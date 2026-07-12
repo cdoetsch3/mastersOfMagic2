@@ -1,0 +1,281 @@
+# Masters of Magic 2 — Game Design
+
+A remake/sequel of Masters of Magic (MoM1). Flutter app targeting phones, tablets, and browsers.
+
+Legend: ✅ decided · 📝 draft (needs review) · 💡 idea bank (later) · ❓ open question
+
+---
+
+## 1. Core Combat ("Mage Duel")
+
+✅ Turn-based 1v1 duel with **simultaneous turns** — both players lock in a move,
+then the round resolves. Prediction/mind-games are the heart of the game.
+
+### Turn flow
+1. If you have **0 charge**, you first choose a **Magic Element** for this casting cycle.
+2. Each turn you either:
+   - **Charge** ("begin casting" — final term TBD): +1 charge, no attack or defense this turn. Max charge = 5.
+   - **Cast a spell** with `charge cost <= current charge`.
+3. ✅ Casting a spell **consumes ALL charge** (even leftover above the spell's cost) and ends the cycle — next turn you pick a new element.
+4. ✅ You must keep the **same element** for an entire charging cycle (baseline rule).
+5. ✅ 0-cost spells (e.g. Flick) can always be cast, even at 0 charge — you're never forced to charge.
+
+### Resolution order — Priority
+✅ Formalized, transparent **Priority 1–10** property on every spell (priority 1 acts first):
+
+| Priority | Category |
+|---|---|
+| 1 | Instant attacks |
+| 3 | Shields |
+| 5 | Quick attacks |
+| 7 | Other defensive / aux spells |
+| 9 | Regular spells |
+| — | End-of-turn effects (burn ticks, etc.) |
+
+- 📝 Aux spells may modify priority (e.g. "your next spell acts X sooner").
+- ✅ Both attacks always land when both players attack — no interrupts (barring aux effects).
+- ✅ Equal priorities resolve **simultaneously** (a same-priority shield does not block a
+  same-priority attack; mutual same-priority kills are a draw).
+- ✅ A mage defeated at an earlier priority step does **not** resolve casts at later
+  steps (e.g. a Quickened kill at priority 2 prevents the victim's priority-9 attack).
+
+### Health
+- MoM1: everyone started at 100 HP.
+- ✅ MoM2: base HP modified by **equipment**.
+
+---
+
+## 2. Elements
+
+✅ Elements matter **only for shield math** (double damage vs countered shields) — attacks
+against a player's bare health are element-neutral. The element is information/bluffing:
+your shield's color reveals its element.
+
+✅ Launch roster (8): Earth, Fire, Water, Air, Electric, Ice, Light, Shadow.
+💡 More elements may be added later as unlockables.
+
+### Counter wheel — 📝 DRAFT proposal (variable volatility)
+
+✅ Rule: elements need not all have 2 strengths / 2 weaknesses. The only invariant is
+**per-element balance**: # strengths == # weaknesses. Different counts = different
+"volatility", which is itself a strategic identity. Mutual counters are legal under
+this rule (each adds one to both columns) but the current draft uses none.
+
+| Element | Volatility | Strong against (2× to their shields) | Weak against |
+|---|---|---|---|
+| Air | 0/0 | — | — |
+| Fire | 2/2 | Ice, Shadow | Water, Light |
+| Water | 2/2 | Fire, Light | Electric, Shadow |
+| Earth | 2/2 | Electric, Light | Ice, Shadow |
+| Electric | 2/2 | Water, Shadow | Earth, Light |
+| Ice | 2/2 | Earth, Light | Fire, Shadow |
+| Light | 3/3 | Shadow, Fire, Electric | Water, Earth, Ice |
+| Shadow | 3/3 | Water, Earth, Ice | Light, Fire, Electric |
+
+Flavor / mnemonics:
+- **Air** — "the untouchable wind": counters nothing, countered by nothing. Its shields
+  can never be double-broken (safest, zero info leaked), but its attacks never crack
+  shields. The poker player's element.
+- **Light outshines every other light source** (Fire, Electric, Shadow) but is swallowed
+  by the dark places (deep Water, stone Earth, entombing Ice).
+- **Shadow claims the dark places** (the depths, the caverns, the long cold night) but is
+  banished by everything that glows (Light, firelight, lightning).
+- Classics keep intuitive pairings: Water douses Fire; Fire melts Ice; permafrost
+  shatters stone; Ice cracks under flame; Earth grounds Electric; Electric conducts
+  through Water.
+- ⚖️ Balance watch: if Air's "never double-broken shield" proves dominant, tune with
+  slightly weaker Air shields or juicier side effects on volatile elements (verify via
+  AI-vs-AI simulation).
+
+### Elemental side effects — 📝 draft, per-element status effects
+- Fire → **Burn** (damage over time)
+- Ice → **Freeze**
+- Shadow → accuracy loss
+- ❓ Others TBD (Electric → stun/paralyze? Water → ? Earth → ? Air → ? Light → ?)
+
+---
+
+## 3. Spells
+
+✅ Spells are **element-agnostic** — any spell takes on your currently charged element
+(a Bolt can be a Fire Bolt or Water Bolt, etc.).
+
+✅ Loadout: before a match you choose which elements and spells you bring.
+MoM2 adds **spell slots** unlocked via leveling.
+
+### Flat-damage offensive
+| Spell | Charge | Notes |
+|---|---|---|
+| Flick | 0 | very low damage |
+| Bolt | 1 | low damage |
+| Blast | 2 | medium damage |
+| *(a few mid-tier spells)* | 3–4 | TBD |
+| Cataclysm | 5 | very high damage |
+
+### Multi-hit offensive
+| Spell | Charge | Notes |
+|---|---|---|
+| Flurry | 1 | small damage ×3 |
+| Volley | 3 | medium damage ×4 |
+| Barrage | X | damage per charge spent (consumes all charge) |
+
+### Lifesteal offensive (heal = damage actually dealt to enemy **health**, not shields)
+| Spell | Charge | Notes |
+|---|---|---|
+| Sap | 1 | small damage |
+| Leech | 3 | medium damage |
+| Drain | 5 | high damage |
+
+### Defensive
+- ✅ One elemental shield per charge level (0–5-ish). Shield strength ≈ **20–30% more**
+  than the same-charge attack's damage.
+- ✅ Shields resolve **before** regular attacks (speed 3 vs 9).
+- ✅ Counter-element attacks deal **2× damage to the shield**; overflow damage passes
+  through to the player at normal (1×) rate. (e.g. 30-dmg water attack vs 50-pt fire
+  shield: 25 of the 30 breaks the shield at 2×, remaining 5 hits the player.)
+- ✅ **Barrier** (3-charge): blocks 100% of all damage, destroyed after the first hit.
+- ✅ **Shield persistence**: players start with **one shield slot**. A cast shield persists
+  across turns until depleted or overwritten by casting a new shield.
+- 💡 Unlockable 2nd and 3rd shield tiers (multiple simultaneous shields) later.
+- 💡 Shield duration types: **permanent** (more expensive) vs **decaying over time**
+  (cheaper, good in a pinch). Engine should model shield lifetime from day 1.
+
+### Aux
+- Next offensive spell deals **double damage**
+- Next offensive spell executes **before enemy defensives** (speed manipulation)
+- An attack that **ignores shields**
+- 📝 Speed-modifying aux spells (increase speed by X)
+
+---
+
+## 4. Progression & Meta
+
+- ✅ **Levels & XP** — more XP unlocks more spells and spell slots. Single-player is the
+  primary source of XP, gold, and loot.
+- ✅ **Equipment** — items affect stats including max HP. Dropped as loot.
+  - ✅ Slots: **Hat, Top, Bottom, Boots, Hands, Neck, Ring, Left hand, Right hand**.
+    - Hands = worn gear (gloves or bracers), separate from held items.
+    - Held items: one-handed weapons (wand) pair with an off-hand (orb, book,
+      shield); **two-handed weapons (staves) occupy both hand slots**.
+  - ❓ Rarity tiers TBD (e.g. common → legendary).
+  - ❓ Are held items restricted by slot (wand = right only?) or freely assignable?
+- ✅ **Luck** — a stat influenced by items/enchantments that increases gold quantity
+  and the likelihood of rare drops.
+- 🎨 Creative north star: **RuneScape 3** — take inspiration from its equipment/skilling/
+  economy feel without plagiarizing or copying assets/names.
+- 💡 **Consumables** — potions purchasable/usable.
+- 💡 **Enchantments** — enhance equipment.
+- 💡 **Crafting** — craft equipment from raw materials.
+- ✅ **Daily & weekly quests** for bonus XP.
+
+### Economy / freemium
+- ✅ Gold = primary currency (earned in-game).
+- ✅ Secondary (premium) currency, primarily from microtransactions.
+- ✅ Time-gated processes (crafting, enchanting) skippable with premium currency.
+
+---
+
+## 5. Game Modes
+
+- ✅ **Online 1v1 PvP** with **Elo + ranking system** — the foundation of the game,
+  though single-player is built first.
+- ✅ **Single-player campaign**: battle increasingly difficult monsters that drop
+  increasingly good loot. Primary XP/gold/loot source.
+  - ✅ Monsters fight by the **exact same rules** as players (elements, charges, spells,
+    shields) with an AI brain.
+
+### Adventure loop (push-your-luck)
+- ✅ **HP persists between encounters** within an adventure. After each encounter the
+  player chooses **"return to town"** (bank the loot) or **"keep going"**.
+- ✅ Rewards improve the deeper you push into a single run — and so does the competition.
+- ✅ Each area has **5–7 monster types**, a **mini-boss** roughly halfway, and a **boss**
+  at the end.
+- ✅ **Defeat penalty**: lose the run and **all loot earned during it**, plus a
+  **respawn timer** that escalates with each sequential death. Death-timer reset is a
+  freemium option.
+  - 📝 Escalation details TBD (how fast it grows, how it cools down over time).
+- 📝 Assumption to confirm: charge/shields reset between encounters; only HP carries.
+- ✅ **No energy/stamina gate for v1** — deliberately deferred.
+  - 💡 Gentler "take a break" alternatives to consider later: rested bonus (first N runs
+    per day get bonus XP/luck), daily-quest cadence as the natural session shape,
+    diminishing returns after many consecutive runs.
+
+### World structure
+- ✅ Pokemon-style topology: safe **hub towns** connected by **dangerous routes**, plus
+  offshoot dangerous areas branching from towns/paths. All players start in one home
+  town; difficulty scales with distance from home.
+- ✅ **No walking/terrain simulation** — simple menu-based travel ("Travel to X",
+  "Venture into the forest").
+- ✅ Each adventure/route shows its **encounter count** up front so progress is visible
+  (e.g. "encounter 3 of 7").
+- ✅ Areas are **element-themed** (volcano = fire+earth monsters, icy pass = ice+air,
+  shadowlands = shadow, etc.).
+
+### World map — 📝 DRAFT region brainstorm (names/levels all tunable)
+
+| Ring | Region | Type | Elements | Lv |
+|---|---|---|---|---|
+| 0 | **Aldermere** | home town | — | — |
+| 1 | Whispering Woods | route | Earth, Air | 1–5 |
+| 1 | Glimmerbrook | route | Water, Light | 2–6 |
+| 1 | Old Quarry | offshoot of Whispering Woods | Earth | 4–8 |
+| 2 | **Forgeholm** | mining town | — | — |
+| 2 | Cinderpeak Foothills | route (Aldermere→Forgeholm) | Fire, Earth | 8–14 |
+| 2 | **Galehaven** | port town | — | — |
+| 2 | Stormcliff Coast | route (Aldermere→Galehaven) | Water, Electric | 8–14 |
+| 3 | The Caldera | offshoot of Forgeholm | Fire | 15–22 |
+| 3 | Crystal Caverns | offshoot of Forgeholm | Earth, Light | 16–24 |
+| 3 | Frostfell Pass | route (Forgeholm→Rimeholt) | Ice, Air | 18–26 |
+| 4 | **Rimeholt** | mountain village | — | — |
+| 4 | The Mirrormere | offshoot of Rimeholt (frozen lake) | Water, Ice | 26–34 |
+| 4 | Thunderspire Peaks | route (Galehaven→Rimeholt) | Electric, Air | 26–34 |
+| 4 | Radiant Sanctum | offshoot of Rimeholt | Light | 30–38 |
+| 5 | Nightfen Marsh | route (Rimeholt→wastes) | Water, Shadow | 38–46 |
+| 5 | The Umbral Wastes | far-edge region | Shadow | 45–55 |
+| 5 | The Eclipsed Citadel | final dungeon | Shadow, Light | 55+ |
+
+---
+
+## 5b. Accounts & Backend
+
+- ✅ **Firebase** is the backend (Auth + Firestore; Cloud Functions later for PvP
+  resolution and Elo).
+- ✅ Even single-player saves persist to the cloud (with local cache for offline play).
+- ✅ Account creation requires: **validated email**, **password**, **character name**,
+  and a **captcha**.
+  - 📝 Implementation: Firebase Auth (email/password + email verification link);
+    bot protection via Firebase App Check — reCAPTCHA on web, Play Integrity (Android)
+    / App Attest (iOS) on mobile, so mobile users don't see a visible captcha.
+  - ❓ Character name uniqueness rules & change policy.
+- 📝 PvP integrity: simultaneous turns require server-authoritative resolution
+  (or commit-reveal) via Cloud Functions so a client can't peek at the opponent's move.
+
+---
+
+## 6. 💡 Idea Bank (banked for later — do not build yet)
+
+1. **Multi-element charging** — an upgrade allowing charging different elements in one
+   cycle and dealing damage of multiple types.
+2. **Charge retention** — upgrade/ability to keep unused charge after casting.
+3. **Element conversion** — a 2-charge spell converting remaining charge to a new element.
+4. **Elemental attunement / transformation** — a spell that makes the caster "become" an
+   element (fire elemental, shadow demon...): +X% to attacks of that type, but your own
+   health becomes subject to shield-cracking counter logic.
+5. **Unlockable elements** beyond the launch 8.
+6. **Priority-boosting aux spells** (priority +X per charge or similar).
+7. **Duel-mechanic stats on hand slots** — make the one-hand-plus-off-hand vs
+   two-hand choice a playstyle decision, not just a stat trade: e.g. wand boosts
+   1–2 charge spells; staff boosts 4–5 charge spells but costs the off-hand;
+   off-hand shield strengthens shield spells; tome improves aux buffs.
+
+---
+
+## 7. ❓ Open Questions
+
+1. Counter wheel assignments (variable-volatility draft above needs sign-off).
+2. Status-effect roster for the remaining elements.
+3. Exact damage/shield numbers table (engine + simulator now exist; needs a balance pass).
+4. Equipment rarity tiers.
+5. Respawn-timer escalation curve (growth per sequential death, cooldown).
+6. Do charge/shields reset between encounters within a run? (assumed yes)
+7. Character name uniqueness & change policy.

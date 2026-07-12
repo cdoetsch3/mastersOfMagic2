@@ -1,0 +1,14 @@
+name: mom_engine
+description: >-
+  Pure Dart combat engine for Masters of Magic 2. No Flutter dependencies —
+  runs identically in the app, in tests, in balance simulations, and (later)
+  server-side for PvP resolution.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
