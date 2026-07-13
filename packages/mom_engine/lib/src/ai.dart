@@ -12,16 +12,17 @@ abstract interface class DuelAi {
   MageAction chooseAction(MageState self, MageState enemy, Random rng);
 }
 
-/// Expected damage of [spell] cast by [self] against [enemy] right now,
-/// accounting for the enemy's current shield. Shared AI helper.
+/// Expected (average) damage of [spell] cast by [self] against [enemy] right
+/// now, accounting for the enemy's current shield. Shared AI helper.
 int estimateDamage(Spell spell, MageState self, MageState enemy) {
   final element = self.element;
   int raw;
   switch (spell.effect) {
-    case DamageEffect(:final amount, :final hits):
-      raw = amount * hits * (self.empowerMultiplier ?? 1);
-    case BarrageEffect(:final damagePerCharge):
-      raw = damagePerCharge * self.charge * (self.empowerMultiplier ?? 1);
+    case DamageEffect(:final minAmount, :final maxAmount, :final hits):
+      raw = ((minAmount + maxAmount) * hits ~/ 2) * (self.empowerMultiplier ?? 1);
+    case BarrageEffect(:final minPerCharge, :final maxPerCharge):
+      raw = ((minPerCharge + maxPerCharge) * self.charge ~/ 2) *
+          (self.empowerMultiplier ?? 1);
     default:
       return 0;
   }

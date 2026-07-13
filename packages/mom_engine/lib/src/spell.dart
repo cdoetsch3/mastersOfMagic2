@@ -42,37 +42,45 @@ sealed class SpellEffect {
   const SpellEffect();
 }
 
-/// Deals [amount] damage per hit, [hits] times. Lifesteal heals the caster
-/// for damage dealt to the enemy's health (never for damage soaked by
+/// Deals [minAmount]–[maxAmount] damage per hit (rolled independently for
+/// each of the [hits] hits, ~10–15% variance by design). Lifesteal heals the
+/// caster for damage dealt to the enemy's health (never for damage soaked by
 /// shields). [ignoresShields] bypasses shields entirely.
 class DamageEffect extends SpellEffect {
-  final int amount;
+  final int minAmount;
+  final int maxAmount;
   final int hits;
   final double lifesteal;
   final bool ignoresShields;
 
   const DamageEffect(
-    this.amount, {
+    this.minAmount,
+    this.maxAmount, {
     this.hits = 1,
     this.lifesteal = 0,
     this.ignoresShields = false,
   });
+
+  int get averageTotal => ((minAmount + maxAmount) * hits) ~/ 2;
 }
 
-/// X-cost damage: deals [damagePerCharge] × (charge consumed).
+/// X-cost damage: deals [minPerCharge]–[maxPerCharge] × (charge consumed),
+/// rolled once.
 class BarrageEffect extends SpellEffect {
-  final int damagePerCharge;
+  final int minPerCharge;
+  final int maxPerCharge;
 
-  const BarrageEffect(this.damagePerCharge);
+  const BarrageEffect(this.minPerCharge, this.maxPerCharge);
 }
 
-/// Raises an elemental shield of [strength] in the caster's charged element.
-/// Replaces any existing shield. Persists across turns until depleted or
-/// replaced (players have one shield slot in v1).
+/// Raises an elemental shield of [minStrength]–[maxStrength] (rolled) in the
+/// caster's charged element. Replaces any existing shield. Persists across
+/// turns until depleted or replaced (players have one shield slot in v1).
 class ShieldEffect extends SpellEffect {
-  final int strength;
+  final int minStrength;
+  final int maxStrength;
 
-  const ShieldEffect(this.strength);
+  const ShieldEffect(this.minStrength, this.maxStrength);
 }
 
 /// Blocks 100% of one incoming hit, then disappears. Element-less: never

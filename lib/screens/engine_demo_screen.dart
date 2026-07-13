@@ -28,7 +28,7 @@ class _EngineDemoScreenState extends State<EngineDemoScreen> {
     final rng = Random(_duelCount++);
     final aldric = MageState(name: 'Aldric');
     final morwen = MageState(name: 'Morwen');
-    final duel = DuelEngine(aldric, morwen);
+    final duel = DuelEngine(aldric, morwen, rng: rng);
     final ai1 = GreedyAi();
     final ai2 = GreedyAi();
     final turns = <_TurnLog>[];

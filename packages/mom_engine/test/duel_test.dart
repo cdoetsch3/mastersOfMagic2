@@ -78,13 +78,13 @@ void main() {
           CastAction(Spellbook.bolt), const ChargeAction(MagicElement.water));
       expect(alice.charge, 0);
       expect(alice.element, isNull, reason: 'new cycle: element re-chosen');
-      expect(bruno.hp, 100 - 12);
+      expect(bruno.hp, inInclusiveRange(86, 89), reason: 'Bolt rolls 11-14');
     });
 
     test('0-cost spells are castable immediately with a fresh element', () {
       duel.resolveTurn(CastAction(Spellbook.flick, MagicElement.fire),
           const ChargeAction(MagicElement.water));
-      expect(bruno.hp, 95);
+      expect(bruno.hp, inInclusiveRange(94, 96), reason: 'Flick rolls 4-6');
       expect(alice.charge, 0);
     });
   });
@@ -97,8 +97,8 @@ void main() {
       bruno.element = MagicElement.air;
       duel.resolveTurn(
           CastAction(Spellbook.blast), CastAction(Spellbook.bulwark));
-      expect(bruno.hp, 100, reason: 'the 42-point shield absorbs all 22');
-      expect(bruno.shield!.remaining, 20);
+      expect(bruno.hp, 100, reason: 'a 3-charge shield absorbs any Blast');
+      expect(bruno.shield!.remaining, inInclusiveRange(39 - 26, 51 - 20));
     });
 
     test('quickened attacks (2) land before enemy shields (3)', () {
@@ -111,8 +111,10 @@ void main() {
       bruno.charge = 3;
       duel.resolveTurn(
           CastAction(Spellbook.blast), CastAction(Spellbook.bulwark));
-      expect(bruno.hp, 100 - 22, reason: 'attack resolves before the shield');
-      expect(bruno.shield!.remaining, 42, reason: 'shield up afterwards');
+      expect(bruno.hp, inInclusiveRange(74, 80),
+          reason: 'attack resolves before the shield');
+      expect(bruno.shield!.remaining, inInclusiveRange(39, 51),
+          reason: 'shield up afterwards, untouched');
     });
 
     test('a mage killed at an earlier priority does not resolve later casts',
@@ -152,8 +154,9 @@ void main() {
       alice.hp = 50;
       duel.resolveTurn(
           CastAction(Spellbook.sap), const ChargeAction(MagicElement.air));
-      expect(bruno.hp, 90);
-      expect(alice.hp, 60);
+      expect(bruno.hp, inInclusiveRange(89, 91));
+      expect(alice.hp - 50, 100 - bruno.hp,
+          reason: 'heals exactly the damage dealt');
     });
 
     test('lifesteal does not heal for damage soaked by shields', () {
@@ -168,19 +171,19 @@ void main() {
     });
 
     test('empower doubles the next offensive spell', () {
-      alice.charge = 2;
+      alice.charge = 3;
       alice.element = MagicElement.fire;
       duel.resolveTurn(
           CastAction(Spellbook.empower), const ChargeAction(MagicElement.air));
       alice.charge = 1;
       alice.element = MagicElement.fire;
       duel.resolveTurn(CastAction(Spellbook.bolt), const ChargeAction());
-      expect(bruno.hp, 100 - 24);
+      expect(bruno.hp, inInclusiveRange(72, 78), reason: '2x Bolt is 22-28');
       expect(alice.empowerMultiplier, isNull, reason: 'buff consumed');
     });
 
     test('phase makes the next offensive spell ignore shields', () {
-      alice.charge = 2;
+      alice.charge = 3;
       alice.element = MagicElement.fire;
       bruno.shield = ActiveShield.elemental(MagicElement.air, 100);
       duel.resolveTurn(
@@ -188,7 +191,7 @@ void main() {
       alice.charge = 1;
       alice.element = MagicElement.fire;
       duel.resolveTurn(CastAction(Spellbook.bolt), const ChargeAction());
-      expect(bruno.hp, 100 - 12);
+      expect(bruno.hp, inInclusiveRange(86, 89));
       expect(bruno.shield!.remaining, 100);
     });
 
@@ -197,7 +200,8 @@ void main() {
       alice.element = MagicElement.electric;
       duel.resolveTurn(
           CastAction(Spellbook.barrage), const ChargeAction(MagicElement.air));
-      expect(bruno.hp, 100 - 44);
+      expect(bruno.hp, inInclusiveRange(52, 60),
+          reason: '4 charges at 10-12 per charge is 40-48');
       expect(alice.charge, 0);
     });
 
@@ -207,21 +211,33 @@ void main() {
       bruno.shield = ActiveShield.elemental(MagicElement.air, 10);
       duel.resolveTurn(
           CastAction(Spellbook.volley), const ChargeAction(MagicElement.air));
-      // Volley: 9 x4. Hit 1: 9 to shield (1 left). Hit 2: breaks it, 8 spills.
-      // Hits 3-4: 18 to health.
+      // Volley rolls 8-11 x4 (32-44 total); the 10-point shield absorbs 10
+      // raw, everything past it strikes health.
       expect(bruno.shield, isNull);
-      expect(bruno.hp, 100 - 8 - 18);
+      expect(bruno.hp, inInclusiveRange(66, 78));
     });
   });
 
   group('duel lifecycle', () {
     test('a defeated mage ends the duel with a winner', () {
-      bruno.hp = 5;
+      bruno.hp = 4;
       duel.resolveTurn(CastAction(Spellbook.flick, MagicElement.fire),
           const ChargeAction(MagicElement.water));
       expect(duel.isOver, isTrue);
       expect(duel.winner, alice);
       expect(duel.isDraw, isFalse);
+    });
+
+    test('conceding ends the duel as a loss for the conceder', () {
+      duel.concede(alice);
+      expect(duel.isOver, isTrue);
+      expect(duel.winner, bruno);
+      expect(alice.hp, 0);
+    });
+
+    test('conceding a finished duel throws', () {
+      bruno.hp = 0;
+      expect(() => duel.concede(alice), throwsStateError);
     });
 
     test('resolving a turn after the duel ends throws', () {

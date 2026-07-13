@@ -15,7 +15,7 @@ void main() {
     for (var i = 0; i < duels; i++) {
       final m1 = MageState(name: 'One');
       final m2 = MageState(name: 'Two');
-      final duel = DuelEngine(m1, m2);
+      final duel = DuelEngine(m1, m2, rng: rng);
       while (!duel.isOver && duel.turnNumber < turnCap) {
         duel.resolveTurn(
           ai1.chooseAction(m1, m2, rng),

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'screens/engine_demo_screen.dart';
+import 'screens/loadout_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // The duel arena is a landscape experience (no-op on web).
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
   runApp(const MastersOfMagicApp());
 }
 
@@ -21,7 +28,7 @@ class MastersOfMagicApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const EngineDemoScreen(),
+      home: const LoadoutScreen(),
     );
   }
 }

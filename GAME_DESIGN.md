@@ -100,6 +100,15 @@ Flavor / mnemonics:
 ✅ Spells are **element-agnostic** — any spell takes on your currently charged element
 (a Bolt can be a Fire Bolt or Water Bolt, etc.).
 
+✅ **Damage variance**: every damaging spell rolls within an explicit min–max range
+(~10–15% around its center, e.g. 4–6, 11–14, 20–26). Each hit of a multi-hit spell
+rolls independently. **Shields roll too**, with a **tiny overlap** between a max-roll
+attack and a min-roll shield at the same charge level.
+
+✅ **Information rules**: charging conceals your element from the opponent (they see
+your charge count, not the element). Your element is revealed when you cast; shields
+visibly carry their element ("the shield's color reveals it").
+
 ✅ Loadout: before a match you choose which elements and spells you bring.
 MoM2 adds **spell slots** unlocked via leveling.
 
@@ -127,13 +136,14 @@ MoM2 adds **spell slots** unlocked via leveling.
 | Drain | 5 | high damage |
 
 ### Defensive
-- ✅ One elemental shield per charge level (0–5-ish). Shield strength ≈ **20–30% more**
-  than the same-charge attack's damage.
-- ✅ Shields resolve **before** regular attacks (speed 3 vs 9).
+- ✅ One elemental shield per charge level. Shield strength scales **linearly with
+  charge** (midpoint 15 × charge: a 4-charge shield is exactly 2× a 2-charge shield);
+  attacks scale super-linearly, so offense slowly catches up to defense at high charge.
+- ✅ Shields resolve **before** regular attacks (priority 3 vs 9).
 - ✅ Counter-element attacks deal **2× damage to the shield**; overflow damage passes
   through to the player at normal (1×) rate. (e.g. 30-dmg water attack vs 50-pt fire
   shield: 25 of the 30 breaks the shield at 2×, remaining 5 hits the player.)
-- ✅ **Barrier** (3-charge): blocks 100% of all damage, destroyed after the first hit.
+- ✅ **Barrier** (2-charge): blocks 100% of all damage, destroyed after the first hit.
 - ✅ **Shield persistence**: players start with **one shield slot**. A cast shield persists
   across turns until depleted or overwritten by casting a new shield.
 - 💡 Unlockable 2nd and 3rd shield tiers (multiple simultaneous shields) later.
@@ -252,7 +262,30 @@ MoM2 adds **spell slots** unlocked via leveling.
 
 ---
 
-## 6. 💡 Idea Bank (banked for later — do not build yet)
+## 6. Duel screen UI (v1)
+
+- ✅ **Landscape phone layout** ("arena" direction): your mage on the left, enemy on
+  the right, status panels in the top corners, spell bar along the bottom.
+- ✅ **Not card/deck based** — spells are icon buttons.
+- ✅ **Character graphics**: low-rez, statically drawn mages whose apparel (hat, robe,
+  boots, staff...) is visible and palette-swaps with equipment.
+- ✅ **Spell animations**: charge swirls, projectiles in the cast element's color,
+  shield domes, hit flashes, floating damage numbers, defeat animation.
+- ✅ **Tooltips** on spell icons: cost, priority (with category name), damage range,
+  description. Element icons show strengths/weaknesses.
+- ✅ **Action bar layout**: element slots on top, then two rows of five spell slots so
+  the QWERT and ASDFG shortcut rows align like a keyboard; Channel to the right.
+- ✅ **Keyboard shortcuts** bind to SLOTS, not contents: 1-8 = element slots,
+  QWERT/ASDFG = spell slots 1-10, C = channel. Slots are unlockable later.
+- ✅ **Surrender** (PvP) / **Flee** (campaign): forfeits the match as a loss, behind a
+  confirmation dialog. Engine support: `DuelEngine.concede()`.
+- ✅ Turn resolution plays events in priority order as an animated sequence whose
+  intensity scales with charge spent (bigger projectiles, more impact rings, screen
+  shake at 3+ charge, full-screen flash at Cataclysm tier).
+
+---
+
+## 7. 💡 Idea Bank (banked for later — do not build yet)
 
 1. **Multi-element charging** — an upgrade allowing charging different elements in one
    cycle and dealing damage of multiple types.
@@ -270,7 +303,7 @@ MoM2 adds **spell slots** unlocked via leveling.
 
 ---
 
-## 7. ❓ Open Questions
+## 8. ❓ Open Questions
 
 1. Counter wheel assignments (variable-volatility draft above needs sign-off).
 2. Status-effect roster for the remaining elements.

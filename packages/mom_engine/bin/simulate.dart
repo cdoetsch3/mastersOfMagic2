@@ -30,7 +30,7 @@ void _matchup(String name1, DuelAi ai1, String name2, DuelAi ai2, int duels,
   for (var i = 0; i < duels; i++) {
     final m1 = MageState(name: name1);
     final m2 = MageState(name: name2);
-    final duel = DuelEngine(m1, m2);
+    final duel = DuelEngine(m1, m2, rng: rng);
     while (!duel.isOver && duel.turnNumber < _turnCap) {
       duel.resolveTurn(
         ai1.chooseAction(m1, m2, rng),
@@ -61,7 +61,7 @@ void _verboseDuel({required int seed}) {
   final m2 = MageState(name: 'Morwen');
   final ai1 = GreedyAi();
   final ai2 = GreedyAi();
-  final duel = DuelEngine(m1, m2);
+  final duel = DuelEngine(m1, m2, rng: rng);
   while (!duel.isOver && duel.turnNumber < _turnCap) {
     final result = duel.resolveTurn(
       ai1.chooseAction(m1, m2, rng),

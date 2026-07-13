@@ -35,7 +35,7 @@ void main() {
     defender.shield = ActiveShield.elemental(MagicElement.fire, 50);
     const waterAttack = Spell(
         id: 'test30', name: 'Test30', chargeCost: 0, priority: 9,
-        effect: DamageEffect(30));
+        effect: DamageEffect(30, 30));
     duel.resolveTurn(
       CastAction(waterAttack, MagicElement.water),
       ChargeAction(MagicElement.air),
@@ -48,7 +48,7 @@ void main() {
     defender.shield = ActiveShield.elemental(MagicElement.fire, 50);
     const earthAttack = Spell(
         id: 'test30e', name: 'Test30e', chargeCost: 0, priority: 9,
-        effect: DamageEffect(30));
+        effect: DamageEffect(30, 30));
     duel.resolveTurn(
       CastAction(earthAttack, MagicElement.earth),
       ChargeAction(MagicElement.air),
@@ -75,25 +75,30 @@ void main() {
   });
 
   test('multi-hit vs barrier: first hit absorbed, later hits land', () {
-    chargeUp(attacker, MagicElement.fire, 1);
+    const tripleHit = Spell(
+        id: 'test3x4', name: 'Test3x4', chargeCost: 0, priority: 9,
+        effect: DamageEffect(4, 4, hits: 3));
     defender.shield = ActiveShield.barrier();
     duel.resolveTurn(
-      CastAction(Spellbook.flurry), // 4 damage x3
-      ChargeAction(),
+      CastAction(tripleHit, MagicElement.fire),
+      ChargeAction(MagicElement.air),
     );
     expect(defender.shield, isNull);
     expect(defender.hp, 100 - 4 * 2, reason: 'hits 2 and 3 land');
   });
 
   test('shield persists across turns until depleted', () {
+    const poke = Spell(
+        id: 'test5', name: 'Test5', chargeCost: 0, priority: 9,
+        effect: DamageEffect(5, 5));
     defender.shield = ActiveShield.elemental(MagicElement.earth, 40);
     duel.resolveTurn(
-      CastAction(Spellbook.flick, MagicElement.fire),
+      CastAction(poke, MagicElement.fire),
       ChargeAction(MagicElement.air),
     );
     expect(defender.shield!.remaining, 35);
     duel.resolveTurn(
-      CastAction(Spellbook.flick, MagicElement.fire),
+      CastAction(poke, MagicElement.fire),
       ChargeAction(),
     );
     expect(defender.shield!.remaining, 30);
@@ -107,14 +112,15 @@ void main() {
       ChargeAction(),
     );
     expect(attacker.shield!.element, MagicElement.fire);
-    expect(attacker.shield!.remaining, 15);
+    expect(attacker.shield!.remaining, inInclusiveRange(13, 17),
+        reason: 'Ward rolls 13-17');
   });
 
   test('shield-ignoring damage goes straight to health', () {
     defender.shield = ActiveShield.elemental(MagicElement.earth, 999);
     const pierce = Spell(
         id: 'testp', name: 'TestPierce', chargeCost: 0, priority: 9,
-        effect: DamageEffect(10, ignoresShields: true));
+        effect: DamageEffect(10, 10, ignoresShields: true));
     duel.resolveTurn(
       CastAction(pierce, MagicElement.fire),
       ChargeAction(MagicElement.air),

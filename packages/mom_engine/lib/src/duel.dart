@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'action.dart';
 import 'element.dart';
 import 'events.dart';
@@ -26,9 +28,17 @@ class TurnResult {
 class DuelEngine {
   final MageState mage1;
   final MageState mage2;
+
+  /// Damage rolls come from here — inject a seeded [Random] for
+  /// deterministic tests, replays, and (later) server-side resolution.
+  final Random rng;
+
   int turnNumber = 0;
 
-  DuelEngine(this.mage1, this.mage2);
+  DuelEngine(this.mage1, this.mage2, {Random? rng}) : rng = rng ?? Random();
+
+  int _roll(int min, int max) =>
+      min >= max ? min : min + rng.nextInt(max - min + 1);
 
   bool get isOver => !mage1.alive || !mage2.alive;
 
@@ -37,6 +47,15 @@ class DuelEngine {
   MageState? get winner {
     if (!isOver || isDraw) return null;
     return mage1.alive ? mage1 : mage2;
+  }
+
+  /// [mage] forfeits the duel (surrender in PvP, flee in the campaign):
+  /// they drop to 0 hp and the duel ends immediately as their loss.
+  void concede(MageState mage) {
+    if (isOver) {
+      throw StateError('The duel is already over.');
+    }
+    mage.hp = 0;
   }
 
   TurnResult resolveTurn(MageAction action1, MageAction action2) {
@@ -157,28 +176,39 @@ class DuelEngine {
     final caster = cast.caster;
     events.add(SpellCastEvent(caster, cast.spell, cast.element));
     switch (cast.spell.effect) {
-      case DamageEffect(:final amount, :final hits, :final lifesteal, :final ignoresShields):
+      case DamageEffect(
+          :final minAmount,
+          :final maxAmount,
+          :final hits,
+          :final lifesteal,
+          :final ignoresShields
+        ):
         final buffs = caster.consumeOffensiveBuffs();
         _attack(
           cast,
-          perHit: amount * buffs.multiplier,
+          minPerHit: minAmount,
+          maxPerHit: maxAmount,
+          multiplier: buffs.multiplier,
           hits: hits,
           lifesteal: lifesteal,
           ignoresShields: ignoresShields || buffs.phase,
           events: events,
         );
-      case BarrageEffect(:final damagePerCharge):
+      case BarrageEffect(:final minPerCharge, :final maxPerCharge):
         final buffs = caster.consumeOffensiveBuffs();
         _attack(
           cast,
-          perHit: damagePerCharge * cast.chargeSpent * buffs.multiplier,
+          minPerHit: minPerCharge * cast.chargeSpent,
+          maxPerHit: maxPerCharge * cast.chargeSpent,
+          multiplier: buffs.multiplier,
           hits: 1,
           lifesteal: 0,
           ignoresShields: buffs.phase,
           events: events,
         );
-      case ShieldEffect(:final strength):
-        caster.shield = ActiveShield.elemental(cast.element, strength);
+      case ShieldEffect(:final minStrength, :final maxStrength):
+        caster.shield = ActiveShield.elemental(
+            cast.element, _roll(minStrength, maxStrength));
         events.add(ShieldRaisedEvent(caster, caster.shield!));
       case BarrierEffect():
         caster.shield = ActiveShield.barrier();
@@ -200,7 +230,9 @@ class DuelEngine {
 
   void _attack(
     _PendingCast cast, {
-    required int perHit,
+    required int minPerHit,
+    required int maxPerHit,
+    required int multiplier,
     required int hits,
     required double lifesteal,
     required bool ignoresShields,
@@ -209,6 +241,7 @@ class DuelEngine {
     final target = cast.target;
     var totalToHp = 0;
     for (var h = 0; h < hits; h++) {
+      final perHit = _roll(minPerHit, maxPerHit) * multiplier;
       final shield = ignoresShields ? null : target.shield;
       if (shield == null) {
         target.takeHpDamage(perHit);
@@ -220,8 +253,8 @@ class DuelEngine {
             toShield: perHit, toHp: 0, shieldBroken: true));
       } else {
         final countered = cast.element.counters(shield.element!);
-        final multiplier = countered ? 2 : 1;
-        final effective = perHit * multiplier;
+        final counterMult = countered ? 2 : 1;
+        final effective = perHit * counterMult;
         if (effective < shield.remaining) {
           shield.remaining -= effective;
           events.add(DamageEvent(target, cast.spell,
@@ -230,7 +263,7 @@ class DuelEngine {
           // Overflow: the raw damage spent breaking the shield is rounded in
           // the defender's favor; the rest strikes health at normal rate.
           final absorbed = shield.remaining;
-          final rawConsumed = (absorbed + multiplier - 1) ~/ multiplier;
+          final rawConsumed = (absorbed + counterMult - 1) ~/ counterMult;
           final toHp = perHit - rawConsumed;
           target.shield = null;
           target.takeHpDamage(toHp);
