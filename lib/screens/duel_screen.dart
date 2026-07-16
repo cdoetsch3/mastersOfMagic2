@@ -19,7 +19,19 @@ class DuelScreen extends StatefulWidget {
   /// Campaign battles say "Flee"; PvP-style duels say "Surrender".
   final bool campaign;
 
-  const DuelScreen({super.key, required this.loadout, this.campaign = false});
+  final String enemyName;
+
+  /// Called once when a duel ends (win, loss, draw, or forfeit) with whether
+  /// the player won. Lets the caller grant XP/gold. Draws report `false`.
+  final void Function(bool playerWon)? onResult;
+
+  const DuelScreen({
+    super.key,
+    required this.loadout,
+    this.campaign = false,
+    this.enemyName = 'Procarius',
+    this.onResult,
+  });
 
   @override
   State<DuelScreen> createState() => _DuelScreenState();
@@ -29,7 +41,9 @@ enum _FxKind { none, projectile, impact, shieldUp, charge, heal, flash }
 
 class _DuelScreenState extends State<DuelScreen>
     with SingleTickerProviderStateMixin {
-  late final DuelController c = DuelController(loadout: widget.loadout);
+  late final DuelController c =
+      DuelController(loadout: widget.loadout, enemyName: widget.enemyName);
+  bool _resultReported = false;
   late final AnimationController _fx = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 400));
 
@@ -49,7 +63,29 @@ class _DuelScreenState extends State<DuelScreen>
   static const _spellKeyLabels = 'QWERTASDFG';
 
   @override
+  void initState() {
+    super.initState();
+    c.addListener(_checkResult);
+    // The arena is a landscape experience. Locks orientation on devices
+    // (no-op on web, where the portrait guard below shows a rotate prompt).
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
+
+  // Reports the outcome exactly once per duel (win/loss/draw/forfeit).
+  void _checkResult() {
+    if (!_resultReported && c.gameOver) {
+      _resultReported = true;
+      widget.onResult?.call(c.playerWon);
+    }
+  }
+
+  @override
   void dispose() {
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    c.removeListener(_checkResult);
     _fx.dispose();
     c.dispose();
     super.dispose();
@@ -245,6 +281,39 @@ class _DuelScreenState extends State<DuelScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    if (size.height > size.width) {
+      // Portrait: the arena needs landscape. Devices auto-rotate via the
+      // orientation lock; web/desktop users see this prompt instead.
+      return Scaffold(
+        backgroundColor: const Color(0xFF141021),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.screen_rotation,
+                  size: 56, color: Color(0xFFE8C547)),
+              const SizedBox(height: 18),
+              const Text('Rotate your device',
+                  style: TextStyle(
+                      color: Color(0xFFECE7F8),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600)),
+              const SizedBox(height: 6),
+              const Text('Duels are fought in landscape.',
+                  style:
+                      TextStyle(color: Color(0xFF9C93C4), fontSize: 13)),
+              const SizedBox(height: 22),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back),
+                label: const Text('Go back'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFF141021),
       body: Focus(
@@ -774,12 +843,15 @@ class _DuelScreenState extends State<DuelScreen>
                 children: [
                   OutlinedButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.tune),
-                    label: const Text('Change loadout'),
+                    icon: Icon(widget.campaign ? Icons.map : Icons.tune),
+                    label: Text(widget.campaign ? 'Leave' : 'Change loadout'),
                   ),
                   const SizedBox(width: 12),
                   ElevatedButton.icon(
-                    onPressed: c.newDuel,
+                    onPressed: () {
+                      _resultReported = false;
+                      c.newDuel();
+                    },
                     icon: const Icon(Icons.replay),
                     label: const Text('Duel again'),
                   ),

@@ -1,11 +1,11 @@
 {
-    "name": "masters_of_magic_2",
-    "short_name": "masters_of_magic_2",
+    "name": "Masters of Magic 2",
+    "short_name": "MoM2",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#141021",
+    "theme_color": "#141021",
+    "description": "Masters of Magic 2 — a simultaneous-turn elemental mage-duel game.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

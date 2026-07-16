@@ -6,9 +6,10 @@ import 'package:mom_engine/mom_engine.dart';
 import 'element_style.dart';
 import 'mage_apparel.dart';
 
-/// Low-rez, statically drawn pixel mage. Apparel colors palette-swap the
-/// sprite (equipment made visible); the staff orb takes the charged
-/// element's color and glows brighter with more charge.
+/// Fine-pixel (32x44) mage sprite, statically drawn. Apparel colors
+/// palette-swap the sprite (equipment made visible); shade pixels are derived
+/// from the apparel colors so swaps stay consistent. The staff orb takes the
+/// charged element's color and glows brighter with more charge.
 class MageSprite extends StatefulWidget {
   final MageApparel apparel;
   final MagicElement? element;
@@ -77,34 +78,61 @@ class _MageSpriteState extends State<MageSprite>
 }
 
 class _MagePainter extends CustomPainter {
-  static const cols = 16;
-  static const rows = 22;
+  static const cols = 32;
+  static const rows = 44;
 
-  // Pixel grid. h hat, H hat trim, s skin, e eye, r robe, R robe trim,
-  // g glove, b boot, w staff wood, o staff orb, . empty.
+  static const _skin = Color(0xFFE8B98A);
+  static const _eye = Color(0xFF2B1D14);
+  static const _wood = Color(0xFF7A5230);
+
+  // Pixel grid. h hat, j hat shade, H hat trim, s skin, S skin shade, e eye,
+  // r robe, d robe shade, R robe trim, g glove, b boot, B boot shade,
+  // w staff wood, W wood shade, o orb, O orb highlight, . empty.
   static const List<String> grid = [
-    '......hh........',
-    '.....hhhh.......',
-    '....hhhhhh......',
-    '...hhhhhhhh.....',
-    '..hhhhhhhhhh....',
-    '.HHHHHHHHHHHH...',
-    '....ssssss......',
-    '....sseses......',
-    '....ssssss......',
-    '.....ssss....oo.',
-    '..RRRRRRRRR..oo.',
-    '..rrrrrrrrr...w.',
-    '..rrrrrrrrr...w.',
-    '..rrrrrrrrrgg.w.',
-    '..rrrrrrrrr.ggw.',
-    '..rrrrrrrrr...w.',
-    '..rrrrrrrrr...w.',
-    '..rrrrrrrrr...w.',
-    '..RRRRRRRRR...w.',
-    '..rrrrrrrrr...w.',
-    '..bbb...bbb.....',
-    '..bbb...bbb.....',
+    '............hh..................',
+    '...........hhhj.................',
+    '...........hhhj.................',
+    '..........hhhhhj................',
+    '.........hhhhhhhj...............',
+    '.........hhhhhhhj...............',
+    '........hhhhhhhhjj..............',
+    '.......hhhhhhhhhhjj.............',
+    '......hhhhhhhhhhhhjj......oo....',
+    '.....hhhhhhhhhhhhhhjj....Oooo...',
+    '....hhhhhhhhhhhhhhhhjj..Oooooo..',
+    '...hhhhhhhhhhhhhhhhhhjj.oooooo..',
+    '...HHHHHHHHHHHHHHHHHHHH..oooo...',
+    '...HHHHHHHHHHHHHHHHHHHH...oo....',
+    '..hhhhhhhhhhhhhhhhhhhhjj..wW....',
+    '.jjjjjjjjjjjjjjjjjjjjjjjj.wW....',
+    '........sssssssssS........wW....',
+    '........sssssssssS........wW....',
+    '........ssseesseeS........wW....',
+    '........ssseesseeS........wW....',
+    '........sssssssssS........wW....',
+    '........ssssSSsssS........wW....',
+    '.........sssssssS.........wW....',
+    '...........ssss...........wW....',
+    '......RRRRRRRRRRRRRR......wW....',
+    '.....rrrrrrrrrrrrrrdd.....wW....',
+    '.....rrrrrrrrrrrrrrddrrrr.wW....',
+    '.....rrrrrrrrrrrrrrddrrrr.wW....',
+    '.....rrrrrrrrrrrrrrddrrrggwW....',
+    '.....rrrrrrrrrrrrrrdd...ggwW....',
+    '.....RRRRRRRRRRRRRRRR.....wW....',
+    '.....RRRRRRRRRRRRRRRR.....wW....',
+    '.....rrrrrrrrrrrrrrdd.....wW....',
+    '.....rrrrrrrrrrrrrrdd.....wW....',
+    '....rrrrrrrrrrrrrrrrdd....wW....',
+    '....rrrrrrrrrrrrrrrrdd....wW....',
+    '....rrrrrrrrrrrrrrrrdd....wW....',
+    '....rrrrrrrrrrrrrrrrdd....wW....',
+    '....RRRRRRRRRRRRRRRRRR....wW....',
+    '....RRRRRRRRRRRRRRRRRR....wW....',
+    '.......bbbb...bbbb........wW....',
+    '.......bbbb...bbbb........wW....',
+    '.......BBBB...BBBB........wW....',
+    '................................',
   ];
 
   final MageApparel apparel;
@@ -117,9 +145,13 @@ class _MagePainter extends CustomPainter {
     required this.charge,
   });
 
+  static Color _shade(Color c) => Color.lerp(c, const Color(0xFF000000), 0.28)!;
+  static Color _light(Color c) => Color.lerp(c, const Color(0xFFFFFFFF), 0.5)!;
+
   @override
   void paint(Canvas canvas, Size size) {
     final cell = size.width / cols;
+    final rowH = size.height / rows;
     final paint = Paint();
 
     // Charge aura behind the mage: grows and brightens with charge.
@@ -134,20 +166,25 @@ class _MagePainter extends CustomPainter {
       for (var x = 0; x < cols; x++) {
         final color = switch (row[x]) {
           'h' => apparel.hat,
+          'j' => _shade(apparel.hat),
           'H' => apparel.hatTrim,
-          's' => const Color(0xFFE8B98A),
-          'e' => const Color(0xFF2B1D14),
+          's' => _skin,
+          'S' => _shade(_skin),
+          'e' => _eye,
           'r' => apparel.robe,
+          'd' => _shade(apparel.robe),
           'R' => apparel.robeTrim,
           'g' => apparel.gloves,
           'b' => apparel.boots,
-          'w' => const Color(0xFF7A5230),
+          'B' => _shade(apparel.boots),
+          'w' => _wood,
+          'W' => _shade(_wood),
           'o' => orbColor,
+          'O' => _light(orbColor),
           _ => null,
         };
         if (color == null) continue;
         paint.color = color;
-        final rowH = size.height / rows;
         canvas.drawRect(
           Rect.fromLTWH(x * cell, y * rowH, cell + 0.5, rowH + 0.5),
           paint,
@@ -155,13 +192,13 @@ class _MagePainter extends CustomPainter {
       }
     }
 
-    // Orb glow ring on top, scaled by charge.
+    // Orb glow on top, scaled by charge.
     if (charge > 0) {
-      final orbCenter = Offset(13.9 * cell, size.height * (9.9 / rows));
+      final orbCenter = Offset(27 * cell, 11 * rowH);
       paint.color = orbColor.withValues(alpha: 0.30);
-      canvas.drawCircle(orbCenter, cell * (1.4 + 0.5 * charge), paint);
-      paint.color = orbColor.withValues(alpha: 0.85);
-      canvas.drawCircle(orbCenter, cell * 1.15, paint);
+      canvas.drawCircle(orbCenter, cell * (3.0 + 1.0 * charge), paint);
+      paint.color = orbColor.withValues(alpha: 0.55);
+      canvas.drawCircle(orbCenter, cell * 2.4, paint);
     }
   }
 

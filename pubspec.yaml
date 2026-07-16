@@ -2,7 +2,8 @@ name: masters_of_magic_2
 description: "Masters of Magic 2 — a simultaneous-turn elemental mage-duel game."
 publish_to: 'none'
 
-version: 0.1.0+1
+# Keep in sync with lib/game/app_version.dart (shown on the About panel).
+version: 0.3.0+3
 
 environment:
   sdk: ^3.12.2
@@ -11,8 +12,11 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  shared_preferences: ^2.3.0
   mom_engine:
     path: packages/mom_engine
+  firebase_core: ^4.12.1
+  firebase_auth: ^6.5.6
 
 dev_dependencies:
   flutter_test:

@@ -1,20 +1,35 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-import 'screens/loadout_screen.dart';
+import 'firebase_options.dart';
+import 'game/auth_service.dart';
+import 'game/game_state.dart';
+import 'game/profile_storage.dart';
+import 'screens/home_shell.dart';
+import 'ui/app_theme.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // The duel arena is a landscape experience (no-op on web).
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
+  try {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    debugPrint('Firebase init failed (running without accounts): $e');
+  }
   runApp(const MastersOfMagicApp());
 }
 
-class MastersOfMagicApp extends StatelessWidget {
+class MastersOfMagicApp extends StatefulWidget {
   const MastersOfMagicApp({super.key});
+
+  @override
+  State<MastersOfMagicApp> createState() => _MastersOfMagicAppState();
+}
+
+class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
+  late final Future<GameState> _future = GameState.boot(LocalProfileStorage());
+  late final AuthService? _auth =
+      Firebase.apps.isNotEmpty ? AuthService() : null;
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +41,33 @@ class MastersOfMagicApp extends StatelessWidget {
           seedColor: const Color(0xFF5B3FA8),
           brightness: Brightness.dark,
         ),
+        scaffoldBackgroundColor: AppColors.bg,
         useMaterial3: true,
       ),
-      home: const LoadoutScreen(),
+      // Provide the game-state and auth scopes ABOVE the Navigator so every
+      // route (including pushed ones like the account screen) can read them.
+      builder: (context, child) {
+        return FutureBuilder<GameState>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const ColoredBox(
+                color: AppColors.bg,
+                child: Center(
+                    child: CircularProgressIndicator(color: AppColors.gold)),
+              );
+            }
+            Widget scoped =
+                GameStateScope(state: snapshot.data!, child: child!);
+            final auth = _auth;
+            if (auth != null) {
+              scoped = AuthScope(service: auth, child: scoped);
+            }
+            return scoped;
+          },
+        );
+      },
+      home: const HomeShell(),
     );
   }
 }

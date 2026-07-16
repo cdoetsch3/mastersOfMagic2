@@ -44,14 +44,19 @@ class DuelController extends ChangeNotifier {
   final List<String> battleLog = [];
 
   final Loadout loadout;
+  final String enemyName;
 
-  DuelController({required this.loadout, int? seed}) : rng = Random(seed) {
+  DuelController({
+    required this.loadout,
+    this.enemyName = 'Procarius',
+    int? seed,
+  }) : rng = Random(seed) {
     newDuel();
   }
 
   void newDuel() {
     player = MageState(name: 'You');
-    enemy = MageState(name: 'Procarius');
+    enemy = MageState(name: enemyName);
     engine = DuelEngine(player, enemy, rng: rng);
     shownPlayerHp = player.hp;
     shownEnemyHp = enemy.hp;

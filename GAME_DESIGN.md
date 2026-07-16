@@ -162,6 +162,16 @@ MoM2 adds **spell slots** unlocked via leveling.
 
 - ✅ **Levels & XP** — more XP unlocks more spells and spell slots. Single-player is the
   primary source of XP, gold, and loot.
+- 📝 **Spell unlocking**: likely a "studying" timer per spell, skippable with premium
+  currency (exact mechanism TBD). Managed from the Spellbook tab. **Temporarily all
+  spells are unlocked** until the leveling/unlock schedule is finalized.
+- ✅ **Loadout capacity (start)**: presets fill **3 element slots + 5 spell slots** to
+  begin with; these grow with level once the unlock schedule is set. (Keybinds still
+  support up to 8 elements / 10 spells.)
+- ✅ **Loadout presets**: named spell/element presets in the Spellbook tab. 1 preset
+  slot initially, up to 5 unlocked by leveling.
+- ✅ **Loadout switching rules**: in 1-player mode, loadouts can only be changed at a
+  dedicated location in town; in PvP, the player picks a loadout before each match.
 - ✅ **Equipment** — items affect stats including max HP. Dropped as loot.
   - ✅ Slots: **Hat, Top, Bottom, Boots, Hands, Neck, Ring, Left hand, Right hand**.
     - Hands = worn gear (gloves or bracers), separate from held items.
@@ -267,8 +277,9 @@ MoM2 adds **spell slots** unlocked via leveling.
 - ✅ **Landscape phone layout** ("arena" direction): your mage on the left, enemy on
   the right, status panels in the top corners, spell bar along the bottom.
 - ✅ **Not card/deck based** — spells are icon buttons.
-- ✅ **Character graphics**: low-rez, statically drawn mages whose apparel (hat, robe,
-  boots, staff...) is visible and palette-swaps with equipment.
+- ✅ **Character graphics**: fine-pixel (32x44) statically drawn mages with shading;
+  apparel (hat, robe, boots, staff...) is visible and palette-swaps with equipment.
+  (Upgraded from 16x22 after playtest feedback that it read as too blocky.)
 - ✅ **Spell animations**: charge swirls, projectiles in the cast element's color,
   shield domes, hit flashes, floating damage numbers, defeat animation.
 - ✅ **Tooltips** on spell icons: cost, priority (with category name), damage range,
@@ -300,10 +311,84 @@ MoM2 adds **spell slots** unlocked via leveling.
    two-hand choice a playstyle decision, not just a stat trade: e.g. wand boosts
    1–2 charge spells; staff boosts 4–5 charge spells but costs the off-hand;
    off-hand shield strengthens shield spells; tome improves aux buffs.
+8. **Tiamonds** — a consumable/currency that instantly **skips time-gated
+   processes** (travel, crafting, researching/studying). ❓ Relationship to the
+   existing premium currency ("gems") TBD — Tiamonds may BE the premium currency
+   renamed, or a distinct time-skip item earned/bought separately.
+9. **Timed travel** — traveling between locations takes real time. Early legs
+   ~10–15s; scales up to hours for distant regions. Skippable with [8] Tiamonds.
+   (Pairs with the crafting/research timers as the core freemium time-gate loop.)
+10. **First-visit town gate** — unlocking a town for the first time requires
+    completing a one-time **required adventure** (a gating encounter) before the
+    town's services open. ❓ Design: towns currently have no adventure of their
+    own — likely a boss encounter on the approaching route, or a special
+    town-intro fight.
 
 ---
 
-## 8. ❓ Open Questions
+## 8. App structure & roadmap
+
+### Navigation (phone-first)
+- ✅ Five tabs: **Map · Inventory · Home · Spellbook · Social**.
+  - **Map**: current location, travel, location-specific actions (shop, etc.);
+    campaign adventures launch from here.
+  - **Inventory**: items + crafting (transmute / craft / salvage). Unlimited space.
+  - **Home** (center): dashboard — quests, resume adventure, PvP queue, timers,
+    currencies, events.
+  - **Spellbook**: spell collection, unlocks (studying timers), loadout presets.
+  - **Social**: friends & challenges (stub for now).
+- ✅ Duels are landscape; menu orientation decided via mockups (avoid forcing the
+  player to flip back and forth).
+
+### Data model
+- ✅ `PlayerProfile` and friends are shaped as Firestore documents from day 1, but
+  persisted locally until the Firebase project is initialized.
+
+### Phase 1 — ✅ SHIPPED
+Live at **https://mastersofmagic2.web.app** (Firebase project `mastersofmagic2`).
+Five-tab nav (Option C: raised center Home button with a **magic-wand** icon;
+bottom bar in portrait, left rail in landscape), map travel + location actions
+("visit shop" placeholder), campaign adventures with XP/gold rewards and
+level-ups, inventory placeholder, spellbook with presets, rotate-to-duel guard
+(menus any orientation, duels landscape). Find-a-duel is a pinned bottom CTA.
+- ✅ **Firebase Auth** (email/password): create-account (character name, email,
+  password, confirm), sign-in, email-verification send, sign-out — reachable
+  from the Social tab; guest play preserved (no gate). Email/password worked
+  out of the box (client init provisioned the Auth config); no console toggle
+  needed. **Captcha via App Check is still pending** a reCAPTCHA key.
+- ✅ Loadout caps: **3 element + 5 spell slots**; **all spells unlocked** for now;
+  old saves auto-clamped on load.
+- ✅ Hosting cache: app-shell files (`index.html`, `flutter_bootstrap.js`,
+  `flutter_service_worker.js`, `main.dart.js`) serve `Cache-Control: no-cache`
+  so returning players always get the latest build.
+- ✅ Stale-build fix: builds use `--pwa-strategy=none` (no service worker), and a
+  **kill-switch service worker** ships at the old worker's URL to purge caches,
+  unregister, and reload clients that installed the early offline-first worker.
+  (`web/flutter_service_worker.js` must be copied into `build/web/` post-build —
+  the build empties that reserved filename.)
+- ✅ **About panel** (app name + version) on the Account screen near Sign out;
+  version constant lives in `lib/game/app_version.dart` (keep in sync with
+  pubspec). Currently **v0.2.0 (2)**.
+- ✅ **Pixel wizard-hat favicon** + PWA icons (generated, in `web/`); page title
+  and manifest branded "Masters of Magic 2".
+- ✅ Desktop layout: tab content is centered in a **720px max-width column**;
+  the spellbook grid uses fixed-size tiles (no more giant cards on monitors).
+- ⚠️ A throwaway test account (`zephyr@example.com`) exists from verifying signup;
+  delete from the console if desired.
+Deploy:
+```
+flutter build web --release --pwa-strategy=none
+cp web/flutter_service_worker.js build/web/flutter_service_worker.js
+firebase deploy --only hosting
+```
+
+### Phase 2 (next)
+Starts with the inventory/crafting/item-catalog design session: align on level
+tiers, build tiers 1–2, playtest, then extend tiers as the game matures.
+
+---
+
+## 9. ❓ Open Questions
 
 1. Counter wheel assignments (variable-volatility draft above needs sign-off).
 2. Status-effect roster for the remaining elements.
