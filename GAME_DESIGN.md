@@ -27,17 +27,34 @@ then the round resolves. Prediction/mind-games are the heart of the game.
 |---|---|
 | 1 | Instant attacks |
 | 3 | Shields |
-| 5 | Quick attacks |
+| 4 | **Channel** (charging) |
+| 5 | Quick attacks (Flick, Jolt) |
 | 7 | Other defensive / aux spells |
 | 9 | Regular spells |
 | — | End-of-turn effects (burn ticks, etc.) |
 
 - 📝 Aux spells may modify priority (e.g. "your next spell acts X sooner").
-- ✅ Both attacks always land when both players attack — no interrupts (barring aux effects).
-- ✅ Equal priorities resolve **simultaneously** (a same-priority shield does not block a
-  same-priority attack; mutual same-priority kills are a draw).
+- ✅ **Channel has priority 4** (after shields, before quick attacks). This is why a
+  faster Discharge (7) or Overload (7) interacts with a same-turn channel — see below.
+- ✅ Charge-scaling spells (Barrage, Overload) read charge **live at resolution**, so a
+  faster Discharge fizzles a same-turn Barrage, and channeling right before an Overload
+  makes the hit bigger.
 - ✅ A mage defeated at an earlier priority step does **not** resolve casts at later
   steps (e.g. a Quickened kill at priority 2 prevents the victim's priority-9 attack).
+
+### Haste (initiative tiebreaker)
+✅ A single **Haste** token — held by nobody, you, or your opponent — breaks
+same-priority collisions: **the holder's spell resolves first**, so a lethal hit lands
+before the opponent can fire back. This replaces the old "same-priority mutual kills are
+a draw" rule (draws dropped from ~12% to ~0% in AI-vs-AI sims once Haste was added).
+- Only consulted for same-priority ties, using the **start-of-turn** holder.
+- **While unheld:** the first non-channel cast grabs it; if both cast, the faster one
+  grabs it; a same-priority pair leaves it unheld.
+- **Once held:** only a Haste-granting spell (Hasty, Jolt) moves it, and it goes to the
+  **last grant to resolve**. So a same-priority pair **flips it to the opponent** (the
+  holder resolves first via the tiebreak, so the other's grant lands last and steals
+  it); among different-priority grants the slower one wins. Ordinary spells don't move it.
+- Channeling never grants or moves Haste.
 
 ### Health
 - MoM1: everyone started at 100 HP.
@@ -105,8 +122,9 @@ Flavor / mnemonics:
 rolls independently. **Shields roll too**, with a **tiny overlap** between a max-roll
 attack and a min-roll shield at the same charge level.
 
-✅ **Information rules**: charging conceals your element from the opponent (they see
-your charge count, not the element). Your element is revealed when you cast; shields
+✅ **Information rules**: the opponent **can see the element you're charging** (and your
+charge count). 💡 A future **Concealed** status (a Shadow side-effect) will hide the
+charging element again — the "mystery ?" code path is kept for it. Shields always
 visibly carry their element ("the shield's color reveals it").
 
 ✅ Loadout: before a match you choose which elements and spells you bring.
@@ -150,11 +168,17 @@ MoM2 adds **spell slots** unlocked via leveling.
 - 💡 Shield duration types: **permanent** (more expensive) vs **decaying over time**
   (cheaper, good in a pinch). Engine should model shield lifetime from day 1.
 
-### Aux
-- Next offensive spell deals **double damage**
-- Next offensive spell executes **before enemy defensives** (speed manipulation)
-- An attack that **ignores shields**
-- 📝 Speed-modifying aux spells (increase speed by X)
+### Aux (priority 7 unless noted)
+- **Empower** (3) — next offensive spell deals double damage
+- **Quicken** (2) — next offensive spell executes before enemy defensives
+- **Phase** (3) — next offensive spell ignores shields
+- **Hasty** (0) — seizes Haste, nothing else
+- **Discharge** (3) — removes ALL of the opponent's charge, no damage (fizzles a
+  same-turn Barrage since it's faster)
+- **Overload** (2) — a full attack (respects shields, benefits from Empower/Phase)
+  dealing ~8–12 damage × the **enemy's** charge, read live at resolution
+- **Jolt** is a quick attack (priority 5) that also **grants Haste**
+- **Flick** is now a quick attack (priority 5)
 
 ---
 
@@ -381,6 +405,24 @@ flutter build web --release --pwa-strategy=none
 cp web/flutter_service_worker.js build/web/flutter_service_worker.js
 firebase deploy --only hosting
 ```
+
+### Multiplayer architecture (v0.8.0)
+- ✅ **Matchmaking is separate from dueling**: quick match / friendly room codes /
+  practice roster all just produce an `OpponentDriver`; the duel screen and engine
+  never know whether the opponent is human or AI.
+- ✅ **Commit-reveal over Firestore** (trustless): per turn both clients write
+  `sha256(move|nonce)`, then reveal; each verifies the other and resolves the turn
+  locally on the shared deterministic engine, seeded by `deriveTurnSeed(master, turn,
+  moveA, moveB)` — proven by a lockstep engine test.
+- ✅ **Quick match**: claims a waiting queue ticket (Firestore transaction) or posts
+  one; if no human answers within ~10s, an **AI persona stands in** (nearest level).
+- ✅ **AI roster**: Wick(1), Brightgale(3), Thornwall(5), Morwen(8), Procarius(12) —
+  distinct loadouts, apparel, and TunableAi skill dials (mistakeChance/aggression/
+  caution). Campaign foes reuse the nearest persona re-skinned with the monster name.
+- ✅ **Disconnects**: the 10s move timer forfeits unmade moves; a vanished remote
+  opponent is auto-forfeited each turn until they lose.
+- 📝 v1 trust model: room codes are secrets, rules require sign-in; server-authoritative
+  arbitration deferred until ranked play.
 
 ### Phase 2 (next)
 Starts with the inventory/crafting/item-catalog design session: align on level

@@ -30,6 +30,30 @@ class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
   late final Future<GameState> _future = GameState.boot(LocalProfileStorage());
   late final AuthService? _auth =
       Firebase.apps.isNotEmpty ? AuthService() : null;
+  GameState? _gameState;
+
+  @override
+  void initState() {
+    super.initState();
+    // Once the profile is loaded, keep its storage backend in sync with the
+    // signed-in user (local while a guest, Firestore once authenticated).
+    _future.then((gs) {
+      _gameState = gs;
+      final auth = _auth;
+      if (auth != null) {
+        auth.addListener(_onAuthChanged);
+        _onAuthChanged();
+      }
+    });
+  }
+
+  void _onAuthChanged() => _gameState?.syncWithAuth(_auth?.user?.uid);
+
+  @override
+  void dispose() {
+    _auth?.removeListener(_onAuthChanged);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

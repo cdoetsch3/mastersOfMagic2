@@ -28,7 +28,8 @@ extension ElementStyleX on MagicElement {
 
 String priorityLabel(int priority) => switch (priority) {
       <= 2 => 'instant',
-      <= 4 => 'shield',
+      3 => 'shield',
+      4 => 'channel',
       <= 6 => 'quick',
       <= 8 => 'aux',
       _ => 'regular',
@@ -57,6 +58,9 @@ const Map<String, IconData> spellIcons = {
   'empower': Icons.upgrade,
   'quicken': Icons.fast_forward,
   'phase': Icons.blur_on,
+  'hasty': Icons.bolt,
+  'discharge': Icons.power_off,
+  'overload': Icons.electric_bolt,
 };
 
 /// Multi-line tooltip text for a spell: cost, priority, effect, flavor.
@@ -80,10 +84,17 @@ String spellTooltip(Spell spell) {
     QuickenEffect(:final priorityOverride) =>
       'Next offensive spell at priority $priorityOverride',
     PhaseEffect() => 'Next offensive spell ignores shields',
+    HasteEffect() => 'Seizes Haste (wins same-priority ties)',
+    DischargeEffect() => "Removes ALL of the enemy's charge",
+    OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
+      "$minPerCharge-$maxPerCharge damage per point of the enemy's charge",
   };
+  final haste = spell.grantsHaste && spell.effect is! HasteEffect
+      ? '\nAlso seizes Haste'
+      : '';
   return '${spell.name}\n'
       'Cost $cost · Priority ${spell.priority} (${priorityLabel(spell.priority)})\n'
-      '$detail\n'
+      '$detail$haste\n'
       '${spellDescriptions[spell.id] ?? ''}';
 }
 
@@ -95,7 +106,7 @@ const Map<String, String> spellDescriptions = {
   'surge': 'A heavy wave of force.',
   'ruin': 'Devastation for the patient.',
   'cataclysm': 'Five charges of pure annihilation.',
-  'jolt': 'Strikes early — before aux and regular spells resolve.',
+  'jolt': 'Strikes early and seizes Haste, winning future same-speed ties.',
   'flurry': 'Three rapid strikes; each rolls its own damage.',
   'volley': 'Four heavy bolts in succession.',
   'barrage': 'Spends ALL your charge; damage scales with every point.',
@@ -111,4 +122,7 @@ const Map<String, String> spellDescriptions = {
   'empower': 'Your next offensive spell deals double damage.',
   'quicken': 'Your next offensive spell strikes before enemy shields.',
   'phase': 'Your next offensive spell passes through shields.',
+  'hasty': 'Free initiative — seize Haste to win same-speed ties.',
+  'discharge': "Strip the enemy's stored charge. Fizzles a same-turn Barrage.",
+  'overload': "Detonate the enemy's own charge — brutal against a full mage.",
 };

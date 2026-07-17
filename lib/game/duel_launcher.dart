@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../screens/duel_screen.dart';
 import '../ui/app_theme.dart';
+import 'ai_personas.dart';
 import 'game_state.dart';
 import 'loadout.dart';
+import 'opponent_driver.dart';
 
-/// Pushes a duel and feeds its result back into [GameState] (XP/gold), then
-/// surfaces any level-up once the player returns to the menus.
+/// Pushes a duel against any [OpponentDriver] (AI persona or remote human)
+/// and feeds its result into [GameState] (XP/gold), surfacing any level-up
+/// once the player returns to the menus. The duel itself is identical
+/// regardless of where the opponent came from.
 Future<void> launchDuel(
   BuildContext context, {
   required Loadout loadout,
+  required OpponentDriver driver,
   required bool campaign,
-  String enemyName = 'Procarius',
 }) async {
   final game = GameStateScope.read(context);
   final messenger = ScaffoldMessenger.of(context);
@@ -20,8 +24,8 @@ Future<void> launchDuel(
     MaterialPageRoute<void>(
       builder: (_) => DuelScreen(
         loadout: loadout,
+        driver: driver,
         campaign: campaign,
-        enemyName: enemyName,
         onResult: (won) => game.recordDuelResult(won: won),
       ),
     ),
@@ -39,3 +43,17 @@ Future<void> launchDuel(
     );
   }
 }
+
+/// Convenience: a duel against a named AI persona.
+Future<void> launchAiDuel(
+  BuildContext context, {
+  required Loadout loadout,
+  required AiPersona persona,
+  required bool campaign,
+}) =>
+    launchDuel(
+      context,
+      loadout: loadout,
+      driver: LocalAiDriver(persona: persona),
+      campaign: campaign,
+    );

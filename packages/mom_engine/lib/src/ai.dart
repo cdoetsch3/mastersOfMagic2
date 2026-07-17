@@ -23,6 +23,9 @@ int estimateDamage(Spell spell, MageState self, MageState enemy) {
     case BarrageEffect(:final minPerCharge, :final maxPerCharge):
       raw = ((minPerCharge + maxPerCharge) * self.charge ~/ 2) *
           (self.empowerMultiplier ?? 1);
+    case OverloadEffect(:final minPerCharge, :final maxPerCharge):
+      raw = ((minPerCharge + maxPerCharge) * enemy.charge ~/ 2) *
+          (self.empowerMultiplier ?? 1);
     default:
       return 0;
   }
@@ -59,6 +62,94 @@ class RandomAi implements DuelAi {
         CastAction(s, self.charge == 0 ? element : null),
     ];
     return options[rng.nextInt(options.length)];
+  }
+}
+
+/// A parameterized heuristic brain for AI personas of different skill.
+///
+/// Behaves like [GreedyAi] at its sharpest, but every instinct is a dial:
+///  - [mistakeChance]: odds of playing a random legal move instead of
+///    thinking (the main difficulty dial — novices blunder, masters don't).
+///  - [aggression]: odds of attacking instead of continuing to charge.
+///  - [caution]: odds of shielding when the enemy sits on a big charge.
+class TunableAi implements DuelAi {
+  final List<Spell> spells;
+  final double mistakeChance;
+  final double aggression;
+  final double caution;
+
+  TunableAi({
+    this.spells = Spellbook.all,
+    this.mistakeChance = 0.25,
+    this.aggression = 0.3,
+    this.caution = 0.4,
+  });
+
+  @override
+  MageAction chooseAction(MageState self, MageState enemy, Random rng) {
+    final element = self.element ??
+        MagicElement.values[rng.nextInt(MagicElement.values.length)];
+    MagicElement? elementArg() => self.charge == 0 ? element : null;
+    final affordable = _affordable(self, spells);
+
+    // A blunder: play anything legal, without thinking.
+    if (rng.nextDouble() < mistakeChance) {
+      final options = <MageAction>[
+        if (self.charge < MageState.maxCharge) ChargeAction(elementArg()),
+        for (final s in affordable) CastAction(s, elementArg()),
+      ];
+      return options[rng.nextInt(options.length)];
+    }
+
+    // Take a kill if one is on the board.
+    for (final spell in affordable) {
+      if (spell.isOffensive &&
+          estimateDamage(spell, self, enemy) >= enemy.hp) {
+        return CastAction(spell, elementArg());
+      }
+    }
+
+    // At full charge, unleash the biggest hit.
+    if (self.charge >= MageState.maxCharge) {
+      final offense = affordable.where((s) => s.isOffensive).toList();
+      if (offense.isNotEmpty) {
+        offense.sort((a, b) => estimateDamage(b, self, enemy)
+            .compareTo(estimateDamage(a, self, enemy)));
+        return CastAction(offense.first, elementArg());
+      }
+    }
+
+    // Shield when threatened (enemy sitting on a big charge).
+    if (enemy.charge >= 3 &&
+        self.shield == null &&
+        rng.nextDouble() < caution) {
+      final shieldSpells = affordable
+          .where((s) => s.effect is ShieldEffect || s.effect is BarrierEffect)
+          .toList();
+      if (shieldSpells.isNotEmpty) {
+        shieldSpells.sort((a, b) => b.chargeCost.compareTo(a.chargeCost));
+        return CastAction(shieldSpells.first, elementArg());
+      }
+    }
+
+    // Otherwise: mostly charge toward bigger spells, sometimes strike now.
+    final attacks = affordable.where((s) => s.isOffensive).toList();
+    final canCharge = self.charge < MageState.maxCharge;
+    if (attacks.isNotEmpty &&
+        (!canCharge || rng.nextDouble() < aggression)) {
+      attacks.sort((a, b) => estimateDamage(b, self, enemy)
+          .compareTo(estimateDamage(a, self, enemy)));
+      if (estimateDamage(attacks.first, self, enemy) > 0) {
+        return CastAction(attacks.first, elementArg());
+      }
+    }
+    if (canCharge) return ChargeAction(elementArg());
+    if (attacks.isNotEmpty) return CastAction(attacks.first, elementArg());
+    // Full charge with nothing offensive in the book — cast anything legal.
+    if (affordable.isNotEmpty) {
+      return CastAction(affordable.last, elementArg());
+    }
+    return const ForfeitAction();
   }
 }
 

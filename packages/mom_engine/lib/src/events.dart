@@ -103,3 +103,36 @@ class DefeatedEvent extends DuelEvent {
   @override
   String toString() => '${mage.name} is defeated';
 }
+
+/// The Haste initiative token changed hands. [holder] is null when Haste
+/// becomes contested (nobody holds it).
+class HasteChangedEvent extends DuelEvent {
+  final MageState? holder;
+
+  const HasteChangedEvent(this.holder);
+
+  @override
+  String toString() => holder == null
+      ? 'Haste is contested — nobody holds the initiative'
+      : '${holder!.name} seizes the initiative (Haste)';
+}
+
+class ChargeDrainedEvent extends DuelEvent {
+  final MageState mage;
+  final int amount;
+
+  const ChargeDrainedEvent(this.mage, this.amount);
+
+  @override
+  String toString() => "${mage.name}'s charge is drained (−$amount)";
+}
+
+/// A mage forfeited the turn (ran out of time or disconnected) and did nothing.
+class ForfeitedEvent extends DuelEvent {
+  final MageState mage;
+
+  const ForfeitedEvent(this.mage);
+
+  @override
+  String toString() => '${mage.name} forfeits the turn';
+}

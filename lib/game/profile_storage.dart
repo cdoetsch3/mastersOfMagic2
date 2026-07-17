@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'player_profile.dart';
@@ -41,5 +42,46 @@ class LocalProfileStorage implements ProfileStorage {
   Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_key);
+  }
+}
+
+/// Cloud persistence at `players/{uid}` — used when the player is signed in,
+/// so progress follows the account across devices. All calls degrade
+/// gracefully (return null / no-op) if Firestore is unreachable or not yet
+/// enabled, so the app keeps working locally.
+class FirestoreProfileStorage implements ProfileStorage {
+  final String uid;
+  FirestoreProfileStorage(this.uid);
+
+  DocumentReference<Map<String, dynamic>> get _doc =>
+      FirebaseFirestore.instance.collection('players').doc(uid);
+
+  @override
+  Future<PlayerProfile?> load() async {
+    try {
+      final snap = await _doc.get();
+      final data = snap.data();
+      if (!snap.exists || data == null) return null;
+      return PlayerProfile.fromJson(data);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> save(PlayerProfile profile) async {
+    try {
+      // Offline persistence queues this and syncs when back online.
+      await _doc.set(profile.toJson());
+    } catch (_) {
+      // Best effort — the local cache still holds the latest state.
+    }
+  }
+
+  @override
+  Future<void> clear() async {
+    try {
+      await _doc.delete();
+    } catch (_) {}
   }
 }

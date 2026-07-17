@@ -2,7 +2,7 @@
 ///
 /// Spells are element-agnostic: a spell takes on the element the caster is
 /// currently charged with. Priority is 1–10; lower priority acts earlier in
-/// the turn (1 = instant attacks, 3 = shields, 5 = quick attacks,
+/// the turn (1 = instant attacks, 3 = shields, 4 = channel, 5 = quick attacks,
 /// 7 = aux/other defensive, 9 = regular spells).
 library;
 
@@ -20,6 +20,11 @@ class Spell {
   /// 1–10, lower acts first.
   final int priority;
 
+  /// Whether casting this spell grants the caster the **Haste** initiative
+  /// token (see DuelEngine). Once Haste is established, only Haste-granting
+  /// spells move it.
+  final bool grantsHaste;
+
   final SpellEffect effect;
 
   const Spell({
@@ -29,10 +34,13 @@ class Spell {
     required this.priority,
     required this.effect,
     this.xCost = false,
+    this.grantsHaste = false,
   });
 
   bool get isOffensive =>
-      effect is DamageEffect || effect is BarrageEffect;
+      effect is DamageEffect ||
+      effect is BarrageEffect ||
+      effect is OverloadEffect;
 
   @override
   String toString() => name;
@@ -107,4 +115,26 @@ class QuickenEffect extends SpellEffect {
 /// Caster's next offensive spell ignores shields.
 class PhaseEffect extends SpellEffect {
   const PhaseEffect();
+}
+
+/// Pure initiative spell: does nothing on resolve; its only effect is the
+/// [Spell.grantsHaste] flag (used by Hasty).
+class HasteEffect extends SpellEffect {
+  const HasteEffect();
+}
+
+/// Removes ALL of the target's charge (Discharge). No damage.
+class DischargeEffect extends SpellEffect {
+  const DischargeEffect();
+}
+
+/// A full attack (respects shields, benefits from Empower/Phase) whose damage
+/// is a single roll of [minPerCharge]–[maxPerCharge] multiplied by the
+/// **target's** charge at the moment of resolution (Overload). Deals 0 if the
+/// target has no charge.
+class OverloadEffect extends SpellEffect {
+  final int minPerCharge;
+  final int maxPerCharge;
+
+  const OverloadEffect(this.minPerCharge, this.maxPerCharge);
 }

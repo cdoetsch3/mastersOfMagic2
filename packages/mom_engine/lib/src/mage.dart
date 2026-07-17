@@ -42,6 +42,16 @@ class MageState {
   int? quickenPriority;
   bool phaseNext = false;
 
+  /// The **Haste** initiative token. At most one mage holds it; it breaks
+  /// same-priority ties (the holder's spell resolves first). Managed by the
+  /// engine — see DuelEngine.
+  bool hasHaste = false;
+
+  /// When true, this mage's charging element is hidden from the opponent
+  /// (reserved for a future Shadow "Concealed" effect). Default false: the
+  /// opponent can see what you're charging.
+  bool concealed = false;
+
   MageState({required this.name, this.maxHp = 100}) : hp = maxHp;
 
   bool get alive => hp > 0;

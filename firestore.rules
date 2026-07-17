@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Masters of Magic 2 — Firestore security rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Each player owns exactly their own profile document.
+    match /players/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Matchmaking tickets: any signed-in player may read the queue and claim
+    // a ticket; only the owner may create/delete their own ticket.
+    match /matchmaking/{uid} {
+      allow read: if request.auth != null;
+      allow create, delete: if request.auth != null && request.auth.uid == uid;
+      // Claiming: another signed-in player may set claimedBy once.
+      allow update: if request.auth != null
+        && (request.auth.uid == uid
+            || (resource.data.claimedBy == null
+                && request.resource.data.claimedBy == request.auth.uid));
+    }
+
+    // Duel rooms + their turn documents. Room codes are unguessable secrets,
+    // so signed-in access is the v1 trust model (commit-reveal handles move
+    // secrecy; a server-authoritative layer can come later for ranked play).
+    match /duels/{roomId} {
+      allow read, create, update, delete: if request.auth != null;
+
+      match /turns/{turnId} {
+        allow read, write: if request.auth != null;
+      }
+    }
+  }
+}

@@ -19,12 +19,22 @@ class TurnResult {
 
 /// A 1v1 duel between two mages (player or monster — identical rules).
 ///
-/// Both sides submit an action, then [resolveTurn] resolves them together:
-/// casts are ordered by priority (1 acts first); equal priorities resolve
-/// simultaneously (attacks see the pre-priority-step world, so a same-priority
-/// shield does not block a same-priority attack). A mage defeated at an
-/// earlier priority step does not get to resolve casts at later steps —
-/// equal-priority mutual kills are a draw.
+/// Both sides submit an action; [resolveTurn] resolves them together. Every
+/// action carries a **priority** (1 acts first): instant 1, shields 3,
+/// channel 4, quick attacks 5, aux 7, regular 9. Equal-priority collisions are
+/// broken by the **Haste** token — the holder's spell resolves first, so a
+/// lethal hit lands before the opponent can fire back. When nobody holds
+/// Haste, equal priorities resolve simultaneously and can trade kills (a draw).
+///
+/// Haste rules:
+///  - Only matters as the same-priority tiebreak (uses the START-of-turn holder).
+///  - While unheld: the first non-channel cast grabs it; if both cast, the
+///    faster one grabs it; a same-priority pair leaves it unheld.
+///  - Once held: only a Haste-granting spell (grantsHaste) moves it, and it
+///    goes to the LAST grant to resolve — so a same-priority pair flips it to
+///    the opponent (the holder resolves first, the other's grant lands last),
+///    and among different priorities the slower grant wins.
+///  - Channeling never grants or moves Haste.
 class DuelEngine {
   final MageState mage1;
   final MageState mage2;
@@ -34,6 +44,8 @@ class DuelEngine {
   final Random rng;
 
   int turnNumber = 0;
+
+  static const int channelPriority = 4;
 
   DuelEngine(this.mage1, this.mage2, {Random? rng}) : rng = rng ?? Random();
 
@@ -48,6 +60,10 @@ class DuelEngine {
     if (!isOver || isDraw) return null;
     return mage1.alive ? mage1 : mage2;
   }
+
+  /// The mage currently holding the Haste initiative token, or null.
+  MageState? get hasteHolder =>
+      mage1.hasHaste ? mage1 : (mage2.hasHaste ? mage2 : null);
 
   /// [mage] forfeits the duel (surrender in PvP, flee in the campaign):
   /// they drop to 0 hp and the duel ends immediately as their loss.
@@ -67,67 +83,89 @@ class DuelEngine {
     turnNumber++;
     final events = <DuelEvent>[];
 
-    // Charging resolves unconditionally and interacts with nothing.
-    for (final (mage, action) in [(mage1, action1), (mage2, action2)]) {
-      if (action is ChargeAction) {
-        mage.element ??= action.element;
-        mage.charge++;
-        events.add(ChargedEvent(mage, mage.element!, mage.charge));
-      }
-    }
+    // Haste holder BEFORE this turn transfers it — used to break ties.
+    final startHolder = hasteHolder;
 
-    // Build pending casts with effective priorities.
-    final casts = <_PendingCast>[];
+    // One resolution entry per mage. Channel is priority 4; casts use their
+    // spell priority (with a pending Quicken override for offense).
+    final entries = <_Entry>[];
     for (final (mage, opponent, action) in [
       (mage1, mage2, action1),
       (mage2, mage1, action2),
     ]) {
-      if (action is CastAction) {
-        final element = mage.element ?? action.element!;
-        var priority = action.spell.priority;
-        if (action.spell.isOffensive && mage.quickenPriority != null) {
-          priority = mage.quickenPriority!;
-          mage.quickenPriority = null;
-        }
-        casts.add(_PendingCast(
-          caster: mage,
-          target: opponent,
-          spell: action.spell,
-          element: element,
-          chargeSpent: mage.charge,
-          priority: priority,
-        ));
+      switch (action) {
+        case ForfeitAction():
+          events.add(ForfeitedEvent(mage));
+        case ChargeAction():
+          entries.add(_Entry(
+            caster: mage,
+            target: opponent,
+            action: action,
+            element: mage.element ?? action.element!,
+            priority: channelPriority,
+          ));
+        case CastAction(:final spell):
+          var priority = spell.priority;
+          if (spell.isOffensive && mage.quickenPriority != null) {
+            priority = mage.quickenPriority!;
+            mage.quickenPriority = null;
+          }
+          entries.add(_Entry(
+            caster: mage,
+            target: opponent,
+            action: action,
+            element: mage.element ?? action.element!,
+            priority: priority,
+          ));
       }
     }
-    casts.sort((a, b) => a.priority.compareTo(b.priority));
+    entries.sort((a, b) => a.priority.compareTo(b.priority));
 
-    // Resolve casts grouped by priority. Within a group, offense resolves
-    // against the pre-group world before defense/aux applies (simultaneity).
+    // Resolve in priority order, grouped by equal priority.
     var i = 0;
-    while (i < casts.length) {
+    while (i < entries.length) {
       var j = i;
-      while (j < casts.length && casts[j].priority == casts[i].priority) {
+      while (j < entries.length && entries[j].priority == entries[i].priority) {
         j++;
       }
-      // Snapshot who is alive at the START of this priority step — a mage
-      // killed within the step still resolves their simultaneous cast.
-      final group = casts.sublist(i, j).where((c) => c.caster.alive).toList();
-      final offense = group.where((c) => c.spell.isOffensive).toList();
-      final support = group.where((c) => !c.spell.isOffensive).toList();
-      for (final cast in offense) {
-        _resolveCast(cast, events);
-      }
-      for (final cast in support) {
-        _resolveCast(cast, events);
+      final group = entries.sublist(i, j).where((e) => e.caster.alive).toList();
+      final twoCasts =
+          group.length == 2 && group.every((e) => !e.isChannel);
+
+      if (twoCasts && startHolder != null) {
+        // Haste tiebreak: the holder resolves first; if it kills the
+        // opponent, the opponent's same-priority spell never fires.
+        final first =
+            identical(group[0].caster, startHolder) ? group[0] : group[1];
+        final second = identical(first, group[0]) ? group[1] : group[0];
+        _resolveEntry(first, events);
+        if (second.caster.alive) _resolveEntry(second, events);
+      } else {
+        // Simultaneous: offense before support (a same-priority shield does
+        // not block a same-priority attack), then channels. No mid-group
+        // alive re-check, so same-priority mutual kills are still possible
+        // when nobody holds Haste.
+        final ordered = [
+          ...group.where((e) => e.isOffensive),
+          ...group.where((e) => !e.isOffensive && !e.isChannel),
+          ...group.where((e) => e.isChannel),
+        ];
+        for (final e in ordered) {
+          _resolveEntry(e, events);
+        }
       }
       i = j;
     }
 
-    // Casting consumes all charge and ends the element cycle.
-    for (final cast in casts) {
-      cast.caster.charge = 0;
-      cast.caster.element = null;
+    // Casting consumes all charge and ends the element cycle (channels keep it).
+    for (final e in entries) {
+      if (!e.isChannel) {
+        e.caster.charge = 0;
+        e.caster.element = null;
+      }
     }
+
+    _updateHaste(entries, startHolder, events);
 
     for (final mage in [mage1, mage2]) {
       if (!mage.alive) events.add(DefeatedEvent(mage));
@@ -137,6 +175,8 @@ class DuelEngine {
 
   void _validate(MageState mage, MageAction action) {
     switch (action) {
+      case ForfeitAction():
+        break; // always legal — you may always do nothing
       case ChargeAction(:final element):
         if (mage.charge >= MageState.maxCharge) {
           throw ArgumentError(
@@ -153,8 +193,7 @@ class DuelEngine {
       case CastAction(:final spell, :final element):
         if (spell.xCost) {
           if (mage.charge < 1) {
-            throw ArgumentError(
-                '${spell.name} needs at least 1 charge.');
+            throw ArgumentError('${spell.name} needs at least 1 charge.');
           }
         } else if (spell.chargeCost > mage.charge) {
           throw ArgumentError(
@@ -172,10 +211,21 @@ class DuelEngine {
     }
   }
 
-  void _resolveCast(_PendingCast cast, List<DuelEvent> events) {
+  void _resolveEntry(_Entry e, List<DuelEvent> events) {
+    if (e.isChannel) {
+      e.caster.element ??= e.element;
+      e.caster.charge++;
+      events.add(ChargedEvent(e.caster, e.caster.element!, e.caster.charge));
+      return;
+    }
+    _resolveCast(e, events);
+  }
+
+  void _resolveCast(_Entry cast, List<DuelEvent> events) {
     final caster = cast.caster;
-    events.add(SpellCastEvent(caster, cast.spell, cast.element));
-    switch (cast.spell.effect) {
+    final spell = cast.spell!;
+    events.add(SpellCastEvent(caster, spell, cast.element));
+    switch (spell.effect) {
       case DamageEffect(
           :final minAmount,
           :final maxAmount,
@@ -196,10 +246,24 @@ class DuelEngine {
         );
       case BarrageEffect(:final minPerCharge, :final maxPerCharge):
         final buffs = caster.consumeOffensiveBuffs();
+        final charge = caster.charge; // live — a same-turn Discharge fizzles it
         _attack(
           cast,
-          minPerHit: minPerCharge * cast.chargeSpent,
-          maxPerHit: maxPerCharge * cast.chargeSpent,
+          minPerHit: minPerCharge * charge,
+          maxPerHit: maxPerCharge * charge,
+          multiplier: buffs.multiplier,
+          hits: 1,
+          lifesteal: 0,
+          ignoresShields: buffs.phase,
+          events: events,
+        );
+      case OverloadEffect(:final minPerCharge, :final maxPerCharge):
+        final buffs = caster.consumeOffensiveBuffs();
+        final base = _roll(minPerCharge, maxPerCharge) * cast.target.charge;
+        _attack(
+          cast,
+          minPerHit: base,
+          maxPerHit: base,
           multiplier: buffs.multiplier,
           hits: 1,
           lifesteal: 0,
@@ -219,17 +283,26 @@ class DuelEngine {
             caster, 'next offensive spell deals ${multiplier}x damage'));
       case QuickenEffect(:final priorityOverride):
         caster.quickenPriority = priorityOverride;
-        events.add(BuffAppliedEvent(
-            caster, 'next offensive spell resolves at priority $priorityOverride'));
+        events.add(BuffAppliedEvent(caster,
+            'next offensive spell resolves at priority $priorityOverride'));
       case PhaseEffect():
         caster.phaseNext = true;
-        events.add(BuffAppliedEvent(
-            caster, 'next offensive spell ignores shields'));
+        events.add(
+            BuffAppliedEvent(caster, 'next offensive spell ignores shields'));
+      case HasteEffect():
+        // Initiative only; the grantsHaste flag does the work post-resolution.
+        break;
+      case DischargeEffect():
+        final target = cast.target;
+        final drained = target.charge;
+        target.charge = 0;
+        target.element = null;
+        events.add(ChargeDrainedEvent(target, drained));
     }
   }
 
   void _attack(
-    _PendingCast cast, {
+    _Entry cast, {
     required int minPerHit,
     required int maxPerHit,
     required int multiplier,
@@ -239,6 +312,7 @@ class DuelEngine {
     required List<DuelEvent> events,
   }) {
     final target = cast.target;
+    final spell = cast.spell!;
     var totalToHp = 0;
     for (var h = 0; h < hits; h++) {
       final perHit = _roll(minPerHit, maxPerHit) * multiplier;
@@ -246,10 +320,10 @@ class DuelEngine {
       if (shield == null) {
         target.takeHpDamage(perHit);
         totalToHp += perHit;
-        events.add(DamageEvent(target, cast.spell, toShield: 0, toHp: perHit));
+        events.add(DamageEvent(target, spell, toShield: 0, toHp: perHit));
       } else if (shield.isBarrier) {
         target.shield = null;
-        events.add(DamageEvent(target, cast.spell,
+        events.add(DamageEvent(target, spell,
             toShield: perHit, toHp: 0, shieldBroken: true));
       } else {
         final countered = cast.element.counters(shield.element!);
@@ -257,7 +331,7 @@ class DuelEngine {
         final effective = perHit * counterMult;
         if (effective < shield.remaining) {
           shield.remaining -= effective;
-          events.add(DamageEvent(target, cast.spell,
+          events.add(DamageEvent(target, spell,
               toShield: effective, toHp: 0, countered: countered));
         } else {
           // Overflow: the raw damage spent breaking the shield is rounded in
@@ -268,7 +342,7 @@ class DuelEngine {
           target.shield = null;
           target.takeHpDamage(toHp);
           totalToHp += toHp;
-          events.add(DamageEvent(target, cast.spell,
+          events.add(DamageEvent(target, spell,
               toShield: absorbed,
               toHp: toHp,
               countered: countered,
@@ -282,22 +356,66 @@ class DuelEngine {
       events.add(HealedEvent(cast.caster, healed));
     }
   }
+
+  // Transfers Haste based on this turn's casts (see class doc for the rules).
+  void _updateHaste(
+      List<_Entry> entries, MageState? startHolder, List<DuelEvent> events) {
+    final casts = entries.where((e) => !e.isChannel).toList();
+    final qualifying = startHolder == null
+        ? casts // unheld: any non-channel cast grabs it
+        : casts.where((e) => e.spell!.grantsHaste).toList();
+    if (qualifying.isEmpty) return; // nothing grants Haste this turn
+
+    MageState? newHolder;
+    if (qualifying.length == 1) {
+      newHolder = qualifying.first.caster;
+    } else {
+      final a = qualifying[0], b = qualifying[1];
+      if (startHolder == null) {
+        // Establishing initiative: the FASTER caster claims it; a same-
+        // priority pair ties and leaves Haste unheld.
+        newHolder = a.priority == b.priority
+            ? null
+            : (a.priority < b.priority ? a.caster : b.caster);
+      } else {
+        // Transferring an established Haste: it goes to the LAST grant to
+        // resolve. Same priority → the holder resolves first (Haste
+        // tiebreak) so the OTHER mage's grant lands last and steals it;
+        // different priority → the slower spell resolves last.
+        newHolder = a.priority == b.priority
+            ? (identical(a.caster, startHolder) ? b.caster : a.caster)
+            : (a.priority > b.priority ? a.caster : b.caster);
+      }
+    }
+
+    mage1.hasHaste = identical(newHolder, mage1);
+    mage2.hasHaste = identical(newHolder, mage2);
+    if (!identical(newHolder, startHolder)) {
+      events.add(HasteChangedEvent(newHolder));
+    }
+  }
 }
 
-class _PendingCast {
+/// One mage's resolved action for a turn (a channel or a spell cast).
+class _Entry {
   final MageState caster;
   final MageState target;
-  final Spell spell;
+  final MageAction action;
   final MagicElement element;
-  final int chargeSpent;
   final int priority;
 
-  _PendingCast({
+  _Entry({
     required this.caster,
     required this.target,
-    required this.spell,
+    required this.action,
     required this.element,
-    required this.chargeSpent,
     required this.priority,
   });
+
+  bool get isChannel => action is ChargeAction;
+
+  Spell? get spell =>
+      action is CastAction ? (action as CastAction).spell : null;
+
+  bool get isOffensive => spell?.isOffensive ?? false;
 }

@@ -10,5 +10,6 @@ export 'src/duel.dart';
 export 'src/element.dart';
 export 'src/events.dart';
 export 'src/mage.dart';
+export 'src/netcode.dart';
 export 'src/spell.dart';
 export 'src/spellbook.dart';

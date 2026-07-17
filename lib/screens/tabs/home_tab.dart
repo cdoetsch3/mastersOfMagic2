@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../game/duel_launcher.dart';
 import '../../game/game_state.dart';
 import '../../game/player_profile.dart';
 import '../../ui/app_theme.dart';
 import '../home_shell.dart';
+import '../matchmaking_screen.dart';
 
 /// Center dashboard: progress, quests, the PvP entry point, and shortcuts
 /// into the rest of the app. The engagement hub.
@@ -163,7 +163,7 @@ class _FindDuelButton extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
-        icon: const Icon(Icons.auto_fix_high),
+        icon: const WizardHatIcon(size: 22, color: AppColors.bg),
         label: const Text('Find a duel',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         onPressed: () => _startPvpDuel(context),
@@ -173,14 +173,14 @@ class _FindDuelButton extends StatelessWidget {
 
   Future<void> _startPvpDuel(BuildContext context) async {
     final game = GameStateScope.read(context);
+    // PvP rule: pick your loadout before each match.
     final index = await showPresetPicker(context);
     if (index == null || !context.mounted) return;
     final preset = game.profile.presets[index];
-    await launchDuel(
-      context,
-      loadout: preset.toLoadout(),
-      campaign: false,
-      enemyName: 'Procarius',
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MatchmakingScreen(loadout: preset.toLoadout()),
+      ),
     );
   }
 }

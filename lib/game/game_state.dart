@@ -8,9 +8,14 @@ import 'progression.dart';
 /// each mutation. Screens read state and call intent methods; they never
 /// touch storage directly.
 class GameState extends ChangeNotifier {
-  final ProfileStorage storage;
+  /// Swappable: local (shared_preferences) while a guest, Firestore once
+  /// signed in. See [syncWithAuth].
+  ProfileStorage storage;
   PlayerProfile profile;
   bool loading = true;
+
+  /// The uid whose cloud profile is currently loaded (null = guest/local).
+  String? _cloudUid;
 
   /// Set when a level-up happens so the UI can celebrate it once.
   int? pendingLevelUp;
@@ -27,6 +32,35 @@ class GameState extends ChangeNotifier {
     }
     await state._persist();
     return state;
+  }
+
+  /// Reacts to sign-in/out. Signed in → load (or create) the cloud profile
+  /// and route saves to Firestore; signed out → revert to the local guest
+  /// profile. Called by the app whenever the auth user changes.
+  Future<void> syncWithAuth(String? uid) async {
+    if (uid == _cloudUid) return;
+    _cloudUid = uid;
+    if (uid != null) {
+      final cloud = FirestoreProfileStorage(uid);
+      final loaded = await cloud.load();
+      if (loaded != null) {
+        // Adopt the existing cloud profile (progress from another session).
+        profile = loaded;
+        for (final preset in profile.presets) {
+          preset.clampToCaps();
+        }
+      } else {
+        // First time on this account — seed the cloud with the current
+        // (guest) profile so nothing is lost.
+        await cloud.save(profile);
+      }
+      storage = cloud;
+    } else {
+      final local = LocalProfileStorage();
+      storage = local;
+      profile = await local.load() ?? PlayerProfile.newPlayer();
+    }
+    notifyListeners();
   }
 
   Future<void> _persist() => storage.save(profile);

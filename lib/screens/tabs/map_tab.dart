@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../game/ai_personas.dart';
 import '../../game/duel_launcher.dart';
 import '../../game/element_style.dart';
 import '../../game/game_state.dart';
@@ -70,11 +71,14 @@ class MapTab extends StatelessWidget {
           title: 'Begin adventure',
           subtitle: 'Fight ${World.opponentNameFor(here)} '
               '(Lv ${here.minLevel}-${here.maxLevel})',
-          onTap: () => launchDuel(
+          onTap: () => launchAiDuel(
             context,
             loadout: game.profile.activePreset.toLoadout(),
             campaign: true,
-            enemyName: World.opponentNameFor(here),
+            persona: AiRoster.campaignFoe(
+              name: World.opponentNameFor(here),
+              level: (here.minLevel + here.maxLevel) ~/ 2,
+            ),
           ),
         ),
     ];

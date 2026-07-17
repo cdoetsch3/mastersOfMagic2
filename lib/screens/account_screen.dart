@@ -318,7 +318,7 @@ class _AboutPanel extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       child: Row(
         children: [
-          const Icon(Icons.auto_fix_high, color: AppColors.gold, size: 20),
+          const WizardHatIcon(size: 20, color: AppColors.gold),
           const SizedBox(width: 10),
           const Expanded(
             child: Column(

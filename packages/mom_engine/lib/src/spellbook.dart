@@ -14,7 +14,7 @@ import 'spell.dart';
 abstract final class Spellbook {
   // Flat damage (priority 9, regular). All damage rolls min–max (~10–15%).
   static const flick = Spell(
-      id: 'flick', name: 'Flick', chargeCost: 0, priority: 9,
+      id: 'flick', name: 'Flick', chargeCost: 0, priority: 5,
       effect: DamageEffect(4, 6));
   static const bolt = Spell(
       id: 'bolt', name: 'Bolt', chargeCost: 1, priority: 9,
@@ -32,11 +32,11 @@ abstract final class Spellbook {
       id: 'cataclysm', name: 'Cataclysm', chargeCost: 5, priority: 9,
       effect: DamageEffect(59, 72));
 
-  // Quick attack (priority 5): cheaper damage that beats aux/regular spells
-  // to the punch but not shields.
+  // Quick attacks (priority 5): cheaper damage that beats aux/regular spells
+  // to the punch but not shields. Jolt also seizes Haste.
   static const jolt = Spell(
       id: 'jolt', name: 'Jolt', chargeCost: 2, priority: 5,
-      effect: DamageEffect(14, 18));
+      grantsHaste: true, effect: DamageEffect(14, 18));
 
   // Multi-hit (priority 9) — each hit rolls independently.
   static const flurry = Spell(
@@ -92,6 +92,23 @@ abstract final class Spellbook {
       id: 'phase', name: 'Phase', chargeCost: 3, priority: 7,
       effect: PhaseEffect());
 
+  // Initiative: seizes Haste for free.
+  static const hasty = Spell(
+      id: 'hasty', name: 'Hasty', chargeCost: 0, priority: 7,
+      grantsHaste: true, effect: HasteEffect());
+
+  // Charge control: wipes all of the opponent's charge (no damage). At
+  // priority 7 it beats a priority-9 Barrage/Overload, fizzling them.
+  static const discharge = Spell(
+      id: 'discharge', name: 'Discharge', chargeCost: 3, priority: 7,
+      effect: DischargeEffect());
+
+  // Punish: ~8-12 damage per point of the ENEMY's charge (a full attack —
+  // respects shields, benefits from Empower/Phase). Read live at resolution.
+  static const overload = Spell(
+      id: 'overload', name: 'Overload', chargeCost: 2, priority: 7,
+      effect: OverloadEffect(8, 12));
+
   static const List<Spell> all = [
     flick, bolt, blast, surge, ruin, cataclysm,
     jolt,
@@ -99,6 +116,7 @@ abstract final class Spellbook {
     sap, leech, drain,
     ward, aegis, bulwark, rampart, sanctuary, barrier,
     empower, quicken, phase,
+    hasty, discharge, overload,
   ];
 
   static Spell byId(String id) => all.firstWhere((s) => s.id == id);

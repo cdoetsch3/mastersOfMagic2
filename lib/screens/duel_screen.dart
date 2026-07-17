@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,9 @@ import '../game/element_style.dart';
 import '../game/loadout.dart';
 import '../game/mage_apparel.dart';
 import '../game/mage_sprite.dart';
+import '../game/opponent_driver.dart';
+import '../game/progression.dart';
+import '../ui/app_theme.dart';
 
 /// The landscape duel arena. Keyboard: 1-8 = element slots, QWERT/ASDFG =
 /// spell slots, C = channel. Turn resolution plays the engine's event list
@@ -16,10 +20,12 @@ import '../game/mage_sprite.dart';
 class DuelScreen extends StatefulWidget {
   final Loadout loadout;
 
+  /// Provides the opponent (AI persona or remote human). The duel logic is
+  /// identical regardless of which it is.
+  final OpponentDriver driver;
+
   /// Campaign battles say "Flee"; PvP-style duels say "Surrender".
   final bool campaign;
-
-  final String enemyName;
 
   /// Called once when a duel ends (win, loss, draw, or forfeit) with whether
   /// the player won. Lets the caller grant XP/gold. Draws report `false`.
@@ -28,8 +34,8 @@ class DuelScreen extends StatefulWidget {
   const DuelScreen({
     super.key,
     required this.loadout,
+    required this.driver,
     this.campaign = false,
-    this.enemyName = 'Procarius',
     this.onResult,
   });
 
@@ -42,7 +48,7 @@ enum _FxKind { none, projectile, impact, shieldUp, charge, heal, flash }
 class _DuelScreenState extends State<DuelScreen>
     with SingleTickerProviderStateMixin {
   late final DuelController c =
-      DuelController(loadout: widget.loadout, enemyName: widget.enemyName);
+      DuelController(loadout: widget.loadout, driver: widget.driver);
   bool _resultReported = false;
   late final AnimationController _fx = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 400));
@@ -62,10 +68,41 @@ class _DuelScreenState extends State<DuelScreen>
 
   static const _spellKeyLabels = 'QWERTASDFG';
 
+  // Per-move countdown. Not committing in time forfeits the move (also how a
+  // disconnected PvP opponent is handled — they forfeit until they lose).
+  static const double _moveSeconds = 10;
+  Timer? _moveTimer;
+  double _secondsLeft = _moveSeconds;
+
+  void _startMoveTimer() {
+    _moveTimer?.cancel();
+    setState(() => _secondsLeft = _moveSeconds);
+    _moveTimer = Timer.periodic(const Duration(milliseconds: 100), (t) {
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
+      // Pause the clock while the arena is hidden behind the rotate prompt.
+      final size = MediaQuery.of(context).size;
+      if (size.height > size.width) return;
+      setState(() => _secondsLeft -= 0.1);
+      if (_secondsLeft <= 0) {
+        t.cancel();
+        if (!c.animating && !c.gameOver) _submit(const ForfeitAction());
+      }
+    });
+  }
+
+  void _stopMoveTimer() {
+    _moveTimer?.cancel();
+    _moveTimer = null;
+  }
+
   @override
   void initState() {
     super.initState();
     c.addListener(_checkResult);
+    _startMoveTimer();
     // The arena is a landscape experience. Locks orientation on devices
     // (no-op on web, where the portrait guard below shows a rotate prompt).
     SystemChrome.setPreferredOrientations([
@@ -84,6 +121,7 @@ class _DuelScreenState extends State<DuelScreen>
 
   @override
   void dispose() {
+    _stopMoveTimer();
     SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     c.removeListener(_checkResult);
     _fx.dispose();
@@ -120,8 +158,9 @@ class _DuelScreenState extends State<DuelScreen>
   }
 
   Future<void> _submit(MageAction action) async {
+    _stopMoveTimer(); // move is locked in — clock stops
     try {
-      final events = c.submitTurn(action);
+      final events = await c.submitTurn(action);
       for (final event in events) {
         await _animate(event);
         if (!mounted) return;
@@ -133,6 +172,7 @@ class _DuelScreenState extends State<DuelScreen>
       if (mounted) {
         setState(() => _banner = null);
         c.finishTurn();
+        if (!c.gameOver) _startMoveTimer(); // next move's clock
       }
     }
   }
@@ -226,6 +266,34 @@ class _DuelScreenState extends State<DuelScreen>
             atEnemy: mage == c.enemy,
             color: const Color(0xFFE8C547),
             ms: 550);
+      case ChargeDrainedEvent(:final mage, :final amount):
+        if (amount > 0) {
+          await _runFx(_FxKind.impact,
+              atEnemy: mage == c.enemy,
+              color: const Color(0xFF8B5CD6),
+              text: 'charge drained',
+              ms: 500);
+        }
+      case HasteChangedEvent(:final holder):
+        setState(() {
+          _banner = holder == null
+              ? 'Haste is contested'
+              : '${holder == c.enemy ? c.enemy.name : 'You'} '
+                  'seize${holder == c.enemy ? 's' : ''} the initiative';
+          _bannerColor = const Color(0xFF7FD4E8);
+        });
+        await _runFx(_FxKind.flash,
+            atEnemy: holder == c.enemy,
+            color: const Color(0xFF7FD4E8),
+            ms: 450);
+      case ForfeitedEvent(:final mage):
+        setState(() {
+          _banner = mage == c.enemy
+              ? '${c.enemy.name} forfeits the turn'
+              : 'You ran out of time — turn forfeited';
+          _bannerColor = const Color(0xFFD85A30);
+        });
+        await Future<void>.delayed(const Duration(milliseconds: 650));
       case DefeatedEvent():
         await Future<void>.delayed(const Duration(milliseconds: 700));
     }
@@ -443,8 +511,9 @@ class _DuelScreenState extends State<DuelScreen>
           alignment: Alignment.center,
           children: [
             MageSprite(
-              apparel:
-                  isEnemy ? MageApparel.duskWitch : MageApparel.apprenticeBlue,
+              apparel: isEnemy
+                  ? widget.driver.opponentApparel
+                  : MageApparel.apprenticeBlue,
               element: isEnemy
                   ? c.revealedEnemyElement
                   : (c.shownPlayerElement ?? c.pendingElement),
@@ -484,6 +553,8 @@ class _DuelScreenState extends State<DuelScreen>
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (!c.gameOver) _countdown(),
+        if (!c.gameOver) const SizedBox(width: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
@@ -532,6 +603,37 @@ class _DuelScreenState extends State<DuelScreen>
     );
   }
 
+  // A per-move countdown. When it empties (or the player is idle/disconnected)
+  // the move is forfeited.
+  Widget _countdown() {
+    final frac = (_secondsLeft / _moveSeconds).clamp(0.0, 1.0);
+    final secs = _secondsLeft.ceil().clamp(0, _moveSeconds.toInt());
+    final urgent = _secondsLeft <= 3;
+    final color =
+        c.animating ? const Color(0xFF6E6A7A) : (urgent ? const Color(0xFFD85A30) : const Color(0xFF7FD4E8));
+    return SizedBox(
+      width: 26,
+      height: 26,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressIndicator(
+            value: c.animating ? null : frac,
+            strokeWidth: 3,
+            backgroundColor: const Color(0xFF2A2342),
+            valueColor: AlwaysStoppedAnimation(color),
+          ),
+          if (!c.animating)
+            Text('$secs',
+                style: TextStyle(
+                    color: color,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
   Future<void> _confirmForfeit() async {
     final verb = widget.campaign ? 'flee' : 'surrender';
     final confirmed = await showDialog<bool>(
@@ -569,6 +671,7 @@ class _DuelScreenState extends State<DuelScreen>
       shield: c.shownPlayerShield,
       alignEnd: false,
       buffs: [
+        if (c.player.hasHaste) 'Haste',
         if (c.player.empowerMultiplier != null) 'Empowered',
         if (c.player.quickenPriority != null) 'Quickened',
         if (c.player.phaseNext) 'Phasing',
@@ -587,6 +690,7 @@ class _DuelScreenState extends State<DuelScreen>
       shield: c.shownEnemyShield,
       alignEnd: true,
       buffs: [
+        if (c.enemy.hasHaste) 'Haste',
         if (c.enemy.empowerMultiplier != null) 'Empowered',
         if (c.enemy.quickenPriority != null) 'Quickened',
         if (c.enemy.phaseNext) 'Phasing',
@@ -818,48 +922,133 @@ class _DuelScreenState extends State<DuelScreen>
   }
 
   Widget _gameOverOverlay() {
-    final title = c.isDraw
-        ? 'Draw'
-        : c.playerWon
-            ? 'Victory!'
-            : 'Defeat';
+    final won = c.playerWon;
+    final title = c.isDraw ? 'Draw' : (won ? 'Victory!' : 'Defeat');
+    final accent = won ? const Color(0xFFE8C547) : const Color(0xFFD85A30);
+    final goldEarned = won ? Progression.winGold : Progression.lossGold;
+    final xpEarned = won ? Progression.winXp : Progression.lossXp;
+
     return Positioned.fill(
       child: Container(
-        color: const Color(0xB3000000),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(title,
-                  style: TextStyle(
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      color: c.playerWon
-                          ? const Color(0xFFE8C547)
-                          : Colors.white)),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(widget.campaign ? Icons.map : Icons.tune),
-                    label: Text(widget.campaign ? 'Leave' : 'Change loadout'),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      _resultReported = false;
-                      c.newDuel();
-                    },
-                    icon: const Icon(Icons.replay),
-                    label: const Text('Duel again'),
-                  ),
-                ],
-              ),
-            ],
+        color: const Color(0xCC0A0812),
+        alignment: Alignment.center,
+        child: SingleChildScrollView(
+          child: Container(
+            width: 340,
+            margin: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1B1531),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: accent, width: 1.5),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                    won
+                        ? Icons.emoji_events
+                        : (c.isDraw ? Icons.handshake : Icons.sentiment_dissatisfied),
+                    color: accent,
+                    size: 40),
+                const SizedBox(height: 6),
+                Text(title,
+                    style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: accent)),
+                Text('vs ${c.enemy.name}',
+                    style: const TextStyle(
+                        color: Color(0xFF9C93C4), fontSize: 13)),
+                const SizedBox(height: 16),
+                _rewardRow(
+                  leading: const CoinIcon(size: 20),
+                  label: 'Gold',
+                  value: goldEarned > 0 ? '+$goldEarned' : '—',
+                ),
+                const SizedBox(height: 8),
+                _rewardRow(
+                  leading: const Icon(Icons.star_rounded,
+                      color: Color(0xFF7FD4E8), size: 22),
+                  label: 'Experience',
+                  value: xpEarned > 0 ? '+$xpEarned XP' : '—',
+                ),
+                const SizedBox(height: 8),
+                _rewardRow(
+                  leading: const Icon(Icons.military_tech,
+                      color: Color(0xFF6E6A7A), size: 22),
+                  label: 'Ranking',
+                  value: 'coming soon',
+                  muted: true,
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(widget.campaign ? Icons.map : Icons.tune,
+                            size: 18),
+                        label: Text(widget.campaign ? 'Leave' : 'Loadout'),
+                      ),
+                    ),
+                    if (widget.driver.supportsRematch) ...[
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFE25822),
+                            foregroundColor: const Color(0xFF141021),
+                          ),
+                          onPressed: () {
+                            _resultReported = false;
+                            c.newDuel();
+                            _startMoveTimer();
+                          },
+                          icon: const Icon(Icons.replay, size: 18),
+                          label: const Text('Again'),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _rewardRow({
+    required Widget leading,
+    required String label,
+    required String value,
+    bool muted = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF141021),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          leading,
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(label,
+                style: const TextStyle(
+                    color: Color(0xFFECE7F8), fontSize: 14)),
+          ),
+          Text(value,
+              style: TextStyle(
+                  color: muted
+                      ? const Color(0xFF6E6A7A)
+                      : const Color(0xFFE8C547),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600)),
+        ],
       ),
     );
   }

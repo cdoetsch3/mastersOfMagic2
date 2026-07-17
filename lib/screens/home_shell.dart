@@ -167,8 +167,8 @@ class _CenterButton extends StatelessWidget {
                 color: AppColors.gold,
                 border: Border.all(color: AppColors.bg, width: 3),
               ),
-              child: Icon(_tabs[_centerIndex].icon,
-                  size: 26, color: AppColors.bg),
+              alignment: Alignment.center,
+              child: const WizardHatIcon(size: 28, color: AppColors.bg),
             ),
           ),
           Transform.translate(
@@ -265,8 +265,8 @@ class _RailCenter extends StatelessWidget {
               color: AppColors.gold,
               border: Border.all(color: AppColors.bg, width: 3),
             ),
-            child:
-                Icon(_tabs[_centerIndex].icon, size: 22, color: AppColors.bg),
+            alignment: Alignment.center,
+            child: const WizardHatIcon(size: 24, color: AppColors.bg),
           ),
           const SizedBox(height: 2),
           Text('Home',
@@ -307,9 +307,11 @@ class PlayerHeader extends StatelessWidget {
               ],
             ),
           ),
-          _Currency(icon: Icons.monetization_on, value: p.gold, color: AppColors.gold),
+          _Currency(leading: const CoinIcon(size: 15), value: p.gold),
           const SizedBox(width: 8),
-          _Currency(icon: Icons.diamond, value: p.gems, color: AppColors.gem),
+          _Currency(
+              leading: const Icon(Icons.diamond, size: 14, color: AppColors.gem),
+              value: p.gems),
         ],
       ),
     );
@@ -317,11 +319,9 @@ class PlayerHeader extends StatelessWidget {
 }
 
 class _Currency extends StatelessWidget {
-  final IconData icon;
+  final Widget leading;
   final int value;
-  final Color color;
-  const _Currency(
-      {required this.icon, required this.value, required this.color});
+  const _Currency({required this.leading, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -335,7 +335,7 @@ class _Currency extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
+          leading,
           const SizedBox(width: 5),
           Text('$value',
               style: const TextStyle(

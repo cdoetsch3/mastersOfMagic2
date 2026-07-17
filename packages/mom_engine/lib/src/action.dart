@@ -30,3 +30,13 @@ class CastAction extends MageAction {
   @override
   String toString() => 'cast ${spell.name}';
 }
+
+/// Do nothing this turn — no charge, no cast, charge and element unchanged.
+/// Submitted when a player runs out of time or is disconnected. Strictly
+/// worse than channeling (you don't even gain charge).
+class ForfeitAction extends MageAction {
+  const ForfeitAction();
+
+  @override
+  String toString() => 'forfeit';
+}
