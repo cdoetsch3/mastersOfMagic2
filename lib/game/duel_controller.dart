@@ -49,10 +49,18 @@ class DuelController extends ChangeNotifier {
   /// True while the commit-reveal exchange is in flight (remote duels).
   bool waitingForOpponent = false;
 
+  /// Forfeiting this many turns in a row is treated as surrendering — it is
+  /// how a player who closed their tab (forfeiting every turn via timeout)
+  /// is handed their loss instead of dragging the duel out forever.
+  static const int forfeitLimit = 3;
+  int _myForfeitStreak = 0;
+  int _theirForfeitStreak = 0;
+
   final List<String> battleLog = [];
 
   DuelController({required this.loadout, required this.driver}) {
     newDuel();
+    driver.watchOpponentSurrender(_onOpponentSurrendered);
   }
 
   bool get playerIsHost => driver.playerIsHost;
@@ -79,6 +87,8 @@ class DuelController extends ChangeNotifier {
     pendingElement = null;
     animating = false;
     waitingForOpponent = false;
+    _myForfeitStreak = 0;
+    _theirForfeitStreak = 0;
     battleLog.clear();
     notifyListeners();
   }
@@ -121,6 +131,14 @@ class DuelController extends ChangeNotifier {
       notifyListeners();
     }
 
+    // The opponent may have surrendered while the exchange was in flight
+    // (the watcher already ended the duel) — nothing left to resolve.
+    if (engine.isOver) {
+      animating = false;
+      notifyListeners();
+      return const [];
+    }
+
     if (exchange.turnSeed != null) _rng.reseed(exchange.turnSeed!);
     final theirs = exchange.opponentAction;
     final hostAction = playerIsHost ? action : theirs;
@@ -128,8 +146,31 @@ class DuelController extends ChangeNotifier {
     final result = engine.resolveTurn(hostAction, guestAction);
     battleLog.add('— Turn ${result.turn}');
     battleLog.addAll(result.events.map(_describe));
+    _trackForfeits(action, theirs);
     notifyListeners();
     return result.events;
+  }
+
+  /// Applies the [forfeitLimit] rule after a turn resolves: whichever side
+  /// has forfeited that many turns in a row surrenders the duel.
+  void _trackForfeits(MageAction mine, MageAction theirs) {
+    _myForfeitStreak = mine is ForfeitAction ? _myForfeitStreak + 1 : 0;
+    _theirForfeitStreak = theirs is ForfeitAction ? _theirForfeitStreak + 1 : 0;
+    if (engine.isOver) return;
+    if (_myForfeitStreak >= forfeitLimit) {
+      engine.concede(player);
+      playerDefeated = true;
+      shownPlayerHp = 0;
+      battleLog.add(
+          'You forfeited $forfeitLimit turns in a row and surrender. '
+          '${enemy.name} wins.');
+      driver.reportSurrender(); // fire-and-forget: tell the remote peer
+    } else if (_theirForfeitStreak >= forfeitLimit) {
+      engine.concede(enemy);
+      enemyDefeated = true;
+      shownEnemyHp = 0;
+      battleLog.add('${enemy.name} left the duel. You win!');
+    }
   }
 
   MageAction chargeAction() =>
@@ -223,6 +264,18 @@ class DuelController extends ChangeNotifier {
     playerDefeated = true;
     shownPlayerHp = 0;
     battleLog.add('You $verb. ${enemy.name} wins.');
+    driver.reportSurrender(); // fire-and-forget: tell the remote peer
+    notifyListeners();
+  }
+
+  /// The remote opponent surrendered: the duel ends right now as a win,
+  /// whether this player was mid-exchange or idle at the move picker.
+  void _onOpponentSurrendered() {
+    if (engine.isOver) return;
+    engine.concede(enemy);
+    enemyDefeated = true;
+    shownEnemyHp = 0;
+    battleLog.add('${enemy.name} surrenders. You win!');
     notifyListeners();
   }
 

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'firestore_rest.dart';
 import 'player_profile.dart';
 
 /// Persistence boundary for the player save. Local now; a `FirestoreProfile
@@ -53,15 +53,13 @@ class FirestoreProfileStorage implements ProfileStorage {
   final String uid;
   FirestoreProfileStorage(this.uid);
 
-  DocumentReference<Map<String, dynamic>> get _doc =>
-      FirebaseFirestore.instance.collection('players').doc(uid);
+  String get _path => 'players/$uid';
 
   @override
   Future<PlayerProfile?> load() async {
     try {
-      final snap = await _doc.get();
-      final data = snap.data();
-      if (!snap.exists || data == null) return null;
+      final data = await FirestoreRest.get(_path);
+      if (data == null) return null;
       return PlayerProfile.fromJson(data);
     } catch (_) {
       return null;
@@ -71,8 +69,7 @@ class FirestoreProfileStorage implements ProfileStorage {
   @override
   Future<void> save(PlayerProfile profile) async {
     try {
-      // Offline persistence queues this and syncs when back online.
-      await _doc.set(profile.toJson());
+      await FirestoreRest.set(_path, profile.toJson());
     } catch (_) {
       // Best effort — the local cache still holds the latest state.
     }
@@ -81,7 +78,7 @@ class FirestoreProfileStorage implements ProfileStorage {
   @override
   Future<void> clear() async {
     try {
-      await _doc.delete();
+      await FirestoreRest.delete(_path);
     } catch (_) {}
   }
 }

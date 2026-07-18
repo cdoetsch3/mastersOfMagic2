@@ -30,6 +30,13 @@ const int _centerIndex = 2;
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
+  /// Cross-route tab requests (routes pushed above the shell can't reach its
+  /// state through context). Setting a tab index here switches the shell to
+  /// it; [goHome] is the common case, e.g. after signing in.
+  static final ValueNotifier<int?> tabRequest = ValueNotifier<int?>(null);
+
+  static void goHome() => tabRequest.value = _centerIndex;
+
   @override
   State<HomeShell> createState() => _HomeShellState();
 }
@@ -38,6 +45,26 @@ class _HomeShellState extends State<HomeShell> {
   int _index = _centerIndex;
 
   void _select(int i) => setState(() => _index = i);
+
+  @override
+  void initState() {
+    super.initState();
+    HomeShell.tabRequest.addListener(_onTabRequest);
+  }
+
+  void _onTabRequest() {
+    final requested = HomeShell.tabRequest.value;
+    if (requested != null && mounted) {
+      _select(requested);
+      HomeShell.tabRequest.value = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    HomeShell.tabRequest.removeListener(_onTabRequest);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

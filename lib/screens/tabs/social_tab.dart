@@ -22,8 +22,13 @@ class SocialTab extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
             children: [
-              if (auth != null) _AccountCard(auth: auth),
-              if (auth != null) const SizedBox(height: 16),
+              if (auth == null || !auth.signedIn) ...[
+                const _SignInButton(),
+                const SizedBox(height: 16),
+              ] else ...[
+                _AccountCard(auth: auth),
+                const SizedBox(height: 16),
+              ],
               GamePanel(
                 child: Column(
                   children: const [
@@ -55,6 +60,41 @@ class SocialTab extends StatelessWidget {
   }
 }
 
+/// The can't-miss-it call to action for guests: a filled gold button, not a
+/// quiet panel row — signing in is the doorway to everything on this tab.
+class _SignInButton extends StatelessWidget {
+  const _SignInButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.gold,
+            foregroundColor: AppColors.bg,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+          ),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const AccountScreen()),
+          ),
+          icon: const Icon(Icons.login, size: 20),
+          label: const Text('Sign in or create account',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+            'Save your progress across devices and duel other mages online.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppColors.textDim, fontSize: 12)),
+      ],
+    );
+  }
+}
+
 class _AccountCard extends StatelessWidget {
   final AuthService auth;
   const _AccountCard({required this.auth});
@@ -67,32 +107,6 @@ class _AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!auth.signedIn) {
-      return GamePanel(
-        onTap: () => _open(context),
-        borderColor: AppColors.gold,
-        child: Row(
-          children: [
-            const Icon(Icons.account_circle, color: AppColors.gold, size: 34),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Playing as guest',
-                      style:
-                          TextStyle(color: AppColors.text, fontSize: 14)),
-                  Text('Create an account to add friends and save progress',
-                      style: TextStyle(
-                          color: AppColors.textDim, fontSize: 12)),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right, color: AppColors.textFaint),
-          ],
-        ),
-      );
-    }
     return GamePanel(
       onTap: () => _open(context),
       child: Row(

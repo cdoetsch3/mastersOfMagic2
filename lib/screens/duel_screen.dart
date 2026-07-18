@@ -13,6 +13,7 @@ import '../game/mage_sprite.dart';
 import '../game/opponent_driver.dart';
 import '../game/progression.dart';
 import '../ui/app_theme.dart';
+import 'home_shell.dart';
 
 /// The landscape duel arena. Keyboard: 1-8 = element slots, QWERT/ASDFG =
 /// spell slots, C = channel. Turn resolution plays the engine's event list
@@ -73,25 +74,52 @@ class _DuelScreenState extends State<DuelScreen>
   static const double _moveSeconds = 10;
   Timer? _moveTimer;
   double _secondsLeft = _moveSeconds;
+  double _clockTotal = _moveSeconds;
+  // Wall-clock deadline, not tick-counting: browsers throttle timers in
+  // hidden tabs, and a tick-counted clock would run far slower than real
+  // time there — never forfeiting, stalling a networked opponent.
+  DateTime _moveDeadline = DateTime.now();
 
-  void _startMoveTimer() {
+  /// Runs the countdown ring. With [forfeitOnExpiry] this is the player's
+  /// move clock; without it, a display-only clock showing how long until
+  /// the waiting-on opponent is declared forfeit (so a quiet wait doesn't
+  /// look like a freeze).
+  void _startClock(double seconds, {required bool forfeitOnExpiry}) {
     _moveTimer?.cancel();
-    setState(() => _secondsLeft = _moveSeconds);
+    _clockTotal = seconds;
+    _moveDeadline =
+        DateTime.now().add(Duration(milliseconds: (seconds * 1000).round()));
+    setState(() => _secondsLeft = seconds);
     _moveTimer = Timer.periodic(const Duration(milliseconds: 100), (t) {
       if (!mounted) {
         t.cancel();
         return;
       }
-      // Pause the clock while the arena is hidden behind the rotate prompt.
+      // Pause the clock while the arena is hidden behind the rotate prompt
+      // (extend the deadline by the elapsed tick so time stands still).
       final size = MediaQuery.of(context).size;
-      if (size.height > size.width) return;
-      setState(() => _secondsLeft -= 0.1);
-      if (_secondsLeft <= 0) {
+      if (size.height > size.width) {
+        _moveDeadline = _moveDeadline.add(const Duration(milliseconds: 100));
+        return;
+      }
+      final left =
+          _moveDeadline.difference(DateTime.now()).inMilliseconds / 1000.0;
+      setState(() => _secondsLeft = left.clamp(0.0, seconds));
+      if (left <= 0) {
+        if (!forfeitOnExpiry) {
+          t.cancel(); // the driver's own timeout resolves the turn from here
+          return;
+        }
+        // Keep ticking while an animation is mid-flight; the forfeit must
+        // eventually fire or a networked opponent would wait forever.
+        if (c.animating) return;
         t.cancel();
-        if (!c.animating && !c.gameOver) _submit(const ForfeitAction());
+        if (!c.gameOver) _submit(const ForfeitAction());
       }
     });
   }
+
+  void _startMoveTimer() => _startClock(_moveSeconds, forfeitOnExpiry: true);
 
   void _stopMoveTimer() {
     _moveTimer?.cancel();
@@ -149,18 +177,33 @@ class _DuelScreenState extends State<DuelScreen>
     _fx.duration = Duration(milliseconds: ms);
     try {
       // .orCancel converts an interrupted ticker into an exception instead of
-      // a future that never completes (which would freeze the turn loop).
-      await _fx.forward(from: 0).orCancel;
+      // a future that never completes (which would freeze the turn loop). The
+      // timeout guards against muted tickers: browsers throttle hidden tabs,
+      // and a never-advancing animation would otherwise stall a PvP duel.
+      await _fx
+          .forward(from: 0)
+          .orCancel
+          .timeout(Duration(milliseconds: ms * 3 + 1000));
     } on TickerCanceled {
       // Animation was interrupted — skip ahead.
+    } on TimeoutException {
+      _fx.stop();
     }
     if (mounted) setState(() => _fxKind = _FxKind.none);
   }
 
   Future<void> _submit(MageAction action) async {
-    _stopMoveTimer(); // move is locked in — clock stops
+    // Move locked in. For remote duels, keep a visible countdown running so
+    // the wait reads as "opponent has N seconds left", not a frozen app.
+    if (widget.driver is RemoteDuelDriver) {
+      _startClock(RemoteDuelDriver.opponentTimeout.inSeconds.toDouble(),
+          forfeitOnExpiry: false);
+    } else {
+      _stopMoveTimer();
+    }
     try {
       final events = await c.submitTurn(action);
+      _stopMoveTimer(); // exchange done — the clock is moot while animating
       for (final event in events) {
         await _animate(event);
         if (!mounted) return;
@@ -604,13 +647,20 @@ class _DuelScreenState extends State<DuelScreen>
   }
 
   // A per-move countdown. When it empties (or the player is idle/disconnected)
-  // the move is forfeited.
+  // the move is forfeited. While waiting on a remote opponent it keeps
+  // counting (in gold) toward the moment they are declared forfeit, so the
+  // wait is visibly alive rather than looking frozen.
   Widget _countdown() {
-    final frac = (_secondsLeft / _moveSeconds).clamp(0.0, 1.0);
-    final secs = _secondsLeft.ceil().clamp(0, _moveSeconds.toInt());
-    final urgent = _secondsLeft <= 3;
-    final color =
-        c.animating ? const Color(0xFF6E6A7A) : (urgent ? const Color(0xFFD85A30) : const Color(0xFF7FD4E8));
+    final waiting = c.waitingForOpponent;
+    final showClock = waiting || !c.animating;
+    final frac = (_secondsLeft / _clockTotal).clamp(0.0, 1.0);
+    final secs = _secondsLeft.ceil().clamp(0, _clockTotal.toInt());
+    final urgent = !waiting && _secondsLeft <= 3;
+    final color = !showClock
+        ? const Color(0xFF6E6A7A)
+        : waiting
+            ? AppColors.gold
+            : (urgent ? const Color(0xFFD85A30) : const Color(0xFF7FD4E8));
     return SizedBox(
       width: 26,
       height: 26,
@@ -618,12 +668,12 @@ class _DuelScreenState extends State<DuelScreen>
         alignment: Alignment.center,
         children: [
           CircularProgressIndicator(
-            value: c.animating ? null : frac,
+            value: showClock ? frac : null,
             strokeWidth: 3,
             backgroundColor: const Color(0xFF2A2342),
             valueColor: AlwaysStoppedAnimation(color),
           ),
-          if (!c.animating)
+          if (showClock)
             Text('$secs',
                 style: TextStyle(
                     color: color,
@@ -986,10 +1036,18 @@ class _DuelScreenState extends State<DuelScreen>
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(widget.campaign ? Icons.map : Icons.tune,
+                        onPressed: () {
+                          if (widget.campaign) {
+                            Navigator.of(context).pop();
+                          } else {
+                            HomeShell.goHome();
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
+                          }
+                        },
+                        icon: Icon(widget.campaign ? Icons.map : Icons.home,
                             size: 18),
-                        label: Text(widget.campaign ? 'Leave' : 'Loadout'),
+                        label: Text(widget.campaign ? 'Leave' : 'Home'),
                       ),
                     ),
                     if (widget.driver.supportsRematch) ...[

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -61,13 +63,21 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       if (!mounted) return;
       setState(() => _busy = _Busy.none);
       if (result.isHuman) {
-        await launchDuel(context,
-            loadout: widget.loadout, driver: result.remote!, campaign: false);
+        await launchDuel(
+          context,
+          loadout: widget.loadout,
+          driver: result.remote!,
+          campaign: false,
+        );
       } else {
         final persona = result.persona!;
         _showStandInNote(persona);
-        await launchAiDuel(context,
-            loadout: widget.loadout, persona: persona, campaign: false);
+        await launchAiDuel(
+          context,
+          loadout: widget.loadout,
+          persona: persona,
+          campaign: false,
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -80,12 +90,15 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
   }
 
   void _showStandInNote(AiPersona persona) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.panel,
-      content: Text(
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.panel,
+        content: Text(
           'No mages answered the call — ${persona.name} steps in!',
-          style: const TextStyle(color: AppColors.text)),
-    ));
+          style: const TextStyle(color: AppColors.text),
+        ),
+      ),
+    );
   }
 
   Future<void> _hostRoom() async {
@@ -100,15 +113,21 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       if (!mounted) return;
       setState(() => _roomCode = room.code);
       final driver = await Matchmaking.waitForGuest(
-          code: room.code, seed: room.seed);
+        code: room.code,
+        seed: room.seed,
+      );
       if (!mounted) return;
       setState(() {
         _busy = _Busy.none;
         _roomCode = null;
       });
       if (driver != null) {
-        await launchDuel(context,
-            loadout: widget.loadout, driver: driver, campaign: false);
+        await launchDuel(
+          context,
+          loadout: widget.loadout,
+          driver: driver,
+          campaign: false,
+        );
       } else {
         await Matchmaking.cancel(uid: id.uid, roomCode: room.code);
         setState(() => _error = 'Nobody joined. Room closed.');
@@ -118,7 +137,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         setState(() {
           _busy = _Busy.none;
           _roomCode = null;
-          _error = 'Could not create a room.';
+          _error = 'Room error: $e';
         });
       }
     }
@@ -137,12 +156,19 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       _error = null;
     });
     try {
-      final driver =
-          await Matchmaking.joinRoom(code: code, uid: id.uid, name: id.name);
+      final driver = await Matchmaking.joinRoom(
+        code: code,
+        uid: id.uid,
+        name: id.name,
+      );
       if (!mounted) return;
       setState(() => _busy = _Busy.none);
-      await launchDuel(context,
-          loadout: widget.loadout, driver: driver, campaign: false);
+      await launchDuel(
+        context,
+        loadout: widget.loadout,
+        driver: driver,
+        campaign: false,
+      );
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -158,12 +184,15 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.panel,
-        title: const Text('Account needed',
-            style: TextStyle(color: AppColors.text, fontSize: 17)),
+        title: const Text(
+          'Account needed',
+          style: TextStyle(color: AppColors.text, fontSize: 17),
+        ),
         content: const Text(
-            'Dueling other players needs an account so they know who beat '
-            'them. Practice duels vs AI work without one.',
-            style: TextStyle(color: AppColors.textDim)),
+          'Dueling other players needs an account so they know who beat '
+          'them. Practice duels vs AI work without one.',
+          style: TextStyle(color: AppColors.textDim),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -172,8 +201,9 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Navigator.of(context).push(MaterialPageRoute<void>(
-                  builder: (_) => const AccountScreen()));
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const AccountScreen()),
+              );
             },
             child: const Text('Sign in'),
           ),
@@ -197,58 +227,54 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
             child: _busy == _Busy.searching
                 ? _searchingView()
                 : (_busy == _Busy.hosting && _roomCode != null)
-                    ? _hostingView()
-                    : _menu(),
+                ? _hostingView()
+                : _menu(),
           ),
         ),
       ),
     );
   }
 
-  Widget _searchingView() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        CircularProgressIndicator(color: AppColors.gold),
-        SizedBox(height: 18),
-        Text('Searching for an opponent...',
-            style: TextStyle(color: AppColors.text, fontSize: 16)),
-        SizedBox(height: 6),
-        Text('If no mage answers, a rival steps in.',
-            style: TextStyle(color: AppColors.textDim, fontSize: 13)),
-      ],
-    );
-  }
+  Widget _searchingView() => const _SearchingView();
 
   Widget _hostingView() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text('Share this code with your friend',
-            style: TextStyle(color: AppColors.textDim, fontSize: 14)),
+        const Text(
+          'Share this code with your friend',
+          style: TextStyle(color: AppColors.textDim, fontSize: 14),
+        ),
         const SizedBox(height: 12),
         InkWell(
           onTap: () {
             Clipboard.setData(ClipboardData(text: _roomCode!));
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
                 backgroundColor: AppColors.panel,
-                content: Text('Code copied',
-                    style: TextStyle(color: AppColors.text))));
+                content: Text(
+                  'Code copied',
+                  style: TextStyle(color: AppColors.text),
+                ),
+              ),
+            );
           },
           child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
             decoration: BoxDecoration(
               color: AppColors.panelHi,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AppColors.gold, width: 1.5),
             ),
-            child: Text(_roomCode!,
-                style: const TextStyle(
-                    color: AppColors.gold,
-                    fontSize: 32,
-                    letterSpacing: 6,
-                    fontWeight: FontWeight.bold)),
+            child: Text(
+              _roomCode!,
+              style: const TextStyle(
+                color: AppColors.gold,
+                fontSize: 32,
+                letterSpacing: 6,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -256,11 +282,15 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
           width: 18,
           height: 18,
           child: CircularProgressIndicator(
-              strokeWidth: 2, color: AppColors.textDim),
+            strokeWidth: 2,
+            color: AppColors.textDim,
+          ),
         ),
         const SizedBox(height: 8),
-        const Text('Waiting for them to join...',
-            style: TextStyle(color: AppColors.textDim, fontSize: 13)),
+        const Text(
+          'Waiting for them to join...',
+          style: TextStyle(color: AppColors.textDim, fontSize: 13),
+        ),
         const SizedBox(height: 20),
         OutlinedButton(
           onPressed: () async {
@@ -298,12 +328,14 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Quick match',
-                        style:
-                            TextStyle(color: AppColors.text, fontSize: 15)),
-                    Text('Face another mage — or a rival AI if none answer',
-                        style: TextStyle(
-                            color: AppColors.textDim, fontSize: 12)),
+                    Text(
+                      'Quick match',
+                      style: TextStyle(color: AppColors.text, fontSize: 15),
+                    ),
+                    Text(
+                      'Face another mage — or a rival AI if none answer',
+                      style: TextStyle(color: AppColors.textDim, fontSize: 12),
+                    ),
                   ],
                 ),
               ),
@@ -320,14 +352,17 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
               const Icon(Icons.qr_code, color: AppColors.gold, size: 24),
               const SizedBox(width: 12),
               const Expanded(
-                child: Text('Create a room code',
-                    style: TextStyle(color: AppColors.text, fontSize: 14)),
+                child: Text(
+                  'Create a room code',
+                  style: TextStyle(color: AppColors.text, fontSize: 14),
+                ),
               ),
               if (_busy == _Busy.hosting)
                 const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2)),
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
             ],
           ),
         ),
@@ -340,11 +375,15 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                   controller: _codeField,
                   textCapitalization: TextCapitalization.characters,
                   style: const TextStyle(
-                      color: AppColors.text, letterSpacing: 3),
+                    color: AppColors.text,
+                    letterSpacing: 3,
+                  ),
                   decoration: const InputDecoration(
                     hintText: 'ROOM CODE',
-                    hintStyle:
-                        TextStyle(color: AppColors.textFaint, letterSpacing: 3),
+                    hintStyle: TextStyle(
+                      color: AppColors.textFaint,
+                      letterSpacing: 3,
+                    ),
                     border: InputBorder.none,
                     isDense: true,
                   ),
@@ -360,7 +399,8 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                     ? const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2))
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
                     : const Text('Join'),
               ),
             ],
@@ -368,8 +408,10 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         ),
         if (_error != null) ...[
           const SizedBox(height: 8),
-          Text(_error!,
-              style: const TextStyle(color: AppColors.ember, fontSize: 13)),
+          Text(
+            _error!,
+            style: const TextStyle(color: AppColors.ember, fontSize: 13),
+          ),
         ],
         const SizedBox(height: 14),
         const SectionLabel('Practice vs AI'),
@@ -388,36 +430,179 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                   CircleAvatar(
                     radius: 16,
                     backgroundColor: persona.apparel.robe,
-                    child: Text(persona.name[0],
-                        style: const TextStyle(
-                            color: AppColors.text,
-                            fontWeight: FontWeight.bold)),
+                    child: Text(
+                      persona.name[0],
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${persona.name} · Lv ${persona.level}',
-                            style: const TextStyle(
-                                color: AppColors.text, fontSize: 14)),
-                        Text(persona.title,
-                            style: const TextStyle(
-                                color: AppColors.textDim, fontSize: 12)),
+                        Text(
+                          '${persona.name} · Lv ${persona.level}',
+                          style: const TextStyle(
+                            color: AppColors.text,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          persona.title,
+                          style: const TextStyle(
+                            color: AppColors.textDim,
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   if (persona.level <= game.profile.level + 1)
-                    const Icon(Icons.chevron_right,
-                        color: AppColors.textFaint)
+                    const Icon(Icons.chevron_right, color: AppColors.textFaint)
                   else
-                    const Icon(Icons.warning_amber,
-                        size: 16, color: AppColors.gold),
+                    const Icon(
+                      Icons.warning_amber,
+                      size: 16,
+                      color: AppColors.gold,
+                    ),
                 ],
               ),
             ),
           ),
       ],
+    );
+  }
+}
+
+/// The quick-match waiting screen: a spinner plus one gameplay tip so the
+/// ~10s search for an opponent teaches a mechanic instead of feeling dead.
+/// A single tip (varied per search) — they're long enough that one is a
+/// comfortable read in the time available.
+class _SearchingView extends StatefulWidget {
+  const _SearchingView();
+
+  @override
+  State<_SearchingView> createState() => _SearchingViewState();
+}
+
+class _SearchingViewState extends State<_SearchingView> {
+  static const List<({String title, String body})> _tips = [
+    (
+      title: 'Haste',
+      body:
+          'Casting first seizes Haste — it wins any tie when you both play the same-speed spell.',
+    ),
+    (
+      title: 'Priority',
+      body:
+          'Shields (3) go up before regular attacks (9). A Quickened attack (2) can beat a shield.',
+    ),
+    (
+      title: 'Elements',
+      body:
+          'Elements only matter for shields: a countering attack deals DOUBLE to a shield of the element it beats.',
+    ),
+    (
+      title: 'Channel',
+      body:
+          'Channeling resolves at priority 4 — a faster Discharge or Overload can punish you mid-charge.',
+    ),
+    (
+      title: 'Discharge',
+      body:
+          'Discharge (7) wipes all enemy charge and, being faster, fizzles a same-turn Barrage (9).',
+    ),
+    (
+      title: 'Overload',
+      body:
+          "Overload deals damage per point of the enemy's charge — brutal against a fully-charged mage.",
+    ),
+    (
+      title: 'Air',
+      body:
+          'Air is the untouchable wind: its shields can never be double-broken, but its attacks never crack shields.',
+    ),
+    (
+      title: 'Bluffing',
+      body:
+          "You can see what your opponent is charging — but not whether they'll strike, shield, or keep charging.",
+    ),
+    (
+      title: 'Barrier',
+      body:
+          'Barrier blocks one hit completely, then shatters — a great answer to a big incoming Cataclysm.',
+    ),
+    (
+      title: 'Lifesteal',
+      body:
+          'Sap, Leech, and Drain heal you for the damage that reaches health — not damage soaked by a shield.',
+    ),
+  ];
+
+  // Deterministic-but-varied tip pick without dart:math in the widget.
+  late final int _i = DateTime.now().microsecondsSinceEpoch % _tips.length;
+
+  @override
+  Widget build(BuildContext context) {
+    final tip = _tips[_i];
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(color: AppColors.gold),
+          const SizedBox(height: 18),
+          const Text(
+            'Searching for an opponent...',
+            style: TextStyle(color: AppColors.text, fontSize: 16),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'If no mage answers, a rival steps in.',
+            style: TextStyle(color: AppColors.textDim, fontSize: 12),
+          ),
+          const SizedBox(height: 28),
+          GamePanel(
+            color: AppColors.panel,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.lightbulb_outline,
+                      color: AppColors.gold,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Tip · ${tip.title}',
+                      style: const TextStyle(
+                        color: AppColors.gold,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  tip.body,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 13.5,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

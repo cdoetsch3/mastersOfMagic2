@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mom_engine/mom_engine.dart';
 
 import 'ai_personas.dart';
+import 'firestore_rest.dart';
 import 'mage_apparel.dart';
 
 /// What one turn's exchange produced: the opponent's action, plus (for
@@ -35,6 +35,14 @@ abstract interface class OpponentDriver {
   /// commit-reveal round trip (and may report the opponent as forfeiting if
   /// they time out or disconnect).
   Future<TurnExchange> exchangeTurn(int turn, MageAction playerAction);
+
+  /// Tells the remote peer this player surrendered, so their duel ends
+  /// immediately instead of waiting out move timeouts. No-op for local AI.
+  Future<void> reportSurrender();
+
+  /// Invokes [onSurrendered] (at most once) if the opponent surrenders,
+  /// even while this player is idle at the move picker. No-op for local AI.
+  void watchOpponentSurrender(void Function() onSurrendered);
 
   /// Tear down listeners/rooms.
   Future<void> dispose();
@@ -75,6 +83,12 @@ class LocalAiDriver implements OpponentDriver {
   }
 
   @override
+  Future<void> reportSurrender() async {}
+
+  @override
+  void watchOpponentSurrender(void Function() onSurrendered) {}
+
+  @override
   Future<void> dispose() async {}
 }
 
@@ -96,6 +110,9 @@ class RemoteDuelDriver implements OpponentDriver {
 
   final _rng = Random.secure();
 
+  Timer? _surrenderWatch;
+  bool _theySurrendered = false;
+
   RemoteDuelDriver({
     required this.roomId,
     required this.isHost,
@@ -103,11 +120,8 @@ class RemoteDuelDriver implements OpponentDriver {
     required this.opponentName,
   });
 
-  DocumentReference<Map<String, dynamic>> get _room =>
-      FirebaseFirestore.instance.collection('duels').doc(roomId);
-
-  DocumentReference<Map<String, dynamic>> _turnDoc(int turn) =>
-      _room.collection('turns').doc('$turn');
+  String get _roomPath => 'duels/$roomId';
+  String _turnPath(int turn) => '$_roomPath/turns/$turn';
 
   String get _me => isHost ? 'host' : 'guest';
   String get _them => isHost ? 'guest' : 'host';
@@ -124,46 +138,43 @@ class RemoteDuelDriver implements OpponentDriver {
 
   @override
   Future<TurnExchange> exchangeTurn(int turn, MageAction playerAction) async {
-    final doc = _turnDoc(turn);
+    final path = _turnPath(turn);
     final myWire = encodeAction(playerAction);
     final myNonce =
-        List.generate(4, (_) => _rng.nextInt(1 << 32).toRadixString(16))
+        List.generate(4, (_) => _rng.nextInt(0x40000000).toRadixString(16))
             .join();
 
     // 1. Commit.
-    await doc.set({'${_me}Commit': commitmentOf(myWire, myNonce)},
-        SetOptions(merge: true));
+    await FirestoreRest.set(path, {'${_me}Commit': commitmentOf(myWire, myNonce)});
 
     // 2. Wait for their commitment (or declare a forfeit on timeout).
-    var data = await _waitFor(doc, (d) => d['${_them}Commit'] != null,
-        timeout: opponentTimeout);
+    var data = await _pollTurn(
+        path, (d) => d['${_them}Commit'] != null, opponentTimeout);
     if (data == null) {
-      await doc.set({'${_them}Forfeit': true}, SetOptions(merge: true));
-      data = (await doc.get()).data() ?? {};
+      await FirestoreRest.set(path, {'${_them}Forfeit': true});
+      data = await FirestoreRest.get(path) ?? {};
     }
     final theirForfeit = data['${_them}Forfeit'] == true &&
         data['${_them}Commit'] == null;
 
     // 3. Reveal (safe now: both commitments are locked, or they forfeited).
-    await doc.set({'${_me}Move': myWire, '${_me}Nonce': myNonce},
-        SetOptions(merge: true));
+    await FirestoreRest.set(path, {'${_me}Move': myWire, '${_me}Nonce': myNonce});
 
     String theirWire;
     if (theirForfeit) {
       theirWire = encodeAction(const ForfeitAction());
     } else {
-      final revealed = await _waitFor(
-          doc, (d) => d['${_them}Move'] != null && d['${_them}Nonce'] != null,
-          timeout: opponentTimeout);
+      final revealed = await _pollTurn(
+          path,
+          (d) => d['${_them}Move'] != null && d['${_them}Nonce'] != null,
+          opponentTimeout);
       if (revealed == null) {
-        // Committed but never revealed (disconnected mid-turn): forfeit.
         theirWire = encodeAction(const ForfeitAction());
       } else {
         theirWire = revealed['${_them}Move'] as String;
         final nonce = revealed['${_them}Nonce'] as String;
-        final commit = revealed['${_them}Commit'] as String;
+        final commit = revealed['${_them}Commit'] as String? ?? '';
         if (!verifyCommitment(commit, theirWire, nonce)) {
-          // Tampered reveal — treat as a forfeited move.
           theirWire = encodeAction(const ForfeitAction());
         }
       }
@@ -173,39 +184,51 @@ class RemoteDuelDriver implements OpponentDriver {
     return TurnExchange(decodeAction(theirWire), seed);
   }
 
-  /// Resolves with the doc data once [ready] passes, or null on timeout.
-  Future<Map<String, dynamic>?> _waitFor(
-    DocumentReference<Map<String, dynamic>> doc,
-    bool Function(Map<String, dynamic>) ready, {
-    required Duration timeout,
-  }) async {
-    final completer = Completer<Map<String, dynamic>?>();
-    late final StreamSubscription sub;
-    final timer = Timer(timeout, () {
-      if (!completer.isCompleted) completer.complete(null);
-    });
-    sub = doc.snapshots().listen((snap) {
-      final d = snap.data();
-      if (d != null && ready(d) && !completer.isCompleted) {
-        completer.complete(d);
-      }
-    }, onError: (_) {
-      if (!completer.isCompleted) completer.complete(null);
-    });
-    final result = await completer.future;
-    timer.cancel();
-    await sub.cancel();
-    return result;
-  }
-
-  /// Marks the duel finished (best effort).
-  Future<void> finish(String winnerSide) async {
-    try {
-      await _room.set(
-          {'status': 'done', 'winner': winnerSide}, SetOptions(merge: true));
-    } catch (_) {}
+  /// Polls the turn doc until [ready] passes, or returns null on timeout
+  /// (or as soon as the opponent is known to have surrendered — no point
+  /// waiting out the clock for a move that will never come).
+  Future<Map<String, dynamic>?> _pollTurn(String path,
+      bool Function(Map<String, dynamic>) ready, Duration timeout) async {
+    final deadline = DateTime.now().add(timeout);
+    while (DateTime.now().isBefore(deadline)) {
+      if (_theySurrendered) return null;
+      try {
+        final d = await FirestoreRest.get(path);
+        if (d != null && ready(d)) return d;
+      } catch (_) {}
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+    }
+    return null;
   }
 
   @override
-  Future<void> dispose() async {}
+  Future<void> reportSurrender() async {
+    try {
+      await FirestoreRest.set(
+          _roomPath, {'${_me}Surrendered': true, 'status': 'ended'});
+    } catch (_) {
+      // Best effort — the opponent's move timeouts still end the duel.
+    }
+  }
+
+  @override
+  void watchOpponentSurrender(void Function() onSurrendered) {
+    _surrenderWatch?.cancel();
+    _surrenderWatch =
+        Timer.periodic(const Duration(seconds: 2), (timer) async {
+      try {
+        final room = await FirestoreRest.get(_roomPath);
+        if (room?['${_them}Surrendered'] == true) {
+          _theySurrendered = true;
+          timer.cancel();
+          onSurrendered();
+        }
+      } catch (_) {}
+    });
+  }
+
+  @override
+  Future<void> dispose() async {
+    _surrenderWatch?.cancel();
+  }
 }

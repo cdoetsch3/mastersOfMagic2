@@ -4,6 +4,7 @@ import '../game/app_version.dart';
 import '../game/auth_service.dart';
 import '../game/game_state.dart';
 import '../ui/app_theme.dart';
+import 'home_shell.dart';
 
 /// Sign-in / create-account flow. Optional in Phase 1 — the game is playable
 /// as a guest; an account is what will carry friends, challenges, and cloud
@@ -71,9 +72,14 @@ class _AccountScreenState extends State<AccountScreen> {
       _busy = false;
       _error = error;
     });
-    // On sign-up/in, adopt the character name into the local profile.
-    if (error == null && _createMode && _name.text.trim().isNotEmpty) {
-      GameStateScope.read(context).setName(_name.text.trim());
+    if (error == null) {
+      // On sign-up, adopt the character name into the local profile.
+      if (_createMode && _name.text.trim().isNotEmpty) {
+        GameStateScope.read(context).setName(_name.text.trim());
+      }
+      // Signed in — head back to Home rather than lingering here.
+      HomeShell.goHome();
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
