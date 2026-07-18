@@ -71,6 +71,12 @@ your shield's color reveals its element.
 ✅ Launch roster (8): Earth, Fire, Water, Air, Electric, Ice, Light, Shadow.
 💡 More elements may be added later as unlockables.
 
+📝 **Superseding proposal:** [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md)
+— a 9-element roster in three tiers with per-element side-effects. Renames:
+Water→Aqua, Fire→Pyro, Electric→Electro, Air→Aero, Earth→Geo, Light→Radiant,
+Shadow→Umbra; adds Flora and Arcane; drops Ice. Not yet implemented; see that
+doc for the balance review and open questions.
+
 ### Counter wheel — 📝 DRAFT proposal (variable volatility)
 
 ✅ Rule: elements need not all have 2 strengths / 2 weaknesses. The only invariant is
