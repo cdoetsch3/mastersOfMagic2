@@ -4,303 +4,400 @@ Design spec + balance review for the nine-element side-effect system.
 Companion to [GAME_DESIGN.md](GAME_DESIGN.md) — priorities, charge rules, and
 Haste referenced here are defined there.
 
-Legend: ✅ decided · 📝 draft (needs review) · ❓ open question · ⚠️ balance/abuse concern
+Legend: ✅ decided · 📝 draft (needs review) · 💡 idea bank · ❓ open question · ⚠️ balance/abuse concern
 
-Status: 📝 **draft — not implemented.** This document captures the proposed
-mechanics, the balance review, and the open questions that block a final spec.
+Status: 📝 **draft — not implemented.** Mechanics below are settling; see §9
+for the questions that still block implementation.
 
 ---
 
 ## 1. Definitions
 
-📝 Proposed terms used by every effect below:
+✅ Decided terms used by every effect below:
 
 1. **Spell cast** — anything EXCEPT charge. Charging only counts when an
-   effect explicitly says so.
+   effect explicitly says so (Umbra is the one current exception, §4.2).
 2. **Offensive spell** — any spell that negatively impacts the opponent.
+   ✅ Discharge is an Offensive spell that is **not** a Damaging spell.
 3. **Damaging spell** — any spell that deals damage to the opponent.
 4. **Shield spell** — anything that creates a shield (including Barrier, a
    special shield).
 5. **Aux spell** — any other spell that impacts the game and fits none of the
    above.
 
-❓ **Definition edge cases to resolve:**
-- Offensive-but-non-damaging spells (e.g. Discharge wipes charge but deals no
-  damage) — see Blind (§4.1): a "missed" Discharge doing "no damage" is
-  meaningless. Either Blind affects **damaging** spells only, or "miss" must be
-  defined per effect type (e.g. a missed Discharge wipes nothing).
-- Do effect *ticks* (Ignite burn) count as hits/damage for other triggers
-  (lifesteal, Static Feedback, further Ignite procs)? **Recommended: no** —
-  ticks are neither casts nor hits. Keeps trigger math sane.
+✅ **Miss semantics:** a "missed" offensive spell has **no effect** — not just
+zero damage. A missed Discharge wipes nothing. (Charge is still spent.)
+
+✅ **Effect ticks are not hits or casts.** Ignite burn, Photosynthesis heals,
+etc. can never trigger on-hit or on-cast effects. All triggers trace back to
+an actual spell cast — no on-hit → on-hit → on-hit chains.
+
+✅ **Every tier is a closed counter-triangle** with two layers:
+- **Shield layer (all tiers):** attacks deal double damage to the countered
+  element's shield — the existing rule, now explicit in Tier 1 as well.
+- **Effect layer (per tier):** the tier-specific interactions listed in each
+  tier's table below.
 
 ---
 
 ## 2. Tier 1 — The Primal Forces
 
-Tempo and sustain. Deterministic or high-frequency effects.
+Tempo and sustain. **Triangle: Pyro burns Flora, Aqua douses Pyro, Flora
+shrugs off Aqua.**
+
+| Counter | Shield layer | Effect layer |
+|---|---|---|
+| Pyro → Flora | Pyro attacks ×2 vs Flora shields | Ignite clears all Photosynthesis stacks |
+| Aqua → Pyro | Aqua attacks ×2 vs Pyro shields | Casting any Aqua shield clears Ignite |
+| Flora → Aqua | Flora attacks ×2 vs Aqua shields | ≥1 Photosynthesis stack blocks Waterlogged |
+
+❓ Confirm the shield-layer direction matches the effect layer as tabled
+(Pyro > Flora > Aqua > Pyro).
 
 ### 2.1 Aqua — Waterlogged
 - 📝 **Trigger:** every 3rd consecutive Aqua cast.
-- 📝 **Effect:** opponent's next planned action is dragged **+5 priority**
-  (slower). Includes charges.
+- ✅ **Effect:** opponent's next planned action is dragged **+10 priority**
+  (slower). Includes charges. ✅ Does **not stack** — a second trigger
+  refreshes, never +20.
+- ✅ **Blocked** entirely if the opponent holds ≥1 Photosynthesis stack.
 
 **Analysis (priority table: instant 1 · shield 3 · channel 4 · quick 5 ·
-aux 7 · regular 9):**
-- Shield 3 → 8: still beats regular spells (9) but now **loses to quick
-  attacks (5)** — Waterlogged is secretly a shield-hoser for quick-attack
-  loadouts. Intended?
-- Charge 4 → 9: the slowed channel now resolves **after Discharge/Overload
-  (7)** — waterlog one turn, Discharge the next, and their charge gain lands
-  after the wipe. ✅ Keep this — it's a real, learnable tempo combo, not a
-  gimmick.
-- Attack 9 → 14: resolves last but still resolves — mild.
-
-⚠️ **Concerns / solutions:**
-- The shield interaction is much stronger than the flavor suggests. If it's
-  too strong in playtests: reduce to +3, or clamp modified priority to a band
-  (e.g. can't cross the shield/attack boundary).
-- ❓ Can Waterlogged stack (+10) if two triggers land before the opponent
-  acts? Recommend: does not stack; refreshes.
-- ❓ Priority floor/ceiling — define what 14 means relative to end-of-turn
-  effects.
+aux 7 · regular 9):** at +10, every waterlogged action — even an instant
+attack (1 → 11) — resolves after every unmodified action. Waterlogged is
+effectively **"your next action goes last."**
+- The charge combo stands: a slowed channel (4 → 14) resolves after
+  Discharge/Overload (7) — waterlog one turn, Discharge the next, and their
+  charge gain lands after the wipe. ✅ A real, learnable tempo combo.
+- If both players are slowed, relative order among slowed actions follows
+  (priority + 10), preserving the original ordering.
 
 ### 2.2 Pyro — Ignite
-- 📝 **Trigger:** 25% chance on hit.
-- 📝 **Effect:** burns for **20% of the attack's damage** at the start of each
-  of the opponent's next two turns (40% total).
-
-**Analysis:** expected value ≈ +10% damage per hit — modest, fine as a
-baseline.
-
-⚠️ **Concerns / solutions:**
-- ❓ **Pre- or post-shield damage?** 20% of *raw* damage burning through a
-  shield is a different (and more interesting) effect than 20% of what got
-  through. Burn ticks at start of turn presumably bypass shields either way —
-  that makes Pyro the anti-turtle tool; worth stating explicitly.
-- ❓ Repeat procs: stack, refresh, or extend? Recommend: refresh with the
-  larger remaining total (no stacking) to cap burst.
-- 💡 Flavor hook: an Aqua cast cleanses Ignite (and/or Ignite removes
-  Photosynthesis stacks). Cheap cross-element counterplay if Pyro needs a
-  valve.
+- 📝 **Trigger:** 25% chance on hit. ✅ A hit fully absorbed by a shield can
+  still ignite — the shield doesn't block the proc.
+- ✅ **Effect:** burns for **10% of the attack's total (raw) damage** at the
+  end of the application turn and each of the **next 2 turns** — 3 ticks,
+  30% total. (A proc on T2 burns through the end of T4.)
+- ✅ **Re-proc refreshes** the window (new 3-tick clock from the new attack);
+  never stacks, never adds.
+- ✅ **Burn is regular damage: it hits the shield first.** Ticks in the
+  end-of-turn damage band at **E8** (§5.1).
+- ✅ **Cleansed by** casting any Aqua shield; **clears** all Photosynthesis
+  stacks on application (§2 table). The short refresh-only window is
+  deliberate — it keeps the Aqua-shield cleanse worth casting.
 
 ### 2.3 Flora — Photosynthesis
 - 📝 **Trigger:** every cast.
-- 📝 **Effect:** stacking buff (max 5), heals **1% max HP per stack** at end
-  of round.
+- 📝 **Effect:** stacking buff (max 5), heals **1% max HP per stack** in the
+  end-of-turn heal band (§5.1).
+- ✅ **Cleared** (all stacks) when Ignite is applied; **grants** Waterlogged
+  immunity while ≥1 stack.
 
-⚠️ **BIGGEST CONCERN IN THE SET — stall meta.**
-- 5 stacks = 5 HP/turn on a 100 HP pool. A Flora player turtling behind
-  shields out-heals chip damage; **two Flora players are a mathematically
-  unwinnable stalemate.**
-- As written, stacks appear permanent: front-load 5 casts, then switch
-  elements and keep the 5%/turn forever with zero ongoing commitment.
-
-**Possible solutions (pick at least one):**
-1. Stacks decay by 1 whenever you cast a non-Flora spell (ongoing
-   commitment).
-2. Healing only triggers on rounds you actually cast Flora.
-3. **Sudden death (recommended regardless):** after turn N, both mages take
-   escalating unblockable damage. Kills every stall strategy at once, gives
-   duels a hard upper bound, and backstops the disconnect/forfeit system
-   (a duel can no longer run forever on timeouts).
+⚠️ Stall risk — see **Mechanics to Watch (§8)**.
 
 ---
 
 ## 3. Tier 2 — The Kinetic Forces
 
-Action-queue disruption. Counter-triangle: **Electro shocks Aero, Aero
-weathers Geo, Geo grounds Electro.**
+Action-queue disruption. **Triangle: Electro shocks Aero, Aero weathers Geo,
+Geo grounds Electro.**
+
+| Counter | Shield layer | Effect layer |
+|---|---|---|
+| Electro → Aero | Electro attacks ×2 vs Aero shields | Any Electro-type attack wipes the Tailwind streak (already-granted Haste is kept) |
+| Aero → Geo | Aero attacks ×2 vs Geo shields | An active Tailwind streak of 3+ makes you immune to Stagger |
+| Geo → Electro | Geo attacks ×2 vs Electro shields | While holding a Geo-type shield you cannot be hit by Static Feedback |
 
 ### 3.1 Electro — Static Feedback
-- 📝 **Trigger:** 10% chance on hit.
-- 📝 **Effect:** removes one charge from the opponent (no-op at 0 charge). If
-  they committed a spell needing exactly their charge and the removal lands
-  first, the spell **fizzles** — charge is still lost down to the new total,
-  and the turn is effectively forfeited.
-
-⚠️ **Concerns / solutions:**
-- **Order-dependence:** the fizzle only exists when the Electro hit resolves
-  *before* the opponent's committed spell. Cheap fast Electro attacks get full
-  lottery value; slow casts get almost none. Expect the meta to tilt toward
-  zero-cost Electro spam fishing for procs — arguably on-brand for a tempo
-  element, but decide deliberately.
-- **Feels-bad ceiling:** losing a committed 3-charge Cataclysm to a background
-  10% roll is the most rage-inducing outcome in this design. Mitigations:
-  - Telegraph: a visible "charged with static" status one turn before a
-    fizzle is possible.
-  - Or make the proc pseudo-random / "guaranteed every 10th hit" (§6).
-- ❓ X-cost spells (Overload, Barrage) read charge live and adapt — confirm
-  they **cannot fizzle**, they just cast smaller.
-- ❓ Does a fizzled cast still count as a "cast" for streak counters (theirs
-  and yours)? Recommend: yes — the action was committed.
+- ✅ **Trigger:** **20%** chance on hit (raised from 10%).
+- ✅ **Effect:** removes one charge from the opponent (no-op at 0 charge).
+- ✅ **Fizzle, precisely:** if the opponent locked in a spell (not a charge),
+  the Electro hit resolves **first**, and the proc drops their charge below
+  the spell's cost — the spell **is simply not cast**. They keep their
+  remaining charge (locked a 4-cost with 4 charge → static leaves them at 3
+  charge, spell uncast, turn wasted). Most procs just strip a charge;
+  the full fizzle needs first-strike AND proc AND a locked spell.
+- ✅ Electro is deliberately the **fast-spells element** — flat on-hit chance
+  favoring cheap quick attacks is its identity. Not converting to
+  charge-scaled procs.
+- ✅ Blocked entirely by an active Geo-type shield (§3 table).
+- ⚠️ Frustration ceiling acknowledged — see **Mechanics to Watch (§8)**.
+- ✅ No special case for charge-scaled spells: any locked spell fizzles if
+  the proc drops remaining charge below its cost. (Correction from an earlier
+  draft: **Overload is a 2-cost spell that detonates the ENEMY's charge** —
+  ~10 damage per enemy charge — not a spend-your-own-charge spell.)
 
 ### 3.2 Aero — Tailwind
-- 📝 **Trigger:** every cast after the 3rd consecutive.
-- 📝 **Effect:** grants Haste.
-
-**Analysis:** Haste is a tie-breaker only, so this is the weakest Tier 2
-effect — guaranteed tie-break dominance while the streak lives, but
-situational. Probably fine as the "safe" pick; bump later if playtests agree.
-
-❓ How does a *granted* Haste interact with the existing seize-by-casting-first
-rule — does the opponent's normal seize override it next turn, or does
-Tailwind re-grant every cast (as written, it re-grants — effectively permanent
-while the streak holds)?
+- ✅ **Trigger:** every cast after the 3rd **consecutive** Aero cast; casting
+  any non-Aero spell resets the counter.
+- ✅ **Effect:** grabs **Haste** — Haste is a single token only one player
+  can hold; while the streak lives, the Aero caster re-grabs it every cast.
+- ✅ The streak is wiped by any Electro-type attack (already-held Haste is
+  not removed — you keep the token until it's seized normally).
+- ✅ At a streak of 3+, the caster is immune to Stagger (§3 table).
+- ✅ Streaks get a **standardized consecutive-counter pip** in the HUD
+  (§5.4).
 
 ### 3.3 Geo — Stagger
-- 📝 **Trigger:** every 4th consecutive Geo cast.
-- 📝 **Effect:** concussion — opponent's currently queued **attack** is
-  dropped and replaced with a basic, low-priority action.
-
-✅ **Best counterplay design in the set — protect it.** The trigger is
-countable, so the opponent can deliberately queue a shield/charge on the
-Stagger turn and make it whiff. Make "Stagger only replaces attacks; it
-whiffs on non-attacks" the explicit rule, not an accident — the mind-game
-(do they burn my 4th cast on a bait?) is the whole point.
-
-❓ **The replacement action is undefined.** Flick? A null action? A forced
-charge? This blocks the spec.
+- ✅ **Trigger:** every 4th consecutive Geo cast.
+- ✅ **Effect (reworked):** the opponent's **next offensive spell deals 50%
+  damage**. No more replace-the-queued-action — simpler to read, and the
+  outplay stays: when you can count that Stagger is coming, throw a cheap
+  attack into it (lose 50% of an 8-damage Flick, not 50% of a 5-charge
+  Cataclysm).
+- ✅ Whiffs against a Tailwind streak of 3+ (§3 table).
+- ❓ Does the 50% debuff expire if unused, or linger until an offensive spell
+  is cast? And can a non-damaging offensive spell (Discharge) consume it
+  harmlessly — the perfect stagger-eater? Needs a ruling (suggest: lingers
+  until consumed; consumed only by **damaging** spells so Discharge doesn't
+  trivialize it).
 
 ---
 
 ## 4. Tier 3 — The Ethereal Forces
 
-Rule-bending late-game mechanics. Counter-triangle: **Radiant banishes Umbra,
-Umbra corrupts Arcane, Arcane unravels Radiant** (verb candidates:
-*unravels* / *nullifies* / *unweaves*).
+Rule-bending late-game mechanics. **Triangle: Radiant banishes Umbra, Umbra
+corrupts Arcane, Arcane unravels Radiant.**
+
+| Counter | Shield layer | Effect layer |
+|---|---|---|
+| Radiant → Umbra | Radiant attacks ×2 vs Umbra shields | A Blind proc clears **all** Creeping Dark stacks |
+| Umbra → Arcane | Umbra attacks ×2 vs Arcane shields | You cannot gain Arcane Knowledge stacks while under Dusk or Midnight |
+| Arcane → Radiant | Arcane attacks ×2 vs Radiant shields | Arcane spells are exempt from Blind (they never miss) |
 
 ### 4.1 Radiant — Blind
-- 📝 **Trigger:** 25% chance on attack.
-- 📝 **Effect:** opponent has a 50% chance to miss each of their next 3
-  offensive spells. Charge is still spent; the spell just does no damage.
-
-⚠️ **Concerns / solutions:**
-- **Double-layer RNG** (25% proc × 50% per spell × 3 spells) — games will
-  occasionally be decided by four coin flips. Least-variance alternative with
-  the same identity: Blind = flat damage reduction for N turns.
-- **Turtle incentive:** because only *offensive* casts burn Blind charges, the
-  blinded player's correct play is to shield/charge for 3 turns and wait it
-  out — which drags the game (compounds the §2.3 stall concern). Fix: make it
-  "next 2 turns" instead of "next 3 offensive spells" so it can't be waited
-  out.
-- ❓ "On attack" vs "on hit" — does a fully-shielded attack still roll the
-  25%?
-- ❓ Re-proc while blind: refresh to 3, stack, or immune-while-blind?
-- ❓ Interaction with non-damaging offensive spells — see §1.
+- ✅ **Trigger (reworked):** **10% per charge spent** on the attack — the
+  brighter the spell, the more blinding. (A 0-cost attack can't blind; a
+  5-charge attack is 50%.) Adopts the charge-scaled proc idea: Radiant is
+  now a big-spell element.
+- ✅ **Effect (reworked):** for the opponent's **next 3 turns**, each
+  offensive spell they cast has a 50% chance to miss (miss = no effect, §1;
+  charge still spent). Time-boxed by turns — defensive casts and charging
+  are deliberate counterplay, but they *spend* the window rather than
+  preserving it.
+- ✅ Arcane spells never miss (§4 table).
+- ✅ Rolls **on attack**, including fully-shielded hits (mirrors Pyro).
+- ❓ Re-proc while blinded: refresh the 3-turn window, or immune while blind?
 
 ### 4.2 Umbra — Creeping Dark
-- 📝 **Trigger:** 2nd cast → **Shadow**; 4th → **Dusk**; 6th → **Midnight**.
-- 📝 **Effect:**
+- ✅ **Stacks (reworked):** casting an Umbra spell grants **+1 stack per
+  charge of the spell** (three 5-charge spells → Midnight). Decay: **−1 per
+  turn** in which the caster neither charged Umbra nor cast an Umbra spell
+  (charging pauses decay but grants nothing — the explicit exception to
+  definition 1). A forfeited turn is neither, so it decays.
+- ✅ **Thresholds:** 5+ → **Shadow**, 10+ → **Dusk**, 15 → **Midnight**.
+  ❓ Cap at 15, or can stacks bank higher as decay padding?
   - **Shadow:** enemy can't see what element the caster is charging.
   - **Dusk:** enemy can't see the caster's charge or health bar.
   - **Midnight:** enemy can't see *their own* charge or health bar.
+- ✅ A Blind proc clears all stacks (§4 table). While your opponent's
+  darkness has you under Dusk or Midnight, you can't gain Arcane Knowledge
+  stacks.
+- ⚠️ **Midnight must not read as a bug** — needs loud visual language (shadow
+  veil over the UI, an unmistakable "MIDNIGHT" banner), per the move-timer
+  lesson: waits and hidden state must never look like freezes.
+- ⚠️ **Honest-client-only for now** — a modded client can read the revealed
+  lockstep state. Accepted for casual; see **Mechanics to Watch (§8)** for
+  the server-authoritative rework.
 
-**Analysis:** pure information warfare — the strongest fit with the game's
-bluffing identity. Shadow alone is strong: element info drives shield
-counter-picks. The engine already stubs a `concealed` flag for exactly this.
-
-⚠️ **Concerns / solutions:**
-- **Midnight will read as a bug.** A silently vanished health bar is
-  indistinguishable from a rendering glitch (see the move-timer lesson: waits
-  must never look like freezes). It needs loud visual language — shadow veil
-  creeping over the UI, an unmistakable "MIDNIGHT" status banner — so it reads
-  as a curse, not a defect.
-- **Honest-client-only:** in the trustless commit-reveal model a modded client
-  can read the revealed state, so Umbra only blinds honest clients. Acceptable
-  for casual; revisit if/when ranked lands.
-- ❓ Total casts or consecutive? Does the darkness persist all duel? Any
-  cleanse (thematically: Radiant)? Permanent Midnight from cast 6 onward is
-  dramatically stronger than streak-maintained darkness.
-
-### 4.3 Arcane — Arcane Surge
-- 📝 **Trigger:** every 5th spell cast.
-- 📝 **Effect:** caster gains **Empower**.
-
-❓ **Two blockers:**
-1. **Empower is undefined.** This is Arcane's entire payoff.
-2. Every 5th **Arcane** cast, or every 5th cast of *any* element? "Arcane as
-   meta-magic that counts all casts" would be a distinctive identity — but the
-   two readings differ hugely in power.
+### 4.3 Arcane — Arcane Knowledge
+- ✅ **Trigger:** casting a **4+ charge Arcane spell** grants one
+  **Arcane Knowledge** stack (max 5).
+- ✅ **Effect:** **+5% damage per stack** (up to +25%), applying to **every
+  spell type** — not just Arcane. Stacks are **permanent for the duel**:
+  never cleared by casting other spells/elements, never consumed on use.
+  (Reduced from +10%/stack when made permanent + universal.)
+- ✅ **Blocked** while under the opponent's Dusk or Midnight (§4 table).
+- ✅ **Role:** the big-spell element and the anti-turtle answer — 5 stacks is
+  20+ charge of committed Arcane casting, and the payoff at full stacks is an
+  Empowered spell hitting for **250%** (100% base + 25% AK = 125%, ×2 from
+  Empower) — enough to crack heavy-shield strategies.
+- ✅ **Empower** is an existing spell (not element-bound): it makes the next
+  turn deal double damage. No further spec needed here.
+- ❓ Does "4+ charge Arcane spell" mean **cost ≥ 4** or **charge spent ≥ 4**?
+  Casting consumes ALL charge, so a cheap Arcane spell cast at 4 charge
+  spends 4 — same ambiguity applies to Umbra's per-charge stacks (§4.2).
+  Recommend: **charge spent**, consistently for both (spending is the
+  commitment).
 
 ---
 
 ## 5. Cross-cutting rules
 
-### 5.1 Effect precedence on a single committed action ⚠️
-One action can simultaneously be Staggered, fizzled, Waterlogged, and Blinded.
-Lockstep clients **must** apply effects in one fixed, documented order or
-state diverges. 📝 Proposed resolution order:
+### 5.1 Turn phases — start / main / end resolution ✅
 
-1. **Replace** (Geo Stagger)
-2. **Fizzle check** (Electro Static Feedback)
-3. **Priority modification** (Aqua Waterlogged)
-4. **Miss roll** (Radiant Blind)
-5. Normal resolution → end-of-turn ticks (Ignite, Photosynthesis)
+Three phases, three separate priority lanes that **never mix** — an E-lane
+effect can never race a main-phase spell.
 
-### 5.2 Streak bookkeeping 📝
-Five of nine elements carry counters (Aqua 3, Aero 3+, Geo 4, Umbra 2/4/6,
-Arcane 5). Adopt **one uniform rule** or players will never internalize it:
+| Phase | Lane | Band order |
+|---|---|---|
+| **Start** | S1–S10 | heals S1–S3 · damage S4–S8 · bookkeeping S9–S10 *(empty for now — reserved)* |
+| **Main** | 1–10 | existing spell priority, unchanged |
+| **End** | E1–E10 | **heals E1–E3** (Photosynthesis ~E2) · **damage E4–E8** (Ignite E8) · **bookkeeping/expiry E9–E10** |
 
-- Charging neither advances nor breaks a streak.
-- Casting a different element **resets** the streak.
-- Fizzled/missed casts still advance streaks (the action was committed).
-- ❓ Confirm whether Umbra/Arcane count *totals* instead of streaks (see
-  §4.2, §4.3).
+✅ Decided rules:
+1. **Survivability first:** in the start and end lanes, heals always resolve
+   before damage — a Photosynthesis player with a burning DoT heals, *then*
+   burns. Bookkeeping/expiry always last. Same band order in both lanes.
+2. **Deaths are instant.** No phase-boundary grace: the priority system plus
+   Haste means ties are impossible, so the first effect that drops a player
+   to 0 ends the duel.
+3. **Haste breaks ties in every lane** — start, main, and end. Explicit,
+   accepted downside: if both players carry symmetric end-of-turn damage at
+   lethal HP, the Haste holder's tick resolves first and **they die first**.
+   Haste is *current* Haste at resolution time — nobody remembers who held
+   it when an effect was applied.
+4. Same numbering convention (1 = earliest) in every lane, prefixed S/E in
+   docs and code so a bare number always means main-phase.
 
-**HUD cost:** counterplay (especially Geo's) requires both players to see both
-sides' counters — up to ~4 visible counters per player. Plan streak pips on
-the element icons early; this is a real UI project, not a footnote.
+### 5.2 Effect precedence on a single committed action ✅
+Fixed, documented order (lockstep clients must agree or state diverges):
 
-### 5.3 Determinism & netcode ✅
-- All proc rolls (25% Ignite, 10% Static, 25%/50% Blind) draw from the shared
-  per-turn seed — already supported by the lockstep engine. No netcode changes
-  needed.
+1. **Fizzle check** (Electro Static Feedback)
+2. **Priority modification** (Aqua Waterlogged)
+3. **Miss roll** (Radiant Blind)
+4. **Damage modifiers** at resolution: additive bonuses first (Arcane
+   Knowledge +5%/stack), then multipliers (Empower ×2, Stagger ×0.5).
+   Example: 5-stack AK + Empower + Staggered = 100% + 25% → ×2 → ×0.5 = 125%.
+5. Normal resolution → end phase (§5.1).
+
+*(Geo's old replace-the-action mechanic is gone, so there is no "replace"
+step.)*
+
+### 5.3 Cleanse & immunity web ✅
+Consolidated in the per-tier tables (§2, §3, §4). Pattern: every tier's
+effect-layer triangle IS its cleanse/immunity web. Surface these in tooltips.
+
+### 5.4 Streaks, stacks & HUD 📝
+
+**Consecutive-cast streaks** (reset when you cast any other element): Aqua
+(every 3rd), Aero (after 3rd), Geo (every 4th). ✅ Arcane has **no streak**
+(Arcane Knowledge persists regardless of what else is cast).
+- ✅ Charging neither advances nor breaks a streak (definition 1). Confirmed
+  edge: a Tailwind streak of 3+ keeps its Stagger immunity through charging
+  turns — intended.
+- ❓ Fizzled/missed casts still advance streaks (the action was committed) —
+  recommended; confirm.
+
+**Persistent stacks** (survive element switching): Photosynthesis (0–5),
+Creeping Dark (0–15, ±per §4.2), Arcane Knowledge (0–5, permanent).
+
+✅ **HUD rules:**
+- One **standardized consecutive-counter pip** design, reused for every
+  streak element.
+- Visually separate **"my buffs / streak counters"** from **"debuffs
+  afflicting me"** — two distinct zones or styles, so a player never has to
+  parse which side an icon belongs to.
+
+### 5.5 Determinism & netcode ✅
+- All proc rolls (Ignite, Static, Blind) draw from the shared per-turn seed —
+  already supported by the lockstep engine. No netcode changes needed.
 - Umbra is display-layer only; both clients keep identical state.
-- The strict event ordering in §5.1 is what keeps the seeded rolls identical
-  on both clients.
+- The strict orderings in §5.1–§5.2 keep the seeded rolls identical on both
+  clients.
 
-### 5.4 Element counter graph ❓
-Current rule: element counters only matter vs **shields** (double damage).
-Open questions:
-- Do the Tier 2/3 triangles use the same shield-double rule, or a new
-  relationship?
-- Are there **cross-tier** counters (does Pyro beat Flora?), or are the three
-  triangles closed? The full 9-element graph is needed for loadout building
-  and the shield-counter UI.
-- ❓ How do players access higher tiers — level gates? Are Tier 3 elements
-  strictly stronger (power creep) or sidegrades? Level-gated matchmaking
-  softens this either way.
+### 5.6 Tier access ✅
+- ✅ The three triangles are fully closed: effect interactions and the
+  shield-double rule both follow the same within-tier triangles; there are
+  no cross-tier effect interactions.
+- ✅ Tiers are level-gated: **Tier 1 at L1, Tier 2 at L15, Tier 3 at L30,
+  Tier 4 (future) at L45** — see
+  [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) for the full unlock
+  schedule, slots, and XP curve.
 
-### 5.5 RNG texture 💡
-Three elements are pure-chance (Pyro, Electro, Radiant); six are
-deterministic/countable. The deterministic ones create the best play —
-counting, baiting, playing around known triggers. If playtests show coin
-flips deciding games in a way that grates, convert procs to pseudo-random
-distribution or "guaranteed every Nth hit" — same average rate, far less
-variance. Keep in the back pocket; don't pre-optimize.
-
-### 5.6 Loadout pressure 📝
+### 5.7 Loadout pressure 📝
 Consecutive-cast triggers push mono-element play; loadouts hold 3 elements.
-Tier 1 (every-cast / chance-on-hit) mixes freely; Tier 2/3 streak elements
-punish switching. That's a real strategic axis (commitment vs flexibility) —
-just confirm it's deliberate, and expect mono-element to dominate until
-switching gets its own payoff.
+Streak elements (Aqua/Aero/Geo) punish switching; persistent-stack elements
+(Flora/Umbra/Arcane) tolerate it. That's a real strategic axis — confirm
+deliberate, and watch whether mono-element dominates.
 
 ---
 
-## 6. Open questions (blocking a final spec)
+## 6. RNG texture 💡
+
+Post-rework: Radiant is charge-scaled (variance shrinks as spells grow),
+Electro is deliberately flat-and-fast, Pyro is flat with scaling damage. If
+playtests show coin flips deciding games in a way that grates, the remaining
+levers are pseudo-random distribution or "guaranteed every Nth hit" — same
+average rate, far less variance. Back pocket; don't pre-optimize.
+
+---
+
+## 7. Big-spell play — adopted & shelved 💡
+
+⚠️ The concern: cast-counting and flat on-hit triggers reward cheap fast
+actions over the charged-nuke drama the game is built around.
+
+**Adopted:**
+- **Radiant** → 10% per charge spent (§4.1) — the marquee charge-scaled proc.
+- **Arcane** → Arcane Knowledge on 4+ charge casts (§4.3) — the deterministic
+  big-spell threshold, and the designated anti-shield finisher.
+- **Electro** stays fast **on purpose** — it is the tempo element; the system
+  needs one.
+
+**Shelved until playtests demand them:**
+- Charge-held triggers ("at end of turn holding 4+ charge, gain X").
+- Streaks counting **charge spent** instead of casts (global lever; heavier
+  HUD).
+- Charge-scaling Pyro's proc chance (its damage already scales).
+
+---
+
+## 8. Mechanics to Watch ⚠️
+
+Suspected-but-unproven risks. Not blockers — playtest, then act.
+
+| Mechanic | Risk | Trigger for action | Candidate fixes |
+|---|---|---|---|
+| **Photosynthesis stall meta** | 5 stacks = 5 HP/turn on a 100 HP pool; shields + heals may out-sustain chip damage; two-Flora mirrors could be unwinnable. Ignite's stack-clear is the built-in answer but requires bringing Pyro. | Duels regularly exceeding ~25 turns; Flora-mirror stalemates | Stack decay on non-Flora cast · heal only on Flora-cast rounds · global sudden death (escalating unblockable damage after turn N — also backstops disconnect/forfeit handling; recommended regardless) |
+| **Umbra client-side trust** | Creeping Dark only hides info in the *UI*; the lockstep model reveals full state to a modded client, so cheaters see through all three darkness levels. | Ranked/Elo launch, or evidence of cheating in casual | Server-authoritative state (Cloud Function arbiter) that withholds hidden fields from the disadvantaged client — a significant architecture change from trustless P2P; scope before ranked |
+| **Static Feedback frustration** | A background 20% roll can void a fully-committed spell (first-strike + proc + locked spell). Accepted for now as Electro's identity. | Playtesters reporting fizzles as "unfair" rather than "tense"; Electro over-represented in quick-attack metas | Telegraph ("charged with static" warning turn) · pseudo-random distribution · deterministic threshold trigger |
+
+---
+
+## 9. Open questions (blocking implementation)
 
 | # | Question | Section |
 |---|---|---|
-| 1 | What does **Empower** do? | §4.3 |
-| 2 | What is Stagger's **replacement action**? | §3.3 |
-| 3 | Arcane: every 5th **Arcane** cast or 5th cast overall? | §4.3 |
-| 4 | Ignite: pre- or post-shield damage? Stack/refresh/extend? | §2.2 |
-| 5 | Blind vs non-damaging offensive spells (missed Discharge?) | §1, §4.1 |
-| 6 | Counter triangles: shield-double rule? Cross-tier counters? | §5.4 |
-| 7 | Waterlogged stacking + priority floor/ceiling | §2.1 |
-| 8 | Umbra: totals or streak? Persistent? Cleansable? | §4.2 |
-| 9 | Radiant: "on attack" incl. fully-shielded hits? Re-proc rule? | §4.1 |
-| 10 | Tailwind vs the seize-Haste rule | §3.2 |
-| 11 | Photosynthesis stack decay (or sudden death instead?) | §2.3 |
-| 12 | Tier access/gating (level? unlock?) | §5.4 |
+| 1 | Stagger 50%: expires if unused? Consumed by non-damaging offensive spells (Discharge = the perfect stagger-eater)? Suggest: lingers until consumed, damaging spells only | §3.3 |
+| 2 | Blind re-proc while blinded: refresh the 3-turn window, or immune while blind? | §4.1 |
+| 3 | "N-charge spell": **cost ≥ N** or **charge spent ≥ N**? (Affects AK gain and Umbra stacks; recommend spent, consistently) | §4.2, §4.3 |
+| 4 | Creeping Dark: cap at 15, or bank higher as decay padding? | §4.2 |
+| 5 | Fizzled/missed casts advance streaks (recommended: yes)? | §5.4 |
+
+---
+
+## Changelog
+
+**Rev 4 (this revision)** — Arcane Knowledge finalized: +5%/stack (max 5 =
++25%), applies to every spell type, permanent for the duel; Empower confirmed
+as an existing non-elemental spell (next turn deals double damage); payoff
+example now 250%. Creeping Dark rescaled: +1 stack per charge of Umbra spells
+cast, −1/turn without Umbra activity, thresholds 5/10/15 (three 5-charge
+spells → Midnight); forfeit turns decay. Blind: rolls on attack incl.
+fully-shielded ✅. Overload corrected (2-cost, detonates enemy charge) — no
+charge-scaled fizzle special case. Triangles confirmed closed + identical for
+effects and shields in every tier. Tier access now level-gated (1/15/30/45)
+per PROGRESSION_DESIGN.md. Arcane confirmed streak-less; Tailwind immunity
+through charge turns confirmed intended.
+
+**Rev 3** — Tier triangles completed (shield layer explicit in
+T1; effect layers tabled per tier). Arcane Knowledge defined (stacking +10%,
+4+ charge Arcane casts, persists, max 5). Death-at-phase-boundary **rejected**
+— replaced with survivability-first band order (heals → damage → bookkeeping)
+in start/end lanes; deaths instant; Haste breaks ties in all lanes (current
+holder; explicit die-first downside accepted). Blind reworked: 10%/charge
+proc, 50% miss on offensive spells for 3 **turns**. Ignite finalized: 10% ×
+3 ticks (incl. application turn), refresh-only, E8. Static Feedback raised to
+20%; fizzle clarified (spell uncast, only the 1 charge lost); Electro stays
+fast on purpose. Tailwind: consecutive, Haste-as-token, standardized pip.
+Stagger reworked: −50% damage on next offensive spell (replace mechanic
+deleted). Creeping Dark reworked: ±1/turn stacks, cap 7, charging counts.
+Waterlogged: refresh, no stacking. Mechanics to Watch grew Umbra client-trust
+and Static-frustration entries. HUD: buffs vs debuffs visually separated.
+
+**Rev 2** — Definitions hardened (Discharge offensive-not-damaging; miss = no
+effect; ticks aren't hits). Waterlogged +5 → +10. Turn phases introduced.
+Ignite moved to end-of-turn, shield-first. Cleanse web added. Mechanics to
+Watch section added.
+
+**Rev 1** — Initial spec + balance review.

@@ -192,11 +192,16 @@ MoM2 adds **spell slots** unlocked via leveling.
 
 - ✅ **Levels & XP** — more XP unlocks more spells and spell slots. Single-player is the
   primary source of XP, gold, and loot.
+- 📝 **Superseding spec:** [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) — L1–50
+  curve (level 40 = halfway XP point), the L1–L50 unlock schedule (charge caps,
+  element tiers, spells), non-combat XP, and the **unified slot pool** below.
 - 📝 **Spell unlocking**: likely a "studying" timer per spell, skippable with premium
   currency (exact mechanism TBD). Managed from the Spellbook tab. **Temporarily all
-  spells are unlocked** until the leveling/unlock schedule is finalized.
-- ✅ **Loadout capacity (start)**: presets fill **3 element slots + 5 spell slots** to
-  begin with; these grow with level once the unlock schedule is set. (Keybinds still
+  spells are unlocked** until the leveling/unlock schedule is implemented.
+- ✅ **Loadout capacity (reworked)**: one pool of **slots shared between elements and
+  spells** (5 total at L1, growing with level) — 4 elements + 1 spell or 1 element +
+  4 spells are both legal splits. Presets must include ≥1 element and ≥1 offensive
+  spell. Supersedes the old "3 element slots + 5 spell slots" split. (Keybinds still
   support up to 8 elements / 10 spells.)
 - ✅ **Loadout presets**: named spell/element presets in the Spellbook tab. 1 preset
   slot initially, up to 5 unlocked by leveling.
