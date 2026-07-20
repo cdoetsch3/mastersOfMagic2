@@ -136,3 +136,73 @@ class ForfeitedEvent extends DuelEvent {
   @override
   String toString() => '${mage.name} forfeits the turn';
 }
+
+/// A committed spell that did not cast because the caster's charge was pulled
+/// below its cost before it resolved (Static Feedback, or a same-turn
+/// Discharge). Behaves like a charge — no streak change, no penalty.
+class SpellFizzledEvent extends DuelEvent {
+  final MageState caster;
+  final Spell spell;
+
+  const SpellFizzledEvent(this.caster, this.spell);
+
+  @override
+  String toString() => "${caster.name}'s ${spell.name} fizzles (not enough "
+      'charge at resolution)';
+}
+
+/// A committed offensive spell that missed (Blind). Charge is spent; the spell
+/// has no effect. Does not advance the cast streak.
+class SpellMissedEvent extends DuelEvent {
+  final MageState caster;
+  final Spell spell;
+
+  const SpellMissedEvent(this.caster, this.spell);
+
+  @override
+  String toString() => '${caster.name} is blinded — ${spell.name} misses';
+}
+
+/// Damage dealt by a status effect during a start/end phase (a DoT tick like
+/// Ignite), rather than by a cast spell. [source] names the status.
+class EffectDamageEvent extends DuelEvent {
+  final MageState target;
+  final String source;
+  final int toShield;
+  final int toHp;
+  final bool countered;
+  final bool shieldBroken;
+
+  const EffectDamageEvent(
+    this.target,
+    this.source, {
+    required this.toShield,
+    required this.toHp,
+    this.countered = false,
+    this.shieldBroken = false,
+  });
+
+  @override
+  String toString() {
+    final parts = <String>[
+      if (toShield > 0) '$toShield to shield${countered ? ' (2x)' : ''}',
+      if (toHp > 0) '$toHp damage',
+      if (toShield == 0 && toHp == 0) 'no effect',
+      if (shieldBroken) 'shield shattered',
+    ];
+    return '${target.name} suffers $source: ${parts.join(', ')}';
+  }
+}
+
+/// A status effect healed its holder during a start/end phase. [source] names
+/// the status (e.g. 'Photosynthesis').
+class EffectHealEvent extends DuelEvent {
+  final MageState mage;
+  final String source;
+  final int amount;
+
+  const EffectHealEvent(this.mage, this.source, this.amount);
+
+  @override
+  String toString() => '${mage.name} heals $amount from $source';
+}

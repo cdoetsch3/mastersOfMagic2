@@ -82,7 +82,7 @@ void main() {
   test('opponent surrender lands mid-exchange without resolving the turn',
       () async {
     final events =
-        controller.submitTurn(const ChargeAction(MagicElement.fire));
+        controller.submitTurn(const ChargeAction(MagicElement.pyro));
     driver.onOpponentSurrendered!(); // surrender arrives while we wait
     // The (now moot) exchange completes afterwards.
     driver.pendingExchange!
@@ -103,7 +103,7 @@ void main() {
 
   group('forfeit streaks (closed tab / AFK)', () {
     test('forfeiting 3 turns in a row surrenders the duel', () async {
-      driver.autoRespond = const ChargeAction(MagicElement.water);
+      driver.autoRespond = const ChargeAction(MagicElement.aqua);
       for (var i = 0; i < DuelController.forfeitLimit; i++) {
         expect(controller.gameOver, isFalse);
         await controller.submitTurn(const ForfeitAction());
@@ -120,7 +120,7 @@ void main() {
       driver.autoRespond = const ForfeitAction();
       for (var i = 0; i < DuelController.forfeitLimit; i++) {
         expect(controller.gameOver, isFalse);
-        await controller.submitTurn(const ChargeAction(MagicElement.fire));
+        await controller.submitTurn(const ChargeAction(MagicElement.pyro));
         controller.finishTurn();
       }
       expect(controller.gameOver, isTrue);
@@ -129,12 +129,12 @@ void main() {
     });
 
     test('a real move resets the forfeit streak', () async {
-      driver.autoRespond = const ChargeAction(MagicElement.water);
+      driver.autoRespond = const ChargeAction(MagicElement.aqua);
       await controller.submitTurn(const ForfeitAction());
       controller.finishTurn();
       await controller.submitTurn(const ForfeitAction());
       controller.finishTurn();
-      await controller.submitTurn(const ChargeAction(MagicElement.fire));
+      await controller.submitTurn(const ChargeAction(MagicElement.pyro));
       controller.finishTurn();
       await controller.submitTurn(const ForfeitAction());
       controller.finishTurn();

@@ -232,6 +232,34 @@ class DuelController extends ChangeNotifier {
         } else {
           shownEnemyHp = (shownEnemyHp + amount).clamp(0, enemy.maxHp);
         }
+      case EffectDamageEvent(
+          :final target,
+          :final toShield,
+          :final toHp,
+          :final shieldBroken
+        ):
+        // A status tick (e.g. Ignite) — same display bookkeeping as a hit.
+        final shield = target == player ? shownPlayerShield : shownEnemyShield;
+        if (shieldBroken) {
+          if (target == player) {
+            shownPlayerShield = null;
+          } else {
+            shownEnemyShield = null;
+          }
+        } else if (shield != null && toShield > 0) {
+          shield.remaining -= toShield;
+        }
+        if (target == player) {
+          shownPlayerHp = (shownPlayerHp - toHp).clamp(0, player.maxHp);
+        } else {
+          shownEnemyHp = (shownEnemyHp - toHp).clamp(0, enemy.maxHp);
+        }
+      case EffectHealEvent(:final mage, :final amount):
+        if (mage == player) {
+          shownPlayerHp = (shownPlayerHp + amount).clamp(0, player.maxHp);
+        } else {
+          shownEnemyHp = (shownEnemyHp + amount).clamp(0, enemy.maxHp);
+        }
       case DefeatedEvent(:final mage):
         if (mage == player) playerDefeated = true;
         if (mage == enemy) enemyDefeated = true;
@@ -244,6 +272,18 @@ class DuelController extends ChangeNotifier {
           enemyIsCharging = false;
           revealedEnemyElement = null;
         }
+      case SpellMissedEvent(:final caster):
+        // Blinded miss — charge is still spent, so reset like a normal cast.
+        if (caster == player) {
+          shownPlayerCharge = 0;
+          shownPlayerElement = null;
+        } else {
+          shownEnemyCharge = 0;
+          enemyIsCharging = false;
+        }
+      case SpellFizzledEvent():
+        // Fizzle keeps the charge (nothing was cast) — no display change.
+        break;
       case HasteChangedEvent():
       case ForfeitedEvent():
       case BuffAppliedEvent():

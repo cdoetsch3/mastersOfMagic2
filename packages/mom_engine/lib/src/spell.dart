@@ -37,10 +37,17 @@ class Spell {
     this.grantsHaste = false,
   });
 
+  /// Deals damage. Drives Haste establishment, Quicken eligibility, and
+  /// same-priority ordering (offense before support).
   bool get isOffensive =>
       effect is DamageEffect ||
       effect is BarrageEffect ||
       effect is OverloadEffect;
+
+  /// Negatively impacts the opponent — the design doc's "offensive spell"
+  /// (TYPE_EFFECTS_DESIGN.md §1). Broader than [isOffensive]: also includes
+  /// Discharge. Drives Blind misses and Stagger consumption.
+  bool get isHarmful => isOffensive || effect is DischargeEffect;
 
   @override
   String toString() => name;

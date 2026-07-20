@@ -9,7 +9,7 @@ void main() {
   setUp(() {
     attacker = MageState(name: 'Attacker');
     defender = MageState(name: 'Defender');
-    duel = DuelEngine(attacker, defender);
+    duel = DuelEngine(attacker, defender, elementEffects: false);
   });
 
   /// Charges [mage] up to [target] charge in [element] while the other mage
@@ -18,7 +18,7 @@ void main() {
     while (mage.charge < target) {
       final filler = ChargeAction(
           (mage == attacker ? defender : attacker).charge == 0
-              ? MagicElement.air
+              ? MagicElement.aero
               : null);
       final action = ChargeAction(mage.charge == 0 ? element : null);
       duel.resolveTurn(
@@ -32,43 +32,48 @@ void main() {
     // "a 50 point fire shield, I could cast a 30 damage water attack, and it
     //  would deal 25 of its 30 damage against the shield that was double
     //  damage, and the remaining 5 damage to the enemy user."
-    defender.shield = ActiveShield.elemental(MagicElement.fire, 50);
+    defender.shield = ActiveShield.elemental(MagicElement.pyro, 50);
     const waterAttack = Spell(
         id: 'test30', name: 'Test30', chargeCost: 0, priority: 9,
         effect: DamageEffect(30, 30));
     duel.resolveTurn(
-      CastAction(waterAttack, MagicElement.water),
-      ChargeAction(MagicElement.air),
+      CastAction(waterAttack, MagicElement.aqua),
+      ChargeAction(MagicElement.aero),
     );
     expect(defender.shield, isNull, reason: 'shield shatters');
     expect(defender.hp, 95, reason: 'only 5 overflow reaches health');
   });
 
   test('non-countered attack hits the shield at normal rate', () {
-    defender.shield = ActiveShield.elemental(MagicElement.fire, 50);
+    defender.shield = ActiveShield.elemental(MagicElement.pyro, 50);
     const earthAttack = Spell(
         id: 'test30e', name: 'Test30e', chargeCost: 0, priority: 9,
         effect: DamageEffect(30, 30));
     duel.resolveTurn(
-      CastAction(earthAttack, MagicElement.earth),
-      ChargeAction(MagicElement.air),
+      CastAction(earthAttack, MagicElement.geo),
+      ChargeAction(MagicElement.aero),
     );
     expect(defender.shield!.remaining, 20);
     expect(defender.hp, 100);
   });
 
-  test('air shields are never countered', () {
-    defender.shield = ActiveShield.elemental(MagicElement.air, 30);
-    for (final element in MagicElement.values) {
-      expect(element.counters(MagicElement.air), isFalse);
+  test('cross-tier attacks never counter a shield', () {
+    // With the three closed triangles, countering only happens within a tier.
+    for (final shield in MagicElement.values) {
+      for (final attack in MagicElement.values) {
+        if (attack.tier != shield.tier) {
+          expect(attack.counters(shield), isFalse,
+              reason: '${attack.name} should not counter ${shield.name}');
+        }
+      }
     }
   });
 
   test('barrier blocks one hit entirely, then is gone', () {
     defender.shield = ActiveShield.barrier();
     duel.resolveTurn(
-      CastAction(Spellbook.flick, MagicElement.fire),
-      ChargeAction(MagicElement.air),
+      CastAction(Spellbook.flick, MagicElement.geo),
+      ChargeAction(MagicElement.aero),
     );
     expect(defender.hp, 100);
     expect(defender.shield, isNull);
@@ -80,8 +85,8 @@ void main() {
         effect: DamageEffect(4, 4, hits: 3));
     defender.shield = ActiveShield.barrier();
     duel.resolveTurn(
-      CastAction(tripleHit, MagicElement.fire),
-      ChargeAction(MagicElement.air),
+      CastAction(tripleHit, MagicElement.geo),
+      ChargeAction(MagicElement.aero),
     );
     expect(defender.shield, isNull);
     expect(defender.hp, 100 - 4 * 2, reason: 'hits 2 and 3 land');
@@ -91,39 +96,39 @@ void main() {
     const poke = Spell(
         id: 'test5', name: 'Test5', chargeCost: 0, priority: 9,
         effect: DamageEffect(5, 5));
-    defender.shield = ActiveShield.elemental(MagicElement.earth, 40);
+    defender.shield = ActiveShield.elemental(MagicElement.geo, 40);
     duel.resolveTurn(
-      CastAction(poke, MagicElement.fire),
-      ChargeAction(MagicElement.air),
+      CastAction(poke, MagicElement.geo),
+      ChargeAction(MagicElement.aero),
     );
     expect(defender.shield!.remaining, 35);
     duel.resolveTurn(
-      CastAction(poke, MagicElement.fire),
+      CastAction(poke, MagicElement.geo),
       ChargeAction(),
     );
     expect(defender.shield!.remaining, 30);
   });
 
   test('casting a new shield replaces the old one', () {
-    chargeUp(attacker, MagicElement.fire, 1);
-    attacker.shield = ActiveShield.elemental(MagicElement.water, 3);
+    chargeUp(attacker, MagicElement.geo, 1);
+    attacker.shield = ActiveShield.elemental(MagicElement.aqua, 3);
     duel.resolveTurn(
       CastAction(Spellbook.ward),
       ChargeAction(),
     );
-    expect(attacker.shield!.element, MagicElement.fire);
+    expect(attacker.shield!.element, MagicElement.geo);
     expect(attacker.shield!.remaining, inInclusiveRange(13, 17),
         reason: 'Ward rolls 13-17');
   });
 
   test('shield-ignoring damage goes straight to health', () {
-    defender.shield = ActiveShield.elemental(MagicElement.earth, 999);
+    defender.shield = ActiveShield.elemental(MagicElement.geo, 999);
     const pierce = Spell(
         id: 'testp', name: 'TestPierce', chargeCost: 0, priority: 9,
         effect: DamageEffect(10, 10, ignoresShields: true));
     duel.resolveTurn(
-      CastAction(pierce, MagicElement.fire),
-      ChargeAction(MagicElement.air),
+      CastAction(pierce, MagicElement.geo),
+      ChargeAction(MagicElement.aero),
     );
     expect(defender.hp, 90);
     expect(defender.shield!.remaining, 999);

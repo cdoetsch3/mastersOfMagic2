@@ -45,7 +45,7 @@ class AiPersona {
 /// The Phase-1 roster, weakest to strongest.
 abstract final class AiRoster {
   static final Loadout _novice = Loadout(
-    elements: const [MagicElement.earth, MagicElement.water, MagicElement.fire]
+    elements: const [MagicElement.geo, MagicElement.aqua, MagicElement.pyro]
         .toList(),
     spells: [
       Spellbook.flick,
@@ -58,7 +58,7 @@ abstract final class AiRoster {
 
   static final Loadout _skirmisher = Loadout(
     elements:
-        const [MagicElement.fire, MagicElement.air, MagicElement.electric]
+        const [MagicElement.pyro, MagicElement.aero, MagicElement.electro]
             .toList(),
     spells: [
       Spellbook.flick,
@@ -70,7 +70,7 @@ abstract final class AiRoster {
   );
 
   static final Loadout _warden = Loadout(
-    elements: const [MagicElement.earth, MagicElement.ice, MagicElement.light]
+    elements: const [MagicElement.geo, MagicElement.flora, MagicElement.radiant]
         .toList(),
     spells: [
       Spellbook.bolt,
@@ -83,7 +83,7 @@ abstract final class AiRoster {
 
   static final Loadout _duelist = Loadout(
     elements:
-        const [MagicElement.fire, MagicElement.water, MagicElement.shadow]
+        const [MagicElement.pyro, MagicElement.aqua, MagicElement.umbra]
             .toList(),
     spells: [
       Spellbook.flick,
@@ -96,7 +96,7 @@ abstract final class AiRoster {
 
   static final Loadout _archmage = Loadout(
     elements:
-        const [MagicElement.light, MagicElement.shadow, MagicElement.electric]
+        const [MagicElement.radiant, MagicElement.umbra, MagicElement.electro]
             .toList(),
     spells: [
       Spellbook.jolt,

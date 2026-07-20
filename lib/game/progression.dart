@@ -85,7 +85,7 @@ abstract final class Progression {
   static const int startingSpellSlots = 5;
 
   /// The elements a brand-new player's first preset is filled with.
-  static const List<String> starterPresetElementIds = ['fire', 'water', 'earth'];
+  static const List<String> starterPresetElementIds = ['pyro', 'aqua', 'flora'];
 
   /// The spells a brand-new player's first preset is filled with.
   static const List<String> starterPresetSpellIds = [

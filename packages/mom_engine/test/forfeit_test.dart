@@ -9,50 +9,50 @@ void main() {
   setUp(() {
     alice = MageState(name: 'Alice');
     bruno = MageState(name: 'Bruno');
-    duel = DuelEngine(alice, bruno);
+    duel = DuelEngine(alice, bruno, elementEffects: false);
   });
 
   test('forfeiting does nothing — charge and element are unchanged', () {
     alice.charge = 3;
-    alice.element = MagicElement.fire;
+    alice.element = MagicElement.pyro;
     duel.resolveTurn(
-        const ForfeitAction(), const ChargeAction(MagicElement.water));
+        const ForfeitAction(), const ChargeAction(MagicElement.aqua));
     expect(alice.charge, 3, reason: 'no charge gained or lost');
-    expect(alice.element, MagicElement.fire);
+    expect(alice.element, MagicElement.pyro);
     expect(alice.hp, 100);
   });
 
   test('forfeiting is strictly worse than channeling (no +1 charge)', () {
     alice.charge = 1;
-    alice.element = MagicElement.fire;
+    alice.element = MagicElement.pyro;
     duel.resolveTurn(
-        const ForfeitAction(), const ChargeAction(MagicElement.water));
+        const ForfeitAction(), const ChargeAction(MagicElement.aqua));
     expect(alice.charge, 1);
     expect(bruno.charge, 1, reason: 'Bruno channeled to 1');
   });
 
   test('the opponent still resolves their move against a forfeiter', () {
     bruno.charge = 2;
-    bruno.element = MagicElement.water;
+    bruno.element = MagicElement.aqua;
     duel.resolveTurn(const ForfeitAction(), CastAction(Spellbook.blast));
     expect(alice.hp, lessThan(100), reason: 'Blast still lands');
   });
 
   test('forfeiting never grants Haste (like channeling)', () {
     duel.resolveTurn(
-        const ForfeitAction(), const ChargeAction(MagicElement.water));
+        const ForfeitAction(), const ChargeAction(MagicElement.aqua));
     expect(duel.hasteHolder, isNull);
   });
 
   test('a forfeiter is ground down to defeat over repeated turns', () {
     bruno.charge = 2;
-    bruno.element = MagicElement.fire;
+    bruno.element = MagicElement.pyro;
     var guard = 0;
     while (!duel.isOver && guard++ < 100) {
       // Bruno keeps Blasting (re-charging when spent); Alice always forfeits.
       final brunoMove = bruno.charge >= 2
           ? CastAction(Spellbook.blast)
-          : ChargeAction(bruno.charge == 0 ? MagicElement.fire : null);
+          : ChargeAction(bruno.charge == 0 ? MagicElement.pyro : null);
       duel.resolveTurn(const ForfeitAction(), brunoMove);
     }
     expect(duel.winner, bruno);

@@ -6,8 +6,8 @@ Haste referenced here are defined there.
 
 Legend: ✅ decided · 📝 draft (needs review) · 💡 idea bank · ❓ open question · ⚠️ balance/abuse concern
 
-Status: 📝 **draft — not implemented.** Mechanics below are settling; see §9
-for the questions that still block implementation.
+Status: ✅ **spec finalized — implementation-ready, not yet implemented.**
+All rulings are in; §8 lists the balance risks to monitor during playtests.
 
 ---
 
@@ -26,7 +26,15 @@ for the questions that still block implementation.
    above.
 
 ✅ **Miss semantics:** a "missed" offensive spell has **no effect** — not just
-zero damage. A missed Discharge wipes nothing. (Charge is still spent.)
+zero damage. A missed Discharge wipes nothing.
+
+⚠️ **Fizzle vs miss — charge (implemented 2026-07-20, confirm intent):** a
+**fizzle** (Static Feedback pulled charge below cost) leaves the spell uncast
+and you **keep your charge** ("you'd still have 3 charge"). A **miss** (Blind)
+still **spends** your charge. Both are otherwise inert. This resolves a
+conflict: §5.4's "behaves like a charge / nothing is lost" is now scoped to
+**streaks/procs/stacks only**, not charge — a miss does cost the charge. Flag
+if a miss should instead refund charge like a fizzle.
 
 ✅ **Effect ticks are not hits or casts.** Ignite burn, Photosynthesis heals,
 etc. can never trigger on-hit or on-cast effects. All triggers trace back to
@@ -86,13 +94,20 @@ effectively **"your next action goes last."**
   deliberate — it keeps the Aqua-shield cleanse worth casting.
 
 ### 2.3 Flora — Photosynthesis
-- 📝 **Trigger:** every cast.
-- 📝 **Effect:** stacking buff (max 5), heals **1% max HP per stack** in the
-  end-of-turn heal band (§5.1).
+- ✅ **Trigger:** every Flora cast adds a stack (**max 3** — trimmed from 5
+  after sims showed even 5-with-decay dominating; see §8).
+- ✅ **Effect:** heals **1% max HP per stack** in the end-of-turn heal band
+  (§5.1).
+- ✅ **Decay:** each turn without Flora activity (a Flora cast **or charge**)
+  sheds one stack — an ongoing commitment, mirroring Creeping Dark's activity
+  rule. The shedding turn still heals at the pre-decay count (bookkeeping runs
+  last). Per §5.4, a fizzled/missed Flora cast counts as activity (it behaves
+  like a charge of the cycling element).
 - ✅ **Cleared** (all stacks) when Ignite is applied; **grants** Waterlogged
   immunity while ≥1 stack.
 
-⚠️ Stall risk — see **Mechanics to Watch (§8)**.
+⚠️ Stall risk — see **Mechanics to Watch (§8)** (largely defused by decay +
+Fatigue).
 
 ---
 
@@ -127,8 +142,10 @@ Geo grounds Electro.**
   ~10 damage per enemy charge — not a spend-your-own-charge spell.)
 
 ### 3.2 Aero — Tailwind
-- ✅ **Trigger:** every cast after the 3rd **consecutive** Aero cast; casting
-  any non-Aero spell resets the counter.
+- ✅ **Trigger (as implemented):** every consecutive Aero cast **from the 3rd
+  onward**; casting any non-Aero spell resets the counter. (One threshold — 3
+  — for both the grant and the Stagger immunity; the earlier "after the 3rd"
+  wording implied 4, flag if 4 was intended.)
 - ✅ **Effect:** grabs **Haste** — Haste is a single token only one player
   can hold; while the streak lives, the Aero caster re-grabs it every cast.
 - ✅ The streak is wiped by any Electro-type attack (already-held Haste is
@@ -145,11 +162,12 @@ Geo grounds Electro.**
   attack into it (lose 50% of an 8-damage Flick, not 50% of a 5-charge
   Cataclysm).
 - ✅ Whiffs against a Tailwind streak of 3+ (§3 table).
-- ❓ Does the 50% debuff expire if unused, or linger until an offensive spell
-  is cast? And can a non-damaging offensive spell (Discharge) consume it
-  harmlessly — the perfect stagger-eater? Needs a ruling (suggest: lingers
-  until consumed; consumed only by **damaging** spells so Discharge doesn't
-  trivialize it).
+- ✅ **The debuff lingers until consumed** by the next offensive spell — it
+  never expires on its own. Consuming it with a non-damaging offensive spell
+  (Discharge) is a legal, harmless "stagger-eater" — accepted as another
+  outplay, at the price of a 3-cost spell and a turn.
+- ✅ Derived from §5.4: a **missed** spell doesn't consume Stagger (a miss
+  behaves like a charge — nothing triggers, nothing is lost).
 
 ---
 
@@ -176,16 +194,18 @@ corrupts Arcane, Arcane unravels Radiant.**
   preserving it.
 - ✅ Arcane spells never miss (§4 table).
 - ✅ Rolls **on attack**, including fully-shielded hits (mirrors Pyro).
-- ❓ Re-proc while blinded: refresh the 3-turn window, or immune while blind?
+- ✅ Re-proc while blinded **refreshes** the 3-turn window — same behavior as
+  Ignite; never stacks.
 
 ### 4.2 Umbra — Creeping Dark
 - ✅ **Stacks (reworked):** casting an Umbra spell grants **+1 stack per
-  charge of the spell** (three 5-charge spells → Midnight). Decay: **−1 per
+  charge spent** (three 5-charge spells → Midnight). Decay: **−1 per
   turn** in which the caster neither charged Umbra nor cast an Umbra spell
   (charging pauses decay but grants nothing — the explicit exception to
   definition 1). A forfeited turn is neither, so it decays.
 - ✅ **Thresholds:** 5+ → **Shadow**, 10+ → **Dusk**, 15 → **Midnight**.
-  ❓ Cap at 15, or can stacks bank higher as decay padding?
+  **Cap: 15** — no banking above it. (Equipment will eventually be able to
+  modify the cap.)
   - **Shadow:** enemy can't see what element the caster is charging.
   - **Dusk:** enemy can't see the caster's charge or health bar.
   - **Midnight:** enemy can't see *their own* charge or health bar.
@@ -213,11 +233,10 @@ corrupts Arcane, Arcane unravels Radiant.**
   Empower) — enough to crack heavy-shield strategies.
 - ✅ **Empower** is an existing spell (not element-bound): it makes the next
   turn deal double damage. No further spec needed here.
-- ❓ Does "4+ charge Arcane spell" mean **cost ≥ 4** or **charge spent ≥ 4**?
-  Casting consumes ALL charge, so a cheap Arcane spell cast at 4 charge
-  spends 4 — same ambiguity applies to Umbra's per-charge stacks (§4.2).
-  Recommend: **charge spent**, consistently for both (spending is the
-  commitment).
+- ✅ "4+ charge" means **charge spent ≥ 4** — spending is the commitment.
+  Casting consumes ALL charge, so a cheap Arcane spell cast while holding 4
+  charge qualifies. Same rule for Umbra's per-charge stacks (§4.2):
+  **spent**, consistently.
 
 ---
 
@@ -275,8 +294,11 @@ effect-layer triangle IS its cleanse/immunity web. Surface these in tooltips.
 - ✅ Charging neither advances nor breaks a streak (definition 1). Confirmed
   edge: a Tailwind streak of 3+ keeps its Stagger immunity through charging
   turns — intended.
-- ❓ Fizzled/missed casts still advance streaks (the action was committed) —
-  recommended; confirm.
+- ✅ **Fizzled and missed casts behave exactly like a charge** for every
+  counter and trigger: they don't advance streaks, don't reset them, don't
+  proc on-cast/on-hit effects, and don't grant stacks (no AK from a missed
+  4+ Arcane cast, no Umbra stacks from a fizzled Umbra spell). Nothing
+  triggers, nothing is penalized.
 
 **Persistent stacks** (survive element switching): Photosynthesis (0–5),
 Creeping Dark (0–15, ±per §4.2), Arcane Knowledge (0–5, permanent).
@@ -345,30 +367,52 @@ actions over the charged-nuke drama the game is built around.
 ## 8. Mechanics to Watch ⚠️
 
 Suspected-but-unproven risks. Not blockers — playtest, then act.
+Quantitative checks: `dart run tool/balance_sim.dart 500` in
+`packages/mom_engine` (AI duel batches with length/outcome stats).
+
+**Sim results (2026-07-20, ALL NINE elements live, Photosynthesis cap 3):**
+- Stall stays fixed: 0% unfinished anywhere; worst duel 59 turns.
+- Effects still barely perturb normal play (greedy avg ~16 turns either way).
+- ✅ **Tier 2 and Tier 3 triangles verified in the 9×9 mono-element matrix**:
+  Electro>Aero 73%, Aero>Geo 67%, Geo>Electro 77%; Radiant>Umbra 71%,
+  Umbra>Arcane 68%, Arcane>Radiant 65%.
+- ⚠️ **The Flora tripwire FIRED at cap 3**: Flora beats its counter Pyro
+  56/44 and everything else 64–95%. A/B at **cap 2** flips the counter
+  (Pyro beats Flora 57/43) and softens cross-tier dominance to 64–88% —
+  recommended, pending Christian's call. (Caveat: sim AIs are effect-blind —
+  they can't exploit Umbra's info-hiding or play around Blind, so Umbra and
+  Radiant under-perform in sims by construction; human playtests are the
+  real test for Tier 3.)
+- ⚠️ Aqua is the weakest Tier 1 row (its tempo effect is invisible to
+  effect-blind AIs); watch in human play before buffing.
 
 | Mechanic | Risk | Trigger for action | Candidate fixes |
 |---|---|---|---|
-| **Photosynthesis stall meta** | 5 stacks = 5 HP/turn on a 100 HP pool; shields + heals may out-sustain chip damage; two-Flora mirrors could be unwinnable. Ignite's stack-clear is the built-in answer but requires bringing Pyro. | Duels regularly exceeding ~25 turns; Flora-mirror stalemates | Stack decay on non-Flora cast · heal only on Flora-cast rounds · global sudden death (escalating unblockable damage after turn N — also backstops disconnect/forfeit handling; recommended regardless) |
+| **Photosynthesis stall meta** | 5 stacks = 5 HP/turn on a 100 HP pool; shields + heals may out-sustain chip damage; two-Flora mirrors could be unwinnable. Ignite's stack-clear is the built-in answer but requires bringing Pyro. **Confirmed real during implementation (2026-07-20): with Flora effects live, 80% of random-AI duels blew past a 200-turn cap.** | ~~Duels regularly exceeding ~25 turns~~ Confirmed | ✅ **Implemented: Fatigue sudden death** — from turn 51, both mages take escalating unblockable end-of-turn damage (+3/turn: 3, 6, 9…), applied after the heal band; Haste holder ticks first (never a fatigue draw). Constants: `fatigueThreshold` 50 (raised from 30 per review), `fatiguePerTurn` 3. ✅ **Also implemented: stack decay** — Photosynthesis sheds a stack each turn without Flora activity (§2.3), converting the buff into an ongoing commitment. |
 | **Umbra client-side trust** | Creeping Dark only hides info in the *UI*; the lockstep model reveals full state to a modded client, so cheaters see through all three darkness levels. | Ranked/Elo launch, or evidence of cheating in casual | Server-authoritative state (Cloud Function arbiter) that withholds hidden fields from the disadvantaged client — a significant architecture change from trustless P2P; scope before ranked |
 | **Static Feedback frustration** | A background 20% roll can void a fully-committed spell (first-strike + proc + locked spell). Accepted for now as Electro's identity. | Playtesters reporting fizzles as "unfair" rather than "tense"; Electro over-represented in quick-attack metas | Telegraph ("charged with static" warning turn) · pseudo-random distribution · deterministic threshold trigger |
 
 ---
 
-## 9. Open questions (blocking implementation)
+## 9. Open questions
 
-| # | Question | Section |
-|---|---|---|
-| 1 | Stagger 50%: expires if unused? Consumed by non-damaging offensive spells (Discharge = the perfect stagger-eater)? Suggest: lingers until consumed, damaging spells only | §3.3 |
-| 2 | Blind re-proc while blinded: refresh the 3-turn window, or immune while blind? | §4.1 |
-| 3 | "N-charge spell": **cost ≥ N** or **charge spent ≥ N**? (Affects AK gain and Umbra stacks; recommend spent, consistently) | §4.2, §4.3 |
-| 4 | Creeping Dark: cap at 15, or bank higher as decay padding? | §4.2 |
-| 5 | Fizzled/missed casts advance streaks (recommended: yes)? | §5.4 |
+✅ **None — the spec is implementation-ready.** (Progression-side questions
+live in [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) §5; the balance
+unknowns worth monitoring are in §8.)
 
 ---
 
 ## Changelog
 
-**Rev 4 (this revision)** — Arcane Knowledge finalized: +5%/stack (max 5 =
+**Rev 5 (this revision)** — Final rulings; zero open questions remain.
+Stagger lingers until consumed by the next offensive spell (Discharge as a
+harmless stagger-eater accepted as an outplay). Blind re-proc refreshes the
+window, same as Ignite. "N-charge" = charge **spent**, uniformly (AK, Umbra).
+Creeping Dark capped at 15 (equipment may later modify). Fizzled/missed casts
+behave like charges everywhere: no streak advance/reset, no procs, no stack
+gains, no penalty. Status: **implementation-ready.**
+
+**Rev 4** — Arcane Knowledge finalized: +5%/stack (max 5 =
 +25%), applies to every spell type, permanent for the duel; Empower confirmed
 as an existing non-elemental spell (next turn deals double damage); payoff
 example now 250%. Creeping Dark rescaled: +1 stack per charge of Umbra spells

@@ -299,6 +299,30 @@ class _DuelScreenState extends State<DuelScreen>
             text: '+$amount',
             intensity: 1 + amount / 30,
             ms: 500);
+      case EffectDamageEvent(
+          :final target,
+          :final toHp,
+          :final toShield,
+          :final source
+        ):
+        // A status tick (DoT). Small impact pulse; no projectile.
+        await _runFx(_FxKind.impact,
+            atEnemy: target == c.enemy,
+            color: const Color(0xFFE2732C),
+            text: toHp > 0
+                ? '-$toHp $source'
+                : (toShield > 0 ? '$source blocked' : source),
+            intensity: 1.1,
+            ms: 460);
+      case EffectHealEvent(:final mage, :final amount, :final source):
+        if (amount > 0) {
+          await _runFx(_FxKind.heal,
+              atEnemy: mage == c.enemy,
+              color: const Color(0xFF58B368),
+              text: '+$amount $source',
+              intensity: 1 + amount / 30,
+              ms: 460);
+        }
       case BuffAppliedEvent(:final mage, :final description):
         setState(() {
           _banner =
@@ -337,6 +361,26 @@ class _DuelScreenState extends State<DuelScreen>
           _bannerColor = const Color(0xFFD85A30);
         });
         await Future<void>.delayed(const Duration(milliseconds: 650));
+      case SpellFizzledEvent(:final caster, :final spell):
+        setState(() {
+          _banner = '${caster == c.enemy ? c.enemy.name : 'You'}: '
+              '${spell.name} fizzled — charge disrupted';
+          _bannerColor = const Color(0xFFE8C547);
+        });
+        await _runFx(_FxKind.flash,
+            atEnemy: caster == c.enemy,
+            color: const Color(0xFFE8C547),
+            ms: 450);
+      case SpellMissedEvent(:final caster, :final spell):
+        setState(() {
+          _banner = '${caster == c.enemy ? c.enemy.name : 'You'}: '
+              '${spell.name} missed — blinded';
+          _bannerColor = const Color(0xFFF2E7C9);
+        });
+        await _runFx(_FxKind.flash,
+            atEnemy: caster == c.enemy,
+            color: const Color(0xFFF2E7C9),
+            ms: 450);
       case DefeatedEvent():
         await Future<void>.delayed(const Duration(milliseconds: 700));
     }

@@ -11,15 +11,28 @@ class ElementStyle {
 }
 
 const Map<MagicElement, ElementStyle> elementStyles = {
-  MagicElement.fire:
-      ElementStyle(Color(0xFFE25822), Icons.local_fire_department, 'Fire'),
-  MagicElement.water: ElementStyle(Color(0xFF3D8BD9), Icons.water_drop, 'Water'),
-  MagicElement.earth: ElementStyle(Color(0xFF9C7A4B), Icons.landscape, 'Earth'),
-  MagicElement.air: ElementStyle(Color(0xFF9BB8C4), Icons.air, 'Air'),
-  MagicElement.electric: ElementStyle(Color(0xFFE8C547), Icons.bolt, 'Electric'),
-  MagicElement.ice: ElementStyle(Color(0xFF7FD4E8), Icons.ac_unit, 'Ice'),
-  MagicElement.light: ElementStyle(Color(0xFFF2E7C9), Icons.light_mode, 'Light'),
-  MagicElement.shadow: ElementStyle(Color(0xFF8B5CD6), Icons.dark_mode, 'Shadow'),
+  // Tier 1 — Primal
+  MagicElement.aqua: ElementStyle(Color(0xFF3D8BD9), Icons.water_drop, 'Aqua'),
+  MagicElement.pyro:
+      ElementStyle(Color(0xFFE25822), Icons.local_fire_department, 'Pyro'),
+  MagicElement.flora: ElementStyle(Color(0xFF5FB35B), Icons.eco, 'Flora'),
+  // Tier 2 — Kinetic
+  MagicElement.electro: ElementStyle(Color(0xFFE8C547), Icons.bolt, 'Electro'),
+  MagicElement.aero: ElementStyle(Color(0xFF9BB8C4), Icons.air, 'Aero'),
+  MagicElement.geo: ElementStyle(Color(0xFF9C7A4B), Icons.landscape, 'Geo'),
+  // Tier 3 — Ethereal
+  MagicElement.radiant:
+      ElementStyle(Color(0xFFF2E7C9), Icons.light_mode, 'Radiant'),
+  MagicElement.umbra: ElementStyle(Color(0xFF8B5CD6), Icons.dark_mode, 'Umbra'),
+  MagicElement.arcane:
+      ElementStyle(Color(0xFFD65AB8), Icons.auto_awesome, 'Arcane'),
+};
+
+/// Display label for a tier (Spellbook grouping, tooltips).
+const Map<MagicTier, String> tierLabels = {
+  MagicTier.primal: 'Primal',
+  MagicTier.kinetic: 'Kinetic',
+  MagicTier.ethereal: 'Ethereal',
 };
 
 extension ElementStyleX on MagicElement {

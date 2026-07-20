@@ -1,4 +1,5 @@
 import 'element.dart';
+import 'status.dart';
 
 /// A raised shield occupying the mage's (single, in v1) shield slot.
 class ActiveShield {
@@ -52,7 +53,57 @@ class MageState {
   /// opponent can see what you're charging.
   bool concealed = false;
 
+  /// Active persistent statuses (DoTs, HoTs, stacking buffs). Resolved each
+  /// turn's start/end phases by the engine — see [TurnStatus] and
+  /// TYPE_EFFECTS_DESIGN.md §5.1. Empty until element effects apply them.
+  final List<TurnStatus> statuses = [];
+
+  // ---- Consecutive-cast streak (TYPE_EFFECTS_DESIGN.md §5.4) -------------
+  // The element of the current cast streak and how many consecutive casts of
+  // it have landed. Charging, forfeiting, fizzling, and missing leave these
+  // untouched; casting a spell of a different element resets to (that, 1).
+  MagicElement? streakElement;
+  int streakCount = 0;
+
+  /// The element this mage engaged this turn — set for a channel or a
+  /// committed cast (fizzled/missed casts included: they "behave like a
+  /// charge" of the cycling element), null on a forfeited turn. Drives
+  /// activity-based stack decay (Photosynthesis; later, Creeping Dark).
+  MagicElement? activeElementThisTurn;
+
+  // ---- Precedence-pipeline modifiers (§5.2) -----------------------------
+  // Set by procs; read at main-phase resolution in the documented order
+  // (fizzle → priority → miss → damage mods).
+
+  /// Added to this mage's next committed action priority (Waterlogged +10 —
+  /// slower). Consumed when the action's priority is computed.
+  int priorityPenalty = 0;
+
+  /// Multiplier on this mage's next offensive spell's damage (Stagger = 0.5).
+  /// Consumed by the next offensive spell that resolves.
+  double nextOffensiveDamageScale = 1.0;
+
+  /// Flat additive damage bonus, in percent, applied to every offensive spell
+  /// (Arcane Knowledge = 5% per stack). Read at resolution, never consumed.
+  int bonusDamagePercent = 0;
+
   MageState({required this.name, this.maxHp = 100}) : hp = maxHp;
+
+  /// Records a resolved cast for streak tracking. Not called for charges,
+  /// forfeits, fizzles, or misses (those behave like a charge — no change).
+  void recordCastForStreak(MagicElement element) {
+    if (streakElement == element) {
+      streakCount++;
+    } else {
+      streakElement = element;
+      streakCount = 1;
+    }
+  }
+
+  /// Highest miss chance among any [Blinding] status on this mage (0 if none).
+  double get missChance => statuses
+      .whereType<Blinding>()
+      .fold(0.0, (m, b) => b.missChance > m ? b.missChance : m);
 
   bool get alive => hp > 0;
 

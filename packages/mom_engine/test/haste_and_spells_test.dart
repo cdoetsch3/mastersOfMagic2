@@ -9,7 +9,7 @@ void main() {
   setUp(() {
     alice = MageState(name: 'Alice');
     bruno = MageState(name: 'Bruno');
-    duel = DuelEngine(alice, bruno);
+    duel = DuelEngine(alice, bruno, elementEffects: false);
   });
 
   void charge(MageState m, MagicElement e, int amount) {
@@ -20,8 +20,8 @@ void main() {
   group('Haste establishment (unheld)', () {
     test('the only caster grabs Haste; a channeler does not', () {
       duel.resolveTurn(
-        CastAction(Spellbook.flick, MagicElement.fire),
-        const ChargeAction(MagicElement.water),
+        CastAction(Spellbook.flick, MagicElement.pyro),
+        const ChargeAction(MagicElement.aqua),
       );
       expect(duel.hasteHolder, alice);
     });
@@ -29,26 +29,26 @@ void main() {
     test('when both cast different priorities, the faster caster grabs it', () {
       alice.charge = 0;
       bruno.charge = 2;
-      bruno.element = MagicElement.water;
+      bruno.element = MagicElement.aqua;
       // Flick (priority 5) vs Blast (priority 9) — Flick is faster.
       duel.resolveTurn(
-        CastAction(Spellbook.flick, MagicElement.fire),
+        CastAction(Spellbook.flick, MagicElement.pyro),
         CastAction(Spellbook.blast),
       );
       expect(duel.hasteHolder, alice);
     });
 
     test('a same-priority pair leaves Haste unheld', () {
-      charge(alice, MagicElement.fire, 2);
-      charge(bruno, MagicElement.water, 2);
+      charge(alice, MagicElement.pyro, 2);
+      charge(bruno, MagicElement.aqua, 2);
       duel.resolveTurn(
           CastAction(Spellbook.blast), CastAction(Spellbook.blast));
       expect(duel.hasteHolder, isNull);
     });
 
     test('channeling never establishes Haste', () {
-      duel.resolveTurn(const ChargeAction(MagicElement.fire),
-          const ChargeAction(MagicElement.water));
+      duel.resolveTurn(const ChargeAction(MagicElement.pyro),
+          const ChargeAction(MagicElement.aqua));
       expect(duel.hasteHolder, isNull);
     });
   });
@@ -56,16 +56,16 @@ void main() {
   group('Haste transfer (established)', () {
     test('an ordinary spell does not move an established Haste', () {
       alice.hasHaste = true;
-      charge(bruno, MagicElement.water, 2);
-      duel.resolveTurn(const ChargeAction(MagicElement.fire),
+      charge(bruno, MagicElement.aqua, 2);
+      duel.resolveTurn(const ChargeAction(MagicElement.pyro),
           CastAction(Spellbook.blast));
       expect(duel.hasteHolder, alice);
     });
 
     test('a Haste-granting spell (Jolt) steals it', () {
       alice.hasHaste = true;
-      charge(bruno, MagicElement.water, 2);
-      duel.resolveTurn(const ChargeAction(MagicElement.fire),
+      charge(bruno, MagicElement.aqua, 2);
+      duel.resolveTurn(const ChargeAction(MagicElement.pyro),
           CastAction(Spellbook.jolt));
       expect(duel.hasteHolder, bruno);
     });
@@ -74,8 +74,8 @@ void main() {
       // Alice holds it, so her Hasty resolves first and Bruno's lands last —
       // Bruno steals the initiative.
       alice.hasHaste = true;
-      duel.resolveTurn(CastAction(Spellbook.hasty, MagicElement.fire),
-          CastAction(Spellbook.hasty, MagicElement.water));
+      duel.resolveTurn(CastAction(Spellbook.hasty, MagicElement.pyro),
+          CastAction(Spellbook.hasty, MagicElement.aqua));
       expect(duel.hasteHolder, bruno);
     });
 
@@ -84,9 +84,9 @@ void main() {
       // Different priorities: Bruno (holder) casts the slower Hasty (7),
       // Alice casts the faster Jolt (5). Hasty resolves last, so Bruno keeps.
       bruno.hasHaste = true;
-      charge(alice, MagicElement.fire, 2);
+      charge(alice, MagicElement.pyro, 2);
       duel.resolveTurn(CastAction(Spellbook.jolt),
-          CastAction(Spellbook.hasty, MagicElement.water));
+          CastAction(Spellbook.hasty, MagicElement.aqua));
       expect(duel.hasteHolder, bruno);
     });
   });
@@ -94,8 +94,8 @@ void main() {
   group('Haste tiebreak', () {
     test('the holder wins a same-priority collision — no mutual kill', () {
       alice.hasHaste = true;
-      charge(alice, MagicElement.fire, 2);
-      charge(bruno, MagicElement.water, 2);
+      charge(alice, MagicElement.pyro, 2);
+      charge(bruno, MagicElement.aqua, 2);
       alice.hp = 10;
       bruno.hp = 10;
       duel.resolveTurn(
@@ -108,8 +108,8 @@ void main() {
 
   group('Hasty', () {
     test('grants Haste and deals no damage', () {
-      duel.resolveTurn(CastAction(Spellbook.hasty, MagicElement.fire),
-          const ChargeAction(MagicElement.water));
+      duel.resolveTurn(CastAction(Spellbook.hasty, MagicElement.pyro),
+          const ChargeAction(MagicElement.aqua));
       expect(duel.hasteHolder, alice);
       expect(bruno.hp, 100);
     });
@@ -117,8 +117,8 @@ void main() {
 
   group('Discharge', () {
     test('wipes the opponent charge', () {
-      charge(alice, MagicElement.fire, 3);
-      charge(bruno, MagicElement.water, 4);
+      charge(alice, MagicElement.pyro, 3);
+      charge(bruno, MagicElement.aqua, 4);
       duel.resolveTurn(const ChargeAction(),
           CastAction(Spellbook.discharge));
       expect(alice.charge, 0, reason: 'Bruno discharged Alice');
@@ -126,16 +126,16 @@ void main() {
 
     test('drains a channeler even after they finish channeling', () {
       // Channel (priority 4) resolves, then Discharge (priority 7) wipes it.
-      charge(alice, MagicElement.fire, 2);
-      charge(bruno, MagicElement.water, 3);
+      charge(alice, MagicElement.pyro, 2);
+      charge(bruno, MagicElement.aqua, 3);
       duel.resolveTurn(
           const ChargeAction(), CastAction(Spellbook.discharge));
       expect(alice.charge, 0);
     });
 
     test('a same-turn Discharge fizzles a Barrage (7 beats 9)', () {
-      charge(alice, MagicElement.fire, 3);
-      charge(bruno, MagicElement.water, 3);
+      charge(alice, MagicElement.pyro, 3);
+      charge(bruno, MagicElement.aqua, 3);
       duel.resolveTurn(
           CastAction(Spellbook.barrage), CastAction(Spellbook.discharge));
       expect(bruno.hp, 100, reason: 'Alice charge wiped before Barrage read it');
@@ -144,8 +144,8 @@ void main() {
 
   group('Overload', () {
     test('deals ~8-12 per point of the enemy charge', () {
-      charge(alice, MagicElement.fire, 2);
-      charge(bruno, MagicElement.water, 3);
+      charge(alice, MagicElement.pyro, 2);
+      charge(bruno, MagicElement.aqua, 3);
       // Bruno casts Bolt (priority 9, after Overload) so his charge reads 3.
       duel.resolveTurn(
           CastAction(Spellbook.overload), CastAction(Spellbook.bolt));
@@ -153,17 +153,17 @@ void main() {
     });
 
     test('does nothing to a chargeless enemy', () {
-      charge(alice, MagicElement.fire, 2);
+      charge(alice, MagicElement.pyro, 2);
       bruno.charge = 0;
       duel.resolveTurn(CastAction(Spellbook.overload),
-          CastAction(Spellbook.flick, MagicElement.water));
+          CastAction(Spellbook.flick, MagicElement.aqua));
       expect(bruno.hp, 100);
     });
 
     test('channeling before an Overload increases the hit (channel is faster)',
         () {
-      charge(alice, MagicElement.fire, 2);
-      charge(bruno, MagicElement.water, 2);
+      charge(alice, MagicElement.pyro, 2);
+      charge(bruno, MagicElement.aqua, 2);
       // Bruno channels 2 -> 3 at priority 4, before Overload reads it at 7.
       duel.resolveTurn(
           CastAction(Spellbook.overload), const ChargeAction());
@@ -172,10 +172,10 @@ void main() {
     });
 
     test('respects shields', () {
-      charge(alice, MagicElement.fire, 2);
+      charge(alice, MagicElement.pyro, 2);
       bruno.charge = 3;
-      bruno.element = MagicElement.water;
-      bruno.shield = ActiveShield.elemental(MagicElement.air, 200);
+      bruno.element = MagicElement.aqua;
+      bruno.shield = ActiveShield.elemental(MagicElement.aero, 200);
       duel.resolveTurn(
           CastAction(Spellbook.overload), CastAction(Spellbook.bolt));
       expect(bruno.hp, 100, reason: 'the big air shield soaks Overload');
