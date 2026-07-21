@@ -20,6 +20,33 @@ then the round resolves. Prediction/mind-games are the heart of the game.
 4. ✅ You must keep the **same element** for an entire charging cycle (baseline rule).
 5. ✅ 0-cost spells (e.g. Flick) can always be cast, even at 0 charge — you're never forced to charge.
 
+### Forfeited turns — two kinds ✅
+
+A turn can pass without an action for two very different reasons, and the
+game must treat them differently:
+
+| Kind | Cause | Counts toward the 3-strike auto-surrender? |
+|---|---|---|
+| **Timeout forfeit** | The player ran out the 10s clock, tabbed away, or disconnected | ✅ **Yes** — this is how a vanished opponent eventually loses |
+| **Compelled forfeit** | The game left the player **no legal action** | 🚫 **No** — never penalize a player for a situation they couldn't act in |
+
+⚠️ **Design rule: no combination of effects may leave a player with zero legal
+actions.** Rule 5 above (0-cost spells are always castable) plus "you can
+always charge below max" currently guarantees this — at max charge every spell
+is affordable, and below max you can always channel.
+
+However, a compelled forfeit is still *reachable* in principle — e.g. a narrow
+loadout at max charge, or the proposed **lockout effects**
+([ITEMS_DESIGN.md](ITEMS_DESIGN.md) §5b.1) which can bar whole action
+categories. So the distinction must exist in the engine regardless: being
+locked out is not the same as being asleep, and only the latter should march
+you toward an auto-surrender.
+
+📝 Implementation note: the forfeit streak lives in `DuelController`
+(`forfeitLimit`, currently 3). It counts every `ForfeitAction` today; when
+lockouts land it needs to distinguish the compelled case and skip the
+increment.
+
 ### Resolution order — Priority
 ✅ Formalized, transparent **Priority 1–10** property on every spell (priority 1 acts first):
 
@@ -362,6 +389,50 @@ MoM2 adds **spell slots** unlocked via leveling.
     own — likely a boss encounter on the approaching route, or a special
     town-intro fight.
 
+### 7a. 💡 Banked spells
+
+Designed but **not scheduled** — no unlock levels assigned; the current
+schedule (PROGRESSION_DESIGN §4) is full through L40 with the 25 shipped
+spells. Bank until there's a reason to slot them in.
+
+**Batch 1 — built on the existing status framework** (DoTs, HoTs, streaks,
+the precedence pipeline). Buildable today; no new engine mechanics needed.
+
+| Spell | Cost | Priority | Effect |
+|---|---|---|---|
+| **Regrowth** | 2 | 7 aux | HoT: heal 5 at end of turn for 3 turns (heal band, so it lands before same-turn burns) |
+| **Blight** | 2 | 9 | 5–7 now, plus **Corrosion**: 4–5 at end of turn for 3 turns, in your cast element (shield-aware ticks) |
+| **Combust** | 1 | 5 quick | Consume all DoTs on the enemy and deal their remaining total as one shield-aware hit; otherwise a 4–6 spark |
+| **Purify** | 1 | 7 aux | Remove all negative statuses from yourself |
+| **Crescendo** | 2 | 9 | 8–10 damage × your current element streak (capped at 5) — the first spell that *reads the streak counter* |
+| **Truestrike** | 1 | 7 aux | Your next offensive spell cannot miss and cannot fizzle |
+| **Dawnmend** | 3 | 7 aux | Heal 9–12 at the **start** of your next 2 turns — the first tenant of the empty start lane |
+| **Siphon** | 3 | 9 | Parasite: 3–4 damage at end of each of the next 3 turns, healing you for the health damage dealt |
+
+**Batch 2 — built on the proposed mechanics** in
+[ITEMS_DESIGN.md](ITEMS_DESIGN.md) §5b. Each needs its mechanic to exist
+first; they are the spell-side expression of those effects.
+
+| Spell | Cost | Priority | Needs | Effect |
+|---|---|---|---|---|
+| **Hush** | 2 | 7 aux | Silence | Target can't cast offensive spells for 2 turns |
+| **Shackle** | 2 | 7 aux | Bind | Target can't charge for 2 turns |
+| **Sunder** | 3 | 7 aux | Sunder | Target can't raise shields for 2 turns |
+| **Endure** | 2 | 7 aux | Endurance | Self: the next lethal hit leaves you at 1 HP (once) |
+| **Reservoir** | 2 | 7 aux | Charge retention | Self: your next cast keeps its unspent charge |
+| **Siege** | 3 | 9 | Sustained | Escalating attack — grows each turn, interruptible |
+| **Vigil** | 3 | 3 | Sustained | Escalating shield — grows each turn, interruptible |
+| **Disrupt** | 1 | 5 quick | Interrupt | Interrupts a sustained spell; minor damage otherwise |
+
+💡 Also banked from the earlier brainstorm, held back deliberately:
+**Dispel** (strip the enemy's *beneficial* statuses — risks making Flora
+unplayable if cheap), **Exhaust** (start the enemy's Fatigue 5 turns early —
+dead weight before turn ~25), **Cocoon** (a shield that also heals while it
+holds — crowds the shield ladder).
+
+⚠️ Note the lockout spells (Hush/Shackle/Sunder) are subject to the
+always-a-legal-action invariant and the forfeit-counter rule in §1.
+
 ---
 
 ## 8. App structure & roadmap
@@ -434,7 +505,9 @@ firebase deploy --only hosting
   distinct loadouts, apparel, and TunableAi skill dials (mistakeChance/aggression/
   caution). Campaign foes reuse the nearest persona re-skinned with the monster name.
 - ✅ **Disconnects**: the 10s move timer forfeits unmade moves; a vanished remote
-  opponent is auto-forfeited each turn until they lose.
+  opponent is auto-forfeited each turn until they lose. **Three forfeited turns
+  in a row auto-surrenders** the duel (so a closed tab resolves in ~75s rather
+  than dragging on) — see the two kinds of forfeit below.
 - 📝 v1 trust model: room codes are secrets, rules require sign-in; server-authoritative
   arbitration deferred until ranked play.
 

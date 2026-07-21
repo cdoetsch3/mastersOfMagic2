@@ -317,6 +317,130 @@ immune to Blind.
 
 ---
 
+## 5b. Proposed new statuses & mechanics 📝
+
+Not yet implemented. Grouped by what they'd cost to build, since some are
+data and some are real engine work.
+
+### 5b.1 The lockout family — "can't do X for N turns"
+
+| Lockout | Blocks | Naturally counters |
+|---|---|---|
+| **Silence** | offensive spells | Emberwright (burst) |
+| **Bind** | charging | anything building toward a big spell (Emberwright, Arcane) |
+| **Sunder** | shields | Aegis Sovereign (tank) |
+| **Seal** | consumables | potion-reliant play |
+
+⭐ **These are counter-picks, not raw power** — each one shuts down a specific
+archetype. That makes them the ideal contents of the **tech slots** (Neck,
+Ring, off-hand), which §2.2 identifies as the adaptation layer that keeps any
+meta answerable. Per §4.3's principle, they'd be miserable as 5-piece set
+bonuses (dead weight against the wrong opponent) and excellent as swappable
+counters.
+
+✅ **Cheap to build:** the engine already fizzles a committed spell it can no
+longer legally cast (§5.5 precedence: fizzle → priority → miss). A lockout is
+just "this *category* of action fizzles for N turns," slotting into the
+existing gate.
+
+⚠️ **Required invariant: a player must always have at least one legal
+action.** Silence + Bind + Sunder together would leave only "use a consumable
+or forfeit" — and with Seal, nothing at all. A player whose move timer
+forfeits them because the game left them no options will read it as a bug,
+not a tactic. 📝 Proposed rules: **at most one lockout active at a time** (a
+new one replaces the old), durations kept short (1–2 turns), and charging
+never fully locked without an escape.
+
+✅ **But design for it failing anyway.** A compelled forfeit stays reachable
+in principle (a narrow loadout at max charge, or an unforeseen lockout
+combination), so the engine must distinguish **two kinds of forfeited turn** —
+see [GAME_DESIGN.md](GAME_DESIGN.md) §1:
+
+- **Timeout forfeit** (too slow / disconnected) → counts toward the 3-strike
+  auto-surrender.
+- **Compelled forfeit** (no legal action existed) → **does not count.**
+
+Being locked out is not the same as being asleep; only the latter should
+march a player toward losing. 📝 `DuelController.forfeitLimit` counts every
+`ForfeitAction` today and will need this distinction before lockouts ship.
+
+### 5b.2 Endurance (death save) 📝
+
+*If a hit would kill you, survive at 1 HP instead.*
+
+- Hooks cleanly into damage application — the engine funnels all damage
+  through one place (`_applyOneHit` → `takeHpDamage`), so this is a single
+  guarded branch.
+- 📝 Once per duel. Strong fit as an **Aegis Sovereign 5-piece bonus** — a
+  build-defining moment rather than a stat.
+- ❓ **Does it save against Fatigue** (turn 51+)? If yes it only delays by a
+  turn, since Fatigue escalates — harmless either way, but needs a ruling.
+- ✅ Interacts fine with our instant-death rule and with DoTs: an Ignite tick
+  that would kill leaves you at 1, and the next tick finishes the job.
+- 💡 Great PvP moment — surviving a lethal Cataclysm at 1 HP is exactly the
+  kind of beat that makes a duel memorable.
+
+### 5b.3 Charge retention ⚠️ (highest-impact item on the list)
+
+*Cast a spell costing less than your charge and keep the remainder — e.g.
+cast a 1-cost spell at 4 charge, keep 3.*
+
+⚠️ **This edits a core rule.** "Casting consumes ALL charge and ends the
+cycle" is the decision the whole duel is built on: *when* do I spend? Charge
+retention doesn't add a stat, it weakens that tension — so it needs the
+tightest bounding of anything in this document.
+
+The degenerate case: a **0-cost Flick at 5 charge, retaining 5**, is free chip
+damage every turn while permanently threatening a nuke. That must not exist.
+
+📝 Proposed bounds (pick one or more):
+- Only spells of **cost ≥ 2** retain (kills Flick-spam abuse outright).
+- **Cap the retained amount** (at most 1–2), rather than "all the remainder."
+- Once per duel, or on a cooldown.
+
+✅ **Two built-in balances worth noting:** retention reduces *charge spent*,
+which is exactly what **Radiant's Blind** (10%/charge) and **Umbra's Creeping
+Dark** (+1 stack/charge) scale from — so the effect is naturally
+anti-synergistic with two Tier 3 elements. ❓ It also needs a ruling on what
+"charge spent" means for **Arcane Knowledge**'s 4+ threshold: the spell's
+cost, or the amount actually consumed?
+
+### 5b.4 Sustained spells & the interrupt mechanic 📝 (largest engine addition)
+
+*2–3 attacks (or defenses) that grow stronger each turn but can be
+interrupted.*
+
+⚠️ This is a **new action type**, not a status — the engine currently assumes
+every turn's action resolves and completes within that turn. Actions today
+are charge / cast / forfeit; sustaining adds a multi-turn commitment.
+
+Two readings, worth choosing between:
+- **(a) Wind-up** — commit N turns, then one enormous release. Interrupt
+  loses *everything*. High stakes, high drama, brutal when countered.
+- **(b) ⭐ Escalating beam** — damages each turn, growing (5 → 10 → 15).
+  Interrupt costs only the remaining escalation. Partial payoff makes it a
+  real option rather than a gamble.
+
+📝 Recommendation: **(b)** — it fails gracefully, and a mechanic that can be
+100% negated by one counter tends not to get played.
+
+**The interrupt** is the necessary counterpart, and note it's the same family
+as §5b.1: an interrupt is a **targeted, instant lockout**. Candidates for what
+interrupts: damage above a threshold, a dedicated interrupt spell, or an
+existing disruptor (Stagger, Static Feedback) gaining the property.
+
+💡 **Why this fits the game well:** sustaining is *visible* to the opponent,
+exactly like charging is. That telegraph creates the mind-game — do I race
+them down, or spend my turn interrupting? — which is the same simultaneous-
+commit tension the duel is built on, applied to a new axis.
+
+⚠️ Netcode note: commit-reveal handles this fine (a sustaining player just
+commits "continue"), but multi-turn actions touch the turn resolver, the move
+timer, and the forfeit/disconnect rules — the most invasive change proposed
+in this document.
+
+---
+
 ## 6. Elemental motes & the crafting economy 📝
 
 Christian's Skyrim-soul-gem model, adopted.
@@ -719,6 +843,11 @@ mode (§7.4), proc-boost levers and caps (§7.1/7.1b).
 |---|---|---|
 | 27 | Conversion cooldown length — and does it scale with skill level too? | §6.0b |
 | 28 | Drop rates per mote tier (Dust common → Core near-never) need concrete numbers | §6.0 |
+| 29 | ⚠️ Lockouts: accept "at most one active at a time" + the always-a-legal-action invariant? | §5b.1 |
+| 30 | Endurance: once per duel? Does it save against Fatigue? | §5b.2 |
+| 31 | ⚠️ **Charge retention bounds** — cost ≥2 only, capped amount, or per-duel limit? And what counts as "charge spent" for Arcane Knowledge? | §5b.3 |
+| 32 | Sustained spells: **wind-up** (all-or-nothing) or **escalating beam** (partial payoff)? | §5b.4 |
+| 33 | What interrupts a sustained spell — damage threshold, dedicated spell, or existing disruptors gaining the property? | §5b.4 |
 | 8 | Are set pieces Epic+ only? | §8 |
 | 16 | Combat potions cost your action ✅ — but **at what priority** do they resolve? | §6b.3 |
 | 17 | Consumable slots **per-duel or per-run**? | §6b.2 |
@@ -735,6 +864,14 @@ mode (§7.4), proc-boost levers and caps (§7.1/7.1b).
 ---
 
 ## Changelog
+
+**Rev 8** — Added §5b, a proposed-mechanics catalogue: the **lockout family**
+(Silence/Bind/Sunder/Seal, positioned as tech-slot counter-picks, with the
+always-a-legal-action invariant), **Endurance** death save, **charge
+retention** (flagged as the highest-impact proposal — it edits the core
+"casting spends all charge" tension), and **sustained spells + interrupts**
+(flagged as the largest engine addition, since multi-turn actions don't exist
+today).
 
 **Rev 7** — Mote economy clarified: **every tier below Heart drops directly**
 at escalating rarity (Dust common → Core near-never), **Hearts are
