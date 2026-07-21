@@ -370,6 +370,14 @@ Suspected-but-unproven risks. Not blockers — playtest, then act.
 Quantitative checks: `dart run tool/balance_sim.dart 500` in
 `packages/mom_engine` (AI duel batches with length/outcome stats).
 
+✅ **Long duels are a feature, not a fault (human playtest, 2026-07-20).** A
+27-turn Flora-vs-Arcane attrition duel — both mages low, trading heals and
+chip damage — was reported as *fun*, not draggy. So **duration alone is not a
+problem signal**: the thing to guard against is a duel that can't *end*
+(unwinnable sustain), not one that runs long. Fatigue at turn 51 is confirmed
+comfortable — it should stay a backstop that most real duels never meet, not
+a pacing tool. Don't shorten it to chase a turn-count target.
+
 **Sim results (2026-07-20, ALL NINE elements live, Photosynthesis cap 3):**
 - Stall stays fixed: 0% unfinished anywhere; worst duel 59 turns.
 - Effects still barely perturb normal play (greedy avg ~16 turns either way).

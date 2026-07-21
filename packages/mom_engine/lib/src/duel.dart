@@ -399,12 +399,14 @@ class DuelEngine {
           events: events,
         );
       case ShieldEffect(:final minStrength, :final maxStrength):
-        caster.shield = ActiveShield.elemental(
-            cast.element, _roll(minStrength, maxStrength));
-        events.add(ShieldRaisedEvent(caster, caster.shield!));
+        final strength = _roll(minStrength, maxStrength);
+        caster.shield = ActiveShield.elemental(cast.element, strength);
+        events.add(ShieldRaisedEvent(caster,
+            element: cast.element, isBarrier: false, strength: strength));
       case BarrierEffect():
         caster.shield = ActiveShield.barrier();
-        events.add(ShieldRaisedEvent(caster, caster.shield!));
+        events.add(ShieldRaisedEvent(caster,
+            element: null, isBarrier: true, strength: 0));
       case EmpowerEffect(:final multiplier):
         caster.empowerMultiplier = multiplier;
         events.add(BuffAppliedEvent(

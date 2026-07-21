@@ -24,30 +24,37 @@ Future<void> showSpellDetail(BuildContext context, Spell spell) {
       _ => (label: 'aux', color: AppColors.gold),
     };
 
+/// The headline figure — kept short so it never crowds the label beside it.
 String _numbers(Spell spell) => switch (spell.effect) {
       DamageEffect(:final minAmount, :final maxAmount, :final hits) =>
         hits > 1 ? '$minAmount–$maxAmount ×$hits' : '$minAmount–$maxAmount',
       BarrageEffect(:final minPerCharge, :final maxPerCharge) =>
-        '$minPerCharge–$maxPerCharge / charge',
+        '$minPerCharge–$maxPerCharge',
       OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
-        '$minPerCharge–$maxPerCharge / enemy charge',
+        '$minPerCharge–$maxPerCharge',
       ShieldEffect(:final minStrength, :final maxStrength) =>
         '$minStrength–$maxStrength',
-      BarrierEffect() => 'blocks 1 hit',
-      EmpowerEffect(:final multiplier) => '×$multiplier next',
-      QuickenEffect() => 'faster next',
-      PhaseEffect() => 'pierce next',
-      HasteEffect() => 'seize Haste',
-      DischargeEffect() => 'wipe charge',
+      BarrierEffect() => '1 hit',
+      EmpowerEffect(:final multiplier) => '×$multiplier',
+      QuickenEffect() => 'faster',
+      PhaseEffect() => 'pierce',
+      HasteEffect() => 'Haste',
+      DischargeEffect() => 'all',
     };
 
+/// The qualifier beside the figure — carries the prose, and is free to wrap.
 String _numbersLabel(Spell spell) => switch (spell.effect) {
       DamageEffect(:final lifesteal) =>
         lifesteal > 0 ? 'damage, heals you' : 'damage, rolled on cast',
-      BarrageEffect() || OverloadEffect() => 'damage, rolled on cast',
+      BarrageEffect() => 'damage per charge spent',
+      OverloadEffect() => "damage per point of the enemy's charge",
       ShieldEffect() => 'shield in your element',
-      BarrierEffect() => 'then it shatters',
-      _ => 'effect',
+      BarrierEffect() => 'blocked fully, then it shatters',
+      EmpowerEffect() => 'damage on your next offensive spell',
+      QuickenEffect() => 'your next offensive spell resolves sooner',
+      PhaseEffect() => 'your next offensive spell ignores shields',
+      HasteEffect() => 'seized — you win same-speed ties',
+      DischargeEffect() => "of the enemy's charge, wiped",
     };
 
 List<String> _systemsRules(Spell spell) {

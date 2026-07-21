@@ -202,11 +202,11 @@ class DuelController extends ChangeNotifier {
           enemyIsCharging = false;
           revealedEnemyElement = element;
         }
-      case ShieldRaisedEvent(:final mage, :final shield):
+      case ShieldRaisedEvent(:final mage, :final element, :final isBarrier, :final strength):
         final snapshot = ShownShield(
-          element: shield.element,
-          isBarrier: shield.isBarrier,
-          remaining: shield.remaining,
+          element: element,
+          isBarrier: isBarrier,
+          remaining: strength,
         );
         if (mage == player) {
           shownPlayerShield = snapshot;

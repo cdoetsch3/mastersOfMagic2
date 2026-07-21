@@ -45,11 +45,14 @@ class _ElementDetailDialog extends StatelessWidget {
                 children: [
                   _elementAvatar(element, 36),
                   const SizedBox(width: 12),
-                  Text(style.label,
-                      style: const TextStyle(
-                          color: AppColors.text,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700)),
+                  Flexible(
+                    child: Text(style.label,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: AppColors.text,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700)),
+                  ),
                   const SizedBox(width: 8),
                   _tierTag(element.tier),
                 ],
@@ -72,27 +75,31 @@ class _ElementDetailDialog extends StatelessWidget {
                               height: 1.4)),
                     ),
                     const SizedBox(height: 14),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: _counterCard(
-                            heading: 'BEATS',
-                            headingColor: AppColors.green,
-                            other: beats,
-                            lines: ['×2 vs their shields', lore.beatsEffect],
+                    // IntrinsicHeight bounds the cross axis: a bare `stretch`
+                    // Row inside a scroll view would demand infinite height.
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: _counterCard(
+                              heading: 'BEATS',
+                              headingColor: AppColors.green,
+                              other: beats,
+                              lines: ['×2 vs their shields', lore.beatsEffect],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _counterCard(
-                            heading: 'WEAK TO',
-                            headingColor: AppColors.ember,
-                            other: weakTo,
-                            lines: ['×2 vs your shields', lore.weakEffect],
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _counterCard(
+                              heading: 'WEAK TO',
+                              headingColor: AppColors.ember,
+                              other: weakTo,
+                              lines: ['×2 vs your shields', lore.weakEffect],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -156,11 +163,14 @@ class _ElementDetailDialog extends StatelessWidget {
             children: [
               _elementAvatar(other, 20),
               const SizedBox(width: 7),
-              Text(other.style.label,
-                  style: const TextStyle(
-                      color: AppColors.text,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600)),
+              Flexible(
+                child: Text(other.style.label,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: AppColors.text,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600)),
+              ),
             ],
           ),
           const SizedBox(height: 6),

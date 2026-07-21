@@ -92,6 +92,63 @@ void main() {
     expect(defender.hp, 100 - 4 * 2, reason: 'hits 2 and 3 land');
   });
 
+  group('ShieldRaisedEvent snapshots the shield as raised', () {
+    // Regression: the event used to hold the LIVE ActiveShield, so a shield
+    // chipped later in the same turn reported its post-damage value. The UI
+    // then subtracted that damage a second time and drove the displayed
+    // shield negative.
+    test('reports full strength even when chipped later the same turn', () {
+      chargeUp(attacker, MagicElement.flora, 1);
+      const poke = Spell(
+          id: 'testpoke', name: 'Poke', chargeCost: 0, priority: 9,
+          effect: DamageEffect(6, 6));
+      // Ward (priority 3) goes up, then the priority-9 poke chips it.
+      final result = duel.resolveTurn(
+        CastAction(Spellbook.ward),
+        CastAction(poke),
+      );
+      final raised =
+          result.events.whereType<ShieldRaisedEvent>().single;
+      expect(raised.strength, inInclusiveRange(13, 17),
+          reason: 'Ward rolls 13-17 — never the post-damage remainder');
+      expect(raised.element, MagicElement.flora);
+      expect(raised.isBarrier, isFalse);
+      // The live shield really did take the hit.
+      expect(attacker.shield!.remaining, raised.strength - 6);
+    });
+
+    test('replaying the events never drives a shield below zero', () {
+      // Mirrors how the UI rebuilds its display copy: start from the raised
+      // strength, then subtract each reported toShield.
+      chargeUp(attacker, MagicElement.flora, 1);
+      const poke = Spell(
+          id: 'testpoke2', name: 'Poke2', chargeCost: 0, priority: 9,
+          effect: DamageEffect(6, 6));
+      final result = duel.resolveTurn(
+        CastAction(Spellbook.ward),
+        CastAction(poke),
+      );
+      var shown = 0;
+      for (final e in result.events) {
+        if (e is ShieldRaisedEvent) shown = e.strength;
+        if (e is DamageEvent && e.target == attacker) shown -= e.toShield;
+      }
+      expect(shown, greaterThanOrEqualTo(0));
+      expect(shown, attacker.shield!.remaining);
+    });
+
+    test('a Barrier reports as element-less', () {
+      chargeUp(attacker, MagicElement.flora, 2);
+      final result = duel.resolveTurn(
+        CastAction(Spellbook.barrier),
+        const ChargeAction(MagicElement.aero),
+      );
+      final raised = result.events.whereType<ShieldRaisedEvent>().single;
+      expect(raised.isBarrier, isTrue);
+      expect(raised.element, isNull);
+    });
+  });
+
   test('shield persists across turns until depleted', () {
     const poke = Spell(
         id: 'test5', name: 'Test5', chargeCost: 0, priority: 9,

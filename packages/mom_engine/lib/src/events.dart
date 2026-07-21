@@ -32,14 +32,31 @@ class SpellCastEvent extends DuelEvent {
       '${caster.name} casts ${element.name} ${spell.name}';
 }
 
+/// A shield went up. Carries an immutable **snapshot** of the shield as raised
+/// — never the live [ActiveShield] — because events are replayed after the
+/// whole turn has resolved, by which point the real shield may already have
+/// been chipped or shattered by damage that landed later in the same turn.
 class ShieldRaisedEvent extends DuelEvent {
   final MageState mage;
-  final ActiveShield shield;
 
-  const ShieldRaisedEvent(this.mage, this.shield);
+  /// Null for a Barrier, which is element-less.
+  final MagicElement? element;
+  final bool isBarrier;
+
+  /// Strength at the moment it was raised.
+  final int strength;
+
+  const ShieldRaisedEvent(
+    this.mage, {
+    required this.element,
+    required this.isBarrier,
+    required this.strength,
+  });
 
   @override
-  String toString() => '${mage.name} raises $shield';
+  String toString() => isBarrier
+      ? '${mage.name} raises Barrier'
+      : '${mage.name} raises ${element!.name} shield ($strength)';
 }
 
 class DamageEvent extends DuelEvent {

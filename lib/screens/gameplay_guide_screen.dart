@@ -239,15 +239,19 @@ class _PhaseStrip extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            phase('Start', 'pre-move effects', AppColors.sky),
-            const SizedBox(width: 8),
-            phase('Main', 'your locked-in moves', AppColors.gold),
-            const SizedBox(width: 8),
-            phase('End', 'burns & heals', AppColors.ember),
-          ],
+        // IntrinsicHeight bounds the cross axis: a bare `stretch` Row inside
+        // the scrolling list would demand infinite height.
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              phase('Start', 'pre-move effects', AppColors.sky),
+              const SizedBox(width: 8),
+              phase('Main', 'your locked-in moves', AppColors.gold),
+              const SizedBox(width: 8),
+              phase('End', 'burns & heals', AppColors.ember),
+            ],
+          ),
         ),
       ],
     );

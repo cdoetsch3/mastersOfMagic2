@@ -68,6 +68,12 @@ class _DuelScreenState extends State<DuelScreen>
   Spell? _castSpell;
   int _castCharge = 0;
 
+  // Every combat message stays up long enough to actually read. Animations
+  // that play while it is showing count toward this, so a message is only
+  // held back if the turn would otherwise blow past it.
+  static const Duration _minMessageVisible = Duration(seconds: 2);
+  DateTime? _messageShownAt;
+
   static const _spellKeyLabels = 'QWERTASDFG';
 
   // Per-move countdown. Not committing in time forfeits the move (also how a
@@ -158,6 +164,28 @@ class _DuelScreenState extends State<DuelScreen>
     super.dispose();
   }
 
+  /// Blocks until the message on screen has had its full reading time.
+  Future<void> _awaitMessageRead() async {
+    final shownAt = _messageShownAt;
+    if (shownAt == null) return;
+    final remaining = _minMessageVisible - DateTime.now().difference(shownAt);
+    if (remaining > Duration.zero) {
+      await Future<void>.delayed(remaining);
+    }
+  }
+
+  /// Shows a combat message, first letting the previous one finish being read
+  /// so messages can never flash past faster than [_minMessageVisible].
+  Future<void> _showMessage(String text, Color color) async {
+    await _awaitMessageRead();
+    if (!mounted) return;
+    setState(() {
+      _banner = text;
+      _bannerColor = color;
+    });
+    _messageShownAt = DateTime.now();
+  }
+
   Future<void> _runFx(_FxKind kind,
       {required bool atEnemy,
       Color color = Colors.white,
@@ -212,12 +240,15 @@ class _DuelScreenState extends State<DuelScreen>
       }
     } catch (error, stack) {
       debugPrint('Turn resolution error: $error\n$stack');
-    } finally {
-      if (mounted) {
-        setState(() => _banner = null);
-        c.finishTurn();
-        if (!c.gameOver) _startMoveTimer(); // next move's clock
-      }
+    }
+    // Let the turn's last message finish being read before clearing it —
+    // otherwise the final beat of a turn flashes past.
+    await _awaitMessageRead();
+    if (mounted) {
+      setState(() => _banner = null);
+      _messageShownAt = null;
+      c.finishTurn();
+      if (!c.gameOver) _startMoveTimer(); // next move's clock
     }
   }
 
@@ -238,12 +269,11 @@ class _DuelScreenState extends State<DuelScreen>
         _castCharge =
             caster == c.player ? c.shownPlayerCharge : c.shownEnemyCharge;
         final isEnemy = caster == c.enemy;
-        setState(() {
-          _banner = isEnemy
-              ? '${c.enemy.name} casts ${element.style.label} ${spell.name}'
-              : 'You cast ${element.style.label} ${spell.name}';
-          _bannerColor = element.style.color;
-        });
+        await _showMessage(
+            isEnemy
+                ? '${c.enemy.name} casts ${element.style.label} ${spell.name}'
+                : 'You cast ${element.style.label} ${spell.name}',
+            element.style.color);
         await _runFx(_FxKind.flash,
             atEnemy: isEnemy,
             color: element.style.color,
@@ -284,14 +314,18 @@ class _DuelScreenState extends State<DuelScreen>
             intensity: 1 + charge * 0.45,
             shake: charge >= 3 ? (charge - 2) * 3.5 : 0,
             ms: isMultiHit ? 320 : 440 + charge * 50);
-      case ShieldRaisedEvent(:final mage, :final shield):
+      case ShieldRaisedEvent(
+          :final mage,
+          :final element,
+          :final isBarrier,
+          :final strength
+        ):
         final isEnemy = mage == c.enemy;
-        final color =
-            shield.isBarrier ? Colors.white : shield.element!.style.color;
+        final color = isBarrier ? Colors.white : element!.style.color;
         await _runFx(_FxKind.shieldUp,
             atEnemy: isEnemy,
             color: color,
-            intensity: shield.isBarrier ? 1.6 : 0.8 + shield.remaining / 40,
+            intensity: isBarrier ? 1.6 : 0.8 + strength / 40,
             ms: 480);
       case HealedEvent(:final mage, :final amount):
         await _runFx(_FxKind.heal,
@@ -325,11 +359,9 @@ class _DuelScreenState extends State<DuelScreen>
               ms: 460);
         }
       case BuffAppliedEvent(:final mage, :final description):
-        setState(() {
-          _banner =
-              '${mage == c.enemy ? c.enemy.name : 'You'}: $description';
-          _bannerColor = const Color(0xFFE8C547);
-        });
+        await _showMessage(
+            '${mage == c.enemy ? c.enemy.name : 'You'}: $description',
+            const Color(0xFFE8C547));
         await _runFx(_FxKind.flash,
             atEnemy: mage == c.enemy,
             color: const Color(0xFFE8C547),
@@ -343,41 +375,37 @@ class _DuelScreenState extends State<DuelScreen>
               ms: 500);
         }
       case HasteChangedEvent(:final holder):
-        setState(() {
-          _banner = holder == null
-              ? 'Haste is contested'
-              : '${holder == c.enemy ? c.enemy.name : 'You'} '
-                  'seize${holder == c.enemy ? 's' : ''} the initiative';
-          _bannerColor = const Color(0xFF7FD4E8);
-        });
+        await _showMessage(
+            holder == null
+                ? 'Haste is contested'
+                : '${holder == c.enemy ? c.enemy.name : 'You'} '
+                    'seize${holder == c.enemy ? 's' : ''} the initiative',
+            const Color(0xFF7FD4E8));
         await _runFx(_FxKind.flash,
             atEnemy: holder == c.enemy,
             color: const Color(0xFF7FD4E8),
             ms: 450);
       case ForfeitedEvent(:final mage):
-        setState(() {
-          _banner = mage == c.enemy
-              ? '${c.enemy.name} forfeits the turn'
-              : 'You ran out of time — turn forfeited';
-          _bannerColor = const Color(0xFFD85A30);
-        });
+        await _showMessage(
+            mage == c.enemy
+                ? '${c.enemy.name} forfeits the turn'
+                : 'You ran out of time — turn forfeited',
+            const Color(0xFFD85A30));
         await Future<void>.delayed(const Duration(milliseconds: 650));
       case SpellFizzledEvent(:final caster, :final spell):
-        setState(() {
-          _banner = '${caster == c.enemy ? c.enemy.name : 'You'}: '
-              '${spell.name} fizzled — charge disrupted';
-          _bannerColor = const Color(0xFFE8C547);
-        });
+        await _showMessage(
+            '${caster == c.enemy ? c.enemy.name : 'You'}: '
+            '${spell.name} fizzled — charge disrupted',
+            const Color(0xFFE8C547));
         await _runFx(_FxKind.flash,
             atEnemy: caster == c.enemy,
             color: const Color(0xFFE8C547),
             ms: 450);
       case SpellMissedEvent(:final caster, :final spell):
-        setState(() {
-          _banner = '${caster == c.enemy ? c.enemy.name : 'You'}: '
-              '${spell.name} missed — blinded';
-          _bannerColor = const Color(0xFFF2E7C9);
-        });
+        await _showMessage(
+            '${caster == c.enemy ? c.enemy.name : 'You'}: '
+            '${spell.name} missed — blinded',
+            const Color(0xFFF2E7C9));
         await _runFx(_FxKind.flash,
             atEnemy: caster == c.enemy,
             color: const Color(0xFFF2E7C9),
@@ -1077,7 +1105,16 @@ class _DuelScreenState extends State<DuelScreen>
                   value: 'coming soon',
                   muted: true,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 10),
+                TextButton.icon(
+                  onPressed: () => _showLog(context),
+                  icon: const Icon(Icons.receipt_long,
+                      size: 17, color: Color(0xFF9C93C4)),
+                  label: const Text('Review battle log',
+                      style:
+                          TextStyle(color: Color(0xFF9C93C4), fontSize: 13)),
+                ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -1161,20 +1198,70 @@ class _DuelScreenState extends State<DuelScreen>
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: const Color(0xFF1B1531),
-      builder: (context) => ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          for (final line in c.battleLog.reversed)
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => FractionallySizedBox(
+        heightFactor: 0.8,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Text(line,
-                  style: TextStyle(
-                      color: line.startsWith('—')
-                          ? const Color(0xFFE8C547)
-                          : const Color(0xFFB9B2D6),
-                      fontSize: 12.5)),
+              padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.receipt_long,
+                      size: 18, color: Color(0xFFE8C547)),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text('Battle log',
+                        style: TextStyle(
+                            color: Color(0xFFECE7F8),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600)),
+                  ),
+                  const Text('newest first',
+                      style:
+                          TextStyle(color: Color(0xFF6E6A7A), fontSize: 11)),
+                  IconButton(
+                    icon: const Icon(Icons.close,
+                        size: 20, color: Color(0xFF9C93C4)),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
             ),
-        ],
+            const Divider(height: 1, color: Color(0xFF2A2342)),
+            Expanded(
+              child: c.battleLog.isEmpty
+                  ? const Center(
+                      child: Text('No turns fought yet.',
+                          style: TextStyle(
+                              color: Color(0xFF6E6A7A), fontSize: 13)),
+                    )
+                  : ListView(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                      children: [
+                        for (final line in c.battleLog.reversed)
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 2),
+                            child: Text(line,
+                                style: TextStyle(
+                                    color: line.startsWith('—')
+                                        ? const Color(0xFFE8C547)
+                                        : const Color(0xFFB9B2D6),
+                                    fontWeight: line.startsWith('—')
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                    fontSize: 12.5)),
+                          ),
+                      ],
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

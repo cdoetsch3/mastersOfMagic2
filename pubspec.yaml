@@ -3,7 +3,7 @@ description: "Masters of Magic 2 — a simultaneous-turn elemental mage-duel gam
 publish_to: 'none'
 
 # Keep in sync with lib/game/app_version.dart (shown on the About panel).
-version: 0.8.10+19
+version: 0.9.3+23
 
 environment:
   sdk: ^3.12.2
