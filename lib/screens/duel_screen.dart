@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:mom_engine/mom_engine.dart';
 
 import '../game/duel_controller.dart';
+import '../game/duel_status_badges.dart';
 import '../game/element_style.dart';
 import '../game/loadout.dart';
 import '../game/mage_apparel.dart';
@@ -754,7 +755,13 @@ class _DuelScreenState extends State<DuelScreen>
     if (confirmed == true) c.surrender(verb: verb);
   }
 
+  /// The opponent's Creeping Dark is what blinds *my* view. Dusk hides the
+  /// enemy's charge/health; Midnight also hides my own (§4.2).
+  CreepingDarkStatus? get _enemyDark =>
+      c.enemy.statuses.whereType<CreepingDarkStatus>().firstOrNull;
+
   Widget _playerPanel() {
+    final midnight = _enemyDark?.midnight ?? false;
     return _StatusPanel(
       name: 'You',
       hp: c.shownPlayerHp,
@@ -764,16 +771,14 @@ class _DuelScreenState extends State<DuelScreen>
       elementHidden: false,
       shield: c.shownPlayerShield,
       alignEnd: false,
-      buffs: [
-        if (c.player.hasHaste) 'Haste',
-        if (c.player.empowerMultiplier != null) 'Empowered',
-        if (c.player.quickenPriority != null) 'Quickened',
-        if (c.player.phaseNext) 'Phasing',
-      ],
+      badges: statusBadgesFor(c.player),
+      barsVeiled: midnight,
+      veilLabel: 'Midnight',
     );
   }
 
   Widget _enemyPanel() {
+    final dark = _enemyDark;
     return _StatusPanel(
       name: c.enemy.name,
       hp: c.shownEnemyHp,
@@ -783,12 +788,9 @@ class _DuelScreenState extends State<DuelScreen>
       elementHidden: c.enemyIsCharging && c.revealedEnemyElement == null,
       shield: c.shownEnemyShield,
       alignEnd: true,
-      buffs: [
-        if (c.enemy.hasHaste) 'Haste',
-        if (c.enemy.empowerMultiplier != null) 'Empowered',
-        if (c.enemy.quickenPriority != null) 'Quickened',
-        if (c.enemy.phaseNext) 'Phasing',
-      ],
+      badges: statusBadgesFor(c.enemy),
+      barsVeiled: dark?.dusk ?? false,
+      veilLabel: (dark?.midnight ?? false) ? 'Midnight' : 'Dusk',
     );
   }
 
@@ -1187,7 +1189,15 @@ class _StatusPanel extends StatelessWidget {
   final bool elementHidden;
   final ShownShield? shield;
   final bool alignEnd;
-  final List<String> buffs;
+  final List<StatusBadge> badges;
+
+  /// When true, this mage's charge and health are hidden behind an enemy
+  /// Creeping Dark (Dusk / Midnight). [veilLabel] names the curse so the
+  /// blackout reads as intentional, not a rendering bug.
+  final bool barsVeiled;
+  final String? veilLabel;
+
+  static const _umbra = Color(0xFF8B5CD6);
 
   const _StatusPanel({
     required this.name,
@@ -1198,7 +1208,9 @@ class _StatusPanel extends StatelessWidget {
     required this.elementHidden,
     required this.shield,
     required this.alignEnd,
-    required this.buffs,
+    required this.badges,
+    this.barsVeiled = false,
+    this.veilLabel,
   });
 
   @override
@@ -1226,65 +1238,159 @@ class _StatusPanel extends StatelessWidget {
                       fontSize: 13,
                       fontWeight: FontWeight.w600)),
               const SizedBox(width: 8),
-              Text('$hp/$maxHp',
-                  style:
-                      const TextStyle(color: Color(0xFF9C93C4), fontSize: 12)),
+              if (barsVeiled)
+                _veilPill()
+              else
+                Text('$hp/$maxHp',
+                    style: const TextStyle(
+                        color: Color(0xFF9C93C4), fontSize: 12)),
             ],
           ),
           const SizedBox(height: 4),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(end: hp / maxHp),
-              duration: const Duration(milliseconds: 450),
-              curve: Curves.easeOut,
-              builder: (context, value, _) => Stack(
-                children: [
-                  Container(height: 8, color: const Color(0xFF2A2342)),
-                  FractionallySizedBox(
-                    widthFactor: value.clamp(0, 1),
-                    child: Container(
-                        height: 8,
-                        color: value > 0.35
-                            ? const Color(0xFF58B368)
-                            : const Color(0xFFD85A30)),
-                  ),
-                ],
+          if (barsVeiled)
+            _veiledBar()
+          else
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(end: hp / maxHp),
+                duration: const Duration(milliseconds: 450),
+                curve: Curves.easeOut,
+                builder: (context, value, _) => Stack(
+                  children: [
+                    Container(height: 8, color: const Color(0xFF2A2342)),
+                    FractionallySizedBox(
+                      widthFactor: value.clamp(0, 1),
+                      child: Container(
+                          height: 8,
+                          color: value > 0.35
+                              ? const Color(0xFF58B368)
+                              : const Color(0xFFD85A30)),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
           const SizedBox(height: 5),
-          Row(
-            mainAxisAlignment:
-                alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
-            children: [
-              if (!alignEnd) ..._chargeRow(pipColor),
-              if (elementHidden)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
-                  child: Text('?',
-                      style: TextStyle(
-                          color: Color(0xFF8E8E9E),
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold)),
-                )
-              else if (element != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Icon(element!.style.icon,
-                      size: 14, color: element!.style.color),
-                ),
-              if (alignEnd) ..._chargeRow(pipColor),
-            ],
-          ),
-          if (shield != null || buffs.isNotEmpty) const SizedBox(height: 4),
+          if (barsVeiled)
+            Row(
+              mainAxisAlignment:
+                  alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
+              children: const [
+                Icon(Icons.nightlight_round, size: 12, color: _umbra),
+                SizedBox(width: 5),
+                Text('charge veiled',
+                    style: TextStyle(
+                        color: _umbra,
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic)),
+              ],
+            )
+          else
+            Row(
+              mainAxisAlignment:
+                  alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
+              children: [
+                if (!alignEnd) ..._chargeRow(pipColor),
+                if (elementHidden)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Text('?',
+                        style: TextStyle(
+                            color: Color(0xFF8E8E9E),
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold)),
+                  )
+                else if (element != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Icon(element!.style.icon,
+                        size: 14, color: element!.style.color),
+                  ),
+                if (alignEnd) ..._chargeRow(pipColor),
+              ],
+            ),
+          if (shield != null || badges.isNotEmpty) const SizedBox(height: 4),
           Wrap(
             spacing: 4,
+            runSpacing: 4,
+            alignment: alignEnd ? WrapAlignment.end : WrapAlignment.start,
             children: [
               if (shield != null) _shieldBadge(),
-              for (final buff in buffs) _badge(buff, const Color(0xFFE8C547)),
+              for (final b in badges) _statusChip(b),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  /// The "hidden by DUSK / MIDNIGHT" pill that replaces the HP readout.
+  Widget _veilPill() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color: _umbra.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: _umbra.withValues(alpha: 0.8), width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.nightlight_round, size: 10, color: _umbra),
+          const SizedBox(width: 3),
+          Text((veilLabel ?? 'Veiled').toUpperCase(),
+              style: const TextStyle(
+                  color: _umbra,
+                  fontSize: 10,
+                  letterSpacing: 0.6,
+                  fontWeight: FontWeight.w700)),
+        ],
+      ),
+    );
+  }
+
+  /// A redacted health bar: diagonal umbra hatching, unmistakably not a health
+  /// color and not an empty (dead) bar.
+  Widget _veiledBar() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: SizedBox(
+        height: 8,
+        width: double.infinity,
+        child: CustomPaint(painter: _VeilHatchPainter()),
+      ),
+    );
+  }
+
+  /// A2 chip: buffs/streaks keep a colored border on a dark fill; debuffs
+  /// invert to a solid ember fill so they can't be mistaken for a buff.
+  Widget _statusChip(StatusBadge b) {
+    final debuff = b.kind == BadgeKind.debuff;
+    final fg = debuff ? const Color(0xFF141021) : b.color;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: debuff ? b.color : b.color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+            color: b.color, width: debuff ? 0 : 0.9),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(b.label,
+              style: TextStyle(
+                  color: fg, fontSize: 10.5, fontWeight: FontWeight.w600)),
+          if (b.sub != null) ...[
+            const SizedBox(width: 4),
+            Text(b.sub!,
+                style: TextStyle(
+                    color: debuff
+                        ? const Color(0xFF141021)
+                        : AppColors.textFaint,
+                    fontSize: 9.5)),
+          ],
         ],
       ),
     );
@@ -1334,6 +1440,26 @@ class _StatusPanel extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Diagonal umbra hatching for a Dusk/Midnight-veiled health bar.
+class _VeilHatchPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(
+        Offset.zero & size, Paint()..color = const Color(0xFF221A38));
+    final stripe = Paint()
+      ..color = const Color(0x558B5CD6)
+      ..strokeWidth = 3;
+    const gap = 7.0;
+    for (double x = -size.height; x < size.width + size.height; x += gap) {
+      canvas.drawLine(
+          Offset(x, size.height), Offset(x + size.height, 0), stripe);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_VeilHatchPainter oldDelegate) => false;
 }
 
 class _FxPainter extends CustomPainter {

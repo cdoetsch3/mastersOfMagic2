@@ -6,7 +6,10 @@ import '../../game/game_state.dart';
 import '../../game/player_profile.dart';
 import '../../game/progression.dart';
 import '../../ui/app_theme.dart';
+import '../element_detail_dialog.dart';
+import '../gameplay_guide_screen.dart';
 import '../home_shell.dart';
+import '../spell_detail_dialog.dart';
 
 const _spellKeyLabels = 'QWERTASDFG';
 
@@ -34,18 +37,47 @@ class SpellbookTab extends StatelessWidget {
               _presetChips(context, game, p),
               const SizedBox(height: 12),
               _EditableName(preset: preset, canEdit: canEdit, game: game),
+              const SizedBox(height: 10),
+              _guideLink(context),
               const SizedBox(height: 12),
               SectionLabel('Elements  ·  ${preset.elementIds.length}/'
-                  '${Progression.startingElementSlots}   (keys 1-3)'),
+                  '${Progression.startingElementSlots}   (tap ⓘ for details)'),
               _elementGrid(context, game, p, preset, canEdit),
               const SizedBox(height: 14),
               SectionLabel('Spells  ·  ${preset.spellIds.length}/'
-                  '${Progression.startingSpellSlots}   (keys Q W E R T)'),
+                  '${Progression.startingSpellSlots}   (tap ⓘ for details)'),
               _spellGrid(context, game, p, preset, canEdit),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _guideLink(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const GameplayGuideScreen()),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.panelHi,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: const Row(
+          children: [
+            Icon(Icons.school, size: 18, color: AppColors.gold),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text('How dueling works',
+                  style: TextStyle(color: AppColors.text, fontSize: 14)),
+            ),
+            Icon(Icons.chevron_right, color: AppColors.textFaint),
+          ],
+        ),
+      ),
     );
   }
 
@@ -147,13 +179,13 @@ class SpellbookTab extends StatelessWidget {
       runSpacing: 8,
       children: [
         for (final element in MagicElement.values)
-          _elementTile(game, p, preset, element, canEdit),
+          _elementTile(context, game, p, preset, element, canEdit),
       ],
     );
   }
 
-  Widget _elementTile(GameState game, PlayerProfile p, LoadoutPreset preset,
-      MagicElement element, bool canEdit) {
+  Widget _elementTile(BuildContext context, GameState game, PlayerProfile p,
+      LoadoutPreset preset, MagicElement element, bool canEdit) {
     final style = element.style;
     final slot = preset.elementIds.indexOf(element.name);
     final selected = slot >= 0;
@@ -173,44 +205,66 @@ class SpellbookTab extends StatelessWidget {
 
     return Opacity(
       opacity: unlocked ? (canEdit || selected ? 1 : 0.7) : 0.35,
-      child: GestureDetector(
-        onTap: toggle,
-        child: Container(
-          width: 104,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: selected
-                ? style.color.withValues(alpha: 0.18)
-                : AppColors.panelHi,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-                color: selected ? style.color : AppColors.border,
-                width: selected ? 1.6 : 1),
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: toggle,
+            child: Container(
+              width: 104,
+              padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
+              decoration: BoxDecoration(
+                color: selected
+                    ? style.color.withValues(alpha: 0.18)
+                    : AppColors.panelHi,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                    color: selected ? style.color : AppColors.border,
+                    width: selected ? 1.6 : 1),
+              ),
+              child: Column(
                 children: [
-                  Icon(style.icon, size: 18, color: style.color),
-                  const SizedBox(width: 6),
-                  Text(style.label,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(style.icon, size: 18, color: style.color),
+                      const SizedBox(width: 6),
+                      Text(style.label,
+                          style: TextStyle(
+                              color: selected
+                                  ? AppColors.text
+                                  : AppColors.textDim,
+                              fontSize: 12.5)),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(selected ? 'Slot ${slot + 1}' : '—',
                       style: TextStyle(
-                          color: selected
-                              ? AppColors.text
-                              : AppColors.textDim,
-                          fontSize: 12.5)),
+                          color:
+                              selected ? style.color : AppColors.textFaint,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600)),
                 ],
               ),
-              const SizedBox(height: 3),
-              Text(selected ? 'Slot ${slot + 1}' : '—',
-                  style: TextStyle(
-                      color: selected ? style.color : AppColors.textFaint,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w600)),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: _infoDot(() => showElementDetail(context, element)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// A small tappable ⓘ affordance used on element and spell tiles.
+  Widget _infoDot(VoidCallback onTap) {
+    return InkResponse(
+      onTap: onTap,
+      radius: 18,
+      child: const Padding(
+        padding: EdgeInsets.all(4),
+        child: Icon(Icons.info_outline, size: 15, color: AppColors.textFaint),
       ),
     );
   }
@@ -230,13 +284,13 @@ class SpellbookTab extends StatelessWidget {
       ),
       children: [
         for (final spell in Spellbook.all)
-          _spellTile(game, p, preset, spell, canEdit),
+          _spellTile(context, game, p, preset, spell, canEdit),
       ],
     );
   }
 
-  Widget _spellTile(GameState game, PlayerProfile p, LoadoutPreset preset,
-      Spell spell, bool canEdit) {
+  Widget _spellTile(BuildContext context, GameState game, PlayerProfile p,
+      LoadoutPreset preset, Spell spell, bool canEdit) {
     final slot = preset.spellIds.indexOf(spell.id);
     final selected = slot >= 0;
     final unlocked = p.isSpellUnlocked(spell);
@@ -324,6 +378,8 @@ class SpellbookTab extends StatelessWidget {
                             fontSize: 10,
                             fontWeight: FontWeight.bold)),
                   ),
+                if (unlocked)
+                  _infoDot(() => showSpellDetail(context, spell)),
               ],
             ),
           ),

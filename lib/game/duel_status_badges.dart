@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mom_engine/mom_engine.dart';
 
+import '../ui/app_theme.dart';
 import 'element_style.dart';
 
 /// A2 HUD pip: one chip per active status/streak on a mage. Buffs keep an
