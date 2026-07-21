@@ -106,6 +106,16 @@ Fighting up rewards more — **but not 1:1 with the opponent's own XP value**:
 
 ## 3. XP beyond combat 📝
 
+⚠️ **Predates the skills decision — needs reconciliation (review
+2026-07-21).** This section treats crafting/enchanting as *player*-XP sources
+with daily caps. Since then, ITEMS_DESIGN §6a established **nine separate
+skill tracks outside player level** (Mining, Felling, Foraging; Tailoring,
+Potions, Enchanting, Jewelry, Metalworking, Woodcarving). ❓ Rulings needed:
+do processing/gathering actions grant **both** skill XP and player XP (this
+table), or skill XP only? And does the 30–40% ceiling below survive nine
+skills' worth of activity, or does it need to be a shared pool across all of
+them? Also unspecified: whether **Academy-mode** duels grant player XP.
+
 Target: non-combat sources can contribute meaningfully but not carry you —
 **cap their practical pace at ~30–40% of leveling**, so a pure crafter
 plateaus and a duelist who also crafts feels accelerated, not obligated.
@@ -181,12 +191,21 @@ non-charge-5") resolves to Jolt, Flurry, Bulwark, Hasty; every 5-cost spell
   together — expect the meta to shift noticeably at L35.
 
 ### 4.1 Interactions worth knowing (derived, not new rules)
-- **Arcane Knowledge is live from L30** — its 4+ charge requirement is
-  already met by the L20 charge-4 cap when Arcane unlocks.
-- **Radiant's Blind** caps at 40% (4 charge) until L40 unlocks charge-5
-  (50%).
-- **Umbra's Midnight** (15 stacks) takes at least four 4-charge casts before
-  L40; the "three 5-charge casts" fast path is a max-level flex.
+
+⚠️ *Revised 2026-07-21 for the "charge spent = the spell's COST" ruling
+(ITEMS_DESIGN §5b.3a): these notes now depend on which spells you own, not
+on your charge cap.*
+
+- **Arcane Knowledge is live from L30** — but only via spells **costing** 4+:
+  at L30 that means **Ruin or Rampart** (both L20 unlocks). The charge-4 cap
+  alone no longer suffices; overcharging a cheap spell earns nothing.
+- **Radiant's Blind** reaches 40% only by casting a 4-**cost** spell
+  (Ruin/Rampart), and 50% only with the 5-cost spells at L40
+  (Cataclysm/Sanctuary/Drain). Cheap spells cast at high charge no longer
+  blind at high rates.
+- **Umbra's Midnight** (15 stacks) needs 4-cost casts before L40 — i.e.
+  repeated **Ruin/Rampart as Umbra**; the "three 5-cost casts" fast path is a
+  max-level flex.
 - **Discharge arriving at L15 pairs with Tier 2** — the charge-counterplay
   spell lands in the same level as the tempo-disruption tier. Thematic and
   teaches the counter role early.
@@ -204,6 +223,8 @@ non-charge-5") resolves to Jolt, Flurry, Bulwark, Hasty; every 5-cost spell
 | 1 | Slot growth rate: +1 per 5 levels (14 at L45) OK, or a custom schedule? | §1 |
 | 2 | Confirm XP constants (base 100, growth 1.0675, reward base 20 / 1.033) or retune after playtests | §2 |
 | 3 | Anti-farm: repeat-opponent decay acceptable for friendly rematch sessions? | §2.5 |
+| 4 | ⚠️ Reconcile §3 with the nine skill tracks: skill XP only, or both? Shared 30–40% ceiling? | §3 |
+| 5 | Does Academy mode grant player XP / quest credit? | §3 |
 
 ---
 

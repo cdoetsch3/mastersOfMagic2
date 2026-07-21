@@ -45,8 +45,8 @@ define the endgame ceiling first, then scale the ladder down to it.
   robeTrim, gloves, boots) and is commented "later derived from equipped
   items" — the cosmetic hook is pre-wired.
 
-❓ Inherited open questions: rarity tiers; whether held items are
-slot-restricted (wand = right only?) or freely assignable.
+✅ Both formerly-inherited open questions are now answered in this doc:
+rarity tiers (§8) and held-item slots (Main/Off hand defined, §1 above).
 
 ---
 
@@ -96,10 +96,28 @@ grounded in mechanics we've already built:
 | **Aegis** → Emberwright | | Shields resolve at priority 3, nukes at 9 — the shield is up before the big hit lands |
 | **Emberwright** → Thornwarden | | Burst kills before 3-tick burns and 1%/turn heals accumulate |
 | **Thornwarden** → Tidebinder | | DoTs tick in the **end phase**, which priority manipulation can't touch — Waterlogged does nothing to damage that never rolls initiative |
-| **Tidebinder** → Voidcaller | | Creeping Dark needs sustained consecutive Umbra casts; fizzles and tempo disruption break the streak before Dusk |
-| **Voidcaller** → Aegis | | Shield counter-picking needs to see the enemy's element — Shadow hides it, so the ×2 math can't be played |
+| **Tidebinder** → Voidcaller | | Charge strips and tempo disruption slow Creeping Dark's growth — Dark stacks scale with charge spent, and a mage kept poor never reaches Dusk |
+| **Voidcaller** → Aegis | | Shield counter-picking needs to see the enemy's element — hidden info means the ×2 math can't be played |
 
 Each archetype beats one, loses to one, and is even with two. No apex.
+
+⚠️ **Two caveats from the design review (2026-07-21):**
+
+1. **The loop's justifications lean on archetype↔element pairings the
+   two-axis system doesn't guarantee.** "Voidcaller beats Aegis because
+   Shadow hides the element" only holds if the Voidcaller runs an Umbra
+   enchant — under two-axis it could carry Pyro and hide nothing. ❓ Ruling
+   needed: either the counter-guarantees come from the **set bonuses
+   themselves** (e.g. Voidcaller's 5-piece natively grants an info-hiding
+   effect, whatever its enchant), or §2.2's "structurally impossible to
+   dominate" claim must be softened to "holds for the canonical pairings."
+   The set-bonus route is recommended — it keeps the guarantee real.
+2. **Precision fix (applied above):** the old Tidebinder→Voidcaller line
+   claimed fizzles "break the streak" — but per §5.4's ruling, fizzled casts
+   behave like charges: they don't advance streaks *or reset them*, and a
+   fizzled Umbra cast still counts as Umbra activity (no Dark decay that
+   turn). Electro *slows* Dark's growth; it doesn't reverse it. The edge
+   exists, but it's thinner than first stated — worth watching in sims.
 
 **2. Tech slots are the adaptation layer.** Neck, Ring, and the off-hand
 carry situational counters (anti-DoT, anti-burst, shield-piercing,
@@ -140,25 +158,34 @@ element"* — is the right architecture, and it's worth naming why:
 > **The base set defines the ARCHETYPE. The element enchant defines the
 > FLAVOR.**
 
-- **Axis 1 — Archetype (3–5 armor sets):** *how* you fight. Burst, sustained,
-  tempo, tank, attrition.
+- **Axis 1 — Archetype (5 armor sets):** *how* you fight. Burst, tempo,
+  attrition, tank, trickster.
 - **Axis 2 — Element enchant (9 elements):** *which* element's signature
   effect gets sharpened.
 
-**Why this is the right call:** 4 sets × 9 elements = **36 distinct endgame
-builds from only 4 art sets**. It sidesteps the alternative (nine bespoke
+**Why this is the right call:** 5 sets × 9 elements = **45 distinct endgame
+builds from only 5 art sets**. It sidesteps the alternative (nine bespoke
 element sets), which would be 9 sets of art for *less* build variety and
 would hard-lock every player into mono-element.
 
-### 3.1 Draft archetypes 📝
+### 3.1 Archetypes ✅ (all five accepted; per-tier bonuses still draft 📝)
 
 | Set | Fantasy | 3-piece | 4-piece | 5-piece (build-defining) |
 |---|---|---|---|---|
 | **Emberwright** | Burst — big charged nukes | +flat damage | +damage per charge spent | Your first 4+ charge spell each duel can't be Blinded or Staggered |
-| **Tidebinder** | Tempo — disruption, speed | +priority utility | Streak thresholds −1 | Your streak effects fire one cast sooner |
+| **Tidebinder** | Tempo — disruption, speed | +priority utility | ⚠️ Streak thresholds −1 | ⚠️ Your streak effects fire one cast sooner |
 | **Thornwarden** | Attrition — DoT/HoT | +HoT per turn | DoTs on you tick 25% weaker | Your damage-over-time effects last +1 turn |
 | **Aegis Sovereign** | Tank — shields, survivability | +max HP | Shields +15% | Your shields keep 25% strength instead of shattering |
-| 💡 **Voidcaller** | Trickster — info war, anti-magic | ? | ? | ? (reserve slot if a 5th is wanted) |
+| **Voidcaller** ✅ | Trickster — info war, anti-magic | ? | ? | ? (bonuses TBD — see the A2 flag below: they must carry the info-war identity natively) |
+
+⚠️ **CONTRADICTION TO FIX (review 2026-07-21): Tidebinder's 4-piece and
+5-piece are the same bonus twice.** "Streak thresholds −1" and "streak
+effects fire one cast sooner" are two wordings of one effect; a full set
+would stack to −2 — Waterlog on **every** Aqua cast — directly violating
+§7.1's hard cap ("thresholds drop by at most 1, never to every cast").
+❓ One of the two tiers needs a different bonus (candidates: 4-piece becomes
+"your streaks survive one fizzle/miss without resetting", or 5-piece becomes
+"Tailwind's Haste grab also blocks the next Haste steal").
 
 ⚠️ Note the deliberate tension: **Emberwright pushes big spells** (aligning
 with TYPE_EFFECTS §7's big-spell goal) while **on-hit weapons push multi-hit
@@ -379,6 +406,17 @@ toward an auto-surrender for a turn they were never allowed to take.
 📝 `DuelController.forfeitLimit` counts every `ForfeitAction` today; this
 distinction is a **hard prerequisite** before any lockout ships.
 
+⚠️ **Netcode prerequisite (review 2026-07-21):** the wire protocol encodes
+exactly one forfeit token (`'F'`), and in commit-reveal it is the
+**opponent's client** that counts your forfeits. So compelled-vs-timeout must
+be distinguishable on the wire (a second token or a flag) — *and* the claim
+must be **verifiable**: a cheater could mark every timeout "compelled" to
+dodge the auto-surrender, so the receiving client must check the claim
+against visible state (the opponent's statuses and loadout are known;
+"I had no legal action" is computable). Also applies to `TunableAi`, which
+returns `ForfeitAction` when nothing is playable — that is a compelled
+forfeit and currently counts toward the streak.
+
 ### 5b.2 Endurance (death save) 📝
 
 *If a hit would kill you, survive at 1 HP instead.*
@@ -420,6 +458,18 @@ retention. The counterplay is already in the game and it is sharp:
 Sitting on a full reserve is loud and punishable, so the "abuse" case is
 really a **standoff the opponent has strong tools against** — it doesn't need
 a rule to forbid it.
+
+❓ **Undefined interaction (review 2026-07-21): retention vs. "casting ends
+the cycle."** The core rule says casting consumes all charge *and ends the
+element cycle*; the engine's invariant is charge > 0 ⇒ element locked. So
+retained charge must keep the cycle **open** — the only coherent reading —
+which quietly grants a second power nobody priced: **you never re-pick your
+element**, streaks keep compounding across casts, and mono-element play
+(Crescendo, Waterlog/Tailwind/Stagger thresholds) gets a hidden subsidy.
+Needs an explicit ruling before Reservoir or any retention gear ships:
+does retention keep the cycle open (recommended: yes, and price the item
+knowing it), or does the cycle end with the element re-lockable only to the
+same element?
 
 ### 5b.3a ✅ Adopted: "charge spent" = the spell's cost, engine-wide
 
@@ -707,8 +757,9 @@ potions from ingredients.
 > ten… those item slots could also be added with equipment."*
 
 A deliberately **bounded** consumable inventory, so a stack of 100 potions
-can't stall the game out. Baseline **4 slots**, growing to **8–10** through
-progression and **equipment bonuses**.
+can't stall the game out. Baseline **2–4 slots** (per the later backpack
+ruling — an earlier draft said 4), growing to **8–10** through progression
+and **equipment bonuses**.
 
 Why this is the right call:
 - It's the upstream fix for potion-spam — Fatigue (turn 51) bounds a stalled
@@ -756,6 +807,14 @@ encounter healing). ✅ **No consumables at all in Academy mode** (§7.6).
 ✅ **Status-pipeline interactions:** potions **can be slowed by Waterlogged**
 (+10 priority, like any action) but **cannot be fizzled** (they cost no
 charge) and **cannot miss from Blind** (they aren't spells).
+
+📝 **Simultaneity spec (needed for lockstep):** the engine resolves
+same-priority groups as *offense → support → channel*, with Haste breaking
+two-cast ties. A potion is a new action type at P3 — define where it sorts
+in that ordering (proposal: with support, i.e. after same-tick offense,
+alongside shields) and whether Haste applies to it (proposal: yes, it's an
+action like any other). Unspecified ordering here is exactly where a
+lockstep desync would hide.
 
 ⚠️ **Healing must be worth less than an equivalent-tier attack deals**, or
 turtling behind potions becomes a dominant, duel-lengthening strategy.
@@ -895,11 +954,11 @@ reads consistently everywhere.
 
 | Rarity | Mote tier | Rough shape |
 |---|---|---|
-| Common | Lesser | flat stats only |
-| Uncommon | Minor | flat stats, small % |
-| Rare | Major | a modifier + set membership |
-| Epic | Greater | strong modifier, enchantable |
-| Legendary | Master | build-defining; full set bonuses |
+| Common | **Dust** | flat stats only |
+| Uncommon | **Shard** | flat stats, small % |
+| Rare | **Crystal** | a modifier + set membership |
+| Epic | **Core** | strong modifier, enchantable |
+| Legendary | **Heart** | build-defining; full set bonuses |
 
 ❓ Are set pieces exclusively Epic+? (Proposal: yes — sets are an endgame
 pursuit; Common/Uncommon are the ladder up to them.)
@@ -914,9 +973,9 @@ Having defined BiS, the ladder back down:
 |---|---|---|
 | **Tutorial** | 1–9 | Flat HP only. Teaches "gear = survivability" with zero complexity |
 | **Foundations** | 10–19 | Flat damage and shield %; first Uncommons; crafting unlocks |
-| **Specialization** | 20–34 | First set pieces (3-piece bonuses); enchanting unlocks; Luck matters |
-| **Mastery** | 35–44 | 4-piece bonuses; Epic drops; element enchants become the build |
-| **Endgame** | 45–50 | 5-piece bonuses; Legendary/Master motes; the §2 ceiling |
+| **Specialization** | 20–34 | Non-set gear deepens (modifiers, Luck); enchanting unlocks; **primary sets begin at L30** (§3.4 Tier I) |
+| **Mastery** | 35–44 | 4-piece bonuses; Epic drops; element enchants become the build; set Tier II at L40 |
+| **Endgame** | 45–50 | 5-piece bonuses; Heart-tier motes; set Tiers III–IV; the §2 ceiling |
 
 📝 Rationale: modifiers arrive *after* the player understands the element
 effects they modify. A level-12 player boosting Ignite rates before they've
@@ -939,9 +998,13 @@ interactions · loot insurance · premium Luck potions · enchant-parity stance.
 | # | Question | §|
 |---|---|---|
 | 8 | Set pieces Epic+ only? *(likely — deferred)* | §8 |
+| 36 | ⚠️ **Tidebinder 4pc/5pc are the same bonus twice** (stacks to −2, violating §7.1) — replace one tier | §3.1 |
+| 37 | ⚠️ **Counter-loop guarantee**: do the guarantees live in the **set bonuses** (recommended) or only hold for canonical archetype↔element pairings? Voidcaller's bonuses (all TBD) should carry the info-war identity natively | §2.2 |
+| 38 | **Charge retention vs the element cycle**: does retained charge keep the cycle open (never re-picking element, streaks compounding)? Recommended yes — but price it deliberately | §5b.3 |
+| 39 | Potion ordering inside the P3 simultaneity group (proposal: with support; Haste applies) | §6b.3 |
 
 ✅ Everything else in this document is decided. The design is ready to move to
-a catalogue pass (concrete items, recipes, drop tables) whenever you are.
+a catalogue pass (concrete items, recipes, drop tables) once #36–38 are ruled.
 
 ### Watch items (not blockers)
 
@@ -954,6 +1017,20 @@ a catalogue pass (concrete items, recipes, drop tables) whenever you are.
 ---
 
 ## Changelog
+
+**Rev 11 (cross-doc review)** — Findings from a four-doc consistency review
+noted in place. Fixed: rarity ladder renamed to Dust→Heart; 5×9=45 builds;
+archetypes marked accepted; consumable baseline aligned to 2–4; §9 bands
+aligned to the L30 set start; stale "inherited open questions" cleared.
+Flagged for ruling: **Tidebinder 4pc/5pc duplicate bonus** (#36),
+**counter-loop guarantees must live in set bonuses vs canonical pairings**
+(#37, incl. corrected Tidebinder→Voidcaller rationale — fizzles don't reset
+streaks/stacks), **charge retention vs the element cycle** (#38), **potion
+ordering in the P3 group** (#39), and the **compelled-forfeit wire-protocol/
+anti-cheat prerequisite** (§5b.1). GAME_DESIGN and PROGRESSION_DESIGN
+updated in the same pass (elements section marked shipped, storage split and
+Tiamonds/gems flagged, two-ladder Elo, §3 skills reconciliation, cost-based
+§4.1 reasoning).
 
 **Rev 10** — Final rulings; only "set pieces Epic+?" remains open.
 **"Charge spent" = the spell's cost** adopted engine-wide (TYPE_EFFECTS_DESIGN

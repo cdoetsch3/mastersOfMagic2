@@ -47,6 +47,14 @@ you toward an auto-surrender.
 lockouts land it needs to distinguish the compelled case and skip the
 increment.
 
+⚠️ **Netcode prerequisite:** the wire protocol has one forfeit token (`'F'`),
+and in commit-reveal it's the **opponent's client** that counts your
+forfeits. Compelled-vs-timeout must be distinguishable on the wire *and
+verifiable* (a cheater could claim "compelled" to dodge the auto-surrender;
+the claim is checkable against the visible statuses/loadout). `TunableAi`
+also returns `ForfeitAction` when nothing is playable — a compelled forfeit
+that currently counts. Details: ITEMS_DESIGN §5b.1.
+
 ### Resolution order — Priority
 ✅ Formalized, transparent **Priority 1–10** property on every spell (priority 1 acts first):
 
@@ -91,20 +99,27 @@ a draw" rule (draws dropped from ~12% to ~0% in AI-vs-AI sims once Haste was add
 
 ## 2. Elements
 
-✅ Elements matter **only for shield math** (double damage vs countered shields) — attacks
-against a player's bare health are element-neutral. The element is information/bluffing:
-your shield's color reveals its element.
+✅ **SUPERSEDED & SHIPPED:** [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md)
+is the authority on elements — the 9-element roster in three tiers (Primal:
+Aqua/Pyro/Flora · Kinetic: Electro/Aero/Geo · Ethereal: Radiant/Umbra/Arcane),
+three closed counter-triangles, and per-element side-effects. **Implemented
+and live as of v0.9.0.** Renames from the old roster: Water→Aqua, Fire→Pyro,
+Electric→Electro, Air→Aero, Earth→Geo, Light→Radiant, Shadow→Umbra; Flora and
+Arcane added; Ice dropped.
 
-✅ Launch roster (8): Earth, Fire, Water, Air, Electric, Ice, Light, Shadow.
-💡 More elements may be added later as unlockables.
+Still true: shield counter math (×2 vs the countered element's shield; bare-
+health damage is element-neutral) and elements-as-information (your shield's
+color reveals its element). **No longer true:** "elements matter only for
+shield math" — every element now carries a side-effect (Ignite, Waterlogged,
+Photosynthesis, Static Feedback, Tailwind, Stagger, Blind, Creeping Dark,
+Arcane Knowledge).
 
-📝 **Superseding proposal:** [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md)
-— a 9-element roster in three tiers with per-element side-effects. Renames:
-Water→Aqua, Fire→Pyro, Electric→Electro, Air→Aero, Earth→Geo, Light→Radiant,
-Shadow→Umbra; adds Flora and Arcane; drops Ice. Not yet implemented; see that
-doc for the balance review and open questions.
+### Counter wheel — ❌ SUPERSEDED (kept for history)
 
-### Counter wheel — 📝 DRAFT proposal (variable volatility)
+*The variable-volatility wheel below was replaced by the three uniform
+counter-triangles in TYPE_EFFECTS_DESIGN (every element counters exactly one
+and is countered by exactly one, within its tier). The engine's element tests
+now enforce volatility = 1 for all nine.*
 
 ✅ Rule: elements need not all have 2 strengths / 2 weaknesses. The only invariant is
 **per-element balance**: # strengths == # weaknesses. Different counts = different
@@ -137,11 +152,11 @@ Flavor / mnemonics:
   slightly weaker Air shields or juicier side effects on volatile elements (verify via
   AI-vs-AI simulation).
 
-### Elemental side effects — 📝 draft, per-element status effects
-- Fire → **Burn** (damage over time)
-- Ice → **Freeze**
-- Shadow → accuracy loss
-- ❓ Others TBD (Electric → stun/paralyze? Water → ? Earth → ? Air → ? Light → ?)
+### Elemental side effects — ✅ SHIPPED (see TYPE_EFFECTS_DESIGN §2–4)
+*The early draft (Fire→Burn, Ice→Freeze, Shadow→accuracy loss) grew into the
+full nine-effect system: Pyro→Ignite, Aqua→Waterlogged, Flora→Photosynthesis,
+Electro→Static Feedback, Aero→Tailwind, Geo→Stagger, Radiant→Blind,
+Umbra→Creeping Dark, Arcane→Arcane Knowledge.*
 
 ---
 
@@ -262,8 +277,11 @@ MoM2 adds **spell slots** unlocked via leveling.
 
 ## 5. Game Modes
 
-- ✅ **Online 1v1 PvP** with **Elo + ranking system** — the foundation of the game,
-  though single-player is built first.
+- ✅ **Online 1v1 PvP** with **two Elo ladders** (per ITEMS_DESIGN §7.4):
+  **ranked counts gear** (matchmaking should seed on gear power + Elo), and
+  **Academy mode** strips all gear and consumables for a separate
+  **skills-only Elo**. ❓ Does Academy grant XP / quest credit?
+  Single-player is still built first.
 - ✅ **Single-player campaign**: battle increasingly difficult monsters that drop
   increasingly good loot. Primary XP/gold/loot source.
   - ✅ Monsters fight by the **exact same rules** as players (elements, charges, spells,
@@ -380,6 +398,10 @@ MoM2 adds **spell slots** unlocked via leveling.
    processes** (travel, crafting, researching/studying). ❓ Relationship to the
    existing premium currency ("gems") TBD — Tiamonds may BE the premium currency
    renamed, or a distinct time-skip item earned/bought separately.
+   ⚠️ *Review note (2026-07-21): ITEMS_DESIGN §3.6 now defines the same role
+   for "purple gems" (cooldown skips, "time crystals") — these are almost
+   certainly one concept under two names; reconcile before implementing
+   either.*
 9. **Timed travel** — traveling between locations takes real time. Early legs
    ~10–15s; scales up to hours for distant regions. Skippable with [8] Tiamonds.
    (Pairs with the crafting/research timers as the core freemium time-gate loop.)
@@ -441,7 +463,11 @@ always-a-legal-action invariant and the forfeit-counter rule in §1.
 - ✅ Five tabs: **Map · Inventory · Home · Spellbook · Social**.
   - **Map**: current location, travel, location-specific actions (shop, etc.);
     campaign adventures launch from here.
-  - **Inventory**: items + crafting (transmute / craft / salvage). Unlimited space.
+  - **Inventory**: items + crafting (transmute / craft / salvage).
+    ⚠️ *"Unlimited space" conflicts with ITEMS_DESIGN's 20-item backpack.*
+    ❓ Ruling needed: presumably a **bank/backpack split** — unlimited (or
+    large) storage at home/town, the 20-item backpack (+ craftable pouches)
+    being what you *carry on a run*. Define explicitly.
   - **Home** (center): dashboard — quests, resume adventure, PvP queue, timers,
     currencies, events.
   - **Spellbook**: spell collection, unlocks (studying timers), loadout presets.
@@ -477,7 +503,7 @@ level-ups, inventory placeholder, spellbook with presets, rotate-to-duel guard
   the build empties that reserved filename.)
 - ✅ **About panel** (app name + version) on the Account screen near Sign out;
   version constant lives in `lib/game/app_version.dart` (keep in sync with
-  pubspec). Currently **v0.2.0 (2)**.
+  pubspec). *(Version number in this doc goes stale — trust the constant.)*
 - ✅ **Pixel wizard-hat favicon** + PWA icons (generated, in `web/`); page title
   and manifest branded "Masters of Magic 2".
 - ✅ Desktop layout: tab content is centered in a **720px max-width column**;
@@ -519,10 +545,15 @@ tiers, build tiers 1–2, playtest, then extend tiers as the game matures.
 
 ## 9. ❓ Open Questions
 
-1. Counter wheel assignments (variable-volatility draft above needs sign-off).
-2. Status-effect roster for the remaining elements.
+~~1. Counter wheel assignments~~ ✅ resolved — three uniform triangles
+(TYPE_EFFECTS_DESIGN), shipped.
+~~2. Status-effect roster~~ ✅ resolved — all nine effects shipped.
 3. Exact damage/shield numbers table (engine + simulator now exist; needs a balance pass).
-4. Equipment rarity tiers.
+~~4. Equipment rarity tiers~~ ✅ resolved — Common→Legendary mapped 1:1 to
+Dust→Heart (ITEMS_DESIGN §8); only "set pieces Epic+?" remains there.
 5. Respawn-timer escalation curve (growth per sequential death, cooldown).
 6. Do charge/shields reset between encounters within a run? (assumed yes)
 7. Character name uniqueness & change policy.
+8. Bank/backpack storage split (see the Inventory note in §8 Navigation).
+9. Does Academy mode grant XP / quest credit? (§5)
+10. Tiamonds vs purple gems — one time-skip currency or two? (Idea bank #8)
