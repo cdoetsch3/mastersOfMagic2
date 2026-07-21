@@ -114,12 +114,21 @@ criterion:
 > **No archetype may average above ~60% across the matrix, and none may beat
 > every other archetype.** A row that beats all four is a meta; ship-blocking.
 
-⚠️ **The subtler failure mode: element-enchant parity.** Even with five
-balanced archetypes, if one *element enchant* is clearly the best, everyone
-converges on it and diversity dies on the second axis. Arcane is the standout
-risk — Arcane Knowledge is permanent, universal, and never decays, so
-sharpening it may simply beat sharpening a conditional effect. Enchant values
-need their own parity pass (§10, Q11).
+⚠️ **Caveat on reading sim numbers.** Today's AIs are effect-blind and play
+close to randomly — they don't set up combos, bait triggers, or counter-pick.
+So the matrix measures *raw stat interaction*, not strategy, and it will
+under-represent any archetype whose strength is in decision-making
+(Voidcaller's info war, Tidebinder's disruption). The criterion above only
+becomes meaningful once the AI can actually play the archetypes (Phase 7 of
+the type-effects work). **Until then, human playtest outranks the sim** — as
+it already did for the "long duels are fun" finding.
+
+📝 **Watch item: element-enchant parity.** If one *element enchant* is clearly
+best, diversity dies on the second axis even with five balanced archetypes.
+Arcane is the standout candidate — Arcane Knowledge is permanent, universal,
+and never decays. ✅ Not treated as a blocker: **if it proves to be a
+persistent problem, the fix is simply to reduce its % per stack.** Revisit
+after playtest, not before.
 
 ---
 
@@ -343,26 +352,32 @@ longer legally cast (§5.5 precedence: fizzle → priority → miss). A lockout 
 just "this *category* of action fizzles for N turns," slotting into the
 existing gate.
 
-⚠️ **Required invariant: a player must always have at least one legal
-action.** Silence + Bind + Sunder together would leave only "use a consumable
-or forfeit" — and with Seal, nothing at all. A player whose move timer
-forfeits them because the game left them no options will read it as a bug,
-not a tactic. 📝 Proposed rules: **at most one lockout active at a time** (a
-new one replaces the old), durations kept short (1–2 turns), and charging
-never fully locked without an escape.
+✅ **Stacking: designed around one, but multiples are allowed.** The *system*
+assumes a single lockout at a time — that's the balance baseline. But if a
+player manipulates turns and mechanics well enough to land two or three, that
+is a **legitimate, earned outcome**, not something to block. It should be
+very difficult to pull off; it should not be impossible.
 
-✅ **But design for it failing anyway.** A compelled forfeit stays reachable
-in principle (a narrow loadout at max charge, or an unforeseen lockout
-combination), so the engine must distinguish **two kinds of forfeited turn** —
-see [GAME_DESIGN.md](GAME_DESIGN.md) §1:
+📝 Consequence: **do not cap lockouts artificially.** Keep durations short
+(1–2 turns) and make application costly, so stacking requires real setup
+rather than falling out by accident.
+
+✅ **This makes the compelled-forfeit rule load-bearing, not a safety net.**
+Because full lockout is now *reachable by design*, the engine must
+distinguish **two kinds of forfeited turn** — see
+[GAME_DESIGN.md](GAME_DESIGN.md) §1:
 
 - **Timeout forfeit** (too slow / disconnected) → counts toward the 3-strike
   auto-surrender.
 - **Compelled forfeit** (no legal action existed) → **does not count.**
 
-Being locked out is not the same as being asleep; only the latter should
-march a player toward losing. 📝 `DuelController.forfeitLimit` counts every
-`ForfeitAction` today and will need this distinction before lockouts ship.
+Being locked out is not the same as being asleep. A fully-locked player still
+takes damage and can still lose the duel outright — which is the *correct*
+payoff for a hard-earned lockout chain — but they must never be marched
+toward an auto-surrender for a turn they were never allowed to take.
+
+📝 `DuelController.forfeitLimit` counts every `ForfeitAction` today; this
+distinction is a **hard prerequisite** before any lockout ships.
 
 ### 5b.2 Endurance (death save) 📝
 
@@ -371,10 +386,15 @@ march a player toward losing. 📝 `DuelController.forfeitLimit` counts every
 - Hooks cleanly into damage application — the engine funnels all damage
   through one place (`_applyOneHit` → `takeHpDamage`), so this is a single
   guarded branch.
-- 📝 Once per duel. Strong fit as an **Aegis Sovereign 5-piece bonus** — a
-  build-defining moment rather than a stat.
-- ❓ **Does it save against Fatigue** (turn 51+)? If yes it only delays by a
-  turn, since Fatigue escalates — harmless either way, but needs a ruling.
+- ✅ **As a spell (Endure):** freely recastable, and re-casting **refreshes —
+  never stacks.** Same semantics as Ignite and Blind, so it needs no special
+  rules.
+- ✅ **As an item:** some gear may grant a "life save," but such items either
+  **break on use** or must be **recharged**. Consumed resources, not a
+  permanent property — so nothing needs hard-coding into the base rules.
+- ✅ Saves against any lethal damage, **Fatigue included** — and since Fatigue
+  escalates every turn, that only ever buys one more turn. Self-balancing; no
+  special case required.
 - ✅ Interacts fine with our instant-death rule and with DoTs: an Ignite tick
   that would kill leaves you at 1, and the next tick finishes the job.
 - 💡 Great PvP moment — surviving a lethal Cataclysm at 1 HP is exactly the
@@ -385,25 +405,46 @@ march a player toward losing. 📝 `DuelController.forfeitLimit` counts every
 *Cast a spell costing less than your charge and keep the remainder — e.g.
 cast a 1-cost spell at 4 charge, keep 3.*
 
-⚠️ **This edits a core rule.** "Casting consumes ALL charge and ends the
-cycle" is the decision the whole duel is built on: *when* do I spend? Charge
-retention doesn't add a stat, it weakens that tension — so it needs the
-tightest bounding of anything in this document.
+✅ **"Charge spent" is always the cast spell's actual cost.** Charge to 5, cast
+a 2-cost spell → 2 was spent; with retention you keep 3.
 
-The degenerate case: a **0-cost Flick at 5 charge, retaining 5**, is free chip
-damage every turn while permanently threatening a nuke. That must not exist.
+✅ **No bounds.** Charging to 5 and casting Flick repeatedly *is* allowed with
+retention. The counterplay is already in the game and it is sharp:
 
-📝 Proposed bounds (pick one or more):
-- Only spells of **cost ≥ 2** retain (kills Flick-spam abuse outright).
-- **Cap the retained amount** (at most 1–2), rather than "all the remainder."
-- Once per duel, or on a cooldown.
+- **Overload** deals 8–12 **per point of the enemy's charge** — a mage parked
+  at 5 charge is offering a 40–60 damage target, on a 2-cost spell.
+- **Discharge** wipes the whole reserve outright.
+- Flick is 4–6 damage; chipping at that rate takes 20+ turns against 100 HP,
+  well inside Fatigue's reach at turn 51.
 
-✅ **Two built-in balances worth noting:** retention reduces *charge spent*,
-which is exactly what **Radiant's Blind** (10%/charge) and **Umbra's Creeping
-Dark** (+1 stack/charge) scale from — so the effect is naturally
-anti-synergistic with two Tier 3 elements. ❓ It also needs a ruling on what
-"charge spent" means for **Arcane Knowledge**'s 4+ threshold: the spell's
-cost, or the amount actually consumed?
+Sitting on a full reserve is loud and punishable, so the "abuse" case is
+really a **standoff the opponent has strong tools against** — it doesn't need
+a rule to forbid it.
+
+### 5b.3a ⚠️ Knock-on: this redefines "charge spent" for everyone
+
+Defining spent-charge as **the spell's cost** is not only a retention rule —
+it changes three shipped Tier 3 effects for *all* players, retention or not:
+
+| Effect | Today (spent = all charge consumed) | Under the new definition (spent = cost) |
+|---|---|---|
+| **Radiant — Blind** (10%/charge) | Charge to 5, cast 1-cost Bolt → **50%** blind chance | → **10%** |
+| **Umbra — Creeping Dark** (+1/charge) | Same cast → **+5** stacks | → **+1** |
+| **Arcane — Arcane Knowledge** (4+ charge) | Any cast at 4+ charge qualifies | Only spells **costing** 4+ qualify |
+
+📝 This is arguably the **better** rule — it ties triggers to the spell's real
+investment instead of rewarding players for overcharging and then dumping it
+into something cheap. But it is a genuine balance change to shipped behavior:
+
+- It **nerfs overcharging** as a way to farm Blind procs and Dark stacks.
+- It **tightens Arcane Knowledge** to genuinely expensive spells (Ruin,
+  Cataclysm, Sanctuary, Drain), which fits its "big-spell element" identity.
+- ⚠️ It needs a **re-run of the balance sim** (the 9×9 mono-element matrix) —
+  Radiant and Umbra both get quieter, and they were already under-performing
+  against effect-blind AI.
+
+❓ Ruling needed: adopt this definition **now** as a general engine change, or
+only once charge retention exists?
 
 ### 5b.4 Sustained spells & the interrupt mechanic 📝 (largest engine addition)
 
@@ -414,15 +455,23 @@ interrupted.*
 every turn's action resolves and completes within that turn. Actions today
 are charge / cast / forfeit; sustaining adds a multi-turn commitment.
 
-Two readings, worth choosing between:
-- **(a) Wind-up** — commit N turns, then one enormous release. Interrupt
-  loses *everything*. High stakes, high drama, brutal when countered.
-- **(b) ⭐ Escalating beam** — damages each turn, growing (5 → 10 → 15).
-  Interrupt costs only the remaining escalation. Partial payoff makes it a
-  real option rather than a gamble.
+✅ **All three variants are wanted** — they're distinct mechanics, not
+alternatives, and each should eventually become spells:
 
-📝 Recommendation: **(b)** — it fails gracefully, and a mechanic that can be
-100% negated by one counter tends not to get played.
+| Variant | Shape | Interrupt costs you |
+|---|---|---|
+| **Beam** | Damages each turn, **growing ~50% per turn**; **discharges 1 charge per turn** to sustain | Only the remaining escalation — partial payoff already banked |
+| **Channelled** | Costs ~4 charge up front, runs ~4 turns | The rest of the channel |
+| **Prepared** | ~3 charge, spends one turn **preparing**, lands the following turn | Everything — nothing has landed yet |
+
+💡 Nice property: they sit at different risk/reward points, so they're not
+redundant. **Beam** is a resource drain that pays continuously, **Channelled**
+is a commitment with a duration, and **Prepared** is the high-stakes
+telegraphed haymaker — the most interruptible, and so the biggest mind-game.
+
+📝 The **Beam's per-turn charge cost** is a neat self-limiter: it can't run
+forever, and it visibly drains the reserve the opponent can see — which also
+plays into Overload/Discharge counterplay.
 
 **The interrupt** is the necessary counterpart, and note it's the same family
 as §5b.1: an interrupt is a **targeted, instant lockout**. Candidates for what
@@ -516,6 +565,10 @@ enchants:
 the motes *now*, but can't convert again for a while. (Chosen deliberately
 over a build-timer: instant gratification, with the throttle on repetition.)
 
+✅ **Cooldown length is a per-recipe property**, scaling with the **tier** of
+the crafting being performed — so a Dust→Shard conversion is quick and a
+Core→Heart is a serious commitment. Set per recipe in data, not globally.
+
 ### 6.1 Where motes come from ⭐
 `world.dart` **already assigns elements to regions** (e.g. Geo+Aero, Aqua+
 Radiant). So mote drops fall out of existing data for free:
@@ -529,6 +582,8 @@ Radiant). So mote drops fall out of existing data for free:
   farming low-level zones yields low-tier motes (mirrors the
   PROGRESSION_DESIGN rule that crafting XP scales with material tier, not
   player level).
+- ✅ **Concrete rates live in per-monster / per-level loot tables**, decided
+  alongside the monster catalogue rather than as a global curve.
 
 ### 6.2 The three verbs (already stubbed in the UI)
 - **Transmute** — refine raw materials up a tier (and 💡 convert neutral →
@@ -572,8 +627,8 @@ Every slot now has a maker, and every gathering skill has a sink:
 |---|---|---|---|
 | Foraging (fibers/cloth) | **Tailoring** | robes & armor | Hat, Robe Top, Robe Bottom, Boots, Gloves |
 | Foraging (herbs) | **Potions** | consumables | — |
-| Mining (gems, precious metal) | **Jewelry** | rings & amulets | Neck, Ring |
-| Felling (wood) | **Woodworking** | staves & wands | Main hand, Off hand |
+| Mining (gems) + other reagents | **Jewelry** (a.k.a. Jewelcraft) | rings & amulets | Neck, Ring |
+| Felling (wood) | **Woodworking** (a.k.a. Woodcarving) | staves & wands | Main hand, Off hand |
 | Mining (ore) | **Metalworking** | refined metal — ingots, fittings, settings | ✅ feeds other recipes |
 | Combat + gathering (motes) | **Enchanting** | the element axis | applies to any gear |
 
@@ -604,14 +659,14 @@ Three tiers, applying to every item and material:
 flagged in §3.5: if those were tradeable, gold could buy what rare drops were
 meant to gate, quietly undoing "money buys time, never access."
 
-❓ **What is the release mechanism for "Untradeable"?** This is a real
-monetization fork:
-- Gold fee · a consumable "release" item · a skill-level requirement · or a
-  time lock (bound for N days).
-- ⚠️ **If premium currency unlocks tradability**, the pay-for-access hole
-  reopens sideways — a player could buy the ability to purchase others'
-  hard-won drops. Recommendation: keep release **gold- or skill-gated**, not
-  premium-gated.
+✅ **Release mechanism: an "unbinding" enchant.** Untradeable items are freed
+by applying a dedicated enchant — putting the mechanism in the **Enchanting
+skill** rather than behind a paywall.
+
+⭐ Two benefits: it's **skill-gated, not premium-gated**, so the
+pay-for-access hole stays shut (§3.6); and it gives Enchanting a third job
+alongside applying the element axis and improving mote conversion — making it
+the most load-bearing processing skill, which suits its endgame role.
 
 ---
 
@@ -647,11 +702,19 @@ Why this is the right call:
   meaningful build value that doesn't inflate damage or HP, which is exactly
   what a system worried about power creep (§2.2) wants more of.
 
-❓ **Per-duel or per-run?** Per-*duel* is tactical (refilled each fight);
-per-*run* is strategic and makes the campaign's "return to town or keep
-going" choice much richer, since potions spent early aren't there later.
-Recommendation: **per-run in the campaign, and a fixed small allotment (or
-none) in PvP** — see §7.6.
+✅ **Two layers: backpack + equipped slots.**
+
+- Your **backpack** is the general inventory — carry as many potions as you
+  like on an adventure.
+- Your **consumable slots** (starting at ~2–4) are what you can actually
+  *use* in a duel. You load them from the backpack **before the duel starts**.
+- On a run, you **replenish the slots from the backpack between duels** — so
+  packing deep still matters, but no single fight can be potion-spammed.
+
+⭐ This is the best of both readings: the *duel* is tactically bounded, while
+the *run* stays a strategic resource-management problem (how much do I carry,
+and how fast am I burning it?). It also makes the backpack itself a
+meaningful capacity consideration for long expeditions.
 
 ### 6b.3 Combat potions — the critical ruling ✅
 
@@ -663,15 +726,16 @@ decision (heal or attack?), never a freebie.
 that **only make sense in single-player** (e.g. loot insurance, between-
 encounter healing). ✅ **No consumables at all in Academy mode** (§7.6).
 
-Consequences to settle (❓):
-- **What priority?** Fast enough to matter (a heal that resolves after the
-  killing blow is useless) — likely near the shield band (3) or quicker.
-- **Do they interact with the status pipeline?** A potion isn't a spell, so
-  presumably it can't *miss* from Blind — but can it be **slowed by
-  Waterlogged** (+10 priority) or **fizzled** by charge loss? (Recommendation:
-  slowed yes, fizzled no — potions don't cost charge.)
-- ⚠️ **Healing must be worth less than an equivalent-tier attack deals**,
-  or turtling behind potions becomes a dominant, duel-lengthening strategy.
+✅ **Potions resolve at priority 3** (the shield band). So a healing potion
+*usually* lands before an incoming attack — but an **instant move (priority
+1) still beats it**, which keeps a read-and-punish window open.
+
+✅ **Status-pipeline interactions:** potions **can be slowed by Waterlogged**
+(+10 priority, like any action) but **cannot be fizzled** (they cost no
+charge) and **cannot miss from Blind** (they aren't spells).
+
+⚠️ **Healing must be worth less than an equivalent-tier attack deals**, or
+turtling behind potions becomes a dominant, duel-lengthening strategy.
 
 ### 6b.4 Loot insurance ⚠️ (highest-risk potion)
 
@@ -680,10 +744,14 @@ tension — the designed "bank it or push deeper?" gamble, where defeat costs
 the whole run. If a cheap potion removes that risk, the decision stops
 mattering.
 
-📝 Suggested guardrails (pick one or more): protect only a **portion** of the
-loot (e.g. half); make it **expensive and rare** enough to be a considered
-use rather than a default; or put it on a **cooldown** so it can't cover
-every run.
+✅ **Partial protection, not blanket immunity** — the potion preserves either
+a **percentage of your loot** or a **fixed number of items** (e.g. "keep 3").
+Either shape keeps the "bank it or push deeper?" gamble intact: you're
+hedging the loss, never erasing it.
+
+💡 "Keep X items" is the more interesting of the two, since it forces a second
+decision — *which* items are worth the slot — and it scales gracefully:
+low-tier insurance keeps 1, endgame insurance keeps several.
 
 ---
 
@@ -835,35 +903,48 @@ felt a burn is noise, not depth.
 
 ## 10. Open questions
 
-✅ **Answered so far:** power budget (§2.1), the five archetypes (§3.1), set
-slots (§3.2), set tiers & acquisition (§3.4–3.5), PvP gear policy + Academy
-mode (§7.4), proc-boost levers and caps (§7.1/7.1b).
+✅ **Resolved:** power budget · five archetypes · counter-loop · sim criterion
+(with the AI caveat) · set slots · set tiers & acquisition · PvP gear policy +
+Academy · proc levers & caps · mote ladder & drop model · neutral conversion ·
+conversion cooldowns · skills & crafter mapping · tradability + unbinding
+enchant · monetization line · lockout stacking · Endurance · charge retention ·
+sustained variants · potion priority, slots, PvP legality and pipeline
+interactions · loot insurance · premium Luck potions · enchant-parity stance.
+
+### Still open
 
 | # | Question | §|
 |---|---|---|
-| 27 | Conversion cooldown length — and does it scale with skill level too? | §6.0b |
-| 28 | Drop rates per mote tier (Dust common → Core near-never) need concrete numbers | §6.0 |
-| 29 | ⚠️ Lockouts: accept "at most one active at a time" + the always-a-legal-action invariant? | §5b.1 |
-| 30 | Endurance: once per duel? Does it save against Fatigue? | §5b.2 |
-| 31 | ⚠️ **Charge retention bounds** — cost ≥2 only, capped amount, or per-duel limit? And what counts as "charge spent" for Arcane Knowledge? | §5b.3 |
-| 32 | Sustained spells: **wind-up** (all-or-nothing) or **escalating beam** (partial payoff)? | §5b.4 |
-| 33 | What interrupts a sustained spell — damage threshold, dedicated spell, or existing disruptors gaining the property? | §5b.4 |
-| 8 | Are set pieces Epic+ only? | §8 |
-| 16 | Combat potions cost your action ✅ — but **at what priority** do they resolve? | §6b.3 |
-| 17 | Consumable slots **per-duel or per-run**? | §6b.2 |
-| 18 | Loot-insurance guardrail — partial protection, rarity, or cooldown? | §6b.4 |
-| 19 | Consumables in PvP — banned in Academy (recommended), and allowed/limited in geared ranked? | §7.6 |
-| 20 | Can potions be **slowed by Waterlogged**? (Recommend yes) Fizzled? (Recommend no) | §6b.3 |
-| 21 | Are premium-currency-purchased Luck/drop-rate potions consistent with "money buys time, never access"? | §3.5, §6b.1 |
-| 11 | **Element-enchant parity** — how do we stop Arcane (permanent, universal) from being the only enchant worth taking? ⏸️ *tabled — balance later* | §2.2 |
-| 22 | ⚠️ **Who makes weapons and jewelry?** Mining/Felling currently gather into a vacuum — 4 of 9 slots have no crafter | §6a.1 |
-| 23 | **Release mechanism for "Untradeable"** — gold, item, skill level, or time lock? (Recommend *not* premium-gated) | §6c |
-| 14 | Confirm the archetype counter-loop (Aegis→Ember→Thorn→Tide→Void→Aegis)? | §2.2 |
-| 15 | Accept the sim acceptance criterion (no archetype above ~60% average, none beats all four)? | §2.2 |
+| 31a | ⚠️ **Adopt "charge spent = spell cost" now, as a general engine change?** It quietly nerfs Blind/Creeping Dark and tightens Arcane Knowledge for *all* players — and needs a sim re-run | §5b.3a |
+| 33 | What **interrupts** a sustained spell — damage threshold, a dedicated spell (Disrupt), or existing disruptors (Stagger, Static Feedback) gaining the property? | §5b.4 |
+| 8 | Set pieces Epic+ only? *(likely — deferred)* | §8 |
+| 34 | Skill naming: **Jewelry vs Jewelcraft**, **Woodworking vs Woodcarving** — pick one each | §6a.1 |
+| 35 | Backpack capacity — unlimited, or a carry limit that makes long runs a real decision? | §6b.2 |
+
+### Watch items (not blockers)
+
+| # | Item | § |
+|---|---|---|
+| 11 | Element-enchant parity — if Arcane dominates, reduce its %/stack | §2.2 |
+| 28 | Concrete drop rates land in per-monster loot tables | §6.1 |
+| 27 | Per-recipe cooldown values land with the recipe catalogue | §6.0b |
 
 ---
 
 ## Changelog
+
+**Rev 9** — Answered nearly every outstanding question. Lockouts: **stacking
+allowed** as an earned outcome (so the compelled-forfeit rule becomes
+load-bearing, not a safety net). Endurance: spell refreshes, items break or
+recharge, saves against Fatigue harmlessly. **Charge retention: no bounds**,
+with "charge spent" defined as the spell's cost — flagged in new §5b.3a as a
+knock-on that changes Blind, Creeping Dark and Arcane Knowledge for *all*
+players and needs a sim re-run. Sustained spells: **all three variants**
+(beam / channelled / prepared). Potions resolve at **P3**, slowed by
+Waterlogged, never fizzled or missed; **backpack + equipped consumable slots**
+model; loot insurance as % or keep-X. Untradeable released via an
+**unbinding enchant** (skill-gated, not premium). Sim criterion accepted with
+the caveat that effect-blind AI under-represents strategic archetypes.
 
 **Rev 8** — Added §5b, a proposed-mechanics catalogue: the **lockout family**
 (Silence/Bind/Sunder/Seal, positioned as tech-slot counter-picks, with the
