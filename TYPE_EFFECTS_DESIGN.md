@@ -40,6 +40,24 @@ if a miss should instead refund charge like a fizzle.
 etc. can never trigger on-hit or on-cast effects. All triggers trace back to
 an actual spell cast — no on-hit → on-hit → on-hit chains.
 
+⚠️ **"Charge spent" = the cast spell's COST** (revised 2026-07-21, see
+[ITEMS_DESIGN.md](ITEMS_DESIGN.md) §5b.3a). Not "charge lost." The two are
+identical today — casting consumes everything — but they diverge under the
+proposed **charge retention**, and the spell's cost is the meaningful number.
+
+**This changes three effects for all players** and is NOT yet implemented:
+
+| Effect | Old behavior | New |
+|---|---|---|
+| **Blind** (§4.1) | charge to 5, cast 1-cost Bolt → 50% | → **10%** |
+| **Creeping Dark** (§4.2) | same cast → +5 stacks | → **+1** |
+| **Arcane Knowledge** (§4.3) | any cast at 4+ charge | only spells **costing** 4+ |
+
+Rationale: triggers should scale with a spell's real investment, not reward
+overcharging and dumping it into something cheap. ⚠️ Requires a **re-run of
+the 9×9 mono-element sim** when implemented — Radiant and Umbra both get
+quieter, and both already under-perform against effect-blind AI.
+
 ✅ **Every tier is a closed counter-triangle** with two layers:
 - **Shield layer (all tiers):** attacks deal double damage to the countered
   element's shield — the existing rule, now explicit in Tier 1 as well.
@@ -162,6 +180,10 @@ Geo grounds Electro.**
   attack into it (lose 50% of an 8-damage Flick, not 50% of a 5-charge
   Cataclysm).
 - ✅ Whiffs against a Tailwind streak of 3+ (§3 table).
+- 📝 **Planned addition:** Stagger will **also interrupt sustained spells**
+  (see [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §5b.4), making Geo the anti-sustained
+  element — a concussive blow breaking concentration. Not yet implemented;
+  depends on sustained spells existing.
 - ✅ **The debuff lingers until consumed** by the next offensive spell — it
   never expires on its own. Consuming it with a non-damaging offensive spell
   (Discharge) is a legal, harmless "stagger-eater" — accepted as another
@@ -234,6 +256,8 @@ corrupts Arcane, Arcane unravels Radiant.**
 - ✅ **Empower** is an existing spell (not element-bound): it makes the next
   turn deal double damage. No further spec needed here.
 - ✅ "4+ charge" means **charge spent ≥ 4** — spending is the commitment.
+  ⚠️ **Revised 2026-07-21:** "charge spent" now means **the cast spell's
+  cost**, not the charge consumed — see the definition note below.
   Casting consumes ALL charge, so a cheap Arcane spell cast while holding 4
   charge qualifies. Same rule for Umbra's per-charge stacks (§4.2):
   **spent**, consistently.

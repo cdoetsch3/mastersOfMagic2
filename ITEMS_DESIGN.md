@@ -421,7 +421,7 @@ Sitting on a full reserve is loud and punishable, so the "abuse" case is
 really a **standoff the opponent has strong tools against** — it doesn't need
 a rule to forbid it.
 
-### 5b.3a ⚠️ Knock-on: this redefines "charge spent" for everyone
+### 5b.3a ✅ Adopted: "charge spent" = the spell's cost, engine-wide
 
 Defining spent-charge as **the spell's cost** is not only a retention rule —
 it changes three shipped Tier 3 effects for *all* players, retention or not:
@@ -432,19 +432,22 @@ it changes three shipped Tier 3 effects for *all* players, retention or not:
 | **Umbra — Creeping Dark** (+1/charge) | Same cast → **+5** stacks | → **+1** |
 | **Arcane — Arcane Knowledge** (4+ charge) | Any cast at 4+ charge qualifies | Only spells **costing** 4+ qualify |
 
-📝 This is arguably the **better** rule — it ties triggers to the spell's real
-investment instead of rewarding players for overcharging and then dumping it
-into something cheap. But it is a genuine balance change to shipped behavior:
+✅ **Adopted as a general engine rule.** "Charge spent" is the **cost of the
+spell cast**, never "charge lost." The two are usually identical — casting
+consumes everything — but they diverge under charge retention, and the cost
+is the meaningful number.
 
+Consequences, accepted deliberately:
 - It **nerfs overcharging** as a way to farm Blind procs and Dark stacks.
 - It **tightens Arcane Knowledge** to genuinely expensive spells (Ruin,
   Cataclysm, Sanctuary, Drain), which fits its "big-spell element" identity.
-- ⚠️ It needs a **re-run of the balance sim** (the 9×9 mono-element matrix) —
-  Radiant and Umbra both get quieter, and they were already under-performing
-  against effect-blind AI.
+- ⚠️ **Needs a re-run of the balance sim** (the 9×9 mono-element matrix) when
+  implemented — Radiant and Umbra both get quieter, and both were already
+  under-performing against effect-blind AI.
 
-❓ Ruling needed: adopt this definition **now** as a general engine change, or
-only once charge retention exists?
+📝 Implementation note: `_triggerElementEffects` currently receives
+`chargeSpent = caster.charge` captured at cast time. It becomes the spell's
+cost (with xCost spells still reading the charge they actually consume).
 
 ### 5b.4 Sustained spells & the interrupt mechanic 📝 (largest engine addition)
 
@@ -474,9 +477,23 @@ forever, and it visibly drains the reserve the opponent can see — which also
 plays into Overload/Discharge counterplay.
 
 **The interrupt** is the necessary counterpart, and note it's the same family
-as §5b.1: an interrupt is a **targeted, instant lockout**. Candidates for what
-interrupts: damage above a threshold, a dedicated interrupt spell, or an
-existing disruptor (Stagger, Static Feedback) gaining the property.
+as §5b.1: an interrupt is a **targeted, instant lockout**. ✅ Three sources:
+
+| Source | Shape |
+|---|---|
+| **Disrupt** | A dedicated **aux** spell — pure interrupt, cheap |
+| 💡 A damaging interrupter | A spell that deals damage **and** interrupts — costlier, two jobs in one |
+| ⭐ **Stagger** (Geo) | The existing Tier 2 effect **also interrupts** |
+
+📝 Giving Stagger the interrupt property makes **Geo the anti-sustained
+element** — thematically perfect (a concussive blow breaks concentration) and
+a free identity win, since it reuses an effect that already exists.
+
+⚠️ Balance note: this is a real buff to Geo, which was already among the
+stronger rows in the mono-element matrix (beating Aqua 81%, Electro 77%,
+Umbra 78%). It's *situational* — worth nothing unless the opponent is
+sustaining — so it likely doesn't move the matrix much, but re-check Geo's row
+once sustained spells and the new charge-spent rule are both in.
 
 💡 **Why this fits the game well:** sustaining is *visible* to the opponent,
 exactly like charging is. That telegraph creates the mind-game — do I race
@@ -607,7 +624,7 @@ Skills live **outside player level**, in two types:
 | Type | Skills | Produces |
 |---|---|---|
 | **Gathering** (3) | **Mining** · **Felling** · **Foraging** | Raw materials |
-| **Processing** (6) | **Tailoring** · **Potions** · **Enchanting** · **Jewelry** · **Metalworking** · **Woodworking** | Finished goods |
+| **Processing** (6) | **Tailoring** · **Potions** · **Enchanting** · **Jewelry** · **Metalworking** · **Woodcarving** | Finished goods |
 
 ✅ Detailed design (XP curves, level caps, unlock tables) is **tabled** — the
 structure above is what the item system is built against for now.
@@ -627,8 +644,8 @@ Every slot now has a maker, and every gathering skill has a sink:
 |---|---|---|---|
 | Foraging (fibers/cloth) | **Tailoring** | robes & armor | Hat, Robe Top, Robe Bottom, Boots, Gloves |
 | Foraging (herbs) | **Potions** | consumables | — |
-| Mining (gems) + other reagents | **Jewelry** (a.k.a. Jewelcraft) | rings & amulets | Neck, Ring |
-| Felling (wood) | **Woodworking** (a.k.a. Woodcarving) | staves & wands | Main hand, Off hand |
+| Mining (gems) + other reagents | **Jewelry** | rings & amulets | Neck, Ring |
+| Felling (wood) | **Woodcarving** | staves & wands | Main hand, Off hand |
 | Mining (ore) | **Metalworking** | refined metal — ingots, fittings, settings | ✅ feeds other recipes |
 | Combat + gathering (motes) | **Enchanting** | the element axis | applies to any gear |
 
@@ -638,7 +655,7 @@ other recipes** (a staff needs a ferrule; a ring needs a band).
 
 This makes the skill tree an **interdependent economy rather than six
 parallel silos**: Mining feeds both Jewelry (gems) and Metalworking (ore),
-and Metalworking in turn feeds Woodworking and Jewelry. 💡 It also gives the
+and Metalworking in turn feeds Woodcarving and Jewelry. 💡 It also gives the
 tree a natural trading hub — refined metal is the obvious commodity for
 player-to-player trade, since it's an input everyone needs and nobody's
 build depends on hoarding.
@@ -713,8 +730,14 @@ Why this is the right call:
 
 ⭐ This is the best of both readings: the *duel* is tactically bounded, while
 the *run* stays a strategic resource-management problem (how much do I carry,
-and how fast am I burning it?). It also makes the backpack itself a
-meaningful capacity consideration for long expeditions.
+and how fast am I burning it?).
+
+✅ **Backpack capacity: 20 items**, expandable with **craftable expansion
+pouches** for particular item types — another job for **Tailoring**, which
+now makes robes *and* the bags that carry everything else. The cap is what
+makes a long expedition a real planning exercise: potions competing with loot
+for space is exactly the "bank it or push deeper?" pressure the campaign is
+built on.
 
 ### 6b.3 Combat potions — the critical ruling ✅
 
@@ -915,11 +938,10 @@ interactions · loot insurance · premium Luck potions · enchant-parity stance.
 
 | # | Question | §|
 |---|---|---|
-| 31a | ⚠️ **Adopt "charge spent = spell cost" now, as a general engine change?** It quietly nerfs Blind/Creeping Dark and tightens Arcane Knowledge for *all* players — and needs a sim re-run | §5b.3a |
-| 33 | What **interrupts** a sustained spell — damage threshold, a dedicated spell (Disrupt), or existing disruptors (Stagger, Static Feedback) gaining the property? | §5b.4 |
 | 8 | Set pieces Epic+ only? *(likely — deferred)* | §8 |
-| 34 | Skill naming: **Jewelry vs Jewelcraft**, **Woodworking vs Woodcarving** — pick one each | §6a.1 |
-| 35 | Backpack capacity — unlimited, or a carry limit that makes long runs a real decision? | §6b.2 |
+
+✅ Everything else in this document is decided. The design is ready to move to
+a catalogue pass (concrete items, recipes, drop tables) whenever you are.
 
 ### Watch items (not blockers)
 
@@ -932,6 +954,14 @@ interactions · loot insurance · premium Luck potions · enchant-parity stance.
 ---
 
 ## Changelog
+
+**Rev 10** — Final rulings; only "set pieces Epic+?" remains open.
+**"Charge spent" = the spell's cost** adopted engine-wide (TYPE_EFFECTS_DESIGN
+§1 updated to match; needs a sim re-run when built). **Interrupts** come from
+three sources: a **Disrupt** aux spell, a damage-plus-interrupt spell, and
+**Stagger** gaining the property — making Geo the anti-sustained element.
+Skill names settled: **Jewelry, Metalworking, Woodcarving**. **Backpack = 20
+items** with craftable expansion pouches (a second job for Tailoring).
 
 **Rev 9** — Answered nearly every outstanding question. Lockouts: **stacking
 allowed** as an earned outcome (so the compelled-forfeit rule becomes
