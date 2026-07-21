@@ -1,0 +1,795 @@
+# Masters of Magic 2 — Items, Crafting & Enchanting
+
+Design for equipment, the crafting economy, and how gear hooks into the
+element-effect system. Companion to [GAME_DESIGN.md](GAME_DESIGN.md) (§4
+Progression & Meta), [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) (the
+nine elements), and [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) (levels,
+slots, XP).
+
+Legend: ✅ decided · 📝 draft (needs review) · 💡 idea bank · ❓ open question · ⚠️ balance/abuse concern
+
+Status: 📝 **design session in progress — nothing implemented.** Approach:
+define the endgame ceiling first, then scale the ladder down to it.
+
+---
+
+## 1. Inherited decisions (from GAME_DESIGN.md)
+
+✅ Already settled before this session:
+
+- **Nine slots** ✅ (naming settled):
+
+  | Group | Slots |
+  |---|---|
+  | **Set slots** (the primary robe set, §3.2) | Hat · Robe Top · Robe Bottom · Boots · **Gloves** |
+  | **Jewelry** | Neck · Ring |
+  | **Held** | **Main hand** · **Off hand** |
+
+  ✅ Held items are **Main hand / Off hand**, never "left/right" — this keeps
+  them clearly distinct from the worn **Gloves** slot (gloves/bracers), which
+  was previously called "Hands" and caused exactly that confusion.
+- **Held items**: a one-handed weapon (wand) in the main hand pairs with an
+  off-hand (orb, book, shield); **two-handed staves occupy both**.
+- Items modify stats **including max HP**; the engine already carries a
+  per-mage `maxHp`, so the hook exists.
+- Items drop as **loot** from the campaign; a run's loot is lost on defeat,
+  banked on "return to town".
+- **Luck** is a real stat (from items/enchants): more gold, better rare drops.
+- **Gold** (earned) and **gems** (premium) already exist on the profile.
+- Crafting and enchanting are **time-gated**, skippable with premium currency.
+- Creative north star: **RuneScape 3** equipment/skilling/economy feel.
+- Existing stub: the Inventory tab already previews three verbs —
+  **Transmute** (refine raw materials), **Craft** (combine into equipment),
+  **Salvage** (break equipment into components).
+- `mage_apparel.dart` already colors six visible pieces (hat, hatTrim, robe,
+  robeTrim, gloves, boots) and is commented "later derived from equipped
+  items" — the cosmetic hook is pre-wired.
+
+❓ Inherited open questions: rarity tiers; whether held items are
+slot-restricted (wand = right only?) or freely assignable.
+
+---
+
+## 2. The endgame ceiling — what BiS looks like
+
+Working backwards, as intended. A fully-geared level-50 mage should feel
+*transformed*, not merely bigger. Proposed shape of a best-in-slot loadout:
+
+| Source | Contribution |
+|---|---|
+| **5-piece armor set** (archetype) | The build's identity — a rule-bending set bonus at 5 pieces |
+| **Element enchant** on that armor | Sharpens one element's signature effect |
+| **Weapon + off-hand** (or staff) | The damage engine: flat damage, on-hit, crit-like procs |
+| **Neck + Ring** | Situational tech (counter-picks, Luck, utility) |
+| **Flat stats across everything** | ~+50 max HP, modest damage % |
+
+### 2.1 The power budget ✅
+
+Measured against **average** gear, not nakedness — nobody reaches 50 unequipped.
+
+| Matchup (both level 50) | Target |
+|---|---|
+| **BiS vs. completely naked** | ~**100%** — gear is not optional |
+| **BiS vs. average gear** | **80–90%** |
+
+✅ Scaling between levels 1–49 is explicitly **not a concern** — that gear is
+transitional and gets replaced. **The endgame ceiling is what matters.**
+
+✅ **The real goal is not a power number — it's that no single build wins.**
+See §2.2; that is the acceptance criterion this whole document serves.
+
+### 2.2 The anti-meta guarantee ✅⚠️ (the primary design constraint)
+
+> *"I want to make sure that there doesn't just become one single unbeatable
+> meta at level 50 that everybody rushes for."*
+
+Three mechanisms, in order of importance:
+
+**1. Archetypes counter each other in a loop, not a power ladder.** 📝
+The game's identity is already counter-triangles (three of them, one per
+element tier). Extending that to archetypes makes dominance *structurally*
+impossible: every build has a predator. Proposed 5-cycle — and every link is
+grounded in mechanics we've already built:
+
+| Beats | Loses to | Why (real engine behavior) |
+|---|---|---|
+| **Aegis** → Emberwright | | Shields resolve at priority 3, nukes at 9 — the shield is up before the big hit lands |
+| **Emberwright** → Thornwarden | | Burst kills before 3-tick burns and 1%/turn heals accumulate |
+| **Thornwarden** → Tidebinder | | DoTs tick in the **end phase**, which priority manipulation can't touch — Waterlogged does nothing to damage that never rolls initiative |
+| **Tidebinder** → Voidcaller | | Creeping Dark needs sustained consecutive Umbra casts; fizzles and tempo disruption break the streak before Dusk |
+| **Voidcaller** → Aegis | | Shield counter-picking needs to see the enemy's element — Shadow hides it, so the ×2 math can't be played |
+
+Each archetype beats one, loses to one, and is even with two. No apex.
+
+**2. Tech slots are the adaptation layer.** Neck, Ring, and the off-hand
+carry situational counters (anti-DoT, anti-burst, shield-piercing,
+anti-lifesteal). This is what stops any meta from being *unanswerable* — you
+can always counter-pick without abandoning your 5-piece commitment.
+
+**3. It's measurable — reuse the sim.** ✅ We already produced a 9×9
+mono-element win-rate matrix that verified all six counter edges. The same
+tool can run an **archetype round-robin at BiS**. Proposed acceptance
+criterion:
+
+> **No archetype may average above ~60% across the matrix, and none may beat
+> every other archetype.** A row that beats all four is a meta; ship-blocking.
+
+⚠️ **The subtler failure mode: element-enchant parity.** Even with five
+balanced archetypes, if one *element enchant* is clearly the best, everyone
+converges on it and diversity dies on the second axis. Arcane is the standout
+risk — Arcane Knowledge is permanent, universal, and never decays, so
+sharpening it may simply beat sharpening a conditional effect. Enchant values
+need their own parity pass (§10, Q11).
+
+---
+
+## 3. The two-axis system 📝 (core proposal)
+
+Christian's instinct — *"3 to 5 armor sets that can be enchanted to a specific
+element"* — is the right architecture, and it's worth naming why:
+
+> **The base set defines the ARCHETYPE. The element enchant defines the
+> FLAVOR.**
+
+- **Axis 1 — Archetype (3–5 armor sets):** *how* you fight. Burst, sustained,
+  tempo, tank, attrition.
+- **Axis 2 — Element enchant (9 elements):** *which* element's signature
+  effect gets sharpened.
+
+**Why this is the right call:** 4 sets × 9 elements = **36 distinct endgame
+builds from only 4 art sets**. It sidesteps the alternative (nine bespoke
+element sets), which would be 9 sets of art for *less* build variety and
+would hard-lock every player into mono-element.
+
+### 3.1 Draft archetypes 📝
+
+| Set | Fantasy | 3-piece | 4-piece | 5-piece (build-defining) |
+|---|---|---|---|---|
+| **Emberwright** | Burst — big charged nukes | +flat damage | +damage per charge spent | Your first 4+ charge spell each duel can't be Blinded or Staggered |
+| **Tidebinder** | Tempo — disruption, speed | +priority utility | Streak thresholds −1 | Your streak effects fire one cast sooner |
+| **Thornwarden** | Attrition — DoT/HoT | +HoT per turn | DoTs on you tick 25% weaker | Your damage-over-time effects last +1 turn |
+| **Aegis Sovereign** | Tank — shields, survivability | +max HP | Shields +15% | Your shields keep 25% strength instead of shattering |
+| 💡 **Voidcaller** | Trickster — info war, anti-magic | ? | ? | ? (reserve slot if a 5th is wanted) |
+
+⚠️ Note the deliberate tension: **Emberwright pushes big spells** (aligning
+with TYPE_EFFECTS §7's big-spell goal) while **on-hit weapons push multi-hit
+spam**. That's healthy — equipment becomes the lever that keeps *both*
+archetypes viable, rather than the meta collapsing to one.
+
+### 3.2 Which slots carry a set? ✅
+
+The **five armor slots** — **Hat, Robe Top, Robe Bottom, Boots, Gloves** — are
+the set ("primary robe set") slots. **Neck, Ring, and both hands** are always
+free for weapons and tech.
+
+This makes mix-and-match exactly as described: 5 armor slots with bonuses at
+3/4/5 means you can run a full 5-piece, or **3+2** (one 3-piece bonus, the
+other two pieces contribute only their raw stats), or **4+1**. Committing to
+five is a real sacrifice — good tension.
+
+---
+
+## 3.4 Set tiers & how they're earned ✅
+
+The five primary robe-set pieces unlock in **four tiers**, at levels **30,
+40, 45, and 50**. Other gear fills the intermediate levels; the primary sets
+follow this ladder alone.
+
+| Tier | Level | Feel | Acquisition |
+|---|---|---|---|
+| I | **30** | First real set identity — 3-piece bonuses come online | Craft + standard materials |
+| II | **40** | Solid mid-endgame power | Craft + enchant; higher-tier motes |
+| III | **45** | ⭐ Noticeable jump | **Rare components from difficult enemies** + enchant + craft |
+| IV | **50** | The ceiling (§2) | **Rarest components**, deepest skill requirement |
+
+✅ **Each threshold must feel like a distinct jump in power**, not a smooth
+ramp — these are the milestones the endgame is paced around.
+
+### 3.5 The acquisition triangle ✅
+
+Tier III and IV sets require **all three** of:
+
+1. **Rare component drops** — obtainable *only* from difficult enemies. Not
+   purchasable, not craftable from bulk materials.
+2. **Enchanting skill** — at sufficient level to apply the element axis.
+3. **Crafting skill** — at sufficient level to assemble the piece.
+
+### 3.6 Monetization principle ✅ (the governing rule)
+
+> **Premium currency ("purple gems") only ever buys a shortcut. There must
+> never be anything you *have* to pay gems to do.**
+
+- ✅ **Allowed:** skipping/reducing crafting, enchanting and conversion
+  **cooldowns**; "time crystals"; extra potion yield; buying better *odds*
+  (Luck/drop-rate boosts).
+- 🚫 **Never:** substituting for the **rare Tier III/IV components**, for
+  **skill levels**, or for any step of the process itself. Every path must be
+  completable — if slowly — without spending.
+
+✅ Buying better *odds* at rare components is explicitly fine; buying the
+components is not. The line is **acceleration, not access**.
+
+✅ Rare Tier III/IV components are **Bound** (§6c), which is what keeps a
+player-to-player market from quietly reselling what drops were meant to gate.
+
+---
+
+## 4. What equipment can grant — the modifier vocabulary
+
+Rated by how safely each can scale. ⚠️ flags need caps.
+
+### 4.1 Safe / linear
+- **Flat max HP** — the baseline stat (already engine-supported).
+- **Flat damage** (per cast) — encourages committing to a hit.
+- **Flat damage per hit** ⭐ — the multi-hit differentiator Christian wanted:
+  +2/hit gives 4-hit Volley +8 but 1-hit Cataclysm +2. Cleanly makes Flurry
+  and Volley *feel different* from a same-charge single spell. The engine
+  already loops per hit and emits a `DamageEvent` each time, so this is a
+  natural hook.
+- **Shield strength %**, **heal %**, **Luck**.
+
+### 4.2 Powerful, needs caps ⚠️
+- **Proc-chance modifiers** (e.g. Ignite 25% → higher) — see §7.1. **The
+  single most dangerous lever in this design.**
+- **Streak-threshold reduction** (Waterlog every 3rd → every 2nd) — see §7.1.
+- **Shield piercing %** ("always phases through X% of shields") — see §7.2.
+- **Set-linked DoT/HoT** — e.g. "your attacks apply a small burn." Fine, but
+  it must route through the existing `TurnStatus` framework so lane ordering
+  and the survivability-first rule hold.
+
+### 4.3 Situational tech (belongs on swappable slots) 💡
+- **Venom blood** — punishes an opponent's lifesteal (real targets exist:
+  Sap, Leech, Drain).
+- Anti-DoT, anti-Blind, anti-charge-strip counters.
+
+📝 **Design principle:** *committed slots (the 5-piece set) get universal
+value; swappable slots (Neck, Ring, off-hand) carry situational counters.* A
+dead stat is acceptable on a ring you can swap; it's miserable on a set you
+built toward for weeks.
+
+---
+
+## 5. Catalogue of every status & effect in the system
+
+The definitive "what equipment can hook into" reference, as requested. All of
+this exists in the engine today.
+
+### 5.1 Element effects (the nine)
+
+| Element | Effect | Trigger | Key numbers |
+|---|---|---|---|
+| Pyro | **Ignite** | 25% on hit (even if fully shielded) | 10% of raw damage, 3 ticks, lane E8 |
+| Aqua | **Waterlogged** | every 3rd consecutive Aqua cast | +10 priority to their next action |
+| Flora | **Photosynthesis** | every Flora cast | max 3 stacks, 1% max HP/stack, lane E2, decays without Flora activity |
+| Electro | **Static Feedback** | 20% on hit | strips 1 charge (can fizzle their spell) |
+| Aero | **Tailwind** | 3rd+ consecutive Aero cast | seizes Haste; 3+ streak = Stagger immunity |
+| Geo | **Stagger** | every 4th consecutive Geo cast | their next offensive spell ×0.5 |
+| Radiant | **Blind** | 10% per charge spent, on attack | 50% miss for 3 turns; clears Creeping Dark |
+| Umbra | **Creeping Dark** | +1 stack per charge spent | cap 15; 5/10/15 = Shadow/Dusk/Midnight; decays |
+| Arcane | **Arcane Knowledge** | 4+ charge Arcane cast | +5%/stack (max 5), permanent |
+
+### 5.2 Cleanse / immunity web
+Pyro's Ignite clears Photosynthesis · Aqua shields cleanse Ignite ·
+Photosynthesis blocks Waterlogged · Geo shield grounds Static Feedback ·
+Electro attacks scatter Tailwind · Tailwind 3+ shrugs off Stagger · Blind
+burns away Creeping Dark · Dusk blocks Arcane Knowledge · Arcane spells are
+immune to Blind.
+
+### 5.3 Per-mage state equipment could touch
+
+| Field | Meaning |
+|---|---|
+| `maxHp` / `hp` | health (already gear-modifiable by design) |
+| `charge` (0–5) | charge; cap is level-gated |
+| `shield` | one slot: elemental (strength) or Barrier |
+| `empowerMultiplier` | pending ×N damage on next offensive spell |
+| `quickenPriority` | pending priority override |
+| `phaseNext` | next offensive spell ignores shields |
+| `hasHaste` | the initiative token (breaks same-priority ties) |
+| `concealed` | charging element hidden (Umbra Shadow) |
+| `priorityPenalty` | +priority to next action (Waterlogged) |
+| `nextOffensiveDamageScale` | ×N on next offensive spell (Stagger) |
+| `bonusDamagePercent` | additive damage % (Arcane Knowledge) |
+| `streakElement` / `streakCount` | consecutive-cast streak |
+| `activeElementThisTurn` | drives activity-based stack decay |
+| `statuses[]` | active `TurnStatus` list (DoTs/HoTs/stacks) |
+
+### 5.4 Spell effect types (what a spell can do)
+`DamageEffect` (min, max, **hits**, lifesteal, ignoresShields) ·
+`BarrageEffect` (per charge spent) · `OverloadEffect` (per *enemy* charge) ·
+`ShieldEffect` · `BarrierEffect` · `EmpowerEffect` · `QuickenEffect` ·
+`PhaseEffect` · `HasteEffect` · `DischargeEffect`
+
+### 5.5 Timing structure (where an effect can live)
+- **Phases:** Start (S1–S10) → Main (1–10) → End (E1–E10). Lanes never mix.
+- **Main-phase priority:** instant 1 · shield 3 · channel 4 · quick 5 · aux 7
+  · regular 9. Haste breaks same-priority ties.
+- **End-phase bands:** heals E1–E3 → damage E4–E8 → bookkeeping E9–E10
+  (survivability-first: heals land before burns).
+- **Precedence on a committed action:** fizzle → priority mod → miss →
+  damage mods (additive, then multiplicative).
+- **Fatigue:** from turn 51, escalating unblockable damage (+3/turn).
+
+### 5.6 Statuses currently implemented
+`IgniteStatus` (DoT) · `PhotosynthesisStatus` (HoT + stacks) ·
+`BlindStatus` (miss chance) · `CreepingDarkStatus` (info-hiding stacks) ·
+`ArcaneKnowledgeStatus` (permanent damage stacks)
+
+---
+
+## 6. Elemental motes & the crafting economy 📝
+
+Christian's Skyrim-soul-gem model, adopted.
+
+- **Motes** are the crafting currency for high-tier gear. Each is either
+  **element-bound** (Pyro, Aqua, …) or **neutral/unattuned**.
+- ✅ **Five tiers — the Crystallization ladder:**
+
+  > **Dust → Shard → Crystal → Core → Heart**
+
+  Element-neutral (works for all nine), unambiguous ordering, and reads well
+  in an item name: *"Pyro Dust", "Aqua Crystal", "Umbra Heart."* "Mote"
+  remains the category term; items are named `<Element> <Tier>`.
+
+### 6.0 The refinement ladder ✅
+
+| Conversion | Cost |
+|---|---|
+| Dust → **Shard** | **50** dust |
+| Shard → **Crystal** | **20** shards |
+| Crystal → **Core** | **12** crystals |
+| Core → **Heart** | **4** cores |
+
+Cumulative cost of one Heart, refined from the bottom:
+
+| Tier | In Dust | In Shards | In Crystals |
+|---|---|---|---|
+| Shard | 50 | — | — |
+| Crystal | 1,000 | 20 | — |
+| Core | 12,000 | 240 | 12 |
+| **Heart** | **48,000** | **960** | **48** |
+
+✅ **The steepness is deliberate, and it works because every tier below Heart
+drops directly** — at escalating rarity:
+
+| Tier | How you get it |
+|---|---|
+| **Dust** | Fairly common — the baseline drop |
+| **Shard** | Occasionally found |
+| **Crystal** | Rare |
+| **Core** | Incredibly rare; possibly never drops |
+| **Heart** | ⭐ **Crafting only** — never drops |
+
+So the ladder isn't a 48,000-dust grind: it's an **exchange between tiers of
+abundance**. A player farms plentiful Dust and occasional Shards, and the
+ratios convert that abundance into the scarcity a Core demands. Drops of the
+higher tiers shortcut the climb; refinement tops up whatever luck didn't
+provide.
+
+📝 Consequence worth designing around: **a Heart is a guaranteed, planned
+achievement, not a lucky one.** No amount of good fortune hands you a Tier IV
+set — every Heart is assembled deliberately. That makes the level-50 set feel
+earned rather than rolled, and it means Heart-tier progress can be shown to
+the player as a **visible progress bar** (48 crystals of 48), which is far
+more motivating than an invisible drop chance.
+
+### 6.0b Neutral → element conversion ✅
+
+Neutral motes are the flexible currency: usable in any recipe, but at a
+conversion penalty — so no drop is ever dead loot. **The rate improves with
+Enchanting level**, which gives the skill value well beyond just applying
+enchants:
+
+| Enchanting level | Neutral : Element |
+|---|---|
+| default | **4 : 1** |
+| 20 | 3 : 1 |
+| 30 | 2 : 1 |
+| 40 | 3 : 2 |
+| **50** | **1 : 1** |
+
+✅ **Conversions are rate-limited by cooldown, not by a wait timer** — you get
+the motes *now*, but can't convert again for a while. (Chosen deliberately
+over a build-timer: instant gratification, with the throttle on repetition.)
+
+### 6.1 Where motes come from ⭐
+`world.dart` **already assigns elements to regions** (e.g. Geo+Aero, Aqua+
+Radiant). So mote drops fall out of existing data for free:
+
+- A region's monsters drop motes of **that region's elements**; neutral motes
+  drop everywhere.
+- ✅ **Motes also drop from gathering** in certain areas — a Pyro-attuned vein
+  yields Pyro Dust alongside its ore. This gives gatherers their own path to
+  motes, so the top of the crafting tree isn't gated behind combat alone.
+- Mote **tier scales with monster (or node) level**, not player level — so
+  farming low-level zones yields low-tier motes (mirrors the
+  PROGRESSION_DESIGN rule that crafting XP scales with material tier, not
+  player level).
+
+### 6.2 The three verbs (already stubbed in the UI)
+- **Transmute** — refine raw materials up a tier (and 💡 convert neutral →
+  element-bound, or combine lesser motes into greater ones).
+- **Craft** — materials + motes → equipment.
+- **Salvage** — equipment → components (proposal: returns motes at a loss,
+  making bad drops into progress rather than vendor trash).
+
+### 6.3 Enchanting
+Applies the **element axis** to a base item: consumes element-bound motes of
+the target element. Proposal: enchants are **rewritable at a cost**, so a
+player can re-attune a hard-won 5-piece set as their build evolves — this is
+what makes the two-axis system feel freeing rather than punishing.
+
+---
+
+## 6a. Skills ✅ (structure settled, detail tabled)
+
+Skills live **outside player level**, in two types:
+
+| Type | Skills | Produces |
+|---|---|---|
+| **Gathering** (3) | **Mining** · **Felling** · **Foraging** | Raw materials |
+| **Processing** (6) | **Tailoring** · **Potions** · **Enchanting** · **Jewelry** · **Metalworking** · **Woodworking** | Finished goods |
+
+✅ Detailed design (XP curves, level caps, unlock tables) is **tabled** — the
+structure above is what the item system is built against for now.
+
+📝 Notes:
+- **"Tailoring"** rather than a generic "crafting" is apt: this is a game of
+  robes, hats and gloves. It also frees the name space for other makers.
+- **Motes come from combat, not gathering** (§6.1) — so high-tier crafting
+  requires *both* fighting and skilling. That interplay is a feature: neither
+  a pure duelist nor a pure crafter can reach the ceiling alone.
+
+### 6a.1 Skill → slot coverage ✅
+
+Every slot now has a maker, and every gathering skill has a sink:
+
+| Gathered from | Processed by | Produces | Slots |
+|---|---|---|---|
+| Foraging (fibers/cloth) | **Tailoring** | robes & armor | Hat, Robe Top, Robe Bottom, Boots, Gloves |
+| Foraging (herbs) | **Potions** | consumables | — |
+| Mining (gems, precious metal) | **Jewelry** | rings & amulets | Neck, Ring |
+| Felling (wood) | **Woodworking** | staves & wands | Main hand, Off hand |
+| Mining (ore) | **Metalworking** | refined metal — ingots, fittings, settings | ✅ feeds other recipes |
+| Combat + gathering (motes) | **Enchanting** | the element axis | applies to any gear |
+
+✅ **Metalworking is the refinement lane for Mining** — it turns ore and other
+mined goods into refined outputs, and **many of those outputs are inputs to
+other recipes** (a staff needs a ferrule; a ring needs a band).
+
+This makes the skill tree an **interdependent economy rather than six
+parallel silos**: Mining feeds both Jewelry (gems) and Metalworking (ore),
+and Metalworking in turn feeds Woodworking and Jewelry. 💡 It also gives the
+tree a natural trading hub — refined metal is the obvious commodity for
+player-to-player trade, since it's an input everyone needs and nobody's
+build depends on hoarding.
+
+---
+
+## 6c. Tradability ✅
+
+Three tiers, applying to every item and material:
+
+| Tier | Meaning | Typical use |
+|---|---|---|
+| **Tradeable** (default) | Freely bought, sold, given | Raw materials, common/uncommon gear, low-tier motes |
+| **Untradeable** | Not tradeable *as-is*, but a mechanism exists to release it | Crafted gear, mid/high-tier motes |
+| **Bound** | Permanently untradeable | ⭐ Tier III/IV rare set components |
+
+✅ Putting the **Tier III/IV rare components in "Bound"** closes the loophole
+flagged in §3.5: if those were tradeable, gold could buy what rare drops were
+meant to gate, quietly undoing "money buys time, never access."
+
+❓ **What is the release mechanism for "Untradeable"?** This is a real
+monetization fork:
+- Gold fee · a consumable "release" item · a skill-level requirement · or a
+  time lock (bound for N days).
+- ⚠️ **If premium currency unlocks tradability**, the pay-for-access hole
+  reopens sideways — a player could buy the ability to purchase others'
+  hard-won drops. Recommendation: keep release **gold- or skill-gated**, not
+  premium-gated.
+
+---
+
+## 6b. Alchemy, potions & consumable slots ✅📝
+
+A **third skill** alongside Crafting and Enchanting: **Alchemy** — brewing
+potions from ingredients.
+
+### 6b.1 What potions do
+
+| Category | Use | Where |
+|---|---|---|
+| **Long real-time boosts** | +Luck, +drop rate, for a real-world duration | Out of combat |
+| **Restoration** | Heal between encounters | Campaign runs |
+| **Loot insurance** ⚠️ | Preserve loot on death | Campaign runs |
+| **Combat utility** | Healing, removing buffs/debuffs mid-duel | In a duel |
+
+### 6b.2 Consumable slots ⭐ ✅
+
+> *"a limit of four item slots that potentially could raise up to eight or
+> ten… those item slots could also be added with equipment."*
+
+A deliberately **bounded** consumable inventory, so a stack of 100 potions
+can't stall the game out. Baseline **4 slots**, growing to **8–10** through
+progression and **equipment bonuses**.
+
+Why this is the right call:
+- It's the upstream fix for potion-spam — Fatigue (turn 51) bounds a stalled
+  duel, but slot limits stop it from starting.
+- "Which four do I bring?" is a genuine loadout decision, mirroring the
+  element/spell slot pool players already reason about.
+- ⭐ It gives equipment a **non-combat-power axis**: +1 consumable slot is
+  meaningful build value that doesn't inflate damage or HP, which is exactly
+  what a system worried about power creep (§2.2) wants more of.
+
+❓ **Per-duel or per-run?** Per-*duel* is tactical (refilled each fight);
+per-*run* is strategic and makes the campaign's "return to town or keep
+going" choice much richer, since potions spent early aren't there later.
+Recommendation: **per-run in the campaign, and a fixed small allotment (or
+none) in PvP** — see §7.6.
+
+### 6b.3 Combat potions — the critical ruling ✅
+
+✅ **A potion costs your action for the turn.** Using one is your move,
+resolving at a priority like any other action — so every potion is a real
+decision (heal or attack?), never a freebie.
+
+✅ Potions come in three scopes: **in-combat**, **out-of-combat**, and some
+that **only make sense in single-player** (e.g. loot insurance, between-
+encounter healing). ✅ **No consumables at all in Academy mode** (§7.6).
+
+Consequences to settle (❓):
+- **What priority?** Fast enough to matter (a heal that resolves after the
+  killing blow is useless) — likely near the shield band (3) or quicker.
+- **Do they interact with the status pipeline?** A potion isn't a spell, so
+  presumably it can't *miss* from Blind — but can it be **slowed by
+  Waterlogged** (+10 priority) or **fizzled** by charge loss? (Recommendation:
+  slowed yes, fizzled no — potions don't cost charge.)
+- ⚠️ **Healing must be worth less than an equivalent-tier attack deals**,
+  or turtling behind potions becomes a dominant, duel-lengthening strategy.
+
+### 6b.4 Loot insurance ⚠️ (highest-risk potion)
+
+A potion that saves loot on death directly defuses the campaign's core
+tension — the designed "bank it or push deeper?" gamble, where defeat costs
+the whole run. If a cheap potion removes that risk, the decision stops
+mattering.
+
+📝 Suggested guardrails (pick one or more): protect only a **portion** of the
+loot (e.g. half); make it **expensive and rare** enough to be a considered
+use rather than a default; or put it on a **cooldown** so it can't cover
+every run.
+
+---
+
+## 7. Balance guardrails ⚠️
+
+### 7.1 Proc rates and streak thresholds — the biggest risk
+
+Christian's examples: *Pyro robe → 50% Ignite instead of 25%*, and
+*"waterlogs every turn instead of every third Aqua cast."*
+
+**Why this needs a hard cap:** the nine element effects are balanced against
+each other in three counter-triangles, and the sims already showed how
+sensitive that is (Flora dominating at 3 stacks until decay + a cap tamed
+it). Doubling a proc rate doesn't just improve one matchup — it inflates that
+element against *all eight others*, breaking the triangle math.
+
+The Waterlog example is the sharpest case: Waterlogged means *"your next
+action resolves dead last."* Every third cast, that's a tempo swing. **Every
+turn, it's a permanent lock — the opponent never acts first again.** That's
+not a buff, it's a different (and unfun) game.
+
+✅ **Confirmed caps:**
+- Proc-rate boosts are **additive percentage points, never multipliers** —
+  e.g. `+10pp` (25% → 35%), with a **hard ceiling around +15pp** across all
+  gear.
+- Streak thresholds may drop by **at most 1** (3rd → 2nd cast). **Never to
+  "every cast."**
+- Some effects are **explicitly not modifiable** — above all **Geo's
+  Stagger**, whose countable 4th-cast trigger our own design doc calls "the
+  best counterplay in the set." Making it every-other-cast destroys the
+  bait-and-whiff mind game it exists for.
+
+### 7.1b Three levers, in order of safety ✅
+
+Rate is the *riskiest* way to buff an element effect. Two safer levers:
+
+| Lever | Example | Risk | Notes |
+|---|---|---|---|
+| ⭐ **Magnitude** — how hard it hits *when* it procs | Ignite burns **15%** of the attack instead of 10% | **Low** | Doesn't change how *often* the counter-triangle interactions fire, only how much they hurt. Tunable in fine increments. **Preferred lever.** |
+| **Duration / stacks** | Ignite ticks 4 turns instead of 3; Photosynthesis cap 3 → 4 | Medium | Watch sustain (Flora's cap is already a balance dial) |
+| **Rate / threshold** | Ignite 25% → 35% | **High** | Inflates that element against all eight others — capped per above |
+
+✅ **Equipment may also introduce entirely new statuses**, not just amplify
+the nine element effects — e.g. a set that applies its own DoT, a chill that
+raises charge costs, a thorns effect. Guardrails:
+- Must be built on the existing `TurnStatus` framework so lane ordering and
+  the survivability-first rule (heals before burns) hold automatically.
+- Must not duplicate or obsolete an element's signature effect — a gear DoT
+  that outclasses Ignite would make Pyro pointless.
+- Must be **visible in the HUD** via the existing buff/debuff pip system, and
+  legible in the battle log. A hidden status is a bug report waiting to
+  happen.
+
+### 7.2 Shield piercing ⚠️
+"Always phases through X% of shields" directly devalues the entire shield
+ladder (Ward → Sanctuary) *and* the counter-element ×2 math — why counter-pick
+a shield element if a third of the damage ignores it? 📝 Cap at **10–25% at
+BiS**, never stackable toward 100%. 💡 A bounded alternative with the same
+fantasy: *"your first attack each duel ignores shields."*
+
+### 7.3 On-hit effects and multi-hit spells ⚠️
+Letting on-hit effects trigger **per hit** is exactly the Volley-vs-Surge
+differentiation Christian wants, and the engine supports it cleanly. The trap:
+a 4-hit Volley becomes a proc-fishing machine. 📝 Guidance: **flat damage per
+hit is safe**; **proc-per-hit is fine only if the base rate is low**; never
+put a high-impact proc (charge strip, Blind) on a per-hit trigger.
+
+### 7.4 PvP and the gear gap ✅ (two ladders)
+
+- ✅ **Ranked counts gear.** A better-geared mage will hold a higher Elo than
+  an equally skilled mage with worse gear. Gear is part of the competitive
+  investment, not noise to be filtered out.
+- ✅ **Academy (contest) mode** — a separate queue that **strips all gear**,
+  with its own **skills-only Elo**. Pure play, no loot chase.
+
+This is the best of both: the geared ladder rewards the full RPG investment,
+while Academy answers "who is actually better at the game?" — and it doubles
+as the honest venue for tournaments and for players who don't want to grind.
+
+📝 Implementation notes / consequences:
+- **Two Elo numbers per player.** Decide which is "primary" for display and
+  whether both show on the profile. (Recommendation: show both; they measure
+  different things and neither should be hidden.)
+- ⚠️ **Gear power should still feed matchmaking, not just Elo.** With an
+  80–90% BiS-vs-average gap (§2.1), a new-to-endgame player entering the
+  geared queue eats a run of stomps before Elo settles them. Seeding matches
+  on *gear power + Elo* smooths that; letting Elo sort it alone is slow and
+  discouraging.
+- 💡 Academy mode is also the **cleanest balance-testing venue** — it isolates
+  element/spell balance from gear entirely, which is exactly what the sim
+  measures today.
+
+### 7.6 Consumables in PvP ❓⚠️
+Potions are grindable, so allowing them in ranked recreates the gear problem
+with a treadmill attached — the better-stocked player wins, and every match
+costs materials. 📝 Recommendation:
+- **Academy mode: no consumables.** It strips gear to measure skill; potions
+  are gear by another name.
+- **Geared ranked:** allowing them is consistent with "ranked counts gear" —
+  but expect longer matches and a consumption grind. A middle path is a
+  **small fixed allotment** (e.g. 2 slots) so they stay tactical rather than
+  attritional.
+
+### 7.5 Element-locked gear vs. the shared slot pool ⚠️
+Loadouts share one pool between elements and spells (up to ~14 slots at L45),
+so many players will run 3–5 elements. Gear that only pays off for one
+element punishes that. 📝 **Every element-enchanted piece should still carry
+universal stats** (HP, flat damage) so it's never dead weight when you cast a
+different element — the enchant sharpens one element, it doesn't gate the
+item.
+
+---
+
+## 8. Rarity ladder 📝 (answers GAME_DESIGN open question #4)
+
+Proposal: **five rarities mapped 1:1 to the five mote tiers**, so the economy
+reads consistently everywhere.
+
+| Rarity | Mote tier | Rough shape |
+|---|---|---|
+| Common | Lesser | flat stats only |
+| Uncommon | Minor | flat stats, small % |
+| Rare | Major | a modifier + set membership |
+| Epic | Greater | strong modifier, enchantable |
+| Legendary | Master | build-defining; full set bonuses |
+
+❓ Are set pieces exclusively Epic+? (Proposal: yes — sets are an endgame
+pursuit; Common/Uncommon are the ladder up to them.)
+
+---
+
+## 9. Scaling down from the ceiling 📝
+
+Having defined BiS, the ladder back down:
+
+| Band | Level | What gear does |
+|---|---|---|
+| **Tutorial** | 1–9 | Flat HP only. Teaches "gear = survivability" with zero complexity |
+| **Foundations** | 10–19 | Flat damage and shield %; first Uncommons; crafting unlocks |
+| **Specialization** | 20–34 | First set pieces (3-piece bonuses); enchanting unlocks; Luck matters |
+| **Mastery** | 35–44 | 4-piece bonuses; Epic drops; element enchants become the build |
+| **Endgame** | 45–50 | 5-piece bonuses; Legendary/Master motes; the §2 ceiling |
+
+📝 Rationale: modifiers arrive *after* the player understands the element
+effects they modify. A level-12 player boosting Ignite rates before they've
+felt a burn is noise, not depth.
+
+---
+
+## 10. Open questions
+
+✅ **Answered so far:** power budget (§2.1), the five archetypes (§3.1), set
+slots (§3.2), set tiers & acquisition (§3.4–3.5), PvP gear policy + Academy
+mode (§7.4), proc-boost levers and caps (§7.1/7.1b).
+
+| # | Question | §|
+|---|---|---|
+| 27 | Conversion cooldown length — and does it scale with skill level too? | §6.0b |
+| 28 | Drop rates per mote tier (Dust common → Core near-never) need concrete numbers | §6.0 |
+| 8 | Are set pieces Epic+ only? | §8 |
+| 16 | Combat potions cost your action ✅ — but **at what priority** do they resolve? | §6b.3 |
+| 17 | Consumable slots **per-duel or per-run**? | §6b.2 |
+| 18 | Loot-insurance guardrail — partial protection, rarity, or cooldown? | §6b.4 |
+| 19 | Consumables in PvP — banned in Academy (recommended), and allowed/limited in geared ranked? | §7.6 |
+| 20 | Can potions be **slowed by Waterlogged**? (Recommend yes) Fizzled? (Recommend no) | §6b.3 |
+| 21 | Are premium-currency-purchased Luck/drop-rate potions consistent with "money buys time, never access"? | §3.5, §6b.1 |
+| 11 | **Element-enchant parity** — how do we stop Arcane (permanent, universal) from being the only enchant worth taking? ⏸️ *tabled — balance later* | §2.2 |
+| 22 | ⚠️ **Who makes weapons and jewelry?** Mining/Felling currently gather into a vacuum — 4 of 9 slots have no crafter | §6a.1 |
+| 23 | **Release mechanism for "Untradeable"** — gold, item, skill level, or time lock? (Recommend *not* premium-gated) | §6c |
+| 14 | Confirm the archetype counter-loop (Aegis→Ember→Thorn→Tide→Void→Aegis)? | §2.2 |
+| 15 | Accept the sim acceptance criterion (no archetype above ~60% average, none beats all four)? | §2.2 |
+
+---
+
+## Changelog
+
+**Rev 7** — Mote economy clarified: **every tier below Heart drops directly**
+at escalating rarity (Dust common → Core near-never), **Hearts are
+craft-only** — so the steep ladder is an exchange between tiers of abundance,
+not a 48,000-dust grind. Noted the consequence: a Heart is always a *planned*
+achievement, which supports showing Tier IV progress as a visible bar.
+**Metalworking** confirmed as Mining's refinement lane, its outputs feeding
+other recipes (making the skill tree an interdependent economy).
+
+**Rev 6** — **Crystallization** adopted (Dust→Shard→Crystal→Core→Heart) with
+the refinement ladder (50/20/12/4) and the warning that 48,000 dust per Heart
+only works if Hearts also drop directly. Neutral→element conversion now
+**scales with Enchanting level** (4:1 → 1:1 at 50), throttled by **cooldown**
+rather than a build timer. Skill list completed with **Jewelry**,
+**Metalworking** and **Woodworking** — every slot now has a maker (Metalworking's
+output still open). Motes also drop from **gathering** in attuned areas.
+Monetization principle formalized: **gems buy shortcuts, never requirements**;
+buying better odds is fine, buying components is not. Combat potions confirmed
+to cost your turn; three potion scopes; no consumables in Academy.
+
+**Rev 5** — **Skills** structured as two types outside player level:
+Gathering (Mining/Felling/Foraging) and Processing (Tailoring/Potions/
+Enchanting); detail tabled. Flagged the gap that Mining and Felling have no
+processing skill — weapons and jewelry (4 of 9 slots) currently have no
+maker. **Tradability** set at three tiers (Tradeable / Untradeable-with-
+release / Bound), with Tier III–IV rare components as **Bound**, closing the
+buy-the-drops loophole. Arcane enchant parity explicitly tabled.
+
+**Rev 4** — Slot naming settled (**Main hand / Off hand** vs the worn
+**Gloves** slot). Added **Alchemy** as a third skill, with potion categories
+(long real-time boosts, restoration, loot insurance, combat utility) and the
+**bounded consumable-slot** mechanic (4 → 8–10, expandable by equipment).
+Flagged the three rulings that matter most: potions must cost your action,
+loot insurance defuses the campaign's core gamble, and consumables should be
+banned in Academy mode.
+
+**Rev 3** — PvP settled: ranked counts gear, plus an **Academy (contest)
+mode** with gear stripped and its own skills-only Elo (flagged: gear power
+should feed matchmaking, not only Elo). Proc levers ranked by safety —
+**magnitude** preferred over rate; equipment may also introduce **entirely
+new statuses**, with framework/visibility/no-obsoleting guardrails. Mote tier
+naming reopened with three element-neutral candidate systems.
+
+**Rev 2** — Power budget settled (100% vs naked, 80–90% vs average; 1–49
+scaling explicitly not a concern). Anti-meta guarantee promoted to the
+primary design constraint, with a proposed archetype counter-loop, tech-slot
+adaptation layer, and a measurable sim criterion. All five archetypes
+accepted. Set slots confirmed as the five primary robe pieces. Added set
+tiers (30/40/45/50), the acquisition triangle (rare drops + enchanting skill
++ crafting skill), and the "money buys time, never access" monetization line.
+New questions on enchant parity, skills-as-tracks, and component tradability.
+
+**Rev 1** — Initial design session: inherited decisions catalogued; endgame
+ceiling and power budget proposed; two-axis (archetype set × element enchant)
+architecture; modifier vocabulary with risk ratings; complete catalogue of
+existing statuses/effects/hooks; mote economy tied to existing region
+elements; balance guardrails on proc rates, shield piercing, on-hit, and PvP
+gear; rarity ladder; level-band scaling.

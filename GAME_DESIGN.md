@@ -207,6 +207,9 @@ MoM2 adds **spell slots** unlocked via leveling.
   slot initially, up to 5 unlocked by leveling.
 - ✅ **Loadout switching rules**: in 1-player mode, loadouts can only be changed at a
   dedicated location in town; in PvP, the player picks a loadout before each match.
+- 📝 **Superseding spec:** [ITEMS_DESIGN.md](ITEMS_DESIGN.md) — the endgame
+  ceiling, archetype sets × element enchants, the modifier vocabulary, the
+  elemental-mote economy, and the full catalogue of statuses gear can hook.
 - ✅ **Equipment** — items affect stats including max HP. Dropped as loot.
   - ✅ Slots: **Hat, Top, Bottom, Boots, Hands, Neck, Ring, Left hand, Right hand**.
     - Hands = worn gear (gloves or bracers), separate from held items.
