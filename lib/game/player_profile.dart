@@ -4,6 +4,10 @@ import 'loadout.dart';
 import 'progression.dart';
 import 'world.dart';
 
+/// Every valid element id, for validating ids read off disk.
+final Set<String> _elementNames =
+    MagicElement.values.map((e) => e.name).toSet();
+
 /// A saved loadout: ordered element and spell slots by id. Persisted as part
 /// of the player document; converts to a runtime [Loadout] for combat.
 class LoadoutPreset {
@@ -34,8 +38,20 @@ class LoadoutPreset {
     }
   }
 
-  List<MagicElement> get elements =>
-      elementIds.map((id) => MagicElement.values.byName(id)).toList();
+  /// Element ids that no longer name a real element — e.g. `radiant`, renamed
+  /// to `sanctus` in the V2 roster change, or the pre-9-element names. Exposed
+  /// so the UI can tell a player their preset lost a slot instead of silently
+  /// shrinking it.
+  List<String> get unknownElementIds =>
+      elementIds.where((id) => !_elementNames.contains(id)).toList();
+
+  /// Elements this preset resolves to. ⚠️ **Unknown ids are dropped, not
+  /// thrown on** — a stale save must never crash the app on load. See
+  /// [unknownElementIds] to detect that it happened.
+  List<MagicElement> get elements => elementIds
+      .where(_elementNames.contains)
+      .map(MagicElement.values.byName)
+      .toList();
 
   List<Spell> get spells => spellIds.map(Spellbook.byId).toList();
 

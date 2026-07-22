@@ -38,7 +38,7 @@ void main() {
     expect(tester.takeException(), isNull, reason: reason);
   }
 
-  testWidgets('element dialog lays out for all nine elements', (tester) async {
+  testWidgets('element dialog lays out for every element in the roster', (tester) async {
     for (final element in MagicElement.values) {
       await expectOpensCleanly(
         tester,

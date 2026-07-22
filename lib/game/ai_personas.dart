@@ -70,7 +70,7 @@ abstract final class AiRoster {
   );
 
   static final Loadout _warden = Loadout(
-    elements: const [MagicElement.geo, MagicElement.flora, MagicElement.radiant]
+    elements: const [MagicElement.geo, MagicElement.flora, MagicElement.sanctus]
         .toList(),
     spells: [
       Spellbook.bolt,
@@ -96,7 +96,7 @@ abstract final class AiRoster {
 
   static final Loadout _archmage = Loadout(
     elements:
-        const [MagicElement.radiant, MagicElement.umbra, MagicElement.electro]
+        const [MagicElement.sanctus, MagicElement.umbra, MagicElement.electro]
             .toList(),
     spells: [
       Spellbook.jolt,

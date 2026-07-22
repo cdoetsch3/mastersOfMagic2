@@ -20,9 +20,16 @@ const Map<MagicElement, ElementStyle> elementStyles = {
   MagicElement.electro: ElementStyle(Color(0xFFE8C547), Icons.bolt, 'Electro'),
   MagicElement.aero: ElementStyle(Color(0xFF9BB8C4), Icons.air, 'Aero'),
   MagicElement.geo: ElementStyle(Color(0xFF9C7A4B), Icons.landscape, 'Geo'),
-  // Tier 3 — Ethereal
-  MagicElement.radiant:
-      ElementStyle(Color(0xFFF2E7C9), Icons.light_mode, 'Radiant'),
+  // Tier 3 — Celestial
+  MagicElement.solar:
+      ElementStyle(Color(0xFFF5B23E), Icons.wb_sunny, 'Solar'),
+  MagicElement.lunar:
+      ElementStyle(Color(0xFFAFC3E8), Icons.nightlight_round, 'Lunar'),
+  MagicElement.astral:
+      ElementStyle(Color(0xFF6E7BD6), Icons.star_outline, 'Astral'),
+  // Tier 4 — Ethereal
+  MagicElement.sanctus:
+      ElementStyle(Color(0xFFF2E7C9), Icons.light_mode, 'Sanctus'),
   MagicElement.umbra: ElementStyle(Color(0xFF8B5CD6), Icons.dark_mode, 'Umbra'),
   MagicElement.arcane:
       ElementStyle(Color(0xFFD65AB8), Icons.auto_awesome, 'Arcane'),
@@ -32,6 +39,7 @@ const Map<MagicElement, ElementStyle> elementStyles = {
 const Map<MagicTier, String> tierLabels = {
   MagicTier.primal: 'Primal',
   MagicTier.kinetic: 'Kinetic',
+  MagicTier.celestial: 'Celestial',
   MagicTier.ethereal: 'Ethereal',
 };
 

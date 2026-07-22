@@ -57,7 +57,7 @@ class StatusHeal extends StatusOp {
 }
 
 /// Marker for statuses that can make the holder's offensive spells miss
-/// (Radiant's Blind). The engine rolls [missChance] at each offensive cast; a
+/// (Sanctus's Blind — moves to Solar in Phase 3). The engine rolls [missChance] at each offensive cast; a
 /// miss resolves to no effect (charge still spent). Multiple blinders use the
 /// highest chance. See TYPE_EFFECTS_DESIGN.md §4.1.
 abstract interface class Blinding {

@@ -325,7 +325,7 @@ class DuelEngine {
     // Precedence step 3 — Miss (Blind): a harmful spell may miss. Unlike a
     // fizzle, the charge is still spent (the post-resolution sweep zeroes it);
     // the spell simply has no effect and advances no streak. Arcane spells
-    // are exempt — they never miss (Arcane unravels Radiant, §4 table).
+    // are exempt — they never miss (Arcane unravels Sanctus, §4 table).
     if (spell.isHarmful &&
         cast.element != MagicElement.arcane &&
         caster.missChance > 0 &&
@@ -336,7 +336,7 @@ class DuelEngine {
 
     events.add(SpellCastEvent(caster, spell, cast.element));
     // Casting consumes ALL charge; capture it now for charge-spent triggers
-    // (Radiant/Umbra/Arcane) before effects read or mutate it.
+    // (Sanctus/Umbra/Arcane) before effects read or mutate it.
     final chargeSpent = caster.charge;
 
     // Precedence step 2/4 — Stagger is consumed by any harmful spell that
@@ -562,8 +562,17 @@ class DuelEngine {
           }
         }
 
-      // ---- Tier 3 — Ethereal -------------------------------------------
-      case MagicElement.radiant:
+      // ---- Tier 3 — Celestial ------------------------------------------
+      // Solar/Lunar/Astral effects land in Phase 3 (TYPE_EFFECTS §4b). Listed
+      // explicitly so the roster change is visible here rather than falling
+      // silently through a non-exhaustive switch statement.
+      case MagicElement.solar:
+      case MagicElement.lunar:
+      case MagicElement.astral:
+        break;
+
+      // ---- Tier 4 — Ethereal -------------------------------------------
+      case MagicElement.sanctus:
         // Blind — 10% per charge spent, on attack (even fully shielded).
         // A proc also burns away the target's Creeping Dark entirely.
         if (rawDamage > 0 &&

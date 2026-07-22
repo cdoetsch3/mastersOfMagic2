@@ -164,11 +164,11 @@ void main() {
     });
   });
 
-  group('Tier 3 — Blind (Radiant §4.1)', () {
+  group('Tier 4 — Blind (Sanctus §4.1)', () {
     test('proc chance is 10% per charge spent', () {
       // 4 charge spent → 40%: a 0.39 roll procs...
       var duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.39]));
-      charge(alice, MagicElement.radiant, 4);
+      charge(alice, MagicElement.sanctus, 4);
       duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
       expect(bruno.statuses.whereType<BlindStatus>(), hasLength(1));
 
@@ -176,7 +176,7 @@ void main() {
       alice = MageState(name: 'Alice');
       bruno = MageState(name: 'Bruno');
       duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.41]));
-      charge(alice, MagicElement.radiant, 4);
+      charge(alice, MagicElement.sanctus, 4);
       duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
       expect(bruno.statuses.whereType<BlindStatus>(), isEmpty);
     });
@@ -184,7 +184,7 @@ void main() {
     test('a 0-cost attack can never blind', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]));
       duel.resolveTurn(
-        CastAction(Spellbook.flick, MagicElement.radiant),
+        CastAction(Spellbook.flick, MagicElement.sanctus),
         const ForfeitAction(),
       );
       expect(bruno.statuses.whereType<BlindStatus>(), isEmpty);
@@ -196,7 +196,7 @@ void main() {
       // (0.4 < 0.5) while blind is active.
       final duel = DuelEngine(alice, bruno,
           rng: ScriptedRandom([0.0, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]));
-      charge(alice, MagicElement.radiant, 4);
+      charge(alice, MagicElement.sanctus, 4);
       duel.resolveTurn(
         CastAction(Spellbook.ruin),
         CastAction(Spellbook.flick, MagicElement.geo), // same turn: no miss
@@ -237,7 +237,7 @@ void main() {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]));
       bruno.statuses.add(CreepingDarkStatus(12));
       bruno.concealed = true;
-      charge(alice, MagicElement.radiant, 4);
+      charge(alice, MagicElement.sanctus, 4);
       duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
       expect(bruno.statuses.whereType<CreepingDarkStatus>(), isEmpty);
       expect(bruno.concealed, isFalse);

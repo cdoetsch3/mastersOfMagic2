@@ -88,8 +88,41 @@ const Map<MagicElement, ElementLore> elementLore = {
     weakEffect: 'Their Tailwind 3+ shrugs off your Stagger',
   ),
 
-  // ---- Tier 3 — Ethereal ----------------------------------------------
-  MagicElement.radiant: ElementLore(
+  // ---- Tier 3 — Celestial ----------------------------------------------
+  // Effects arrive in Phase 3 (TYPE_EFFECTS_DESIGN §4b). Until then these
+  // read honestly as "not yet active" rather than describing behaviour the
+  // engine doesn't have — a player must never be told about a mechanic that
+  // won't fire.
+  MagicElement.solar: ElementLore(
+    effectName: 'Blind',
+    trigger: 'not yet active',
+    description: 'The Celestial tier is still being woven. Solar will inherit '
+        'Blind: a chance per charge spent to leave the opponent missing their '
+        'attacks. Not yet implemented.',
+    beatsEffect: 'Solar eclipses Lunar',
+    weakEffect: 'Astral slips through Solar',
+  ),
+  MagicElement.lunar: ElementLore(
+    effectName: 'Phases of the Moon',
+    trigger: 'not yet active',
+    description: 'The Celestial tier is still being woven. Lunar will follow a '
+        'public four-turn moon cycle — new, waxing, full, waning — that '
+        'strengthens and weakens its spells in turn. Not yet implemented.',
+    beatsEffect: 'Lunar anchors Astral',
+    weakEffect: 'Solar eclipses Lunar',
+  ),
+  MagicElement.astral: ElementLore(
+    effectName: 'Astral Alignment',
+    trigger: 'not yet active',
+    description: 'The Celestial tier is still being woven. Astral will stack '
+        'Alignment, sending part of every attack straight through shields to '
+        'health. Not yet implemented.',
+    beatsEffect: 'Astral slips through Solar',
+    weakEffect: 'Lunar anchors Astral',
+  ),
+
+  // ---- Tier 4 — Ethereal ----------------------------------------------
+  MagicElement.sanctus: ElementLore(
     effectName: 'Blind',
     trigger: '10% per charge spent, on attack',
     description: 'For the opponent\'s next 3 turns, each offensive spell has a '

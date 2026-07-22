@@ -1,17 +1,49 @@
-/// The nine elements, in three tiers of three. See TYPE_EFFECTS_DESIGN.md.
+/// The twelve elements, in four tiers of three. See TYPE_EFFECTS_DESIGN.md.
 ///
 /// Each tier is a **closed counter-triangle**: every element counters exactly
 /// one other element and is countered by exactly one, all within its own tier.
-/// There are no cross-tier counter relationships. Countering matters for two
-/// layers — shield math (an attack deals double to a countered shield) and the
-/// per-tier effect interactions (the cleanse/immunity web) — both following
-/// the same triangles.
+/// Countering matters for two layers — shield math (an attack deals double to
+/// a countered shield) and the per-tier effect interactions (the
+/// cleanse/immunity web) — both following the same triangles.
 ///
 /// Triangles (A → B means "A counters B"):
-///   Tier 1 (Primal):   Pyro → Flora → Aqua → Pyro
-///   Tier 2 (Kinetic):  Electro → Aero → Geo → Electro
-///   Tier 3 (Ethereal): Radiant → Umbra → Arcane → Radiant
-enum MagicTier { primal, kinetic, ethereal }
+///   Tier 1 (Primal):    Pyro → Flora → Aqua → Pyro
+///   Tier 2 (Kinetic):   Electro → Aero → Geo → Electro
+///   Tier 3 (Celestial): Solar → Lunar → Astral → Solar
+///   Tier 4 (Ethereal):  Sanctus → Umbra → Arcane → Sanctus
+///
+/// **Macro-tier loop** (TYPE_EFFECTS_DESIGN §0.3) — a second, coarser layer
+/// that applies only *between* tiers. The higher tier beats the one below it,
+/// and the starter tier beats the endgame tier:
+///
+///   Kinetic → Primal → Ethereal → Celestial → Kinetic
+///
+/// Primal beating Ethereal is the anti-power-creep valve: the starter
+/// elements are the designed answer to the endgame tier, so a max-level mage
+/// can never simply out-tier everyone. Opposite tiers (Primal↔Celestial,
+/// Kinetic↔Ethereal) are neutral in both directions.
+enum MagicTier {
+  primal,
+  kinetic,
+  celestial,
+  ethereal;
+
+  /// The tier this one counters in the macro-tier loop.
+  MagicTier get beatsTier => _tierCounters[this]!;
+
+  /// The tier that counters this one.
+  MagicTier get beatenByTier =>
+      _tierCounters.entries.firstWhere((e) => e.value == this).key;
+
+  /// True if this tier counters [other] at the macro layer. Always false for
+  /// [other] == this — same-tier matchups resolve on the element triangle.
+  bool countersTier(MagicTier other) => _tierCounters[this] == other;
+
+  /// True if neither tier counters the other (the "opposite" tier in the
+  /// 4-cycle). Same-tier is not neutral — it uses the element triangle.
+  bool isNeutralWith(MagicTier other) =>
+      this != other && !countersTier(other) && !other.countersTier(this);
+}
 
 enum MagicElement {
   // Tier 1 — Primal
@@ -22,15 +54,20 @@ enum MagicElement {
   electro,
   aero,
   geo,
-  // Tier 3 — Ethereal
-  radiant,
+  // Tier 3 — Celestial
+  solar,
+  lunar,
+  astral,
+  // Tier 4 — Ethereal
+  sanctus,
   umbra,
   arcane;
 
   MagicTier get tier => switch (this) {
         aqua || pyro || flora => MagicTier.primal,
         electro || aero || geo => MagicTier.kinetic,
-        radiant || umbra || arcane => MagicTier.ethereal,
+        solar || lunar || astral => MagicTier.celestial,
+        sanctus || umbra || arcane => MagicTier.ethereal,
       };
 
   /// Elements whose shields this element deals double damage to (and, at the
@@ -62,8 +99,21 @@ const Map<MagicElement, MagicElement> _counters = {
   MagicElement.electro: MagicElement.aero,
   MagicElement.aero: MagicElement.geo,
   MagicElement.geo: MagicElement.electro,
-  // Tier 3: Radiant → Umbra → Arcane → Radiant
-  MagicElement.radiant: MagicElement.umbra,
+  // Tier 3: Solar → Lunar → Astral → Solar
+  MagicElement.solar: MagicElement.lunar,
+  MagicElement.lunar: MagicElement.astral,
+  MagicElement.astral: MagicElement.solar,
+  // Tier 4: Sanctus → Umbra → Arcane → Sanctus
+  MagicElement.sanctus: MagicElement.umbra,
   MagicElement.umbra: MagicElement.arcane,
-  MagicElement.arcane: MagicElement.radiant,
+  MagicElement.arcane: MagicElement.sanctus,
+};
+
+/// The macro-tier 4-cycle. Each tier counters exactly one other tier, and the
+/// loop closes back on Primal → Ethereal (the anti-power-creep valve).
+const Map<MagicTier, MagicTier> _tierCounters = {
+  MagicTier.kinetic: MagicTier.primal,
+  MagicTier.celestial: MagicTier.kinetic,
+  MagicTier.ethereal: MagicTier.celestial,
+  MagicTier.primal: MagicTier.ethereal,
 };

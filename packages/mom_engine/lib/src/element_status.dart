@@ -80,7 +80,7 @@ class PhotosynthesisStatus extends TurnStatus {
   }
 }
 
-/// **Blind** (Radiant). The holder's harmful spells have a 50% chance to miss
+/// **Blind** (Sanctus; moves to Solar in Phase 3). The holder's harmful spells have a 50% chance to miss
 /// for their next 3 turns (not the turn it lands — [missChance] reports 0
 /// until the application turn's bookkeeping runs). Re-proccing refreshes the
 /// window. Arcane spells are exempt (checked at the miss gate, §4 table).
@@ -121,7 +121,7 @@ class BlindStatus extends TurnStatus implements Blinding {
 ///   5+  Shadow — enemy can't see what element the caster is charging
 ///   10+ Dusk — enemy can't see the caster's charge or health bar
 ///   15  Midnight — enemy can't see their OWN charge or health bar
-/// Cleared entirely when the holder is Blinded (Radiant banishes Umbra).
+/// Cleared entirely when the holder is Blinded (Sanctus banishes Umbra).
 class CreepingDarkStatus extends TurnStatus {
   static const int maxStacks = 15;
   static const int shadowThreshold = 5;

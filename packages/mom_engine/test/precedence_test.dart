@@ -2,7 +2,7 @@ import 'package:mom_engine/mom_engine.dart';
 import 'package:test/test.dart';
 
 /// A test-double blinder: makes the holder's harmful spells miss with a fixed
-/// chance for [turnsLeft] turns. (Phase 4 builds the real Radiant Blind on the
+/// chance for [turnsLeft] turns. (Phase 4 built the real Blind on the
 /// same [Blinding] marker.)
 class _Blind extends TurnStatus implements Blinding {
   @override
