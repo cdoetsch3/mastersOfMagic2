@@ -12,7 +12,7 @@ that is **not yet built** — the twelve-element V2 expansion, the items /
 crafting / enchanting economy, and the content systems (enemies, loot) that
 still need design before they can be built.
 
-⚠️ **This is a large plan.** Phases 1–5 are a focused engine expansion.
+⚠️ **This is a large plan.** Phases 1–3b are a focused engine expansion.
 Phases 6–12 are roughly "the rest of the game." Do not attempt to run them
 concurrently, and do not start a phase whose gate hasn't cleared.
 
@@ -65,9 +65,11 @@ hours.
 ## Dependency graph
 
 ```
-Phase 0  Rulings (human) ──┬──────────────────────────────────┐
-                           │                                  │
+Phase 0  Rulings ✅ CLEARED — nothing blocks
+
 Phase 1  12 elements ──► Phase 2  shield math ──► Phase 3  effects
+                                                        │
+                                              Phase 3b  combat stats
                                                         │
                                                   ⚠️ Phase 4  SIM GATE
                                                         │
@@ -90,23 +92,48 @@ Phase 1  12 elements ──► Phase 2  shield math ──► Phase 3  effects
 
 ---
 
-# Phase 0 — Rulings the human must make 🚫 agent cannot proceed past these
+# Phase 0 — ✅ CLEARED. Every blocking ruling is made.
 
-None of these are guessable; each changes what gets built. Collect answers
-before Phase 7, and the starred ones before Phase 3.
+No design question blocks any phase. The rulings, with where each now lives:
 
-| # | Question | Blocks | Source |
-|---|---|---|---|
-| ⭐ 1 | Is `Hallow` element-neutral? *(recommended: yes)* | Phase 3 | TYPE_EFFECTS §4c.4 |
-| ⭐ 2 | Absolution's purge: pure random, fixed severity order, or severity-weighted random? | Phase 3 | TYPE_EFFECTS §4c.1 |
-| 3 | **HP and damage per enemy level** — the constant the whole L45–60 curve rests on | Phase 5 | GAME_DESIGN §5 |
-| 4 | Where does **post-cap XP** go? (motes / currency / paragon trickle) | Phase 5 | PROGRESSION §4 |
-| 5 | Close the 5 untaught counter edges with more zones, or accept? | Phase 5 | GAME_DESIGN §5 |
-| 6 | **ITEMS #36** — Tidebinder 4pc and 5pc are the same bonus twice | Phase 7 | ITEMS §3.1 |
-| 7 | **Voidcaller 3/4/5-piece bonuses** — all TBD, must carry info-war natively | Phase 7 | ITEMS §3.1, §2.2 |
-| 8 | **ITEMS #38** — does charge retention keep the element cycle open? | Phase 7 | ITEMS §5b.3 |
-| 9 | **ITEMS #39** — potion ordering inside the P3 group | Phase 10 | ITEMS §6b.3 |
-| 10 | **ITEMS #8** — are set pieces Epic+ only? | Phase 7 | ITEMS §8 |
+| Ruling | Where it's specified |
+|---|---|
+| `Hallow` is **element-neutral** (like `Discharge`) | TYPE_EFFECTS §4c.4 |
+| Absolution purges **one debuff, uniformly at random** | TYPE_EFFECTS §4c.1 |
+| Enemy HP/damage are **per-monster**, not a global per-level constant | GAME_DESIGN §5 |
+| Post-cap XP → motes: **10 XP = 1 Dust, 250 Dust/day** | ITEMS §6.1, PROGRESSION §4 |
+| The 5 untaught counter edges are **accepted**; more zones can come later | GAME_DESIGN §5 |
+| Charge retention is **high-level gear only**, and where it applies it **keeps the element cycle open** | ITEMS §5b.3 |
+| Potions are **ordinary priority-3 actions**; Haste breaks ties | ITEMS §6b.3 |
+| Sets are **Epic+**, on a **six-rarity** ladder (Legendary rarest); motes span Common→Epic only | ITEMS §8 |
+| **Six new combat stats** — accuracy, dodge, crit chance/damage, deflection chance/amount | GAME_DESIGN §1, TYPE_EFFECTS §5.2, ITEMS §4.1a |
+
+### Two things deliberately left TBD — neither blocks implementation
+
+- **Tidebinder's 4-piece** (ITEMS #36) and **all three Voidcaller bonuses**
+  (#37) are blank on purpose. Build the **set-bonus framework generically**
+  so any bonus shape drops in later. ⚠️ Neither set can *ship* without them.
+
+### Three constraints these rulings created — carry them forward
+
+1. ⚠️ **Per-monster stats mean there is no automatic difficulty curve.**
+   Phase 6 must define a **baseline statline per level** that archetypes
+   deviate from (tank +HP/−damage, glass −HP/+damage, comparable totals), or
+   "gear is worth ten levels" has nothing to be measured against and the
+   L45–60 band can't be tuned or simmed.
+2. ⚠️ **Every-cast procs are now an intended endgame outcome**, so §7.1's old
+   blanket "never to every cast" rule is gone — replaced by a **per-effect
+   allowlist** (ITEMS §7.1). Aero/Flora/Sanctus may reach every-cast;
+   **Aqua's Waterlogged and Geo's Stagger must stay capped**, because firing
+   those every turn makes the *opponent* passive rather than making you
+   strong. ❓ That split is a recommendation awaiting Christian's ruling.
+   The every-turn-proc build becomes the new balance ceiling — **sim it
+   explicitly**, don't infer it.
+3. ⚠️ **The six new combat stats add three seeded rolls per hit** (hit, crit,
+   deflection) at fixed pipeline positions — TYPE_EFFECTS §5.2 steps 3, 4 and
+   6. This is the **most likely source of a lockstep desync** in the whole V2
+   effort. The hard rule: **one unified hit roll**, pure subtraction, Blind
+   folded in as a flat −50 — never two miss systems.
 
 ---
 
@@ -209,8 +236,10 @@ immunity moves Arcane → **Astral**; the Creeping-Dark clear moves to
 ### 3d. Sanctus — Absolution + Grace, and the `Hallow` spell
 - **Streak element:** every **3rd consecutive** Sanctus cast fires Absolution;
   casting another element resets to 0; charging does neither.
-- Absolution removes **one debuff** (see Phase 0 #2 for the selection rule) —
-  **no healing**. Resolves in the **E1–E3 heal band**, before Ignite's E8.
+- Absolution removes **one debuff, chosen uniformly at random** — **no
+  healing**. Resolves in the **E1–E3 heal band**, before Ignite's E8.
+  ⚠️ The roll **must** draw from the shared per-turn seed, or the clients
+  disagree about which debuff vanished and lockstep diverges.
 - If nothing to purge, bank **Grace**: blocks the next debuff outright.
   **Max 1, persists until consumed**, does not block Fatigue.
 - **Sanctus → Umbra:** each Absolution strips **5 Creeping Dark stacks**
@@ -218,14 +247,54 @@ immunity moves Arcane → **Astral**; the Creeping-Dark clear moves to
 - **Arcane → Sanctus:** an Arcane attack **resets the Sanctus streak to 0**.
   Un-gated is correct — charging isn't a cast, so a big-spell Arcane player
   rarely resets it; denying Sanctus means cheap attacks and no AK stacks.
-- New spell **`Hallow`**: 2 charge, priority 7 (aux), grants Grace, unlocks
-  at L25. Shares the max-1 Grace cap with Absolution.
+- New spell **`Hallow`**: 2 charge, priority 7 (aux), **element-neutral**
+  (like `Discharge`), grants Grace, unlocks at L25. Shares the max-1 Grace
+  cap with Absolution.
 
 **Done when:** a new `tier34_effects_test.dart` covers each effect, each of
 the five edges, the eclipse lock, the Alignment split (including the
 40-point-shield case and Barrier), Grace consumption and its cap, and
 Absolution's streak reset by an Arcane attack. `precedence_test.dart` gains
 the routing step.
+
+---
+
+# Phase 3b — Engine: the six combat stats
+
+**Reference:** GAME_DESIGN §1 "Combat stats" · TYPE_EFFECTS §5.2 steps 3/4/6 ·
+ITEMS §4.1a.
+
+Do this **after** 3a–3d and **before** the sim gate, so the gate covers
+everything. All six default to no-ops (accuracy 100%, everything else 0), so
+⭐ **a correct implementation must not move the sim at all** — that is the
+cleanest possible regression test for this phase.
+
+1. **Per-mage stats** on `MageState`: dodge, critChance, critDamage
+   (default +50%), deflectionChance, deflectionAmount. **Per-spell**
+   accuracy on `Spell`, defaulting to 100% for all 25 shipped spells —
+   🚫 **do not retrofit any existing spell below 100%.**
+2. **Unify the hit roll** (§5.2 step 3):
+   `spellAccuracy + gearAccuracy − targetDodge − blindPenalty`. Pure
+   subtraction, **no clamp** — accuracy above 100% is meaningful against
+   dodge. Blind becomes a flat **−50**. Astral's exemption drops the blind
+   term.
+3. **Crit roll** (step 4) → multiplier in step 5, alongside Empower/Stagger.
+   **Per hit**, so Flurry rolls three times.
+4. **Deflection roll** (step 6), **per hit**. Pure **damage reduction** —
+   the defender takes `damage × (1 − deflectionAmount)` and the deflected
+   portion is removed, not redirected. **Cap at 50% for players.** Resolves
+   **before** Astral's pierce split.
+   💡 The optional *reflection* rider (deflected portion dealt back to the
+   attacker) is a separate late-game perk — if built, let the chain recurse:
+   it decays geometrically. **Round down, integer arithmetic**, so both
+   clients terminate on the identical step.
+
+**Done when:** a new `combat_stats_test.dart` covers accuracy above 100%
+against dodge (120 − 30 = 90), Blind-as-flat-−50 matching the old Blind
+behaviour exactly, per-hit crit and deflection on a multi-hit spell, and the
+50% deflection cap. ⭐ **And the balance sim produces statistically
+indistinguishable results from the Phase 3 run** — if it moves, a default
+isn't neutral.
 
 ---
 
@@ -270,7 +339,9 @@ iterations here — that is the point of the gate.
    ⚠️ The UI must make that unmistakable, or players read "58–60" as "come
    back at 58" and never return — same legibility lesson as the move timer
    and Midnight.
-4. Implement the enemy-level → stat curve using the Phase 0 #3 constant.
+4. ⚠️ **No enemy stat curve is implemented here.** Enemy HP/damage are
+   per-monster (Phase 0), so the baseline statline is a **Phase 6**
+   deliverable. Phase 5 only assigns each zone its enemy-level *band*.
 
 **Done when:** a world test asserts every element has exactly one pure zone,
 every hybrid names two real elements, level bands don't overlap tiers
@@ -296,8 +367,12 @@ behaviour, or mechanics.
 1. **The common monster roster** — ~5–7 types per zone × 21 zones. Almost
    certainly needs *archetypes* (bruiser / caster / turtle / swarm) reskinned
    per element rather than 100+ bespoke designs. Decide that first.
-2. **Stat curve** per level, from the Phase 0 #3 constant: HP, damage,
-   charge behaviour, shield usage.
+2. ⭐ **The baseline statline per level** — HP, damage, charge behaviour,
+   shield usage — that archetypes deviate from (tank +HP/−damage, glass
+   −HP/+damage, comparable totals). Enemy stats are per-monster by ruling,
+   so **this baseline is the only thing making the curve tunable**; without
+   it, "gear is worth ten levels" can't be measured and L45–60 can't be
+   simmed.
 3. **Enemy AI personas.** `lib/game/ai_personas.dart` and the engine's
    `ai.dart` already exist — extend rather than replace. ⚠️ The current AI is
    **effect-blind** (it doesn't understand statuses), which is both a
@@ -317,9 +392,9 @@ model, and the adventure-loop hooks.
 
 # Phase 7 — 📝 DESIGN THEN BUILD: the item and loot catalogue
 
-⚠️ **Also a design session first**, and gated on Phase 0 #6–#10.
-ITEMS_DESIGN §10 says explicitly: *"ready to move to a catalogue pass once
-#36–38 are ruled."*
+⚠️ **Also a design session first.** No longer blocked — every architectural
+ruling is made (Phase 0). ITEMS #36 (Tidebinder 4pc) and #37 (Voidcaller
+bonuses) stay TBD, which is content to fill in, not architecture to settle.
 
 **Design deliverables:**
 
@@ -389,7 +464,7 @@ Buying better odds is acceptable; buying components is not (ITEMS §3.6).
 
 # Phase 10 — Consumables, potions, alchemy
 
-Per ITEMS §6b. Gated on Phase 0 #9.
+Per ITEMS §6b.
 
 - Potions resolve at **P3**, are slowed by Waterlogged, and are **never
   fizzled or missed**.
@@ -419,9 +494,11 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
    otherwise claim "compelled" to dodge auto-surrender. Also fix
    `TunableAi`, which returns `ForfeitAction` when nothing is playable.
    (GAME_DESIGN §1, ITEMS §5b.1.)
-3. **Charge retention** ⚠️ — flagged as the highest-impact proposal in the
-   doc because it edits the core "casting spends all charge" tension. Gated
-   on Phase 0 #8. Re-run the sim after.
+3. **Charge retention** ⚠️ — the highest-impact proposal in the doc, because
+   it edits the core "casting spends all charge" tension. ✅ Ruled: retention
+   **keeps the element cycle open**, so streaks compound across casts.
+   🚫 **Enforce §7.1's floor in code** — retention plus Tidebinder's −1 is
+   the exact vector that pushes a streak proc to every cast. Re-sim after.
 4. **Sustained spells + interrupts** ⚠️ — explicitly *"the largest engine
    addition"*: multi-turn actions **do not exist today**, so this changes the
    action model itself. Three variants (beam / channelled / prepared), with
@@ -462,7 +539,11 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
 ## Suggested first session for the agent
 
 1. Read this file, then TYPE_EFFECTS §0, §4b, §4c.
-2. Put Phase 0's ⭐ questions (#1, #2) to Christian.
-3. Do **Phase 1** end to end, including the persisted-data question, and stop
+2. Do **Phase 1** end to end, including the persisted-data question, and stop
    for review. It is self-contained, fully testable, touches no balance, and
    proves the toolchain and test suite are healthy before anything risky.
+
+**Nothing is blocked.** Every design ruling is made (Phase 0), so the agent
+can run from Phase 1 through the sim gate and onward without waiting on
+anybody. The next human checkpoints are judgement calls, not blockers: the
+Phase 4 sim review, and Christian's UI verification at each visible change.

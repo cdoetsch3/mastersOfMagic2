@@ -154,11 +154,19 @@ level — high-level players crafting trash get trash XP, which keeps the
 
 📝 **The level cap stays 50, but Ethereal *content* runs to enemy level 60**
 (GAME_DESIGN §5). The last three Ethereal zones are deliberately above your
-level — you close a gap of up to ten levels with **equipment**, not XP. Two
-things this schedule doesn't yet answer: ❓ where **post-cap XP** goes (it
-needs a sink — motes, currency, or a paragon trickle), and ❓ **what one
-enemy level is worth** in HP and damage, which is the constant the whole
-endgame curve rests on.
+level — you close a gap of up to ten levels with **equipment**, not XP.
+
+✅ **Post-cap XP converts to motes — the daily-play hook.** At level 50,
+excess XP converts at **10 XP → 1 Dust**, capped at **250 Dust per day**
+(2,500 XP). Neutral Dust; players route it through the neutral→element
+conversion. Full economy sizing and the caveats are in
+[ITEMS_DESIGN.md](ITEMS_DESIGN.md) §6.1 — the short version is that it's a
+**trickle, not a path**: at the cap, a Heart is ~6 months of dailies, so it
+rewards logging in without out-earning someone who actually plays.
+
+✅ **Enemy HP and damage are set per-monster, not by a global per-level
+constant** — see GAME_DESIGN §5 and the enemies design pass. Two monsters of
+the same level can differ sharply (tanky vs damage-heavy).
 
 📝 **Revised for the V2 expansion** (TYPE_EFFECTS_DESIGN §0): the old Tier 3
 (Radiant/Umbra/Arcane) became Tier 4 **Ethereal** at L45, with Radiant renamed

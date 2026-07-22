@@ -581,23 +581,24 @@ is now a **streak element with no healing at all**.
   Same shape as Aqua's every-3rd (§5.4), and Sanctus joins the streak-element
   group: **casting any other element resets the count to 0.** Charging
   neither advances nor breaks it (definition 1).
-- ✅ **Effect:** **remove one debuff from yourself, at random.** No healing.
+- ✅ **Effect:** **remove one debuff from yourself, chosen uniformly at
+  random.** No healing. Flat random is final — no severity ordering, no
+  weighting.
 - ✅ **Resolves at end of turn in the heal band (E1–E3)** — before Ignite's E8
   tick, so a burn you just purged doesn't land one last hit. Survivability
   first (§5.1).
 - ✅ **Purges debuffs only, never your own buffs** — it will not eat your
   Photosynthesis, Astral Alignment, or Arcane Knowledge stacks.
-- ✅ **"At random" is netcode-safe** *provided* the roll draws from the
-  **shared per-turn seed** (§5.5), exactly like Ignite and Blind procs. It
-  must not use client-local RNG or the two clients will disagree about which
-  debuff vanished and diverge immediately.
-- 💡 **Alternative if the randomness grates:** a fixed severity order
-  (**Blind → Ignite → Waterlogged → Stagger → Static**) is equally
-  deterministic and makes Absolution a reliable answer to the *worst* thing
-  on you. Random is the more interesting version — it means a Sanctus player
-  can't count on stripping the Blind — but it also means the payoff for three
-  committed casts can be "you removed Static Feedback." Cheap middle ground:
-  random, but weighted toward severity.
+- ⚠️ **"At random" is netcode-safe only via the shared per-turn seed** (§5.5),
+  exactly like Ignite and Blind procs. Client-local RNG will make the two
+  clients disagree about which debuff vanished and diverge immediately. This
+  is a correctness requirement, not a complexity choice.
+- ✅ **Uniform, over the debuffs actually present.** A Sanctus player cannot
+  count on stripping the Blind — the payoff for three committed casts may
+  well be "you removed Static Feedback." That variance is accepted; it's what
+  keeps a guaranteed cleanse from being oppressive. *(A fixed severity order
+  and a severity-weighted roll were both considered and rejected as
+  unnecessary complexity.)*
 - ❓ **Open — Fatigue:** recommend Absolution **cannot** purge it. Fatigue is
   the anti-stall sudden-death clock (§8); an element that switches it off
   rebuilds the exact stall meta it exists to kill.
@@ -691,10 +692,9 @@ consolation prize; `Hallow` lets any loadout buy it deliberately.
   not a reaction to an attack you can see coming. Deliberate: shields already
   occupy the fast defensive slot at priority 3, and a reactive
   status-immunity at that speed would be strictly better than they are.
-- ❓ **Open:** does `Hallow` belong to a single element or stay neutral like
-  Empower/Quicken/Phase? Recommend **neutral** — it's the counterplay to
-  every status element, and binding it to one element would hand that element
-  a monopoly on status defence.
+- ✅ **Element-neutral**, exactly like `Discharge`, `Empower`, `Quicken` and
+  `Phase`. It's the counterplay to *every* status element; binding it to one
+  would hand that element a monopoly on status defence.
 - 💡 Later: a 4-charge upgrade that grants **2** Grace, if playtests show one
   isn't worth a turn.
 
@@ -733,18 +733,38 @@ Fixed, documented order (lockstep clients must agree or state diverges):
 
 1. **Fizzle check** (Electro Static Feedback)
 2. **Priority modification** (Aqua Waterlogged)
-3. **Miss roll** (Radiant Blind)
-4. **Damage modifiers** at resolution: additive bonuses first (Arcane
+3. **Hit roll** — 📝 V2: a **single unified roll**, not one per source:
+   `hitChance = spellAccuracy + gearAccuracy − targetDodge − blindPenalty`.
+   Pure subtraction, **no clamp** — accuracy above 100% is meaningful against
+   dodge (120 − 30 = 90). ⚠️ **Blind is folded in as a flat −50**, replacing
+   the old standalone miss roll — two independent miss systems would
+   double-roll every attack. Astral's exemption = drop the blind term. See
+   GAME_DESIGN §1 "Combat stats."
+4. 📝 **V2 — crit roll** (if the hit landed). Rolls **per hit**, so multi-hit
+   spells roll once each.
+5. **Damage modifiers** at resolution: additive bonuses first (Arcane
    Knowledge +5%/stack, 📝 V2: Lunar phase modifier), then multipliers
-   (Empower ×2, Stagger ×0.5).
+   (Empower ×2, Stagger ×0.5, 📝 V2: crit ×(1 + critDamage)).
    Example: 5-stack AK + Empower + Staggered = 100% + 25% → ×2 → ×0.5 = 125%.
-5. 📝 **V2 — damage routing** (Astral Alignment, §4b.4): split
-   `round(damage × 0.05 × stacks)` off the final figure and send it straight
-   to health; the remainder proceeds to shield math. The aux spell `Phase`
-   short-circuits this — it routes 100% and Alignment adds nothing.
-6. **Shield application** — the §0.3 counter multipliers apply here, to the
+6. 📝 **V2 — deflection roll** (defender side, **per hit**). On proc the
+   defender takes `damage × (1 − deflectionAmount)`; the deflected portion is
+   simply **removed**, not redirected. Capped at **50% for players**.
+   💡 If the optional *reflection* rider is present, the deflected portion is
+   also dealt to the attacker, which may itself be deflected — the chain
+   terminates by geometric decay. **Round down and keep the arithmetic
+   integer** so both clients terminate on the identical step.
+7. 📝 **V2 — damage routing** (Astral Alignment, §4b.4): split
+   `round(damage × 0.05 × stacks)` off the *post-deflection* figure and send
+   it straight to health; the remainder proceeds to shield math. The aux
+   spell `Phase` short-circuits this — it routes 100% and Alignment adds
+   nothing.
+8. **Shield application** — the §0.3 counter multipliers apply here, to the
    non-pierced remainder only.
-7. Normal resolution → end phase (§5.1).
+9. Normal resolution → end phase (§5.1).
+
+⚠️ **Steps 3, 4 and 6 are three new seeded rolls per hit.** All must draw
+from the shared per-turn seed in this exact order, on both clients — the
+single most likely source of a lockstep desync in the V2 work.
 
 *(Geo's old replace-the-action mechanic is gone, so there is no "replace"
 step.)*

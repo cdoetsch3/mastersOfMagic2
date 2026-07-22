@@ -264,6 +264,39 @@ Rated by how safely each can scale. ⚠️ flags need caps.
   natural hook.
 - **Shield strength %**, **heal %**, **Luck**.
 
+#### 4.1a 📝 NEW — the six combat stats
+
+Specified in GAME_DESIGN §1 "Combat stats"; these are their gear hooks. ⭐
+**This is the main reason the stats exist** — equipment needed numbers to move
+that weren't just flat damage, and defensive builds needed an axis other than
+shields.
+
+| Stat | Safety | Notes |
+|---|---|---|
+| **Accuracy** | ✅ safe | Stacks past 100% and stays useful — it's the **counter-pick to dodge builds** (a §2.2 tech-slot role) |
+| **Dodge** | ⚠️ tune by content | No engine floor; 0% enemy hit chance is reachable by an all-in build. Keep it **temporary and unlikely** through item/spell design — see the GAME_DESIGN §1 warning about permanent lockout states |
+| **Crit Chance** | ✅ build axis | See the note below — deliberately *not* jointly capped with crit damage |
+| **Crit Damage** | ✅ build axis | Inert without crit chance, which is a natural brake |
+| **Deflection Chance** | ✅ safe | Pure damage reduction, no attacker punishment (unless the reflection rider is equipped) |
+| **Deflection Amount** | ⚠️ **hard cap 50%** for players | Enemies and bosses may be tuned past it |
+
+✅ **Crit Chance × Crit Damage is a build axis, not a trap.** A
+**low-chance / high-crit-damage** glass cannon chasing big hits should be
+just as viable as a **high-accuracy / consistent** build. So budget the
+**expected value** (chance × damage) across builds rather than capping either
+stat — the goal is that both strategies land in the same power band by
+different routes, which is exactly the archetype diversity §2.2 is protecting.
+
+💡 The **reflection** rider (sending the deflected portion back at the
+attacker) is the one piece here that *does* punish attacking, so it's the one
+to watch for a passivity spiral — price it as a late-game perk, not a
+baseline roll.
+
+💡 **Elemental affinity for flavour, not mechanics:** let gear *roll* these
+with an element lean — Aero favours dodge, Geo deflection, Electro crit
+chance, Pyro crit damage, Solar accuracy — without giving any element a
+second side-effect.
+
 ### 4.2 Powerful, needs caps ⚠️
 - **Proc-chance modifiers** (e.g. Ignite 25% → higher) — see §7.1. **The
   single most dangerous lever in this design.**
@@ -459,17 +492,38 @@ Sitting on a full reserve is loud and punishable, so the "abuse" case is
 really a **standoff the opponent has strong tools against** — it doesn't need
 a rule to forbid it.
 
-❓ **Undefined interaction (review 2026-07-21): retention vs. "casting ends
-the cycle."** The core rule says casting consumes all charge *and ends the
-element cycle*; the engine's invariant is charge > 0 ⇒ element locked. So
-retained charge must keep the cycle **open** — the only coherent reading —
-which quietly grants a second power nobody priced: **you never re-pick your
-element**, streaks keep compounding across casts, and mono-element play
-(Crescendo, Waterlog/Tailwind/Stagger thresholds) gets a hidden subsidy.
-Needs an explicit ruling before Reservoir or any retention gear ships:
-does retention keep the cycle open (recommended: yes, and price the item
-knowing it), or does the cycle end with the element re-lockable only to the
-same element?
+🚫 **Retention is NOT the default rule.** The base game keeps "casting
+consumes ALL charge" (GAME_DESIGN §1 rule 3) exactly as it is. Retention is a
+**special case granted by high-level equipment only** — a late-game modifier,
+not a change to core combat. Nothing before the endgame should retain charge.
+
+✅ **Where retention does apply, it keeps the element cycle OPEN.** Retained
+charge means the element stays locked and the cycle continues; you do not
+re-pick. This is the coherent reading (the engine's invariant is
+charge > 0 ⇒ element locked).
+
+⚠️ **So the item grants two powers, and must be priced for both.** Keeping
+the cycle open means **you never re-pick your element and streaks compound
+across casts** — retention gear is quietly also a mono-element subsidy. Every
+streak mechanic gets easier to sustain:
+
+| Mechanic | Effect of a never-breaking cycle |
+|---|---|
+| Aqua — Waterlogged (every 3rd) | Proc rate approaches its ceiling |
+| Aero — Tailwind (3rd onward) | Haste grab + Stagger immunity become permanent |
+| Geo — Stagger (every 4th) | Sustained |
+| 📝 Sanctus — Absolution (every 3rd) | Sustained |
+
+✅ **Every-cast procs are an intended endgame outcome** — retention gear plus
+Tidebinder's −1 threshold is *meant* to get some streaks firing every turn
+for a player who commits their whole build to it. See the revised §7.1, which
+replaces the old blanket "never to every cast" rule with a **per-effect
+allowlist**: some streaks may reach every-cast, and a named few may not.
+
+⚠️ **Needs a sim re-run when implemented**, alongside the §5b.3a
+"charge spent = cost" change, which is the other half of this mechanic. The
+every-turn-proc build becomes the **new balance ceiling** and must be simmed
+explicitly, not inferred.
 
 ### 5b.3a ✅ Adopted: "charge spent" = the spell's cost, engine-wide
 
@@ -651,6 +705,29 @@ Radiant). So mote drops fall out of existing data for free:
   player level).
 - ✅ **Concrete rates live in per-monster / per-level loot tables**, decided
   alongside the monster catalogue rather than as a global curve.
+- ✅ **Post-cap XP converts to motes** — the daily-play hook. At **level 50**,
+  excess XP converts at **10 XP → 1 Dust**, capped at **250 Dust per day**
+  (= 2,500 XP/day). Presumed **neutral** Dust, since XP carries no element;
+  players route it through the §6.0b neutral→element conversion.
+
+  📝 **What that cap is actually worth**, against the §6.0 ladder — useful
+  because the number reads generous but isn't:
+
+  | From dailies alone | Time at the cap |
+  |---|---|
+  | 1 Shard (50 Dust) | ~5 per day |
+  | 1 Crystal (1,000) | 4 days |
+  | 1 Core (12,000) | ~7 weeks |
+  | 1 Heart (48,000) | **~6 months** |
+
+  ⭐ **Read that table as a floor, not a rate.** It's XP conversion **alone**;
+  monsters still drop motes as ordinary loot the entire time, and that
+  remains the main line. The daily conversion is a *supplement* that
+  guarantees a maxed player always banks something, however they spend the
+  session — consistent with §6.1's rule that every tier below Heart drops
+  directly and Hearts are craft-only.
+  📝 **2,500 XP/day is fine as a starting number**; expect heavy tuning once
+  the XP curve and the drop tables both exist and can be measured together.
 
 ### 6.2 The three verbs (already stubbed in the UI)
 - **Transmute** — refine raw materials up a tier (and 💡 convert neutral →
@@ -808,13 +885,12 @@ encounter healing). ✅ **No consumables at all in Academy mode** (§7.6).
 (+10 priority, like any action) but **cannot be fizzled** (they cost no
 charge) and **cannot miss from Blind** (they aren't spells).
 
-📝 **Simultaneity spec (needed for lockstep):** the engine resolves
-same-priority groups as *offense → support → channel*, with Haste breaking
-two-cast ties. A potion is a new action type at P3 — define where it sorts
-in that ordering (proposal: with support, i.e. after same-tick offense,
-alongside shields) and whether Haste applies to it (proposal: yes, it's an
-action like any other). Unspecified ordering here is exactly where a
-lockstep desync would hide.
+✅ **RESOLVED — a potion is an ordinary action.** No special simultaneity
+group, no bespoke sort rule: a potion competes at **priority 3** against
+every other action at that priority, and **Haste breaks ties** exactly as it
+does for two spells. Nothing new to specify, which is the point — the
+existing ordering already covers it, and the fewer special cases the
+resolution pipeline has, the fewer places a lockstep desync can hide.
 
 ⚠️ **Healing must be worth less than an equivalent-tier attack deals**, or
 turtling behind potions becomes a dominant, duel-lengthening strategy.
@@ -855,12 +931,36 @@ action resolves dead last."* Every third cast, that's a tempo swing. **Every
 turn, it's a permanent lock — the opponent never acts first again.** That's
 not a buff, it's a different (and unfun) game.
 
-✅ **Confirmed caps:**
+⚠️ **REVISED 2026-07-22 — "never to every cast" is no longer absolute.**
+Christian's ruling: *some* streaks **may** become proccable every turn with
+the right high-level gear. Every-cast procs are now an **earned endgame
+outcome**, not a forbidden state — the payoff for committing an entire build
+(full set + retention gear) and giving up every other bonus to get it.
+
+📝 **But the Waterlog reasoning above still stands for a subset**, so the
+blanket rule is replaced by a **per-effect allowlist**. The test is simple:
+*does firing every turn create a state where the opponent no longer
+meaningfully gets to play?*
+
+| Effect | Every-cast at endgame? | Why |
+|---|---|---|
+| **Aero — Tailwind** | ✅ allow | Permanent Haste + Stagger immunity is strong, but the opponent still acts |
+| **Flora — Photosynthesis** | ✅ allow | It's a stacking heal with a cap; no lockout |
+| 📝 **Sanctus — Absolution** | ✅ allow | Permanent cleanse is a hard counter to status decks, not to *playing* |
+| **Aqua — Waterlogged** | 🚫 **cap at −1** | *"Your next action resolves dead last"* every turn = **the opponent never acts first again.** The original argument holds: this isn't a buff, it's a different and unfun game |
+| **Geo — Stagger** | 🚫 **cap at −1** | Permanent −50% enemy damage. §7.1 already lists Stagger as explicitly non-modifiable |
+
+❓ **Needs Christian's ruling** — this split is a recommendation, not a
+decision. The principle offered: allow every-cast where it makes you strong,
+forbid it where it makes the *opponent* passive.
+
+✅ **Caps that remain unchanged:**
 - Proc-rate boosts are **additive percentage points, never multipliers** —
   e.g. `+10pp` (25% → 35%), with a **hard ceiling around +15pp** across all
   gear.
-- Streak thresholds may drop by **at most 1** (3rd → 2nd cast). **Never to
-  "every cast."**
+- Streak thresholds may drop by **at most 1 per source**; reaching every-cast
+  requires stacking an allowlisted effect with retention gear, never a single
+  item.
 - Some effects are **explicitly not modifiable** — above all **Geo's
   Stagger**, whose countable 4th-cast trigger our own design doc calls "the
   best counterplay in the set." Making it every-other-cast destroys the
@@ -947,21 +1047,59 @@ item.
 
 ---
 
-## 8. Rarity ladder 📝 (answers GAME_DESIGN open question #4)
+## 8. Rarity ladder ✅ (answers GAME_DESIGN open question #4)
 
-Proposal: **five rarities mapped 1:1 to the five mote tiers**, so the economy
-reads consistently everywhere.
+✅ **Six rarities**, standard conventions, with colours. The ladder labels
+**both** item rarity and how rare a **mote** of each tier is to obtain:
 
-| Rarity | Mote tier | Rough shape |
+| Rarity | Colour | Motes at this rarity | Items at this rarity |
+|---|---|---|---|
+| **Common** | Light Gray | **Dust** | flat stats only |
+| **Uncommon** | White | **Shard · Crystal** | flat stats, small % |
+| **Rare** | Blue | **Core** | a modifier |
+| **Epic** | Purple | **Heart** | strong modifier, enchantable · ⭐ **sets start here** |
+| **Mythic** | Orange | — | top-tier; rarely obtained |
+| **Legendary** | Iridescent (gold ⇄ teal ⇄ purple) | — | ⭐ **the rarest tier** — e.g. assembled from combinations of incredibly rare high-level boss drops |
+
+✅ **Legendary is strictly rarer than Mythic.** It's a straight ladder to the
+top, not two parallel endgames.
+
+✅ **Both Mythic and Legendary include crafted *and* dropped items.** Neither
+tier is acquisition-locked — "crafted from rare boss components" is an
+*example* of a Legendary, not a definition of the rarity.
+
+✅ **The mote ladder tops out at Epic.** Motes span Common→Epic only; the two
+highest rarities have no mote tier — so there's no 1:1 mapping to preserve
+and no sixth mote tier to invent.
+
+⚠️ **Heart's "Epic" label describes standing, not a drop rate** — Hearts are
+**craft-only** (§6.1), so nothing at that rarity actually drops. Every tier
+*below* Heart does drop directly, at the escalating rarity shown above.
+
+📝 **Set tiers vs rarity** — four set tiers (L30/40/45/50, §3.4) mapped onto
+the top three rarities:
+
+| Set tier | Level | Rarity |
 |---|---|---|
-| Common | **Dust** | flat stats only |
-| Uncommon | **Shard** | flat stats, small % |
-| Rare | **Crystal** | a modifier + set membership |
-| Epic | **Core** | strong modifier, enchantable |
-| Legendary | **Heart** | build-defining; full set bonuses |
+| I | 30 | Epic |
+| II | 40 | Epic |
+| III | 45 | **Mythic** |
+| IV | 50 | **Legendary** |
 
-❓ Are set pieces exclusively Epic+? (Proposal: yes — sets are an endgame
-pursuit; Common/Uncommon are the ladder up to them.)
+The rarity step lands on Tier III, which §3.4 already calls out as the ⭐
+*noticeable jump* — the two ladders reinforce each other instead of drifting.
+
+⚠️ **UI risks in the colour set** (these are the most-repeated visual
+elements in the game, so they're worth getting right early):
+- **Light Gray vs White** is a very low-contrast pair, and it inverts on a
+  light background. Consider a heavier weight difference, an icon frame, or
+  a literal label rather than relying on the swatch alone.
+- **Iridescent needs an animated or gradient treatment**, not a flat colour —
+  it can't be a single hex value in a theme map. Budget for it as a small
+  custom widget, and make sure it degrades to solid gold if animations are
+  reduced or disabled.
+- Most conventions use white for the *baseline* tier; here it's Uncommon.
+  Intentional per Christian, but worth a glance in situ.
 
 ---
 
@@ -997,14 +1135,18 @@ interactions · loot insurance · premium Luck potions · enchant-parity stance.
 
 | # | Question | §|
 |---|---|---|
-| 8 | Set pieces Epic+ only? *(likely — deferred)* | §8 |
-| 36 | ⚠️ **Tidebinder 4pc/5pc are the same bonus twice** (stacks to −2, violating §7.1) — replace one tier | §3.1 |
-| 37 | ✅ **RESOLVED — the guarantees live in the set bonuses.** Voidcaller's bonuses must carry the **info-war identity natively**, not borrow it from an assumed Umbra enchant. Forced by the V2 expansion: Umbra moves from L30 → L45 (TYPE_EFFECTS §0.4), so a L30 Voidcaller has no Umbra to lean on for fifteen levels. Bonuses still TBD | §2.2 |
-| 38 | **Charge retention vs the element cycle**: does retained charge keep the cycle open (never re-picking element, streaks compounding)? Recommended yes — but price it deliberately | §5b.3 |
-| 39 | Potion ordering inside the P3 simultaneity group (proposal: with support; Haste applies) | §6b.3 |
+| 36 | 📝 **TBD, deliberately deferred** — Tidebinder's 4pc and 5pc are the same bonus twice (stacks to −2, violating §7.1). Not a blocker: implementation can proceed with the 5pc as written and the 4pc left blank. ⚠️ **Must be fixed before Tidebinder ships**, and the §7.1 floor must be enforced in code regardless | §3.1 |
+| 37 | 📝 **TBD, deliberately deferred** — Voidcaller's 3/4/5-piece bonuses are all blank. Not a blocker: build the set-bonus framework generically so any bonus shape slots in. ⚠️ **Voidcaller cannot ship without them**, and per the resolved ruling they must carry the **info-war identity natively** rather than borrowing it from an assumed Umbra enchant (Umbra moves L30 → L45 under V2, TYPE_EFFECTS §0.4) | §2.2, §3.1 |
 
-✅ Everything else in this document is decided. The design is ready to move to
-a catalogue pass (concrete items, recipes, drop tables) once #36–38 are ruled.
+✅ **Resolved since the last pass:** set pieces are **Epic+** with a
+**six-rarity** ladder (#8, §8) · charge retention **keeps the element cycle
+open** (#38, §5b.3) · potions are **ordinary priority-3 actions with Haste
+tiebreaks** (#39, §6b.3) · **post-cap XP → 10 XP per Dust, 250/day** (§6.1).
+
+✅ Everything else in this document is decided. The design is ready for the
+catalogue pass (concrete items, recipes, drop tables); #36 and #37 are the
+only gaps, and both are content to fill in rather than architecture to
+settle.
 
 ### Watch items (not blockers)
 

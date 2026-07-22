@@ -95,6 +95,124 @@ a draw" rule (draws dropped from ~12% to ~0% in AI-vs-AI sims once Haste was add
 - MoM1: everyone started at 100 HP.
 - ✅ MoM2: base HP modified by **equipment**.
 
+### Combat stats — 📝 NEW (accuracy, crit, deflection)
+
+Six stats that sit underneath every attack. They exist mainly so **equipment
+has numbers to move** that aren't just flat damage, and so defensive builds
+have an axis other than shields.
+
+| Stat | Lives on | Default |
+|---|---|---|
+| **Accuracy** | spell (+ gear) | **100%** for every shipped spell · **can exceed 100%** |
+| **Dodge** | mage (gear) | 0% · subtracts from accuracy |
+| **Crit Chance** | mage (gear) | **0%** |
+| **Crit Damage** | mage (gear) | +50% *(the bonus when a crit lands)* |
+| **Deflection Chance** | mage (gear) | 0% |
+| **Deflection Amount** | mage (gear) | — *(% of damage reduced on proc; **capped at 50% for players**)* |
+
+✅ **Crit Chance starts at 0 on purpose.** Crit and Crit Damage are a pair;
+until gear grants chance, crit damage is inert. That keeps the early game
+clean and makes the first crit item feel like an unlock rather than a
+percentage nudge.
+
+#### One hit roll, not two ⭐
+
+⚠️ **Blind already implements a miss chance** (TYPE_EFFECTS §4.1). Two
+independent miss systems would double-roll every attack and make the numbers
+unreadable. So **Blind is re-expressed as a flat −50 accuracy penalty** and
+folded into a single subtraction:
+
+```
+hitChance = spellAccuracy + gearAccuracy − targetDodge − blindPenalty
+```
+
+- ✅ **Pure subtraction, one calculation, no clamp at 100%.** Accuracy above
+  100% is real and useful: **120% accuracy vs 30% dodge still hits 90% of the
+  time.** That makes accuracy the natural counter-pick to a dodge build —
+  exactly the adaptive tech-slot role ITEMS §2.2 wants — instead of a stat
+  that's wasted the moment it's maxed.
+- ✅ **Blind is a flat −50**, matching its old 50% miss chance.
+- One RNG draw per hit, from the shared per-turn seed; one number to show.
+- Astral's Blind exemption becomes "drop the blind term" — same behaviour,
+  no special case in the roll.
+- 📝 **0% hit chance is reachable, and that's allowed.** No hard floor. An
+  all-in dodge build *may* temporarily zero out an attacker; the guardrail is
+  **content design** — items and spells tuned so it's unlikely and
+  short-lived — not a clamp in the engine.
+  ⚠️ **Keep it temporary.** A permanent 0% state is the same "opponent no
+  longer gets to play" failure that got Waterlogged capped at every-3rd
+  (ITEMS §7.1). Reaching 0 through a *status with a duration* is fine;
+  reaching it through flat stat totals that never expire is not. Worth
+  holding those two rulings side by side when tuning dodge gear.
+
+#### Deflection — damage reduction
+
+✅ **Deflection reduces the damage you take. It does not bounce it back.**
+Take a 100-damage hit with 20% deflection and you take **80** — the other 20
+is simply gone.
+
+```
+on proc:  taken = damage × (1 − deflectionAmount)
+```
+
+- ✅ **Cap deflection at 50% for players.** 📝 Note the wording — the cap is a
+  *player* cap, so enemies and bosses may be tuned past it.
+- 💡 **"Reflection" is a separate modifier worth adding on top** — a late-game
+  perk that sends the *deflected* portion back at the attacker. Distinct from
+  deflection itself; deflection is the defensive base, reflection is the
+  optional aggressive rider.
+- ✅ **Reflection chains terminate on their own, so let them chain.** 100
+  deflected/reflected at 20% → they take 20 → they deflect and reflect →
+  you take 4 → 1 → done. It's geometric decay, and with the 50% player cap
+  the worst case still halves each bounce. 📝 Two implementation notes:
+  **round down** so it provably reaches 0, and keep the arithmetic integer so
+  both clients terminate on the identical step. A very niche interaction —
+  it needs a small late-game subset of effects on *both* mages — but it
+  should be correct rather than special-cased.
+- ✅ **Deflection resolves before Astral's pierce split** — pierce governs how
+  the *remaining* damage is routed.
+
+#### Multi-hit ⚠️
+
+Crit and deflection both **roll per hit**, so Flurry (×3) and Volley (×4) make
+three and four rolls. That deliberately makes multi-hit spells
+**low-variance** crit carriers and single big spells high-variance — a real
+build axis, and one more reason ITEMS §7.3 flags multi-hit + on-hit effects as
+a thing to watch.
+
+#### Should these be element effects?
+
+🚫 **Recommend no — keep them on equipment.** Every element already carries a
+side-effect; a second one each would double the mechanics a player must hold
+in their head and blur identities that took a whole design pass to separate.
+
+✅ **The one exception is a merge, not an addition:** Blind becomes an
+accuracy debuff (above). That removes a system rather than adding one.
+
+💡 **Flavour without new mechanics:** let gear *roll* these stats with
+elemental affinity — Aero gear favours **dodge**, Geo **deflection**, Electro
+**crit chance**, Pyro **crit damage**, Solar **accuracy**. The fantasy lands
+and the rules stay where they are.
+
+#### Spell accuracy — do not retrofit the shipped spells
+
+⚠️ **Low accuracy on a high-charge spell is the worst feel in the game.**
+Missing a Cataclysm after five turns of charging isn't tension, it's a
+wasted session. So:
+
+- ✅ **Every shipped spell stays at 100%.** Accuracy exists so that *dodge*
+  has something to reduce, not to make current spells unreliable.
+- 💡 If low-accuracy spells are wanted later, put them on **cheap, high-value
+  gamblers** where a miss costs one turn — never on the 4–5 cost payoffs.
+- ⭐ **The more interesting lever is accuracy above 100%**: a spell at 110%
+  reads as *inevitable* and is the clean answer to a dodge build. Good fit
+  for Cataclysm (the spell you saw coming and couldn't avoid) or the quick
+  attacks.
+
+📝 Precedence integration is specified in
+[TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) §5.2; gear modifiers in
+[ITEMS_DESIGN.md](ITEMS_DESIGN.md) §4.
+
 ---
 
 ## 2. Elements
@@ -453,12 +571,19 @@ Consequences worth being deliberate about:
   from an endgame curve. Sim against it.
 - ✅ **Difficulty becomes gear-driven, not XP-driven, past 50.** That is the
   intended endgame loop: the Tier III/IV set chase *is* the progression.
-- ❓ **What happens to XP earned after the cap?** It needs a sink — motes,
-  currency, or a paragon-style trickle. Currently undefined.
-- ❓ **What is one enemy level worth** in HP and damage? The whole scheme
-  rests on that constant: too steep and L58 zones are impassable, too shallow
-  and out-levelled content is trivial. Needs a number before these zones can
-  be tuned.
+- ✅ **Post-cap XP converts to motes** — **10 XP → 1 Dust, capped at 250 Dust
+  per day**, as a daily-play hook. Sizing and caveats in
+  [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §6.1; it's a trickle, not a path.
+- ✅ **Enemy HP and damage are set per-monster, not by a global per-level
+  constant.** Two monsters of the same level can differ sharply — some tanky,
+  some damage-heavy. That's the better design; it's what makes a zone's
+  roster feel varied rather than reskinned.
+  ⚠️ **But without a single constant there is no automatic difficulty
+  curve.** The enemies pass (IMPLEMENTATION_PLAN Phase 6) therefore needs a
+  **baseline statline per level** that archetypes deviate *from* — tank
+  +HP/−damage, glass −HP/+damage, comparable totals. Otherwise "gear is worth
+  about ten levels" has nothing to be measured against, and the L45–60 band
+  can be neither tuned nor simmed.
 - ⚠️ **The level shown on a zone is now the *enemy* level, not a
   requirement.** The UI has to make that unmistakable, or players will read
   "58–60" as "come back when you're 58" and never return — the same
@@ -476,9 +601,10 @@ map teaches **seven** through hybrid zones:
 
 The remaining four hybrids (Frostfell, Molten Deep, Tidewrack, Shattered
 Orrery) are *cross-tier or neutral* pairings that exist for flavour and for
-the macro-tier loop rather than for a counter edge. ❓ Add five more zones to
-close the gap, or accept that some edges are learned in duels rather than in
-the world? Ethereal being fully closed is deliberate — the endgame tier is
+the macro-tier loop rather than for a counter edge. ✅ **Accepted as-is** —
+the five untaught edges get learned in duels rather than in the world, and
+more zones can be added later if that proves to be a gap. Ethereal being
+fully closed is deliberate — the endgame tier is
 where the counter game has to be second nature.
 
 **Old draft (superseded, kept for names only):**
