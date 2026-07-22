@@ -145,12 +145,20 @@ level — high-level players crafting trash get trash XP, which keeps the
 | **10** | **3** | — | Surge, Volley |
 | **15** | — | **Tier 2 — Kinetic** (Electro, Aero, Geo) | Leech, Discharge |
 | **20** | **4** | — | Ruin, Barrier, Barrage |
-| **25** | — | — | Overload, Empower, Rampart |
+| **25** | — | — | Overload, Empower, Rampart, Hallow 📝 |
 | **30** | — | **Tier 3 — Celestial** (Solar, Lunar, Astral) 📝 | Phase |
 | **35** | — | — | Jolt, Flurry, Bulwark, Hasty |
 | **40** | **5** | — | Cataclysm, Sanctuary, Drain |
 | **45** | — | **Tier 4 — Ethereal** (Sanctus, Umbra, Arcane) 📝 | — |
 | **50** | — | — | max level |
+
+📝 **The level cap stays 50, but Ethereal *content* runs to enemy level 60**
+(GAME_DESIGN §5). The last three Ethereal zones are deliberately above your
+level — you close a gap of up to ten levels with **equipment**, not XP. Two
+things this schedule doesn't yet answer: ❓ where **post-cap XP** goes (it
+needs a sink — motes, currency, or a paragon trickle), and ❓ **what one
+enemy level is worth** in HP and damage, which is the constant the whole
+endgame curve rests on.
 
 📝 **Revised for the V2 expansion** (TYPE_EFFECTS_DESIGN §0): the old Tier 3
 (Radiant/Umbra/Arcane) became Tier 4 **Ethereal** at L45, with Radiant renamed

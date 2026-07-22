@@ -545,11 +545,11 @@ against exactly the shields it exists to beat. **Implement Order A.**
   step 5, after all damage modifiers and before shield application: compute
   final damage, split off `round(damage × 0.05 × stacks)` to health, run the
   remainder through normal shield math.
-- ❓ **Open — Barrier:** does Alignment pierce a **Barrier** (2-charge, blocks
-  100% of all damage, dies to the first hit)? Recommend **yes** — 20% gets
-  through and the Barrier still pops. A Barrier that hard-stops the one
+- ✅ **Barrier is pierced too.** Against a **Barrier** (2-charge, blocks 100%
+  of all damage, dies to the first hit), the Alignment percentage still gets
+  through **and the Barrier still pops**. A Barrier that hard-stopped the one
   mechanic built to beat shields would make Astral a dead pick into any
-  Barrier deck. ✅ Confirm.
+  Barrier deck.
 - ⚠️ **Watch (stacking with Phase):** the aux spell `Phase` already grants
   100% shield bypass for one attack. 5 stacks + Phase is not additive past
   100% — Phase simply wins that turn. Make sure the engine can't double-route
@@ -602,15 +602,26 @@ is now a **streak element with no healing at all**.
   the anti-stall sudden-death clock (§8); an element that switches it off
   rebuilds the exact stall meta it exists to kill.
 
-⚠️ **Open concern — Sanctus can still be a dead pick.** With healing removed,
-Absolution is Sanctus's *only* effect, and it does nothing unless the
-opponent is applying debuffs. Roughly half the roster applies none at all
-(Flora, Aero, Astral, Umbra, Arcane are self-buff elements) — against those,
-Sanctus's element identity is blank for the whole duel while every other
-element is doing something. 💡 **Cheap fix that adds no healing:** if
-Absolution fires with **no debuff to remove**, bank a **Ward** — the next
-debuff applied to you is blocked outright (max 1). Same trigger, same
-commitment, never wasted. ❓ Adopt?
+✅ **Never a dead cast — Absolution banks Grace.** With healing removed,
+Absolution would otherwise do nothing at all against the five elements that
+apply no debuffs (Flora, Aero, Astral, Umbra, Arcane are self-buff
+elements) — Sanctus's identity would be blank for whole duels through no
+fault of the player. So:
+
+> **If Absolution fires with no debuff to remove, you gain **Grace**
+> instead.** The next debuff applied to you is blocked outright.
+
+- ✅ **Grace: max 1, no stacking, persists until consumed.** It does not
+  expire on its own — same shape as Empower's banked "next spell" (and the
+  §7 ruling that Stagger lingers until consumed).
+- ⚠️ **Naming:** the working name for this was "Ward," which **collides with
+  the shipped `Ward` spell** (1-charge shield, priority 3,
+  [spellbook.dart](packages/mom_engine/lib/src/spellbook.dart)). **Grace** is
+  the name; alternates considered and free: Benediction, Reprieve, Sanctity.
+- ✅ Grace does **not** block Fatigue, for the same reason Absolution can't
+  purge it.
+- ✅ **`Hallow`** (§4c.4) is the element-agnostic spell that grants the same
+  buff. Both sources share the max-1 cap.
 
 ### 4c.2 Sanctus → Umbra — consecration burns the dark 📝
 
@@ -633,28 +644,59 @@ goes back to being three committed casts away.
 - ✅ Consistent with §5.4 — the Sanctus streak is an ordinary consecutive
   counter, and this is simply another thing that resets it.
 
-⚠️ **Balance concern — as written this is an off switch, not a counter.**
-Sanctus needs **three consecutive** casts to get anything at all. If *any*
-Arcane attack resets the counter, then an Arcane player who attacks every
-turn — the normal way to play Arcane — means the Sanctus player's counter
-**never exceeds 1 and Absolution never fires once in the entire duel**. Every
-other within-tier edge in this document degrades the loser's mechanic; this
-one deletes it.
+✅ **Un-gated is correct — the gate is Arcane's own economy.** A concern was
+raised that an Arcane player attacking every turn would hold the Sanctus
+counter at 1 forever and Absolution would never fire. It doesn't hold,
+because **Arcane is the big-spell element**: its whole identity is cost-4+
+casts, which means spending most turns **charging**, and charging is not a
+cast and therefore **resets nothing** (definition 1). A big-Arcane player
+naturally attacks roughly once every five turns — easily slow enough for a
+Sanctus player to string three together.
 
-💡 Three ways to keep the flavour without the lockout, cheapest first:
+To *deny* Sanctus, the Arcane player must throw **cheap attacks every
+turn** — and every cheap attack is a turn that earns **no Arcane Knowledge
+stack**. That is exactly the shape a good counter should have: available,
+effective, and paid for in the counter-er's own currency. The Arcane player
+chooses between building damage and suppressing the cleanse; they don't get
+both.
 
-1. **Reset by 1 instead of to 0** — a setback that costs the Sanctus player a
-   turn of tempo rather than the whole mechanic. ⭐ Recommended.
-2. **Gate it behind cost 4+** (the same threshold that earns an AK stack) —
-   consistent with the doc's "spending is the commitment" rule, and it gives
-   the Sanctus player a read: *they're charging to 4, my streak is about to
-   break.*
-3. **Require the attack to actually deal damage to health** — fully-shielded,
-   missed, and fizzled attacks wouldn't reset (already the §5.4 rule for
-   every other trigger, so this is arguably the default anyway).
+- ✅ Fizzled, missed, and fully-shielded attacks follow the §5.4 rule and
+  **do not** reset the streak (nothing triggers, nothing is penalized).
 
-❓ Which? The doc currently records the un-gated version as specified; pick
-one before this reaches the engine.
+### 4c.4 New spell — `Hallow` 📝
+
+An **element-agnostic aux spell** that grants **Grace** (§4c.1) directly, so
+status defence isn't locked behind playing Sanctus. Sanctus earns Grace as a
+consolation prize; `Hallow` lets any loadout buy it deliberately.
+
+| Field | Value |
+|---|---|
+| **Name** | **Hallow** ✅ *(checked against all 25 shipped spell ids — no collision)* |
+| **Charge cost** | **2** |
+| **Priority** | **7** (aux) |
+| **Effect** | Gain **Grace**: the next debuff applied to you is blocked outright |
+| **Unlock** | 📝 **L25**, alongside Overload / Empower / Rampart |
+
+- ✅ **Name checked.** The shipped roster is Aegis · Barrage · Barrier ·
+  Blast · Bolt · Bulwark · Cataclysm · Discharge · Drain · Empower · Flick ·
+  Flurry · Hasty · Jolt · Leech · Overload · Phase · Quicken · Rampart ·
+  Ruin · Sanctuary · Sap · Surge · Volley · **Ward**. "Hallow" is free, is a
+  terse verb like Ruin/Phase/Surge/Jolt, and echoes **Hallowmarch**, the
+  Sanctus region (GAME_DESIGN §5). Alternates also free: *Anoint*,
+  *Consecrate*, *Benediction*, *Vigil*.
+- ✅ **Shares the max-1 Grace cap with Absolution** — casting `Hallow` while
+  already holding Grace is a wasted turn, exactly like re-casting Empower.
+- ⚠️ **Priority 7 means quick attacks beat it.** A priority-5 Jolt or Flick
+  lands its proc *before* Grace exists, so `Hallow` is a **pre-emptive** tool,
+  not a reaction to an attack you can see coming. Deliberate: shields already
+  occupy the fast defensive slot at priority 3, and a reactive
+  status-immunity at that speed would be strictly better than they are.
+- ❓ **Open:** does `Hallow` belong to a single element or stay neutral like
+  Empower/Quicken/Phase? Recommend **neutral** — it's the counterplay to
+  every status element, and binding it to one element would hand that element
+  a monopoly on status defence.
+- 💡 Later: a 4-charge upgrade that grants **2** Grace, if playtests show one
+  isn't worth a turn.
 
 ---
 
@@ -844,6 +886,17 @@ unknowns worth monitoring are in §8.)
 ---
 
 ## Changelog
+
+**Rev 9 (rulings)** — Astral Alignment **pierces Barrier** too (the Barrier
+still pops). Arcane→Sanctus stays **un-gated**: the earlier lockout worry
+doesn't hold, because Arcane is the big-spell element and spends most turns
+*charging*, which resets nothing — denying Sanctus costs the Arcane player
+their Arcane Knowledge stacks, which is exactly the right price. Sanctus's
+no-debuff consolation prize adopted and renamed **Grace** (the working name
+"Ward" **collides with the shipped `Ward` spell**). New element-neutral aux
+spell **`Hallow`** (2 charge, priority 7, L25) grants Grace directly, so
+status defence isn't locked behind one element; name checked against all 25
+shipped spell ids.
 
 **Rev 8 (effect revisions)** — Astral's effect renamed **Astral Alignment**
 (final). Clarified that the pierce **splits** an attack — the non-pierced

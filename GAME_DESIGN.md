@@ -221,6 +221,9 @@ MoM2 adds **spell slots** unlocked via leveling.
 - **Quicken** (2) — next offensive spell executes before enemy defensives
 - **Phase** (3) — next offensive spell ignores shields
 - **Hasty** (0) — seizes Haste, nothing else
+- 📝 **Hallow** (2) — gain **Grace**: the next debuff applied to you is
+  blocked outright (max 1, persists until consumed). Element-neutral. New in
+  V2 — full spec in [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) §4c.4
 - **Discharge** (3) — removes ALL of the opponent's charge, no damage (fizzles a
   same-turn Barrage since it's faster)
 - **Overload** (2) — a full attack (respects shields, benefits from Empower/Phase)
@@ -422,28 +425,44 @@ within-tier counter edge.
 | **The Shattered Orrery** | hybrid — *a broken model of the heavens* | Astral + Electro | 40–44 |
 | **Vespergate** | 🚪 threshold town — **unlocks Ethereal (L45)** | — | — |
 
-#### Ring 4 · Ethereal · **L45–50+** ⚠️ *see the squeeze below*
+#### Ring 4 · Ethereal · **L45–60** ✅ *enemies out-level you; gear closes the gap*
 
-| Region | Type | Elements | Lv |
+| Region | Type | Elements | Enemy Lv |
 |---|---|---|---|
-| **Hallowmarch** | pure — *a consecrated causeway* | Sanctus | 45–47 |
-| **The Umbral Wastes** | pure | Umbra | 46–48 |
-| **The Collapsed Academy** | pure — *a school that read too far* | Arcane | 48–50 |
-| **The Reliquary Deep** | hybrid — *sanctity buried in the dark* | Sanctus + Umbra *(Sanctus ▸ Umbra)* | 50 · gear-gated |
-| **The Unwritten Library** | hybrid — *knowledge that eats its keeper* | Umbra + Arcane *(Umbra ▸ Arcane)* | 50 · gear-gated |
-| **The Eclipsed Citadel** | 🏰 **final dungeon** | Arcane + Sanctus *(Arcane ▸ Sanctus)* | 50 · gear-gated |
+| **Hallowmarch** | pure — *a consecrated causeway* | Sanctus | 45–49 |
+| **The Umbral Wastes** | pure | Umbra | 47–51 |
+| **The Collapsed Academy** | pure — *a school that read too far* | Arcane | 50–54 |
+| **The Reliquary Deep** | hybrid — *sanctity buried in the dark* | Sanctus + Umbra *(Sanctus ▸ Umbra)* | 52–56 |
+| **The Unwritten Library** | hybrid — *knowledge that eats its keeper* | Umbra + Arcane *(Umbra ▸ Arcane)* | 54–58 |
+| **The Eclipsed Citadel** | 🏰 **final dungeon** | Arcane + Sanctus *(Arcane ▸ Sanctus)* | 58–60 |
 
-⚠️ **Structural problem — the Ethereal band is only five levels wide.** Max
-level is 50 and Ethereal unlocks at 45, so the entire Tier 4 region set has
-to fit into L45–50 while Primal gets fourteen levels. Three options:
+✅ **The Ethereal band runs to enemy level 60 while the player cap stays at
+50.** The last three zones are deliberately **above your level** — you close
+a gap of up to **ten levels with equipment**, not with XP. This solves the
+five-level squeeze (Tier 4 would otherwise have had to fit into L45–50 while
+Primal got fourteen levels) without raising the cap or pulling the Ethereal
+unlock earlier, which would reopen the L30–44 gap (TYPE_EFFECTS §0.4) from
+the other side.
 
-1. ⭐ **Make Ethereal zones post-cap and gear-gated, not level-gated** — you
-   arrive at 50 and progress through them on equipment, which is exactly what
-   [ITEMS_DESIGN.md](ITEMS_DESIGN.md)'s Tier III/IV set chase is for. This is
-   the recommendation, and it's what the table above assumes.
-2. Raise the level cap above 50.
-3. Move the Ethereal unlock earlier — but that reopens the L30–44 gap
-   (TYPE_EFFECTS §0.4) from the other side.
+Consequences worth being deliberate about:
+
+- ⭐ **It quantifies the gear power budget.** [ITEMS_DESIGN.md](ITEMS_DESIGN.md)
+  already asserts that full best-in-slot beats fully naked ≈ 100% of the
+  time; this pins a number to it — **gear must be worth about ten levels**.
+  The two documents now constrain each other, which is exactly what you want
+  from an endgame curve. Sim against it.
+- ✅ **Difficulty becomes gear-driven, not XP-driven, past 50.** That is the
+  intended endgame loop: the Tier III/IV set chase *is* the progression.
+- ❓ **What happens to XP earned after the cap?** It needs a sink — motes,
+  currency, or a paragon-style trickle. Currently undefined.
+- ❓ **What is one enemy level worth** in HP and damage? The whole scheme
+  rests on that constant: too steep and L58 zones are impassable, too shallow
+  and out-levelled content is trivial. Needs a number before these zones can
+  be tuned.
+- ⚠️ **The level shown on a zone is now the *enemy* level, not a
+  requirement.** The UI has to make that unmistakable, or players will read
+  "58–60" as "come back when you're 58" and never return — the same
+  legibility lesson as the move timer and Midnight.
 
 📝 **Counter-edge coverage.** Of the twelve within-tier counter edges, the
 map teaches **seven** through hybrid zones:
