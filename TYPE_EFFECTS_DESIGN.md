@@ -7,7 +7,7 @@ Haste referenced here are defined there.
 Legend: ✅ decided · 📝 draft (needs review) · 💡 idea bank · ❓ open question · ⚠️ balance/abuse concern
 
 Status: ✅ **Tiers 1–3 shipped (v0.9.0).** ⚠️ **A V2 expansion is now planned —
-see §0 — which adds a fourth tier, renames Radiant→Holy, and changes the
+see §0 — which adds a fourth tier, renames Radiant→Sanctus, and changes the
 shield counter math. Everything below §0 describes the SHIPPED nine-element
 system and remains the source of truth until the expansion lands.**
 
@@ -30,35 +30,27 @@ Waterlogged (+10 priority, "your next action goes last") is better.
 | 1 | **Primal** | Aqua · Pyro · Flora | ✅ shipped |
 | 2 | **Kinetic** | Electro · Aero · Geo | ✅ shipped |
 | 3 | **Celestial** ⭐ NEW | **Solar · Lunar · Astral** | 📝 new tier |
-| 4 | **Ethereal** *(was Tier 3)* | **Holy** *(was Radiant)* · Umbra · Arcane | 📝 renumbered |
+| 4 | **Ethereal** *(was Tier 3)* | **Sanctus** *(was Radiant)* · Umbra · Arcane | 📝 renumbered |
 
 ✅ **Solar inherits the old Radiant Blind mechanic** verbatim (10% per charge
-spent, 50% miss for 3 turns). **Holy** keeps the Ethereal slot but needs a
+spent, 50% miss for 3 turns). **Sanctus** keeps the Ethereal slot but gets a
 **brand-new effect** — the rename exists because "Radiant" and "Solar" read
 as the same concept.
 
-📝 **Three effects still to design: Holy, Lunar, Astral.**
+✅ **All three new effects are designed — see §4b (Celestial) and §4c
+(Ethereal repairs).**
 
-✅ **Naming:** **Umbra** confirmed (matches shipped code). **Holy** confirmed
-as the concept — ❓ but its *name* is under review: every other element is
-Latin or Greek (Aqua, Flora, Umbra, Arcane = Latin; Pyro, Aero, Geo, Electro
-= Greek; Solar, Lunar, Astral = Latin), and **"Holy" is the lone Germanic
-outlier**. Candidates in §0.5.
+✅ **Naming final:** **Umbra** (matches shipped code) and **Sanctus** (§0.5).
 
-### 0.5 ❓ A Latin/Greek name for Holy
+### 0.5 ✅ Holy is renamed **Sanctus**
 
-| Candidate | Root | Fit |
-|---|---|---|
-| **Sanctus** | Latin *sanctus*, "holy, consecrated" | The most literal translation; instantly readable |
-| **Numen** ⭐ | Latin *numen*, "divine presence / a god's will" | Distinctive, not games-clichéd, and means *divinity* rather than *brightness* — which matters now that Solar owns light |
-| **Theo** | Greek *theós*, "god" | Matches the **-o** pattern of Pyro/Aero/Geo/Electro exactly; shortest |
-| **Hieros** | Greek *hierós*, "sacred" | Good root, but reads obscure in a UI |
-
-📝 Recommendation: **Numen** or **Theo**. Numen is the most evocative and
-avoids any light/sun connotation (important now that Solar exists); Theo is
-the tidiest pattern-match with the Greek -o elements. *Avoid* Empyrean
-(contains "pyr"), Aether and Caelum (collide with the Ethereal and Celestial
-tier names), and Lux/Lumen (light belongs to Solar).
+Latin *sanctus*, "holy, consecrated." Final. Keeps the roster fully
+Latin/Greek (Aqua · Flora · Umbra · Arcane · Solar · Lunar · Astral ·
+Sanctus = Latin; Pyro · Aero · Geo · Electro = Greek), and reads as
+*consecration* rather than *brightness* — which matters now that Solar owns
+light. Rejected alternates: Numen, Theo, Hieros (considered); Empyrean
+(contains "pyr"), Aether/Caelum (collide with the Ethereal and Celestial tier
+names), Lux/Lumen (light belongs to Solar).
 
 ### 0.2 ⚠️ Consequence: both Tier 3 and Tier 4 effect-webs must be rebuilt
 
@@ -75,13 +67,14 @@ Arcane:
 Because effect-layer interactions are **within-tier only** (§5.6), the
 expansion needs **five new interactions**, not zero:
 
-- **Celestial (new):** Solar→Lunar, Lunar→Astral, Astral→Solar
-- **Ethereal (repair):** Holy→Umbra and Arcane→Holy, replacing the two that
-  Blind's departure broke
+- **Celestial (new):** Solar→Lunar, Lunar→Astral, Astral→Solar — see **§4b**
+- **Ethereal (repair):** Sanctus→Umbra and Arcane→Sanctus, replacing the two
+  that Blind's departure broke — see **§4c**
 
-📝 So "design three effects" is really **design three effects + rewire five
-edges**. Holy's effect in particular has to be something Umbra can be weak to,
-and something Arcane can be immune to or unravel.
+✅ All five are now specified. Note that **Astral→Solar reuses the retired
+Arcane→Radiant mechanic** ("these spells are exempt from Blind") — it follows
+Blind into the Celestial tier rather than being thrown away, and Arcane gets
+a genuinely new anti-Sanctus edge instead.
 
 ### 0.3 ⚠️ New shield counter math (a real balance change)
 
@@ -134,10 +127,12 @@ never simply out-tier everyone. Every other edge rewards progression.
   V2 they become max-level content, and **L30–44 has no info-war or
   damage-stacking element at all**. Two knock-ons: the whole L30–44 band now
   learns Tier 3 through Solar/Lunar/Astral only, and **ITEMS_DESIGN's
-  Voidcaller archetype** — whose counter-loop role leans on Umbra's
-  element-hiding — has no Umbra to lean on until L45, despite set pieces
-  starting at L30. ❓ Acceptable, or should Voidcaller's info-war identity
-  come from its own set bonuses (which §2.2/Q37 already recommends)?
+  Voidcaller archetype** — whose counter-loop role leaned on Umbra's
+  element-hiding — has no Umbra until L45, despite set pieces starting at
+  L30. ✅ **Resolved: Voidcaller gets its own info-war identity from its set
+  bonuses**, independent of Umbra (per §2.2/Q37). Partial relief for the
+  L30–44 hole also arrives via **Lunar's New Moon phase**, which veils the
+  caster's element for one turn in four (§4b.2).
 - **ITEMS_DESIGN:** element enchants go from 9 to 12 (5 archetypes × 12 =
   **60** endgame builds); mote types gain three elements; the Voidcaller
   archetype's info-war identity leans on Umbra, which is now a *later* tier.
@@ -331,7 +326,13 @@ Geo grounds Electro.**
 
 ---
 
-## 4. Tier 3 — The Ethereal Forces
+## 4. Tier 3 — The Ethereal Forces ✅ SHIPPED *(becomes Tier 4 under V2)*
+
+⚠️ **Read this section as shipped-today truth.** Under the V2 expansion (§0)
+this tier is renumbered **Tier 4**, **Radiant is renamed Sanctus and loses
+Blind** (Blind moves to the new Tier 3 element **Solar**, §4b.1), and two of
+the three effect-layer edges below are replaced — see **§4c**. Umbra and
+Arcane are unchanged apart from their unlock level (L30 → L45).
 
 Rule-bending late-game mechanics. **Triangle: Radiant banishes Umbra, Umbra
 corrupts Arcane, Arcane unravels Radiant.**
@@ -402,6 +403,198 @@ corrupts Arcane, Arcane unravels Radiant.**
 
 ---
 
+## 4b. Tier 3 — The Celestial Forces 📝 (V2, not implemented)
+
+The sky tier. Where Primal is elemental matter and Kinetic is force,
+Celestial is **timing and position**: a public clock, a rhythm to schedule
+around, and a way to stop being where the shield is.
+
+**Triangle: Solar eclipses Lunar, Lunar anchors Astral, Astral slips Solar.**
+
+| Counter | Shield layer | Effect layer |
+|---|---|---|
+| Solar → Lunar | Solar attacks ×2 vs Lunar shields | A **Blind proc locks the moon at New Moon** for the 3-turn Blind window — a literal eclipse |
+| Lunar → Astral | Lunar attacks ×2 vs Astral shields | A **Lunar attack strips 1 Displacement stack**; on **Full Moon it strips all** |
+| Astral → Solar | Astral attacks ×2 vs Solar shields | **Astral spells are exempt from Blind** — they never miss |
+
+*(Astral→Solar is the retired Arcane→Radiant mechanic, following Blind into
+its new tier rather than being discarded — see §0.2.)*
+
+### 4b.1 Solar — Blind ✅ *(inherited verbatim from Radiant)*
+
+Spec unchanged from §4.1: **10% per charge spent**, opponent's next 3 turns
+each carry a **50% miss chance on offensive spells**, re-proc refreshes,
+rolls on attack including fully-shielded hits. Only two things change:
+
+- The **immunity** edge moves from Arcane to **Astral** (§4b table).
+- The **cleanse** edge moves from "clears Creeping Dark" to "**locks the
+  moon**" (§4b.3), because Umbra is now a different tier.
+
+⚠️ **A Blind proc no longer clears Creeping Dark.** That job passes to
+Sanctus's Absolution (§4c.1) — otherwise Umbra would have gained a free
+buff out of the renumbering.
+
+### 4b.2 Lunar — Phases of the Moon 📝
+
+**The only public, shared, fully-deterministic piece of state in the game.**
+
+- ✅ **A single global clock, not a personal one.** The moon advances **every
+  turn** regardless of what either player casts: `phase = turnNumber mod 4`,
+  starting at **New Moon on turn 1**. It is **visible to both players at all
+  times**, along with a preview of the next phase.
+- **You do not control the moon — you schedule around it.** That is the whole
+  identity. Every other element rewards *doing a thing*; Lunar rewards
+  *doing the right thing on the right turn*. It's a planning element in a
+  simultaneous-turn game, which is exactly where planning has teeth.
+- ✅ **Phase effects modify Lunar spells only** — they never touch your other
+  elements. Both players get the same moon, so a Lunar mirror is symmetric.
+
+| Turn mod 4 | Phase | Effect on **your Lunar spells** |
+|---|---|---|
+| 1 | 🌑 **New Moon** | Attacks **−25%**. Your cast is **veiled**: the opponent cannot see which element you charged or cast this turn |
+| 2 | 🌒 **Waxing** | Attacks **+25%** |
+| 3 | 🌕 **Full Moon** | Attacks **+50%** |
+| 0 | 🌘 **Waning** | Lunar **shields +50% strength** and Lunar **heals +50%**; attacks unmodified |
+
+- **Rhythm: hide → build → strike → defend.** No dead beat, one clear peak,
+  one clear trough. Average attack modifier across the cycle is **+12.5%**,
+  paid for by a forced weak turn — cheap on paper, but the real cost is that
+  a Lunar player's best turn is *public knowledge*, so the opponent can
+  pre-shield Full Moon or bait the New Moon trough.
+- ✅ **New Moon's veil partly fills the L30–44 info-war hole** left by Umbra
+  moving to L45 (§0.4) — one veiled turn in four, no stacking, no
+  accumulation. A taste of the mechanic, not a replacement.
+- ✅ **Determinism:** derived from the turn counter, so it needs no RNG, no
+  state sync, and no netcode work at all. Both clients compute it.
+- ❓ **Fatigue interaction:** at turn 50+ the duel is on the sudden-death
+  clock. The moon keeps turning; no special case. Confirm that's fine.
+- ⚠️ **Watch:** a 4-turn cycle against duels that typically run 10–25 turns
+  means 3–6 full cycles. If playtests show Lunar players simply passing on
+  New Moon, the trough is too deep — soften to −15% before touching the peak.
+
+### 4b.3 Solar's eclipse — the Solar → Lunar edge 📝
+
+When a **Blind proc** lands on a mage, their moon is **locked at 🌑 New Moon**
+for the same 3-turn window. Not "reset to New Moon" — *frozen* there.
+
+- Destroys the Lunar player's entire rhythm rather than shaving a number off
+  it, which is what an effect-layer counter should do.
+- The lock is **per-mage**, not global: the Solar caster's own moon keeps
+  turning. So the global clock stays global, and the eclipse is a personal
+  affliction — consistent with how every other debuff works.
+- Stacks naturally with Blind's own 50% miss chance; a blinded Lunar mage is
+  missing half their casts *and* stuck at −25%. That's the intended weight of
+  a within-tier counter.
+
+### 4b.4 Astral — Displacement 📝
+
+- ⚠️ **Naming:** the working name for this was "Phase Shift," but **`Phase`
+  is already a shipped aux spell** ("next offensive spell ignores shields",
+  GAME_DESIGN §3). "Phase" and "Phase Shift" in the same battle log is a
+  readability trap. ✅ Renamed **Displacement**; individual stacks are
+  **Drift**. Same mechanic, unambiguous log lines.
+- ✅ **Trigger:** **+1 stack for each turn you cast an Astral spell**, at any
+  cost. **Max 5.**
+- ✅ **Decay:** **−1 per turn** in which you cast no Astral spell (same shape
+  as Photosynthesis, §2.3). Charging neither grants nor decays.
+- ✅ **Effect:** **5% of your damage per stack bypasses shields entirely** and
+  strikes health directly. At 5 stacks, **25% always gets through**.
+- ✅ **The pierced portion ignores the shield's counter math.** It never
+  touches the shield, so it is never multiplied by the ×2 / ×0.5 / ×1.5 /
+  ×0.75 shield table (§0.3) — it lands on health at **100%**. This is the
+  point: Displacement is worth *most* exactly when the shield matchup is
+  worst for you. In a 50%-into-their-shield matchup, your 25% pierce is the
+  only full-value damage you have.
+- ✅ **Role: the designed anti-turtle answer**, and a deliberately *sharp*
+  one — against an unshielded opponent Displacement does **literally
+  nothing**, since all damage was hitting health anyway. That's not a flaw to
+  patch; it's what keeps a 25% unconditional-sounding number honest.
+- **Contrast with the other stackers, on purpose:** Arcane rewards *big*
+  casts (cost 4+), Umbra rewards *charge dumped*, Astral rewards
+  **consistency** — cast it every turn or watch it drain.
+- ⚠️ **Precedence:** damage *routing* is a new step. Insert into §5.2 as
+  step 4b, after all damage modifiers and before shield application:
+  compute final damage, split off `round(damage × 0.05 × stacks)` to health,
+  run the remainder through normal shield math.
+- ⚠️ **Watch (stacking with Phase):** the aux spell `Phase` already grants
+  100% shield bypass for one attack. 5 stacks of Displacement + Phase is not
+  additive past 100% — Phase simply wins that turn. Make sure the engine
+  can't double-route the same damage.
+- ⚠️ **Watch (ITEMS):** this directly attacks the **Aegis Sovereign**
+  archetype, on top of the §0.3 shield-math change already hitting it. Two
+  nerfs from two directions in one expansion; sim before shipping either.
+
+---
+
+## 4c. Tier 4 repairs — Sanctus 📝 (V2, not implemented)
+
+The two Ethereal edges that Blind's departure broke (§0.2), rebuilt around
+Sanctus's own mechanic.
+
+| Counter | Shield layer | Effect layer |
+|---|---|---|
+| Sanctus → Umbra | Sanctus attacks ×2 vs Umbra shields | **Absolution strips 5 Creeping Dark stacks** from the opponent — consecration burns off the dark |
+| Umbra → Arcane | *(unchanged, §4)* | No Arcane Knowledge while under Dusk or Midnight |
+| Arcane → Sanctus | Arcane attacks ×2 vs Sanctus shields | An Arcane attack that **earns an AK stack (cost 4+) suppresses the target's purge** this turn — the heal still lands |
+
+### 4c.1 Sanctus — Absolution 📝
+
+- ✅ **Trigger:** cast a Sanctus spell of **any cost**. Resolves at **end of
+  turn in the heal band (E1–E3)** — before Ignite's E8 tick, so the burn you
+  just cleansed does not get one last hit in. Survivability-first (§5.1).
+- ✅ **Effect:** **purge one debuff** from yourself, and **heal**:
+  - **10 HP** if you had nothing to purge, or
+  - **20 HP** if a debuff was purged.
+- ✅ **Never a dead cast.** This is the whole reason for the two-tier heal: a
+  pure cleanse is miserable against an opponent running no status elements —
+  you'd be holding a card that does nothing through no fault of your own.
+  Sanctus is therefore **the sustain element** first and the cleanse element
+  second: *"Sanctus mends. If you are afflicted, it burns the affliction away
+  and mends the harder."*
+- ⚠️ **Purge order must be a fixed, documented list** — lockstep clients that
+  disagree about *which* debuff was removed diverge immediately. Proposed
+  severity order, highest first:
+  **Blind → Ignite → Waterlogged → Stagger → Static Feedback → (future)**.
+  Sanctus purges exactly one per cast, so a doubly-afflicted mage needs two
+  turns of Sanctus to come clean.
+- ✅ **Purges debuffs only, never your own buffs** — it will not eat your
+  Photosynthesis, Displacement, or Arcane Knowledge stacks.
+- ⚠️ **Numbers are placeholders** (10/20 against 100 max HP, i.e. 10%/20% of
+  a health bar). Sized to be meaningful but not to out-sustain a 3-charge
+  attack. Needs sim.
+- ❓ **Open:** should Absolution be able to purge **Fatigue**? Recommend
+  **no** — Fatigue is the anti-stall sudden-death clock (§8), and an element
+  that turns it off would recreate the exact stall meta Fatigue exists to
+  kill.
+
+### 4c.2 Sanctus → Umbra — consecration burns the dark 📝
+
+Each Absolution strips **5 Creeping Dark stacks** from the opponent — exactly
+one threshold band (§4.2: 5 = Shadow, 10 = Dusk, 15 = Midnight).
+
+- **Softer and more interesting than the old Radiant edge**, which cleared
+  *all* stacks in one proc. Sustained Sanctus play now holds an Umbra mage
+  down a tier of darkness per cast rather than deleting their resource on a
+  coin flip — a grind, not a light switch.
+- The strip is **not** conditional on hitting; casting Sanctus is enough.
+
+### 4c.3 Arcane → Sanctus — the seal 📝
+
+An Arcane attack that **earns an Arcane Knowledge stack** (i.e. cost 4+,
+§4.3) also **suppresses the target's Absolution purge** at end of that turn.
+The heal still resolves at the **10 HP "nothing purged"** rate.
+
+- ✅ **Deliberately gated behind the cost-4+ threshold** rather than firing on
+  any Arcane cast. An ungated version would be near-100% uptime for a
+  committed Arcane player, which is not a counter — it's an off switch. Tying
+  it to AK's existing commitment threshold keeps the doc's "spending is the
+  commitment" rule intact and gives the Sanctus player a read: *they're
+  charging to 4, my cleanse is about to be sealed.*
+- Arcane unravels sanctity but cannot stop it healing — that split is what
+  keeps the edge from being oppressive.
+
+---
+
 ## 5. Cross-cutting rules
 
 ### 5.1 Turn phases — start / main / end resolution ✅
@@ -437,9 +630,16 @@ Fixed, documented order (lockstep clients must agree or state diverges):
 2. **Priority modification** (Aqua Waterlogged)
 3. **Miss roll** (Radiant Blind)
 4. **Damage modifiers** at resolution: additive bonuses first (Arcane
-   Knowledge +5%/stack), then multipliers (Empower ×2, Stagger ×0.5).
+   Knowledge +5%/stack, 📝 V2: Lunar phase modifier), then multipliers
+   (Empower ×2, Stagger ×0.5).
    Example: 5-stack AK + Empower + Staggered = 100% + 25% → ×2 → ×0.5 = 125%.
-5. Normal resolution → end phase (§5.1).
+5. 📝 **V2 — damage routing** (Astral Displacement, §4b.4): split
+   `round(damage × 0.05 × stacks)` off the final figure and send it straight
+   to health; the remainder proceeds to shield math. The aux spell `Phase`
+   short-circuits this — it routes 100% and Displacement adds nothing.
+6. **Shield application** — the §0.3 counter multipliers apply here, to the
+   non-pierced remainder only.
+7. Normal resolution → end phase (§5.1).
 
 *(Geo's old replace-the-action mechanic is gone, so there is no "replace"
 step.)*
@@ -463,7 +663,13 @@ effect-layer triangle IS its cleanse/immunity web. Surface these in tooltips.
   triggers, nothing is penalized.
 
 **Persistent stacks** (survive element switching): Photosynthesis (0–5),
-Creeping Dark (0–15, ±per §4.2), Arcane Knowledge (0–5, permanent).
+Creeping Dark (0–15, ±per §4.2), Arcane Knowledge (0–5, permanent),
+📝 V2: Displacement (0–5, −1/turn without an Astral cast).
+
+📝 **V2 HUD additions:** the **moon phase** (§4b.2) is not a per-mage badge —
+it is **shared, always-visible chrome** with a next-phase preview, since both
+players plan around it. An **eclipse lock** on a mage, by contrast, is a
+normal debuff badge.
 
 ✅ **HUD rules:**
 - One **standardized consecutive-counter pip** design, reused for every
@@ -483,8 +689,8 @@ Creeping Dark (0–15, ±per §4.2), Arcane Knowledge (0–5, permanent).
 - ✅ The three triangles are fully closed: effect interactions and the
   shield-double rule both follow the same within-tier triangles; there are
   no cross-tier effect interactions.
-- ✅ Tiers are level-gated: **Tier 1 at L1, Tier 2 at L15, Tier 3 at L30,
-  Tier 4 (future) at L45** — see
+- ✅ Tiers are level-gated: **Primal L1, Kinetic L15, Celestial L30,
+  Ethereal L45** — see
   [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) for the full unlock
   schedule, slots, and XP curve.
 
@@ -573,6 +779,23 @@ unknowns worth monitoring are in §8.)
 ---
 
 ## Changelog
+
+**Rev 7 (Celestial & Sanctus effects)** — All three outstanding V2 effects
+designed and all five broken effect-layer edges rewired. **Holy → Sanctus**
+(final). **§4b Celestial:** Solar keeps Blind; **Lunar — Phases of the Moon**,
+a *global, public, deterministic* 4-turn clock (New/Waxing/Full/Waning) that
+modifies Lunar spells only — the game's first pure timing element; **Astral —
+Displacement**, 5 stacks × 5% shield-piercing damage routed straight to
+health, ignoring the shield counter table. Renamed from "Phase Shift" to
+avoid colliding with the shipped `Phase` aux spell. **§4c Ethereal repairs:**
+**Sanctus — Absolution**, purge-one-debuff + heal (10 clean / 20 on a purge)
+so it is never a dead cast; Sanctus→Umbra strips 5 Creeping Dark stacks;
+Arcane→Sanctus seals the purge behind the cost-4+ AK threshold. Celestial
+triangle closed as Solar eclipses Lunar (Blind locks the moon at New) → Lunar
+anchors Astral (strips Drift) → Astral slips Solar (exempt from Blind, the
+retired Arcane→Radiant mechanic rehomed). §5.2 gained a **damage-routing**
+step; §5.4 gained the moon as shared HUD chrome. Voidcaller's info-war
+identity moved to its own set bonuses.
 
 **Rev 6 (V2 reconciliation)** — Added §0: a planned **four-tier, twelve-
 element** expansion reconciled from an external inspiration doc. New

@@ -330,28 +330,72 @@ motes.
 | **Electro** | Storm Shaman · Thunder Roc · Voltgeist | **Storm Lord** |
 | **Aero** | Wind Wraith · Gale Serpent · Sky Titan | **Tempest Monarch** |
 | **Geo** | Earth Titan · Obsidian Golem · Sandstorm Djinn | **Mountain Heart** |
-| **Solar** † | Sun Templar · Solar Archon · Prism Sentinel | **Solar Deity** |
+| **Solar** ✅ | Sun Templar · Solar Archon · Prism Sentinel | **Solar Deity** |
+| **Lunar** 📝 | Herald of the Waxing · Stalker of the New Moon · The Waning Wraith | **Luna Plena, the Full Moon** |
+| **Astral** 📝 | Rift Walker · Constellation Warden · Echo of the Between | **The Zodiac Ascendant** |
+| **Sanctus** 📝 | Vestal Warden · Reliquary Colossus · Seraph Judicant | **The Hierophant Eternal** |
 | **Umbra** | Void Stalker · Umbral Knight · Eclipse Weaver | **Nightbringer** |
 | **Arcane** | Spell Weaver · Mana Golem · Arcane Chimera | **Archmage** |
 
-† ❓ **This roster was written for "Radiant," but every name is solar** (Sun
-Templar, Solar Archon, Solar Deity) — so it belongs to the new **Solar**
-element rather than to **Holy**, its renamed successor. Assigning it to Solar
-here; confirm.
+✅ **The Radiant roster went to Solar** (confirmed) — every name in it was
+already solar imagery, and it would have read as a duplicate of Sanctus.
 
-📝 **Missing rosters — three elements have no bestiary yet:** **Holy**,
-**Lunar**, and **Astral**. (Holy needs a distinct identity from Solar now that
-they're separate elements in separate tiers.)
+📝 **Lunar's roster teaches the mechanic.** The three mini-bosses *are* the
+three non-peak moon phases (§TYPE_EFFECTS 4b.2), and the final boss is the
+Full Moon itself — so a player learns the four-phase cycle by fighting it
+before they ever cast it.
+- 💡 **Hook worth building:** make **Luna Plena only fightable on a Full Moon
+  turn** — or have the fight begin locked to a phase. The moon is the one
+  piece of state the game already exposes publicly; a boss keyed to it costs
+  nothing to implement and is instantly legible.
+
+📝 **Sanctus's roster is deliberately temple/oath imagery, not light** —
+vestals, reliquaries, hierophants, judgment. Sanctus is *consecration*;
+Solar is *brightness*. If a Sanctus monster name could plausibly be a Solar
+monster name, it is the wrong name.
+
+📝 **Astral's roster is the space between things** — rifts, constellations,
+echoes. Ties to Displacement: these are creatures that are not entirely here.
 
 💡 Note "Void Stalker" survives as a *monster* name even though **Void was
 rejected as an element** (TYPE_EFFECTS_DESIGN §0) — no conflict, but worth
-knowing it's not an element reference.
+knowing it's not an element reference. Ditto "Eclipse Weaver," which now
+rhymes with the Solar→Lunar eclipse mechanic by coincidence.
 
-❓ Also unmapped: which **zones/regions** host which element's bestiary, and
-at what levels. The region table below predates the 12-element roster and
-still uses old element names (Fire, Water, Ice, Light, Shadow).
+### World map — ⚠️ TO REDO for the 12-element roster
 
-### World map — 📝 DRAFT region brainstorm (names/levels all tunable)
+📝 **TODO — rebuild the region map from scratch against the V2 element
+roster.** The table below predates the expansion and is kept only as a
+starting point for names and ring structure. Requirements for the redo:
+
+1. **One clearly-defined single-element zone per element — all twelve.**
+   Every element needs exactly one home region where its bestiary lives
+   undiluted and its motes drop at the best rate. Twelve pure zones.
+2. **Plus mixed zones** combining two (occasionally three) elements, for
+   routes between towns and for variety. Mixed zones are where the counter
+   game gets taught: a two-element zone punishes a one-element loadout.
+3. **Level bands must follow the tier unlocks** (PROGRESSION §4):
+   Primal zones **1–14**, Kinetic **15–29**, Celestial **30–44**, Ethereal
+   **45–50+**. A player must not walk into an Ethereal zone at L20.
+4. **Rename every old element reference.** The current table uses **Fire,
+   Water, Electric, Light, Shadow** → Pyro, Aqua, Electro, Solar/Sanctus,
+   Umbra.
+5. ⚠️ **"Ice" is not an element.** Frostfell Pass and The Mirrormere are both
+   built on it. Reassign — Aqua, or Aqua + Aero for a blizzard read — or
+   accept that ice is *flavor* that Aqua zones can wear without being a
+   twelfth-plus element.
+6. **Town placement** should put each tier's unlock town near that tier's
+   first zone, so the unlock and the content arrive together.
+7. **Name the Celestial and Ethereal regions.** There are currently zero
+   regions for six of the twelve elements (Solar, Lunar, Astral, Sanctus,
+   and arguably Umbra/Arcane, which only have "Umbral Wastes" and nothing).
+
+💡 Sketch to react to, not a commitment: Celestial reads as **high places and
+open sky** (observatories, peaks, a tidal coast for Lunar), Ethereal as
+**thresholds** (a cathedral for Sanctus, the Umbral Wastes for Umbra, a
+collapsed academy for Arcane).
+
+**Old draft (superseded, kept for names only):**
 
 | Ring | Region | Type | Elements | Lv |
 |---|---|---|---|---|

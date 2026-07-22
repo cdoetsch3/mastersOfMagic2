@@ -149,12 +149,12 @@ level — high-level players crafting trash get trash XP, which keeps the
 | **30** | — | **Tier 3 — Celestial** (Solar, Lunar, Astral) 📝 | Phase |
 | **35** | — | — | Jolt, Flurry, Bulwark, Hasty |
 | **40** | **5** | — | Cataclysm, Sanctuary, Drain |
-| **45** | — | **Tier 4 — Ethereal** (Holy, Umbra, Arcane) 📝 | — |
+| **45** | — | **Tier 4 — Ethereal** (Sanctus, Umbra, Arcane) 📝 | — |
 | **50** | — | — | max level |
 
 📝 **Revised for the V2 expansion** (TYPE_EFFECTS_DESIGN §0): the old Tier 3
 (Radiant/Umbra/Arcane) became Tier 4 **Ethereal** at L45, with Radiant renamed
-**Holy**; the new **Celestial** tier (Solar/Lunar/Astral) takes the L30 slot.
+**Sanctus**; the new **Celestial** tier (Solar/Lunar/Astral) takes the L30 slot.
 ⚠️ Consequence: **Umbra and Arcane — and therefore Creeping Dark and Arcane
 Knowledge — move from L30 to L45**, leaving L30–44 without an info-war or
 damage-stacking element. Solar inherits Blind, so L30 still gets a proc-based

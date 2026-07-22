@@ -999,7 +999,7 @@ interactions · loot insurance · premium Luck potions · enchant-parity stance.
 |---|---|---|
 | 8 | Set pieces Epic+ only? *(likely — deferred)* | §8 |
 | 36 | ⚠️ **Tidebinder 4pc/5pc are the same bonus twice** (stacks to −2, violating §7.1) — replace one tier | §3.1 |
-| 37 | ⚠️ **Counter-loop guarantee**: do the guarantees live in the **set bonuses** (recommended) or only hold for canonical archetype↔element pairings? Voidcaller's bonuses (all TBD) should carry the info-war identity natively | §2.2 |
+| 37 | ✅ **RESOLVED — the guarantees live in the set bonuses.** Voidcaller's bonuses must carry the **info-war identity natively**, not borrow it from an assumed Umbra enchant. Forced by the V2 expansion: Umbra moves from L30 → L45 (TYPE_EFFECTS §0.4), so a L30 Voidcaller has no Umbra to lean on for fifteen levels. Bonuses still TBD | §2.2 |
 | 38 | **Charge retention vs the element cycle**: does retained charge keep the cycle open (never re-picking element, streaks compounding)? Recommended yes — but price it deliberately | §5b.3 |
 | 39 | Potion ordering inside the P3 simultaneity group (proposal: with support; Haste applies) | §6b.3 |
 
