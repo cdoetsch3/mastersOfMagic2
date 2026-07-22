@@ -314,6 +314,43 @@ MoM2 adds **spell slots** unlocked via leveling.
 - ✅ Areas are **element-themed** (volcano = fire+earth monsters, icy pass = ice+air,
   shadowlands = shadow, etc.).
 
+### Bestiary — 📝 DRAFT (from the V2 inspiration doc + boss design pass)
+
+Enemy rosters per element zone. Each zone runs **5–7 monster types**, three
+**mini-bosses**, and a **final boss** (per the adventure-loop rules above).
+Bosses drop the best loot — and are the natural home for the rare Tier III/IV
+set components ([ITEMS_DESIGN.md](ITEMS_DESIGN.md) §3.5) and for Core-tier
+motes.
+
+| Element | Mini-bosses | Final boss |
+|---|---|---|
+| **Aqua** | Tidal Empress · Maelstrom Horror · Leviathan | **Kraken** |
+| **Pyro** | Inferno Lord · Magma Behemoth · Phoenix | **Efreet** |
+| **Flora** | Root Matriarch · Spore Warlord · Thorn Colossus | **Guardian of the World Tree** |
+| **Electro** | Storm Shaman · Thunder Roc · Voltgeist | **Storm Lord** |
+| **Aero** | Wind Wraith · Gale Serpent · Sky Titan | **Tempest Monarch** |
+| **Geo** | Earth Titan · Obsidian Golem · Sandstorm Djinn | **Mountain Heart** |
+| **Solar** † | Sun Templar · Solar Archon · Prism Sentinel | **Solar Deity** |
+| **Umbra** | Void Stalker · Umbral Knight · Eclipse Weaver | **Nightbringer** |
+| **Arcane** | Spell Weaver · Mana Golem · Arcane Chimera | **Archmage** |
+
+† ❓ **This roster was written for "Radiant," but every name is solar** (Sun
+Templar, Solar Archon, Solar Deity) — so it belongs to the new **Solar**
+element rather than to **Holy**, its renamed successor. Assigning it to Solar
+here; confirm.
+
+📝 **Missing rosters — three elements have no bestiary yet:** **Holy**,
+**Lunar**, and **Astral**. (Holy needs a distinct identity from Solar now that
+they're separate elements in separate tiers.)
+
+💡 Note "Void Stalker" survives as a *monster* name even though **Void was
+rejected as an element** (TYPE_EFFECTS_DESIGN §0) — no conflict, but worth
+knowing it's not an element reference.
+
+❓ Also unmapped: which **zones/regions** host which element's bestiary, and
+at what levels. The region table below predates the 12-element roster and
+still uses old element names (Fire, Water, Ice, Light, Shadow).
+
 ### World map — 📝 DRAFT region brainstorm (names/levels all tunable)
 
 | Ring | Region | Type | Elements | Lv |

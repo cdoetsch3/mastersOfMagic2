@@ -6,8 +6,110 @@ Haste referenced here are defined there.
 
 Legend: ✅ decided · 📝 draft (needs review) · 💡 idea bank · ❓ open question · ⚠️ balance/abuse concern
 
-Status: ✅ **spec finalized — implementation-ready, not yet implemented.**
-All rulings are in; §8 lists the balance risks to monitor during playtests.
+Status: ✅ **Tiers 1–3 shipped (v0.9.0).** ⚠️ **A V2 expansion is now planned —
+see §0 — which adds a fourth tier, renames Radiant→Holy, and changes the
+shield counter math. Everything below §0 describes the SHIPPED nine-element
+system and remains the source of truth until the expansion lands.**
+
+---
+
+## 0. V2 expansion 📝 (planned — not implemented)
+
+Reconciled from an external inspiration doc ("Fantasy Game Elements & Enemy
+Bestiary Design V2"). **This document stays the source of truth**; the
+inspiration doc contributed the fourth tier, the macro-tier counter idea, and
+the bestiary (now in [GAME_DESIGN.md](GAME_DESIGN.md) §5). Its other
+proposals — a "Void" element, and a rescaled Waterlogged (+1 priority
+bracket) — were **rejected**: Ethereal stays three elements, and our
+Waterlogged (+10 priority, "your next action goes last") is better.
+
+### 0.1 The twelve elements, in four tiers
+
+| Tier | Name | Elements | Status |
+|---|---|---|---|
+| 1 | **Primal** | Aqua · Pyro · Flora | ✅ shipped |
+| 2 | **Kinetic** | Electro · Aero · Geo | ✅ shipped |
+| 3 | **Celestial** ⭐ NEW | **Solar · Lunar · Astral** | 📝 new tier |
+| 4 | **Ethereal** *(was Tier 3)* | **Holy** *(was Radiant)* · Umbra · Arcane | 📝 renumbered |
+
+✅ **Solar inherits the old Radiant Blind mechanic** verbatim (10% per charge
+spent, 50% miss for 3 turns). **Holy** keeps the Ethereal slot but needs a
+**brand-new effect** — the rename exists because "Radiant" and "Solar" read
+as the same concept.
+
+📝 **Three effects still to design: Holy, Lunar, Astral.**
+
+❓ **Naming to confirm:** the source called it "Holy/Divine" and the reconcile
+notes used both **Holy** and **Divine**, plus **Shadow** once where the engine
+says **Umbra**. This doc uses **Holy** and **Umbra** (Umbra matches shipped
+code, `MagicElement.umbra`). Confirm before implementation.
+
+### 0.2 ⚠️ Consequence: both Tier 3 and Tier 4 effect-webs must be rebuilt
+
+This is the part that isn't obvious from the roster change. Our shipped Tier 3
+triangle wired three *effect-layer* interactions between Radiant, Umbra and
+Arcane:
+
+| Old edge | Interaction | Fate under V2 |
+|---|---|---|
+| Radiant → Umbra | Blind burns away Creeping Dark | 💥 **Breaks** — Blind moves to Solar (T3), Umbra stays T4, so this becomes cross-tier |
+| Umbra → Arcane | Dusk blocks Arcane Knowledge | ✅ Survives — both still Ethereal |
+| Arcane → Radiant | Arcane spells are immune to Blind | 💥 **Breaks** — same reason |
+
+Because effect-layer interactions are **within-tier only** (§5.6), the
+expansion needs **five new interactions**, not zero:
+
+- **Celestial (new):** Solar→Lunar, Lunar→Astral, Astral→Solar
+- **Ethereal (repair):** Holy→Umbra and Arcane→Holy, replacing the two that
+  Blind's departure broke
+
+📝 So "design three effects" is really **design three effects + rewire five
+edges**. Holy's effect in particular has to be something Umbra can be weak to,
+and something Arcane can be immune to or unravel.
+
+### 0.3 ⚠️ New shield counter math (a real balance change)
+
+Two layers now apply to shield damage. **They never stack** — same tier uses
+the within-tier row, different tiers use the macro row:
+
+| Relationship | Multiplier vs that shield |
+|---|---|
+| **Within-tier**, you counter their shield | **200%** *(unchanged — today's ×2)* |
+| **Within-tier**, their shield's element counters you | **50%** ⭐ new |
+| **Within-tier**, same element | 100% |
+| **Macro-tier**, your tier counters theirs | **150%** ⭐ new |
+| **Macro-tier**, their tier counters yours | **75%** ⭐ new |
+| **Macro-tier**, neither (the opposite tier) | 100% |
+
+⚠️ **This is the largest balance change in the expansion.** Today every
+non-countering attack hits a shield at 100%. Under V2, **half of all
+within-tier matchups drop to 50%** — attacking into the shield that counters
+you becomes genuinely punishing, which sharply raises the value of shield
+counter-picking and of Umbra's element-hiding. Requires a full re-run of the
+9×9 (soon 12×12) mono-element sim, and it likely shifts the Aegis Sovereign
+archetype's power in [ITEMS_DESIGN.md](ITEMS_DESIGN.md).
+
+❓ **Macro-tier loop direction unconfirmed.** The source described "a
+symmetrical loop where each tier counters the next," which for four tiers
+gives **Primal → Kinetic → Celestial → Ethereal → Primal** (each tier counters
+one, is countered by one, and is neutral against the tier opposite it).
+Confirm — especially that **Ethereal → Primal** closes the loop, since that
+means the endgame tier is weak to the starter tier, which is a nice
+anti-power-creep property but should be intentional.
+
+### 0.4 Ripple into the other docs (not yet applied)
+
+- **PROGRESSION_DESIGN §4:** the unlock schedule has Tier 3 at L30 and "Tier 4
+  (future)" at L45 — that now resolves to **Celestial at L30, Ethereal at
+  L45**. Charge caps and spell placements are unaffected.
+- **ITEMS_DESIGN:** element enchants go from 9 to 12 (5 archetypes × 12 =
+  **60** endgame builds); mote types gain three elements; the Voidcaller
+  archetype's info-war identity leans on Umbra, which is now a *later* tier.
+- **Engine:** `MagicElement` gains three values and a fourth `MagicTier`;
+  `_applyOneHit`'s counter math becomes a multiplier lookup instead of a
+  boolean ×2.
+
+---
 
 ---
 
@@ -435,6 +537,16 @@ unknowns worth monitoring are in §8.)
 ---
 
 ## Changelog
+
+**Rev 6 (V2 reconciliation)** — Added §0: a planned **four-tier, twelve-
+element** expansion reconciled from an external inspiration doc. New
+**Celestial** tier (Solar/Lunar/Astral) inserted as Tier 3; the old Tier 3
+becomes **Ethereal** (Tier 4) with **Radiant renamed Holy**; **Solar inherits
+Blind**. Rejected from the source: the Void element and its rescaled
+Waterlogged. New **shield counter math** (within-tier 200%/50%, macro-tier
+150%/75%). Flagged the non-obvious consequence that **five effect-layer edges
+must be rewired**, not zero, plus the naming (Holy/Divine, Umbra/Shadow) and
+macro-loop-direction confirmations.
 
 **Rev 5 (this revision)** — Final rulings; zero open questions remain.
 Stagger lingers until consumed by the next offensive spell (Discharge as a
