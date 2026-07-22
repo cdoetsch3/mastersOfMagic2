@@ -39,10 +39,26 @@ as the same concept.
 
 📝 **Three effects still to design: Holy, Lunar, Astral.**
 
-❓ **Naming to confirm:** the source called it "Holy/Divine" and the reconcile
-notes used both **Holy** and **Divine**, plus **Shadow** once where the engine
-says **Umbra**. This doc uses **Holy** and **Umbra** (Umbra matches shipped
-code, `MagicElement.umbra`). Confirm before implementation.
+✅ **Naming:** **Umbra** confirmed (matches shipped code). **Holy** confirmed
+as the concept — ❓ but its *name* is under review: every other element is
+Latin or Greek (Aqua, Flora, Umbra, Arcane = Latin; Pyro, Aero, Geo, Electro
+= Greek; Solar, Lunar, Astral = Latin), and **"Holy" is the lone Germanic
+outlier**. Candidates in §0.5.
+
+### 0.5 ❓ A Latin/Greek name for Holy
+
+| Candidate | Root | Fit |
+|---|---|---|
+| **Sanctus** | Latin *sanctus*, "holy, consecrated" | The most literal translation; instantly readable |
+| **Numen** ⭐ | Latin *numen*, "divine presence / a god's will" | Distinctive, not games-clichéd, and means *divinity* rather than *brightness* — which matters now that Solar owns light |
+| **Theo** | Greek *theós*, "god" | Matches the **-o** pattern of Pyro/Aero/Geo/Electro exactly; shortest |
+| **Hieros** | Greek *hierós*, "sacred" | Good root, but reads obscure in a UI |
+
+📝 Recommendation: **Numen** or **Theo**. Numen is the most evocative and
+avoids any light/sun connotation (important now that Solar exists); Theo is
+the tidiest pattern-match with the Greek -o elements. *Avoid* Empyrean
+(contains "pyr"), Aether and Caelum (collide with the Ethereal and Celestial
+tier names), and Lux/Lumen (light belongs to Solar).
 
 ### 0.2 ⚠️ Consequence: both Tier 3 and Tier 4 effect-webs must be rebuilt
 
@@ -89,19 +105,39 @@ counter-picking and of Umbra's element-hiding. Requires a full re-run of the
 9×9 (soon 12×12) mono-element sim, and it likely shifts the Aegis Sovereign
 archetype's power in [ITEMS_DESIGN.md](ITEMS_DESIGN.md).
 
-❓ **Macro-tier loop direction unconfirmed.** The source described "a
-symmetrical loop where each tier counters the next," which for four tiers
-gives **Primal → Kinetic → Celestial → Ethereal → Primal** (each tier counters
-one, is countered by one, and is neutral against the tier opposite it).
-Confirm — especially that **Ethereal → Primal** closes the loop, since that
-means the endgame tier is weak to the starter tier, which is a nice
-anti-power-creep property but should be intentional.
+✅ **Macro-tier loop direction** — stated explicitly to avoid arrow-notation
+confusion. **The higher tier beats the one below it, and the starter tier
+beats the endgame tier:**
+
+| Matchup | Winner |
+|---|---|
+| Kinetic vs **Primal** | **Kinetic (T2)** beats Primal |
+| Celestial vs **Kinetic** | **Celestial (T3)** beats Kinetic |
+| Ethereal vs **Celestial** | **Ethereal (T4)** beats Celestial |
+| Primal vs **Ethereal** | ⭐ **Primal (T1)** beats Ethereal |
+| T1↔T3, T2↔T4 (opposite tiers) | neutral — 100% both ways |
+
+⭐ **Primal beating Ethereal is the anti-power-creep valve**: the starter
+elements are the designed answer to the endgame tier, so a level-50 mage can
+never simply out-tier everyone. Every other edge rewards progression.
+
+⚠️ *Note: an earlier draft of this section had the loop running the other way
+(Primal beats Kinetic, …). The table above is authoritative.*
 
 ### 0.4 Ripple into the other docs (not yet applied)
 
-- **PROGRESSION_DESIGN §4:** the unlock schedule has Tier 3 at L30 and "Tier 4
-  (future)" at L45 — that now resolves to **Celestial at L30, Ethereal at
-  L45**. Charge caps and spell placements are unaffected.
+- ✅ **PROGRESSION_DESIGN §4:** **Celestial unlocks at L30, Ethereal at L45**
+  (confirmed). Charge caps and spell placements are unaffected — but see the
+  warning below.
+- ⚠️ **Umbra and Arcane slip from L30 → L45.** Creeping Dark and Arcane
+  Knowledge are *shipped* mechanics that players currently meet at L30; under
+  V2 they become max-level content, and **L30–44 has no info-war or
+  damage-stacking element at all**. Two knock-ons: the whole L30–44 band now
+  learns Tier 3 through Solar/Lunar/Astral only, and **ITEMS_DESIGN's
+  Voidcaller archetype** — whose counter-loop role leans on Umbra's
+  element-hiding — has no Umbra to lean on until L45, despite set pieces
+  starting at L30. ❓ Acceptable, or should Voidcaller's info-war identity
+  come from its own set bonuses (which §2.2/Q37 already recommends)?
 - **ITEMS_DESIGN:** element enchants go from 9 to 12 (5 archetypes × 12 =
   **60** endgame builds); mote types gain three elements; the Voidcaller
   archetype's info-war identity leans on Umbra, which is now a *later* tier.

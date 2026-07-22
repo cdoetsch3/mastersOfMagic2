@@ -143,14 +143,22 @@ level — high-level players crafting trash get trash XP, which keeps the
 | **1** | **2** | **Tier 1** (Aqua, Pyro, Flora) | Flick, Bolt, Ward, Aegis, Quicken |
 | **5** | — | — | Blast, Sap |
 | **10** | **3** | — | Surge, Volley |
-| **15** | — | **Tier 2** (Electro, Aero, Geo) | Leech, Discharge |
+| **15** | — | **Tier 2 — Kinetic** (Electro, Aero, Geo) | Leech, Discharge |
 | **20** | **4** | — | Ruin, Barrier, Barrage |
 | **25** | — | — | Overload, Empower, Rampart |
-| **30** | — | **Tier 3** (Radiant, Umbra, Arcane) | Phase |
+| **30** | — | **Tier 3 — Celestial** (Solar, Lunar, Astral) 📝 | Phase |
 | **35** | — | — | Jolt, Flurry, Bulwark, Hasty |
 | **40** | **5** | — | Cataclysm, Sanctuary, Drain |
-| **45** | — | **Tier 4** (future) | — |
+| **45** | — | **Tier 4 — Ethereal** (Holy, Umbra, Arcane) 📝 | — |
 | **50** | — | — | max level |
+
+📝 **Revised for the V2 expansion** (TYPE_EFFECTS_DESIGN §0): the old Tier 3
+(Radiant/Umbra/Arcane) became Tier 4 **Ethereal** at L45, with Radiant renamed
+**Holy**; the new **Celestial** tier (Solar/Lunar/Astral) takes the L30 slot.
+⚠️ Consequence: **Umbra and Arcane — and therefore Creeping Dark and Arcane
+Knowledge — move from L30 to L45**, leaving L30–44 without an info-war or
+damage-stacking element. Solar inherits Blind, so L30 still gets a proc-based
+Tier 3 effect.
 
 All 25 engine spells are placed. The L35 bucket ("all remaining
 non-charge-5") resolves to Jolt, Flurry, Bulwark, Hasty; every 5-cost spell
@@ -196,16 +204,17 @@ non-charge-5") resolves to Jolt, Flurry, Bulwark, Hasty; every 5-cost spell
 (ITEMS_DESIGN §5b.3a): these notes now depend on which spells you own, not
 on your charge cap.*
 
-- **Arcane Knowledge is live from L30** — but only via spells **costing** 4+:
-  at L30 that means **Ruin or Rampart** (both L20 unlocks). The charge-4 cap
-  alone no longer suffices; overcharging a cheap spell earns nothing.
-- **Radiant's Blind** reaches 40% only by casting a 4-**cost** spell
-  (Ruin/Rampart), and 50% only with the 5-cost spells at L40
-  (Cataclysm/Sanctuary/Drain). Cheap spells cast at high charge no longer
-  blind at high rates.
-- **Umbra's Midnight** (15 stacks) needs 4-cost casts before L40 — i.e.
-  repeated **Ruin/Rampart as Umbra**; the "three 5-cost casts" fast path is a
-  max-level flex.
+- **Arcane Knowledge is live from L45** (Ethereal), and only via spells
+  **costing** 4+ — by then all of them are unlocked, so the constraint is
+  moot at max level. *(Pre-V2 this was L30.)*
+- **Solar's Blind** (inheriting Radiant's mechanic at L30) reaches 40% only by
+  casting a 4-**cost** spell (Ruin/Rampart), and 50% only with the 5-cost
+  spells at L40. Cheap spells cast at high charge no longer blind at high
+  rates.
+- **Umbra's Midnight** (15 stacks) arrives at L45, by which point 5-cost casts
+  are available — so the "three 5-cost casts" path is the normal route, not a
+  max-level flex. *(Pre-V2 this was a L30 mechanic reachable only via 4-cost
+  casts.)*
 - **Discharge arriving at L15 pairs with Tier 2** — the charge-counterplay
   spell lands in the same level as the tempo-disruption tier. Thematic and
   teaches the counter role early.
