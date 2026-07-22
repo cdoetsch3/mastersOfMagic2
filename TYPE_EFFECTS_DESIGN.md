@@ -414,7 +414,7 @@ around, and a way to stop being where the shield is.
 | Counter | Shield layer | Effect layer |
 |---|---|---|
 | Solar → Lunar | Solar attacks ×2 vs Lunar shields | A **Blind proc locks the moon at New Moon** for the 3-turn Blind window — a literal eclipse |
-| Lunar → Astral | Lunar attacks ×2 vs Astral shields | A **Lunar attack strips 1 Displacement stack**; on **Full Moon it strips all** |
+| Lunar → Astral | Lunar attacks ×2 vs Astral shields | A **Lunar attack strips 1 Alignment stack**; on **Full Moon it strips all** |
 | Astral → Solar | Astral attacks ×2 vs Solar shields | **Astral spells are exempt from Blind** — they never miss |
 
 *(Astral→Solar is the retired Arcane→Radiant mechanic, following Blind into
@@ -486,40 +486,74 @@ for the same 3-turn window. Not "reset to New Moon" — *frozen* there.
   missing half their casts *and* stuck at −25%. That's the intended weight of
   a within-tier counter.
 
-### 4b.4 Astral — Displacement 📝
+### 4b.4 Astral — Astral Alignment 📝
 
-- ⚠️ **Naming:** the working name for this was "Phase Shift," but **`Phase`
-  is already a shipped aux spell** ("next offensive spell ignores shields",
-  GAME_DESIGN §3). "Phase" and "Phase Shift" in the same battle log is a
-  readability trap. ✅ Renamed **Displacement**; individual stacks are
-  **Drift**. Same mechanic, unambiguous log lines.
+- ✅ **Name: Astral Alignment** (stacks: *Alignment*). The working name "Phase
+  Shift" was rejected because **`Phase` is already a shipped aux spell**
+  ("next offensive spell ignores shields", GAME_DESIGN §3) — "Phase" and
+  "Phase Shift" in the same battle log is a readability trap.
 - ✅ **Trigger:** **+1 stack for each turn you cast an Astral spell**, at any
   cost. **Max 5.**
 - ✅ **Decay:** **−1 per turn** in which you cast no Astral spell (same shape
   as Photosynthesis, §2.3). Charging neither grants nor decays.
-- ✅ **Effect:** **5% of your damage per stack bypasses shields entirely** and
-  strikes health directly. At 5 stacks, **25% always gets through**.
+- ✅ **Effect:** **5% of the attack's damage per stack bypasses the shield**
+  and strikes health directly. **The remaining damage still hits the shield
+  normally** — Alignment *splits* an attack, it does not shrink it.
+- ✅ **Worked example** (4 stacks = 20%, a 25-damage spell into a 40-point
+  shield): **5 damage goes straight to health**; the other **20 hits the
+  shield**, leaving it at 20. Nothing is lost.
 - ✅ **The pierced portion ignores the shield's counter math.** It never
   touches the shield, so it is never multiplied by the ×2 / ×0.5 / ×1.5 /
   ×0.75 shield table (§0.3) — it lands on health at **100%**. This is the
-  point: Displacement is worth *most* exactly when the shield matchup is
-  worst for you. In a 50%-into-their-shield matchup, your 25% pierce is the
-  only full-value damage you have.
+  point: Alignment is worth *most* exactly when the shield matchup is worst
+  for you. In a 50%-into-their-shield matchup, your 25% pierce is the only
+  full-value damage you have.
 - ✅ **Role: the designed anti-turtle answer**, and a deliberately *sharp*
-  one — against an unshielded opponent Displacement does **literally
+  one — against an **unshielded** opponent Alignment does **literally
   nothing**, since all damage was hitting health anyway. That's not a flaw to
   patch; it's what keeps a 25% unconditional-sounding number honest.
 - **Contrast with the other stackers, on purpose:** Arcane rewards *big*
   casts (cost 4+), Umbra rewards *charge dumped*, Astral rewards
   **consistency** — cast it every turn or watch it drain.
+
+#### Resolution order — ✅ split first; it is provably equivalent
+
+The intuition that we should hit the shield first (so a broken shield lets
+the rest through) is right to check, and the answer is that **the two orders
+give identical results**, so we take the simpler one.
+
+Order A — split first: pierce → health; remainder → shield; overflow →
+health.
+Order B — shield first: whole attack → shield; overflow → health; then
+pierce.
+
+They agree because **both the pierced portion and the shield's overflow land
+on health at 100%**, so it doesn't matter which arrives first.
+
+| Case | Order A | Order B |
+|---|---|---|
+| 25 dmg, 20% pierce, **10-pt** shield | 5 → hp; 20 vs 10 breaks it, 10 overflow → hp = **15 hp** | 25 breaks 10, 15 overflow → hp = **15 hp** ✅ |
+| 25 dmg, 20% pierce, 10-pt shield, **×2 counter** | 5 → hp; 5 raw ×2 breaks the shield, 15 raw overflow → hp = **20 hp** | 5 raw ×2 breaks it, 20 raw → hp = **20 hp** ✅ |
+| 25 dmg, 20% pierce, **40-pt** shield | 5 → hp, shield 40→20 = **5 hp** | *(the shield absorbs everything — pierce never happens)* ❌ |
+
+⚠️ **The third row is the one that matters.** "Shield first" only stays
+equivalent if the pierce is still applied afterwards; if it's implemented as
+"see whether the shield eats it all," the mechanic silently disappears
+against exactly the shields it exists to beat. **Implement Order A.**
+
 - ⚠️ **Precedence:** damage *routing* is a new step. Insert into §5.2 as
-  step 4b, after all damage modifiers and before shield application:
-  compute final damage, split off `round(damage × 0.05 × stacks)` to health,
-  run the remainder through normal shield math.
+  step 5, after all damage modifiers and before shield application: compute
+  final damage, split off `round(damage × 0.05 × stacks)` to health, run the
+  remainder through normal shield math.
+- ❓ **Open — Barrier:** does Alignment pierce a **Barrier** (2-charge, blocks
+  100% of all damage, dies to the first hit)? Recommend **yes** — 20% gets
+  through and the Barrier still pops. A Barrier that hard-stops the one
+  mechanic built to beat shields would make Astral a dead pick into any
+  Barrier deck. ✅ Confirm.
 - ⚠️ **Watch (stacking with Phase):** the aux spell `Phase` already grants
-  100% shield bypass for one attack. 5 stacks of Displacement + Phase is not
-  additive past 100% — Phase simply wins that turn. Make sure the engine
-  can't double-route the same damage.
+  100% shield bypass for one attack. 5 stacks + Phase is not additive past
+  100% — Phase simply wins that turn. Make sure the engine can't double-route
+  the same damage.
 - ⚠️ **Watch (ITEMS):** this directly attacks the **Aegis Sovereign**
   archetype, on top of the §0.3 shield-math change already hitting it. Two
   nerfs from two directions in one expansion; sim before shipping either.
@@ -535,37 +569,48 @@ Sanctus's own mechanic.
 |---|---|---|
 | Sanctus → Umbra | Sanctus attacks ×2 vs Umbra shields | **Absolution strips 5 Creeping Dark stacks** from the opponent — consecration burns off the dark |
 | Umbra → Arcane | *(unchanged, §4)* | No Arcane Knowledge while under Dusk or Midnight |
-| Arcane → Sanctus | Arcane attacks ×2 vs Sanctus shields | An Arcane attack that **earns an AK stack (cost 4+) suppresses the target's purge** this turn — the heal still lands |
+| Arcane → Sanctus | Arcane attacks ×2 vs Sanctus shields | An **Arcane attack resets the target's Sanctus streak to 0** — Absolution is pushed 3 casts away again |
 
 ### 4c.1 Sanctus — Absolution 📝
 
-- ✅ **Trigger:** cast a Sanctus spell of **any cost**. Resolves at **end of
-  turn in the heal band (E1–E3)** — before Ignite's E8 tick, so the burn you
-  just cleansed does not get one last hit in. Survivability-first (§5.1).
-- ✅ **Effect:** **purge one debuff** from yourself, and **heal**:
-  - **10 HP** if you had nothing to purge, or
-  - **20 HP** if a debuff was purged.
-- ✅ **Never a dead cast.** This is the whole reason for the two-tier heal: a
-  pure cleanse is miserable against an opponent running no status elements —
-  you'd be holding a card that does nothing through no fault of your own.
-  Sanctus is therefore **the sustain element** first and the cleanse element
-  second: *"Sanctus mends. If you are afflicted, it burns the affliction away
-  and mends the harder."*
-- ⚠️ **Purge order must be a fixed, documented list** — lockstep clients that
-  disagree about *which* debuff was removed diverge immediately. Proposed
-  severity order, highest first:
-  **Blind → Ignite → Waterlogged → Stagger → Static Feedback → (future)**.
-  Sanctus purges exactly one per cast, so a doubly-afflicted mage needs two
-  turns of Sanctus to come clean.
+⚠️ **Revised.** The first draft (purge + heal 10/20 on *every* Sanctus cast)
+was **too strong** — a per-turn heal stapled to a per-turn cleanse. Sanctus
+is now a **streak element with no healing at all**.
+
+- ✅ **Trigger:** **every 3rd consecutive Sanctus spell** fires Absolution.
+  Same shape as Aqua's every-3rd (§5.4), and Sanctus joins the streak-element
+  group: **casting any other element resets the count to 0.** Charging
+  neither advances nor breaks it (definition 1).
+- ✅ **Effect:** **remove one debuff from yourself, at random.** No healing.
+- ✅ **Resolves at end of turn in the heal band (E1–E3)** — before Ignite's E8
+  tick, so a burn you just purged doesn't land one last hit. Survivability
+  first (§5.1).
 - ✅ **Purges debuffs only, never your own buffs** — it will not eat your
-  Photosynthesis, Displacement, or Arcane Knowledge stacks.
-- ⚠️ **Numbers are placeholders** (10/20 against 100 max HP, i.e. 10%/20% of
-  a health bar). Sized to be meaningful but not to out-sustain a 3-charge
-  attack. Needs sim.
-- ❓ **Open:** should Absolution be able to purge **Fatigue**? Recommend
-  **no** — Fatigue is the anti-stall sudden-death clock (§8), and an element
-  that turns it off would recreate the exact stall meta Fatigue exists to
-  kill.
+  Photosynthesis, Astral Alignment, or Arcane Knowledge stacks.
+- ✅ **"At random" is netcode-safe** *provided* the roll draws from the
+  **shared per-turn seed** (§5.5), exactly like Ignite and Blind procs. It
+  must not use client-local RNG or the two clients will disagree about which
+  debuff vanished and diverge immediately.
+- 💡 **Alternative if the randomness grates:** a fixed severity order
+  (**Blind → Ignite → Waterlogged → Stagger → Static**) is equally
+  deterministic and makes Absolution a reliable answer to the *worst* thing
+  on you. Random is the more interesting version — it means a Sanctus player
+  can't count on stripping the Blind — but it also means the payoff for three
+  committed casts can be "you removed Static Feedback." Cheap middle ground:
+  random, but weighted toward severity.
+- ❓ **Open — Fatigue:** recommend Absolution **cannot** purge it. Fatigue is
+  the anti-stall sudden-death clock (§8); an element that switches it off
+  rebuilds the exact stall meta it exists to kill.
+
+⚠️ **Open concern — Sanctus can still be a dead pick.** With healing removed,
+Absolution is Sanctus's *only* effect, and it does nothing unless the
+opponent is applying debuffs. Roughly half the roster applies none at all
+(Flora, Aero, Astral, Umbra, Arcane are self-buff elements) — against those,
+Sanctus's element identity is blank for the whole duel while every other
+element is doing something. 💡 **Cheap fix that adds no healing:** if
+Absolution fires with **no debuff to remove**, bank a **Ward** — the next
+debuff applied to you is blocked outright (max 1). Same trigger, same
+commitment, never wasted. ❓ Adopt?
 
 ### 4c.2 Sanctus → Umbra — consecration burns the dark 📝
 
@@ -580,18 +625,36 @@ one threshold band (§4.2: 5 = Shadow, 10 = Dusk, 15 = Midnight).
 
 ### 4c.3 Arcane → Sanctus — the seal 📝
 
-An Arcane attack that **earns an Arcane Knowledge stack** (i.e. cost 4+,
-§4.3) also **suppresses the target's Absolution purge** at end of that turn.
-The heal still resolves at the **10 HP "nothing purged"** rate.
+An **Arcane attack resets the target's Sanctus streak to 0.** Absolution
+goes back to being three committed casts away.
 
-- ✅ **Deliberately gated behind the cost-4+ threshold** rather than firing on
-  any Arcane cast. An ungated version would be near-100% uptime for a
-  committed Arcane player, which is not a counter — it's an off switch. Tying
-  it to AK's existing commitment threshold keeps the doc's "spending is the
-  commitment" rule intact and gives the Sanctus player a read: *they're
-  charging to 4, my cleanse is about to be sealed.*
-- Arcane unravels sanctity but cannot stop it healing — that split is what
-  keeps the edge from being oppressive.
+- Thematically exact: Arcane *unravels*, and what it unravels here is the
+  accumulated ritual rather than the effect itself.
+- ✅ Consistent with §5.4 — the Sanctus streak is an ordinary consecutive
+  counter, and this is simply another thing that resets it.
+
+⚠️ **Balance concern — as written this is an off switch, not a counter.**
+Sanctus needs **three consecutive** casts to get anything at all. If *any*
+Arcane attack resets the counter, then an Arcane player who attacks every
+turn — the normal way to play Arcane — means the Sanctus player's counter
+**never exceeds 1 and Absolution never fires once in the entire duel**. Every
+other within-tier edge in this document degrades the loser's mechanic; this
+one deletes it.
+
+💡 Three ways to keep the flavour without the lockout, cheapest first:
+
+1. **Reset by 1 instead of to 0** — a setback that costs the Sanctus player a
+   turn of tempo rather than the whole mechanic. ⭐ Recommended.
+2. **Gate it behind cost 4+** (the same threshold that earns an AK stack) —
+   consistent with the doc's "spending is the commitment" rule, and it gives
+   the Sanctus player a read: *they're charging to 4, my streak is about to
+   break.*
+3. **Require the attack to actually deal damage to health** — fully-shielded,
+   missed, and fizzled attacks wouldn't reset (already the §5.4 rule for
+   every other trigger, so this is arguably the default anyway).
+
+❓ Which? The doc currently records the un-gated version as specified; pick
+one before this reaches the engine.
 
 ---
 
@@ -633,10 +696,10 @@ Fixed, documented order (lockstep clients must agree or state diverges):
    Knowledge +5%/stack, 📝 V2: Lunar phase modifier), then multipliers
    (Empower ×2, Stagger ×0.5).
    Example: 5-stack AK + Empower + Staggered = 100% + 25% → ×2 → ×0.5 = 125%.
-5. 📝 **V2 — damage routing** (Astral Displacement, §4b.4): split
+5. 📝 **V2 — damage routing** (Astral Alignment, §4b.4): split
    `round(damage × 0.05 × stacks)` off the final figure and send it straight
    to health; the remainder proceeds to shield math. The aux spell `Phase`
-   short-circuits this — it routes 100% and Displacement adds nothing.
+   short-circuits this — it routes 100% and Alignment adds nothing.
 6. **Shield application** — the §0.3 counter multipliers apply here, to the
    non-pierced remainder only.
 7. Normal resolution → end phase (§5.1).
@@ -651,7 +714,9 @@ effect-layer triangle IS its cleanse/immunity web. Surface these in tooltips.
 ### 5.4 Streaks, stacks & HUD 📝
 
 **Consecutive-cast streaks** (reset when you cast any other element): Aqua
-(every 3rd), Aero (after 3rd), Geo (every 4th). ✅ Arcane has **no streak**
+(every 3rd), Aero (after 3rd), Geo (every 4th), 📝 V2: **Sanctus** (every 3rd
+→ Absolution; also reset by an Arcane attack, §4c.3). ✅ Arcane has **no
+streak**
 (Arcane Knowledge persists regardless of what else is cast).
 - ✅ Charging neither advances nor breaks a streak (definition 1). Confirmed
   edge: a Tailwind streak of 3+ keeps its Stagger immunity through charging
@@ -664,7 +729,7 @@ effect-layer triangle IS its cleanse/immunity web. Surface these in tooltips.
 
 **Persistent stacks** (survive element switching): Photosynthesis (0–5),
 Creeping Dark (0–15, ±per §4.2), Arcane Knowledge (0–5, permanent),
-📝 V2: Displacement (0–5, −1/turn without an Astral cast).
+📝 V2: Astral Alignment (0–5, −1/turn without an Astral cast).
 
 📝 **V2 HUD additions:** the **moon phase** (§4b.2) is not a per-mage badge —
 it is **shared, always-visible chrome** with a next-phase preview, since both
@@ -779,6 +844,20 @@ unknowns worth monitoring are in §8.)
 ---
 
 ## Changelog
+
+**Rev 8 (effect revisions)** — Astral's effect renamed **Astral Alignment**
+(final). Clarified that the pierce **splits** an attack — the non-pierced
+remainder still hits the shield — with a worked example, and proved
+split-first and shield-first are equivalent *provided the pierce is still
+applied after* (the third table row is the trap). **Sanctus rebuilt:** the
+heal is gone entirely (purge + 10/20 heal every cast was too strong);
+Absolution now fires on **every 3rd consecutive Sanctus cast** and removes
+**one random debuff**, making Sanctus a streak element. Arcane→Sanctus
+changed from sealing the purge to **resetting the Sanctus streak**. Flagged
+two consequences: an un-gated reset means Absolution can *never* fire against
+an attacking Arcane player, and with healing removed Sanctus does nothing at
+all against the five elements that apply no debuffs — a Ward-on-empty-purge
+is proposed for the latter. Barrier-vs-pierce raised as open.
 
 **Rev 7 (Celestial & Sanctus effects)** — All three outstanding V2 effects
 designed and all five broken effect-layer edges rewired. **Holy → Sanctus**

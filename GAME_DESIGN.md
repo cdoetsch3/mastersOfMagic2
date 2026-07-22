@@ -355,45 +355,112 @@ Solar is *brightness*. If a Sanctus monster name could plausibly be a Solar
 monster name, it is the wrong name.
 
 📝 **Astral's roster is the space between things** — rifts, constellations,
-echoes. Ties to Displacement: these are creatures that are not entirely here.
+echoes. Ties to Astral Alignment: these are creatures that are not entirely here.
 
 💡 Note "Void Stalker" survives as a *monster* name even though **Void was
 rejected as an element** (TYPE_EFFECTS_DESIGN §0) — no conflict, but worth
 knowing it's not an element reference. Ditto "Eclipse Weaver," which now
 rhymes with the Solar→Lunar eclipse mechanic by coincidence.
 
-### World map — ⚠️ TO REDO for the 12-element roster
+### World map — 📝 DRAFT v2: 12 pure zones + 9 hybrids
 
-📝 **TODO — rebuild the region map from scratch against the V2 element
-roster.** The table below predates the expansion and is kept only as a
-starting point for names and ring structure. Requirements for the redo:
+Rebuilt for the twelve-element roster. **Twelve pure zones — one per element**
+— each the undiluted home of that element's bestiary and its best mote drop
+rate; plus **nine hybrid zones**, one per tier boundary and one per
+within-tier counter edge.
 
-1. **One clearly-defined single-element zone per element — all twelve.**
-   Every element needs exactly one home region where its bestiary lives
-   undiluted and its motes drop at the best rate. Twelve pure zones.
-2. **Plus mixed zones** combining two (occasionally three) elements, for
-   routes between towns and for variety. Mixed zones are where the counter
-   game gets taught: a two-element zone punishes a one-element loadout.
-3. **Level bands must follow the tier unlocks** (PROGRESSION §4):
-   Primal zones **1–14**, Kinetic **15–29**, Celestial **30–44**, Ethereal
-   **45–50+**. A player must not walk into an Ethereal zone at L20.
-4. **Rename every old element reference.** The current table uses **Fire,
-   Water, Electric, Light, Shadow** → Pyro, Aqua, Electro, Solar/Sanctus,
-   Umbra.
-5. ⚠️ **"Ice" is not an element.** Frostfell Pass and The Mirrormere are both
-   built on it. Reassign — Aqua, or Aqua + Aero for a blizzard read — or
-   accept that ice is *flavor* that Aqua zones can wear without being a
-   twelfth-plus element.
-6. **Town placement** should put each tier's unlock town near that tier's
-   first zone, so the unlock and the content arrive together.
-7. **Name the Celestial and Ethereal regions.** There are currently zero
-   regions for six of the twelve elements (Solar, Lunar, Astral, Sanctus,
-   and arguably Umbra/Arcane, which only have "Umbral Wastes" and nothing).
+✅ **Design rules the map follows:**
+1. **Every hybrid zone pairs two elements that are on a counter edge**, so
+   the zone itself teaches the matchup. A player who brings only Pyro into
+   Ashfall Vale meets the Flora it beats *and* the Aqua that beats it.
+2. **Pure zone before hybrid zone, in every tier.** You learn an element
+   alone before you meet it mixed.
+3. **Level bands track the tier unlocks** — Primal 1–14, Kinetic 15–29,
+   Celestial 30–44, Ethereal 45–50+.
+4. **The tier's unlock town sits at the mouth of that tier's first zone**, so
+   the unlock and the content arrive in the same breath.
+5. ✅ **Ice is Aqua + Aero** (confirmed) — a hybrid *look*, not a thirteenth
+   element. The same trick carries every other classic that isn't on the
+   roster: magma is Pyro + Geo, storms are Electro + Aero, jungle is Flora +
+   Geo.
 
-💡 Sketch to react to, not a commitment: Celestial reads as **high places and
-open sky** (observatories, peaks, a tidal coast for Lunar), Ethereal as
-**thresholds** (a cathedral for Sanctus, the Umbral Wastes for Umbra, a
-collapsed academy for Arcane).
+#### Ring 0–1 · Primal · **L1–14**
+
+| Region | Type | Elements | Lv |
+|---|---|---|---|
+| **Aldermere** | 🏠 home town | — | — |
+| **Whispering Woods** | pure | Flora | 1–5 |
+| **Glimmerbrook** | pure | Aqua | 3–8 |
+| **Cinderpeak Foothills** | pure | Pyro | 6–11 |
+| **Thornmire** | hybrid — *drowned swamp* | Flora + Aqua *(Flora ▸ Aqua)* | 8–13 |
+| **Ashfall Vale** | hybrid — *wildfire* | Pyro + Flora *(Pyro ▸ Flora)* | 10–14 |
+| **Forgeholm** | ⛏️ mining town — **unlocks Kinetic (L15)** | — | — |
+
+#### Ring 2 · Kinetic · **L15–29**
+
+| Region | Type | Elements | Lv |
+|---|---|---|---|
+| **Old Quarry** | pure | Geo | 15–19 |
+| **Stormcliff Coast** | pure | Electro | 17–22 |
+| **Windward Steppe** | pure | Aero | 19–24 |
+| **Galehaven** | ⚓ port town | — | — |
+| **Frostfell Pass** | hybrid — ❄️ **ice** | Aqua + Aero | 21–26 |
+| **Thunderspire Peaks** | hybrid — *storm* | Electro + Aero *(Electro ▸ Aero)* | 23–28 |
+| **The Molten Deep** | hybrid — *magma* | Pyro + Geo *(cross-tier)* | 25–29 |
+| **Rimeholt** | 🏔️ mountain village — **unlocks Celestial (L30)** | — | — |
+
+#### Ring 3 · Celestial · **L30–44**
+
+| Region | Type | Elements | Lv |
+|---|---|---|---|
+| **The Kiln Desert** | pure | Solar | 30–34 |
+| **The Mirrormere** | pure — *the moon's reflection on a still lake* | Lunar | 32–37 |
+| **Starfall Basin** | pure — *a crater field of fallen stars* | Astral | 34–39 |
+| **Meridian** | 🔭 observatory town | — | — |
+| **Tidewrack Shoals** | hybrid — *tides that obey the moon* | Lunar + Aqua | 36–40 |
+| **The Sunless Reach** | hybrid — *where day never comes* | Solar + Lunar *(Solar ▸ Lunar)* | 38–42 |
+| **The Shattered Orrery** | hybrid — *a broken model of the heavens* | Astral + Electro | 40–44 |
+| **Vespergate** | 🚪 threshold town — **unlocks Ethereal (L45)** | — | — |
+
+#### Ring 4 · Ethereal · **L45–50+** ⚠️ *see the squeeze below*
+
+| Region | Type | Elements | Lv |
+|---|---|---|---|
+| **Hallowmarch** | pure — *a consecrated causeway* | Sanctus | 45–47 |
+| **The Umbral Wastes** | pure | Umbra | 46–48 |
+| **The Collapsed Academy** | pure — *a school that read too far* | Arcane | 48–50 |
+| **The Reliquary Deep** | hybrid — *sanctity buried in the dark* | Sanctus + Umbra *(Sanctus ▸ Umbra)* | 50 · gear-gated |
+| **The Unwritten Library** | hybrid — *knowledge that eats its keeper* | Umbra + Arcane *(Umbra ▸ Arcane)* | 50 · gear-gated |
+| **The Eclipsed Citadel** | 🏰 **final dungeon** | Arcane + Sanctus *(Arcane ▸ Sanctus)* | 50 · gear-gated |
+
+⚠️ **Structural problem — the Ethereal band is only five levels wide.** Max
+level is 50 and Ethereal unlocks at 45, so the entire Tier 4 region set has
+to fit into L45–50 while Primal gets fourteen levels. Three options:
+
+1. ⭐ **Make Ethereal zones post-cap and gear-gated, not level-gated** — you
+   arrive at 50 and progress through them on equipment, which is exactly what
+   [ITEMS_DESIGN.md](ITEMS_DESIGN.md)'s Tier III/IV set chase is for. This is
+   the recommendation, and it's what the table above assumes.
+2. Raise the level cap above 50.
+3. Move the Ethereal unlock earlier — but that reopens the L30–44 gap
+   (TYPE_EFFECTS §0.4) from the other side.
+
+📝 **Counter-edge coverage.** Of the twelve within-tier counter edges, the
+map teaches **seven** through hybrid zones:
+
+| Tier | Edges taught | Edges untaught |
+|---|---|---|
+| Primal | Pyro ▸ Flora, Flora ▸ Aqua | Aqua ▸ Pyro |
+| Kinetic | Electro ▸ Aero | Aero ▸ Geo, Geo ▸ Electro |
+| Celestial | Solar ▸ Lunar | Lunar ▸ Astral, Astral ▸ Solar |
+| **Ethereal** | **all three** ✅ | — |
+
+The remaining four hybrids (Frostfell, Molten Deep, Tidewrack, Shattered
+Orrery) are *cross-tier or neutral* pairings that exist for flavour and for
+the macro-tier loop rather than for a counter edge. ❓ Add five more zones to
+close the gap, or accept that some edges are learned in duels rather than in
+the world? Ethereal being fully closed is deliberate — the endgame tier is
+where the counter game has to be second nature.
 
 **Old draft (superseded, kept for names only):**
 
