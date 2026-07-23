@@ -259,7 +259,12 @@ the routing step.
 
 ---
 
-# Phase 3b — Engine: the six combat stats
+# Phase 3b — ✅ DONE — Engine: the six combat stats
+
+Implemented; sim byte-identical to Phase 3 (defaults inert). The hit roll is
+per-cast (preserves Blind exactly), crit and deflection per-hit; every roll is
+chance-guarded so default duels draw no RNG. Blind is now a flat −50 accuracy
+term, not a separate miss system. `combat_stats_test.dart` covers it.
 
 **Reference:** GAME_DESIGN §1 "Combat stats" · TYPE_EFFECTS §5.2 steps 3/4/6 ·
 ITEMS §4.1a.

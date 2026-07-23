@@ -25,6 +25,12 @@ class Spell {
   /// spells move it.
   final bool grantsHaste;
 
+  /// Base accuracy in percent (GAME_DESIGN §1 "Combat stats"). 100 = always
+  /// hits before dodge; may exceed 100 to out-pace a dodge build. Every
+  /// shipped spell is 100 — low-accuracy spells are a later, deliberate design
+  /// lever, never retrofitted onto the current roster.
+  final int accuracy;
+
   final SpellEffect effect;
 
   const Spell({
@@ -35,6 +41,7 @@ class Spell {
     required this.effect,
     this.xCost = false,
     this.grantsHaste = false,
+    this.accuracy = 100,
   });
 
   /// Deals damage. Drives Haste establishment, Quicken eligibility, and

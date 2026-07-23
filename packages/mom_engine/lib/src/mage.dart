@@ -92,6 +92,34 @@ class MageState {
   /// (Arcane Knowledge = 5% per stack). Read at resolution, never consumed.
   int bonusDamagePercent = 0;
 
+  // ---- Combat stats (GAME_DESIGN §1 "Combat stats") — Phase 3b ----------
+  // All default to no-ops, and every roll that reads them is guarded on the
+  // relevant chance being > 0, so a mage with default stats consumes no extra
+  // RNG — the whole point is that turning these on is what changes a duel,
+  // never leaving them off.
+
+  /// Flat accuracy bonus (from gear), added to a spell's own accuracy. Percent.
+  int accuracyBonus = 0;
+
+  /// Reduces an attacker's hit chance against this mage. Percent points.
+  int dodge = 0;
+
+  /// Chance this mage's attacks land a crit (percent, 0–100).
+  int critChance = 0;
+
+  /// Extra damage a crit deals, in percent (default +50). Inert without
+  /// [critChance], which is the natural brake on the pair.
+  int critDamage = 50;
+
+  /// Chance this mage deflects an incoming hit (percent, 0–100).
+  int deflectChance = 0;
+
+  /// Percent of a deflected hit that is removed (pure reduction, not
+  /// reflection). The 50% player cap is a gear-budget rule (ITEMS §4.1a),
+  /// enforced where stats are granted — the engine only clamps to [0,100] so
+  /// damage can't go negative.
+  int deflectAmount = 0;
+
   MageState({required this.name, this.maxHp = 100}) : hp = maxHp;
 
   /// Records a resolved cast for streak tracking. Not called for charges,

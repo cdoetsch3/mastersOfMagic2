@@ -132,7 +132,12 @@ hitChance = spellAccuracy + gearAccuracy − targetDodge − blindPenalty
   exactly the adaptive tech-slot role ITEMS §2.2 wants — instead of a stat
   that's wasted the moment it's maxed.
 - ✅ **Blind is a flat −50**, matching its old 50% miss chance.
-- One RNG draw per hit, from the shared per-turn seed; one number to show.
+- ✅ **The hit roll is per *cast*** (a whole harmful spell hits or misses),
+  which preserves Blind's exact behaviour — a blinded multi-hit spell whiffs
+  as a unit. Only crit and deflection roll per *hit*. And the roll is taken
+  **only when the hit chance is below 100** (dodge or blind present), so a
+  default-stat attack draws no RNG — that's why turning these stats on is the
+  only thing that ever changes a duel.
 - Astral's Blind exemption becomes "drop the blind term" — same behaviour,
   no special case in the roll.
 - 📝 **0% hit chance is reachable, and that's allowed.** No hard floor. An

@@ -65,6 +65,7 @@ abstract final class Progression {
     'drain': 8,
     'phase': 8,
     'cataclysm': 10,
+    'hallow': 25, // status defence (Grace), TYPE_EFFECTS §4c.4
   };
 
   static int unlockLevelOf(Spell spell) => spellUnlockLevel[spell.id] ?? 1;

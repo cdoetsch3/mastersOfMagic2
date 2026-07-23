@@ -94,7 +94,10 @@ void main() {
       alice.charge = 2;
       alice.element = MagicElement.pyro;
       bruno.charge = 3;
-      bruno.element = MagicElement.aero;
+      // Solar shield is neutral to a Pyro attacker (opposite tiers, 100%) so
+      // this priority test doesn't get entangled with the §0.3 shield math —
+      // the chip is exactly the un-multiplied blast, whatever the rolls are.
+      bruno.element = MagicElement.solar;
       duel.resolveTurn(
           CastAction(Spellbook.blast), CastAction(Spellbook.bulwark));
       expect(bruno.hp, 100, reason: 'a 3-charge shield absorbs any Blast');

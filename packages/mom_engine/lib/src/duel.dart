@@ -331,16 +331,22 @@ class DuelEngine {
       return;
     }
 
-    // Precedence step 3 — Miss (Blind): a harmful spell may miss. Unlike a
-    // fizzle, the charge is still spent (the post-resolution sweep zeroes it);
-    // the spell simply has no effect and advances no streak. Astral spells
-    // are exempt — they never miss (Astral slips Solar, §4b table).
-    if (spell.isHarmful &&
-        cast.element != MagicElement.astral &&
-        caster.missChance > 0 &&
-        rng.nextDouble() < caster.missChance) {
-      events.add(SpellMissedEvent(caster, spell));
-      return;
+    // Precedence step 3 — Hit roll: a single unified accuracy check (§5.2).
+    //   hitChance = spellAccuracy + gearAccuracy − targetDodge − blind
+    // Blind is folded in as a flat −50 (no separate miss system); Astral is
+    // exempt (Astral slips Solar, §4b). Only harmful spells roll, and only
+    // when the hit chance is actually below 100 — so a default-stat cast (100
+    // accuracy, 0 dodge, unblinded) consumes no RNG, leaving the sim unmoved.
+    // Miss ⇒ no effect, charge still spent (post-resolution sweep), no streak.
+    if (spell.isHarmful && cast.element != MagicElement.astral) {
+      final blindPenalty = (caster.missChance * 100).round(); // 50 if blinded
+      final hitChance =
+          spell.accuracy + caster.accuracyBonus - cast.target.dodge - blindPenalty;
+      final missPercent = 100 - hitChance;
+      if (missPercent > 0 && rng.nextDouble() * 100 < missPercent) {
+        events.add(SpellMissedEvent(caster, spell));
+        return;
+      }
     }
 
     events.add(SpellCastEvent(caster, spell, cast.element));
@@ -500,11 +506,29 @@ class DuelEngine {
     final piercePct = (!ignoresShields && target.shield != null)
         ? (_statusOf<AstralAlignmentStatus>(cast.caster)?.piercePercent ?? 0)
         : 0;
+    final caster = cast.caster;
     var totalToHp = 0;
     var totalRaw = 0;
     for (var h = 0; h < hits; h++) {
-      final perHit = (_roll(minPerHit, maxPerHit) * scale).round();
+      var perHit = (_roll(minPerHit, maxPerHit) * scale).round();
       totalRaw += perHit;
+
+      // Crit (§5.2 step 4/5, per hit). Guarded on chance > 0 so a no-crit
+      // build rolls nothing. The bonus is a multiplier atop the damage mods.
+      var crit = false;
+      if (caster.critChance > 0 && rng.nextInt(100) < caster.critChance) {
+        crit = true;
+        perHit = (perHit * (100 + caster.critDamage) / 100).round();
+      }
+
+      // Deflection (§5.2 step 6, defender side, per hit). Pure reduction — the
+      // deflected portion is removed, not reflected. Also chance-guarded.
+      var deflected = 0;
+      if (target.deflectChance > 0 && rng.nextInt(100) < target.deflectChance) {
+        deflected = (perHit * target.deflectAmount.clamp(0, 100) / 100).round();
+        perHit -= deflected;
+      }
+
       final pierce = piercePct > 0 ? (perHit * piercePct / 100).round() : 0;
       final r = _applyOneHit(target, perHit - pierce, cast.element, ignoresShields);
       if (pierce > 0) target.takeHpDamage(pierce);
@@ -514,7 +538,9 @@ class DuelEngine {
           toShield: r.toShield,
           toHp: toHp,
           shieldMultiplierPercent: r.multiplierPercent,
-          shieldBroken: r.broken));
+          shieldBroken: r.broken,
+          crit: crit,
+          deflected: deflected));
     }
     if (lifesteal > 0 && totalToHp > 0) {
       final healed = (totalToHp * lifesteal * healScale).round();

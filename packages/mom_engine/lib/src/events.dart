@@ -71,6 +71,14 @@ class DamageEvent extends DuelEvent {
 
   final bool shieldBroken;
 
+  /// This hit rolled a critical (Phase 3b). Its damage already includes the
+  /// crit bonus; the flag is for the log/HUD.
+  final bool crit;
+
+  /// Damage the defender's Deflection removed from this hit before it landed
+  /// (Phase 3b). 0 when nothing deflected.
+  final int deflected;
+
   const DamageEvent(
     this.target,
     this.spell, {
@@ -78,15 +86,19 @@ class DamageEvent extends DuelEvent {
     required this.toHp,
     this.shieldMultiplierPercent = 100,
     this.shieldBroken = false,
+    this.crit = false,
+    this.deflected = 0,
   });
 
   @override
   String toString() {
     final tag = shieldMultiplierTag(shieldMultiplierPercent);
     final parts = <String>[
+      if (crit) 'CRIT',
       if (toShield > 0) '$toShield to shield${tag == null ? '' : ' ($tag)'}',
       if (toHp > 0) '$toHp damage',
       if (toShield == 0 && toHp == 0) 'no effect',
+      if (deflected > 0) '$deflected deflected',
       if (shieldBroken) 'shield shattered',
     ];
     return '${target.name} takes ${spell.name}: ${parts.join(', ')}';
