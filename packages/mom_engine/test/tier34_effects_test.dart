@@ -59,15 +59,8 @@ void main() {
       expect(moonPhaseForTurn(5), MoonPhase.newMoon, reason: 'cycle repeats');
     });
 
-    test('New Moon weakens a Lunar attack by 25%', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
-      charge(alice, MagicElement.lunar, 0);
-      duel.resolveTurn(
-          CastAction(dmg(20), MagicElement.lunar), const ForfeitAction());
-      expect(bruno.hp, 85, reason: 'turn 1 New Moon: 20 × 0.75 = 15');
-    });
-
-    test('Full Moon strengthens a Lunar attack by 50%', () {
+    test('only the Full Moon matters — it strengthens a Lunar attack by 20%',
+        () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
       // Advance to turn 3 (Full).
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
@@ -75,58 +68,79 @@ void main() {
       charge(alice, MagicElement.lunar, 0);
       duel.resolveTurn(
           CastAction(dmg(20), MagicElement.lunar), const ForfeitAction());
-      expect(bruno.hp, 70, reason: 'turn 3 Full Moon: 20 × 1.5 = 30');
+      expect(bruno.hp, 76, reason: 'turn 3 Full Moon: 20 × 1.2 = 24');
     });
 
-    test('the phase only touches Lunar spells, never other elements', () {
+    test('the other phases do nothing (simplified design)', () {
+      // Turn 1 is New — under the trimmed design that is now neutral.
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      charge(alice, MagicElement.lunar, 0);
+      duel.resolveTurn(
+          CastAction(dmg(20), MagicElement.lunar), const ForfeitAction());
+      expect(bruno.hp, 80, reason: 'New Moon is neutral: full 20 lands');
+    });
+
+    test('Full Moon touches only Lunar spells, never other elements', () {
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
+      duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       charge(alice, MagicElement.pyro, 0);
       duel.resolveTurn(
           CastAction(dmg(20), MagicElement.pyro), const ForfeitAction());
-      expect(bruno.hp, 80, reason: 'a Pyro attack on turn 1 is unmodified');
+      expect(bruno.hp, 80, reason: 'a Pyro attack on a Full Moon is unmodified');
     });
 
-    test('Waning boosts a Lunar shield by 50%', () {
+    test('the public moonPhase getter reports the *upcoming* turn', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
-      // Advance to turn 4 (Waning).
-      for (var i = 0; i < 3; i++) {
-        duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-      }
-      charge(alice, MagicElement.lunar, 2);
-      duel.resolveTurn(
-          CastAction(Spellbook.aegis), const ForfeitAction());
-      expect(alice.shield!.remaining, 39, reason: 'Aegis 26 × 1.5 = 39');
+      expect(duel.moonPhase, MoonPhase.newMoon, reason: 'turn 1 is next');
+      duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // turn 1
+      expect(duel.moonPhase, MoonPhase.waxing, reason: 'turn 2 is next');
+      expect(duel.nextMoonPhase, MoonPhase.full, reason: 'preview: turn 3');
     });
   });
 
   // ======================================================================
-  // §4b.3 — Solar → Lunar: the eclipse
+  // §4b.3 — Solar → Lunar: the eclipse denies the Full Moon
   // ======================================================================
-  group('Solar → Lunar — the eclipse locks the moon to New', () {
-    test('a Blinded Lunar mage is at New even on a non-New turn', () {
+  group('Solar → Lunar — the eclipse denies the Full Moon', () {
+    test('an eclipsed Lunar mage gets no Full-Moon bonus', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
-      // Blind Bruno, then reach turn 2 (Waxing globally, +25%).
       bruno.statuses.add(BlindStatus());
-      duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // turn 1
+      // Reach turn 3 (Full globally). Bruno's blind is active from turn 2 on.
+      duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // 1
+      duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // 2
       charge(bruno, MagicElement.lunar, 0);
-      // Turn 2: Bruno's blind is active (missChance 0.5); script no-miss so we
-      // measure damage, not the miss. Eclipse → New Moon → −25%, not +25%.
+      // Blind is active (missChance 0.5); the empty script returns 0.99 → the
+      // attack lands. Eclipse locks Bruno to New, so no +20% on this Full turn.
       duel.resolveTurn(
           const ForfeitAction(), CastAction(dmg(20), MagicElement.lunar));
-      expect(alice.hp, 85, reason: 'eclipsed to New: 20 × 0.75 = 15, not +25%');
+      expect(alice.hp, 80, reason: 'eclipsed → 20, not the Full-Moon 24');
     });
 
-    test('the eclipse is per-mage — the Solar caster\'s own moon still turns',
-        () {
+    test('the eclipse is per-mage — an unblinded caster still gets Full', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
-      // Only Bruno is eclipsed; Alice (unblinded) on turn 3 gets Full Moon.
-      bruno.statuses.add(BlindStatus());
+      bruno.statuses.add(BlindStatus()); // Bruno eclipsed, but Alice casts
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // 1
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // 2
       charge(alice, MagicElement.lunar, 0);
       duel.resolveTurn(
           CastAction(dmg(20), MagicElement.lunar), const ForfeitAction());
-      expect(bruno.hp, 70, reason: 'Alice is not eclipsed: Full Moon, 20 × 1.5');
+      expect(bruno.hp, 76, reason: 'Alice is not eclipsed: Full Moon, 20 × 1.2');
+    });
+
+    test('the application turn is not yet eclipsed (matches the miss window)',
+        () {
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      // Reach turn 3 (Full) first, THEN blind Bruno this same turn so his
+      // Blind is fresh (missChance 0 on the application turn) — his moon is
+      // still the global Full, exactly as his attacks still land this turn.
+      duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // 1
+      duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // 2
+      bruno.statuses.add(BlindStatus()); // fresh: _justApplied, missChance 0
+      charge(bruno, MagicElement.lunar, 0);
+      duel.resolveTurn(
+          const ForfeitAction(), CastAction(dmg(20), MagicElement.lunar));
+      expect(alice.hp, 76, reason: 'not yet eclipsed → Full Moon 24 still lands');
     });
   });
 
@@ -241,6 +255,18 @@ void main() {
       duel.resolveTurn(
           CastAction(Spellbook.flick, MagicElement.sanctus), const ForfeitAction());
       expect(alice.hasGrace, isTrue);
+    });
+
+    test('the purge pool includes field-debuffs (Waterlogged, Stagger)', () {
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      alice.priorityPenalty = 10; // Waterlogged — a field, not a status
+      alice
+        ..streakElement = MagicElement.sanctus
+        ..streakCount = 2;
+      charge(alice, MagicElement.sanctus, 0);
+      duel.resolveTurn(
+          CastAction(Spellbook.flick, MagicElement.sanctus), const ForfeitAction());
+      expect(alice.priorityPenalty, 0, reason: 'Waterlogged was purged');
     });
 
     test('a non-3rd Sanctus cast does nothing', () {

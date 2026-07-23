@@ -43,9 +43,9 @@ void main() {
   // ======================================================================
   group('accuracy & dodge', () {
     test('default stats always hit', () {
-      // Flora has no on-attack proc, so nothing but the (guarded-off) hit roll
-      // could touch the RNG — the full 20 landing proves the default path is a
-      // clean, un-rolled hit.
+      // 100 accuracy, 0 dodge → the full 20 lands. (That the default path
+      // draws *no* RNG isn't proven here — a missPercent of 0 never rolls
+      // regardless — but by the sim staying byte-identical to Phase 3.)
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]));
       cast(duel, dmg(20), MagicElement.flora);
       expect(bruno.hp, 80, reason: '100 accuracy, 0 dodge → always lands');

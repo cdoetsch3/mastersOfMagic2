@@ -52,4 +52,29 @@ void main() {
       expect(preset.unknownElementIds, isEmpty);
     });
   });
+
+  group('LoadoutPreset tolerates stale spell ids too', () {
+    test('an unknown spell id is dropped, not thrown on', () {
+      final preset = LoadoutPreset.fromJson({
+        'name': 'Save with a removed spell',
+        'elementIds': ['pyro'],
+        'spellIds': ['flick', 'fireball', 'bolt'], // fireball never existed
+      });
+
+      expect(preset.spells.map((s) => s.id), ['flick', 'bolt']);
+      expect(preset.unknownSpellIds, ['fireball']);
+      expect(preset.hasUnknownIds, isTrue);
+    });
+
+    test('a clean preset reports no unknown ids', () {
+      final preset = LoadoutPreset.fromJson({
+        'name': 'Current',
+        'elementIds': ['solar'],
+        'spellIds': ['flick', 'hallow'],
+      });
+
+      expect(preset.unknownSpellIds, isEmpty);
+      expect(preset.hasUnknownIds, isFalse);
+    });
+  });
 }

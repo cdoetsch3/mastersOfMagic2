@@ -130,9 +130,9 @@ never simply out-tier everyone. Every other edge rewards progression.
   Voidcaller archetype** — whose counter-loop role leaned on Umbra's
   element-hiding — has no Umbra until L45, despite set pieces starting at
   L30. ✅ **Resolved: Voidcaller gets its own info-war identity from its set
-  bonuses**, independent of Umbra (per §2.2/Q37). Partial relief for the
-  L30–44 hole also arrives via **Lunar's New Moon phase**, which veils the
-  caster's element for one turn in four (§4b.2).
+  bonuses**, independent of Umbra (per §2.2/Q37). *(The New-Moon veil that
+  once offered partial relief here was cut when Lunar was trimmed — §4b.2 — so
+  L30–44 has no info-war at all until the veil is revisited.)*
 - **ITEMS_DESIGN:** element enchants go from 9 to 12 (5 archetypes × 12 =
   **60** endgame builds); mote types gain three elements; the Voidcaller
   archetype's info-war identity leans on Umbra, which is now a *later* tier.
@@ -434,7 +434,7 @@ rolls on attack including fully-shielded hits. Only two things change:
 Sanctus's Absolution (§4c.1) — otherwise Umbra would have gained a free
 buff out of the renumbering.
 
-### 4b.2 Lunar — Phases of the Moon 📝
+### 4b.2 Lunar — Phases of the Moon 📝 *(trimmed 2026-07-23)*
 
 **The only public, shared, fully-deterministic piece of state in the game.**
 
@@ -443,48 +443,51 @@ buff out of the renumbering.
   starting at **New Moon on turn 1**. It is **visible to both players at all
   times**, along with a preview of the next phase.
 - **You do not control the moon — you schedule around it.** That is the whole
-  identity. Every other element rewards *doing a thing*; Lunar rewards
-  *doing the right thing on the right turn*. It's a planning element in a
-  simultaneous-turn game, which is exactly where planning has teeth.
-- ✅ **Phase effects modify Lunar spells only** — they never touch your other
-  elements. Both players get the same moon, so a Lunar mirror is symmetric.
+  identity: Lunar rewards *doing the right thing on the right turn*.
+- ✅ **The phase modifies Lunar attacks only** — never your other elements,
+  never shields or heals. Both players get the same moon.
 
-| Turn mod 4 | Phase | Effect on **your Lunar spells** |
-|---|---|---|
-| 1 | 🌑 **New Moon** | Attacks **−25%**. Your cast is **veiled**: the opponent cannot see which element you charged or cast this turn |
-| 2 | 🌒 **Waxing** | Attacks **+25%** |
-| 3 | 🌕 **Full Moon** | Attacks **+50%** |
-| 0 | 🌘 **Waning** | Lunar **shields +50% strength** and Lunar **heals +50%**; attacks unmodified |
+⚠️ **SHIPPED VERSION — deliberately minimal.** The rich four-effect table
+below (New −25% + veil, Waxing +25%, Full +50%, Waning +50% shields/heals)
+was judged **too powerful**, so the implementation ships with only:
 
-- **Rhythm: hide → build → strike → defend.** No dead beat, one clear peak,
-  one clear trough. Average attack modifier across the cycle is **+12.5%**,
-  paid for by a forced weak turn — cheap on paper, but the real cost is that
-  a Lunar player's best turn is *public knowledge*, so the opponent can
-  pre-shield Full Moon or bait the New Moon trough.
-- ✅ **New Moon's veil partly fills the L30–44 info-war hole** left by Umbra
-  moving to L45 (§0.4) — one veiled turn in four, no stacking, no
-  accumulation. A taste of the mechanic, not a replacement.
-- ✅ **Determinism:** derived from the turn counter, so it needs no RNG, no
-  state sync, and no netcode work at all. Both clients compute it.
-- ❓ **Fatigue interaction:** at turn 50+ the duel is on the sudden-death
-  clock. The moon keeps turning; no special case. Confirm that's fine.
-- ⚠️ **Watch:** a 4-turn cycle against duels that typically run 10–25 turns
-  means 3–6 full cycles. If playtests show Lunar players simply passing on
-  New Moon, the trough is too deep — soften to −15% before touching the peak.
+| Phase | Effect on **your Lunar attacks** |
+|---|---|
+| 🌕 **Full Moon** (turn ≡ 3 mod 4) | **+20%** |
+| 🌑 New · 🌒 Waxing · 🌘 Waning | **nothing** (neutral) |
+
+So Lunar is currently "hit ~20% harder on every fourth turn, and time your big
+casts for it." No trough, no veil, no defensive phase. The moon still turns
+publicly (the HUD can still show it and preview the next Full), and the two
+counter edges below are unchanged.
+
+💡 **Shelved for later, not discarded:** the New-Moon veil (an info-war taste
+for the L30–44 gap), the Waxing ramp, and the Waning shield/heal phase. Re-add
+piecemeal once the Full-Moon bonus is tuned. The removed veil also means New
+Moon is no longer a downside that needs compensating — which was the reason
+the veil existed in the first place.
+
+- ✅ **Determinism:** derived from the turn counter — no RNG, no state sync,
+  no netcode work. Both clients compute it.
+- ✅ **Fatigue:** the moon keeps turning past turn 50; no special case.
 
 ### 4b.3 Solar's eclipse — the Solar → Lunar edge 📝
 
 When a **Blind proc** lands on a mage, their moon is **locked at 🌑 New Moon**
 for the same 3-turn window. Not "reset to New Moon" — *frozen* there.
 
-- Destroys the Lunar player's entire rhythm rather than shaving a number off
-  it, which is what an effect-layer counter should do.
+- ✅ **Under the trimmed Lunar (§4b.2), the eclipse denies the Full Moon
+  bonus:** since only Full does anything, locking to New means an eclipsed
+  Lunar mage simply never gets the +20% for the blind's duration. Still a real
+  counter (it neuters their one payoff turn), just a quieter one than against
+  the full four-phase design.
+- ✅ **Keyed to the active miss window, not mere Blind presence.** The lock
+  runs exactly as long as the 50% miss does — the 3 turns *after* the
+  application turn, not the application turn itself. (Implementation: the
+  engine reads `missChance > 0`, so the eclipse and the misses share one
+  clock.)
 - The lock is **per-mage**, not global: the Solar caster's own moon keeps
-  turning. So the global clock stays global, and the eclipse is a personal
-  affliction — consistent with how every other debuff works.
-- Stacks naturally with Blind's own 50% miss chance; a blinded Lunar mage is
-  missing half their casts *and* stuck at −25%. That's the intended weight of
-  a within-tier counter.
+  turning — a personal affliction, like every other debuff.
 
 ### 4b.4 Astral — Astral Alignment 📝
 
@@ -589,6 +592,10 @@ is now a **streak element with no healing at all**.
   first (§5.1).
 - ✅ **Purges debuffs only, never your own buffs** — it will not eat your
   Photosynthesis, Astral Alignment, or Arcane Knowledge stacks.
+- ✅ **The pool is every affliction on you**, whether it's a lingering status
+  (Ignite, Blind) *or* a one-turn field-debuff (**Waterlogged, Stagger**).
+  Implementation note: the latter two aren't statuses, so the engine builds a
+  combined removable-debuff list in a fixed order before the random pick.
 - ⚠️ **"At random" is netcode-safe only via the shared per-turn seed** (§5.5),
   exactly like Ignite and Blind procs. Client-local RNG will make the two
   clients disagree about which debuff vanished and diverge immediately. This

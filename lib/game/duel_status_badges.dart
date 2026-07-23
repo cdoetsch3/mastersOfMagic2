@@ -23,7 +23,8 @@ String? _streakMechanic(MagicElement element) => switch (element) {
       MagicElement.aqua => 'WATERLOG',
       MagicElement.aero => 'TAILWIND',
       MagicElement.geo => 'STAGGER',
-      _ => null, // only these three carry consecutive-streak effects
+      MagicElement.sanctus => 'ABSOLUTION',
+      _ => null, // only these four carry consecutive-streak effects
     };
 
 /// Extracts the active status badges for [mage] — its own buffs and the
@@ -52,6 +53,18 @@ List<StatusBadge> statusBadgesFor(MageState mage) {
     badges.add(StatusBadge('AK ×${ak.stacks}',
         sub: '+${ak.bonusPercent}%',
         color: MagicElement.arcane.style.color,
+        kind: BadgeKind.buff));
+  }
+  final align = mage.statuses.whereType<AstralAlignmentStatus>().firstOrNull;
+  if (align != null) {
+    badges.add(StatusBadge('Align ×${align.stacks}',
+        sub: '${align.piercePercent}% pierce',
+        color: MagicElement.astral.style.color,
+        kind: BadgeKind.buff));
+  }
+  if (mage.hasGrace) {
+    badges.add(StatusBadge('Grace',
+        sub: 'blocks 1', color: MagicElement.sanctus.style.color,
         kind: BadgeKind.buff));
   }
   final dark = mage.statuses.whereType<CreepingDarkStatus>().firstOrNull;

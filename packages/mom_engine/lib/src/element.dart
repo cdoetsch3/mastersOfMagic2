@@ -173,12 +173,9 @@ MoonPhase moonPhaseForTurn(int turnNumber) => switch (turnNumber % 4) {
     };
 
 /// The **additive** damage percent a Lunar attack gets in [phase] (folded in
-/// alongside Arcane Knowledge, before multipliers — §5.2 step 5). New Moon is
-/// the trough, Full Moon the peak; Waning is neutral for attacks (its bonus is
-/// on shields/heals instead).
-int lunarAttackPercent(MoonPhase phase) => switch (phase) {
-      MoonPhase.newMoon => -25,
-      MoonPhase.waxing => 25,
-      MoonPhase.full => 50,
-      MoonPhase.waning => 0,
-    };
+/// alongside Arcane Knowledge, before multipliers — §5.2 step 5). Deliberately
+/// minimal for now: only the **Full Moon** matters (+20%); every other phase
+/// is neutral. Richer phase effects (troughs, shield/heal bonuses, a veil)
+/// were considered and shelved as too strong — TYPE_EFFECTS §4b.2.
+int lunarAttackPercent(MoonPhase phase) =>
+    phase == MoonPhase.full ? 20 : 0;

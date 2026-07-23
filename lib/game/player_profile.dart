@@ -8,6 +8,9 @@ import 'world.dart';
 final Set<String> _elementNames =
     MagicElement.values.map((e) => e.name).toSet();
 
+/// Every valid spell id, for the same disk-validation of stale saves.
+final Set<String> _spellIds = Spellbook.all.map((s) => s.id).toSet();
+
 /// A saved loadout: ordered element and spell slots by id. Persisted as part
 /// of the player document; converts to a runtime [Loadout] for combat.
 class LoadoutPreset {
@@ -45,6 +48,16 @@ class LoadoutPreset {
   List<String> get unknownElementIds =>
       elementIds.where((id) => !_elementNames.contains(id)).toList();
 
+  /// Spell ids that no longer name a real spell (a removed or renamed spell in
+  /// an old save). Same purpose as [unknownElementIds].
+  List<String> get unknownSpellIds =>
+      spellIds.where((id) => !_spellIds.contains(id)).toList();
+
+  /// True when this preset carries any id that no longer resolves — the one
+  /// call the UI needs to decide whether to warn the player about a stale save.
+  bool get hasUnknownIds =>
+      unknownElementIds.isNotEmpty || unknownSpellIds.isNotEmpty;
+
   /// Elements this preset resolves to. ⚠️ **Unknown ids are dropped, not
   /// thrown on** — a stale save must never crash the app on load. See
   /// [unknownElementIds] to detect that it happened.
@@ -53,7 +66,10 @@ class LoadoutPreset {
       .map(MagicElement.values.byName)
       .toList();
 
-  List<Spell> get spells => spellIds.map(Spellbook.byId).toList();
+  /// Spells this preset resolves to. Unknown ids are dropped, not thrown on —
+  /// symmetric with [elements]; see [unknownSpellIds].
+  List<Spell> get spells =>
+      spellIds.where(_spellIds.contains).map(Spellbook.byId).toList();
 
   Loadout toLoadout() => Loadout(elements: elements, spells: spells);
 

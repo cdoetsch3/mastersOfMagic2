@@ -87,14 +87,22 @@ class DuelEngine {
   MageState? get hasteHolder =>
       mage1.hasHaste ? mage1 : (mage2.hasHaste ? mage2 : null);
 
-  /// The **shared, public** moon phase this turn (Lunar — §4b.2). Both clients
-  /// derive it from the turn counter. For the HUD's always-visible moon chrome.
-  MoonPhase get moonPhase => moonPhaseForTurn(turnNumber == 0 ? 1 : turnNumber);
+  /// The **shared, public** moon phase for the **next turn to be resolved**
+  /// (Lunar — §4b.2), i.e. the one the players are choosing an action in.
+  /// [turnNumber] is the last *resolved* turn, so the upcoming turn is +1.
+  /// Both clients derive it; for the HUD's moon chrome.
+  MoonPhase get moonPhase => moonPhaseForTurn(turnNumber + 1);
 
-  /// The moon phase actually governing [mage]'s Lunar spells — the shared moon
-  /// unless they're eclipsed (Blinded), which locks them to New. The HUD reads
-  /// this to show an eclipse badge distinct from the global moon.
-  MoonPhase effectiveMoonPhaseFor(MageState mage) => _effectiveMoonPhase(mage);
+  /// The phase after [moonPhase] — for a "next: Full" preview so a Lunar mage
+  /// can plan the turn ahead.
+  MoonPhase get nextMoonPhase => moonPhaseForTurn(turnNumber + 2);
+
+  /// The moon phase actually governing [mage]'s Lunar spells next turn — the
+  /// shared moon unless they're eclipsed (Blind active), which locks them to
+  /// New. The HUD reads this to show an eclipse badge distinct from the global
+  /// moon.
+  MoonPhase effectiveMoonPhaseFor(MageState mage) =>
+      mage.missChance > 0 ? MoonPhase.newMoon : moonPhase;
 
   /// [mage] forfeits the duel (surrender in PvP, flee in the campaign):
   /// they drop to 0 hp and the duel ends immediately as their loss.
@@ -387,11 +395,6 @@ class DuelEngine {
           :final ignoresShields
         ):
         final buffs = caster.consumeOffensiveBuffs();
-        // Lunar lifesteal heals +50% during the Waning moon (§4b.2).
-        final healScale = (cast.element == MagicElement.lunar &&
-                _effectiveMoonPhase(caster) == MoonPhase.waning)
-            ? 1.5
-            : 1.0;
         rawDamage = _attack(
           cast,
           minPerHit: minAmount,
@@ -399,7 +402,6 @@ class DuelEngine {
           scale: damageScale(buffs),
           hits: hits,
           lifesteal: lifesteal,
-          healScale: healScale,
           ignoresShields: ignoresShields || buffs.phase,
           events: events,
         );
@@ -430,12 +432,7 @@ class DuelEngine {
           events: events,
         );
       case ShieldEffect(:final minStrength, :final maxStrength):
-        var strength = _roll(minStrength, maxStrength);
-        // Lunar shields are +50% during the Waning moon (§4b.2).
-        if (cast.element == MagicElement.lunar &&
-            _effectiveMoonPhase(caster) == MoonPhase.waning) {
-          strength = (strength * 1.5).round();
-        }
+        final strength = _roll(minStrength, maxStrength);
         caster.shield = ActiveShield.elemental(cast.element, strength);
         events.add(ShieldRaisedEvent(caster,
             element: cast.element, isBarrier: false, strength: strength));
@@ -465,8 +462,14 @@ class DuelEngine {
         target.element = null;
         events.add(ChargeDrainedEvent(target, drained));
       case HallowEffect():
-        caster.hasGrace = true;
-        events.add(BuffAppliedEvent(caster, 'Grace — next debuff blocked'));
+        // Grace doesn't stack past one, so casting Hallow while already warded
+        // is a wasted turn — say so rather than logging a fresh success.
+        if (caster.hasGrace) {
+          events.add(BuffAppliedEvent(caster, 'Already warded — Grace unchanged'));
+        } else {
+          caster.hasGrace = true;
+          events.add(BuffAppliedEvent(caster, 'Grace — next debuff blocked'));
+        }
     }
 
     // Any resolved cast (offensive or not) advances the element streak.
@@ -495,7 +498,6 @@ class DuelEngine {
     required double lifesteal,
     required bool ignoresShields,
     required List<DuelEvent> events,
-    double healScale = 1.0,
   }) {
     final target = cast.target;
     final spell = cast.spell!;
@@ -511,7 +513,6 @@ class DuelEngine {
     var totalRaw = 0;
     for (var h = 0; h < hits; h++) {
       var perHit = (_roll(minPerHit, maxPerHit) * scale).round();
-      totalRaw += perHit;
 
       // Crit (§5.2 step 4/5, per hit). Guarded on chance > 0 so a no-crit
       // build rolls nothing. The bonus is a multiplier atop the damage mods.
@@ -520,6 +521,11 @@ class DuelEngine {
         crit = true;
         perHit = (perHit * (100 + caster.critDamage) / 100).round();
       }
+
+      // Ignite reads the attack's full output, so a crit burns harder — count
+      // it after the crit multiplier but before the defender's deflection
+      // (that's mitigation of the strike, not a change to its force).
+      totalRaw += perHit;
 
       // Deflection (§5.2 step 6, defender side, per hit). Pure reduction — the
       // deflected portion is removed, not reflected. Also chance-guarded.
@@ -543,7 +549,7 @@ class DuelEngine {
           deflected: deflected));
     }
     if (lifesteal > 0 && totalToHp > 0) {
-      final healed = (totalToHp * lifesteal * healScale).round();
+      final healed = (totalToHp * lifesteal).round();
       cast.caster.heal(healed);
       events.add(HealedEvent(cast.caster, healed));
     }
@@ -750,13 +756,15 @@ class DuelEngine {
   }
 
   /// The moon phase governing [mage]'s Lunar spells: the global clock, unless
-  /// they are Blinded — a Blind proc eclipses their moon to New for its whole
-  /// window (Solar → Lunar, §4b.3). Per-mage: the caster's own moon still
-  /// turns.
-  MoonPhase _effectiveMoonPhase(MageState mage) =>
-      _statusOf<BlindStatus>(mage) != null
-          ? MoonPhase.newMoon
-          : moonPhaseForTurn(turnNumber);
+  /// they are eclipsed — while Blind is *active* (its 3-turn miss window),
+  /// their moon locks to New, denying the Full-Moon bonus (Solar → Lunar,
+  /// §4b.3). Keyed on the miss window (`missChance > 0`), not mere presence,
+  /// so the eclipse matches Blind's 3 turns exactly and skips the application
+  /// turn — the same "starts next turn" rule the misses follow. Per-mage: the
+  /// Solar caster's own moon still turns.
+  MoonPhase _effectiveMoonPhase(MageState mage) => mage.missChance > 0
+      ? MoonPhase.newMoon
+      : moonPhaseForTurn(turnNumber);
 
   /// If [target] holds Grace, consume it and return true (the incoming debuff
   /// is blocked). Grace is max-1 and persists until spent (§4c.1).
@@ -920,18 +928,31 @@ class DuelEngine {
       events.add(BuffAppliedEvent(opponent, 'Creeping Dark seared (−5)'));
     }
 
-    final debuffs = holder.statuses.whereType<Debuff>().toList();
-    if (debuffs.isEmpty) {
+    // The removable-debuff pool is every lingering [Debuff] status PLUS the
+    // two field-debuffs (Waterlogged, Stagger) — which aren't statuses but are
+    // still afflictions the doc's purge list names (§4c.1). Built in a fixed
+    // order so the shared-seed pick is identical on both lockstep clients.
+    final removable = <({String label, void Function() clear})>[
+      for (final s in holder.statuses.whereType<Debuff>().cast<TurnStatus>())
+        (label: s.id, clear: () => holder.statuses.remove(s)),
+      if (holder.priorityPenalty > 0)
+        (label: 'Waterlogged', clear: () => holder.priorityPenalty = 0),
+      if (holder.nextOffensiveDamageScale < 1.0)
+        (label: 'Stagger', clear: () => holder.nextOffensiveDamageScale = 1.0),
+    ];
+
+    if (removable.isEmpty) {
+      // Nothing to purge → bank Grace instead, so Absolution is never a dead
+      // cast against a status-light opponent.
       if (!holder.hasGrace) {
         holder.hasGrace = true;
         events.add(BuffAppliedEvent(holder, 'Grace — next debuff blocked'));
       }
     } else {
-      // Uniformly random, from the shared per-turn seed so both clients purge
-      // the identical debuff (§4c.1). List order is deterministic in lockstep.
-      final victim = debuffs[rng.nextInt(debuffs.length)] as TurnStatus;
-      holder.statuses.remove(victim);
-      events.add(BuffAppliedEvent(holder, 'Absolution — ${victim.id} purged'));
+      // Uniformly random, from the shared per-turn seed (§4c.1).
+      final victim = removable[rng.nextInt(removable.length)];
+      victim.clear();
+      events.add(BuffAppliedEvent(holder, 'Absolution — ${victim.label} purged'));
     }
   }
 

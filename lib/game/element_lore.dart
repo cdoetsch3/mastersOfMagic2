@@ -89,47 +89,44 @@ const Map<MagicElement, ElementLore> elementLore = {
   ),
 
   // ---- Tier 3 — Celestial ----------------------------------------------
-  // Effects arrive in Phase 3 (TYPE_EFFECTS_DESIGN §4b). Until then these
-  // read honestly as "not yet active" rather than describing behaviour the
-  // engine doesn't have — a player must never be told about a mechanic that
-  // won't fire.
   MagicElement.solar: ElementLore(
     effectName: 'Blind',
-    trigger: 'not yet active',
-    description: 'The Celestial tier is still being woven. Solar will inherit '
-        'Blind: a chance per charge spent to leave the opponent missing their '
-        'attacks. Not yet implemented.',
-    beatsEffect: 'Solar eclipses Lunar',
-    weakEffect: 'Astral slips through Solar',
+    trigger: '10% per charge spent, on attack',
+    description: 'For the opponent\'s next 3 turns, each offensive spell has a '
+        '50% chance to miss — no effect, but the charge is spent. Astral spells '
+        'are exempt. A Blind also eclipses a Lunar mage\'s moon to New.',
+    beatsEffect: 'Blind eclipses their moon to New',
+    weakEffect: 'Their Astral spells are immune to Blind',
   ),
   MagicElement.lunar: ElementLore(
     effectName: 'Phases of the Moon',
-    trigger: 'not yet active',
-    description: 'The Celestial tier is still being woven. Lunar will follow a '
-        'public four-turn moon cycle — new, waxing, full, waning — that '
-        'strengthens and weakens its spells in turn. Not yet implemented.',
-    beatsEffect: 'Lunar anchors Astral',
-    weakEffect: 'Solar eclipses Lunar',
+    trigger: 'a shared, public 4-turn cycle',
+    description: 'The moon turns every turn for both players. On a Full Moon '
+        'your Lunar attacks hit 20% harder; the other phases do nothing for '
+        'now. Time your big Lunar turns for the Full Moon.',
+    beatsEffect: 'A Lunar hit strips their Astral Alignment (all of it at Full)',
+    weakEffect: 'Their Blind eclipses your moon, denying the Full Moon',
   ),
   MagicElement.astral: ElementLore(
     effectName: 'Astral Alignment',
-    trigger: 'not yet active',
-    description: 'The Celestial tier is still being woven. Astral will stack '
-        'Alignment, sending part of every attack straight through shields to '
-        'health. Not yet implemented.',
-    beatsEffect: 'Astral slips through Solar',
-    weakEffect: 'Lunar anchors Astral',
+    trigger: '+1 stack each Astral turn (max 5)',
+    description: 'Each stack routes 5% of every attack past shields, straight '
+        'to health — up to 25%, ignoring shield counter math and piercing '
+        'Barrier. Decays on turns without an Astral cast. Astral spells never '
+        'miss.',
+    beatsEffect: 'Your spells slip Solar\'s Blind',
+    weakEffect: 'A Lunar hit strips your Alignment',
   ),
 
   // ---- Tier 4 — Ethereal ----------------------------------------------
   MagicElement.sanctus: ElementLore(
-    effectName: 'Blind',
-    trigger: '10% per charge spent, on attack',
-    description: 'For the opponent\'s next 3 turns, each offensive spell has a '
-        '50% chance to miss — no effect, but the charge is spent. A proc also '
-        'burns away all their Creeping Dark. Arcane spells never miss.',
-    beatsEffect: 'Blind burns away their Creeping Dark',
-    weakEffect: 'Their Arcane spells are immune to Blind',
+    effectName: 'Absolution',
+    trigger: 'every 3rd consecutive Sanctus cast',
+    description: 'Purges one random debuff from you, before end-of-turn burns '
+        'tick. Nothing to purge? Bank Grace — the next debuff on you is blocked '
+        '(max 1). Every Absolution also sears 5 Creeping Dark off the enemy.',
+    beatsEffect: 'Absolution sears their Creeping Dark (−5)',
+    weakEffect: 'An Arcane hit resets your Sanctus streak',
   ),
   MagicElement.umbra: ElementLore(
     effectName: 'Creeping Dark',
@@ -139,15 +136,15 @@ const Map<MagicElement, ElementLore> elementLore = {
         'charge & health), 15 Midnight (hides their own). Dusk+ also stops '
         'them gaining Arcane Knowledge.',
     beatsEffect: 'Dusk blocks their Arcane Knowledge',
-    weakEffect: 'Their Blind burns away your Creeping Dark',
+    weakEffect: 'Their Absolution sears away your Creeping Dark',
   ),
   MagicElement.arcane: ElementLore(
     effectName: 'Arcane Knowledge',
     trigger: '4+ charge Arcane cast (max 5 stacks)',
     description: '+5% damage per stack on every spell, permanent for the duel '
         '— never decays or is consumed. Blocked while the opponent\'s darkness '
-        'has you at Dusk or worse. Arcane spells can never miss.',
-    beatsEffect: 'Your spells are immune to their Blind',
+        'has you at Dusk or worse.',
+    beatsEffect: 'An Arcane hit resets their Sanctus rite',
     weakEffect: 'Their Dusk blocks your Arcane Knowledge',
   ),
 };
