@@ -65,8 +65,9 @@ class DamageEvent extends DuelEvent {
   final int toShield;
   final int toHp;
 
-  /// The attack's element countered the shield's element (2× vs shield).
-  final bool countered;
+  /// The §0.3 shield multiplier this hit landed at, as an integer percent
+  /// (50/75/100/150/200). 100 = neutral. Replaces the old boolean "countered".
+  final int shieldMultiplierPercent;
 
   final bool shieldBroken;
 
@@ -75,15 +76,15 @@ class DamageEvent extends DuelEvent {
     this.spell, {
     required this.toShield,
     required this.toHp,
-    this.countered = false,
+    this.shieldMultiplierPercent = 100,
     this.shieldBroken = false,
   });
 
   @override
   String toString() {
+    final tag = shieldMultiplierTag(shieldMultiplierPercent);
     final parts = <String>[
-      if (toShield > 0)
-        '$toShield to shield${countered ? ' (countered, 2x)' : ''}',
+      if (toShield > 0) '$toShield to shield${tag == null ? '' : ' ($tag)'}',
       if (toHp > 0) '$toHp damage',
       if (toShield == 0 && toHp == 0) 'no effect',
       if (shieldBroken) 'shield shattered',
@@ -187,7 +188,7 @@ class EffectDamageEvent extends DuelEvent {
   final String source;
   final int toShield;
   final int toHp;
-  final bool countered;
+  final int shieldMultiplierPercent;
   final bool shieldBroken;
 
   const EffectDamageEvent(
@@ -195,14 +196,15 @@ class EffectDamageEvent extends DuelEvent {
     this.source, {
     required this.toShield,
     required this.toHp,
-    this.countered = false,
+    this.shieldMultiplierPercent = 100,
     this.shieldBroken = false,
   });
 
   @override
   String toString() {
+    final tag = shieldMultiplierTag(shieldMultiplierPercent);
     final parts = <String>[
-      if (toShield > 0) '$toShield to shield${countered ? ' (2x)' : ''}',
+      if (toShield > 0) '$toShield to shield${tag == null ? '' : ' ($tag)'}',
       if (toHp > 0) '$toHp damage',
       if (toShield == 0 && toHp == 0) 'no effect',
       if (shieldBroken) 'shield shattered',

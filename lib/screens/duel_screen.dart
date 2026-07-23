@@ -283,7 +283,7 @@ class _DuelScreenState extends State<DuelScreen>
           :final target,
           :final toShield,
           :final toHp,
-          :final countered,
+          :final shieldMultiplierPercent,
           :final shieldBroken
         ):
         final isEnemy = target == c.enemy;
@@ -304,7 +304,8 @@ class _DuelScreenState extends State<DuelScreen>
         final text = [
           if (toHp > 0) '-$toHp',
           if (toHp == 0 && toShield > 0) 'blocked',
-          if (countered) '2x vs shield',
+          if (shieldMultiplierTag(shieldMultiplierPercent) case final t?)
+            '$t vs shield',
           if (shieldBroken) 'shield shattered',
         ].join('  ');
         await _runFx(_FxKind.impact,

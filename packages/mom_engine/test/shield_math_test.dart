@@ -44,17 +44,113 @@ void main() {
     expect(defender.hp, 95, reason: 'only 5 overflow reaches health');
   });
 
-  test('non-countered attack hits the shield at normal rate', () {
-    defender.shield = ActiveShield.elemental(MagicElement.pyro, 50);
-    const earthAttack = Spell(
+  test('a truly neutral attack hits the shield at normal rate', () {
+    // Kinetic vs Ethereal is the opposite-tier (neutral) macro matchup — the
+    // only cross-tier pairing that is still 100%. (Geo vs a Primal shield is
+    // now 150%, since Kinetic beats Primal — see the macro-tier group below.)
+    defender.shield = ActiveShield.elemental(MagicElement.umbra, 50);
+    const geoAttack = Spell(
         id: 'test30e', name: 'Test30e', chargeCost: 0, priority: 9,
         effect: DamageEffect(30, 30));
     duel.resolveTurn(
-      CastAction(earthAttack, MagicElement.geo),
+      CastAction(geoAttack, MagicElement.geo),
       ChargeAction(MagicElement.aero),
     );
-    expect(defender.shield!.remaining, 20);
+    expect(defender.shield!.remaining, 20, reason: '30 at 100%');
     expect(defender.hp, 100);
+  });
+
+  // TYPE_EFFECTS_DESIGN §0.3 — the full six-relationship table, asserted on
+  // the pure helper (exhaustive) and then spot-checked through a real turn.
+  group('§0.3 shield multiplier table', () {
+    test('within-tier: counter 200, countered 50, mirror 100', () {
+      // Primal triangle: pyro → flora → aqua → pyro.
+      expect(shieldMultiplierPercent(MagicElement.pyro, MagicElement.flora),
+          200); // you counter their shield
+      expect(shieldMultiplierPercent(MagicElement.flora, MagicElement.pyro),
+          50); // their shield counters you
+      expect(shieldMultiplierPercent(MagicElement.pyro, MagicElement.pyro),
+          100); // same element
+    });
+
+    test('macro-tier: your tier wins 150, their tier wins 75', () {
+      // Kinetic beats Primal; Primal beats Ethereal.
+      expect(shieldMultiplierPercent(MagicElement.geo, MagicElement.pyro),
+          150); // kinetic attacker into primal shield
+      expect(shieldMultiplierPercent(MagicElement.pyro, MagicElement.geo),
+          75); // primal attacker into kinetic shield
+    });
+
+    test('opposite tiers are neutral both ways (100)', () {
+      // Primal↔Celestial and Kinetic↔Ethereal.
+      expect(shieldMultiplierPercent(MagicElement.pyro, MagicElement.solar),
+          100);
+      expect(shieldMultiplierPercent(MagicElement.solar, MagicElement.pyro),
+          100);
+      expect(shieldMultiplierPercent(MagicElement.geo, MagicElement.umbra),
+          100);
+    });
+
+    test('element-agnostic damage never counters (100)', () {
+      expect(shieldMultiplierPercent(null, MagicElement.pyro), 100);
+    });
+
+    test('the two layers never stack — only one rule ever applies', () {
+      // Every ordered pair lands on exactly one of the five legal values.
+      for (final a in MagicElement.values) {
+        for (final s in MagicElement.values) {
+          expect(shieldMultiplierPercent(a, s), isIn([50, 75, 100, 150, 200]),
+              reason: '${a.name} vs ${s.name}');
+        }
+      }
+    });
+
+    test('the resist edge (50%) chips a shield at half rate', () {
+      // Flora attacking into a Pyro shield: Pyro counters Flora → 50%.
+      defender.shield = ActiveShield.elemental(MagicElement.pyro, 50);
+      const floraAttack = Spell(
+          id: 't50', name: 'T50', chargeCost: 0, priority: 9,
+          effect: DamageEffect(30, 30));
+      duel.resolveTurn(
+        CastAction(floraAttack, MagicElement.flora),
+        ChargeAction(MagicElement.aero),
+      );
+      expect(defender.shield!.remaining, 35, reason: '30 × 50% = 15 to shield');
+      expect(defender.hp, 100);
+    });
+
+    test('the macro edge (150%) overflows across a tier boundary', () {
+      // Geo (Kinetic) into a Pyro (Primal) shield: Kinetic beats Primal → 150%.
+      // 30 × 150% = 45 effective vs a 30-point shield → shatters, and the
+      // overflow reaches health at the normal 1× rate.
+      defender.shield = ActiveShield.elemental(MagicElement.pyro, 30);
+      const geoAttack = Spell(
+          id: 't150', name: 'T150', chargeCost: 0, priority: 9,
+          effect: DamageEffect(30, 30));
+      duel.resolveTurn(
+        CastAction(geoAttack, MagicElement.geo),
+        ChargeAction(MagicElement.aero),
+      );
+      expect(defender.shield, isNull, reason: 'shield shatters');
+      // 30 shield absorbed at 150% = 20 raw consumed; 10 raw overflows to hp.
+      expect(defender.hp, 90);
+    });
+
+    test('the 75% edge lets a weak attacker through slowly', () {
+      // Pyro (Primal) into a Geo (Kinetic) shield: Kinetic beats Primal, so
+      // the attacker is the weaker tier → 75%.
+      defender.shield = ActiveShield.elemental(MagicElement.geo, 40);
+      const pyroAttack = Spell(
+          id: 't75', name: 'T75', chargeCost: 0, priority: 9,
+          effect: DamageEffect(40, 40));
+      duel.resolveTurn(
+        CastAction(pyroAttack, MagicElement.pyro),
+        ChargeAction(MagicElement.aero),
+      );
+      // 40 × 75% = 30 to a 40-point shield → 10 remaining, nothing to hp.
+      expect(defender.shield!.remaining, 10);
+      expect(defender.hp, 100);
+    });
   });
 
   test('cross-tier attacks never counter a shield', () {
@@ -113,8 +209,15 @@ void main() {
           reason: 'Ward rolls 13-17 — never the post-damage remainder');
       expect(raised.element, MagicElement.flora);
       expect(raised.isBarrier, isFalse);
-      // The live shield really did take the hit.
-      expect(attacker.shield!.remaining, raised.strength - 6);
+      // The live shield really did take the hit. The exact chip depends on the
+      // §0.3 multiplier (the poke is Aero into a Flora shield — Kinetic beats
+      // Primal, so 150%); this test is about the *snapshot*, not the multiplier,
+      // so derive the chip from the reported event rather than hardcoding it.
+      final chip = result.events
+          .whereType<DamageEvent>()
+          .where((e) => e.target == attacker)
+          .fold(0, (sum, e) => sum + e.toShield);
+      expect(attacker.shield!.remaining, raised.strength - chip);
     });
 
     test('replaying the events never drives a shield below zero', () {

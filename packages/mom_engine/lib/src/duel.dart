@@ -464,7 +464,7 @@ class DuelEngine {
       events.add(DamageEvent(target, spell,
           toShield: r.toShield,
           toHp: r.toHp,
-          countered: r.countered,
+          shieldMultiplierPercent: r.multiplierPercent,
           shieldBroken: r.broken));
     }
     if (lifesteal > 0 && totalToHp > 0) {
@@ -659,7 +659,7 @@ class DuelEngine {
   /// the right event. Shared by spell attacks and status ticks (DoTs), so
   /// shield behavior is identical everywhere. [attackElement] null = element-
   /// agnostic (never counters); [ignoresShields] strikes health directly.
-  ({int toShield, int toHp, bool broken, bool countered}) _applyOneHit(
+  ({int toShield, int toHp, bool broken, int multiplierPercent}) _applyOneHit(
     MageState target,
     int amount,
     MagicElement? attackElement,
@@ -668,33 +668,39 @@ class DuelEngine {
     final shield = ignoresShields ? null : target.shield;
     if (shield == null) {
       target.takeHpDamage(amount);
-      return (toShield: 0, toHp: amount, broken: false, countered: false);
+      return (toShield: 0, toHp: amount, broken: false, multiplierPercent: 100);
     }
     if (shield.isBarrier) {
       target.shield = null;
-      return (toShield: amount, toHp: 0, broken: true, countered: false);
+      return (toShield: amount, toHp: 0, broken: true, multiplierPercent: 100);
     }
-    final countered =
-        attackElement != null && attackElement.counters(shield.element!);
-    final counterMult = countered ? 2 : 1;
-    final effective = amount * counterMult;
+    // §0.3 shield multiplier (50/75/100/150/200%). All arithmetic stays
+    // integer so both lockstep clients land on the identical remainder.
+    final pct = shieldMultiplierPercent(attackElement, shield.element!);
+    final effective = amount * pct ~/ 100;
     if (effective < shield.remaining) {
       shield.remaining -= effective;
       return (
         toShield: effective,
         toHp: 0,
         broken: false,
-        countered: countered
+        multiplierPercent: pct
       );
     }
-    // Overflow: raw damage spent breaking the shield is rounded in the
-    // defender's favor; the rest strikes health at normal rate.
+    // Overflow: the raw damage spent breaking the shield is rounded in the
+    // defender's favor (ceil of absorbed ÷ multiplier); the rest strikes
+    // health at the normal 1× rate.
     final absorbed = shield.remaining;
-    final rawConsumed = (absorbed + counterMult - 1) ~/ counterMult;
+    final rawConsumed = (absorbed * 100 + pct - 1) ~/ pct;
     final toHp = amount - rawConsumed;
     target.shield = null;
     target.takeHpDamage(toHp);
-    return (toShield: absorbed, toHp: toHp, broken: true, countered: countered);
+    return (
+      toShield: absorbed,
+      toHp: toHp,
+      broken: true,
+      multiplierPercent: pct
+    );
   }
 
   /// Resolves one turn phase (start or end): gathers each mage's status ops,
@@ -751,7 +757,7 @@ class DuelEngine {
         events.add(EffectDamageEvent(holder, source,
             toShield: r.toShield,
             toHp: r.toHp,
-            countered: r.countered,
+            shieldMultiplierPercent: r.multiplierPercent,
             shieldBroken: r.broken));
     }
   }

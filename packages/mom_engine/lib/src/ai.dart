@@ -32,12 +32,11 @@ int estimateDamage(Spell spell, MageState self, MageState enemy) {
   final shield = enemy.shield;
   if (shield == null || self.phaseNext) return raw;
   if (shield.isBarrier) return 0;
-  final countered =
-      element != null && shield.element != null && element.counters(shield.element!);
-  final multiplier = countered ? 2 : 1;
-  final effective = raw * multiplier;
+  // Mirror the engine's §0.3 shield math so the AI values a hit correctly.
+  final pct = shieldMultiplierPercent(element, shield.element!);
+  final effective = raw * pct ~/ 100;
   if (effective <= shield.remaining) return 0;
-  return raw - (shield.remaining + multiplier - 1) ~/ multiplier;
+  return raw - (shield.remaining * 100 + pct - 1) ~/ pct;
 }
 
 List<Spell> _affordable(MageState self, List<Spell> spells) => [

@@ -86,7 +86,11 @@ void main() {
       final duel = DuelEngine(alice, bruno, rng: Random(1));
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       expect(bruno.hp, 100);
-      expect(bruno.shield!.remaining, 25, reason: 'geo shield, no counter');
+      // The burn carries Pyro's element — the same identity that gives it 2×
+      // vs a Flora shield gives it the §0.3 macro penalty here: Geo's Kinetic
+      // tier resists Pyro's Primal, so 5 lands at 75% → 3 to the shield.
+      expect(bruno.shield!.remaining, 27,
+          reason: 'geo (Kinetic) resists a primal burn at 75%: 5 × 0.75 = 3');
     });
 
     test('the burn counters a Flora shield (pyro burns flora, 2x)', () {

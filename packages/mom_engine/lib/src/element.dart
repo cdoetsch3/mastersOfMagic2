@@ -117,3 +117,43 @@ const Map<MagicTier, MagicTier> _tierCounters = {
   MagicTier.ethereal: MagicTier.celestial,
   MagicTier.primal: MagicTier.ethereal,
 };
+
+/// The shield-damage multiplier for an [attack] element striking a shield of
+/// [shieldElement], as an **integer percent**. TYPE_EFFECTS_DESIGN §0.3.
+///
+/// Two layers, which never stack — same-tier matchups use the element
+/// triangle, cross-tier matchups use the macro-tier loop:
+///
+/// | Relationship                         | Percent |
+/// |--------------------------------------|---------|
+/// | Within-tier, you counter their shield| 200     |
+/// | Within-tier, their shield counters you| 50     |
+/// | Within-tier, same element            | 100     |
+/// | Macro-tier, your tier counters theirs| 150     |
+/// | Macro-tier, their tier counters yours| 75      |
+/// | Macro-tier, opposite (neutral) tier  | 100     |
+///
+/// [attack] null means element-agnostic damage (a raw hit, a DoT that carries
+/// no element): it never counters, so the multiplier is always 100.
+int shieldMultiplierPercent(MagicElement? attack, MagicElement shieldElement) {
+  if (attack == null) return 100;
+  if (attack.tier == shieldElement.tier) {
+    if (attack.counters(shieldElement)) return 200;
+    if (shieldElement.counters(attack)) return 50;
+    return 100; // same element (the only within-tier non-counter)
+  }
+  if (attack.tier.countersTier(shieldElement.tier)) return 150;
+  if (shieldElement.tier.countersTier(attack.tier)) return 75;
+  return 100; // opposite tier — neutral both ways
+}
+
+/// A short label for a non-neutral shield multiplier ("2×", "1.5×", "¾×",
+/// "½×"), or null at 100% so callers can omit it. Shared by the battle log
+/// and the duel screen so both read identically.
+String? shieldMultiplierTag(int percent) => switch (percent) {
+      200 => '2×',
+      150 => '1.5×',
+      75 => '¾×',
+      50 => '½×',
+      _ => null,
+    };

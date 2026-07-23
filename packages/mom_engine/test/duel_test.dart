@@ -209,7 +209,11 @@ void main() {
     test('multi-hit spells strike separately', () {
       alice.charge = 3;
       alice.element = MagicElement.pyro;
-      bruno.shield = ActiveShield.elemental(MagicElement.aero, 10);
+      // Solar is Celestial — the opposite tier to Pyro's Primal, so this is a
+      // neutral 100% matchup. (A Kinetic shield like Aero would now resist a
+      // Primal attacker at 75% under the §0.3 macro layer; that's covered in
+      // shield_math_test, not here — this test is only about multi-hit.)
+      bruno.shield = ActiveShield.elemental(MagicElement.solar, 10);
       duel.resolveTurn(
           CastAction(Spellbook.volley), const ChargeAction(MagicElement.aero));
       // Volley rolls 8-11 x4 (32-44 total); the 10-point shield absorbs 10
