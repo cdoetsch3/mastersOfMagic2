@@ -109,6 +109,13 @@ abstract final class Spellbook {
       id: 'overload', name: 'Overload', chargeCost: 2, priority: 7,
       effect: OverloadEffect(8, 12));
 
+  // Status defence: banks Grace (blocks the next debuff). Element-neutral, so
+  // any loadout can answer a status deck without playing Sanctus. Priority 7,
+  // so quick attacks land their proc before Grace exists — it's pre-emptive.
+  static const hallow = Spell(
+      id: 'hallow', name: 'Hallow', chargeCost: 2, priority: 7,
+      effect: HallowEffect());
+
   static const List<Spell> all = [
     flick, bolt, blast, surge, ruin, cataclysm,
     jolt,
@@ -116,7 +123,7 @@ abstract final class Spellbook {
     sap, leech, drain,
     ward, aegis, bulwark, rampart, sanctuary, barrier,
     empower, quicken, phase,
-    hasty, discharge, overload,
+    hasty, discharge, overload, hallow,
   ];
 
   static Spell byId(String id) => all.firstWhere((s) => s.id == id);

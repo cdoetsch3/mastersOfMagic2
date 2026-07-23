@@ -40,6 +40,7 @@ String _numbers(Spell spell) => switch (spell.effect) {
       PhaseEffect() => 'pierce',
       HasteEffect() => 'Haste',
       DischargeEffect() => 'all',
+      HallowEffect() => 'Grace',
     };
 
 /// The qualifier beside the figure — carries the prose, and is free to wrap.
@@ -55,6 +56,7 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
       PhaseEffect() => 'your next offensive spell ignores shields',
       HasteEffect() => 'seized — you win same-speed ties',
       DischargeEffect() => "of the enemy's charge, wiped",
+      HallowEffect() => 'banked — it blocks the next debuff applied to you',
     };
 
 List<String> _systemsRules(Spell spell) {

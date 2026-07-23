@@ -87,6 +87,15 @@ class DuelEngine {
   MageState? get hasteHolder =>
       mage1.hasHaste ? mage1 : (mage2.hasHaste ? mage2 : null);
 
+  /// The **shared, public** moon phase this turn (Lunar — §4b.2). Both clients
+  /// derive it from the turn counter. For the HUD's always-visible moon chrome.
+  MoonPhase get moonPhase => moonPhaseForTurn(turnNumber == 0 ? 1 : turnNumber);
+
+  /// The moon phase actually governing [mage]'s Lunar spells — the shared moon
+  /// unless they're eclipsed (Blinded), which locks them to New. The HUD reads
+  /// this to show an eclipse badge distinct from the global moon.
+  MoonPhase effectiveMoonPhaseFor(MageState mage) => _effectiveMoonPhase(mage);
+
   /// [mage] forfeits the duel (surrender in PvP, flee in the campaign):
   /// they drop to 0 hp and the duel ends immediately as their loss.
   void concede(MageState mage) {
@@ -324,10 +333,10 @@ class DuelEngine {
 
     // Precedence step 3 — Miss (Blind): a harmful spell may miss. Unlike a
     // fizzle, the charge is still spent (the post-resolution sweep zeroes it);
-    // the spell simply has no effect and advances no streak. Arcane spells
-    // are exempt — they never miss (Arcane unravels Sanctus, §4 table).
+    // the spell simply has no effect and advances no streak. Astral spells
+    // are exempt — they never miss (Astral slips Solar, §4b table).
     if (spell.isHarmful &&
-        cast.element != MagicElement.arcane &&
+        cast.element != MagicElement.astral &&
         caster.missChance > 0 &&
         rng.nextDouble() < caster.missChance) {
       events.add(SpellMissedEvent(caster, spell));
@@ -347,12 +356,22 @@ class DuelEngine {
       caster.nextOffensiveDamageScale = 1.0;
     }
 
-    // Damage modifiers in order: additive (Arcane Knowledge +5%/stack) then
-    // multipliers (Empower ×2, Stagger ×0.5).
+    // The Lunar phase modifier is additive alongside Arcane Knowledge (§5.2
+    // step 5), and only for a Lunar attack. New −25 / Waxing +25 / Full +50 /
+    // Waning 0; an eclipsed Lunar mage is locked to New (−25).
+    final lunarPercent = (cast.element == MagicElement.lunar && spell.isOffensive)
+        ? lunarAttackPercent(_effectiveMoonPhase(caster))
+        : 0;
+
+    // Damage modifiers in order: additive (Arcane Knowledge +5%/stack, Lunar
+    // phase) then multipliers (Empower ×2, Stagger ×0.5).
     double damageScale(({int multiplier, bool phase}) buffs) =>
-        (1 + caster.bonusDamagePercent / 100) * buffs.multiplier * staggerScale;
+        (1 + (caster.bonusDamagePercent + lunarPercent) / 100) *
+        buffs.multiplier *
+        staggerScale;
 
     var rawDamage = 0; // total pre-shield damage rolled (for Ignite)
+    _lastAttackToHp = 0; // reset; _attack sets it, non-attacks leave it 0
     switch (spell.effect) {
       case DamageEffect(
           :final minAmount,
@@ -362,6 +381,11 @@ class DuelEngine {
           :final ignoresShields
         ):
         final buffs = caster.consumeOffensiveBuffs();
+        // Lunar lifesteal heals +50% during the Waning moon (§4b.2).
+        final healScale = (cast.element == MagicElement.lunar &&
+                _effectiveMoonPhase(caster) == MoonPhase.waning)
+            ? 1.5
+            : 1.0;
         rawDamage = _attack(
           cast,
           minPerHit: minAmount,
@@ -369,6 +393,7 @@ class DuelEngine {
           scale: damageScale(buffs),
           hits: hits,
           lifesteal: lifesteal,
+          healScale: healScale,
           ignoresShields: ignoresShields || buffs.phase,
           events: events,
         );
@@ -399,7 +424,12 @@ class DuelEngine {
           events: events,
         );
       case ShieldEffect(:final minStrength, :final maxStrength):
-        final strength = _roll(minStrength, maxStrength);
+        var strength = _roll(minStrength, maxStrength);
+        // Lunar shields are +50% during the Waning moon (§4b.2).
+        if (cast.element == MagicElement.lunar &&
+            _effectiveMoonPhase(caster) == MoonPhase.waning) {
+          strength = (strength * 1.5).round();
+        }
         caster.shield = ActiveShield.elemental(cast.element, strength);
         events.add(ShieldRaisedEvent(caster,
             element: cast.element, isBarrier: false, strength: strength));
@@ -428,6 +458,9 @@ class DuelEngine {
         target.charge = 0;
         target.element = null;
         events.add(ChargeDrainedEvent(target, drained));
+      case HallowEffect():
+        caster.hasGrace = true;
+        events.add(BuffAppliedEvent(caster, 'Grace — next debuff blocked'));
     }
 
     // Any resolved cast (offensive or not) advances the element streak.
@@ -441,6 +474,11 @@ class DuelEngine {
     }
   }
 
+  /// The health damage the most recent [_attack] actually dealt (past shields
+  /// and pierce). Read by charge-spent triggers that must ignore fully-shielded
+  /// hits — Arcane → Sanctus (§4c.3). Reset at the top of each cast.
+  int _lastAttackToHp = 0;
+
   /// Returns the total pre-shield damage rolled (for Ignite's 10%).
   int _attack(
     _Entry cast, {
@@ -451,27 +489,39 @@ class DuelEngine {
     required double lifesteal,
     required bool ignoresShields,
     required List<DuelEvent> events,
+    double healScale = 1.0,
   }) {
     final target = cast.target;
     final spell = cast.spell!;
+    // Astral Alignment: this fraction of each hit bypasses the shield to
+    // health at 100%, splitting the attack rather than shrinking it (§4b.4).
+    // Only matters when there's a shield to pierce and the hit isn't already
+    // going straight to health (Phase wins that turn).
+    final piercePct = (!ignoresShields && target.shield != null)
+        ? (_statusOf<AstralAlignmentStatus>(cast.caster)?.piercePercent ?? 0)
+        : 0;
     var totalToHp = 0;
     var totalRaw = 0;
     for (var h = 0; h < hits; h++) {
       final perHit = (_roll(minPerHit, maxPerHit) * scale).round();
       totalRaw += perHit;
-      final r = _applyOneHit(target, perHit, cast.element, ignoresShields);
-      totalToHp += r.toHp;
+      final pierce = piercePct > 0 ? (perHit * piercePct / 100).round() : 0;
+      final r = _applyOneHit(target, perHit - pierce, cast.element, ignoresShields);
+      if (pierce > 0) target.takeHpDamage(pierce);
+      final toHp = r.toHp + pierce;
+      totalToHp += toHp;
       events.add(DamageEvent(target, spell,
           toShield: r.toShield,
-          toHp: r.toHp,
+          toHp: toHp,
           shieldMultiplierPercent: r.multiplierPercent,
           shieldBroken: r.broken));
     }
     if (lifesteal > 0 && totalToHp > 0) {
-      final healed = (totalToHp * lifesteal).round();
+      final healed = (totalToHp * lifesteal * healScale).round();
       cast.caster.heal(healed);
       events.add(HealedEvent(cast.caster, healed));
     }
+    _lastAttackToHp = totalToHp;
     return totalRaw;
   }
 
@@ -507,7 +557,8 @@ class DuelEngine {
         // next action by +10 priority, unless they hold Photosynthesis.
         if (caster.streakElement == MagicElement.aqua &&
             caster.streakCount % 3 == 0) {
-          if (_statusOf<PhotosynthesisStatus>(target) == null) {
+          if (_statusOf<PhotosynthesisStatus>(target) == null &&
+              !_graceBlocks(target, e)) {
             target.priorityPenalty = 10;
             e.add(BuffAppliedEvent(target, 'Waterlogged — next action slowed'));
           }
@@ -555,7 +606,7 @@ class DuelEngine {
             caster.streakCount % 4 == 0) {
           final windShielded = target.streakElement == MagicElement.aero &&
               target.streakCount >= 3;
-          if (!windShielded) {
+          if (!windShielded && !_graceBlocks(target, e)) {
             target.nextOffensiveDamageScale = 0.5;
             e.add(BuffAppliedEvent(
                 target, 'Staggered — next offensive spell halved'));
@@ -563,22 +614,54 @@ class DuelEngine {
         }
 
       // ---- Tier 3 — Celestial ------------------------------------------
-      // Solar/Lunar/Astral effects land in Phase 3 (TYPE_EFFECTS §4b). Listed
-      // explicitly so the roster change is visible here rather than falling
-      // silently through a non-exhaustive switch statement.
       case MagicElement.solar:
-      case MagicElement.lunar:
-      case MagicElement.astral:
-        break;
-
-      // ---- Tier 4 — Ethereal -------------------------------------------
-      case MagicElement.sanctus:
         // Blind — 10% per charge spent, on attack (even fully shielded).
-        // A proc also burns away the target's Creeping Dark entirely.
+        // Inherited from Radiant; the immunity is now Astral, and the proc no
+        // longer clears Creeping Dark (that moved to Absolution). While
+        // present, Blind also eclipses the target's moon to New (§4b.3).
         if (rawDamage > 0 &&
             chargeSpent > 0 &&
             rng.nextDouble() < 0.10 * chargeSpent) {
           _applyBlind(target, e);
+        }
+      case MagicElement.lunar:
+        // Lunar → Astral: a Lunar attack strips one Alignment stack from the
+        // target; under a Full Moon it strips them all (§4b table).
+        if (rawDamage > 0) {
+          final align = _statusOf<AstralAlignmentStatus>(target);
+          if (align != null) {
+            if (_effectiveMoonPhase(caster) == MoonPhase.full) {
+              target.statuses.removeWhere((s) => s is AstralAlignmentStatus);
+              e.add(BuffAppliedEvent(target, 'Alignment scattered (Full Moon)'));
+            } else {
+              align.stacks--;
+              if (align.stacks <= 0) {
+                target.statuses.removeWhere((s) => s is AstralAlignmentStatus);
+              }
+              e.add(BuffAppliedEvent(target, 'Alignment stripped'));
+            }
+          }
+        }
+      case MagicElement.astral:
+        // Astral Alignment — +1 stack per turn Astral is cast (max 5). Decay
+        // is handled in the status's end-of-turn bookkeeping.
+        final align = _statusOf<AstralAlignmentStatus>(caster);
+        if (align == null) {
+          caster.statuses.add(AstralAlignmentStatus());
+        } else {
+          align.addStack();
+        }
+        e.add(BuffAppliedEvent(caster,
+            'Astral Alignment (${_statusOf<AstralAlignmentStatus>(caster)!.stacks})'));
+
+      // ---- Tier 4 — Ethereal -------------------------------------------
+      case MagicElement.sanctus:
+        // Absolution — every 3rd consecutive Sanctus cast. Schedules a purge
+        // for the end heal band (before Ignite's E8) via a one-shot status.
+        if (caster.streakElement == MagicElement.sanctus &&
+            caster.streakCount % 3 == 0) {
+          caster.statuses.add(PendingAbsolutionStatus());
+          e.add(BuffAppliedEvent(caster, 'Absolution rising'));
         }
       case MagicElement.umbra:
         // Creeping Dark — stacks grow by the charge spent on each cast.
@@ -594,6 +677,16 @@ class DuelEngine {
               caster, 'Creeping Dark (${dark.stacks} stacks)'));
         }
       case MagicElement.arcane:
+        // Arcane → Sanctus: an Arcane attack that lands on health resets the
+        // target's Sanctus streak to 0, pushing Absolution three casts away
+        // (§4c.3). Fully-shielded / missed / fizzled hits don't count (§5.4),
+        // hence _lastAttackToHp rather than rawDamage.
+        if (_lastAttackToHp > 0 &&
+            target.streakElement == MagicElement.sanctus) {
+          target.streakElement = null;
+          target.streakCount = 0;
+          e.add(BuffAppliedEvent(target, 'Sanctus rite unravelled'));
+        }
         // Arcane Knowledge — a 4+ charge Arcane cast earns a stack, unless
         // the opponent's darkness is at Dusk or worse (Umbra corrupts
         // Arcane).
@@ -616,13 +709,11 @@ class DuelEngine {
     }
   }
 
-  /// Applies (or refreshes) Blind on [target] and dispels their darkness.
+  /// Applies (or refreshes) Blind on [target]. Under V2 this no longer clears
+  /// Creeping Dark (that job is Absolution's); it does, while it persists,
+  /// eclipse the target's moon (read by [_effectiveMoonPhase]).
   void _applyBlind(MageState target, List<DuelEvent> e) {
-    if (_statusOf<CreepingDarkStatus>(target) != null) {
-      target.statuses.removeWhere((s) => s is CreepingDarkStatus);
-      target.concealed = false;
-      e.add(BuffAppliedEvent(target, 'Creeping Dark burned away'));
-    }
+    if (_graceBlocks(target, e)) return;
     final existing = _statusOf<BlindStatus>(target);
     if (existing != null) {
       existing.refresh();
@@ -632,11 +723,30 @@ class DuelEngine {
     e.add(BuffAppliedEvent(target, 'Blinded — 50% miss for 3 turns'));
   }
 
+  /// The moon phase governing [mage]'s Lunar spells: the global clock, unless
+  /// they are Blinded — a Blind proc eclipses their moon to New for its whole
+  /// window (Solar → Lunar, §4b.3). Per-mage: the caster's own moon still
+  /// turns.
+  MoonPhase _effectiveMoonPhase(MageState mage) =>
+      _statusOf<BlindStatus>(mage) != null
+          ? MoonPhase.newMoon
+          : moonPhaseForTurn(turnNumber);
+
+  /// If [target] holds Grace, consume it and return true (the incoming debuff
+  /// is blocked). Grace is max-1 and persists until spent (§4c.1).
+  bool _graceBlocks(MageState target, List<DuelEvent> e) {
+    if (!target.hasGrace) return false;
+    target.hasGrace = false;
+    e.add(BuffAppliedEvent(target, 'Grace absorbs the debuff'));
+    return true;
+  }
+
   /// Applies (or refreshes) Ignite on [target]: a burn of 10% of [rawDamage]
   /// per tick. Landing Ignite clears the target's Photosynthesis stacks.
   void _applyIgnite(MageState target, int rawDamage, List<DuelEvent> e) {
     final perTick = (rawDamage * 0.10).round();
     if (perTick < 1) return; // a sub-1 burn is no burn
+    if (_graceBlocks(target, e)) return;
     target.statuses.removeWhere((s) => s is PhotosynthesisStatus);
     final existing = _statusOf<IgniteStatus>(target);
     if (existing != null) {
@@ -711,12 +821,13 @@ class DuelEngine {
   /// bookkeeping advances/expires durations after all ops.
   void _resolvePhase(TurnPhase phase, List<DuelEvent> events) {
     final tieHolder = hasteHolder;
-    final queued = <({MageState holder, StatusOp op, int seq})>[];
+    final queued =
+        <({MageState holder, TurnStatus status, StatusOp op, int seq})>[];
     var seq = 0;
     for (final mage in [mage1, mage2]) {
       for (final status in mage.statuses) {
         for (final op in status.operationsFor(phase, mage)) {
-          queued.add((holder: mage, op: op, seq: seq++));
+          queued.add((holder: mage, status: status, op: op, seq: seq++));
         }
       }
     }
@@ -731,6 +842,10 @@ class DuelEngine {
     for (final q in queued) {
       if (isOver) break; // instant death stops the phase
       if (!q.holder.alive) continue;
+      // A status removed earlier this phase (e.g. Absolution in the heal band
+      // purging an Ignite) cancels its own later ops — so a purged burn never
+      // gets its E8 tick. Ops are gathered up-front, so we re-check presence.
+      if (!q.holder.statuses.contains(q.status)) continue;
       _applyStatusOp(q.holder, q.op, events);
     }
     // Bookkeeping band (E9–E10): advance durations/stacks once per turn.
@@ -759,6 +874,38 @@ class DuelEngine {
             toHp: r.toHp,
             shieldMultiplierPercent: r.multiplierPercent,
             shieldBroken: r.broken));
+      case StatusPurge():
+        _resolveAbsolution(holder, events);
+    }
+  }
+
+  /// Resolves Absolution for [holder] (Sanctus, §4c). Two parts, both
+  /// unconditional on the purge outcome:
+  ///  1. **Sanctus → Umbra:** strip 5 Creeping Dark from the opponent.
+  ///  2. **Self:** remove one random [Debuff]; if there is none, bank Grace.
+  void _resolveAbsolution(MageState holder, List<DuelEvent> events) {
+    final opponent = identical(holder, mage1) ? mage2 : mage1;
+    final dark = _statusOf<CreepingDarkStatus>(opponent);
+    if (dark != null) {
+      dark.stacks = (dark.stacks - 5).clamp(0, CreepingDarkStatus.maxStacks);
+      if (dark.stacks <= 0) {
+        opponent.statuses.removeWhere((s) => s is CreepingDarkStatus);
+      }
+      events.add(BuffAppliedEvent(opponent, 'Creeping Dark seared (−5)'));
+    }
+
+    final debuffs = holder.statuses.whereType<Debuff>().toList();
+    if (debuffs.isEmpty) {
+      if (!holder.hasGrace) {
+        holder.hasGrace = true;
+        events.add(BuffAppliedEvent(holder, 'Grace — next debuff blocked'));
+      }
+    } else {
+      // Uniformly random, from the shared per-turn seed so both clients purge
+      // the identical debuff (§4c.1). List order is deterministic in lockstep.
+      final victim = debuffs[rng.nextInt(debuffs.length)] as TurnStatus;
+      holder.statuses.remove(victim);
+      events.add(BuffAppliedEvent(holder, 'Absolution — ${victim.id} purged'));
     }
   }
 

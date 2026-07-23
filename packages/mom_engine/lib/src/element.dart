@@ -157,3 +157,28 @@ String? shieldMultiplierTag(int percent) => switch (percent) {
       50 => '½×',
       _ => null,
     };
+
+/// The four phases of the moon (Lunar — TYPE_EFFECTS_DESIGN §4b.2). A single
+/// **global, public, deterministic** clock derived from the turn counter, not
+/// per-mage state — both clients compute it, so it needs no RNG or netcode.
+enum MoonPhase { newMoon, waxing, full, waning }
+
+/// The global moon phase on [turnNumber]. Turn 1 is New Moon, then the cycle
+/// runs New → Waxing → Full → Waning every four turns (`turnNumber % 4`).
+MoonPhase moonPhaseForTurn(int turnNumber) => switch (turnNumber % 4) {
+      1 => MoonPhase.newMoon,
+      2 => MoonPhase.waxing,
+      3 => MoonPhase.full,
+      _ => MoonPhase.waning, // 0
+    };
+
+/// The **additive** damage percent a Lunar attack gets in [phase] (folded in
+/// alongside Arcane Knowledge, before multipliers — §5.2 step 5). New Moon is
+/// the trough, Full Moon the peak; Waning is neutral for attacks (its bonus is
+/// on shields/heals instead).
+int lunarAttackPercent(MoonPhase phase) => switch (phase) {
+      MoonPhase.newMoon => -25,
+      MoonPhase.waxing => 25,
+      MoonPhase.full => 50,
+      MoonPhase.waning => 0,
+    };

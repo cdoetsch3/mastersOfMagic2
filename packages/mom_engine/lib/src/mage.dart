@@ -53,6 +53,11 @@ class MageState {
   /// opponent can see what you're charging.
   bool concealed = false;
 
+  /// **Grace** (Sanctus §4c.1 / the Hallow spell): the next debuff applied to
+  /// this mage is blocked outright. Max 1, no stacking, persists until
+  /// consumed. Does not block Fatigue.
+  bool hasGrace = false;
+
   /// Active persistent statuses (DoTs, HoTs, stacking buffs). Resolved each
   /// turn's start/end phases by the engine — see [TurnStatus] and
   /// TYPE_EFFECTS_DESIGN.md §5.1. Empty until element effects apply them.

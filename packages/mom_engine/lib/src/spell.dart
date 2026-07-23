@@ -135,6 +135,12 @@ class DischargeEffect extends SpellEffect {
   const DischargeEffect();
 }
 
+/// Grants the caster **Grace**: the next debuff applied to them is blocked
+/// (Hallow — element-neutral, TYPE_EFFECTS §4c.4). Max 1, persists until used.
+class HallowEffect extends SpellEffect {
+  const HallowEffect();
+}
+
 /// A full attack (respects shields, benefits from Empower/Phase) whose damage
 /// is a single roll of [minPerCharge]–[maxPerCharge] multiplied by the
 /// **target's** charge at the moment of resolution (Overload). Deals 0 if the

@@ -56,13 +56,28 @@ class StatusHeal extends StatusOp {
   }) : super(lane, source);
 }
 
+/// Resolve **Absolution** on the holder (Sanctus — TYPE_EFFECTS §4c). Runs in
+/// the heal band (E1–E3) so a purged burn never gets its E8 tick. The engine
+/// handles it (it needs the shared RNG for the random purge, and the opponent
+/// for the Creeping-Dark strip), so this op carries no data of its own.
+class StatusPurge extends StatusOp {
+  const StatusPurge({int lane = Lane.heal, String source = 'Absolution'})
+      : super(lane, source);
+}
+
 /// Marker for statuses that can make the holder's offensive spells miss
-/// (Sanctus's Blind — moves to Solar in Phase 3). The engine rolls [missChance] at each offensive cast; a
-/// miss resolves to no effect (charge still spent). Multiple blinders use the
-/// highest chance. See TYPE_EFFECTS_DESIGN.md §4.1.
+/// (Blind — Solar in the V2 roster). The engine rolls [missChance] at each
+/// offensive cast; a miss resolves to no effect (charge still spent). Multiple
+/// blinders use the highest chance. See TYPE_EFFECTS_DESIGN.md §4b.1.
 abstract interface class Blinding {
   double get missChance;
 }
+
+/// Marker for statuses that are **bad for their holder** — the pool Sanctus's
+/// Absolution purges from, and (by prevention) the things Grace blocks. Only
+/// lingering afflictions implement it; self-buffs (Photosynthesis, Creeping
+/// Dark, Arcane Knowledge, Astral Alignment) never do. TYPE_EFFECTS §4c.1.
+abstract interface class Debuff {}
 
 /// A persistent status on a mage, resolved each turn's start and end phases.
 ///

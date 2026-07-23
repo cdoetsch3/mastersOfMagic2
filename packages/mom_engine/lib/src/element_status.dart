@@ -11,7 +11,7 @@ import 'status.dart';
 /// end-phase damage band (E8). Regular damage: hits the shield first, with
 /// Pyro counter math. Re-proccing refreshes the window (new value, new clock);
 /// it never stacks.
-class IgniteStatus extends TurnStatus {
+class IgniteStatus extends TurnStatus implements Debuff {
   int perTick;
   int turnsLeft;
 
@@ -80,11 +80,13 @@ class PhotosynthesisStatus extends TurnStatus {
   }
 }
 
-/// **Blind** (Sanctus; moves to Solar in Phase 3). The holder's harmful spells have a 50% chance to miss
-/// for their next 3 turns (not the turn it lands — [missChance] reports 0
-/// until the application turn's bookkeeping runs). Re-proccing refreshes the
-/// window. Arcane spells are exempt (checked at the miss gate, §4 table).
-class BlindStatus extends TurnStatus implements Blinding {
+/// **Blind** (Solar in the V2 roster). The holder's harmful spells have a 50%
+/// chance to miss for their next 3 turns (not the turn it lands — [missChance]
+/// reports 0 until the application turn's bookkeeping runs). Re-proccing
+/// refreshes the window. Astral spells are exempt (checked at the miss gate,
+/// §4b table). While present it also **eclipses** the holder's moon to New
+/// (the engine reads its presence — TYPE_EFFECTS §4b.3).
+class BlindStatus extends TurnStatus implements Blinding, Debuff {
   int turnsLeft = 3;
   bool _justApplied = true;
 
@@ -182,4 +184,54 @@ class ArcaneKnowledgeStatus extends TurnStatus {
 
   @override
   bool advanceAndCheckExpiry(MageState holder) => false; // permanent
+}
+
+/// **Astral Alignment** (Astral — TYPE_EFFECTS §4b.4). A stacking self-buff
+/// (max 5): +1 per turn an Astral spell is cast, −1 on turns without Astral
+/// activity — the same commit-or-lose decay as Photosynthesis. Each stack
+/// routes 5% of every attack's damage straight to health, bypassing the
+/// shield (applied in the engine's `_attack`, not as a StatusOp). Not a
+/// [Debuff] — it's the caster's own buff, so Absolution never touches it.
+class AstralAlignmentStatus extends TurnStatus {
+  static const int maxStacks = 5;
+  static const int percentPerStack = 5;
+  int stacks;
+
+  AstralAlignmentStatus([this.stacks = 1]);
+
+  void addStack() {
+    if (stacks < maxStacks) stacks++;
+  }
+
+  /// The fraction of an attack that bypasses the shield to health (0.0–0.25).
+  int get piercePercent => stacks * percentPerStack;
+
+  @override
+  String get id => 'astralAlignment';
+
+  @override
+  List<StatusOp> operationsFor(TurnPhase phase, MageState holder) => const [];
+
+  @override
+  bool advanceAndCheckExpiry(MageState holder) {
+    if (holder.activeElementThisTurn != MagicElement.astral) stacks--;
+    return stacks <= 0;
+  }
+}
+
+/// A one-shot marker that schedules **Absolution** to resolve in this turn's
+/// end heal band (E1–E3). Added when the 3rd consecutive Sanctus cast lands;
+/// emits a single [StatusPurge] in the end phase, then expires in the same
+/// turn's bookkeeping. The purge itself (random debuff → else Grace) plus the
+/// opponent's Creeping-Dark strip are handled by the engine. TYPE_EFFECTS §4c.
+class PendingAbsolutionStatus extends TurnStatus {
+  @override
+  String get id => 'pendingAbsolution';
+
+  @override
+  List<StatusOp> operationsFor(TurnPhase phase, MageState holder) =>
+      phase == TurnPhase.end ? const [StatusPurge()] : const [];
+
+  @override
+  bool advanceAndCheckExpiry(MageState holder) => true; // fires once, then gone
 }

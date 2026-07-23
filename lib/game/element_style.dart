@@ -109,6 +109,7 @@ String spellTooltip(Spell spell) {
     DischargeEffect() => "Removes ALL of the enemy's charge",
     OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
       "$minPerCharge-$maxPerCharge damage per point of the enemy's charge",
+    HallowEffect() => 'Grants Grace — blocks the next debuff on you',
   };
   final haste = spell.grantsHaste && spell.effect is! HasteEffect
       ? '\nAlso seizes Haste'

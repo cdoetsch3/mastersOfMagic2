@@ -164,11 +164,13 @@ void main() {
     });
   });
 
-  group('Tier 4 — Blind (Sanctus §4.1)', () {
+  // Blind moved from Radiant to Solar in the V2 roster (§4b.1). Same mechanic;
+  // the immunity is now Astral, and a proc no longer clears Creeping Dark.
+  group('Tier 3 — Blind (Solar §4b.1)', () {
     test('proc chance is 10% per charge spent', () {
       // 4 charge spent → 40%: a 0.39 roll procs...
       var duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.39]));
-      charge(alice, MagicElement.sanctus, 4);
+      charge(alice, MagicElement.solar, 4);
       duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
       expect(bruno.statuses.whereType<BlindStatus>(), hasLength(1));
 
@@ -176,7 +178,7 @@ void main() {
       alice = MageState(name: 'Alice');
       bruno = MageState(name: 'Bruno');
       duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.41]));
-      charge(alice, MagicElement.sanctus, 4);
+      charge(alice, MagicElement.solar, 4);
       duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
       expect(bruno.statuses.whereType<BlindStatus>(), isEmpty);
     });
@@ -184,7 +186,7 @@ void main() {
     test('a 0-cost attack can never blind', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]));
       duel.resolveTurn(
-        CastAction(Spellbook.flick, MagicElement.sanctus),
+        CastAction(Spellbook.flick, MagicElement.solar),
         const ForfeitAction(),
       );
       expect(bruno.statuses.whereType<BlindStatus>(), isEmpty);
@@ -196,7 +198,7 @@ void main() {
       // (0.4 < 0.5) while blind is active.
       final duel = DuelEngine(alice, bruno,
           rng: ScriptedRandom([0.0, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]));
-      charge(alice, MagicElement.sanctus, 4);
+      charge(alice, MagicElement.solar, 4);
       duel.resolveTurn(
         CastAction(Spellbook.ruin),
         CastAction(Spellbook.flick, MagicElement.geo), // same turn: no miss
@@ -223,24 +225,29 @@ void main() {
       expect(bruno.statuses.whereType<BlindStatus>(), isEmpty);
     });
 
-    test('Arcane spells never miss while blinded', () {
+    test('Astral spells never miss while blinded (Astral slips Solar)', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0, 0.0]));
       bruno.statuses.add(BlindStatus()..advanceAndCheckExpiry(bruno));
       duel.resolveTurn(
         const ForfeitAction(),
-        CastAction(Spellbook.flick, MagicElement.arcane),
+        CastAction(Spellbook.flick, MagicElement.astral),
       );
-      expect(alice.hp, lessThan(100), reason: 'Arcane is exempt from Blind');
+      expect(alice.hp, lessThan(100), reason: 'Astral is exempt from Blind');
     });
 
-    test('a Blind proc burns away the Creeping Dark', () {
+    test('a Blind proc no longer touches Creeping Dark (that is Absolution now)',
+        () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]));
       bruno.statuses.add(CreepingDarkStatus(12));
-      bruno.concealed = true;
-      charge(alice, MagicElement.sanctus, 4);
-      duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
-      expect(bruno.statuses.whereType<CreepingDarkStatus>(), isEmpty);
-      expect(bruno.concealed, isFalse);
+      charge(alice, MagicElement.solar, 4);
+      // Bruno charges Umbra so its dark doesn't take its normal -1 decay this
+      // turn — isolating the question of whether the Blind proc cleared it.
+      duel.resolveTurn(
+          CastAction(Spellbook.ruin), const ChargeAction(MagicElement.umbra));
+      expect(bruno.statuses.whereType<BlindStatus>(), hasLength(1),
+          reason: 'the blind lands');
+      expect(bruno.statuses.whereType<CreepingDarkStatus>().single.stacks, 12,
+          reason: 'the dark is untouched by the blind');
     });
   });
 
