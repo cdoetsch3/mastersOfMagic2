@@ -1054,8 +1054,8 @@ item.
 
 | Rarity | Colour | Motes at this rarity | Items at this rarity |
 |---|---|---|---|
-| **Common** | Light Gray | **Dust** | flat stats only |
-| **Uncommon** | White | **Shard · Crystal** | flat stats, small % |
+| **Common** | White | **Dust · Shard** | flat stats only |
+| **Uncommon** | Green | **Crystal** | flat stats, small % |
 | **Rare** | Blue | **Core** | a modifier |
 | **Epic** | Purple | **Heart** | strong modifier, enchantable · ⭐ **sets start here** |
 | **Mythic** | Orange | — | top-tier; rarely obtained |
@@ -1068,9 +1068,11 @@ top, not two parallel endgames.
 tier is acquisition-locked — "crafted from rare boss components" is an
 *example* of a Legendary, not a definition of the rarity.
 
-✅ **The mote ladder tops out at Epic.** Motes span Common→Epic only; the two
-highest rarities have no mote tier — so there's no 1:1 mapping to preserve
-and no sixth mote tier to invent.
+✅ **The mote ladder tops out at Epic.** The five motes span Common→Epic; the
+two highest rarities (Mythic, Legendary) have no mote tier. **The two most
+abundant motes — Dust and Shard — both sit at Common**, so the bottom of the
+crafting economy is squarely "common floor-drop" material; Crystal (Uncommon),
+Core (Rare) and Heart (Epic) then climb one rarity per tier.
 
 ⚠️ **Heart's "Epic" label describes standing, not a drop rate** — Hearts are
 **craft-only** (§6.1), so nothing at that rarity actually drops. Every tier
@@ -1089,17 +1091,15 @@ the top three rarities:
 The rarity step lands on Tier III, which §3.4 already calls out as the ⭐
 *noticeable jump* — the two ladders reinforce each other instead of drifting.
 
-⚠️ **UI risks in the colour set** (these are the most-repeated visual
-elements in the game, so they're worth getting right early):
-- **Light Gray vs White** is a very low-contrast pair, and it inverts on a
-  light background. Consider a heavier weight difference, an icon frame, or
-  a literal label rather than relying on the swatch alone.
-- **Iridescent needs an animated or gradient treatment**, not a flat colour —
-  it can't be a single hex value in a theme map. Budget for it as a small
-  custom widget, and make sure it degrades to solid gold if animations are
-  reduced or disabled.
-- Most conventions use white for the *baseline* tier; here it's Uncommon.
-  Intentional per Christian, but worth a glance in situ.
+✅ **The colour set is now the standard ARPG ladder** — White · Green · Blue ·
+Purple · Orange · Iridescent — so players read it on sight (White = Common,
+Green = Uncommon, and so on). This also retires the old Light-Gray-vs-White
+contrast problem.
+
+⚠️ **One UI risk remains:** **Iridescent needs an animated or gradient
+treatment**, not a flat colour — it can't be a single hex value in a theme
+map. Budget for it as a small custom widget, and make sure it degrades to
+solid gold if animations are reduced or disabled.
 
 ---
 
