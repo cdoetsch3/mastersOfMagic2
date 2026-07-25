@@ -11,6 +11,7 @@ import '../game/element_style.dart';
 import '../game/loadout.dart';
 import '../game/mage_apparel.dart';
 import '../game/mage_sprite.dart';
+import '../game/shield_aura.dart';
 import '../game/opponent_driver.dart';
 import '../game/progression.dart';
 import '../ui/app_theme.dart';
@@ -642,41 +643,27 @@ class _DuelScreenState extends State<DuelScreen>
               defeated: isEnemy ? c.enemyDefeated : c.playerDefeated,
               height: height,
             ),
-            if (shield != null)
+            // Shield + Barrier are one painter: the shield is one ring per
+            // 100 points with its stroke scaled to what's LEFT (so it visibly
+            // thins as it fails), and each Barrier point is a thin beaded white
+            // ring outside it. Drawn rather than built from BoxDecoration
+            // borders — the rest of the arena is already CustomPainter-drawn,
+            // and beads/stacks aren't expressible as a border.
+            if (shield != null || barrierPoints > 0)
               IgnorePointer(
-                child: Container(
-                  width: height * 0.98,
-                  height: height * 1.12,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: (shield.isBarrier
+                child: SizedBox(
+                  width: height * 2.2,
+                  height: height * 2.2,
+                  child: CustomPaint(
+                    painter: ShieldAuraPainter(
+                      shieldColor: shield == null
+                          ? null
+                          : (shield.isBarrier
                               ? Colors.white
-                              : shield.element!.style.color)
-                          .withValues(alpha: 0.75),
-                      width: 3,
-                    ),
-                    color: (shield.isBarrier
-                            ? Colors.white
-                            : shield.element!.style.color)
-                        .withValues(alpha: 0.08),
-                  ),
-                ),
-              ),
-            // Barrier stacks with the shield and holds up to 3 points, so it
-            // draws one concentric ring per point — the level is readable at a
-            // glance without a number. Always white: a barrier is
-            // element-less, since anything pops a point.
-            for (var i = 0; i < barrierPoints; i++)
-              IgnorePointer(
-                child: Container(
-                  width: height * (1.06 + i * 0.07),
-                  height: height * (1.20 + i * 0.08),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.85 - i * 0.18),
-                      width: 2,
+                              : shield.element!.style.color),
+                      shieldRemaining: shield?.remaining ?? 0,
+                      barrierPoints: barrierPoints,
+                      spriteHeight: height,
                     ),
                   ),
                 ),
