@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:mom_engine/mom_engine.dart';
 
-/// Visual identity of each element: color + icon + display name.
+import '../ui/element_glyphs.dart';
+
+/// Visual identity of each element: color + glyph + display name.
 class ElementStyle {
   final Color color;
+
+  /// The Material icon, used for every element Material can actually express.
   final IconData icon;
+
+  /// A hand-drawn glyph, for the elements Material cannot: Sanctus's halo and
+  /// Umbra's demon. Takes precedence over [icon] when present.
+  final CustomPainter Function(Color)? glyph;
+
   final String label;
 
-  const ElementStyle(this.color, this.icon, this.label);
+  const ElementStyle(this.color, this.icon, this.label, {this.glyph});
 }
 
 const Map<MagicElement, ElementStyle> elementStyles = {
@@ -32,10 +41,14 @@ const Map<MagicElement, ElementStyle> elementStyles = {
   // Solar and Lunar, and the old light_mode/dark_mode pair read as a second
   // sun and a second moon. Sanctus takes a haloed seal, Umbra the blinded eye
   // (its Creeping Dark is literally what hides the board from you).
-  MagicElement.sanctus:
-      ElementStyle(Color(0xFFF2E7C9), Icons.workspace_premium, 'Sanctus'),
-  MagicElement.umbra:
-      ElementStyle(Color(0xFF8B5CD6), Icons.visibility_off, 'Umbra'),
+  // Material has no halo and no demon, so these two are drawn (see
+  // ui/element_glyphs.dart). The icons named here are fallbacks only.
+  MagicElement.sanctus: ElementStyle(
+      Color(0xFFF2E7C9), Icons.workspace_premium, 'Sanctus',
+      glyph: HaloGlyphPainter.new),
+  MagicElement.umbra: ElementStyle(
+      Color(0xFF8B5CD6), Icons.dark_mode, 'Umbra',
+      glyph: DemonGlyphPainter.new),
   MagicElement.arcane:
       ElementStyle(Color(0xFFD65AB8), Icons.auto_awesome, 'Arcane'),
 };
@@ -50,6 +63,18 @@ const Map<MagicTier, String> tierLabels = {
 
 extension ElementStyleX on MagicElement {
   ElementStyle get style => elementStyles[this]!;
+}
+
+/// The element's mark at [size] — its drawn glyph where it has one, otherwise
+/// its Material icon. Use this rather than `Icon(element.style.icon)` so the
+/// hand-drawn elements render everywhere they appear.
+Widget elementGlyph(MagicElement element, {required double size, Color? color}) {
+  final style = element.style;
+  final tint = color ?? style.color;
+  final glyph = style.glyph;
+  return glyph == null
+      ? Icon(style.icon, size: size, color: tint)
+      : PaintedGlyph(painter: glyph, size: size, color: tint);
 }
 
 String priorityLabel(int priority) => switch (priority) {

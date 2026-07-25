@@ -425,6 +425,12 @@ class DuelEngine {
       }
     }
 
+    // Any resolved cast (offensive or not) advances the element streak.
+    // Fizzles and misses returned early — they leave the streak untouched.
+    // Recorded BEFORE the first event so the streak pip appears on the cast
+    // itself; every status frame from here on carries the new count.
+    caster.recordCastForStreak(cast.element);
+
     events.add(SpellCastEvent(caster, spell, cast.element));
     // Casting consumes ALL charge; capture it now for charge-spent triggers
     // (Sanctus/Umbra/Arcane) before effects read or mutate it.
@@ -550,10 +556,6 @@ class DuelEngine {
               caster, 'Grace — next debuff blocked', statusId: 'grace'));
         }
     }
-
-    // Any resolved cast (offensive or not) advances the element streak.
-    // Fizzles and misses returned early — they leave the streak untouched.
-    caster.recordCastForStreak(cast.element);
 
     // Fire this element's on-cast effects (Tier 1: Ignite, Photosynthesis,
     // Waterlogged, and the Aqua-shield cleanse).

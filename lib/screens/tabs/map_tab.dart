@@ -151,7 +151,7 @@ class _CurrentLocationCard extends StatelessWidget {
               for (final e in location.elements)
                 Padding(
                   padding: const EdgeInsets.only(right: 6),
-                  child: Icon(e.style.icon, size: 15, color: e.style.color),
+                  child: elementGlyph(e, size: 15),
                 ),
             ]),
           ],

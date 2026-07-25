@@ -226,7 +226,7 @@ class SpellbookTab extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(style.icon, size: 18, color: style.color),
+                      elementGlyph(element, size: 18),
                       const SizedBox(width: 6),
                       Text(style.label,
                           style: TextStyle(

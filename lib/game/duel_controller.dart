@@ -418,6 +418,13 @@ class DuelController extends ChangeNotifier {
   void finishTurn() {
     animating = false;
     _replaying = false;
+    // Settle the pips on the turn's true final state. Frames only capture the
+    // moment each EVENT was emitted, but a turn keeps mutating after its last
+    // event — end-phase bookkeeping, the charge sweep, decay. Without this,
+    // anything that changes after the final event would not show until some
+    // later turn happened to emit an event and snapshot it.
+    shownPlayerStatuses = StatusSnapshot.of(player);
+    shownEnemyStatuses = StatusSnapshot.of(enemy);
     if (player.charge == 0) pendingElement = null;
     // Persistently show what the enemy is currently charging, unless they
     // are Concealed (a future Shadow effect) — then it stays a mystery.

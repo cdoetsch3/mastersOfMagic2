@@ -219,7 +219,7 @@ Widget _elementAvatar(MagicElement element, double size) {
     width: size,
     height: size,
     decoration: BoxDecoration(color: style.color, shape: BoxShape.circle),
-    child: Icon(style.icon, size: size * 0.55, color: AppColors.bg),
+    child: elementGlyph(element, size: size * 0.55, color: AppColors.bg),
   );
 }
 

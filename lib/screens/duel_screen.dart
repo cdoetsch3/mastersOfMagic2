@@ -974,7 +974,7 @@ class _DuelScreenState extends State<DuelScreen>
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Icon(style.icon,
+                  elementGlyph(element,
                       size: 16,
                       color: active ? const Color(0xFF141021) : style.color),
                   Positioned(
@@ -1465,8 +1465,7 @@ class _StatusPanel extends StatelessWidget {
                 else if (element != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Icon(element!.style.icon,
-                        size: 14, color: element!.style.color),
+                    child: elementGlyph(element!, size: 14),
                   ),
                 if (alignEnd) ..._chargeRow(pipColor),
               ],
