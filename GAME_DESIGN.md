@@ -315,7 +315,7 @@ MoM2 adds **spell slots** unlocked via leveling.
 |---|---|---|
 | Flurry | 1 | small damage ×3 |
 | Volley | 3 | medium damage ×4 |
-| Barrage | X | damage per charge spent (consumes all charge) |
+| Barrage | X | **one hit per charge spent**, each rolled separately (consumes all charge) |
 
 ### Lifesteal offensive (heal = **half** the damage dealt to enemy **health**, never shields)
 | Spell | Charge | Notes |

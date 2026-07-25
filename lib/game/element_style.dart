@@ -128,7 +128,7 @@ String spellTooltip(Spell spell) {
       '${hits > 1 ? '$hits hits of ' : ''}$minAmount-$maxAmount damage'
           '${lifesteal > 0 ? ', heals for ${(lifesteal * 100).round()}% of the health damage' : ''}',
     BarrageEffect(:final minPerCharge, :final maxPerCharge) =>
-      '$minPerCharge-$maxPerCharge damage per charge spent',
+      'One hit per charge spent, each $minPerCharge-$maxPerCharge damage',
     ShieldEffect(:final minStrength, :final maxStrength) =>
       '$minStrength-$maxStrength shield in your element',
     BarrierEffect() => 'Adds a Barrier point (max 3). Each blocks one hit',
@@ -162,7 +162,8 @@ const Map<String, String> spellDescriptions = {
   'jolt': 'Strikes early and seizes Haste, winning future same-speed ties.',
   'flurry': 'Three rapid strikes; each rolls its own damage.',
   'volley': 'Four bolts in succession — steady chip through a shield.',
-  'barrage': 'Spends ALL your charge; damage scales with every point.',
+  'barrage': 'Spends ALL your charge as separate bolts — one per point. '
+      'Each meets the shield on its own, so it chews through Barriers.',
   'sap': 'Heals you for half the damage that reaches their health.',
   'leech': 'A stronger draught — still half of what reaches their health.',
   'drain': 'The heaviest steal; heals half the health damage it lands.',

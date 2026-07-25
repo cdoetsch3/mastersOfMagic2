@@ -86,8 +86,10 @@ class DamageEffect extends SpellEffect {
   int get averageTotal => ((minAmount + maxAmount) * hits) ~/ 2;
 }
 
-/// X-cost damage: deals [minPerCharge]–[maxPerCharge] × (charge consumed),
-/// rolled once.
+/// X-cost multi-hit: fires **one hit per point of charge consumed**, each
+/// rolling [minPerCharge]–[maxPerCharge] independently. Same total band as a
+/// single big roll, but every hit is its own event — so each meets the shield,
+/// spends its own Barrier point, and rolls its own crit and deflection.
 class BarrageEffect extends SpellEffect {
   final int minPerCharge;
   final int maxPerCharge;
@@ -105,8 +107,10 @@ class ShieldEffect extends SpellEffect {
   const ShieldEffect(this.minStrength, this.maxStrength);
 }
 
-/// Blocks 100% of one incoming hit, then disappears. Element-less: never
-/// takes counter damage. (Multi-hit spells: only the first hit is absorbed.)
+/// Adds one **Barrier point** (max 3). Each point blocks one incoming hit
+/// whole, then is spent — so a multi-hit spell burns one point per hit and the
+/// excess hits land. Element-less: anything pops a point, so counter maths
+/// never applies.
 class BarrierEffect extends SpellEffect {
   const BarrierEffect();
 }

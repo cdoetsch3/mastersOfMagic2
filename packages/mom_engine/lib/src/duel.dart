@@ -482,12 +482,16 @@ class DuelEngine {
       case BarrageEffect(:final minPerCharge, :final maxPerCharge):
         final buffs = caster.consumeOffensiveBuffs();
         final charge = caster.charge; // live — a same-turn Discharge fizzles it
+        // One hit PER CHARGE, each rolled independently — the Volley shape.
+        // Same damage band as the old single roll, but every hit meets the
+        // shield, a Barrier point, crit and deflection on its own. The fizzle
+        // gate guarantees charge >= 1 for an X-cost spell.
         rawDamage = _attack(
           cast,
-          minPerHit: minPerCharge * charge,
-          maxPerHit: maxPerCharge * charge,
+          minPerHit: minPerCharge,
+          maxPerHit: maxPerCharge,
           scale: damageScale(buffs),
-          hits: 1,
+          hits: charge,
           lifesteal: 0,
           ignoresShields: buffs.phase,
           events: events,

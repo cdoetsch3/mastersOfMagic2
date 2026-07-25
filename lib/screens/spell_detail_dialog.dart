@@ -29,7 +29,7 @@ String _numbers(Spell spell) => switch (spell.effect) {
       DamageEffect(:final minAmount, :final maxAmount, :final hits) =>
         hits > 1 ? '$minAmount–$maxAmount ×$hits' : '$minAmount–$maxAmount',
       BarrageEffect(:final minPerCharge, :final maxPerCharge) =>
-        '$minPerCharge–$maxPerCharge',
+        '$minPerCharge–$maxPerCharge ×X',
       OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
         '$minPerCharge–$maxPerCharge',
       ShieldEffect(:final minStrength, :final maxStrength) =>
@@ -51,7 +51,7 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
           ? 'damage — heals you for ${(lifesteal * 100).round()}% of what '
               'reaches their health'
           : 'damage, rolled on cast',
-      BarrageEffect() => 'damage per charge spent',
+      BarrageEffect() => 'damage, one hit per charge spent',
       OverloadEffect() => "damage per point of the enemy's charge",
       ShieldEffect() => 'shield in your element',
       BarrierEffect() => 'of Barrier (max 3) — each point blocks one whole hit',

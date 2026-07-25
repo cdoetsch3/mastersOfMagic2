@@ -311,17 +311,22 @@ class _DuelScreenState extends State<DuelScreen>
         // The spell's own weight drives every flourish below, so a Flick looks
         // like a Flick no matter how much charge was on the board.
         final weight = _castWeight;
-        final isMultiHit = switch (_castSpell?.effect) {
-          DamageEffect(:final hits) => hits > 1,
-          _ => false,
+        // Barrage now fires one hit per charge, so it animates like Volley:
+        // a burst of quick strikes rather than one heavy blow.
+        final hitCount = switch (_castSpell?.effect) {
+          DamageEffect(:final hits) => hits,
+          BarrageEffect() => max(1, _castCharge),
+          _ => 1,
         };
-        final projectiles =
-            _castSpell?.effect is BarrageEffect ? max(1, _castCharge) : 1;
+        final isMultiHit = hitCount > 1;
+        // Each event is ONE hit, so the flourish is sized by that hit's share
+        // of the spell — otherwise every bolt of a 5-charge Barrage would land
+        // like a Cataclysm.
+        final perHit = weight / hitCount;
         await _runFx(_FxKind.projectile,
             atEnemy: isEnemy,
             color: color,
-            intensity: 1 + weight * 0.35,
-            projectiles: projectiles,
+            intensity: 1 + perHit * 0.35,
             ms: isMultiHit ? 240 : max(280, 420 - weight * 20));
         final text = [
           if (toHp > 0) '-$toHp',
@@ -334,8 +339,8 @@ class _DuelScreenState extends State<DuelScreen>
             atEnemy: isEnemy,
             color: color,
             text: text,
-            intensity: 1 + weight * 0.45,
-            shake: weight >= 3 ? (weight - 2) * 3.5 : 0,
+            intensity: 1 + perHit * 0.45,
+            shake: perHit >= 3 ? (perHit - 2) * 3.5 : 0,
             ms: isMultiHit ? 320 : 440 + weight * 50);
       case ShieldRaisedEvent(
           :final mage,
