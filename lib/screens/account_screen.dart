@@ -4,6 +4,7 @@ import '../game/app_version.dart';
 import '../game/auth_service.dart';
 import '../game/game_state.dart';
 import '../ui/app_theme.dart';
+import 'password_screens.dart';
 import 'home_shell.dart';
 
 /// Sign-in / create-account flow. Optional in Phase 1 — the game is playable
@@ -154,7 +155,17 @@ class _AccountScreenState extends State<AccountScreen> {
                         fontSize: 15, fontWeight: FontWeight.w600)),
           ),
         ),
-        const SizedBox(height: 10),
+        if (!_createMode)
+          TextButton(
+            onPressed: _busy
+                ? null
+                : () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      builder: (_) =>
+                          ForgotPasswordScreen(initialEmail: _email.text),
+                    )),
+            child: const Text('Forgot your password?'),
+          ),
+        const SizedBox(height: 4),
         TextButton(
           onPressed: _busy
               ? null
@@ -303,6 +314,17 @@ class _AccountView extends StatelessWidget {
           ),
         ],
         const SizedBox(height: 16),
+        Builder(
+          builder: (context) => OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                  builder: (_) => const ChangePasswordScreen()),
+            ),
+            icon: const Icon(Icons.lock_reset, size: 18),
+            label: const Text('Change password'),
+          ),
+        ),
+        const SizedBox(height: 8),
         TextButton.icon(
           onPressed: () => auth.signOut(),
           icon: const Icon(Icons.logout, color: AppColors.ember),

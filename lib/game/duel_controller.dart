@@ -52,6 +52,25 @@ class DuelController extends ChangeNotifier {
   StatusSnapshot shownPlayerStatuses = StatusSnapshot.empty;
   StatusSnapshot shownEnemyStatuses = StatusSnapshot.empty;
   List<StatusFrame> _frames = const [];
+
+  /// True between the turn resolving and its animation finishing. The engine's
+  /// turn counter has already advanced by then, so anything the HUD shows for
+  /// "this turn" has to read one turn back while this is set.
+  bool _replaying = false;
+
+  /// The moon the HUD should show.
+  ///
+  /// While a turn is being animated this is the moon that actually governed
+  /// **that** turn, so it matches the Lunar damage the player is watching land.
+  /// Once the turn finishes it advances to the turn they are about to act in.
+  MoonPhase get shownMoonPhase => _replaying
+      ? moonPhaseForTurn(engine.turnNumber)
+      : engine.moonPhase;
+
+  /// The phase after [shownMoonPhase] — the "next turn" preview.
+  MoonPhase get shownNextMoonPhase => _replaying
+      ? moonPhaseForTurn(engine.turnNumber + 1)
+      : engine.nextMoonPhase;
   bool playerDefeated = false;
   bool enemyDefeated = false;
 
@@ -100,6 +119,7 @@ class DuelController extends ChangeNotifier {
     shownPlayerStatuses = StatusSnapshot.empty;
     shownEnemyStatuses = StatusSnapshot.empty;
     _frames = const [];
+    _replaying = false;
     playerDefeated = false;
     enemyDefeated = false;
     pendingElement = null;
@@ -162,6 +182,8 @@ class DuelController extends ChangeNotifier {
     final hostAction = playerIsHost ? action : theirs;
     final guestAction = playerIsHost ? theirs : action;
     final result = engine.resolveTurn(hostAction, guestAction);
+    // The counter has advanced; hold the HUD on the turn being replayed.
+    _replaying = true;
     _frames = result.frames;
     battleLog.add('— Turn ${result.turn}');
     battleLog.addAll(result.events.map(_describe));
@@ -395,6 +417,7 @@ class DuelController extends ChangeNotifier {
   /// Called by the screen once every event animation has played.
   void finishTurn() {
     animating = false;
+    _replaying = false;
     if (player.charge == 0) pendingElement = null;
     // Persistently show what the enemy is currently charging, unless they
     // are Concealed (a future Shadow effect) — then it stays a mystery.

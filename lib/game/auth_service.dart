@@ -55,6 +55,56 @@ class AuthService extends ChangeNotifier {
     await _auth.currentUser?.sendEmailVerification();
   }
 
+  /// Sends a password-reset email. Returns null on success, or a friendly
+  /// error.
+  ///
+  /// ⚠️ Deliberately reports success even when no account exists for [email]:
+  /// saying "no account found" would turn this form into an oracle for which
+  /// addresses are registered. The caller's confirmation text is worded to
+  /// match ("if an account exists…").
+  Future<String?> sendPasswordReset(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') return null; // don't leak account existence
+      return _message(e);
+    } catch (e) {
+      return 'Something went wrong. Please try again.';
+    }
+  }
+
+  /// Changes the signed-in user's password.
+  ///
+  /// Firebase treats this as a sensitive operation, so it requires a recent
+  /// login — we re-authenticate with [currentPassword] first, which doubles as
+  /// proof the person at the keyboard is the account owner and not someone who
+  /// found an unlocked device.
+  Future<String?> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final user = _auth.currentUser;
+    final email = user?.email;
+    if (user == null || email == null) return 'You are not signed in.';
+    try {
+      await user.reauthenticateWithCredential(
+          EmailAuthProvider.credential(email: email, password: currentPassword));
+      await user.updatePassword(newPassword);
+      notifyListeners();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      // Re-auth failures surface as credential errors; name the actual field
+      // so the user doesn't hunt for a typo in the new password.
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        return 'That is not your current password.';
+      }
+      return _message(e);
+    } catch (e) {
+      return 'Something went wrong. Please try again.';
+    }
+  }
+
   /// Reloads the user so [emailVerified] reflects a link clicked elsewhere.
   Future<void> refresh() async {
     await _auth.currentUser?.reload();

@@ -115,8 +115,15 @@ class PlayerProfile {
   int duelsWon;
   int duelsLost;
 
+  /// When this player was last active, for the friends list's presence dot.
+  /// Refreshed whenever the save is written, so it tracks real activity rather
+  /// than merely having the app open. Null for a save from before presence
+  /// existed — treated as "unknown", not "offline forever".
+  DateTime? lastSeenAt;
+
   PlayerProfile({
     required this.name,
+    this.lastSeenAt,
     this.xp = 0,
     this.gold = 0,
     this.gems = 0,
@@ -158,6 +165,7 @@ class PlayerProfile {
 
   Map<String, dynamic> toJson() => {
         'name': name,
+        'lastSeenAt': lastSeenAt?.toUtc().toIso8601String(),
         'xp': xp,
         'gold': gold,
         'gems': gems,
@@ -178,6 +186,7 @@ class PlayerProfile {
         [LoadoutPreset.starter('Loadout I')];
     return PlayerProfile(
       name: json['name'] as String? ?? 'Apprentice',
+      lastSeenAt: DateTime.tryParse(json['lastSeenAt'] as String? ?? '')?.toLocal(),
       xp: (json['xp'] as num?)?.toInt() ?? 0,
       gold: (json['gold'] as num?)?.toInt() ?? 0,
       gems: (json['gems'] as num?)?.toInt() ?? 0,

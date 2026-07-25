@@ -688,7 +688,7 @@ class _DuelScreenState extends State<DuelScreen>
   /// on either mage. Only the Full Moon does anything (+20% Lunar attacks), so
   /// it's the one phase highlighted; the rest read as a countdown toward it.
   Widget _moonChip() {
-    final phase = c.engine.moonPhase;
+    final phase = c.shownMoonPhase;
     final isFull = phase == MoonPhase.full;
     final (glyph, label) = switch (phase) {
       MoonPhase.newMoon => ('🌑', 'New'),
@@ -702,7 +702,7 @@ class _DuelScreenState extends State<DuelScreen>
       message: isFull
           ? 'Full Moon — Lunar attacks deal +20% this turn'
           : '$label moon — Lunar attacks are unmodified.\n'
-              'Next turn: ${switch (c.engine.nextMoonPhase) {
+              'Next turn: ${switch (c.shownNextMoonPhase) {
               MoonPhase.newMoon => 'New',
               MoonPhase.waxing => 'Waxing',
               MoonPhase.full => 'Full Moon (+20% Lunar)',

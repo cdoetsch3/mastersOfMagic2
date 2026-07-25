@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../game/auth_service.dart';
+import '../../game/game_state.dart';
+import '../../ui/presence_dot.dart';
 import '../../ui/app_theme.dart';
 import '../account_screen.dart';
 import '../home_shell.dart';
@@ -117,9 +119,23 @@ class _AccountCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(auth.displayName ?? 'Mage',
-                    style:
-                        const TextStyle(color: AppColors.text, fontSize: 14)),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(auth.displayName ?? 'Mage',
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: AppColors.text, fontSize: 14)),
+                    ),
+                    const SizedBox(width: 7),
+                    // Your own dot — the same indicator friends will carry, so
+                    // the mechanism is visible (and verifiable) before the
+                    // friends list exists.
+                    PresenceDot(
+                        lastSeen:
+                            GameStateScope.of(context).profile.lastSeenAt),
+                  ],
+                ),
                 Text(
                     auth.emailVerified
                         ? '${auth.email} · verified'

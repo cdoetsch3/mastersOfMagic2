@@ -67,9 +67,17 @@ class GameState extends ChangeNotifier {
 
   Future<void> _mutate(void Function() change) async {
     change();
+    // Every save is evidence the player is here, so presence rides along with
+    // the write rather than needing its own heartbeat — no extra traffic, and
+    // it tracks real activity instead of merely having the tab open.
+    profile.lastSeenAt = DateTime.now();
     notifyListeners();
     await _persist();
   }
+
+  /// Records activity without changing anything else — for moments that are
+  /// presence but not progress (opening the app, entering a duel).
+  Future<void> touchPresence() => _mutate(() {});
 
   // ---- Identity --------------------------------------------------------
 
