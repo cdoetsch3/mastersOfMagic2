@@ -233,10 +233,12 @@ class _DuelScreenState extends State<DuelScreen>
     try {
       final events = await c.submitTurn(action);
       _stopMoveTimer(); // exchange done — the clock is moot while animating
-      for (final event in events) {
-        await _animate(event);
+      for (var i = 0; i < events.length; i++) {
+        await _animate(events[i]);
         if (!mounted) return;
-        c.applyEvent(event);
+        // Pass the index so the status pips advance with this event rather
+        // than all appearing the moment the turn resolved.
+        c.applyEvent(events[i], index: i);
       }
     } catch (error, stack) {
       debugPrint('Turn resolution error: $error\n$stack');
@@ -618,7 +620,7 @@ class _DuelScreenState extends State<DuelScreen>
 
   Widget _mage(Offset pos, double height, {required bool isEnemy}) {
     final shield = isEnemy ? c.shownEnemyShield : c.shownPlayerShield;
-    final barrier = isEnemy ? c.shownEnemyBarrier : c.shownPlayerBarrier;
+    final barrierPoints = isEnemy ? c.shownEnemyBarrier : c.shownPlayerBarrier;
     return Positioned(
       left: pos.dx - height * 0.45,
       top: pos.dy - height * 0.55,
@@ -661,17 +663,19 @@ class _DuelScreenState extends State<DuelScreen>
                   ),
                 ),
               ),
-            // The Barrier stacks with the shield, so it gets its own ring —
-            // drawn wider so both are visible at once.
-            if (barrier != null)
+            // Barrier stacks with the shield and holds up to 3 points, so it
+            // draws one concentric ring per point — the level is readable at a
+            // glance without a number. Always white: a barrier is
+            // element-less, since anything pops a point.
+            for (var i = 0; i < barrierPoints; i++)
               IgnorePointer(
                 child: Container(
-                  width: height * 1.08,
-                  height: height * 1.22,
+                  width: height * (1.06 + i * 0.07),
+                  height: height * (1.20 + i * 0.08),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: Colors.white.withValues(alpha: 0.85 - i * 0.18),
                       width: 2,
                     ),
                   ),
@@ -870,7 +874,7 @@ class _DuelScreenState extends State<DuelScreen>
       shield: c.shownPlayerShield,
       barrier: c.shownPlayerBarrier,
       alignEnd: false,
-      badges: statusBadgesFor(c.player),
+      badges: badgesFromSnapshot(c.shownPlayerStatuses),
       barsVeiled: midnight,
       veilLabel: 'Midnight',
     );
@@ -888,7 +892,7 @@ class _DuelScreenState extends State<DuelScreen>
       shield: c.shownEnemyShield,
       barrier: c.shownEnemyBarrier,
       alignEnd: true,
-      badges: statusBadgesFor(c.enemy),
+      badges: badgesFromSnapshot(c.shownEnemyStatuses),
       barsVeiled: dark?.dusk ?? false,
       veilLabel: (dark?.midnight ?? false) ? 'Midnight' : 'Dusk',
     );
@@ -1347,7 +1351,7 @@ class _StatusPanel extends StatelessWidget {
   final MagicElement? element;
   final bool elementHidden;
   final ShownShield? shield;
-  final ShownShield? barrier;
+  final int barrier;
   final bool alignEnd;
   final List<StatusBadge> badges;
 
@@ -1367,7 +1371,7 @@ class _StatusPanel extends StatelessWidget {
     required this.element,
     required this.elementHidden,
     required this.shield,
-    this.barrier,
+    this.barrier = 0,
     required this.alignEnd,
     required this.badges,
     this.barsVeiled = false,
@@ -1478,8 +1482,10 @@ class _StatusPanel extends StatelessWidget {
             alignment: alignEnd ? WrapAlignment.end : WrapAlignment.start,
             children: [
               if (shield != null) _shieldBadge(),
-              if (barrier != null)
-                _badge('Barrier', Colors.white, icon: Icons.shield_moon),
+              if (barrier > 0)
+                _badge(barrier > 1 ? 'Barrier ×$barrier' : 'Barrier',
+                    Colors.white,
+                    icon: Icons.shield_moon),
               for (final b in badges) _statusChip(b),
             ],
           ),

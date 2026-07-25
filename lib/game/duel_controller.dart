@@ -40,9 +40,18 @@ class DuelController extends ChangeNotifier {
   ShownShield? shownPlayerShield;
   ShownShield? shownEnemyShield;
 
-  /// The Barrier slot, separate from the elemental shield — the two stack.
-  ShownShield? shownPlayerBarrier;
-  ShownShield? shownEnemyBarrier;
+  /// Barrier POINTS (0–3), separate from the elemental shield — the two stack
+  /// and each point blocks one hit.
+  int shownPlayerBarrier = 0;
+  int shownEnemyBarrier = 0;
+
+  /// Status pips, advanced one event at a time as the turn animates rather
+  /// than read from live engine state (which is already final the moment the
+  /// turn resolves, so every pip would appear at once). Fed by the frames the
+  /// engine records alongside its events.
+  StatusSnapshot shownPlayerStatuses = StatusSnapshot.empty;
+  StatusSnapshot shownEnemyStatuses = StatusSnapshot.empty;
+  List<StatusFrame> _frames = const [];
   bool playerDefeated = false;
   bool enemyDefeated = false;
 
@@ -86,8 +95,11 @@ class DuelController extends ChangeNotifier {
     revealedEnemyElement = null;
     shownPlayerShield = null;
     shownEnemyShield = null;
-    shownPlayerBarrier = null;
-    shownEnemyBarrier = null;
+    shownPlayerBarrier = 0;
+    shownEnemyBarrier = 0;
+    shownPlayerStatuses = StatusSnapshot.empty;
+    shownEnemyStatuses = StatusSnapshot.empty;
+    _frames = const [];
     playerDefeated = false;
     enemyDefeated = false;
     pendingElement = null;
@@ -150,6 +162,7 @@ class DuelController extends ChangeNotifier {
     final hostAction = playerIsHost ? action : theirs;
     final guestAction = playerIsHost ? theirs : action;
     final result = engine.resolveTurn(hostAction, guestAction);
+    _frames = result.frames;
     battleLog.add('— Turn ${result.turn}');
     battleLog.addAll(result.events.map(_describe));
     _trackForfeits(action, theirs);
@@ -186,7 +199,20 @@ class DuelController extends ChangeNotifier {
       CastAction(spell, player.charge == 0 ? pendingElement : null);
 
   /// Advances the display state past [event] (called after its animation).
-  void applyEvent(DuelEvent event) {
+  ///
+  /// [index] is the event's position in the turn — pass it so the status pips
+  /// step forward with the animation. Omit it and the pips hold still.
+  void applyEvent(DuelEvent event, {int? index}) {
+    if (index != null && index < _frames.length) {
+      final frame = _frames[index];
+      final playerIsMage1 = identical(player, engine.mage1);
+      shownPlayerStatuses = playerIsMage1 ? frame.mage1 : frame.mage2;
+      shownEnemyStatuses = playerIsMage1 ? frame.mage2 : frame.mage1;
+    }
+    _applyEventInner(event);
+  }
+
+  void _applyEventInner(DuelEvent event) {
     switch (event) {
       case ChargedEvent(:final mage, :final element, :final newCharge):
         if (mage == player) {
@@ -217,10 +243,11 @@ class DuelController extends ChangeNotifier {
         // A Barrier occupies its own slot and never displaces the elemental
         // shield the player paid for.
         if (isBarrier) {
+          // `strength` is the resulting point count.
           if (mage == player) {
-            shownPlayerBarrier = snapshot;
+            shownPlayerBarrier = strength;
           } else {
-            shownEnemyBarrier = snapshot;
+            shownEnemyBarrier = strength;
           }
         } else if (mage == player) {
           shownPlayerShield = snapshot;
@@ -234,11 +261,11 @@ class DuelController extends ChangeNotifier {
           :final barrierPopped
         ):
         if (barrierPopped) {
-          // The Barrier ate the hit; the elemental shield behind it is intact.
+          // One point ate the hit; the shield behind it is intact.
           if (target == player) {
-            shownPlayerBarrier = null;
+            shownPlayerBarrier = (shownPlayerBarrier - 1).clamp(0, 3);
           } else {
-            shownEnemyBarrier = null;
+            shownEnemyBarrier = (shownEnemyBarrier - 1).clamp(0, 3);
           }
         } else {
           final shield =
@@ -271,9 +298,9 @@ class DuelController extends ChangeNotifier {
         // A status tick (e.g. Ignite) — same display bookkeeping as a hit.
         if (barrierPopped) {
           if (target == player) {
-            shownPlayerBarrier = null;
+            shownPlayerBarrier = (shownPlayerBarrier - 1).clamp(0, 3);
           } else {
-            shownEnemyBarrier = null;
+            shownEnemyBarrier = (shownEnemyBarrier - 1).clamp(0, 3);
           }
         } else {
           final shield =

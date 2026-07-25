@@ -15,3 +15,4 @@ export 'src/element_status.dart';
 export 'src/spell.dart';
 export 'src/spellbook.dart';
 export 'src/status.dart';
+export 'src/status_snapshot.dart';

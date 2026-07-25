@@ -27,93 +27,115 @@ String? _streakMechanic(MagicElement element) => switch (element) {
       _ => null, // only these four carry consecutive-streak effects
     };
 
-/// Extracts the active status badges for [mage] — its own buffs and the
-/// debuffs afflicting it — for the duel HUD. Order: streak, buffs, debuffs.
-List<StatusBadge> statusBadgesFor(MageState mage) {
+/// Badges for one mage, built from a [StatusSnapshot] rather than live engine
+/// state — that is what lets the duel screen reveal a pip at the moment its
+/// event animates instead of showing every status the instant the turn
+/// resolves. Order: streak, buffs, debuffs.
+List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
   final badges = <StatusBadge>[];
 
-  // --- Streak (only the three consecutive-effect elements) --------------
-  final streakEl = mage.streakElement;
-  if (streakEl != null && mage.streakCount > 0) {
-    final mechanic = _streakMechanic(streakEl);
+  // --- Streak (only the elements that build toward something) -----------
+  final streak = snap['streak'];
+  if (streak != null && streak.element != null) {
+    final mechanic = _streakMechanic(streak.element!);
     if (mechanic != null) {
-      badges.add(StatusBadge('${streakEl.style.label} ${mage.streakCount}',
-          sub: mechanic, color: streakEl.style.color, kind: BadgeKind.streak));
+      badges.add(StatusBadge('${streak.element!.style.label} ${streak.stacks}',
+          sub: mechanic,
+          color: streak.element!.style.color,
+          kind: BadgeKind.streak));
     }
   }
 
   // --- Buffs (mine) -----------------------------------------------------
-  final photo = mage.statuses.whereType<PhotosynthesisStatus>().firstOrNull;
+  final photo = snap['photosynthesis'];
   if (photo != null) {
     badges.add(StatusBadge('Photo ×${photo.stacks}',
-        sub: 'heal', color: MagicElement.flora.style.color, kind: BadgeKind.buff));
+        sub: 'heal',
+        color: MagicElement.flora.style.color,
+        kind: BadgeKind.buff));
   }
-  final ak = mage.statuses.whereType<ArcaneKnowledgeStatus>().firstOrNull;
+  final ak = snap['arcaneKnowledge'];
   if (ak != null) {
     badges.add(StatusBadge('AK ×${ak.stacks}',
-        sub: '+${ak.bonusPercent}%',
+        sub: '+${ak.magnitude}%',
         color: MagicElement.arcane.style.color,
         kind: BadgeKind.buff));
   }
-  final align = mage.statuses.whereType<AstralAlignmentStatus>().firstOrNull;
+  final align = snap['astralAlignment'];
   if (align != null) {
     badges.add(StatusBadge('Align ×${align.stacks}',
-        sub: '${align.piercePercent}% pierce',
+        sub: '${align.magnitude}% pierce',
         color: MagicElement.astral.style.color,
         kind: BadgeKind.buff));
   }
-  if (mage.hasGrace) {
-    badges.add(StatusBadge('Grace',
-        sub: 'blocks 1', color: MagicElement.sanctus.style.color,
-        kind: BadgeKind.buff));
-  }
-  final dark = mage.statuses.whereType<CreepingDarkStatus>().firstOrNull;
+  final dark = snap['creepingDark'];
   if (dark != null) {
-    final tier = dark.midnight
+    final tier = dark.stacks >= CreepingDarkStatus.midnightThreshold
         ? 'MIDNIGHT'
-        : dark.dusk
+        : dark.stacks >= CreepingDarkStatus.duskThreshold
             ? 'DUSK'
-            : dark.shadow
+            : dark.stacks >= CreepingDarkStatus.shadowThreshold
                 ? 'SHADOW'
                 : 'veiled';
     badges.add(StatusBadge('Dark ${dark.stacks}',
-        sub: tier, color: MagicElement.umbra.style.color, kind: BadgeKind.buff));
+        sub: tier,
+        color: MagicElement.umbra.style.color,
+        kind: BadgeKind.buff));
   }
-  if (mage.hasHaste) {
-    badges.add(const StatusBadge('Haste', color: AppColors.teal, kind: BadgeKind.buff));
+  if (snap['grace'] != null) {
+    badges.add(StatusBadge('Grace',
+        sub: 'blocks 1',
+        color: MagicElement.sanctus.style.color,
+        kind: BadgeKind.buff));
   }
-  if (mage.empowerMultiplier != null) {
+  if (snap['haste'] != null) {
+    badges.add(const StatusBadge('Haste',
+        color: AppColors.teal, kind: BadgeKind.buff));
+  }
+  final empower = snap['empower'];
+  if (empower != null) {
     badges.add(StatusBadge('Empower',
-        sub: '×${mage.empowerMultiplier}', color: AppColors.gold, kind: BadgeKind.buff));
+        sub: '×${empower.magnitude}',
+        color: AppColors.gold,
+        kind: BadgeKind.buff));
   }
-  if (mage.quickenPriority != null) {
-    badges.add(const StatusBadge('Quicken', color: AppColors.sky, kind: BadgeKind.buff));
+  if (snap['quicken'] != null) {
+    badges.add(const StatusBadge('Quicken',
+        color: AppColors.sky, kind: BadgeKind.buff));
   }
-  if (mage.phaseNext) {
-    badges.add(const StatusBadge('Phase', color: AppColors.gem, kind: BadgeKind.buff));
+  if (snap['phase'] != null) {
+    badges.add(const StatusBadge('Phase',
+        color: AppColors.gem, kind: BadgeKind.buff));
   }
 
   // --- Debuffs (afflicting me) ------------------------------------------
-  final ignite = mage.statuses.whereType<IgniteStatus>().firstOrNull;
+  final ignite = snap['ignite'];
   if (ignite != null) {
     badges.add(StatusBadge('Ignite',
-        sub: '${ignite.perTick}/t · ${ignite.turnsLeft}t',
+        sub: '${ignite.magnitude}/t · ${ignite.turnsLeft}t',
         color: AppColors.ember,
         kind: BadgeKind.debuff));
   }
-  final blind = mage.statuses.whereType<BlindStatus>().firstOrNull;
+  final blind = snap['blind'];
   if (blind != null) {
     badges.add(StatusBadge('Blind',
-        sub: '${blind.turnsLeft}t', color: AppColors.ember, kind: BadgeKind.debuff));
+        sub: '${blind.turnsLeft}t',
+        color: AppColors.ember,
+        kind: BadgeKind.debuff));
   }
-  if (mage.nextOffensiveDamageScale < 1.0) {
+  if (snap['stagger'] != null) {
     badges.add(const StatusBadge('Staggered',
         sub: 'next −50%', color: AppColors.ember, kind: BadgeKind.debuff));
   }
-  if (mage.priorityPenalty > 0) {
+  if (snap['waterlogged'] != null) {
     badges.add(const StatusBadge('Waterlogged',
         sub: 'slowed', color: AppColors.ember, kind: BadgeKind.debuff));
   }
 
   return badges;
 }
+
+/// Live-state convenience wrapper — used outside a turn replay (e.g. before
+/// the first turn), where lagging behind the animation isn't a concern.
+List<StatusBadge> statusBadgesFor(MageState mage) =>
+    badgesFromSnapshot(StatusSnapshot.of(mage));

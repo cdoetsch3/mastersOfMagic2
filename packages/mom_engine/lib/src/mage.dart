@@ -40,10 +40,14 @@ class MageState {
   /// the two stack, and a Barrier never displaces a shield you paid for.
   ActiveShield? shield;
 
-  /// The **Barrier** slot, independent of [shield]: blocks one incoming hit
-  /// entirely, then shatters. Element-less, so it never takes counter damage.
+  /// **Barrier points**, independent of [shield]. Each point blocks one
+  /// incoming hit entirely, then is spent — so a 3-hit spell burns three
+  /// points. Element-less by design: anything pops a point, so no counter
+  /// math applies. Casting Barrier adds a point, up to [maxBarrierPoints].
   /// Checked before [shield] on every hit.
-  ActiveShield? barrier;
+  int barrierPoints = 0;
+
+  static const int maxBarrierPoints = 3;
 
   // Pending aux buffs, consumed by the next offensive spell cast.
   int? empowerMultiplier;

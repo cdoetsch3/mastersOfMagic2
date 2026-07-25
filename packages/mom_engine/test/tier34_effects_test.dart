@@ -197,12 +197,12 @@ void main() {
     test('it pierces a Barrier too — and the Barrier still pops', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
       alice.statuses.add(AstralAlignmentStatus(20)); // 20%
-      bruno.barrier = ActiveShield.barrier();
+      bruno.barrierPoints = 1;
       charge(alice, MagicElement.pyro, 0);
       duel.resolveTurn(
           CastAction(dmg(25), MagicElement.pyro), const ForfeitAction());
       expect(bruno.hp, 95, reason: '5 pierces to health');
-      expect(bruno.barrier, isNull, reason: 'the Barrier absorbs the 20 and pops');
+      expect(bruno.barrierPoints, 0, reason: 'the Barrier absorbs the 20 and pops');
     });
 
     test('does nothing against an unshielded target (all damage was health)',

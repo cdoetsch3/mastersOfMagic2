@@ -34,7 +34,7 @@ String _numbers(Spell spell) => switch (spell.effect) {
         '$minPerCharge–$maxPerCharge',
       ShieldEffect(:final minStrength, :final maxStrength) =>
         '$minStrength–$maxStrength',
-      BarrierEffect() => '1 hit',
+      BarrierEffect() => '+1 pt',
       EmpowerEffect(:final multiplier) => '×$multiplier',
       // These headline figures are all short labels, so they all capitalise —
       // mixing 'Haste' with 'pierce' read as a bug.
@@ -52,7 +52,7 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
       BarrageEffect() => 'damage per charge spent',
       OverloadEffect() => "damage per point of the enemy's charge",
       ShieldEffect() => 'shield in your element',
-      BarrierEffect() => 'blocked fully, then it shatters',
+      BarrierEffect() => 'of Barrier (max 3) — each point blocks one whole hit',
       EmpowerEffect() => 'damage on your next offensive spell',
       QuickenEffect() => 'your next offensive spell resolves sooner',
       PhaseEffect() => 'your next offensive spell ignores shields',

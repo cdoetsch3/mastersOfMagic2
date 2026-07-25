@@ -166,13 +166,64 @@ void main() {
   });
 
   test('barrier blocks one hit entirely, then is gone', () {
-    defender.barrier = ActiveShield.barrier();
+    defender.barrierPoints = 1;
     duel.resolveTurn(
       CastAction(Spellbook.flick, MagicElement.geo),
       ChargeAction(MagicElement.aero),
     );
     expect(defender.hp, 100);
-    expect(defender.barrier, isNull);
+    expect(defender.barrierPoints, 0);
+  });
+
+  // Barrier is a stack of POINTS (max 3): each point blocks one hit, so a
+  // multi-hit spell burns one per hit (note 18).
+  group('Barrier points', () {
+    test('each cast adds a point, capped at 3', () {
+      for (var cast = 1; cast <= 4; cast++) {
+        attacker
+          ..charge = 2
+          ..element = MagicElement.geo;
+        duel.resolveTurn(
+            CastAction(Spellbook.barrier), const ForfeitAction());
+        expect(attacker.barrierPoints, cast > 3 ? 3 : cast,
+            reason: 'after $cast casts');
+      }
+    });
+
+    test('a 3-hit spell burns three points, and the third hit still lands', () {
+      defender.barrierPoints = 2;
+      const tripleHit = Spell(
+          id: 'tri6', name: 'Tri6', chargeCost: 0, priority: 9,
+          effect: DamageEffect(6, 6, hits: 3));
+      duel.resolveTurn(
+          CastAction(tripleHit, MagicElement.geo), ChargeAction(MagicElement.aero));
+      expect(defender.barrierPoints, 0, reason: 'both points spent');
+      expect(defender.hp, 94, reason: 'hits 1-2 blocked, hit 3 lands for 6');
+    });
+
+    test('one big hit spends only one point', () {
+      defender.barrierPoints = 3;
+      const big = Spell(
+          id: 'big50', name: 'Big50', chargeCost: 0, priority: 9,
+          effect: DamageEffect(50, 50));
+      duel.resolveTurn(
+          CastAction(big, MagicElement.geo), ChargeAction(MagicElement.aero));
+      expect(defender.barrierPoints, 2, reason: 'a 50-damage hit costs 1 point');
+      expect(defender.hp, 100);
+    });
+
+    test('points are element-agnostic — no counter math applies', () {
+      // Pyro into a Flora-countering matchup would normally be 200%; a barrier
+      // point simply eats the hit regardless.
+      defender.barrierPoints = 1;
+      const poke = Spell(
+          id: 'pk9', name: 'Pk9', chargeCost: 0, priority: 9,
+          effect: DamageEffect(9, 9));
+      duel.resolveTurn(
+          CastAction(poke, MagicElement.pyro), ChargeAction(MagicElement.aero));
+      expect(defender.hp, 100);
+      expect(defender.barrierPoints, 0);
+    });
   });
 
   // A Barrier occupies its own slot, so it stacks with an elemental shield.
@@ -184,13 +235,13 @@ void main() {
 
       chargeUp(attacker, MagicElement.geo, 2);
       duel.resolveTurn(CastAction(Spellbook.barrier), const ChargeAction());
-      expect(attacker.barrier, isNotNull, reason: 'barrier is up');
+      expect(attacker.barrierPoints, 1, reason: 'barrier is up');
       expect(attacker.shield!.remaining, shieldBefore,
           reason: 'and the shield it used to overwrite is still there');
     });
 
     test('the barrier absorbs the hit and the shield survives for the next', () {
-      defender.barrier = ActiveShield.barrier();
+      defender.barrierPoints = 1;
       defender.shield = ActiveShield.elemental(MagicElement.solar, 40);
       const poke = Spell(
           id: 'tb10', name: 'TB10', chargeCost: 0, priority: 9,
@@ -198,7 +249,7 @@ void main() {
 
       duel.resolveTurn(
           CastAction(poke, MagicElement.pyro), ChargeAction(MagicElement.aero));
-      expect(defender.barrier, isNull, reason: 'barrier popped');
+      expect(defender.barrierPoints, 0, reason: 'barrier popped');
       expect(defender.shield!.remaining, 40, reason: 'shield untouched');
       expect(defender.hp, 100);
 
@@ -209,14 +260,14 @@ void main() {
     });
 
     test('a shield-ignoring attack bypasses the barrier as well', () {
-      defender.barrier = ActiveShield.barrier();
+      defender.barrierPoints = 1;
       const pierce = Spell(
           id: 'tbp', name: 'TBPierce', chargeCost: 0, priority: 9,
           effect: DamageEffect(10, 10, ignoresShields: true));
       duel.resolveTurn(
           CastAction(pierce, MagicElement.geo), ChargeAction(MagicElement.aero));
       expect(defender.hp, 90);
-      expect(defender.barrier, isNotNull, reason: 'never engaged, so not spent');
+      expect(defender.barrierPoints, 1, reason: 'never engaged, so not spent');
     });
   });
 
@@ -224,12 +275,12 @@ void main() {
     const tripleHit = Spell(
         id: 'test3x4', name: 'Test3x4', chargeCost: 0, priority: 9,
         effect: DamageEffect(4, 4, hits: 3));
-    defender.barrier = ActiveShield.barrier();
+    defender.barrierPoints = 1;
     duel.resolveTurn(
       CastAction(tripleHit, MagicElement.geo),
       ChargeAction(MagicElement.aero),
     );
-    expect(defender.barrier, isNull);
+    expect(defender.barrierPoints, 0);
     expect(defender.hp, 100 - 4 * 2, reason: 'hits 2 and 3 land');
   });
 

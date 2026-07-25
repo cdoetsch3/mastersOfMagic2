@@ -28,9 +28,14 @@ const Map<MagicElement, ElementStyle> elementStyles = {
   MagicElement.astral:
       ElementStyle(Color(0xFF6E7BD6), Icons.star_outline, 'Astral'),
   // Tier 4 — Ethereal
+  // Sanctus and Umbra deliberately avoid sun/moon glyphs — those belong to
+  // Solar and Lunar, and the old light_mode/dark_mode pair read as a second
+  // sun and a second moon. Sanctus takes a haloed seal, Umbra the blinded eye
+  // (its Creeping Dark is literally what hides the board from you).
   MagicElement.sanctus:
-      ElementStyle(Color(0xFFF2E7C9), Icons.light_mode, 'Sanctus'),
-  MagicElement.umbra: ElementStyle(Color(0xFF8B5CD6), Icons.dark_mode, 'Umbra'),
+      ElementStyle(Color(0xFFF2E7C9), Icons.workspace_premium, 'Sanctus'),
+  MagicElement.umbra:
+      ElementStyle(Color(0xFF8B5CD6), Icons.visibility_off, 'Umbra'),
   MagicElement.arcane:
       ElementStyle(Color(0xFFD65AB8), Icons.auto_awesome, 'Arcane'),
 };
@@ -100,7 +105,7 @@ String spellTooltip(Spell spell) {
       '$minPerCharge-$maxPerCharge damage per charge spent',
     ShieldEffect(:final minStrength, :final maxStrength) =>
       '$minStrength-$maxStrength shield in your element',
-    BarrierEffect() => 'Blocks one hit fully, then shatters',
+    BarrierEffect() => 'Adds a Barrier point (max 3). Each blocks one hit',
     EmpowerEffect(:final multiplier) => 'Next offensive spell x$multiplier',
     QuickenEffect(:final priorityOverride) =>
       'Next offensive spell at priority $priorityOverride',
@@ -140,7 +145,8 @@ const Map<String, String> spellDescriptions = {
   'bulwark': 'A heavy shield in your element.',
   'rampart': 'A towering shield in your element.',
   'sanctuary': 'The greatest shield a mage can weave.',
-  'barrier': 'Blocks one hit completely, then shatters. No element.',
+  'barrier': 'Stacks up to 3 points; each blocks one hit whole. '
+      'Element-less — a multi-hit spell burns one point per hit.',
   'empower': 'Your next offensive spell deals double damage.',
   'quicken': 'Your next offensive spell strikes before enemy shields.',
   'phase': 'Your next offensive spell passes through shields.',

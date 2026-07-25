@@ -828,6 +828,30 @@ potions from ingredients.
 | **Loot insurance** ⚠️ | Preserve loot on death | Campaign runs |
 | **Combat utility** | Healing, removing buffs/debuffs mid-duel | In a duel |
 
+#### 📝 TODO — timed buffs and *hidden* statuses (playtest note, 2026-07-23)
+
+Two related mechanics to design here, not yet specified:
+
+1. **Real-time durations, in minutes.** Out-of-combat buffs measured in
+   wall-clock time rather than turns — lasting **X minutes and stacking up to
+   a ceiling** (an early figure was 60 minutes; ⚠️ some may run as long as a
+   **week**). ❓ Open: does the clock run while logged out? A week-long buff
+   almost certainly must, or it becomes a login-timer chore.
+2. **Hidden statuses.** Effects the opponent cannot see until they trigger —
+   the example being **Venom Blood**: the enemy doesn't know you have it until
+   they lifesteal off you and get punished. ⚠️ Note this is the *inverse* of
+   Umbra's info-war, which hides **your** state from them; this hides a
+   **trap** in yours. It needs its own reveal rule (revealed on proc? on
+   inspect? never?) and a HUD treatment that doesn't leak its existence.
+3. **Three magnitudes: Minor / Major / Extreme.** A shared tier vocabulary for
+   both of the above — presumably mapping onto the rarity ladder (§8) and the
+   Alchemy skill level that can brew each.
+
+⚠️ **Engine gap:** every status today is *turn*-scoped and duel-scoped
+([TurnStatus]). Real-time, cross-duel, persisted-to-profile buffs are a new
+category — they belong on the **player profile**, not `MageState`, and need
+their own expiry sweep on load. Budget that before promising week-long buffs.
+
 ### 6b.2 Consumable slots ⭐ ✅
 
 > *"a limit of four item slots that potentially could raise up to eight or

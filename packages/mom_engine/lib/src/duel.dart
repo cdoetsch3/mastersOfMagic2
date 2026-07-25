@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'action.dart';
@@ -7,16 +8,71 @@ import 'events.dart';
 import 'mage.dart';
 import 'spell.dart';
 import 'status.dart';
+import 'status_snapshot.dart';
 
 /// Result of resolving one simultaneous turn.
 class TurnResult {
   final int turn;
   final List<DuelEvent> events;
 
-  const TurnResult(this.turn, this.events);
+  /// A status snapshot of both mages taken immediately after each event,
+  /// parallel to [events]. Lets the UI advance status pips one event at a
+  /// time instead of jumping to the end-of-turn state the moment the turn
+  /// resolves. Empty only for results built without a recording list.
+  final List<StatusFrame> frames;
+
+  const TurnResult(this.turn, this.events, [this.frames = const []]);
 
   @override
   String toString() => events.map((e) => '  $e').join('\n');
+}
+
+/// A [List] of events that also records a [StatusFrame] for every event
+/// appended, so the UI can replay status changes in step with the animation.
+///
+/// It implements `List<DuelEvent>` deliberately: the engine passes
+/// `List<DuelEvent> events` through a dozen private methods, and this way none
+/// of those signatures — or their call sites — have to change.
+class _RecordingEvents extends ListBase<DuelEvent> {
+  final List<DuelEvent> _events = [];
+  final List<StatusFrame> frames = [];
+  final MageState _m1;
+  final MageState _m2;
+
+  _RecordingEvents(this._m1, this._m2);
+
+  StatusFrame _snap() =>
+      (mage1: StatusSnapshot.of(_m1), mage2: StatusSnapshot.of(_m2));
+
+  @override
+  int get length => _events.length;
+  @override
+  set length(int v) {
+    _events.length = v;
+    frames.length = v;
+  }
+
+  @override
+  DuelEvent operator [](int i) => _events[i];
+  @override
+  void operator []=(int i, DuelEvent e) {
+    _events[i] = e;
+    frames[i] = _snap();
+  }
+
+  @override
+  void add(DuelEvent e) {
+    _events.add(e);
+    frames.add(_snap());
+  }
+
+  @override
+  void insert(int i, DuelEvent e) {
+    _events.insert(i, e);
+    // Reuse the frame already at that index: the spliced event (a Haste
+    // transfer) is being reported at the moment that state was current.
+    frames.insert(i, i < frames.length ? frames[i] : _snap());
+  }
 }
 
 /// A 1v1 duel between two mages (player or monster — identical rules).
@@ -120,7 +176,7 @@ class DuelEngine {
     _validate(mage1, action1);
     _validate(mage2, action2);
     turnNumber++;
-    final events = <DuelEvent>[];
+    final events = _RecordingEvents(mage1, mage2);
     mage1.activeElementThisTurn = null;
     mage2.activeElementThisTurn = null;
 
@@ -133,7 +189,7 @@ class DuelEngine {
       for (final mage in [mage1, mage2]) {
         if (!mage.alive) events.add(DefeatedEvent(mage));
       }
-      return TurnResult(turnNumber, events);
+      return TurnResult(turnNumber, events, events.frames);
     }
 
     // One resolution entry per mage. Channel is priority 4; casts use their
@@ -275,7 +331,7 @@ class DuelEngine {
     for (final mage in [mage1, mage2]) {
       if (!mage.alive) events.add(DefeatedEvent(mage));
     }
-    return TurnResult(turnNumber, events);
+    return TurnResult(turnNumber, events, events.frames);
   }
 
   void _validate(MageState mage, MageAction action) {
@@ -449,9 +505,14 @@ class DuelEngine {
         events.add(ShieldRaisedEvent(caster,
             element: cast.element, isBarrier: false, strength: strength));
       case BarrierEffect():
-        caster.barrier = ActiveShield.barrier();
+        // Barrier stacks: each cast adds a point, up to the cap. `strength`
+        // reports the resulting point count so the UI can show the level.
+        caster.barrierPoints =
+            (caster.barrierPoints + 1).clamp(0, MageState.maxBarrierPoints);
         events.add(ShieldRaisedEvent(caster,
-            element: null, isBarrier: true, strength: 0));
+            element: null,
+            isBarrier: true,
+            strength: caster.barrierPoints));
       case EmpowerEffect(:final multiplier):
         caster.empowerMultiplier = multiplier;
         events.add(BuffAppliedEvent(
@@ -518,7 +579,8 @@ class DuelEngine {
     // Only matters when there's a shield to pierce and the hit isn't already
     // going straight to health (Phase wins that turn).
     final piercePct =
-        (!ignoresShields && (target.shield != null || target.barrier != null))
+        (!ignoresShields &&
+                (target.shield != null || target.barrierPoints > 0))
             ? (_statusOf<AstralAlignmentStatus>(cast.caster)?.piercePercent ?? 0)
             : 0;
     final caster = cast.caster;
@@ -837,8 +899,8 @@ class DuelEngine {
     // The Barrier slot is checked FIRST and independently of the elemental
     // shield — the two coexist, so a Barrier eats this hit whole and shatters
     // while the shield underneath is left completely untouched for the next.
-    if (!ignoresShields && target.barrier != null) {
-      target.barrier = null;
+    if (!ignoresShields && target.barrierPoints > 0) {
+      target.barrierPoints--;
       // `broken` stays false: the ELEMENTAL shield is untouched and still
       // standing. Callers distinguish the two via [barrierPopped].
       return (
