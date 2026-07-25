@@ -12,6 +12,7 @@ import '../game/loadout.dart';
 import '../game/mage_apparel.dart';
 import '../game/mage_sprite.dart';
 import '../game/shield_aura.dart';
+import '../game/status_fx.dart';
 import '../game/opponent_driver.dart';
 import '../game/progression.dart';
 import '../ui/app_theme.dart';
@@ -46,7 +47,7 @@ class DuelScreen extends StatefulWidget {
   State<DuelScreen> createState() => _DuelScreenState();
 }
 
-enum _FxKind { none, projectile, impact, shieldUp, charge, heal, flash }
+enum _FxKind { none, projectile, impact, shieldUp, charge, heal, flash, status }
 
 class _DuelScreenState extends State<DuelScreen>
     with SingleTickerProviderStateMixin {
@@ -63,6 +64,7 @@ class _DuelScreenState extends State<DuelScreen>
   double _fxIntensity = 1;
   int _fxProjectiles = 1;
   double _shake = 0;
+  StatusMotion _fxMotion = StatusMotion.dim;
   String? _banner;
   Color _bannerColor = Colors.white;
   MagicElement? _castElement;
@@ -194,9 +196,11 @@ class _DuelScreenState extends State<DuelScreen>
       double intensity = 1,
       int projectiles = 1,
       double shake = 0,
+      StatusMotion motion = StatusMotion.dim,
       int ms = 400}) async {
     setState(() {
       _fxKind = kind;
+      _fxMotion = motion;
       _fxAtEnemy = atEnemy;
       _fxColor = color;
       _fxText = text;
@@ -362,14 +366,18 @@ class _DuelScreenState extends State<DuelScreen>
               intensity: 1 + amount / 30,
               ms: 460);
         }
-      case BuffAppliedEvent(:final mage, :final description):
+      case BuffAppliedEvent(:final mage, :final description, :final statusId):
+        // Each status has its own colour and motion (see status_fx.dart), so
+        // an Ignite never looks like a Grace. ~1.7s: long enough to read the
+        // flourish and the message together.
+        final fx = statusFxFor(statusId);
         await _showMessage(
-            '${mage == c.enemy ? c.enemy.name : 'You'}: $description',
-            const Color(0xFFE8C547));
-        await _runFx(_FxKind.flash,
+            '${mage == c.enemy ? c.enemy.name : 'You'}: $description', fx.color);
+        await _runFx(_FxKind.status,
             atEnemy: mage == c.enemy,
-            color: const Color(0xFFE8C547),
-            ms: 550);
+            color: fx.color,
+            motion: fx.motion,
+            ms: 1700);
       case ChargeDrainedEvent(:final mage, :final amount):
         if (amount > 0) {
           await _runFx(_FxKind.impact,
@@ -552,6 +560,7 @@ class _DuelScreenState extends State<DuelScreen>
                           builder: (context, _) => CustomPaint(
                             painter: _FxPainter(
                               kind: _fxKind,
+                              motion: _fxMotion,
                               t: _fx.value,
                               color: _fxColor,
                               text: _fxText,
@@ -1620,6 +1629,7 @@ class _VeilHatchPainter extends CustomPainter {
 
 class _FxPainter extends CustomPainter {
   final _FxKind kind;
+  final StatusMotion motion;
   final double t;
   final Color color;
   final String? text;
@@ -1630,6 +1640,7 @@ class _FxPainter extends CustomPainter {
 
   _FxPainter({
     required this.kind,
+    required this.motion,
     required this.t,
     required this.color,
     required this.text,
@@ -1713,9 +1724,165 @@ class _FxPainter extends CustomPainter {
       case _FxKind.flash:
         paint.color = color.withValues(alpha: (1 - t) * 0.5);
         canvas.drawCircle(to, (36 + 18 * t) * (0.8 + intensity * 0.3), paint);
+      case _FxKind.status:
+        _drawStatus(canvas, paint);
       case _FxKind.none:
         break;
     }
+  }
+
+  /// Draws the status flourish for [motion] around the affected mage. `t` runs
+  /// 0→1 over the whole ~1.7s beat.
+  void _drawStatus(Canvas canvas, Paint paint) {
+    final fade = t < 0.75 ? 1.0 : (1 - t) * 4; // hold, then fall away
+    final a = fade.clamp(0.0, 1.0);
+    final c = color;
+
+    switch (motion) {
+      case StatusMotion.rise:
+        // Motes drift up and thin out — burning, growing, evaporating.
+        for (var i = 0; i < 7; i++) {
+          final p = (t + i / 7) % 1.0;
+          final sway = sin((p * 3 + i) * pi) * 9;
+          paint.color = c.withValues(alpha: (1 - p) * 0.9 * a);
+          canvas.drawCircle(
+              to + Offset((i - 3) * 9.0 + sway, 34 - 78 * p), 3.4 - p * 1.8, paint);
+        }
+
+      case StatusMotion.sink:
+        // Heavy drops fall and pool at the feet.
+        for (var i = 0; i < 6; i++) {
+          final p = ((t * 1.3) + i / 6) % 1.0;
+          paint.color = c.withValues(alpha: (1 - p * 0.6) * 0.85 * a);
+          canvas.drawCircle(
+              to + Offset((i - 2.5) * 11.0, -34 + 74 * p), 3.2, paint);
+        }
+        paint.color = c.withValues(alpha: 0.35 * a * t);
+        canvas.drawOval(
+            Rect.fromCenter(center: to + const Offset(0, 40),
+                width: 66 * t, height: 12 * t), paint);
+
+      case StatusMotion.orbit:
+        // Motes circle the mage — accumulating knowledge.
+        for (var i = 0; i < 5; i++) {
+          final ang = t * 2 * pi + i * 2 * pi / 5;
+          paint.color = c.withValues(alpha: 0.9 * a);
+          canvas.drawCircle(
+              to + Offset(cos(ang) * 44, sin(ang) * 26 - 4),
+              3.0, paint);
+        }
+
+      case StatusMotion.converge:
+        // Motes pull inward from off-frame — something settling onto you.
+        for (var i = 0; i < 8; i++) {
+          final ang = i * 2 * pi / 8;
+          final r = 78 * (1 - t);
+          paint.color = c.withValues(alpha: t * 0.95 * a);
+          canvas.drawCircle(
+              to + Offset(cos(ang) * r, sin(ang) * r * 0.62 - 4),
+              3.4, paint);
+        }
+
+      case StatusMotion.scatter:
+        // Motes fly outward — something torn off you.
+        for (var i = 0; i < 9; i++) {
+          final ang = i * 2 * pi / 9 + 0.4;
+          final r = 14 + 66 * t;
+          paint.color = c.withValues(alpha: (1 - t) * 0.95);
+          canvas.drawCircle(
+              to + Offset(cos(ang) * r, sin(ang) * r * 0.62 - 4),
+              3.6 - t * 2, paint);
+        }
+
+      case StatusMotion.bloom:
+        // Bright core, expanding ring — a discharge of power.
+        paint.color = c.withValues(alpha: (1 - t) * 0.55);
+        canvas.drawCircle(to, 18 + 60 * t, paint);
+        paint.color = c.withValues(alpha: (1 - t) * 0.9);
+        canvas.drawCircle(to, 20 * (1 - t), paint);
+
+      case StatusMotion.crack:
+        // Jagged fractures radiating out.
+        final stroke = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.4
+          ..color = c.withValues(alpha: (1 - t * 0.7) * a);
+        for (var i = 0; i < 5; i++) {
+          final ang = i * 2 * pi / 5 + 0.3;
+          final len = 58 * min(1.0, t * 2.2);
+          final mid = to + Offset(cos(ang) * len * 0.55,
+              sin(ang) * len * 0.4 - 4);
+          final end = to +
+              Offset(cos(ang + 0.22) * len, sin(ang + 0.22) * len * 0.7 - 4);
+          canvas.drawPath(
+              Path()..moveTo(to.dx, to.dy - 4)..lineTo(mid.dx, mid.dy)
+                ..lineTo(end.dx, end.dy),
+              stroke);
+        }
+
+      case StatusMotion.streak:
+        // Horizontal speed lines — tempo.
+        final stroke = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3
+          ..strokeCap = StrokeCap.round;
+        for (var i = 0; i < 4; i++) {
+          final p = (t * 1.6 + i / 4) % 1.0;
+          stroke.color = c.withValues(alpha: (1 - p) * 0.9 * a);
+          final y = to.dy - 26 + i * 17.0;
+          final x = to.dx - 54 + 110 * p;
+          canvas.drawLine(Offset(x, y), Offset(x + 26, y), stroke);
+        }
+
+      case StatusMotion.chevron:
+        // Stacked chevrons swelling upward — amplification.
+        final stroke = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3.4
+          ..strokeCap = StrokeCap.round;
+        for (var i = 0; i < 3; i++) {
+          final p = (t * 1.4 - i * 0.16).clamp(0.0, 1.0);
+          if (p <= 0) continue;
+          stroke.color = c.withValues(alpha: (1 - p) * 0.95);
+          final y = to.dy + 26 - 60 * p;
+          final w = 15 + i * 5.0;
+          canvas.drawPath(
+              Path()..moveTo(to.dx - w, y + 9)..lineTo(to.dx, y)
+                ..lineTo(to.dx + w, y + 9),
+              stroke);
+        }
+
+      case StatusMotion.ghost:
+        // An offset duplicate peels away and dissolves.
+        paint.color = c.withValues(alpha: (1 - t) * 0.45);
+        for (final dir in [-1.0, 1.0]) {
+          canvas.drawOval(
+              Rect.fromCenter(
+                  center: to + Offset(dir * 30 * t, -4),
+                  width: 44 - 8 * t, height: 76 - 12 * t),
+              paint);
+        }
+
+      case StatusMotion.align:
+        // Scattered motes snap into one straight line.
+        for (var i = 0; i < 6; i++) {
+          final ang = i * 2.4 + 0.7;
+          final spread = 52 * (1 - t);
+          final target = Offset(to.dx - 45 + i * 18.0, to.dy - 4);
+          final scattered =
+              to + Offset(cos(ang) * spread, sin(ang) * spread * 0.7 - 4);
+          final pos = Offset.lerp(scattered, target, t)!;
+          paint.color = c.withValues(alpha: (0.5 + t * 0.5) * a);
+          canvas.drawCircle(pos, 3.2, paint);
+        }
+
+      case StatusMotion.dim:
+        // A weak pulse: something was cast, but nothing changed.
+        paint.color = c.withValues(alpha: (1 - t) * 0.3);
+        canvas.drawCircle(to, 26 + 14 * t, paint);
+    }
+
+    _drawText(canvas, to + Offset(0, -58 - 10 * t), a * 0.9, fontSize: 14);
   }
 
   void _drawText(Canvas canvas, Offset pos, double opacity,

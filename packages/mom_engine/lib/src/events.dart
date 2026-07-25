@@ -126,7 +126,12 @@ class BuffAppliedEvent extends DuelEvent {
   final MageState mage;
   final String description;
 
-  const BuffAppliedEvent(this.mage, this.description);
+  /// Stable identifier for *which* status this is, so presentation can key off
+  /// identity rather than parsing [description]. Null only for buffs that
+  /// predate the ids. See `StatusFx` in the app for the animation mapping.
+  final String? statusId;
+
+  const BuffAppliedEvent(this.mage, this.description, {this.statusId});
 
   @override
   String toString() => '${mage.name}: $description';

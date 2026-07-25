@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:mom_engine/mom_engine.dart';
+
+import '../game/element_style.dart';
+import '../game/status_fx.dart';
 import '../ui/app_theme.dart';
 
 /// "How dueling works" — the general rules reference, built around the
@@ -52,6 +56,8 @@ class GameplayGuideScreen extends StatelessWidget {
                       'Blinded — the charge is spent for nothing. Neither one '
                       'advances an element streak or procs an effect.',
                 ),
+                SizedBox(height: 18),
+                _StatusList(),
                 SizedBox(height: 18),
                 _Section(
                   title: 'Elements carry effects',
@@ -264,6 +270,105 @@ class _PhaseStrip extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Every status in the game, straight from [StatusCatalog] — so the guide can
+/// never fall out of step with what the engine actually applies.
+class _StatusList extends StatelessWidget {
+  const _StatusList();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Every status',
+            style: TextStyle(
+                color: AppColors.text,
+                fontSize: 16,
+                fontWeight: FontWeight.w700)),
+        const SizedBox(height: 4),
+        const Text(
+          'Conditions you carry show as pips beside your health. Moments are '
+          'things that happen in passing — a cleanse, a strip, a block.',
+          style: TextStyle(color: AppColors.textDim, fontSize: 13),
+        ),
+        const SizedBox(height: 12),
+        for (final group in [
+          ('Lasting conditions', StatusCatalog.lasting.toList()),
+          ('Moments', StatusCatalog.moments.toList()),
+        ]) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 6, bottom: 6),
+            child: Text(group.$1.toUpperCase(),
+                style: const TextStyle(
+                    color: AppColors.textFaint,
+                    fontSize: 11,
+                    letterSpacing: 1.1,
+                    fontWeight: FontWeight.w600)),
+          ),
+          for (final info in group.$2) _StatusRow(info),
+        ],
+      ],
+    );
+  }
+}
+
+class _StatusRow extends StatelessWidget {
+  final StatusInfo info;
+  const _StatusRow(this.info);
+
+  @override
+  Widget build(BuildContext context) {
+    final color = statusColor(info);
+    final kindLabel = switch (info.kind) {
+      StatusKind.buff => 'buff',
+      StatusKind.debuff => 'debuff',
+      StatusKind.moment => 'moment',
+    };
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: AppColors.panelHi,
+        borderRadius: BorderRadius.circular(9),
+        border: Border(left: BorderSide(color: color, width: 3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(info.name,
+                    style: TextStyle(
+                        color: color,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700)),
+              ),
+              Text(
+                info.element == null
+                    ? kindLabel
+                    : '${info.element!.style.label} · $kindLabel',
+                style: const TextStyle(
+                    color: AppColors.textFaint, fontSize: 11),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(info.description,
+              style: const TextStyle(
+                  color: AppColors.textDim, fontSize: 12.5, height: 1.35)),
+          const SizedBox(height: 4),
+          Text('How: ${info.trigger}',
+              style: const TextStyle(
+                  color: AppColors.textFaint,
+                  fontSize: 11.5,
+                  fontStyle: FontStyle.italic)),
+        ],
+      ),
     );
   }
 }

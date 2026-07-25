@@ -516,15 +516,18 @@ class DuelEngine {
       case EmpowerEffect(:final multiplier):
         caster.empowerMultiplier = multiplier;
         events.add(BuffAppliedEvent(
-            caster, 'next offensive spell deals ${multiplier}x damage'));
+            caster, 'next offensive spell deals ${multiplier}x damage',
+            statusId: 'empower'));
       case QuickenEffect(:final priorityOverride):
         caster.quickenPriority = priorityOverride;
         events.add(BuffAppliedEvent(caster,
-            'next offensive spell resolves at priority $priorityOverride'));
+            'next offensive spell resolves at priority $priorityOverride',
+            statusId: 'quicken'));
       case PhaseEffect():
         caster.phaseNext = true;
-        events.add(
-            BuffAppliedEvent(caster, 'next offensive spell ignores shields'));
+        events.add(BuffAppliedEvent(
+            caster, 'next offensive spell ignores shields',
+            statusId: 'phase'));
       case HasteEffect():
         // Initiative only; the grantsHaste flag does the work post-resolution.
         break;
@@ -538,10 +541,13 @@ class DuelEngine {
         // Grace doesn't stack past one, so casting Hallow while already warded
         // is a wasted turn — say so rather than logging a fresh success.
         if (caster.hasGrace) {
-          events.add(BuffAppliedEvent(caster, 'Already warded — Grace unchanged'));
+          events.add(BuffAppliedEvent(
+              caster, 'Already warded — Grace unchanged',
+              statusId: 'graceAlready'));
         } else {
           caster.hasGrace = true;
-          events.add(BuffAppliedEvent(caster, 'Grace — next debuff blocked'));
+          events.add(BuffAppliedEvent(
+              caster, 'Grace — next debuff blocked', statusId: 'grace'));
         }
     }
 
@@ -658,8 +664,11 @@ class DuelEngine {
         } else {
           photo.addStack();
         }
-        e.add(BuffAppliedEvent(caster, 'Photosynthesis '
-            '(${_statusOf<PhotosynthesisStatus>(caster)!.stacks} stacks)'));
+        e.add(BuffAppliedEvent(
+            caster,
+            'Photosynthesis '
+                '(${_statusOf<PhotosynthesisStatus>(caster)!.stacks} stacks)',
+            statusId: 'photosynthesis'));
       case MagicElement.aqua:
         // Waterlogged — every 3rd consecutive Aqua cast slows the opponent's
         // next action by +10 priority, unless they hold Photosynthesis.
@@ -668,14 +677,17 @@ class DuelEngine {
           if (_statusOf<PhotosynthesisStatus>(target) == null &&
               !_graceBlocks(target, e)) {
             target.priorityPenalty = 10;
-            e.add(BuffAppliedEvent(target, 'Waterlogged — next action slowed'));
+            e.add(BuffAppliedEvent(
+                target, 'Waterlogged — next action slowed',
+                statusId: 'waterlogged'));
           }
         }
         // An Aqua elemental shield cleanses the caster's Ignite.
         if (spell.effect is ShieldEffect &&
             _statusOf<IgniteStatus>(caster) != null) {
           caster.statuses.removeWhere((s) => s is IgniteStatus);
-          e.add(BuffAppliedEvent(caster, 'Ignite doused'));
+          e.add(BuffAppliedEvent(caster, 'Ignite doused',
+              statusId: 'igniteDoused'));
         }
 
       // ---- Tier 2 — Kinetic --------------------------------------------
@@ -687,7 +699,8 @@ class DuelEngine {
               target.streakCount > 0) {
             target.streakElement = null;
             target.streakCount = 0;
-            e.add(BuffAppliedEvent(target, 'Tailwind scattered'));
+            e.add(BuffAppliedEvent(target, 'Tailwind scattered',
+                statusId: 'tailwindScattered'));
           }
           // Static Feedback — 20% on hit strips one charge. Grounded out by
           // a Geo shield still standing after the hit.
@@ -717,7 +730,8 @@ class DuelEngine {
           if (!windShielded && !_graceBlocks(target, e)) {
             target.nextOffensiveDamageScale = 0.5;
             e.add(BuffAppliedEvent(
-                target, 'Staggered — next offensive spell halved'));
+                target, 'Staggered — next offensive spell halved',
+                statusId: 'stagger'));
           }
         }
 
@@ -740,13 +754,16 @@ class DuelEngine {
           if (align != null) {
             if (_effectiveMoonPhase(caster) == MoonPhase.full) {
               target.statuses.removeWhere((s) => s is AstralAlignmentStatus);
-              e.add(BuffAppliedEvent(target, 'Alignment scattered (Full Moon)'));
+              e.add(BuffAppliedEvent(
+                  target, 'Alignment scattered (Full Moon)',
+                  statusId: 'alignmentStripped'));
             } else {
               align.stacks--;
               if (align.stacks <= 0) {
                 target.statuses.removeWhere((s) => s is AstralAlignmentStatus);
               }
-              e.add(BuffAppliedEvent(target, 'Alignment stripped'));
+              e.add(BuffAppliedEvent(target, 'Alignment stripped',
+                  statusId: 'alignmentStripped'));
             }
           }
         }
@@ -763,8 +780,10 @@ class DuelEngine {
                 return s;
               })();
           align.addStacks(chargeSpent);
-          e.add(BuffAppliedEvent(caster,
-              'Astral Alignment (${align.stacks} — ${align.piercePercent}% pierce)'));
+          e.add(BuffAppliedEvent(
+              caster,
+              'Astral Alignment (${align.stacks} — ${align.piercePercent}% pierce)',
+              statusId: 'astralAlignment'));
         }
 
       // ---- Tier 4 — Ethereal -------------------------------------------
@@ -774,7 +793,8 @@ class DuelEngine {
         if (caster.streakElement == MagicElement.sanctus &&
             caster.streakCount % 3 == 0) {
           caster.statuses.add(PendingAbsolutionStatus());
-          e.add(BuffAppliedEvent(caster, 'Absolution rising'));
+          e.add(BuffAppliedEvent(caster, 'Absolution rising',
+              statusId: 'absolutionRising'));
         }
       case MagicElement.umbra:
         // Creeping Dark — stacks grow by the charge spent on each cast.
@@ -787,7 +807,8 @@ class DuelEngine {
               })();
           dark.addStacks(chargeSpent);
           e.add(BuffAppliedEvent(
-              caster, 'Creeping Dark (${dark.stacks} stacks)'));
+              caster, 'Creeping Dark (${dark.stacks} stacks)',
+              statusId: 'creepingDark'));
         }
       case MagicElement.arcane:
         // Arcane → Sanctus: an Arcane attack that lands on health resets the
@@ -798,7 +819,8 @@ class DuelEngine {
             target.streakElement == MagicElement.sanctus) {
           target.streakElement = null;
           target.streakCount = 0;
-          e.add(BuffAppliedEvent(target, 'Sanctus rite unravelled'));
+          e.add(BuffAppliedEvent(target, 'Sanctus rite unravelled',
+              statusId: 'sanctusUnravelled'));
         }
         // Arcane Knowledge — a 4+ charge Arcane cast earns a stack, unless
         // the opponent's darkness is at Dusk or worse (Umbra corrupts
@@ -815,8 +837,11 @@ class DuelEngine {
             final stacks = _statusOf<ArcaneKnowledgeStatus>(caster)!.stacks;
             caster.bonusDamagePercent =
                 stacks * ArcaneKnowledgeStatus.percentPerStack;
-            e.add(BuffAppliedEvent(caster,
-                'Arcane Knowledge ($stacks stacks, +${caster.bonusDamagePercent}% damage)'));
+            e.add(BuffAppliedEvent(
+                caster,
+                'Arcane Knowledge ($stacks stacks, '
+                    '+${caster.bonusDamagePercent}% damage)',
+                statusId: 'arcaneKnowledge'));
           }
         }
     }
@@ -833,7 +858,8 @@ class DuelEngine {
     } else {
       target.statuses.add(BlindStatus());
     }
-    e.add(BuffAppliedEvent(target, 'Blinded — 50% miss for 3 turns'));
+    e.add(BuffAppliedEvent(target, 'Blinded — 50% miss for 3 turns',
+        statusId: 'blind'));
   }
 
   /// The moon phase governing [mage]'s Lunar spells: the global clock, unless
@@ -852,7 +878,8 @@ class DuelEngine {
   bool _graceBlocks(MageState target, List<DuelEvent> e) {
     if (!target.hasGrace) return false;
     target.hasGrace = false;
-    e.add(BuffAppliedEvent(target, 'Grace absorbs the debuff'));
+    e.add(BuffAppliedEvent(target, 'Grace absorbs the debuff',
+        statusId: 'graceConsumed'));
     return true;
   }
 
@@ -869,7 +896,8 @@ class DuelEngine {
     } else {
       target.statuses.add(IgniteStatus(perTick));
     }
-    e.add(BuffAppliedEvent(target, 'Ignited ($perTick/turn)'));
+    e.add(BuffAppliedEvent(target, 'Ignited ($perTick/turn)',
+        statusId: 'ignite'));
   }
 
   T? _statusOf<T extends TurnStatus>(MageState mage) {
@@ -1045,7 +1073,8 @@ class DuelEngine {
       if (dark.stacks <= 0) {
         opponent.statuses.removeWhere((s) => s is CreepingDarkStatus);
       }
-      events.add(BuffAppliedEvent(opponent, 'Creeping Dark seared (−5)'));
+      events.add(BuffAppliedEvent(opponent, 'Creeping Dark seared (−5)',
+          statusId: 'darkSeared'));
     }
 
     // The removable-debuff pool is every lingering [Debuff] status PLUS the
@@ -1066,13 +1095,16 @@ class DuelEngine {
       // cast against a status-light opponent.
       if (!holder.hasGrace) {
         holder.hasGrace = true;
-        events.add(BuffAppliedEvent(holder, 'Grace — next debuff blocked'));
+        events.add(BuffAppliedEvent(holder, 'Grace — next debuff blocked',
+            statusId: 'grace'));
       }
     } else {
       // Uniformly random, from the shared per-turn seed (§4c.1).
       final victim = removable[rng.nextInt(removable.length)];
       victim.clear();
-      events.add(BuffAppliedEvent(holder, 'Absolution — ${victim.label} purged'));
+      events.add(BuffAppliedEvent(
+          holder, 'Absolution — ${victim.label} purged',
+          statusId: 'absolution'));
     }
   }
 
