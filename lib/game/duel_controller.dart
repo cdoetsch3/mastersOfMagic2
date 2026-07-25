@@ -39,6 +39,10 @@ class DuelController extends ChangeNotifier {
   MagicElement? revealedEnemyElement;
   ShownShield? shownPlayerShield;
   ShownShield? shownEnemyShield;
+
+  /// The Barrier slot, separate from the elemental shield — the two stack.
+  ShownShield? shownPlayerBarrier;
+  ShownShield? shownEnemyBarrier;
   bool playerDefeated = false;
   bool enemyDefeated = false;
 
@@ -82,6 +86,8 @@ class DuelController extends ChangeNotifier {
     revealedEnemyElement = null;
     shownPlayerShield = null;
     shownEnemyShield = null;
+    shownPlayerBarrier = null;
+    shownEnemyBarrier = null;
     playerDefeated = false;
     enemyDefeated = false;
     pendingElement = null;
@@ -208,21 +214,44 @@ class DuelController extends ChangeNotifier {
           isBarrier: isBarrier,
           remaining: strength,
         );
-        if (mage == player) {
+        // A Barrier occupies its own slot and never displaces the elemental
+        // shield the player paid for.
+        if (isBarrier) {
+          if (mage == player) {
+            shownPlayerBarrier = snapshot;
+          } else {
+            shownEnemyBarrier = snapshot;
+          }
+        } else if (mage == player) {
           shownPlayerShield = snapshot;
         } else {
           shownEnemyShield = snapshot;
         }
-      case DamageEvent(:final target, :final toShield, :final shieldBroken):
-        final shield = target == player ? shownPlayerShield : shownEnemyShield;
-        if (shieldBroken) {
+      case DamageEvent(
+          :final target,
+          :final toShield,
+          :final shieldBroken,
+          :final barrierPopped
+        ):
+        if (barrierPopped) {
+          // The Barrier ate the hit; the elemental shield behind it is intact.
           if (target == player) {
-            shownPlayerShield = null;
+            shownPlayerBarrier = null;
           } else {
-            shownEnemyShield = null;
+            shownEnemyBarrier = null;
           }
-        } else if (shield != null && toShield > 0) {
-          shield.remaining -= toShield;
+        } else {
+          final shield =
+              target == player ? shownPlayerShield : shownEnemyShield;
+          if (shieldBroken) {
+            if (target == player) {
+              shownPlayerShield = null;
+            } else {
+              shownEnemyShield = null;
+            }
+          } else if (shield != null && toShield > 0) {
+            shield.remaining -= toShield;
+          }
         }
         shownPlayerHp = player == target ? _clampHp(event) : shownPlayerHp;
         shownEnemyHp = enemy == target ? _clampHp(event) : shownEnemyHp;
@@ -236,18 +265,28 @@ class DuelController extends ChangeNotifier {
           :final target,
           :final toShield,
           :final toHp,
-          :final shieldBroken
+          :final shieldBroken,
+          :final barrierPopped
         ):
         // A status tick (e.g. Ignite) — same display bookkeeping as a hit.
-        final shield = target == player ? shownPlayerShield : shownEnemyShield;
-        if (shieldBroken) {
+        if (barrierPopped) {
           if (target == player) {
-            shownPlayerShield = null;
+            shownPlayerBarrier = null;
           } else {
-            shownEnemyShield = null;
+            shownEnemyBarrier = null;
           }
-        } else if (shield != null && toShield > 0) {
-          shield.remaining -= toShield;
+        } else {
+          final shield =
+              target == player ? shownPlayerShield : shownEnemyShield;
+          if (shieldBroken) {
+            if (target == player) {
+              shownPlayerShield = null;
+            } else {
+              shownEnemyShield = null;
+            }
+          } else if (shield != null && toShield > 0) {
+            shield.remaining -= toShield;
+          }
         }
         if (target == player) {
           shownPlayerHp = (shownPlayerHp - toHp).clamp(0, player.maxHp);
@@ -263,14 +302,21 @@ class DuelController extends ChangeNotifier {
       case DefeatedEvent(:final mage):
         if (mage == player) playerDefeated = true;
         if (mage == enemy) enemyDefeated = true;
-      case ChargeDrainedEvent(:final mage):
+      case ChargeDrainedEvent(:final mage, :final amount):
+        // Two very different drains share this event: Discharge wipes ALL
+        // charge, Static Feedback strips exactly 1. Subtract the reported
+        // amount — zeroing unconditionally made a 1-charge Static proc look
+        // like a full wipe and wrongly forgot the element you were still
+        // charging (which is what a fizzle then looked like).
         if (mage == player) {
-          shownPlayerCharge = 0;
-          shownPlayerElement = null;
+          shownPlayerCharge = (shownPlayerCharge - amount).clamp(0, 5);
+          if (shownPlayerCharge == 0) shownPlayerElement = null;
         } else {
-          shownEnemyCharge = 0;
-          enemyIsCharging = false;
-          revealedEnemyElement = null;
+          shownEnemyCharge = (shownEnemyCharge - amount).clamp(0, 5);
+          if (shownEnemyCharge == 0) {
+            enemyIsCharging = false;
+            revealedEnemyElement = null;
+          }
         }
       case SpellMissedEvent(:final caster):
         // Blinded miss — charge is still spent, so reset like a normal cast.
@@ -336,7 +382,38 @@ class DuelController extends ChangeNotifier {
       return '${enemy.name} channels an unknown element '
           '(charge ${event.newCharge})';
     }
-    return event.toString();
+    return toSecondPerson(event.toString());
+  }
+
+  /// The engine writes log lines in the third person from each mage's name
+  /// ("Morwen casts…"). The local player is named **You**, so those same
+  /// templates come out as "You forfeits" and "You's charge is drained" —
+  /// fix the agreement rather than duplicating every template per person.
+  @visibleForTesting
+  static String toSecondPerson(String line) {
+    if (!line.startsWith('You')) return line;
+    // Possessive first: "You's Bolt fizzles" → "Your Bolt fizzles".
+    var s = line.replaceFirst("You's", 'Your');
+    // Copula: "You is defeated" / "You is blinded" → "You are …".
+    s = s.replaceFirst(RegExp(r'^You is\b'), 'You are');
+    // Third-person singular verbs sitting directly after the subject.
+    const verbs = {
+      'channels': 'channel',
+      'casts': 'cast',
+      'raises': 'raise',
+      'takes': 'take',
+      'drains': 'drain',
+      'seizes': 'seize',
+      'forfeits': 'forfeit',
+      'suffers': 'suffer',
+      'heals': 'heal',
+    };
+    for (final MapEntry(key: third, value: base) in verbs.entries) {
+      if (s.startsWith('You $third ')) {
+        return s.replaceFirst('You $third ', 'You $base ');
+      }
+    }
+    return s;
   }
 
   @override

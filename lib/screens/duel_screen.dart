@@ -71,7 +71,7 @@ class _DuelScreenState extends State<DuelScreen>
   // Every combat message stays up long enough to actually read. Animations
   // that play while it is showing count toward this, so a message is only
   // held back if the turn would otherwise blow past it.
-  static const Duration _minMessageVisible = Duration(seconds: 2);
+  static const Duration _minMessageVisible = Duration(milliseconds: 1500);
   DateTime? _messageShownAt;
 
   static const _spellKeyLabels = 'QWERTASDFG';
@@ -618,6 +618,7 @@ class _DuelScreenState extends State<DuelScreen>
 
   Widget _mage(Offset pos, double height, {required bool isEnemy}) {
     final shield = isEnemy ? c.shownEnemyShield : c.shownPlayerShield;
+    final barrier = isEnemy ? c.shownEnemyBarrier : c.shownPlayerBarrier;
     return Positioned(
       left: pos.dx - height * 0.45,
       top: pos.dy - height * 0.55,
@@ -660,6 +661,72 @@ class _DuelScreenState extends State<DuelScreen>
                   ),
                 ),
               ),
+            // The Barrier stacks with the shield, so it gets its own ring —
+            // drawn wider so both are visible at once.
+            if (barrier != null)
+              IgnorePointer(
+                child: Container(
+                  width: height * 1.08,
+                  height: height * 1.22,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      width: 2,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The shared moon. Public, always-visible chrome (TYPE_EFFECTS §4b.2) — the
+  /// moon is the same for both players, so it lives in the turn bar rather than
+  /// on either mage. Only the Full Moon does anything (+20% Lunar attacks), so
+  /// it's the one phase highlighted; the rest read as a countdown toward it.
+  Widget _moonChip() {
+    final phase = c.engine.moonPhase;
+    final isFull = phase == MoonPhase.full;
+    final (glyph, label) = switch (phase) {
+      MoonPhase.newMoon => ('🌑', 'New'),
+      MoonPhase.waxing => ('🌒', 'Waxing'),
+      MoonPhase.full => ('🌕', 'Full'),
+      MoonPhase.waning => ('🌘', 'Waning'),
+    };
+    final color =
+        isFull ? const Color(0xFFF5E6A8) : const Color(0xFF9C93C4);
+    return Tooltip(
+      message: isFull
+          ? 'Full Moon — Lunar attacks deal +20% this turn'
+          : '$label moon — Lunar attacks are unmodified.\n'
+              'Next turn: ${switch (c.engine.nextMoonPhase) {
+              MoonPhase.newMoon => 'New',
+              MoonPhase.waxing => 'Waxing',
+              MoonPhase.full => 'Full Moon (+20% Lunar)',
+              MoonPhase.waning => 'Waning',
+            }}',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1B1531),
+          borderRadius: BorderRadius.circular(14),
+          border: isFull
+              ? Border.all(color: const Color(0xFFF5E6A8), width: 1)
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(glyph, style: const TextStyle(fontSize: 11)),
+            const SizedBox(width: 4),
+            Text(label,
+                style: TextStyle(
+                    color: color,
+                    fontSize: 12,
+                    fontWeight: isFull ? FontWeight.w700 : FontWeight.w400)),
           ],
         ),
       ),
@@ -681,6 +748,8 @@ class _DuelScreenState extends State<DuelScreen>
           child: Text('Turn ${c.turnNumber + 1}',
               style: const TextStyle(color: Color(0xFF9C93C4), fontSize: 12)),
         ),
+        const SizedBox(width: 6),
+        _moonChip(),
         const SizedBox(width: 6),
         InkWell(
           onTap: () => _showLog(context),
@@ -799,6 +868,7 @@ class _DuelScreenState extends State<DuelScreen>
       element: c.shownPlayerElement ?? c.pendingElement,
       elementHidden: false,
       shield: c.shownPlayerShield,
+      barrier: c.shownPlayerBarrier,
       alignEnd: false,
       badges: statusBadgesFor(c.player),
       barsVeiled: midnight,
@@ -816,6 +886,7 @@ class _DuelScreenState extends State<DuelScreen>
       element: c.revealedEnemyElement,
       elementHidden: c.enemyIsCharging && c.revealedEnemyElement == null,
       shield: c.shownEnemyShield,
+      barrier: c.shownEnemyBarrier,
       alignEnd: true,
       badges: statusBadgesFor(c.enemy),
       barsVeiled: dark?.dusk ?? false,
@@ -1276,6 +1347,7 @@ class _StatusPanel extends StatelessWidget {
   final MagicElement? element;
   final bool elementHidden;
   final ShownShield? shield;
+  final ShownShield? barrier;
   final bool alignEnd;
   final List<StatusBadge> badges;
 
@@ -1295,6 +1367,7 @@ class _StatusPanel extends StatelessWidget {
     required this.element,
     required this.elementHidden,
     required this.shield,
+    this.barrier,
     required this.alignEnd,
     required this.badges,
     this.barsVeiled = false,
@@ -1405,6 +1478,8 @@ class _StatusPanel extends StatelessWidget {
             alignment: alignEnd ? WrapAlignment.end : WrapAlignment.start,
             children: [
               if (shield != null) _shieldBadge(),
+              if (barrier != null)
+                _badge('Barrier', Colors.white, icon: Icons.shield_moon),
               for (final b in badges) _statusChip(b),
             ],
           ),

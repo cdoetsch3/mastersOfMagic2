@@ -36,7 +36,14 @@ class MageState {
   /// and no cast is in flight.
   MagicElement? element;
 
+  /// The elemental shield slot. Barriers live in [barrier], a separate slot —
+  /// the two stack, and a Barrier never displaces a shield you paid for.
   ActiveShield? shield;
+
+  /// The **Barrier** slot, independent of [shield]: blocks one incoming hit
+  /// entirely, then shatters. Element-less, so it never takes counter damage.
+  /// Checked before [shield] on every hit.
+  ActiveShield? barrier;
 
   // Pending aux buffs, consumed by the next offensive spell cast.
   int? empowerMultiplier;

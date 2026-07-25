@@ -148,27 +148,42 @@ void main() {
   // §4b.4 — Astral: Astral Alignment
   // ======================================================================
   group('Astral — Astral Alignment', () {
-    test('an Astral cast grants a stack; decays without Astral activity', () {
+    test('stacks grow by CHARGE SPENT, not per cast', () {
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      charge(alice, MagicElement.astral, 4);
+      duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
+      expect(statusOf<AstralAlignmentStatus>(alice)!.stacks, 4,
+          reason: 'a 4-charge Ruin grants 4 stacks');
+    });
+
+    test('a 0-charge cast grants nothing — spending is the commitment', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
       charge(alice, MagicElement.astral, 0);
       duel.resolveTurn(
           CastAction(Spellbook.flick, MagicElement.astral), const ForfeitAction());
-      expect(statusOf<AstralAlignmentStatus>(alice)!.stacks, 1);
-
-      // A non-Astral turn sheds the stack (like Photosynthesis).
-      duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       expect(statusOf<AstralAlignmentStatus>(alice), isNull);
     });
 
-    test('stacks cap at 5', () {
-      final align = AstralAlignmentStatus(5)..addStack();
-      expect(align.stacks, 5);
-      expect(align.piercePercent, 25);
+    test('decays by 1 per turn without Astral activity', () {
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      charge(alice, MagicElement.astral, 3);
+      duel.resolveTurn(CastAction(Spellbook.surge), const ForfeitAction());
+      expect(statusOf<AstralAlignmentStatus>(alice)!.stacks, 3);
+
+      duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
+      expect(statusOf<AstralAlignmentStatus>(alice)!.stacks, 2,
+          reason: 'one stack shed, not all of them');
     });
 
-    test('the split routes 5%/stack past the shield to health at 100%', () {
+    test('stacks cap at 20 → 20% pierce', () {
+      final align = AstralAlignmentStatus(18)..addStacks(5);
+      expect(align.stacks, 20, reason: 'clamped at the cap');
+      expect(align.piercePercent, 20, reason: '1% per stack');
+    });
+
+    test('the split routes 1%/stack past the shield to health at 100%', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
-      alice.statuses.add(AstralAlignmentStatus(4)); // 20% pierce
+      alice.statuses.add(AstralAlignmentStatus(20)); // 20% pierce
       // Solar shield is neutral to a Pyro attacker (opposite tiers) → 100%, so
       // the shield chip is un-multiplied and the arithmetic is clean.
       bruno.shield = ActiveShield.elemental(MagicElement.solar, 40);
@@ -181,23 +196,41 @@ void main() {
 
     test('it pierces a Barrier too — and the Barrier still pops', () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
-      alice.statuses.add(AstralAlignmentStatus(4)); // 20%
-      bruno.shield = ActiveShield.barrier();
+      alice.statuses.add(AstralAlignmentStatus(20)); // 20%
+      bruno.barrier = ActiveShield.barrier();
       charge(alice, MagicElement.pyro, 0);
       duel.resolveTurn(
           CastAction(dmg(25), MagicElement.pyro), const ForfeitAction());
       expect(bruno.hp, 95, reason: '5 pierces to health');
-      expect(bruno.shield, isNull, reason: 'the Barrier absorbs the 20 and pops');
+      expect(bruno.barrier, isNull, reason: 'the Barrier absorbs the 20 and pops');
     });
 
     test('does nothing against an unshielded target (all damage was health)',
         () {
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
-      alice.statuses.add(AstralAlignmentStatus(5));
+      alice.statuses.add(AstralAlignmentStatus(20));
       charge(alice, MagicElement.pyro, 0);
       duel.resolveTurn(
           CastAction(dmg(25), MagicElement.pyro), const ForfeitAction());
       expect(bruno.hp, 75, reason: 'full 25 to health, no double-counting');
+    });
+
+    // Note 13 — the pierce lands on health, so lifesteal must heal for it.
+    test('lifesteal heals pro-rata for the pierced portion', () {
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      alice
+        ..hp = 50
+        ..statuses.add(AstralAlignmentStatus(20)); // 20% pierce
+      // A shield big enough to soak everything that is NOT pierced, so the
+      // only health damage — and so the only lifesteal — comes from the pierce.
+      bruno.shield = ActiveShield.elemental(MagicElement.solar, 500);
+      charge(alice, MagicElement.pyro, 0);
+      const sap = Spell(
+          id: 'sap20', name: 'Sap20', chargeCost: 0, priority: 9,
+          effect: DamageEffect(20, 20, lifesteal: 0.5));
+      duel.resolveTurn(CastAction(sap, MagicElement.pyro), const ForfeitAction());
+      expect(bruno.hp, 96, reason: '20% of 20 = 4 pierces to health');
+      expect(alice.hp, 52, reason: 'healed 50% of the 4 that hit health');
     });
   });
 

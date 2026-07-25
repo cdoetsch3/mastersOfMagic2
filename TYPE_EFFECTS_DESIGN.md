@@ -495,14 +495,20 @@ for the same 3-turn window. Not "reset to New Moon" — *frozen* there.
   Shift" was rejected because **`Phase` is already a shipped aux spell**
   ("next offensive spell ignores shields", GAME_DESIGN §3) — "Phase" and
   "Phase Shift" in the same battle log is a readability trap.
-- ✅ **Trigger:** **+1 stack for each turn you cast an Astral spell**, at any
-  cost. **Max 5.**
+- ✅ **Trigger (revised 2026-07-24):** **+1 stack per CHARGE SPENT** on an
+  Astral cast — a 5-charge spell grants 5 — capped at **20**. A 0-charge cast
+  grants nothing: spending is the commitment, the same rule Umbra and Arcane
+  already follow. *(Was: +1 per cast at any cost, max 5.)*
 - ✅ **Decay:** **−1 per turn** in which you cast no Astral spell (same shape
   as Photosynthesis, §2.3). Charging neither grants nor decays.
-- ✅ **Effect:** **5% of the attack's damage per stack bypasses the shield**
-  and strikes health directly. **The remaining damage still hits the shield
-  normally** — Alignment *splits* an attack, it does not shrink it.
-- ✅ **Worked example** (4 stacks = 20%, a 25-damage spell into a 40-point
+- ✅ **Effect:** **1% of the attack's damage per stack bypasses the shield**
+  and strikes health directly — so a maxed Alignment pierces **20%**.
+  ⚠️ The per-stack figure dropped from 5% to **1%** when the cap went 5 → 20:
+  at 5%/stack a 20-stack cap would pierce 100% and delete shields outright.
+  20 × 1% keeps the ceiling within a point of the old 25% while making it a
+  far steeper climb. **The remaining damage still hits the shield normally** —
+  Alignment *splits* an attack, it does not shrink it.
+- ✅ **Worked example** (20 stacks = 20%, a 25-damage spell into a 40-point
   shield): **5 damage goes straight to health**; the other **20 hits the
   shield**, leaving it at 20. Nothing is lost.
 - ✅ **The pierced portion ignores the shield's counter math.** It never

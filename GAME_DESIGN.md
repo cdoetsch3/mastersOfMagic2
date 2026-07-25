@@ -317,7 +317,7 @@ MoM2 adds **spell slots** unlocked via leveling.
 | Volley | 3 | medium damage ×4 |
 | Barrage | X | damage per charge spent (consumes all charge) |
 
-### Lifesteal offensive (heal = damage actually dealt to enemy **health**, not shields)
+### Lifesteal offensive (heal = **half** the damage dealt to enemy **health**, never shields)
 | Spell | Charge | Notes |
 |---|---|---|
 | Sap | 1 | small damage |
@@ -332,7 +332,11 @@ MoM2 adds **spell slots** unlocked via leveling.
 - ✅ Counter-element attacks deal **2× damage to the shield**; overflow damage passes
   through to the player at normal (1×) rate. (e.g. 30-dmg water attack vs 50-pt fire
   shield: 25 of the 30 breaks the shield at 2×, remaining 5 hits the player.)
-- ✅ **Barrier** (2-charge): blocks 100% of all damage, destroyed after the first hit.
+- ✅ **Barrier** (2-charge): blocks 100% of all damage, destroyed after the first
+  hit. ⭐ **It occupies its own slot**, so it stacks with an elemental shield
+  instead of overwriting one you already paid for — the Barrier eats the next
+  hit whole and the shield underneath is untouched, ready for the one after.
+  A shield-ignoring attack (Phase) bypasses both.
 - ✅ **Shield persistence**: players start with **one shield slot**. A cast shield persists
   across turns until depleted or overwritten by casting a new shield.
 - 💡 Unlockable 2nd and 3rd shield tiers (multiple simultaneous shields) later.
@@ -344,10 +348,10 @@ MoM2 adds **spell slots** unlocked via leveling.
 - **Quicken** (2) — next offensive spell executes before enemy defensives
 - **Phase** (3) — next offensive spell ignores shields
 - **Hasty** (0) — seizes Haste, nothing else
-- 📝 **Hallow** (2) — gain **Grace**: the next debuff applied to you is
+- 📝 **Hallow** (1) — gain **Grace**: the next debuff applied to you is
   blocked outright (max 1, persists until consumed). Element-neutral. New in
   V2 — full spec in [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) §4c.4
-- **Discharge** (3) — removes ALL of the opponent's charge, no damage (fizzles a
+- **Discharge** (2) — removes ALL of the opponent's charge, no damage (fizzles a
   same-turn Barrage since it's faster)
 - **Overload** (2) — a full attack (respects shields, benefits from Empower/Phase)
   dealing ~8–12 damage × the **enemy's** charge, read live at resolution

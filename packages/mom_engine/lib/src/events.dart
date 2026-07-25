@@ -71,6 +71,11 @@ class DamageEvent extends DuelEvent {
 
   final bool shieldBroken;
 
+  /// A **Barrier** absorbed this hit and shattered. Distinct from
+  /// [shieldBroken] (the elemental shield): the two occupy separate slots, so
+  /// the UI must clear the right one.
+  final bool barrierPopped;
+
   /// This hit rolled a critical (Phase 3b). Its damage already includes the
   /// crit bonus; the flag is for the log/HUD.
   final bool crit;
@@ -86,6 +91,7 @@ class DamageEvent extends DuelEvent {
     required this.toHp,
     this.shieldMultiplierPercent = 100,
     this.shieldBroken = false,
+    this.barrierPopped = false,
     this.crit = false,
     this.deflected = 0,
   });
@@ -99,6 +105,7 @@ class DamageEvent extends DuelEvent {
       if (toHp > 0) '$toHp damage',
       if (toShield == 0 && toHp == 0) 'no effect',
       if (deflected > 0) '$deflected deflected',
+      if (barrierPopped) 'barrier shattered',
       if (shieldBroken) 'shield shattered',
     ];
     return '${target.name} takes ${spell.name}: ${parts.join(', ')}';
@@ -202,6 +209,7 @@ class EffectDamageEvent extends DuelEvent {
   final int toHp;
   final int shieldMultiplierPercent;
   final bool shieldBroken;
+  final bool barrierPopped;
 
   const EffectDamageEvent(
     this.target,
@@ -210,6 +218,7 @@ class EffectDamageEvent extends DuelEvent {
     required this.toHp,
     this.shieldMultiplierPercent = 100,
     this.shieldBroken = false,
+    this.barrierPopped = false,
   });
 
   @override

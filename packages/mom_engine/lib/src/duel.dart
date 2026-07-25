@@ -195,7 +195,11 @@ class DuelEngine {
             identical(group[0].caster, startHolder) ? group[0] : group[1];
         final second = identical(first, group[0]) ? group[1] : group[0];
         _resolveEntry(first, events);
-        if (second.caster.alive) _resolveEntry(second, events);
+        first.endEventIndex = events.length;
+        if (second.caster.alive) {
+          _resolveEntry(second, events);
+        }
+        second.endEventIndex = events.length;
       } else {
         // Simultaneous: offense before support (a same-priority shield does
         // not block a same-priority attack), then channels. No mid-group
@@ -208,6 +212,7 @@ class DuelEngine {
         ];
         for (final e in ordered) {
           _resolveEntry(e, events);
+          e.endEventIndex = events.length;
         }
       }
       i = j;
@@ -231,7 +236,14 @@ class DuelEngine {
     if (grab != null && !grab.hasHaste) {
       mage1.hasHaste = identical(grab, mage1);
       mage2.hasHaste = identical(grab, mage2);
-      events.add(HasteChangedEvent(grab));
+      // Same as the normal transfer: report it right after the Aero cast the
+      // wind came from, not at end of turn.
+      final from = entries
+          .where((e) => !e.isChannel && identical(e.caster, grab))
+          .map((e) => e.endEventIndex);
+      events.insert(
+          from.isEmpty ? events.length : from.last.clamp(0, events.length),
+          HasteChangedEvent(grab));
     }
 
     // END phase — post-move effects (DoTs like Ignite, HoTs like
@@ -437,7 +449,7 @@ class DuelEngine {
         events.add(ShieldRaisedEvent(caster,
             element: cast.element, isBarrier: false, strength: strength));
       case BarrierEffect():
-        caster.shield = ActiveShield.barrier();
+        caster.barrier = ActiveShield.barrier();
         events.add(ShieldRaisedEvent(caster,
             element: null, isBarrier: true, strength: 0));
       case EmpowerEffect(:final multiplier):
@@ -505,9 +517,10 @@ class DuelEngine {
     // health at 100%, splitting the attack rather than shrinking it (§4b.4).
     // Only matters when there's a shield to pierce and the hit isn't already
     // going straight to health (Phase wins that turn).
-    final piercePct = (!ignoresShields && target.shield != null)
-        ? (_statusOf<AstralAlignmentStatus>(cast.caster)?.piercePercent ?? 0)
-        : 0;
+    final piercePct =
+        (!ignoresShields && (target.shield != null || target.barrier != null))
+            ? (_statusOf<AstralAlignmentStatus>(cast.caster)?.piercePercent ?? 0)
+            : 0;
     final caster = cast.caster;
     var totalToHp = 0;
     var totalRaw = 0;
@@ -545,6 +558,7 @@ class DuelEngine {
           toHp: toHp,
           shieldMultiplierPercent: r.multiplierPercent,
           shieldBroken: r.broken,
+          barrierPopped: r.barrierPopped,
           crit: crit,
           deflected: deflected));
     }
@@ -675,16 +689,21 @@ class DuelEngine {
           }
         }
       case MagicElement.astral:
-        // Astral Alignment — +1 stack per turn Astral is cast (max 5). Decay
-        // is handled in the status's end-of-turn bookkeeping.
-        final align = _statusOf<AstralAlignmentStatus>(caster);
-        if (align == null) {
-          caster.statuses.add(AstralAlignmentStatus());
-        } else {
-          align.addStack();
+        // Astral Alignment — +1 stack per CHARGE SPENT on the cast (max 20),
+        // so committing a big Astral spell aligns far faster than spamming
+        // cheap ones. Decay is the status's end-of-turn bookkeeping.
+        // A 0-charge cast (Flick) grants nothing — spending is the commitment.
+        if (chargeSpent > 0) {
+          final align = _statusOf<AstralAlignmentStatus>(caster) ??
+              (() {
+                final s = AstralAlignmentStatus(0);
+                caster.statuses.add(s);
+                return s;
+              })();
+          align.addStacks(chargeSpent);
+          e.add(BuffAppliedEvent(caster,
+              'Astral Alignment (${align.stacks} — ${align.piercePercent}% pierce)'));
         }
-        e.add(BuffAppliedEvent(caster,
-            'Astral Alignment (${_statusOf<AstralAlignmentStatus>(caster)!.stacks})'));
 
       // ---- Tier 4 — Ethereal -------------------------------------------
       case MagicElement.sanctus:
@@ -803,20 +822,56 @@ class DuelEngine {
   /// the right event. Shared by spell attacks and status ticks (DoTs), so
   /// shield behavior is identical everywhere. [attackElement] null = element-
   /// agnostic (never counters); [ignoresShields] strikes health directly.
-  ({int toShield, int toHp, bool broken, int multiplierPercent}) _applyOneHit(
+  ({
+    int toShield,
+    int toHp,
+    bool broken,
+    int multiplierPercent,
+    bool barrierPopped
+  }) _applyOneHit(
     MageState target,
     int amount,
     MagicElement? attackElement,
     bool ignoresShields,
   ) {
+    // The Barrier slot is checked FIRST and independently of the elemental
+    // shield — the two coexist, so a Barrier eats this hit whole and shatters
+    // while the shield underneath is left completely untouched for the next.
+    if (!ignoresShields && target.barrier != null) {
+      target.barrier = null;
+      // `broken` stays false: the ELEMENTAL shield is untouched and still
+      // standing. Callers distinguish the two via [barrierPopped].
+      return (
+        toShield: amount,
+        toHp: 0,
+        broken: false,
+        multiplierPercent: 100,
+        barrierPopped: true
+      );
+    }
     final shield = ignoresShields ? null : target.shield;
     if (shield == null) {
       target.takeHpDamage(amount);
-      return (toShield: 0, toHp: amount, broken: false, multiplierPercent: 100);
+      return (
+        toShield: 0,
+        toHp: amount,
+        broken: false,
+        multiplierPercent: 100,
+        barrierPopped: false
+      );
     }
+    // Defensive: barriers belong in [MageState.barrier], but an element-less
+    // shield in this slot must degrade gracefully rather than crash on
+    // `element!` below.
     if (shield.isBarrier) {
       target.shield = null;
-      return (toShield: amount, toHp: 0, broken: true, multiplierPercent: 100);
+      return (
+        toShield: amount,
+        toHp: 0,
+        broken: false,
+        multiplierPercent: 100,
+        barrierPopped: true
+      );
     }
     // §0.3 shield multiplier (50/75/100/150/200%). All arithmetic stays
     // integer so both lockstep clients land on the identical remainder.
@@ -828,7 +883,8 @@ class DuelEngine {
         toShield: effective,
         toHp: 0,
         broken: false,
-        multiplierPercent: pct
+        multiplierPercent: pct,
+        barrierPopped: false
       );
     }
     // Overflow: the raw damage spent breaking the shield is rounded in the
@@ -843,7 +899,8 @@ class DuelEngine {
       toShield: absorbed,
       toHp: toHp,
       broken: true,
-      multiplierPercent: pct
+      multiplierPercent: pct,
+      barrierPopped: false
     );
   }
 
@@ -907,7 +964,8 @@ class DuelEngine {
             toShield: r.toShield,
             toHp: r.toHp,
             shieldMultiplierPercent: r.multiplierPercent,
-            shieldBroken: r.broken));
+            shieldBroken: r.broken,
+            barrierPopped: r.barrierPopped));
       case StatusPurge():
         _resolveAbsolution(holder, events);
     }
@@ -989,9 +1047,19 @@ class DuelEngine {
 
     mage1.hasHaste = identical(newHolder, mage1);
     mage2.hasHaste = identical(newHolder, mage2);
-    if (!identical(newHolder, startHolder)) {
-      events.add(HasteChangedEvent(newHolder));
-    }
+    if (identical(newHolder, startHolder)) return;
+
+    // Report it immediately after the cast that seized it, not at end of turn
+    // — "you seize the initiative" arriving after all the damage read as a
+    // separate, unexplained beat. When Haste becomes contested (a
+    // same-priority tie, newHolder == null) there is no single owning cast, so
+    // it lands after the later of the two.
+    final owner = newHolder == null
+        ? qualifying.map((e) => e.endEventIndex).reduce((a, b) => a > b ? a : b)
+        : qualifying
+            .firstWhere((e) => identical(e.caster, newHolder))
+            .endEventIndex;
+    events.insert(owner.clamp(0, events.length), HasteChangedEvent(newHolder));
   }
 }
 
@@ -1006,6 +1074,11 @@ class _Entry {
   /// Set true when the cast fizzled (charge pulled below cost at resolution),
   /// so the post-resolution sweep leaves the caster's charge intact.
   bool fizzled = false;
+
+  /// Index just past this entry's last emitted event. Lets the Haste transfer
+  /// be reported immediately after the cast that seized it (its rules need to
+  /// see BOTH casts, so it can only be *computed* once the turn has resolved).
+  int endEventIndex = 0;
 
   _Entry({
     required this.caster,

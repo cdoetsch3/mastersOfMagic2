@@ -44,6 +44,16 @@ class GameplayGuideScreen extends StatelessWidget {
                 _PhaseStrip(),
                 SizedBox(height: 18),
                 _Section(
+                  title: 'When a spell does not go off',
+                  body: 'A spell FIZZLES if your charge is pulled below its '
+                      'cost before it resolves (Discharge, or an Electro '
+                      'Static Feedback proc) — nothing is cast and you keep '
+                      'the charge you have left. A spell MISSES if you are '
+                      'Blinded — the charge is spent for nothing. Neither one '
+                      'advances an element streak or procs an effect.',
+                ),
+                SizedBox(height: 18),
+                _Section(
                   title: 'Elements carry effects',
                   body: 'Every element has a side-effect that fires as you '
                       'cast it — burns, charge theft, blinding, and more — plus '

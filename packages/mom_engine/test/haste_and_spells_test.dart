@@ -185,4 +185,43 @@ void main() {
   test('Channel now has priority 4 (after shields, before quick attacks)', () {
     expect(DuelEngine.channelPriority, 4);
   });
+
+  // Note 22 — a Haste transfer is reported immediately after the cast that
+  // seized it, not appended at end of turn (where it read as an unexplained
+  // extra beat after all the damage).
+  group('Haste is reported at the moment it is seized', () {
+    test('the transfer lands right after the granting cast, before later casts',
+        () {
+      alice.charge = 2;
+      alice.element = MagicElement.pyro;
+      bruno.charge = 2;
+      bruno.element = MagicElement.solar;
+      // Jolt (priority 5, grants Haste) resolves before Blast (priority 9).
+      final result = duel.resolveTurn(
+          CastAction(Spellbook.jolt), CastAction(Spellbook.blast));
+      final events = result.events;
+      final haste = events.indexWhere((e) => e is HasteChangedEvent);
+      final jolt = events.indexWhere(
+          (e) => e is SpellCastEvent && e.spell == Spellbook.jolt);
+      final blast = events.indexWhere(
+          (e) => e is SpellCastEvent && e.spell == Spellbook.blast);
+
+      expect(haste, greaterThan(jolt), reason: 'after the Jolt that seized it');
+      expect(haste, lessThan(blast),
+          reason: 'and before the later cast — not at the end of the turn');
+    });
+
+    test('it still sits after its own cast damage', () {
+      alice.charge = 2;
+      alice.element = MagicElement.pyro;
+      final result =
+          duel.resolveTurn(CastAction(Spellbook.jolt), const ForfeitAction());
+      final events = result.events;
+      final haste = events.indexWhere((e) => e is HasteChangedEvent);
+      final damage = events.indexWhere((e) => e is DamageEvent);
+      expect(damage, greaterThanOrEqualTo(0), reason: 'the Jolt hit');
+      expect(haste, greaterThan(damage),
+          reason: 'the cast fully resolves, then the initiative is reported');
+    });
+  });
 }

@@ -29,9 +29,12 @@ int estimateDamage(Spell spell, MageState self, MageState enemy) {
     default:
       return 0;
   }
+  if (self.phaseNext) return raw;
+  // A Barrier is its own slot and eats the whole hit, so nothing gets through
+  // this turn regardless of the elemental shield behind it.
+  if (enemy.barrier != null) return 0;
   final shield = enemy.shield;
-  if (shield == null || self.phaseNext) return raw;
-  if (shield.isBarrier) return 0;
+  if (shield == null) return raw;
   // Mirror the engine's §0.3 shield math so the AI values a hit correctly.
   final pct = shieldMultiplierPercent(element, shield.element!);
   final effective = raw * pct ~/ 100;

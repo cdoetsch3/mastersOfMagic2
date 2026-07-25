@@ -151,15 +151,16 @@ void main() {
   });
 
   group('spell effects', () {
-    test('lifesteal heals for damage dealt to health', () {
+    test('lifesteal heals for HALF the damage dealt to health', () {
       alice.charge = 1;
       alice.element = MagicElement.umbra;
       alice.hp = 50;
       duel.resolveTurn(
           CastAction(Spellbook.sap), const ChargeAction(MagicElement.aero));
       expect(bruno.hp, inInclusiveRange(89, 91));
-      expect(alice.hp - 50, 100 - bruno.hp,
-          reason: 'heals exactly the damage dealt');
+      final dealt = 100 - bruno.hp;
+      expect(alice.hp - 50, (dealt * 0.5).round(),
+          reason: 'drains half of the health damage, not all of it');
     });
 
     test('lifesteal does not heal for damage soaked by shields', () {

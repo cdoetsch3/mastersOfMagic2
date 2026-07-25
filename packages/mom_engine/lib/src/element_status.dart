@@ -187,23 +187,29 @@ class ArcaneKnowledgeStatus extends TurnStatus {
 }
 
 /// **Astral Alignment** (Astral — TYPE_EFFECTS §4b.4). A stacking self-buff
-/// (max 5): +1 per turn an Astral spell is cast, −1 on turns without Astral
-/// activity — the same commit-or-lose decay as Photosynthesis. Each stack
-/// routes 5% of every attack's damage straight to health, bypassing the
-/// shield (applied in the engine's `_attack`, not as a StatusOp). Not a
-/// [Debuff] — it's the caster's own buff, so Absolution never touches it.
+/// that grows with **charge spent**, not cast count: **+1 per charge** on an
+/// Astral cast (so a 5-charge spell grants 5), capped at **20**, and −1 on
+/// turns without Astral activity — the same commit-or-lose decay as
+/// Photosynthesis. Each stack routes **1%** of every attack's damage straight
+/// to health, bypassing the shield (applied in the engine's `_attack`, not as
+/// a StatusOp), so a maxed Alignment pierces **20%**. Not a [Debuff] — it's
+/// the caster's own buff, so Absolution never touches it.
 class AstralAlignmentStatus extends TurnStatus {
-  static const int maxStacks = 5;
-  static const int percentPerStack = 5;
+  static const int maxStacks = 20;
+
+  /// Pierce per stack. 1% × 20 stacks = 20% max — deliberately *not* the old
+  /// 5%/stack, which at a 20 cap would have pierced 100% and deleted shields.
+  static const int percentPerStack = 1;
   int stacks;
 
   AstralAlignmentStatus([this.stacks = 1]);
 
-  void addStack() {
-    if (stacks < maxStacks) stacks++;
+  /// Grants [amount] stacks (the charge spent on the cast), clamped to the cap.
+  void addStacks(int amount) {
+    stacks = (stacks + amount).clamp(0, maxStacks);
   }
 
-  /// The fraction of an attack that bypasses the shield to health (0.0–0.25).
+  /// The percent of an attack that bypasses the shield to health (0–20).
   int get piercePercent => stacks * percentPerStack;
 
   @override

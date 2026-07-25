@@ -36,10 +36,12 @@ String _numbers(Spell spell) => switch (spell.effect) {
         '$minStrength–$maxStrength',
       BarrierEffect() => '1 hit',
       EmpowerEffect(:final multiplier) => '×$multiplier',
-      QuickenEffect() => 'faster',
-      PhaseEffect() => 'pierce',
+      // These headline figures are all short labels, so they all capitalise —
+      // mixing 'Haste' with 'pierce' read as a bug.
+      QuickenEffect() => 'Faster',
+      PhaseEffect() => 'Pierce',
       HasteEffect() => 'Haste',
-      DischargeEffect() => 'all',
+      DischargeEffect() => 'All',
       HallowEffect() => 'Grace',
     };
 
@@ -64,20 +66,25 @@ List<String> _systemsRules(Spell spell) {
       spell.effect is BarrageEffect ||
       spell.effect is OverloadEffect;
   final isHarmful = isDamaging || spell.effect is DischargeEffect;
-  final costText = spell.xCost ? '1' : '${spell.chargeCost}';
+  final isShield =
+      spell.effect is ShieldEffect || spell.effect is BarrierEffect;
   return [
-    isDamaging
-        ? 'Takes on your charged element — its side-effect can proc (Ignite, '
-            'Static Feedback, Blind…).'
-        : 'Takes on your charged element for counter math and streaks.',
+    // The element line only earns its place where the element actually does
+    // something: it drives side-effect procs on an attack and the shield's
+    // own element on a shield. On a pure aux spell it explains nothing, so it
+    // is omitted rather than saying "counter math" about a spell that neither
+    // deals damage nor raises a shield.
+    if (isDamaging)
+      'Takes on your charged element — its side-effect can proc (Ignite, '
+          'Static Feedback, Blind…).',
+    if (spell.effect is ShieldEffect)
+      'The shield takes your charged element, which sets its counter math.',
     if (isDamaging)
       'Damage order: +Arcane Knowledge (5%/stack) → ×Empower → ×Stagger.',
-    if (spell.chargeCost > 0 || spell.xCost)
-      'Fizzles if your charge drops below $costText before it resolves — you '
-          'keep the rest, nothing is spent.',
     if (isHarmful)
       'While Blinded, 50% chance to miss (the charge is still spent).',
-    'Advances your element streak. Misses and fizzles don\'t.',
+    if (isDamaging || isShield || isHarmful)
+      'Advances your element streak. Misses and fizzles don\'t.',
   ];
 }
 

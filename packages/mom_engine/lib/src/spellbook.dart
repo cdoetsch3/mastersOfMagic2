@@ -49,16 +49,19 @@ abstract final class Spellbook {
       id: 'barrage', name: 'Barrage', chargeCost: 1, xCost: true, priority: 9,
       effect: BarrageEffect(10, 12));
 
-  // Lifesteal (priority 9) — heals for damage dealt to health, not shields.
+  // Lifesteal (priority 9) — heals for HALF the damage dealt to health.
+  // Never heals for damage a shield soaked (only [DamageEvent.toHp] counts),
+  // and the Astral Alignment pierce does count, since that lands on health.
+  static const _lifestealRate = 0.5;
   static const sap = Spell(
       id: 'sap', name: 'Sap', chargeCost: 1, priority: 9,
-      effect: DamageEffect(9, 11, lifesteal: 1));
+      effect: DamageEffect(9, 11, lifesteal: _lifestealRate));
   static const leech = Spell(
       id: 'leech', name: 'Leech', chargeCost: 3, priority: 9,
-      effect: DamageEffect(25, 31, lifesteal: 1));
+      effect: DamageEffect(25, 31, lifesteal: _lifestealRate));
   static const drain = Spell(
       id: 'drain', name: 'Drain', chargeCost: 5, priority: 9,
-      effect: DamageEffect(47, 58, lifesteal: 1));
+      effect: DamageEffect(47, 58, lifesteal: _lifestealRate));
 
   // Shields (priority 3) — linear: midpoint 15 x charge, rolled.
   static const ward = Spell(
@@ -100,7 +103,7 @@ abstract final class Spellbook {
   // Charge control: wipes all of the opponent's charge (no damage). At
   // priority 7 it beats a priority-9 Barrage/Overload, fizzling them.
   static const discharge = Spell(
-      id: 'discharge', name: 'Discharge', chargeCost: 3, priority: 7,
+      id: 'discharge', name: 'Discharge', chargeCost: 2, priority: 7,
       effect: DischargeEffect());
 
   // Punish: ~8-12 damage per point of the ENEMY's charge (a full attack —
@@ -113,7 +116,7 @@ abstract final class Spellbook {
   // any loadout can answer a status deck without playing Sanctus. Priority 7,
   // so quick attacks land their proc before Grace exists — it's pre-emptive.
   static const hallow = Spell(
-      id: 'hallow', name: 'Hallow', chargeCost: 2, priority: 7,
+      id: 'hallow', name: 'Hallow', chargeCost: 1, priority: 7,
       effect: HallowEffect());
 
   static const List<Spell> all = [

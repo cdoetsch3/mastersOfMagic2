@@ -166,25 +166,70 @@ void main() {
   });
 
   test('barrier blocks one hit entirely, then is gone', () {
-    defender.shield = ActiveShield.barrier();
+    defender.barrier = ActiveShield.barrier();
     duel.resolveTurn(
       CastAction(Spellbook.flick, MagicElement.geo),
       ChargeAction(MagicElement.aero),
     );
     expect(defender.hp, 100);
-    expect(defender.shield, isNull);
+    expect(defender.barrier, isNull);
+  });
+
+  // A Barrier occupies its own slot, so it stacks with an elemental shield.
+  group('Barrier and shield coexist', () {
+    test('casting a Barrier leaves a standing shield untouched', () {
+      chargeUp(attacker, MagicElement.geo, 1);
+      duel.resolveTurn(CastAction(Spellbook.ward), const ChargeAction());
+      final shieldBefore = attacker.shield!.remaining;
+
+      chargeUp(attacker, MagicElement.geo, 2);
+      duel.resolveTurn(CastAction(Spellbook.barrier), const ChargeAction());
+      expect(attacker.barrier, isNotNull, reason: 'barrier is up');
+      expect(attacker.shield!.remaining, shieldBefore,
+          reason: 'and the shield it used to overwrite is still there');
+    });
+
+    test('the barrier absorbs the hit and the shield survives for the next', () {
+      defender.barrier = ActiveShield.barrier();
+      defender.shield = ActiveShield.elemental(MagicElement.solar, 40);
+      const poke = Spell(
+          id: 'tb10', name: 'TB10', chargeCost: 0, priority: 9,
+          effect: DamageEffect(10, 10));
+
+      duel.resolveTurn(
+          CastAction(poke, MagicElement.pyro), ChargeAction(MagicElement.aero));
+      expect(defender.barrier, isNull, reason: 'barrier popped');
+      expect(defender.shield!.remaining, 40, reason: 'shield untouched');
+      expect(defender.hp, 100);
+
+      // The next hit now meets the shield.
+      duel.resolveTurn(CastAction(poke, MagicElement.pyro), const ChargeAction());
+      expect(defender.shield!.remaining, 30);
+      expect(defender.hp, 100);
+    });
+
+    test('a shield-ignoring attack bypasses the barrier as well', () {
+      defender.barrier = ActiveShield.barrier();
+      const pierce = Spell(
+          id: 'tbp', name: 'TBPierce', chargeCost: 0, priority: 9,
+          effect: DamageEffect(10, 10, ignoresShields: true));
+      duel.resolveTurn(
+          CastAction(pierce, MagicElement.geo), ChargeAction(MagicElement.aero));
+      expect(defender.hp, 90);
+      expect(defender.barrier, isNotNull, reason: 'never engaged, so not spent');
+    });
   });
 
   test('multi-hit vs barrier: first hit absorbed, later hits land', () {
     const tripleHit = Spell(
         id: 'test3x4', name: 'Test3x4', chargeCost: 0, priority: 9,
         effect: DamageEffect(4, 4, hits: 3));
-    defender.shield = ActiveShield.barrier();
+    defender.barrier = ActiveShield.barrier();
     duel.resolveTurn(
       CastAction(tripleHit, MagicElement.geo),
       ChargeAction(MagicElement.aero),
     );
-    expect(defender.shield, isNull);
+    expect(defender.barrier, isNull);
     expect(defender.hp, 100 - 4 * 2, reason: 'hits 2 and 3 land');
   });
 
