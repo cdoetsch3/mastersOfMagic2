@@ -62,9 +62,12 @@ class GameplayGuideScreen extends StatelessWidget {
                 _Section(
                   title: 'Elements carry effects',
                   body: 'Every element has a side-effect that fires as you '
-                      'cast it — burns, charge theft, blinding, and more — plus '
-                      'a counter it beats (double damage to that shield). Open '
-                      'any element in the Spellbook for its full rules.',
+                      'cast it — burns, charge theft, blinding, and more. Each '
+                      'also beats one element in its tier: you hit that '
+                      'shield for DOUBLE, and only HALF into the element that '
+                      'beats you. Across tiers the swing is gentler — 1.5× or '
+                      '¾× — and opposite tiers are even. Open any element in '
+                      'the Spellbook for its full rules.',
                 ),
               ],
             ),
@@ -152,8 +155,9 @@ class _PriorityLadder extends StatelessWidget {
                     size: 15, color: AppColors.ember),
                 SizedBox(width: 8),
                 Expanded(
-                  child: Text('End of turn: burns tick and heals land, in that '
-                      'order — a Photosynthesis heal beats an Ignite burn.',
+                  child: Text('End of turn: heals land FIRST, then burns tick '
+                      '— so a Photosynthesis heal resolves before an Ignite '
+                      'burn can finish you.',
                       style: TextStyle(
                           color: AppColors.textDim, fontSize: 12, height: 1.35)),
                 ),

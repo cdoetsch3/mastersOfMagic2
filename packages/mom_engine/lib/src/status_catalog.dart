@@ -94,7 +94,7 @@ abstract final class StatusCatalog {
     ),
     StatusInfo(
       id: 'stagger',
-      name: 'Staggered',
+      name: 'Stagger',
       description: 'Your next offensive spell deals half damage.',
       trigger:
           'Every 4th consecutive Geo cast. Whiffs against a Tailwind streak.',

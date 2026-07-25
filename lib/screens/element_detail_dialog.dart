@@ -6,7 +6,8 @@ import '../game/element_style.dart';
 import '../ui/app_theme.dart';
 
 /// The "B2 · stat sheet" element detail: identity + tier, the effect rules,
-/// and both counter layers (shield ×2 and the effect interaction) as side-by
+/// and both counter layers (the shield multiplier and the effect interaction)
+/// as side-by
 /// -side BEATS / WEAK TO cards.
 Future<void> showElementDetail(BuildContext context, MagicElement element) {
   return showDialog<void>(
@@ -86,7 +87,11 @@ class _ElementDetailDialog extends StatelessWidget {
                               heading: 'BEATS',
                               headingColor: AppColors.green,
                               other: beats,
-                              lines: ['×2 vs their shields', lore.beatsEffect],
+                              lines: [
+                                'You hit their shields ×2',
+                                'They hit your shields ½×',
+                                lore.beatsEffect,
+                              ],
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -95,12 +100,21 @@ class _ElementDetailDialog extends StatelessWidget {
                               heading: 'WEAK TO',
                               headingColor: AppColors.ember,
                               other: weakTo,
-                              lines: ['×2 vs your shields', lore.weakEffect],
+                              lines: [
+                                'They hit your shields ×2',
+                                'You hit their shields ½×',
+                                lore.weakEffect,
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    // The macro-tier layer had no home in this dialog, so the
+                    // ×2/½× cards above read as the whole story when they are
+                    // only the within-tier half of it.
+                    _tierMatchup(element.tier),
                   ],
                 ),
               ),
@@ -220,6 +234,44 @@ Widget _elementAvatar(MagicElement element, double size) {
     height: size,
     decoration: BoxDecoration(color: style.color, shape: BoxShape.circle),
     child: elementGlyph(element, size: size * 0.55, color: AppColors.bg),
+  );
+}
+
+/// The coarser, cross-tier layer: your tier beats one other outright and is
+/// beaten by one, with the opposite tier neutral. Kept compact — it matters
+/// less turn to turn than the element triangle, but omitting it made the
+/// counter cards look like the complete rule.
+Widget _tierMatchup(MagicTier tier) {
+  final beats = tier.beatsTier;
+  final beatenBy = tier.beatenByTier;
+  final neutral = MagicTier.values
+      .firstWhere((t) => t != tier && t != beats && t != beatenBy);
+  return Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: AppColors.panelHi,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('ACROSS TIERS',
+            style: TextStyle(
+                color: AppColors.textFaint,
+                fontSize: 10.5,
+                letterSpacing: 1,
+                fontWeight: FontWeight.w600)),
+        const SizedBox(height: 5),
+        Text(
+          'Against ${tierLabels[beats]!} you hit shields 1.5×; against '
+          '${tierLabels[beatenBy]!} only ¾×. ${tierLabels[neutral]!} is even. '
+          'This never stacks with the element counters above — same tier uses '
+          'those, different tiers use these.',
+          style: const TextStyle(
+              color: AppColors.textDim, fontSize: 12, height: 1.4),
+        ),
+      ],
+    ),
   );
 }
 

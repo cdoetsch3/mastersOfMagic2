@@ -112,6 +112,7 @@ const Map<String, IconData> spellIcons = {
   'hasty': Icons.bolt,
   'discharge': Icons.power_off,
   'overload': Icons.electric_bolt,
+  'hallow': Icons.verified_user,
 };
 
 /// Multi-line tooltip text for a spell: cost, priority, effect, flavor.
@@ -125,7 +126,7 @@ String spellTooltip(Spell spell) {
       :final lifesteal
     ) =>
       '${hits > 1 ? '$hits hits of ' : ''}$minAmount-$maxAmount damage'
-          '${lifesteal > 0 ? ', heals for health damage dealt' : ''}',
+          '${lifesteal > 0 ? ', heals for ${(lifesteal * 100).round()}% of the health damage' : ''}',
     BarrageEffect(:final minPerCharge, :final maxPerCharge) =>
       '$minPerCharge-$maxPerCharge damage per charge spent',
     ShieldEffect(:final minStrength, :final maxStrength) =>
@@ -134,7 +135,7 @@ String spellTooltip(Spell spell) {
     EmpowerEffect(:final multiplier) => 'Next offensive spell x$multiplier',
     QuickenEffect(:final priorityOverride) =>
       'Next offensive spell at priority $priorityOverride',
-    PhaseEffect() => 'Next offensive spell ignores shields',
+    PhaseEffect() => 'Next offensive spell ignores shields and Barriers',
     HasteEffect() => 'Seizes Haste (wins same-priority ties)',
     DischargeEffect() => "Removes ALL of the enemy's charge",
     OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
@@ -160,11 +161,11 @@ const Map<String, String> spellDescriptions = {
   'cataclysm': 'Five charges of pure annihilation.',
   'jolt': 'Strikes early and seizes Haste, winning future same-speed ties.',
   'flurry': 'Three rapid strikes; each rolls its own damage.',
-  'volley': 'Four heavy bolts in succession.',
+  'volley': 'Four bolts in succession — steady chip through a shield.',
   'barrage': 'Spends ALL your charge; damage scales with every point.',
-  'sap': 'Steals life equal to health damage dealt.',
-  'leech': 'A stronger draught of stolen vitality.',
-  'drain': 'Rips the life from your foe wholesale.',
+  'sap': 'Heals you for half the damage that reaches their health.',
+  'leech': 'A stronger draught — still half of what reaches their health.',
+  'drain': 'The heaviest steal; heals half the health damage it lands.',
   'ward': 'A light shield in your element.',
   'aegis': 'A sturdy shield in your element.',
   'bulwark': 'A heavy shield in your element.',
@@ -174,8 +175,9 @@ const Map<String, String> spellDescriptions = {
       'Element-less — a multi-hit spell burns one point per hit.',
   'empower': 'Your next offensive spell deals double damage.',
   'quicken': 'Your next offensive spell strikes before enemy shields.',
-  'phase': 'Your next offensive spell passes through shields.',
+  'phase': 'Your next offensive spell ignores shields AND Barriers.',
   'hasty': 'Free initiative — seize Haste to win same-speed ties.',
   'discharge': "Strip the enemy's stored charge. Fizzles a same-turn Barrage.",
   'overload': "Detonate the enemy's own charge — brutal against a full mage.",
+  'hallow': 'Ward yourself: the next debuff that lands on you is blocked.',
 };

@@ -109,11 +109,11 @@ const Map<MagicElement, ElementLore> elementLore = {
   ),
   MagicElement.astral: ElementLore(
     effectName: 'Astral Alignment',
-    trigger: '+1 stack each Astral turn (max 5)',
-    description: 'Each stack routes 5% of every attack past shields, straight '
-        'to health — up to 25%, ignoring shield counter math and piercing '
-        'Barrier. Decays on turns without an Astral cast. Astral spells never '
-        'miss.',
+    trigger: '+1 stack per charge spent (max 20)',
+    description: 'Each stack routes 1% of every attack past shields, straight '
+        'to health — up to 20%, ignoring shield counter math and piercing '
+        'Barriers. Sheds a stack on any turn without an Astral cast. Astral '
+        'spells never miss.',
     beatsEffect: 'Your spells slip Solar\'s Blind',
     weakEffect: 'A Lunar hit strips your Alignment',
   ),

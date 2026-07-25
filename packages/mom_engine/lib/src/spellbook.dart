@@ -44,7 +44,7 @@ abstract final class Spellbook {
       effect: DamageEffect(3, 5, hits: 3));
   static const volley = Spell(
       id: 'volley', name: 'Volley', chargeCost: 3, priority: 9,
-      effect: DamageEffect(8, 11, hits: 4));
+      effect: DamageEffect(7, 10, hits: 4));
   static const barrage = Spell(
       id: 'barrage', name: 'Barrage', chargeCost: 1, xCost: true, priority: 9,
       effect: BarrageEffect(10, 12));

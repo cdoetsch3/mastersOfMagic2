@@ -71,6 +71,19 @@ class _DuelScreenState extends State<DuelScreen>
   Spell? _castSpell;
   int _castCharge = 0;
 
+  /// How heavy the spell being animated *is*, for scaling its effects.
+  ///
+  /// This is the spell's own cost, NOT the charge the caster happened to be
+  /// holding — casting spends everything, so a Flick thrown at 5 charge used
+  /// to shake the screen like a Cataclysm. X-cost spells (Barrage) are the one
+  /// exception: their damage really does scale with the charge consumed, so
+  /// for those the charge IS the weight.
+  int get _castWeight {
+    final spell = _castSpell;
+    if (spell == null) return 0;
+    return spell.xCost ? _castCharge : spell.chargeCost;
+  }
+
   // Every combat message stays up long enough to actually read. Animations
   // that play while it is showing count toward this, so a message is only
   // held back if the turn would otherwise blow past it.
@@ -284,8 +297,8 @@ class _DuelScreenState extends State<DuelScreen>
         await _runFx(_FxKind.flash,
             atEnemy: isEnemy,
             color: element.style.color,
-            intensity: 1 + _castCharge * 0.3,
-            ms: 300 + _castCharge * 40);
+            intensity: 1 + _castWeight * 0.3,
+            ms: 300 + _castWeight * 40);
       case DamageEvent(
           :final target,
           :final toShield,
@@ -295,19 +308,21 @@ class _DuelScreenState extends State<DuelScreen>
         ):
         final isEnemy = target == c.enemy;
         final color = _castElement?.style.color ?? Colors.white;
-        final charge = _castCharge;
+        // The spell's own weight drives every flourish below, so a Flick looks
+        // like a Flick no matter how much charge was on the board.
+        final weight = _castWeight;
         final isMultiHit = switch (_castSpell?.effect) {
           DamageEffect(:final hits) => hits > 1,
           _ => false,
         };
         final projectiles =
-            _castSpell?.effect is BarrageEffect ? max(1, charge) : 1;
+            _castSpell?.effect is BarrageEffect ? max(1, _castCharge) : 1;
         await _runFx(_FxKind.projectile,
             atEnemy: isEnemy,
             color: color,
-            intensity: 1 + charge * 0.35,
+            intensity: 1 + weight * 0.35,
             projectiles: projectiles,
-            ms: isMultiHit ? 240 : max(280, 420 - charge * 20));
+            ms: isMultiHit ? 240 : max(280, 420 - weight * 20));
         final text = [
           if (toHp > 0) '-$toHp',
           if (toHp == 0 && toShield > 0) 'blocked',
@@ -319,9 +334,9 @@ class _DuelScreenState extends State<DuelScreen>
             atEnemy: isEnemy,
             color: color,
             text: text,
-            intensity: 1 + charge * 0.45,
-            shake: charge >= 3 ? (charge - 2) * 3.5 : 0,
-            ms: isMultiHit ? 320 : 440 + charge * 50);
+            intensity: 1 + weight * 0.45,
+            shake: weight >= 3 ? (weight - 2) * 3.5 : 0,
+            ms: isMultiHit ? 320 : 440 + weight * 50);
       case ShieldRaisedEvent(
           :final mage,
           :final element,

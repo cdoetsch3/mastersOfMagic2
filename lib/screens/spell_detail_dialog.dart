@@ -47,8 +47,10 @@ String _numbers(Spell spell) => switch (spell.effect) {
 
 /// The qualifier beside the figure — carries the prose, and is free to wrap.
 String _numbersLabel(Spell spell) => switch (spell.effect) {
-      DamageEffect(:final lifesteal) =>
-        lifesteal > 0 ? 'damage, heals you' : 'damage, rolled on cast',
+      DamageEffect(:final lifesteal) => lifesteal > 0
+          ? 'damage — heals you for ${(lifesteal * 100).round()}% of what '
+              'reaches their health'
+          : 'damage, rolled on cast',
       BarrageEffect() => 'damage per charge spent',
       OverloadEffect() => "damage per point of the enemy's charge",
       ShieldEffect() => 'shield in your element',
@@ -78,9 +80,11 @@ List<String> _systemsRules(Spell spell) {
       'Takes on your charged element — its side-effect can proc (Ignite, '
           'Static Feedback, Blind…).',
     if (spell.effect is ShieldEffect)
-      'The shield takes your charged element, which sets its counter math.',
+      'The shield takes your charged element, which sets how hard each attack '
+          'hits it — from ½× up to 2×.',
     if (isDamaging)
-      'Damage order: +Arcane Knowledge (5%/stack) → ×Empower → ×Stagger.',
+      'Damage order: additive first (Arcane Knowledge 5%/stack, a Full Moon '
+          'on a Lunar spell), then multipliers (Empower ×2, Stagger ×½).',
     if (isHarmful)
       'While Blinded, 50% chance to miss (the charge is still spent).',
     if (isDamaging || isShield || isHarmful)
