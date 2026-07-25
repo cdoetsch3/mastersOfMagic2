@@ -82,8 +82,13 @@ abstract final class Progression {
 
   /// How many element / spell slots a preset may fill "to start out with".
   /// These will grow with level once the unlock schedule is set.
-  static const int startingElementSlots = 3;
-  static const int startingSpellSlots = 5;
+  ///
+  /// 5 of the 12 elements and 10 of the 26 spells — enough room to bring a
+  /// real plan (a tier, its counters, and answers) without being able to carry
+  /// the whole book. The duel screen's shortcuts already cover both: 1-8 for
+  /// elements, QWERTASDFG for spells.
+  static const int startingElementSlots = 5;
+  static const int startingSpellSlots = 10;
 
   /// The elements a brand-new player's first preset is filled with.
   static const List<String> starterPresetElementIds = ['pyro', 'aqua', 'flora'];
