@@ -594,23 +594,72 @@ bosses — not merely reached level 30. It is the only mechanism here that makes
 *breadth* mandatory; everything else in this section is a pull rather than a
 wall.
 
-✅ **Shape confirmed: the key comes in thirds.** Each of a tier's three pure-zone
-bosses drops **one fragment** — a third of a key, a third of a scroll, a third
-of a seal — on **first defeat only**. Assembling all three opens the road to
-the next tier's city.
+✅ **Each tier's gate is its own object, and each teaches something different.**
+Three collectables per tier, one from each pure-zone boss, on **first defeat
+only** — but the *shape* of the lock changes as the world gets stranger:
 
-Why the fragment framing beats an abstract "attunement" flag:
+| Tier | What you gather | The lock | What it teaches |
+|---|---|---|---|
+| **Primal** | Three ordinary **proofs** — an arbitrary set of trophies | A **guard** who wants to see them before letting you leave | The world is still mundane: a person, a request, a door |
+| **Kinetic** | Three parts of a **Sigil** | Displayed to enter **Concordance** | Authority is now bureaucratic — you are showing papers, not fighting |
+| **Celestial** | Three **essences** (Solar · Lunar · Astral) | Charge a **Celestial Totem**; the charged totem passes a **magical barrier** to Rimeholt | The world stops asking permission and starts asking power |
+| **Ethereal** | Three **key fragments** | The **Eclipsed Citadel** itself | No gatekeeper left — only the door |
 
-- It is **visible progress**. Two of three fragments in your bag tells you
-  exactly what is left and where; a hidden completion counter does not.
-- It **explains itself** — nobody needs a tutorial to understand that a
-  broken key needs its third piece.
-- It gives each tier a **named artifact** to build lore around, rather than a
-  generic unlock.
+⭐ **Why the escalation is worth keeping exactly as written.** The gate is the
+same mechanic four times (kill three bosses, assemble three things), but the
+*fiction* moves from a guard, to a bureaucracy, to a barrier, to a lock with
+nobody behind it. The player feels the world getting less human without a
+single line of exposition. Keep the shapes distinct even if the underlying
+rule is shared.
 
-📝 **Detail deferred:** what the object actually is per tier (key / scroll /
-seal / sigil), whether the three fragments are visually distinct, and whether
-the assembled item is consumed or kept as a trophy.
+📝 **Deferred:** what the three Primal proofs actually are, and whether the
+assembled objects are consumed or kept as trophies. The Totem in particular
+wants to be keepable — a charged artifact is a better souvenir than a spent
+one.
+
+#### 3a. The endgame chain — Citadel → Crown → Zenith ⭐
+
+✅ **This is the long tail, and it is deliberately enormous.**
+
+1. **Beat the Eclipsed Citadel's final boss** (first clear) → it drops a
+   **crown with twelve empty gem slots**.
+2. **Collect twelve elemental gems**, one per element. ✅ Hybrid zones count,
+   which is what finally makes them matter to a completionist.
+3. **Collect twelve elemental Hearts**, one per element — the top of the mote
+   ladder (ITEMS §6.0).
+4. **Buy a binding spell** for a large sum of gold, and cast it to bind each
+   essence to the crown using its Heart.
+5. ✅ **Zenith opens.**
+
+⭐ **What this structure gets right:** it is the only goal in the game that
+requires *all twelve elements at once*. Every other system lets you
+specialise; the crown does not care what you main. It is the perfect final ask
+of a game whose whole identity is twelve elements in four tiers.
+
+⚠️ **But size it deliberately — the Heart requirement is very large.** Running
+the ITEMS §6.0 ladder backwards:
+
+| Requirement | In Cores | In Crystals | In Dust-equivalent |
+|---|---|---|---|
+| 1 Heart | 4 | 48 | 48,000 |
+| **12 Hearts** | **48** | **576** | **576,000** |
+
+At the daily XP→mote cap (250 Dust/day) that is **over six years**, so
+essentially **all of it has to come from drops** — the real ask is
+**48 Core-tier drops**, plus whatever crafting closes the gap. ❓ **Decide the
+Core drop rate against this number**, not independently of it: at 1-in-50
+endgame kills it is ~2,400 fights, at 1-in-20 it is ~960. Either can be right
+for a final goal, but it should be chosen rather than discovered.
+
+💡 **A lever if it proves too steep:** the crown could open Zenith at *some*
+gems (say six), with the remaining six unlocking Zenith's deeper tiers. Same
+total chase, but the reward arrives in stages rather than all at the end.
+
+📝 **Crown name candidates:** ⭐ **The Concordant Crown** (it binds twelve
+things into agreement, and quietly ties back to Concordance), **The Twelvefold
+Crown** (plainest and clearest), **The Diadem of Ages**, **The Aetherwrought
+Crown**.
+
 
 This is the piece that actually prevents skipping, because it is keyed to
 *breadth* rather than *level*. Combined with the existing element unlocks you
@@ -644,6 +693,30 @@ an organic reason to tour the whole map that never has to be enforced.
 design. That is right for a campaign, but if alt characters or seasons ever
 happen, they need a way to inherit or fast-track attunements or the second
 run-through will feel like a chore.
+
+#### 3d. The shape of a zone — ✅ three sections
+
+✅ **Every zone runs in three parts:**
+
+| Section | Contents |
+|---|---|
+| **1** | 4–5 enemies → **mini-boss** |
+| **2** | 4–5 enemies → **mini-boss** |
+| **3** | a few more enemies → **final boss** |
+
+✅ **Sizes grow with the game** — the first few zones run lean, and the count
+climbs toward the late game, so a Primal route is a short outing and an
+Ethereal one is an expedition.
+
+📝 **Two consequences to carry forward:**
+
+1. ⚠️ **The bestiary currently lists THREE mini-bosses per element** (§5
+   Bestiary) but a zone only has room for **two**. Each element needs one of
+   its three demoted, repurposed as an ordinary elite, or promoted into a
+   hybrid zone.
+2. ✅ **Three sections means three resource areas** — one at each mini-boss
+   and one at the boss (§4b). That is a natural difficulty ramp for gathering
+   too: the deeper you push in a single run, the richer the ground.
 
 #### 4. What makes a town worth returning to
 
@@ -707,6 +780,46 @@ while §6a says *"Motes come from combat, not gathering (§6.1)"* — and cites
 advanced nodes are a *gathering* reward or an *enchanting* one, and therefore
 whether a pure crafter can reach the ceiling without fighting.
 
+#### 3c. The Eclipsed Citadel — ✅ required, all twelve, and scalable
+
+✅ **No longer optional.** Zenith sits behind it, so it is the campaign's
+capstone rather than a dashed side-zone.
+
+✅ **A hybrid of every element.** Not two elements like the other hybrids —
+**all twelve**, and incredibly difficult.
+
+⭐ **This is the single best possible final exam, and the reason is
+mechanical.** Under the §0.3 shield table, every attack lands somewhere
+between ½× and 2× depending on the matchup. Against a twelve-element dungeon
+**no loadout counters everything** — five element slots against twelve enemy
+elements means you will always be at ½× against something. The Citadel
+therefore tests the one thing nothing else can: whether you can *adapt* rather
+than *specialise*. Every other zone rewards a plan; this one punishes only
+having one.
+
+✅ **Difficulty scaling.** The Citadel starts at **100%** and can be pushed
+higher and higher — an endless ladder rather than a fixed wall.
+
+📝 **What should actually scale** (proposal, needs a ruling):
+
+| Scale | Don't scale |
+|---|---|
+| Enemy **HP** and **damage** | Enemy **level** — it feeds the shield/counter maths and the numbers stop being readable |
+| Enemy **count per section** | The **element roster** — twelve is already all of them |
+| **Reward quality**: drop rates, mote tier, gold | The **rules** — a percentage that changes mechanics is a different mode, not a difficulty |
+
+⚠️ **The ceiling to watch.** Scaling damage indefinitely eventually reaches
+"the player never gets a second turn," which is the same failure the design
+already rejected for permanent Waterlogged and 0% hit chance. A difficulty
+ladder should make fights *longer and sharper*, not *shorter and decided on
+turn one*. ❓ Worth deciding whether there is a hard cap, or whether the curve
+simply flattens.
+
+❓ **Open:** does pushing higher persist as a personal best (a score to beat),
+or does each threshold unlock permanently the way a raid difficulty does?
+Persistent unlocks are friendlier; personal bests give leaderboards something
+to hold.
+
 #### 3b. The ninth town — ✅ **ZENITH** ⭐
 
 ✅ **A ninth town sits past the end of the campaign**, reached only by
@@ -719,7 +832,7 @@ key-fragment gates have been building toward.
 |---|---|
 | ⭐ **Every crafting station** | All six making-skills in one place — the only town that has them all |
 | ⭐ **Teleports to every other city** | The map folds up once you have earned it |
-| ⭐ **A player market** | ✅ **The same market as Concordance**, reached from a second door — *not* a second market |
+| ⭐ **A player market** | ✅ **The same market as Concordance**, reached from a second door — *not* a second market. **10% tax on every sale** (below) |
 | The unbinding enchant (ITEMS §6c) | The most consequential thing the economy allows |
 | Post-cap XP → motes (10 XP = 1 Dust, 250/day) | It only exists at level 50; its home should be a place only level-50s stand in |
 | Tier IV set assembly · the hardest repeatable content | Where the loop keeps going once the story stops |
@@ -814,31 +927,45 @@ gains not one point of Mining for it. Two more guards on the same idea:
 
 #### 6. Still open
 
-1. ❓ **Capital name** — from the ten above, or a different direction?
-2. ❓ **Attunements**: adopt the per-tier gate (3 pure-zone bosses per tier)?
-   The alternative is per-*element* (all 12 bosses), which is stricter and
-   would make the last tier a long grind before Ethereal opens.
-3. ✅ **The second Primal town is PENNYCROSS** — a coin and a crossroads. It
-   is the **first working market**, where buying and selling are taught before
-   Concordance turns trade into a system, so a name that states its own
-   function is exactly right for a village this early. Sits beside *Aldermere*
-   in register without crowding it. Runners-up: Scalewick, Wainbridge,
-   Copperfold, Tallowmoot, Millbrook, Chaffhold, Weftbury, Bramblewick,
-   Hearthfen.
+1. ✅ ~~Capital name~~ · ✅ ~~second Primal town~~ · ✅ ~~ninth town~~ — Concordance,
+   Pennycross, Zenith.
+2. ❓ **What the three Primal "proofs" are.** They are deliberately arbitrary
+   trophies, but arbitrary still needs choosing — and they are the first
+   collectables a new player ever sees, so they set the tone.
+3. ❓ **Are the assembled gate objects consumed or kept?** The Celestial Totem
+   especially wants to be keepable; a charged artifact is a better souvenir
+   than a spent one.
+4. ❓ **The Core drop rate**, decided *against* the 48-Core crown requirement
+   (§3a) rather than independently of it.
+5. ❓ **What Concordance's hour-long buffs do.** Still TBD. Flat XP/gold/luck
+   is the safe answer; anything build-shaping risks becoming mandatory. They
+   also need the persistent real-time buff machinery ITEMS §6b.1 flags as
+   unbuilt.
+6. ❓ **Citadel scaling**: hard cap or flattening curve, and does a pushed
+   threshold persist as an unlock or stand as a personal best?
+7. ⚠️ **Each element has one mini-boss too many** (§3d) — three listed, two
+   used.
+8. ❓ **Crown name** — The Concordant Crown, The Twelvefold Crown, or another?
 
-4. ❓ **Which town owns which crafting skill** — §4 has a proposal, but it was
-   drawn for six towns and there are now eight. Two towns will have no station
-   unless the list grows.
-5. ❓ **What the hour-long buffs actually are.** Flat XP/gold/luck is the safe
-   answer; something build-shaping would be more interesting but risks
-   becoming mandatory. They also need the persistent real-time buff machinery
-   ITEMS §6b.1 flags as unbuilt.
-6. ❓ **Does trading need a sink?** A player-to-player market plus a gold
-   economy usually needs a tax or fee, or currency inflates. Worth deciding
-   before it ships rather than after.
-7. ⚠️ **Rimeholt is currently listed as Ethereal (~L45)** but was written as a
-   mountain village on the Kinetic→Celestial road. Either move it or rename
-   the Ethereal slot — the two placements can't both be true.
+#### 7. Economy rulings from this session
+
+✅ **Player trading is taxed at 10% of the sale.** This is the gold sink the
+market needs; without one, a player-to-player economy inflates until gold
+stops meaning anything and every price is quoted in materials instead.
+
+📝 Two details the build will need to pin down:
+
+- **Who pays** — seller-side is the convention (the listed price is what the
+  buyer pays, the seller receives 90%), because a buyer-side fee makes every
+  displayed price a lie.
+- **Where the gold goes** — deleted, not redistributed. A tax that recirculates
+  is not a sink.
+
+⚠️ **10% is a real drag on low-value trades.** Flipping a common item for 20
+gold nets 18, which discourages exactly the small liquid trades that make a
+market feel alive. ❓ Worth considering a **minimum fee floor** (a flat 1g on
+anything cheap) *instead of* the percentage at the bottom end, so the tax bites
+the big trades it is meant to and leaves the small ones alone.
 
 ---
 
