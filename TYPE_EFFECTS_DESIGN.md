@@ -713,6 +713,90 @@ consolation prize; `Hallow` lets any loadout buy it deliberately.
 
 ---
 
+## 4d. Tempo — 📝 NEW (designed, not built)
+
+✅ **A status that shortens the afflicted mage's move clock** — the 10-second
+turn timer drops to **5 seconds**. Castable in PvP, and inflictable by
+computer-controlled enemies.
+
+⭐ **Why this is a genuinely new axis.** Every existing tempo effect works on
+*turn order* — Waterlogged pushes your action last, Haste breaks ties, Quicken
+jumps the queue. Tempo is the first effect that touches **real time**. It does
+not change when your spell resolves; it changes how long you have to *think*.
+Nothing else in the game does that, and in a simultaneous-turn game built on
+prediction, taking away thinking time is a real attack on the thing the game is
+actually about.
+
+📝 **Also the Citadel's difficulty lever** (GAME_DESIGN §3c): higher
+thresholds can push the clock to **5s, then 2–3s**. A duel against an expert
+should feel like one.
+
+### ⚠️ What has to be decided before this is built
+
+**1 · Does a Tempo'd timeout count toward the 3-strike auto-surrender?**
+
+This is the important one. Today a timeout forfeit counts, because that is how
+a vanished opponent eventually loses (GAME_DESIGN §1). But if Tempo'd timeouts
+count too, then **Tempo is a win condition**: land it, run out three clocks,
+and the opponent auto-surrenders without ever being reduced to 0 HP.
+
+| Option | Effect |
+|---|---|
+| **Counts normally** | Simple and consistent — but makes Tempo a lockout, which is the exact failure the design rejected for permanent Waterlogged and 0% hit chance |
+| ⭐ **Counts, but Tempo resets the streak on any successful action** | A player who acts even once is not vanished, so the 3-strike clock should not be creeping toward a loss they can't see |
+| **Does not count while Tempo is active** | Safest, but re-opens the disconnect hole — someone could self-Tempo to stall |
+
+❓ Needs a ruling. It decides whether Tempo is a *pressure* effect or a *kill*
+effect.
+
+**2 · The move timer lives in the CLIENT, not the engine.**
+
+⚠️ `_moveSeconds` is a `duel_screen` constant; the engine has no concept of
+time at all. That is fine for a status whose *state* is lockstep-deterministic
+— both clients will agree that Tempo is applied — but two consequences follow:
+
+- **`RemoteDuelDriver.opponentTimeout` (25s) needs to know**, or a Tempo'd
+  opponent burns their 5s while you sit watching a 25s bar. Their client will
+  submit the forfeit, so state stays correct, but the *experience* is wrong.
+- ⚠️ **It is honest-client-only**, exactly like Umbra's information hiding
+  (§8). A modified client can simply ignore Tempo and take its full ten
+  seconds. Acceptable for casual and PvE; a real problem for ranked, and it
+  belongs in the same server-authoritative rework Umbra is already waiting on.
+
+**3 · ⚠️ Accessibility — this one deserves a deliberate answer.**
+
+Five seconds is tight. Two to three seconds is beyond some players entirely —
+not as a matter of skill, but of motor control, reading speed, or processing
+time. A mechanic that shortens a clock is the single least accessible kind of
+difficulty there is.
+
+💡 Options, none free:
+- Keep **sub-5s strictly inside optional content** (the Citadel ladder), so
+  nobody is locked out of the campaign or ranked play by reaction speed.
+- Offer an **accessibility setting** that restores the clock and takes the
+  difficulty back some other way (fewer rewards, or a compensating enemy buff).
+- **Scale the floor, not the ceiling** — Tempo could remove a *percentage* of
+  the clock, so a player-configured longer base timer still shortens
+  proportionally.
+
+**4 · Smaller questions**
+
+- ❓ **Duration** — 3 turns like Blind, or until the end of the next turn?
+- ❓ **Element or neutral?** Aqua already owns "you act last" and Aero owns
+  initiative, so Tempo is not obviously either. Element-neutral (like Hallow
+  and Discharge) may be the cleanest, giving any loadout access to it.
+- ❓ **Does it stack or refresh?** Refresh, following every other timed status.
+- ❓ **Does Grace block it?** It is a debuff, so by the existing rule yes — worth
+  confirming, since that gives Sanctus a natural answer to a Tempo deck.
+
+📝 **When built,** it needs: a `StatusCatalog` entry, its own animation (a
+fast-ticking clock, `StatusMotion.streak` in a warning colour), a HUD pip
+showing the shortened clock, and — most importantly — **the countdown ring
+itself must visibly change**, or the player will simply be confused about why
+they ran out of time.
+
+---
+
 ## 5. Cross-cutting rules
 
 ### 5.1 Turn phases — start / main / end resolution ✅

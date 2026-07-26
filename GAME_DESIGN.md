@@ -636,24 +636,26 @@ requires *all twelve elements at once*. Every other system lets you
 specialise; the crown does not care what you main. It is the perfect final ask
 of a game whose whole identity is twelve elements in four tiers.
 
-⚠️ **But size it deliberately — the Heart requirement is very large.** Running
-the ITEMS §6.0 ladder backwards:
+✅ **Twelve CORES, not twelve Hearts** — and Zenith stays a single, complete
+achievement rather than opening in stages. The crown must be finished.
 
-| Requirement | In Cores | In Crystals | In Dust-equivalent |
+⚠️ **Why the step down matters.** Running the ITEMS §6.0 ladder backwards:
+
+| Requirement | In Crystals | In Dust-equivalent | Direct drops needed |
 |---|---|---|---|
-| 1 Heart | 4 | 48 | 48,000 |
-| **12 Hearts** | **48** | **576** | **576,000** |
+| 12 **Hearts** *(rejected)* | 576 | 576,000 | ~48 Cores |
+| ✅ 12 **Cores** | 144 | 144,000 | **12 Cores** |
 
-At the daily XP→mote cap (250 Dust/day) that is **over six years**, so
-essentially **all of it has to come from drops** — the real ask is
-**48 Core-tier drops**, plus whatever crafting closes the gap. ❓ **Decide the
-Core drop rate against this number**, not independently of it: at 1-in-50
-endgame kills it is ~2,400 fights, at 1-in-20 it is ~960. Either can be right
-for a final goal, but it should be chosen rather than discovered.
+That is a **quarter** of the ask, and — the part that actually matters — it
+preserves the design: **one Core of each element** still means touring all
+twelve zones. Nothing about the crown's "you must have met the whole world"
+character is lost; only the grind is cut. Hearts also stay meaningful as the
+top of the ladder rather than becoming a checklist item.
 
-💡 **A lever if it proves too steep:** the crown could open Zenith at *some*
-gems (say six), with the remaining six unlocking Zenith's deeper tiers. Same
-total chase, but the reward arrives in stages rather than all at the end.
+❓ **Still decide the Core drop rate against this number**, not independently:
+twelve is now a *findable* target rather than an endurance test, so the rate
+can be generous enough that the last element is a satisfying hunt rather than
+a wall.
 
 📝 **Crown name candidates:** ⭐ **The Concordant Crown** (it binds twelve
 things into agreement, and quietly ties back to Concordance), **The Twelvefold
@@ -708,15 +710,30 @@ run-through will feel like a chore.
 climbs toward the late game, so a Primal route is a short outing and an
 Ethereal one is an expedition.
 
-📝 **Two consequences to carry forward:**
+✅ **Each zone keeps a POOL, and a run draws from it.** Not a fixed roster —
+**3–5 mini-bosses and 1–2 bosses** exist per zone, and every run rolls a
+random combination. Two mini-bosses and one boss appear; which ones is a
+surprise.
 
-1. ⚠️ **The bestiary currently lists THREE mini-bosses per element** (§5
-   Bestiary) but a zone only has room for **two**. Each element needs one of
-   its three demoted, repurposed as an ordinary elite, or promoted into a
-   hybrid zone.
-2. ✅ **Three sections means three resource areas** — one at each mini-boss
-   and one at the boss (§4b). That is a natural difficulty ramp for gathering
-   too: the deeper you push in a single run, the richer the ground.
+⭐ **This is what makes a zone worth running twice.** A fixed roster is
+memorised after one clear and every later visit is the same fight. A pool
+means the counter-pick you brought might be the wrong one, which keeps a zone
+tense long after its level band has been outgrown — and that matters a great
+deal here, because the resource areas (§4b) are a standing reason to come
+back.
+
+📝 **Consequences to carry forward:**
+
+1. ⚠️ **The bestiary needs to GROW, not shrink.** It currently lists three
+   mini-bosses and one boss per element; the pool wants **3–5 and 1–2**. That
+   is up to twelve more mini-bosses and twelve more bosses to design, and it
+   is the single largest content task the enemies pass now carries.
+2. ✅ **Three sections means three resource areas** — one at each mini-boss and
+   one at the boss (§4b). A natural gathering ramp: the deeper you push in a
+   run, the richer the ground.
+3. ❓ **Does the pool reroll per run or per day?** Per run is more surprising;
+   per day lets a player plan a loadout around what is up, which suits a game
+   built on counter-picking.
 
 #### 4. What makes a town worth returning to
 
@@ -935,37 +952,52 @@ gains not one point of Mining for it. Two more guards on the same idea:
 3. ❓ **Are the assembled gate objects consumed or kept?** The Celestial Totem
    especially wants to be keepable; a charged artifact is a better souvenir
    than a spent one.
-4. ❓ **The Core drop rate**, decided *against* the 48-Core crown requirement
-   (§3a) rather than independently of it.
+4. ❓ **The Core drop rate**, decided *against* the crown's twelve-Core
+   requirement (§3a) rather than independently of it.
 5. ❓ **What Concordance's hour-long buffs do.** Still TBD. Flat XP/gold/luck
    is the safe answer; anything build-shaping risks becoming mandatory. They
    also need the persistent real-time buff machinery ITEMS §6b.1 flags as
    unbuilt.
 6. ❓ **Citadel scaling**: hard cap or flattening curve, and does a pushed
-   threshold persist as an unlock or stand as a personal best?
-7. ⚠️ **Each element has one mini-boss too many** (§3d) — three listed, two
-   used.
+   threshold persist as an unlock or stand as a personal best? ✅ One lever is
+   settled — the **move clock shortens** (5s, then 2–3s); see the **Tempo**
+   status in TYPE_EFFECTS §4d, which carries real netcode and accessibility
+   questions of its own.
+7. ⚠️ **The bestiary needs to grow** (§3d) — pools of 3–5 mini-bosses and 1–2
+   bosses per zone, against the three-and-one it currently lists.
 8. ❓ **Crown name** — The Concordant Crown, The Twelvefold Crown, or another?
 
 #### 7. Economy rulings from this session
 
-✅ **Player trading is taxed at 10% of the sale.** This is the gold sink the
-market needs; without one, a player-to-player economy inflates until gold
-stops meaning anything and every price is quoted in materials instead.
+✅ **Player trading is taxed at 10%, split evenly across both sides.**
 
-📝 Two details the build will need to pin down:
+> An item **listed at 100g**: the **buyer pays 105g**, the **seller receives
+> 95g**. The 10g in between is **deleted**.
 
-- **Who pays** — seller-side is the convention (the listed price is what the
-  buyer pays, the seller receives 90%), because a buyer-side fee makes every
-  displayed price a lie.
-- **Where the gold goes** — deleted, not redistributed. A tax that recirculates
-  is not a sink.
+✅ **The gold is destroyed, not redistributed.** A tax that recirculates is not
+a sink — it just moves inflation somewhere else.
 
-⚠️ **10% is a real drag on low-value trades.** Flipping a common item for 20
-gold nets 18, which discourages exactly the small liquid trades that make a
-market feel alive. ❓ Worth considering a **minimum fee floor** (a flat 1g on
-anything cheap) *instead of* the percentage at the bottom end, so the tax bites
-the big trades it is meant to and leaves the small ones alone.
+✅ **The rate is configurable**, so it can be tuned once there is a real
+economy to observe rather than guessed at now.
+
+⭐ **Why the split beats a one-sided fee.** A seller-only fee makes the listed
+price honest for the buyer but quietly lies to the seller; a buyer-only fee
+does the reverse. Splitting it means the listed price is **the midpoint both
+sides negotiate around**, and each party can see exactly what the market costs
+them. It also makes the spread visible, which is the honest way to show a
+player that trading has a price.
+
+⚠️ **The one thing this must get right is the UI.** With a split fee, the
+number on the listing is what *neither* party actually pays. Both figures have
+to be on screen at the point of action — "you pay 105g" on the buy button,
+"you receive 95g" on the list form. Showing only the listing price would be
+the most confusing possible presentation of a perfectly fair rule.
+
+📝 **Still worth watching:** 10% is a meaningful drag on cheap trades — a 20g
+item nets 19g and costs 21g. If small trades dry up in practice, a flat
+minimum fee at the bottom end (rather than the percentage) would let the tax
+bite the large trades it is aimed at while leaving pocket-change trading alive.
+Configurability makes that a tuning change rather than a rewrite.
 
 ---
 
