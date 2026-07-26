@@ -137,7 +137,7 @@ No design question blocks any phase. The rulings, with where each now lives:
 
 ---
 
-# Phase 1 — Engine: twelve elements, four tiers
+# Phase 1 — ✅ DONE — Engine: twelve elements, four tiers
 
 **Goal:** the roster change, and nothing else. No new behaviour.
 
@@ -167,7 +167,7 @@ the macro-tier map is a 4-cycle, and the full suite is green.
 
 ---
 
-# Phase 2 — Engine: the new shield counter math
+# Phase 2 — ✅ DONE — Engine: the new shield counter math
 
 **Goal:** replace the boolean ×2 with the multiplier table. This is
 **the largest balance change in the expansion** — isolate it in its own
@@ -197,7 +197,7 @@ with an explicit note that their expectations changed *by design*.
 
 ---
 
-# Phase 3 — Engine: three new effects + five rewired edges
+# Phase 3 — ✅ DONE — Engine: three new effects + five rewired edges
 
 **Reference:** TYPE_EFFECTS §4b (Celestial) and §4c (Ethereal repairs). Build
 in this order; each is independently testable.
@@ -303,7 +303,7 @@ isn't neutral.
 
 ---
 
-# Phase 4 — ⚠️ SIM GATE (do not skip, do not proceed on a fail)
+# Phase 4 — 🟡 PARTLY DONE — ⚠️ SIM GATE
 
 **File:** `packages/mom_engine/tool/balance_sim.dart` — extend the existing
 9×9 mono-element round-robin to **12×12**.
@@ -329,7 +329,22 @@ iterations here — that is the point of the gate.
 
 ---
 
-# Phase 5 — Progression and the world map
+# Phase 5 — ⬜ NEXT — Progression and the world map
+
+⚠️ **Three live inconsistencies found while reviewing (2026-07-25).** These
+are shipped-and-wrong today, not merely unbuilt:
+
+1. **`world.dart` still holds the OLD 18-region map.** The 12-pure + 9-hybrid
+   + 6-town map designed in GAME_DESIGN §5 was never built.
+2. **A region is still named "Radiant Sanctum"** — a leftover from the
+   Radiant→Sanctus rename, visible to players on the map. (The tooltip
+   consistency test guards spell/lore/catalogue text for exactly this, but
+   does not cover location names — worth extending.)
+3. **Four elements appear in no region at all**: Solar, Lunar, Astral and
+   Arcane. The world only references the other eight.
+
+Plus the planned work: element and spell unlock gating are both still
+`=> true`, so nothing is level-gated yet.
 
 **Files:** `lib/game/progression.dart`, `lib/game/world.dart`,
 `lib/screens/tabs/map_tab.dart`, `PROGRESSION_DESIGN.md` §4.
@@ -352,6 +367,31 @@ iterations here — that is the point of the gate.
 every hybrid names two real elements, level bands don't overlap tiers
 incorrectly, and the connection graph has no unreachable nodes.
 **Hand the map screen to Christian for visual review.**
+
+---
+
+# Interlude — ✅ DONE — playtest response (not originally planned)
+
+Christian playtested after Phase 3b and filed 26 notes; these were built in
+response and are not part of the numbered plan:
+
+- **Barrier as stacking points** (max 3, one spent per hit), and shields +
+  barriers moved to a `CustomPainter`: stroke scales with the shield REMAINING,
+  barriers are beaded rings, and shields above 100 split into stacked rings
+- **Per-status animations** (twelve motions over 22 statuses), backed by a
+  **status catalogue** in the engine that the HUD, log, animations and a new
+  in-game player guide all read from — with tests that fail the build if a
+  status ships undocumented or unanimated
+- **Status pips advance with the animation** rather than all appearing when the
+  turn resolves (the engine records a status frame per event)
+- **Hand-drawn Sanctus halo and Umbra demon glyphs**
+- **Password reset, password change, friend presence** (the green dot)
+- **A tooltip audit** plus a consistency test that checks player-facing text
+  against the data rather than against memory
+- Balance: lifesteal → 50%, Discharge → 2 charge, Hallow → 1 charge, Volley →
+  7–10, **Barrage → one hit per charge**, loadout caps → 5 elements / 10 spells
+- Bug fixes: charge-drain display, battle-log grammar, the lagging streak pip,
+  and cast FX scaling off the spell rather than the charge held
 
 ---
 
