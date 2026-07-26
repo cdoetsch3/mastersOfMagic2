@@ -535,8 +535,8 @@ Primal village are new.
 |---|---|---|
 | **Primal** | 🏠 **Aldermere** *(home village)* · ⛲ **[new — a second Primal town]** | L1 · ~L8 |
 | **Kinetic** | ⛏️ **Forgeholm** *(mining)* · ⚓ **Galehaven** *(port)* | ~L15 · ~L22 |
-| **Celestial** | 🏛️ **[CAPITAL]** *(gateway to Celestial)* · 🔭 **Meridian** *(observatory)* | ~L30 · ~L36 |
-| **Ethereal** | 🏔️ **Rimeholt** *(high and remote)* · 🚪 **Vespergate** *(threshold fortress)* | ~L45 · ~L50 |
+| **Celestial** | 🏛️ **Concordance** *(capital · gateway to Celestial)* · 🔭 **Meridian** *(observatory)* | ~L30 · ~L36 |
+| **Ethereal** | 🏔️ **Rimeholt** *(the last mortal outpost, above the tree line)* · 🚪 **Vespergate** *(threshold fortress)* | ~L45 · ~L50 |
 
 ✅ **The capital opens at the mid-point — the Kinetic→Celestial boundary
 (~L30).** Two full tiers behind you, two ahead; it is the literal middle of
@@ -562,27 +562,14 @@ the campaign and the moment the world stops being provincial.
 - ⭐ **Still no crafting stations.** The six making-skills stay decentralised
   (§4 below) — the capital is where value *moves*, not where it is made.
 
-📝 **Ten name candidates.** Magisterium was too on-the-nose, so these lean
-magic-*adjacent* — trade, convergence, scholarship, navigation — rather than
-shouting "wizards live here". Grouped by register:
+✅ **The capital is CONCORDANCE.** An agreement *and* an index of a text — it
+carries the trade-hub meaning and the scholarly one in a single word, without
+shouting "wizards live here" the way Magisterium did. Runners-up, kept in case
+it ever needs a second look: Thousandgate, Cynosure, Vellum, Wyrdholm.
 
-| Name | Register | Why it works |
-|---|---|---|
-| ⭐ **Concordance** | scholarly | An agreement *and* an index of a text — a trade capital and a place of learning in one word |
-| ⭐ **Thousandgate** | grand | A great city measured by how much passes through it. Says "trade hub" instantly, no magic needed |
-| ⭐ **Cynosure** | navigational | The star everything steers by — the map's centre, and it earns its place at the Celestial gateway |
-| **Vellum** | understated | The skin spells are written on. Quiet, unusual, and unmistakably a magic world's city |
-| **Wyrdholm** | Old English | *Wyrd* is fate/destiny — magic-adjacent without a single Latin root, a nice contrast against the elements |
-| **Auriel** | regal | Gold and air; sounds like a capital, stays vague about why |
-| **Sable Court** | courtly | Implies a seat of power and an institution to petition |
-| **The Weft** | weaving | The cross-threads that hold a weave together — a trade city as the thing binding the world |
-| **Orison** | devotional | A spoken prayer; elegant, and pairs oddly well with Sanctus being an element |
-| **Emberquay** | mercantile | A quay is where goods land; the ember keeps it warm rather than industrial |
-
-⚠️ **Names to avoid, and why:** *Arcanum* and *Arcanis* read as the Arcane
-element's home town. *Sanctum* collides with Sanctus. *Caelum* and *Aether*
-collide with the Celestial and Ethereal tier names. *Meridian* is taken by the
-observatory town.
+⚠️ **Names ruled out:** *Arcanum*/*Arcanis* (read as the Arcane element's home
+town), *Sanctum* (collides with Sanctus), *Caelum*/*Aether* (collide with the
+Celestial and Ethereal tier names), *Magisterium* (too on-the-nose).
 
 #### 3. Gating — two different problems, two different tools
 
@@ -606,6 +593,24 @@ So to reach Celestial content you must have beaten the Electro, Aero and Geo
 bosses — not merely reached level 30. It is the only mechanism here that makes
 *breadth* mandatory; everything else in this section is a pull rather than a
 wall.
+
+✅ **Shape confirmed: the key comes in thirds.** Each of a tier's three pure-zone
+bosses drops **one fragment** — a third of a key, a third of a scroll, a third
+of a seal — on **first defeat only**. Assembling all three opens the road to
+the next tier's city.
+
+Why the fragment framing beats an abstract "attunement" flag:
+
+- It is **visible progress**. Two of three fragments in your bag tells you
+  exactly what is left and where; a hidden completion counter does not.
+- It **explains itself** — nobody needs a tutorial to understand that a
+  broken key needs its third piece.
+- It gives each tier a **named artifact** to build lore around, rather than a
+  generic unlock.
+
+📝 **Detail deferred:** what the object actually is per tier (key / scroll /
+seal / sigil), whether the three fragments are visually distinct, and whether
+the assembled item is consumed or kept as a trophy.
 
 This is the piece that actually prevents skipping, because it is keyed to
 *breadth* rather than *level*. Combined with the existing element unlocks you
@@ -646,14 +651,37 @@ run-through will feel like a chore.
 **only** place one skill can be practised, so travel stays meaningful after
 the levelling is done.
 
-| Town | Its exclusive station | Why there |
-|---|---|---|
-| Aldermere | **Woodcarving** | the woods are its whole geography |
-| Forgeholm | **Metalworking** | mining town |
-| Galehaven | **Tailoring** | a port is where cloth and trade arrive |
-| Rimeholt | **Jewelry** | mountain gems |
-| Meridian | **Enchanting** | an observatory is where you study |
-| Vespergate | **Potions / Alchemy** | a threshold fortress needs its own supply |
+✅ **The thematic fit, one skill per town** — six making-skills across eight
+towns, leaving two deliberately civic:
+
+| Town | Tier | Station | Why there |
+|---|---|---|---|
+| 🏠 **Aldermere** | Primal | **Woodcarving** | The woods are its whole geography, and a stave is the first weapon a new mage cuts |
+| ⛲ **[2nd Primal town]** | Primal | — *(first market)* | Teaches buying and selling before Concordance turns trade into a system |
+| ⛏️ **Forgeholm** | Kinetic | **Metalworking** | It is the mining town; ore is refined where it comes out of the ground |
+| ⚓ **Galehaven** | Kinetic | **Tailoring** | A port is where cloth and dye arrive from elsewhere — robes are a trade good, not a local one |
+| 🏛️ **Concordance** | Celestial | — *(trade + buffs)* | Value **moves** here; it is not made here |
+| 🔭 **Meridian** | Celestial | **Enchanting** | An observatory is where you *study*, and enchanting is the only skill that works on motes rather than matter |
+| 🏔️ **Rimeholt** | Ethereal | **Jewelry** | The deep stone is where gems come from, and the last outpost is where they get cut |
+| 🚪 **Vespergate** | Ethereal | **Potions / Alchemy** | A threshold fortress that cannot resupply from behind has to brew its own |
+
+⭐ **Why this arrangement and not another.** Three principles, in order:
+
+1. **The skill lives where its raw material comes from.** Woodcarving in the
+   woods, Metalworking at the mine, Jewelry in the deep stone. The exception
+   proves it — **Tailoring sits in the port**, because cloth is the one
+   material you *import* rather than dig up.
+2. **The two skills with no physical material go late.** Enchanting works on
+   motes and Alchemy on essences, so both belong in the back half where the
+   player has motes to spend and reagents worth brewing.
+3. ⭐ **The difficulty curve of the craft matches the difficulty curve of the
+   road.** A player meets Woodcarving at level 1 and Alchemy at level 50, so
+   the crafting tree unfolds at the same pace as the world — no town ever
+   offers a skill the player has no use for yet.
+
+📝 Gathering skills sit alongside naturally: **Felling** around Aldermere,
+**Mining** around Forgeholm and Rimeholt, **Foraging** around Galehaven and
+Vespergate.
 
 ⭐ **And give the capital no crafting stations at all.** The instinct is to put
 everything in the capital; that would kill the other six towns overnight.
@@ -678,6 +706,39 @@ while §6a says *"Motes come from combat, not gathering (§6.1)"* — and cites
 §6.1 for the opposite of what §6.1 says. ❓ **Which is it?** It decides whether
 advanced nodes are a *gathering* reward or an *enchanting* one, and therefore
 whether a pure crafter can reach the ceiling without fighting.
+
+#### 4b. Boss-gated resource areas — ⭐ and the "free levels" problem
+
+✅ **Every mini-boss and boss arena also holds a resource area.** You can work
+an ordinary node out in the zone, or you can kill what guards the good ground
+and gather far more in the same time. ✅ **Hybrid zones are harder and richer**
+on the same principle — some deliberately hard enough that you leave and come
+back later.
+
+⚠️ **The danger the brief already named: this must not hand out gathering
+levels for free.** Left naive, a strong fighter would out-level a dedicated
+gatherer by punching bosses, and the whole gathering skill line becomes a
+formality.
+
+⭐ **The fix — split what each system pays out:**
+
+> A boss-gated node yields **more material per action**, but the **same skill
+> XP per action** as an ordinary node.
+
+So combat prowess buys you **stuff**; the gathering skill still buys you
+**levels**. A fighter who clears a boss arena fills their bags faster, and
+gains not one point of Mining for it. Two more guards on the same idea:
+
+- ✅ **The node still checks the gathering skill.** Beating the boss grants
+  *access*, never *capability* — an Adamant Vein behind a level-40 boss is
+  still unworkable at Mining 10, so nobody skips the skill line by fighting.
+- ✅ **First clear opens it; the area stays open.** The attunement fragments
+  (§3) are one-time, but the resource area is the repeatable reason to return
+  — that is the whole point of putting it there.
+- ❓ **Open:** does the boss need re-killing each visit, or does one clear open
+  the ground permanently? Permanent is friendlier and makes the arena a
+  genuine destination; re-killing keeps the challenge but risks becoming a toll
+  players resent.
 
 #### 5. Settled this session
 
