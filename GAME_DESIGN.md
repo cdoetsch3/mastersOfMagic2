@@ -527,9 +527,9 @@ not better at everything.
 
 #### 2. Towns — and the capital
 
-✅ **Eight towns — two per tier.** Six exist in the current draft (Aldermere,
-Forgeholm, Galehaven, Rimeholt, Meridian, Vespergate); the capital and one
-Primal village are new.
+✅ **Nine towns — two per tier, plus a post-campaign ninth (§3b).** Six exist
+in the current draft (Aldermere, Forgeholm, Galehaven, Rimeholt, Meridian,
+Vespergate); Concordance, one Primal village, and the Super Capital are new.
 
 | Tier | Towns | When |
 |---|---|---|
@@ -707,6 +707,78 @@ while §6a says *"Motes come from combat, not gathering (§6.1)"* — and cites
 advanced nodes are a *gathering* reward or an *enchanting* one, and therefore
 whether a pure crafter can reach the ceiling without fighting.
 
+#### 3b. The ninth town — the grand hub ⭐
+
+✅ **A ninth town sits past the end of the campaign**, reached only by
+defeating **The Eclipsed Citadel**. Everything the tier ladder and the
+key-fragment gates have been building toward.
+
+✅ **It has everything, on purpose:**
+
+| It holds | Note |
+|---|---|
+| ⭐ **Every crafting station** | All six making-skills in one place — the only town that has them all |
+| ⭐ **Teleports to every other city** | The map folds up once you have earned it |
+| ⭐ **A player market** | ✅ **The same market as Concordance**, reached from a second door — *not* a second market |
+| The unbinding enchant (ITEMS §6c) | The most consequential thing the economy allows |
+| Post-cap XP → motes (10 XP = 1 Dust, 250/day) | It only exists at level 50; its home should be a place only level-50s stand in |
+| Tier IV set assembly · the hardest repeatable content | Where the loop keeps going once the story stops |
+
+⭐ **One market, two doors — this is the detail that matters.** A second,
+separate marketplace would split liquidity: fewer listings in each, worse
+prices, and a player never sure which door to try. Because Concordance and the
+grand hub are **access points onto one shared order book**, the endgame town
+adds convenience without fragmenting the economy. Worth stating explicitly in
+the build, because "add a market to the new town" is exactly the kind of thing
+that gets implemented as a second table by accident.
+
+📝 **What this means for the other eight towns — a deliberate trade, not an
+oversight.** The one-craft-per-town rule (§4) is a **mid-game structure that
+dissolves at endgame**, and that is fine:
+
+- Crafting exclusivity exists to make the *world* feel worth crossing while
+  you are learning it. Once the campaign is done, that lesson has landed, and
+  making a level-50 player sail to Galehaven for every robe is friction
+  without purpose.
+- The towns keep the reason that outlasts convenience: **they are next to
+  their zones and their resource nodes.** You still go to Rimeholt to mine —
+  you simply teleport back to craft. The gathering loop is untouched.
+- ⚠️ The thing to watch is not the towns, it's **whether the mid-game ever
+  felt tedious rather than characterful.** If players resent the travel *while
+  it is happening*, the endgame teleport is a bandage over a design problem
+  rather than a reward. Worth asking directly in playtesting.
+
+⚠️ **"Super Capital" is a working title and a misnomer.** Concordance is the
+*capital*; this is something else — the point every road, craft and market
+converges on. The name should say **convergence**, not **rank**.
+
+📝 **Ten candidates.** Now that it teleports to every city, names about
+gateways and convergence fit far better than names about height or authority:
+
+| Name | Why |
+|---|---|
+| ⭐ **Thousandgate** | A city of a thousand gates — the teleport hub, said literally. Grand without being pompous, and it needs no explaining |
+| ⭐ **The Convergence** | Every road ends here. Deliberately echoes *Concordance* as its completed form — the two capitals as a matched pair |
+| ⭐ **Zenith** | The highest point of the sky's arc. Short, and it quietly rhymes with **Meridian**, so the two most advanced towns share a family |
+| **Axis Mundi** | "The turning point of the world" — Latin, and it frames the town as the thing everything else orbits |
+| **Cor Mundi** | "Heart of the world" — warmer than *Axis*, same register |
+| **The Firmament** | The vault above everything; apt after a tier built on thresholds |
+| **Omphalos** | Greek, "the navel of the world" — the ancient name for the centre of everything. Evocative, but obscure enough to need a gloss |
+| **Everdawn** | A place where the light never turns. The least austere option |
+| **Wayscross** | Where all ways cross. Plain Anglo, contrasts with the Latin elements |
+| **Ultima** | The last and highest. Clean, though it reads more "final" than "hub" |
+
+⭐ **Recommendation: Thousandgate.** It is the only one that describes what the
+place actually *does* — and after a campaign of walking, arriving somewhere
+defined by its gates lands the reward.
+
+⚠️ **A structural consequence worth naming.** The Eclipsed Citadel is currently
+the **final dungeon** *and* a hybrid zone (Arcane + Sanctus), which the map
+marks optional. It cannot be both: if the grand hub is behind it, the Citadel
+is **required**, and should be drawn as the campaign's capstone rather than one
+more dashed side-zone. ❓ Confirm — or gate the hub behind something else and
+let the Citadel stay optional.
+
 #### 4b. Boss-gated resource areas — ⭐ and the "free levels" problem
 
 ✅ **Every mini-boss and boss arena also holds a resource area.** You can work
@@ -756,10 +828,27 @@ gains not one point of Mining for it. Two more guards on the same idea:
 2. ❓ **Attunements**: adopt the per-tier gate (3 pure-zone bosses per tier)?
    The alternative is per-*element* (all 12 bosses), which is stricter and
    would make the last tier a long grind before Ethereal opens.
-3. ❓ **The second Primal town** needs a name and a purpose. Aldermere is the
-   tutorial village; what is the other one *for*? (Suggestion: the first place
-   with a working market, so buying/selling is taught before the capital makes
-   it a system.)
+3. ❓ **The second Primal town's name.** Its purpose is settled — the **first
+   working market**, where buying and selling are taught before Concordance
+   makes trade a system. It should sound humble and Anglo, like Aldermere,
+   Forgeholm, Galehaven and Rimeholt (all compound names), and ideally hint at
+   trade without announcing it:
+
+   | Name | Why |
+   |---|---|
+   | ⭐ **Pennycross** | A coin and a crossroads. Unmistakably a market village, and it sits beside *Aldermere* without crowding it |
+   | ⭐ **Scalewick** | The scales you weigh goods on; *-wick* is an old word for a settlement, often a trading one |
+   | **Wainbridge** | A *wain* is a cart — the bridge the carts cross to get to market |
+   | **Copperfold** | Copper coin and a sheep fold: the two things a small market town runs on |
+   | **Tallowmoot** | Tallow was a real trade good and a *moot* is an assembly — a village that meets to trade |
+   | **Millbrook** | The mill everyone brings their grain to. Gentle, unmistakably rural |
+   | **Chaffhold** | Where the grain is separated. Humble to the point of self-deprecating |
+   | **Weftbury** | Weaving town — a nice quiet nod to Tailoring even though the station is in Galehaven |
+   | **Bramblewick** | No trade signal, but it sounds like somewhere a level-6 mage would pass through |
+   | **Hearthfen** | Warm and homely; the last comfortable place before the road gets serious |
+
+   ⭐ **Recommendation: Pennycross.** It teaches the town's function in its
+   name, which is exactly what a tutorial-adjacent village should do.
 4. ❓ **Which town owns which crafting skill** — §4 has a proposal, but it was
    drawn for six towns and there are now eight. Two towns will have no station
    unless the list grows.
