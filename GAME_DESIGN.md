@@ -529,11 +529,11 @@ not better at everything.
 
 ✅ **Nine towns — two per tier, plus a post-campaign ninth (§3b).** Six exist
 in the current draft (Aldermere, Forgeholm, Galehaven, Rimeholt, Meridian,
-Vespergate); Concordance, one Primal village, and the Super Capital are new.
+Vespergate); **Pennycross**, **Concordance** and **Zenith** are new.
 
 | Tier | Towns | When |
 |---|---|---|
-| **Primal** | 🏠 **Aldermere** *(home village)* · ⛲ **[new — a second Primal town]** | L1 · ~L8 |
+| **Primal** | 🏠 **Aldermere** *(home village)* · ⛲ **Pennycross** *(the first market)* | L1 · ~L8 |
 | **Kinetic** | ⛏️ **Forgeholm** *(mining)* · ⚓ **Galehaven** *(port)* | ~L15 · ~L22 |
 | **Celestial** | 🏛️ **Concordance** *(capital · gateway to Celestial)* · 🔭 **Meridian** *(observatory)* | ~L30 · ~L36 |
 | **Ethereal** | 🏔️ **Rimeholt** *(the last mortal outpost, above the tree line)* · 🚪 **Vespergate** *(threshold fortress)* | ~L45 · ~L50 |
@@ -657,7 +657,7 @@ towns, leaving two deliberately civic:
 | Town | Tier | Station | Why there |
 |---|---|---|---|
 | 🏠 **Aldermere** | Primal | **Woodcarving** | The woods are its whole geography, and a stave is the first weapon a new mage cuts |
-| ⛲ **[2nd Primal town]** | Primal | — *(first market)* | Teaches buying and selling before Concordance turns trade into a system |
+| ⛲ **Pennycross** | Primal | — *(first market)* | Teaches buying and selling before Concordance turns trade into a system |
 | ⛏️ **Forgeholm** | Kinetic | **Metalworking** | It is the mining town; ore is refined where it comes out of the ground |
 | ⚓ **Galehaven** | Kinetic | **Tailoring** | A port is where cloth and dye arrive from elsewhere — robes are a trade good, not a local one |
 | 🏛️ **Concordance** | Celestial | — *(trade + buffs)* | Value **moves** here; it is not made here |
@@ -707,7 +707,7 @@ while §6a says *"Motes come from combat, not gathering (§6.1)"* — and cites
 advanced nodes are a *gathering* reward or an *enchanting* one, and therefore
 whether a pure crafter can reach the ceiling without fighting.
 
-#### 3b. The ninth town — the grand hub ⭐
+#### 3b. The ninth town — ✅ **ZENITH** ⭐
 
 ✅ **A ninth town sits past the end of the campaign**, reached only by
 defeating **The Eclipsed Citadel**. Everything the tier ladder and the
@@ -727,7 +727,7 @@ key-fragment gates have been building toward.
 ⭐ **One market, two doors — this is the detail that matters.** A second,
 separate marketplace would split liquidity: fewer listings in each, worse
 prices, and a player never sure which door to try. Because Concordance and the
-grand hub are **access points onto one shared order book**, the endgame town
+Zenith are **access points onto one shared order book**, the endgame town
 adds convenience without fragmenting the economy. Worth stating explicitly in
 the build, because "add a market to the new town" is exactly the kind of thing
 that gets implemented as a second table by accident.
@@ -748,33 +748,23 @@ dissolves at endgame**, and that is fine:
   it is happening*, the endgame teleport is a bandage over a design problem
   rather than a reward. Worth asking directly in playtesting.
 
-⚠️ **"Super Capital" is a working title and a misnomer.** Concordance is the
-*capital*; this is something else — the point every road, craft and market
-converges on. The name should say **convergence**, not **rank**.
+✅ **The ninth town is ZENITH.** The highest point of the sky's arc — and
+⭐ **it begins with Z, the last letter, for the last city.** A quiet piece of
+symmetry that costs nothing and rewards anyone who notices. It also rhymes
+with **Meridian**: both are astronomical terms, so the two most advanced towns
+in the world read as a matched pair.
 
-📝 **Ten candidates.** Now that it teleports to every city, names about
-gateways and convergence fit far better than names about height or authority:
+📝 "Super Capital" is retired as a working title — Concordance is the
+*capital*; Zenith is the summit. Runners-up, kept only in case Zenith ever
+needs replacing: Thousandgate, The Convergence, Axis Mundi, Cor Mundi, The
+Firmament, Omphalos, Everdawn, Wayscross, Ultima.
 
-| Name | Why |
-|---|---|
-| ⭐ **Thousandgate** | A city of a thousand gates — the teleport hub, said literally. Grand without being pompous, and it needs no explaining |
-| ⭐ **The Convergence** | Every road ends here. Deliberately echoes *Concordance* as its completed form — the two capitals as a matched pair |
-| ⭐ **Zenith** | The highest point of the sky's arc. Short, and it quietly rhymes with **Meridian**, so the two most advanced towns share a family |
-| **Axis Mundi** | "The turning point of the world" — Latin, and it frames the town as the thing everything else orbits |
-| **Cor Mundi** | "Heart of the world" — warmer than *Axis*, same register |
-| **The Firmament** | The vault above everything; apt after a tier built on thresholds |
-| **Omphalos** | Greek, "the navel of the world" — the ancient name for the centre of everything. Evocative, but obscure enough to need a gloss |
-| **Everdawn** | A place where the light never turns. The least austere option |
-| **Wayscross** | Where all ways cross. Plain Anglo, contrasts with the Latin elements |
-| **Ultima** | The last and highest. Clean, though it reads more "final" than "hub" |
-
-⭐ **Recommendation: Thousandgate.** It is the only one that describes what the
-place actually *does* — and after a campaign of walking, arriving somewhere
-defined by its gates lands the reward.
+⚠️ **Do not rename Zenith casually.** The Z-for-last-city symmetry is
+deliberate; a rename loses something the docs would not otherwise record.
 
 ⚠️ **A structural consequence worth naming.** The Eclipsed Citadel is currently
 the **final dungeon** *and* a hybrid zone (Arcane + Sanctus), which the map
-marks optional. It cannot be both: if the grand hub is behind it, the Citadel
+marks optional. It cannot be both: if Zenith is behind it, the Citadel
 is **required**, and should be drawn as the campaign's capstone rather than one
 more dashed side-zone. ❓ Confirm — or gate the hub behind something else and
 let the Citadel stay optional.
@@ -828,27 +818,14 @@ gains not one point of Mining for it. Two more guards on the same idea:
 2. ❓ **Attunements**: adopt the per-tier gate (3 pure-zone bosses per tier)?
    The alternative is per-*element* (all 12 bosses), which is stricter and
    would make the last tier a long grind before Ethereal opens.
-3. ❓ **The second Primal town's name.** Its purpose is settled — the **first
-   working market**, where buying and selling are taught before Concordance
-   makes trade a system. It should sound humble and Anglo, like Aldermere,
-   Forgeholm, Galehaven and Rimeholt (all compound names), and ideally hint at
-   trade without announcing it:
+3. ✅ **The second Primal town is PENNYCROSS** — a coin and a crossroads. It
+   is the **first working market**, where buying and selling are taught before
+   Concordance turns trade into a system, so a name that states its own
+   function is exactly right for a village this early. Sits beside *Aldermere*
+   in register without crowding it. Runners-up: Scalewick, Wainbridge,
+   Copperfold, Tallowmoot, Millbrook, Chaffhold, Weftbury, Bramblewick,
+   Hearthfen.
 
-   | Name | Why |
-   |---|---|
-   | ⭐ **Pennycross** | A coin and a crossroads. Unmistakably a market village, and it sits beside *Aldermere* without crowding it |
-   | ⭐ **Scalewick** | The scales you weigh goods on; *-wick* is an old word for a settlement, often a trading one |
-   | **Wainbridge** | A *wain* is a cart — the bridge the carts cross to get to market |
-   | **Copperfold** | Copper coin and a sheep fold: the two things a small market town runs on |
-   | **Tallowmoot** | Tallow was a real trade good and a *moot* is an assembly — a village that meets to trade |
-   | **Millbrook** | The mill everyone brings their grain to. Gentle, unmistakably rural |
-   | **Chaffhold** | Where the grain is separated. Humble to the point of self-deprecating |
-   | **Weftbury** | Weaving town — a nice quiet nod to Tailoring even though the station is in Galehaven |
-   | **Bramblewick** | No trade signal, but it sounds like somewhere a level-6 mage would pass through |
-   | **Hearthfen** | Warm and homely; the last comfortable place before the road gets serious |
-
-   ⭐ **Recommendation: Pennycross.** It teaches the town's function in its
-   name, which is exactly what a tutorial-adjacent village should do.
 4. ❓ **Which town owns which crafting skill** — §4 has a proposal, but it was
    drawn for six towns and there are now eight. Two towns will have no station
    unless the list grows.
