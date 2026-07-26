@@ -492,6 +492,229 @@ rejected as an element** (TYPE_EFFECTS_DESIGN §0) — no conflict, but worth
 knowing it's not an element reference. Ditto "Eclipse Weaver," which now
 rhymes with the Solar→Lunar eclipse mechanic by coincidence.
 
+### World design session — 📝 IN PROGRESS (2026-07-25)
+
+Working through towns, flow, gating and what brings a player back. **Nothing
+here is built yet**; the map below is the previous draft and gets rebuilt from
+whatever this section settles on.
+
+#### 1. Structure — confirmed shape
+
+✅ **Twelve pure zones, four groups of three, one group per tier.** Each pure
+zone is the undiluted home of one element's bestiary and the best source of
+its motes. That is the spine, and it is what makes "visit everywhere" a
+mechanical need rather than a completionist urge (see §3 below).
+
+✅ **The nine hybrid zones are optional** — never required, but worth going to.
+Pure zones are the road; hybrids are the shoulder.
+
+That only works if the perks are real, so they need designing rather than
+assuming. Candidates, strongest first:
+
+| Pull | Why it works |
+|---|---|
+| ⭐ **Two mote types from one zone** | A hybrid drops both its elements' motes, so it is the efficient stop when you need a pair — no other zone can offer that |
+| ⭐ **The counter matchup is the reward** | A hybrid pairs elements on a counter edge, so it is where you *learn* a matchup safely before meeting it in PvP. Frame it as a proving ground, not a lecture |
+| **Denser encounters** | More fights per run than a pure zone of the same level — the farming spot |
+| **Hybrid-only materials** | Ice only exists where Aqua meets Aero; magma only where Pyro meets Geo. Recipes that want those must come here |
+| **Better first-clear reward** | Optional content should pay *better* than required content for the same level, since it costs a detour |
+
+⚠️ **The trap to avoid:** if hybrids pay strictly better than pure zones, the
+"optional" content becomes mandatory in practice and the pure zones — the ones
+the Attunement gate is built on — turn into a chore to rush. Hybrids should be
+**better at something specific** (paired motes, hybrid materials, density),
+not better at everything.
+
+#### 2. Towns — and the capital
+
+✅ **Eight towns — two per tier.** Six exist in the current draft (Aldermere,
+Forgeholm, Galehaven, Rimeholt, Meridian, Vespergate); the capital and one
+Primal village are new.
+
+| Tier | Towns | When |
+|---|---|---|
+| **Primal** | 🏠 **Aldermere** *(home village)* · ⛲ **[new — a second Primal town]** | L1 · ~L8 |
+| **Kinetic** | ⛏️ **Forgeholm** *(mining)* · ⚓ **Galehaven** *(port)* | ~L15 · ~L22 |
+| **Celestial** | 🏛️ **[CAPITAL]** *(gateway to Celestial)* · 🔭 **Meridian** *(observatory)* | ~L30 · ~L36 |
+| **Ethereal** | 🏔️ **Rimeholt** *(high and remote)* · 🚪 **Vespergate** *(threshold fortress)* | ~L45 · ~L50 |
+
+✅ **The capital opens at the mid-point — the Kinetic→Celestial boundary
+(~L30).** Two full tiers behind you, two ahead; it is the literal middle of
+the campaign and the moment the world stops being provincial.
+
+- It is the **"act two begins"** beat, and the reward for finishing Kinetic.
+- Celestial spokes off it, so it becomes your base for the back half rather
+  than a place you pass through. Difficulty still scales with distance from
+  home — the capital simply *becomes* home.
+- Aldermere stays a humble village, which it should: opening in the capital
+  would spend the game's biggest location on a player who cannot appreciate
+  it.
+
+✅ **What the capital is for** (this shapes the name):
+
+- **The trade capital of the world**, and one of the only planned
+  **player-to-player trading hubs**. Everywhere else you make things; here you
+  exchange them.
+- **Hour-long buffs** available from its districts — a real reason to route
+  through before a long session. 📝 These are the real-time timed buffs
+  ITEMS §6b.1 has as a TODO; the capital is their natural home and probably
+  their first implementation.
+- ⭐ **Still no crafting stations.** The six making-skills stay decentralised
+  (§4 below) — the capital is where value *moves*, not where it is made.
+
+📝 **Ten name candidates.** Magisterium was too on-the-nose, so these lean
+magic-*adjacent* — trade, convergence, scholarship, navigation — rather than
+shouting "wizards live here". Grouped by register:
+
+| Name | Register | Why it works |
+|---|---|---|
+| ⭐ **Concordance** | scholarly | An agreement *and* an index of a text — a trade capital and a place of learning in one word |
+| ⭐ **Thousandgate** | grand | A great city measured by how much passes through it. Says "trade hub" instantly, no magic needed |
+| ⭐ **Cynosure** | navigational | The star everything steers by — the map's centre, and it earns its place at the Celestial gateway |
+| **Vellum** | understated | The skin spells are written on. Quiet, unusual, and unmistakably a magic world's city |
+| **Wyrdholm** | Old English | *Wyrd* is fate/destiny — magic-adjacent without a single Latin root, a nice contrast against the elements |
+| **Auriel** | regal | Gold and air; sounds like a capital, stays vague about why |
+| **Sable Court** | courtly | Implies a seat of power and an institution to petition |
+| **The Weft** | weaving | The cross-threads that hold a weave together — a trade city as the thing binding the world |
+| **Orison** | devotional | A spoken prayer; elegant, and pairs oddly well with Sanctus being an element |
+| **Emberquay** | mercantile | A quay is where goods land; the ember keeps it warm rather than industrial |
+
+⚠️ **Names to avoid, and why:** *Arcanum* and *Arcanis* read as the Arcane
+element's home town. *Sanctum* collides with Sanctus. *Caelum* and *Aether*
+collide with the Celestial and Ethereal tier names. *Meridian* is taken by the
+observatory town.
+
+#### 3. Gating — two different problems, two different tools
+
+The brief asked for gates that stop skipping *and* mechanisms that make people
+want the content. Those are **not the same problem**, and conflating them is
+how games end up with walls that annoy the prepared player.
+
+⚠️ **A level gate stops you rushing ahead. It does nothing about skipping.**
+A player who out-levels a zone can walk straight past it — level gates only
+have a floor, never a ceiling.
+
+**The hard gate — ⭐ Attunements.**
+
+📝 **This is a new proposal, not something from the existing docs** — it was
+invented in this session, which is why it won't be familiar. In one line:
+
+> Each tier's road is sealed until you hold that tier's **Attunement**, a key
+> item earned by defeating **all three of its pure-zone bosses**.
+
+So to reach Celestial content you must have beaten the Electro, Aero and Geo
+bosses — not merely reached level 30. It is the only mechanism here that makes
+*breadth* mandatory; everything else in this section is a pull rather than a
+wall.
+
+This is the piece that actually prevents skipping, because it is keyed to
+*breadth* rather than *level*. Combined with the existing element unlocks you
+get a clean two-lock door:
+
+| Lock | Stops | Earned by |
+|---|---|---|
+| **Level** (15/30/45) | rushing ahead under-levelled | XP |
+| **Attunement** | skipping sideways past content | clearing all 3 pure zones of the tier |
+
+It is also thematically exact: you attune to a *tier* of magic, which is
+precisely what unlocking Celestial means.
+
+**The soft pull — the mote economy already does this work.**
+
+Enchanting needs **element-bound motes**, and each element's motes come best
+from its own pure zone. A Pyro enchant therefore means a trip to Cinderpeak.
+Twelve elements, twelve zones, and an endgame that wants all of them — that is
+an organic reason to tour the whole map that never has to be enforced.
+
+💡 Other pulls worth considering, cheapest first:
+- **First-clear bonuses** — a one-time reward per zone, so completion is
+  rewarded without punishing repetition.
+- **Set components by boss** — spread the five archetypes' Tier III/IV
+  components across different bosses so a full set requires a tour (ITEMS
+  §3.5 already demands "rare components from difficult enemies"; this just
+  says *which*).
+- **Bestiary/codex completion** — a passive per element mastered.
+
+⚠️ **One thing to watch:** attunements make the *first* playthrough linear by
+design. That is right for a campaign, but if alt characters or seasons ever
+happen, they need a way to inherit or fast-track attunements or the second
+run-through will feel like a chore.
+
+#### 4. What makes a town worth returning to
+
+⭐ **Decentralise crafting.** The strongest available lever: make each town the
+**only** place one skill can be practised, so travel stays meaningful after
+the levelling is done.
+
+| Town | Its exclusive station | Why there |
+|---|---|---|
+| Aldermere | **Woodcarving** | the woods are its whole geography |
+| Forgeholm | **Metalworking** | mining town |
+| Galehaven | **Tailoring** | a port is where cloth and trade arrive |
+| Rimeholt | **Jewelry** | mountain gems |
+| Meridian | **Enchanting** | an observatory is where you study |
+| Vespergate | **Potions / Alchemy** | a threshold fortress needs its own supply |
+
+⭐ **And give the capital no crafting stations at all.** The instinct is to put
+everything in the capital; that would kill the other six towns overnight.
+Instead the capital owns what nowhere else can: **the bank, the auction/trade
+floor, contracts, and the PvP + Academy entrances**. You bank in the capital
+and you *make things* out in the world.
+
+**Advanced nodes as previews** (the brief's own idea, and a good one):
+
+> Place a resource node near each town that is **far above your current skill**,
+> visible and clearly labelled — *"Adamant Vein · requires Mining 40"*.
+
+⭐ Sharpen it: put the node for a **later tier's material next to an earlier
+tier's town**. You walk past the Adamant Vein outside Aldermere at level 6 and
+finally crack it at level 40 — which drags you back to the starting village at
+the endgame. That single trick makes every town permanently relevant and costs
+nothing but placement.
+
+⚠️ **Blocked on a contradiction in ITEMS_DESIGN.** §6.1 says *"Motes also drop
+from gathering — a Pyro-attuned vein yields Pyro Dust alongside its ore"*,
+while §6a says *"Motes come from combat, not gathering (§6.1)"* — and cites
+§6.1 for the opposite of what §6.1 says. ❓ **Which is it?** It decides whether
+advanced nodes are a *gathering* reward or an *enchanting* one, and therefore
+whether a pure crafter can reach the ceiling without fighting.
+
+#### 5. Settled this session
+
+| Decision | |
+|---|---|
+| Hybrid zones are **optional**, pulled by paired motes, hybrid-only materials and density — never required | ✅ |
+| **Eight towns, two per tier** | ✅ |
+| The capital opens at the **mid-point** (Kinetic→Celestial, ~L30) | ✅ |
+| The capital is the **trade hub** with **hour-long buffs**, and has **no crafting stations** | ✅ |
+| Motes drop from **combat and gathering** — steady from the first, random drops/events from the second (ITEMS §6.1 corrected) | ✅ |
+
+#### 6. Still open
+
+1. ❓ **Capital name** — from the ten above, or a different direction?
+2. ❓ **Attunements**: adopt the per-tier gate (3 pure-zone bosses per tier)?
+   The alternative is per-*element* (all 12 bosses), which is stricter and
+   would make the last tier a long grind before Ethereal opens.
+3. ❓ **The second Primal town** needs a name and a purpose. Aldermere is the
+   tutorial village; what is the other one *for*? (Suggestion: the first place
+   with a working market, so buying/selling is taught before the capital makes
+   it a system.)
+4. ❓ **Which town owns which crafting skill** — §4 has a proposal, but it was
+   drawn for six towns and there are now eight. Two towns will have no station
+   unless the list grows.
+5. ❓ **What the hour-long buffs actually are.** Flat XP/gold/luck is the safe
+   answer; something build-shaping would be more interesting but risks
+   becoming mandatory. They also need the persistent real-time buff machinery
+   ITEMS §6b.1 flags as unbuilt.
+6. ❓ **Does trading need a sink?** A player-to-player market plus a gold
+   economy usually needs a tax or fee, or currency inflates. Worth deciding
+   before it ships rather than after.
+7. ⚠️ **Rimeholt is currently listed as Ethereal (~L45)** but was written as a
+   mountain village on the Kinetic→Celestial road. Either move it or rename
+   the Ethereal slot — the two placements can't both be true.
+
+---
+
 ### World map — 📝 DRAFT v2: 12 pure zones + 9 hybrids
 
 Rebuilt for the twelve-element roster. **Twelve pure zones — one per element**

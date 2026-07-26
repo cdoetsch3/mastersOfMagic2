@@ -696,9 +696,16 @@ Radiant). So mote drops fall out of existing data for free:
 
 - A region's monsters drop motes of **that region's elements**; neutral motes
   drop everywhere.
-- ✅ **Motes also drop from gathering** in certain areas — a Pyro-attuned vein
-  yields Pyro Dust alongside its ore. This gives gatherers their own path to
-  motes, so the top of the crafting tree isn't gated behind combat alone.
+- ✅ **Motes come from BOTH combat and gathering** (ruling, 2026-07-25).
+  Combat is the steady, predictable source — a region's monsters drop motes of
+  that region's elements. Gathering is the *irregular* one: motes appear as
+  **random drops and random events** while working a node, not as a guaranteed
+  yield per swing. A Pyro-attuned vein sometimes gives up Pyro Dust alongside
+  its ore.
+  ⭐ The asymmetry is deliberate: a fighter can *plan* their mote income, a
+  gatherer *stumbles into* it. Neither path is closed, and neither is a
+  reliable substitute for the other, so the top of the crafting tree still
+  rewards doing both without demanding it.
 - Mote **tier scales with monster (or node) level**, not player level — so
   farming low-level zones yields low-tier motes (mirrors the
   PROGRESSION_DESIGN rule that crafting XP scales with material tier, not
@@ -759,9 +766,10 @@ structure above is what the item system is built against for now.
 📝 Notes:
 - **"Tailoring"** rather than a generic "crafting" is apt: this is a game of
   robes, hats and gloves. It also frees the name space for other makers.
-- **Motes come from combat, not gathering** (§6.1) — so high-tier crafting
-  requires *both* fighting and skilling. That interplay is a feature: neither
-  a pure duelist nor a pure crafter can reach the ceiling alone.
+- **Motes come from combat *and* gathering** (§6.1) — steadily from the first,
+  as random drops and events from the second. High-tier crafting still wants
+  both fighting and skilling, since gathering alone will not supply motes at a
+  rate you can plan around.
 
 ### 6a.1 Skill → slot coverage ✅
 
