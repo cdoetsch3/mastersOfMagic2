@@ -13,6 +13,10 @@ final Set<String> _spellIds = Spellbook.all.map((s) => s.id).toSet();
 
 /// A saved loadout: ordered element and spell slots by id. Persisted as part
 /// of the player document; converts to a runtime [Loadout] for combat.
+///
+/// ⭐ Capacity is a **single shared pool** — see [slotsUsed]. The wire format
+/// keeps two id lists only for backward compatibility with saves written before
+/// the pools merged; it is a storage detail, not two separate budgets.
 class LoadoutPreset {
   String name;
   List<String> elementIds;
@@ -30,14 +34,36 @@ class LoadoutPreset {
         spellIds: List.of(Progression.starterPresetSpellIds),
       );
 
-  /// Truncates to the current slot caps (used to migrate saves made when the
-  /// caps were larger).
-  void clampToCaps() {
-    if (elementIds.length > Progression.startingElementSlots) {
-      elementIds = elementIds.sublist(0, Progression.startingElementSlots);
+  /// Slots this preset fills, elements and spells counted alike — the pool is
+  /// shared, so a fourth element costs what a tenth spell would have.
+  int get slotsUsed => elementIds.length + spellIds.length;
+
+  /// Truncates to the current caps (used to migrate saves made when the caps
+  /// were larger). Clamps the per-kind *arena* limits first — the duel screen
+  /// has a fixed number of shortcut keys — then the shared pool, trimming
+  /// spells before elements since elements are the scarcer, more foundational
+  /// pick.
+  ///
+  /// [slotBudget] defaults to the absolute ceiling, which with per-kind limits
+  /// of 8 and 10 can never actually bite (8 + 10 = 18 < 20). It becomes the
+  /// binding constraint once level gating turns on, at which point callers pass
+  /// `Progression.usableSlotsAtLevel(level)`. Taking it as a parameter now means
+  /// that switch is a one-line change at the call site rather than a rewrite.
+  void clampToCaps({int slotBudget = Loadout.maxSlots}) {
+    if (elementIds.length > Loadout.maxElementSlots) {
+      elementIds = elementIds.sublist(0, Loadout.maxElementSlots);
     }
-    if (spellIds.length > Progression.startingSpellSlots) {
-      spellIds = spellIds.sublist(0, Progression.startingSpellSlots);
+    if (spellIds.length > Loadout.maxSpellSlots) {
+      spellIds = spellIds.sublist(0, Loadout.maxSpellSlots);
+    }
+    var overflow = slotsUsed - slotBudget;
+    if (overflow <= 0) return;
+
+    final spellsToDrop = overflow.clamp(0, spellIds.length);
+    spellIds = spellIds.sublist(0, spellIds.length - spellsToDrop);
+    overflow -= spellsToDrop;
+    if (overflow > 0) {
+      elementIds = elementIds.sublist(0, elementIds.length - overflow);
     }
   }
 

@@ -220,10 +220,10 @@ void main() {
       bruno.shield = ActiveShield.elemental(MagicElement.solar, 10);
       duel.resolveTurn(
           CastAction(Spellbook.volley), const ChargeAction(MagicElement.aero));
-      // Volley rolls 8-11 x4 (32-44 total); the 10-point shield absorbs 10
-      // raw, everything past it strikes health.
+      // Volley rolls 7-10 x4 (28-40 total); the 10-point shield absorbs 10
+      // raw, everything past it strikes health — so 110 - total.
       expect(bruno.shield, isNull);
-      expect(bruno.hp, inInclusiveRange(66, 78));
+      expect(bruno.hp, inInclusiveRange(70, 82));
     });
   });
 

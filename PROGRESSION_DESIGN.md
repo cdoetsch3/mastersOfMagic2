@@ -19,12 +19,27 @@ Status: 📝 **draft — not implemented.**
 - ✅ **Preset validation:** a preset must contain **at least 1 element** and
   **at least 1 offensive spell**. (Guarantees every duelist can, in
   principle, win.)
-- 📝 **Slot growth proposal:** +1 slot at each 5-level milestone
-  (L5, 10, 15, … 45) → **14 slots at L45**. Keeps slot pressure real at max
-  level: 9+ elements and a full spellbook will never all fit, so split
-  decisions persist forever. ❓ Confirm rate (or provide a schedule).
+- ✅ **Slot growth — settled: 5 at L1 → 15 at L50.** Ten gains across the
+  curve, front-loaded so a new player feels the pool open up and later gains
+  stretch out:
+
+  | Slot | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+  |---|---|---|---|---|---|---|---|---|---|---|
+  | **Level** | 3 | 6 | 10 | 15 | 20 | 26 | 32 | 38 | 44 | 50 |
+
+- ✅ **Equipment can add up to +5 more**, so the absolute ceiling is **20
+  slots**. Levelling alone never reaches it — the last quarter of your pool is
+  something you gear for.
+- ✅ Slot pressure stays real forever: 12 elements + 26 spells is 38 things
+  competing for at most 20 slots, so split decisions never stop mattering.
+- ⚠️ **Enforcement is deliberately LAST.** Level-gating the pool is one of the
+  final things to switch on, because playtesting needs every element and spell
+  available at once. Until then the curve is *data only* and the effective cap
+  is the ceiling — `Progression.enforceSlotLimits = false`.
 - 💡 UI: slot count displayed as one bar with element/spell chips filling it,
   so the tradeoff is visible while editing.
+- ❓ Which equipment grants slots, and at what rarity — ITEMS_DESIGN has no
+  slot-granting modifier in its vocabulary yet.
 
 ---
 
@@ -254,6 +269,14 @@ on your charge cap.*
 ---
 
 ## Changelog
+
+**Rev 3** — Slot growth settled: **5 at L1 → 15 at L50** on an explicit
+ten-step schedule (L3/6/10/15/20/26/32/38/44/50), replacing the "+1 per 5
+levels → 14 at L45" proposal; equipment adds up to +5 for an absolute ceiling
+of **20**. Implemented as a genuinely shared pool in code (`Loadout` now stores
+one ordered `List<LoadoutSlot>`; `elements`/`spells` are views over it), with
+level enforcement deliberately left off (`enforceSlotLimits = false`) so
+playtesting keeps every element and spell. Open: which equipment grants slots.
 
 **Rev 2** — Unlock schedule completed: Barrage → L20 (dupe resolved),
 Discharge → L15, Drain + Cataclysm → L40 (Cataclysm briefly at L35, moved so

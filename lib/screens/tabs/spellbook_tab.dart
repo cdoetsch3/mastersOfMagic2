@@ -4,6 +4,7 @@ import 'package:mom_engine/mom_engine.dart';
 import '../../game/element_style.dart';
 import '../../game/game_state.dart';
 import '../../game/player_profile.dart';
+import '../../game/loadout.dart';
 import '../../game/progression.dart';
 import '../../ui/app_theme.dart';
 import '../element_detail_dialog.dart';
@@ -40,12 +41,18 @@ class SpellbookTab extends StatelessWidget {
               const SizedBox(height: 10),
               _guideLink(context),
               const SizedBox(height: 12),
-              SectionLabel('Elements  ·  ${preset.elementIds.length}/'
-                  '${Progression.startingElementSlots}   (tap ⓘ for details)'),
+              // One shared pool: show what the whole loadout costs, then the
+              // per-kind breakdown, so the trade-off is visible while editing.
+              SectionLabel('Loadout  ·  ${preset.slotsUsed}/'
+                  '${Progression.usableSlotsAtLevel(p.level)} slots'
+                  '   (elements and spells share these)'),
+              const SizedBox(height: 12),
+              SectionLabel('Elements  ·  ${preset.elementIds.length}'
+                  '   (tap ⓘ for details)'),
               _elementGrid(context, game, p, preset, canEdit),
               const SizedBox(height: 14),
-              SectionLabel('Spells  ·  ${preset.spellIds.length}/'
-                  '${Progression.startingSpellSlots}   (tap ⓘ for details)'),
+              SectionLabel('Spells  ·  ${preset.spellIds.length}'
+                  '   (tap ⓘ for details)'),
               _spellGrid(context, game, p, preset, canEdit),
             ],
           ),
@@ -196,7 +203,8 @@ class SpellbookTab extends StatelessWidget {
       if (selected) {
         if (ids.length <= 1) return; // keep at least one
         ids.remove(element.name);
-      } else if (ids.length < Progression.startingElementSlots) {
+      } else if (preset.slotsUsed < Progression.usableSlotsAtLevel(p.level) &&
+          ids.length < Loadout.maxElementSlots) {
         ids.add(element.name);
       }
       game.savePreset(p.activePresetIndex,
@@ -301,7 +309,8 @@ class SpellbookTab extends StatelessWidget {
       if (selected) {
         if (ids.length <= 1) return;
         ids.remove(spell.id);
-      } else if (ids.length < Progression.startingSpellSlots) {
+      } else if (preset.slotsUsed < Progression.usableSlotsAtLevel(p.level) &&
+          ids.length < Loadout.maxSpellSlots) {
         ids.add(spell.id);
       }
       game.savePreset(p.activePresetIndex,

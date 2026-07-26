@@ -371,10 +371,13 @@ MoM2 adds **spell slots** unlocked via leveling.
   currency (exact mechanism TBD). Managed from the Spellbook tab. **Temporarily all
   spells are unlocked** until the leveling/unlock schedule is implemented.
 - ✅ **Loadout capacity (reworked)**: one pool of **slots shared between elements and
-  spells** (5 total at L1, growing with level) — 4 elements + 1 spell or 1 element +
-  4 spells are both legal splits. Presets must include ≥1 element and ≥1 offensive
-  spell. Supersedes the old "3 element slots + 5 spell slots" split. (Keybinds still
-  support up to 8 elements / 10 spells.)
+  spells** — 4 elements + 1 spell or 1 element + 4 spells are both legal splits.
+  **5 slots at L1 → 15 at L50, +5 more from equipment (ceiling 20).** Presets must
+  include ≥1 element and ≥1 offensive spell. Supersedes the old "3 element slots +
+  5 spell slots" split. (Keybinds still support up to 8 elements / 10 spells, so no
+  pool can be spent entirely on one kind.) Schedule in
+  [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) §1. ⚠️ Level-gating the pool is
+  intentionally the *last* thing implemented, so playtesting keeps everything.
 - ✅ **Loadout presets**: named spell/element presets in the Spellbook tab. 1 preset
   slot initially, up to 5 unlocked by leveling.
 - ✅ **Loadout switching rules**: in 1-player mode, loadouts can only be changed at a
@@ -1361,8 +1364,10 @@ level-ups, inventory placeholder, spellbook with presets, rotate-to-duel guard
   from the Social tab; guest play preserved (no gate). Email/password worked
   out of the box (client init provisioned the Auth config); no console toggle
   needed. **Captcha via App Check is still pending** a reCAPTCHA key.
-- ✅ Loadout caps: **3 element + 5 spell slots**; **all spells unlocked** for now;
-  old saves auto-clamped on load.
+- ✅ Loadout caps: **one shared pool** (§4 — 5 at L1 → 15 at L50, ceiling 20), with
+  per-kind keybind limits of 8 elements / 10 spells; **all spells unlocked** and the
+  pool un-gated for now; old saves auto-clamped on load. (Superseded the earlier
+  "3 element + 5 spell slots", then "5 + 10", splits.)
 - ✅ Hosting cache: app-shell files (`index.html`, `flutter_bootstrap.js`,
   `flutter_service_worker.js`, `main.dart.js`) serve `Cache-Control: no-cache`
   so returning players always get the latest build.

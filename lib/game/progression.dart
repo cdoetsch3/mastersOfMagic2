@@ -1,5 +1,7 @@
 import 'package:mom_engine/mom_engine.dart';
 
+import 'loadout.dart';
+
 /// Leveling, unlock, and reward rules. All values are Phase-1 tentative and
 /// live in one place so balancing is a single-file edit.
 abstract final class Progression {
@@ -78,17 +80,40 @@ abstract final class Progression {
   /// a later-phase refinement).
   static bool isElementUnlockedAt(MagicElement element, int level) => true;
 
-  // ---- Loadout capacity ----------------------------------------------
+  // ---- Loadout slot pool ---------------------------------------------
+  //
+  // ⭐ Elements and spells share ONE pool. Spending a slot on a fourth element
+  // is spending it away from a tenth spell — that tension is the strategy.
 
-  /// How many element / spell slots a preset may fill "to start out with".
-  /// These will grow with level once the unlock schedule is set.
-  ///
-  /// 5 of the 12 elements and 10 of the 26 spells — enough room to bring a
-  /// real plan (a tier, its counters, and answers) without being able to carry
-  /// the whole book. The duel screen's shortcuts already cover both: 1-8 for
-  /// elements, QWERTASDFG for spells.
-  static const int startingElementSlots = 5;
-  static const int startingSpellSlots = 10;
+  /// Slots from levelling alone: **5 at level 1, 15 at level 50.**
+  static const int startingSlots = 5;
+  static const int slotsAtCap = 15;
+
+  /// The extra slots equipment can grant on top of the level curve, taking the
+  /// ceiling to [Loadout.maxSlots] = 20.
+  static const int maxEquipmentSlots = 5;
+
+  /// Levels at which a slot is granted — ten gains across levels 1-50, spaced
+  /// so the early ones land close together (a new player feels the pool open
+  /// up) and later ones stretch out.
+  static const List<int> slotUnlockLevels = [
+    3, 6, 10, 15, 20, 26, 32, 38, 44, 50,
+  ];
+
+  /// Slots unlocked by levelling at [level] — [startingSlots] plus one per
+  /// threshold passed, so exactly [slotsAtCap] at 50.
+  static int slotsAtLevel(int level) =>
+      startingSlots + slotUnlockLevels.where((l) => l <= level).length;
+
+  /// ⚠️ TEMPORARY: the pool is not level-gated yet. Enforcing [slotsAtLevel] is
+  /// deliberately one of the LAST things to turn on, because playtesting needs
+  /// every element and spell available at once. Until then the effective cap is
+  /// the absolute ceiling, and [slotsAtLevel] is data only.
+  static const bool enforceSlotLimits = false;
+
+  /// Slots a player of [level] may actually fill right now.
+  static int usableSlotsAtLevel(int level) =>
+      enforceSlotLimits ? slotsAtLevel(level) : Loadout.maxSlots;
 
   /// The elements a brand-new player's first preset is filled with.
   static const List<String> starterPresetElementIds = ['pyro', 'aqua', 'flora'];

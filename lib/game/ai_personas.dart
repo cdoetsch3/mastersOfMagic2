@@ -8,6 +8,12 @@ import 'mage_apparel.dart';
 /// A named AI opponent with a level, look, spell kit, and tactical skill.
 /// Personas fill two roles: a practice roster, and matchmaking stand-ins
 /// when no human opponent is found.
+///
+/// ⚠️ **The roster is NOT the intelligence scale.** Intelligence 1–10
+/// (GAME_DESIGN §6b) is a property every enemy carries — wild monsters,
+/// mini-bosses, bosses and these personas alike. This list is just the handful
+/// of *named, fightable* opponents; there is no one-persona-per-rating
+/// mapping, and adding a persona does not mean adding a rating.
 class AiPersona {
   final String id;
   final String name;
@@ -16,9 +22,16 @@ class AiPersona {
   final MageApparel apparel;
   final Loadout loadout;
 
-  /// Skill dials (see TunableAi): blunder rate falls and tactical instincts
-  /// sharpen as level rises.
-  final double mistakeChance;
+  /// **Intelligence 1–10** — how *well* this opponent plays, on the capability
+  /// ladder in GAME_DESIGN §6b. 1 flicks forever · 3 is random · 5 is
+  /// counter-aware · 7 predicts · 9 is genuinely sharp · 10 is optimal.
+  ///
+  /// Deliberately separate from [aggression] and [caution], which describe how
+  /// an opponent *prefers* to play. Skill and personality are different axes:
+  /// a cautious level-9 and a reckless level-9 are both hard, differently.
+  final int intelligence;
+
+  /// Personality dials (see TunableAi) — orthogonal to [intelligence].
   final double aggression;
   final double caution;
 
@@ -27,12 +40,16 @@ class AiPersona {
     required this.name,
     required this.title,
     required this.level,
+    required this.intelligence,
     required this.apparel,
     required this.loadout,
-    required this.mistakeChance,
     required this.aggression,
     required this.caution,
   });
+
+  /// Blunder rate implied by [intelligence] — the one place skill becomes a
+  /// number, so a persona can never drift out of step with its rating.
+  double get mistakeChance => blunderChanceForIntelligence(intelligence);
 
   DuelAi buildBrain() => TunableAi(
         spells: loadout.spells,
@@ -42,80 +59,165 @@ class AiPersona {
       );
 }
 
+/// Blunder rate per intelligence rating. An explicit table rather than a fitted
+/// curve: ten discrete values are easier to tune by hand, and the shape matters
+/// far more at the low end than the high.
+///
+/// Top-level on purpose — the 1-10 ladder is shared enemy infrastructure, not a
+/// persona detail. Wild monsters, mini-bosses and bosses all rate on this same
+/// scale without going through [AiPersona].
+const Map<int, double> _blunderByIntelligence = {
+  1: 0.60, 2: 0.48, 3: 0.35, 4: 0.28, 5: 0.22,
+  6: 0.16, 7: 0.10, 8: 0.07, 9: 0.04, 10: 0.00,
+};
+
+/// Chance that an enemy of the given [intelligence] throws away its turn.
+///
+/// ⚠️ Blunder rate is only the part of the ladder that is **implemented**. The
+/// higher rungs are defined behaviourally in GAME_DESIGN §6b — 5 is
+/// counter-aware, 7 predicts, 9 is genuinely sharp — and `TunableAi` cannot do
+/// any of that yet: it is effect-blind and has no opponent model. So today a
+/// rating of 7 differs from 9 only by how often it fumbles, not by insight.
+/// Ratings above ~6 are declarative until the AI grows those competences.
+double blunderChanceForIntelligence(int intelligence) =>
+    _blunderByIntelligence[intelligence.clamp(1, 10)] ?? 0.25;
+
 /// The Phase-1 roster, weakest to strongest.
 abstract final class AiRoster {
+  // Loadouts scale with level in BOTH kit and size. Elements and spells share
+  // one slot pool (PROGRESSION_DESIGN §1), and each persona fills exactly the
+  // pool a *player* of its level would have — 5 slots at L1 up to 15 at L50 —
+  // so an opponent is never carrying more than the person fighting it.
+  //
+  // Every kit is also legal for its level (Kinetic L15, Celestial L30, Ethereal
+  // L45), so no opponent wields magic the player could not yet face.
+
+  // 5 slots — exactly a level-1 player's pool, so the tutorial dummy is not
+  // quietly better equipped than the person fighting it.
   static final Loadout _novice = Loadout(
-    elements: const [MagicElement.geo, MagicElement.aqua, MagicElement.pyro]
-        .toList(),
-    spells: [
-      Spellbook.flick,
-      Spellbook.bolt,
-      Spellbook.flurry,
-      Spellbook.ward,
-      Spellbook.sap,
-    ],
+    elements: const [MagicElement.pyro, MagicElement.aqua],
+    spells: [Spellbook.flick, Spellbook.bolt, Spellbook.ward],
   );
 
   static final Loadout _skirmisher = Loadout(
-    elements:
-        const [MagicElement.pyro, MagicElement.aero, MagicElement.electro]
-            .toList(),
+    elements: const [
+      MagicElement.pyro,
+      MagicElement.aero,
+      MagicElement.electro,
+    ],
     spells: [
       Spellbook.flick,
       Spellbook.bolt,
       Spellbook.blast,
       Spellbook.jolt,
       Spellbook.ward,
+      Spellbook.aegis,
     ],
   );
 
   static final Loadout _warden = Loadout(
-    elements: const [MagicElement.geo, MagicElement.flora, MagicElement.sanctus]
-        .toList(),
+    elements: const [
+      MagicElement.geo,
+      MagicElement.flora,
+      MagicElement.aqua,
+      MagicElement.aero,
+    ],
     spells: [
       Spellbook.bolt,
       Spellbook.blast,
+      Spellbook.surge,
       Spellbook.aegis,
       Spellbook.bulwark,
       Spellbook.barrier,
+      Spellbook.hallow,
     ],
   );
 
+  // Celestial — the first roster kit to use Solar/Lunar/Astral at all, so the
+  // three newest elements are something a player actually faces.
   static final Loadout _duelist = Loadout(
-    elements:
-        const [MagicElement.pyro, MagicElement.aqua, MagicElement.umbra]
-            .toList(),
+    elements: const [
+      MagicElement.solar,
+      MagicElement.lunar,
+      MagicElement.astral,
+      MagicElement.electro, // not Ethereal — that tier is still locked at 40
+    ],
     spells: [
       Spellbook.flick,
       Spellbook.blast,
+      Spellbook.surge,
       Spellbook.jolt,
       Spellbook.bulwark,
-      Spellbook.surge,
+      Spellbook.rampart,
+      Spellbook.empower,
+      Spellbook.discharge,
+      Spellbook.volley,
     ],
   );
 
+  // Al'Dorian — Ethereal, and a full level-50 pool: 15 slots, split 5/10.
+  static final Loadout _lastWarden = Loadout(
+    elements: const [
+      MagicElement.sanctus,
+      MagicElement.umbra,
+      MagicElement.arcane,
+      MagicElement.solar,
+      MagicElement.aqua,
+    ],
+    spells: [
+      Spellbook.bolt,
+      Spellbook.surge,
+      Spellbook.ruin,
+      Spellbook.leech,
+      Spellbook.bulwark,
+      Spellbook.sanctuary,
+      Spellbook.barrier,
+      Spellbook.hallow,
+      Spellbook.empower,
+      Spellbook.quicken,
+    ],
+  );
+
+  // Procarius — every tier represented, and the whole toolbox.
   static final Loadout _archmage = Loadout(
-    elements:
-        const [MagicElement.sanctus, MagicElement.umbra, MagicElement.electro]
-            .toList(),
+    elements: const [
+      MagicElement.arcane,
+      MagicElement.umbra,
+      MagicElement.lunar,
+      MagicElement.electro,
+      MagicElement.pyro,
+    ],
     spells: [
       Spellbook.jolt,
       Spellbook.blast,
-      Spellbook.bulwark,
-      Spellbook.overload,
+      Spellbook.ruin,
       Spellbook.cataclysm,
+      Spellbook.barrage,
+      Spellbook.drain,
+      Spellbook.sanctuary,
+      Spellbook.barrier,
+      Spellbook.overload,
+      Spellbook.discharge,
     ],
   );
 
+  /// Weakest to strongest. ✅ **Levels spread evenly from 1 to 50** — the
+  /// player cap — with Procarius alone above it at 60, matching the Eclipsed
+  /// Citadel's enemy band (GAME_DESIGN §5).
+  ///
+  /// ✅ Each persona's loadout is **legal for its level**: Kinetic elements
+  /// only from L15, Celestial from L30, Ethereal from L45. And loadout *size*
+  /// scales too — a level-50 opponent fills the whole 15-slot pool, because a
+  /// player at 50 can. All of this is enforced by `test/ai_roster_test.dart`.
   static final List<AiPersona> all = [
     AiPersona(
       id: 'wick',
       name: 'Wick',
       title: 'Candle Apprentice',
       level: 1,
+      intelligence: 1, // flicks and hopes — the tutorial dummy
       apparel: MageApparel.apprenticeBlue,
       loadout: _novice,
-      mistakeChance: 0.55,
       aggression: 0.5,
       caution: 0.15,
     ),
@@ -123,7 +225,8 @@ abstract final class AiRoster {
       id: 'brightgale',
       name: 'Brightgale',
       title: 'Storm Skirmisher',
-      level: 3,
+      level: 15,
+      intelligence: 3, // unpredictable, but wastes charge freely
       apparel: MageApparel(
         hat: const Color(0xFF9BB8C4),
         hatTrim: const Color(0xFFE8C547),
@@ -133,7 +236,6 @@ abstract final class AiRoster {
         boots: const Color(0xFF2C2230),
       ),
       loadout: _skirmisher,
-      mistakeChance: 0.35,
       aggression: 0.55,
       caution: 0.25,
     ),
@@ -141,7 +243,8 @@ abstract final class AiRoster {
       id: 'thornwall',
       name: 'Thornwall',
       title: 'Warden of the Quarry',
-      level: 5,
+      level: 28,
+      intelligence: 5, // reads your shield and picks its counter
       apparel: MageApparel(
         hat: const Color(0xFF6B7F3E),
         hatTrim: const Color(0xFFB0851E),
@@ -151,26 +254,44 @@ abstract final class AiRoster {
         boots: const Color(0xFF3A2E20),
       ),
       loadout: _warden,
-      mistakeChance: 0.22,
       aggression: 0.2,
-      caution: 0.7,
+      caution: 0.7, // the defensive one — same skill, different temperament
     ),
     AiPersona(
       id: 'morwen',
       name: 'Morwen',
       title: 'Duelist of the Deep',
-      level: 8,
+      level: 40,
+      intelligence: 7, // starts predicting what you are charging toward
       apparel: MageApparel.duskWitch,
       loadout: _duelist,
-      mistakeChance: 0.1,
       aggression: 0.45,
       caution: 0.45,
+    ),
+    AiPersona(
+      id: 'aldorian',
+      name: "Al'Dorian",
+      title: 'Warden of the Last Gate',
+      level: 50, // the player cap — the last mortal opponent
+      intelligence: 9,
+      apparel: MageApparel(
+        hat: const Color(0xFFF2E7C9),
+        hatTrim: const Color(0xFFD9B44A),
+        robe: const Color(0xFFE4DAC0),
+        robeTrim: const Color(0xFFD9B44A),
+        gloves: const Color(0xFF6E6A7A),
+        boots: const Color(0xFF4A4270),
+      ),
+      loadout: _lastWarden,
+      aggression: 0.4,
+      caution: 0.5,
     ),
     AiPersona(
       id: 'procarius',
       name: 'Procarius',
       title: 'The Eclipsed',
-      level: 12,
+      level: 60, // above the cap, in the Citadel's own band
+      intelligence: 10,
       apparel: MageApparel(
         hat: const Color(0xFF2C2230),
         hatTrim: const Color(0xFF8B5CD6),
@@ -180,7 +301,6 @@ abstract final class AiRoster {
         boots: const Color(0xFF141021),
       ),
       loadout: _archmage,
-      mistakeChance: 0.02,
       aggression: 0.4,
       caution: 0.55,
     ),
@@ -188,24 +308,42 @@ abstract final class AiRoster {
 
   static AiPersona byId(String id) => all.firstWhere((p) => p.id == id);
 
-  /// A themed campaign foe: the roster persona nearest [level], re-skinned
-  /// with the location monster's name.
+  /// A themed campaign foe: a roster persona's kit re-skinned with the location
+  /// monster's name and dropped to [level].
+  ///
+  /// Borrows from [strongestAtOrBelow] rather than [nearestToLevel]. Because
+  /// this overrides the level, the *nearest* persona can be a stronger one —
+  /// which used to hand a level-9 foe Brightgale's Aero, magic the player
+  /// cannot own until 15. Borrowing downward keeps the kit legal for the level
+  /// the foe actually fights at.
   static AiPersona campaignFoe({required String name, required int level}) {
-    final base = nearestToLevel(level);
+    final base = strongestAtOrBelow(level);
     return AiPersona(
       id: 'campaign_$name',
       name: name,
       title: 'Wild opponent',
       level: level,
+      intelligence: base.intelligence,
       apparel: base.apparel,
       loadout: base.loadout,
-      mistakeChance: base.mistakeChance,
       aggression: base.aggression,
       caution: base.caution,
     );
   }
 
-  /// The persona closest to [level] — the matchmaking stand-in.
+  /// The toughest persona a mage of [level] could legally be, falling back to
+  /// the weakest. Use this whenever a persona's *kit* is being reused at some
+  /// other level; [nearestToLevel] is only safe when the persona keeps its own.
+  static AiPersona strongestAtOrBelow(int level) {
+    AiPersona best = all.first; // all is level-ascending (guarded by tests)
+    for (final p in all) {
+      if (p.level <= level) best = p;
+    }
+    return best;
+  }
+
+  /// The persona closest to [level] — the matchmaking stand-in. Safe here
+  /// because the stand-in fights at its *own* level, kit and level in step.
   static AiPersona nearestToLevel(int level) {
     AiPersona best = all.first;
     var bestDiff = (best.level - level).abs();
