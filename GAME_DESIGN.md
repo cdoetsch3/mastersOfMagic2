@@ -942,30 +942,89 @@ gains not one point of Mining for it. Two more guards on the same idea:
 | The capital is the **trade hub** with **hour-long buffs**, and has **no crafting stations** | ✅ |
 | Motes drop from **combat and gathering** — steady from the first, random drops/events from the second (ITEMS §6.1 corrected) | ✅ |
 
-#### 6. Still open
+#### 6. ✅ The map is settled — what's left is content and tuning
 
-1. ✅ ~~Capital name~~ · ✅ ~~second Primal town~~ · ✅ ~~ninth town~~ — Concordance,
-   Pennycross, Zenith.
-2. ❓ **What the three Primal "proofs" are.** They are deliberately arbitrary
-   trophies, but arbitrary still needs choosing — and they are the first
-   collectables a new player ever sees, so they set the tone.
-3. ❓ **Are the assembled gate objects consumed or kept?** The Celestial Totem
-   especially wants to be keepable; a charged artifact is a better souvenir
-   than a spent one.
-4. ❓ **The Core drop rate**, decided *against* the crown's twelve-Core
-   requirement (§3a) rather than independently of it.
-5. ❓ **What Concordance's hour-long buffs do.** Still TBD. Flat XP/gold/luck
-   is the safe answer; anything build-shaping risks becoming mandatory. They
-   also need the persistent real-time buff machinery ITEMS §6b.1 flags as
-   unbuilt.
-6. ❓ **Citadel scaling**: hard cap or flattening curve, and does a pushed
-   threshold persist as an unlock or stand as a personal best? ✅ One lever is
-   settled — the **move clock shortens** (5s, then 2–3s); see the **Tempo**
-   status in TYPE_EFFECTS §4d, which carries real netcode and accessibility
-   questions of its own.
-7. ⚠️ **The bestiary needs to grow** (§3d) — pools of 3–5 mini-bosses and 1–2
-   bosses per zone, against the three-and-one it currently lists.
-8. ❓ **Crown name** — The Concordant Crown, The Twelvefold Crown, or another?
+Every question this session opened about **geography, names, gates and the
+economy** is answered. ✅ Concordance · Pennycross · Zenith · the four-object
+gate chain · hybrids optional · nine towns · boss-gated resource areas · the
+10% split tax.
+
+📝 **Five things remain open, and all five are deliberately deferred** — they
+are content to author or numbers to tune, not decisions that block building the
+map:
+
+| Deferred | Belongs to |
+|---|---|
+| The three Primal **"proofs"** — arbitrary trophies, but arbitrary still needs choosing, and they are the first collectables a player ever sees | the enemies/loot pass |
+| Whether the assembled **gate objects are consumed or kept** *(the Celestial Totem especially wants to be keepable — a charged artifact is a better souvenir than a spent one)* | the loot pass |
+| The **Core drop rate**, decided *against* the crown's twelve-Core requirement rather than independently | the loot tables |
+| What **Concordance's hour-long buffs** do — ✅ confirmed TBD. Also needs the persistent real-time buff machinery ITEMS §6b.1 flags as unbuilt | items/potions |
+| The **crown's name** — The Concordant Crown, The Twelvefold Crown, or another | naming, any time |
+
+⚠️ **One item is a task rather than a question, and it is large:** the bestiary
+needs to **grow** to pools of 3–5 mini-bosses and 1–2 bosses per zone, against
+the three-and-one it lists today. Up to twelve more mini-bosses and twelve more
+bosses. That is the biggest single content job the enemies pass now carries.
+
+#### 6b. Difficulty levers that aren't damage and health ⭐
+
+The Citadel's scaling threshold (§3c) needs to mean something more interesting
+than multiplying enemy HP. Two levers, both orthogonal to stats:
+
+**1 · 📝 Tempo — TABLED for now.**
+
+Shortening the move clock (10s → 5s → 2–3s) is designed in TYPE_EFFECTS §4d and
+**deliberately parked**. Recorded here because it is the clearest example of
+the category: a difficulty knob that changes *how the fight feels* rather than
+how long it takes. It carries unresolved netcode and accessibility questions,
+so it waits — but it stays on the shelf as something to reach for.
+
+**2 · ⭐ Intelligence — a 1–10 capability ladder.**
+
+Not a single "accuracy of play" dial but a **ladder of competences**, each
+level adding a specific thing the brain can now do. That matters: a dial only
+makes an opponent better or worse at the same game, while a ladder makes each
+step a *qualitatively different* opponent.
+
+| Lvl | It can… | New capability |
+|---|---|---|
+| **1** | Flick, forever | One habit, repeated. Predictable and bad — it teaches the interface and cannot punish anything |
+| **2** | Charge to a fixed number, then cast one spell | Still fully readable, but it now uses the charge system |
+| **3** | Any legal move, uniformly | ⭐ **Random.** Unpredictable *and* incompetent — will burn a 5-charge cycle on a Flick |
+| **4** | Random among *sensible* moves | **Stops wasting charge** — no cheap spell out of a big cycle |
+| **5** | Read the enemy shield's element | ⭐ **Counter-aware.** Picks attacks that beat that shield, and avoids attacking into one that halves it (§0.3) |
+| **6** | Shield under threat; take a guaranteed kill | **Defensive sense** — reacts to a big enemy charge, never misses lethal |
+| **7** | Infer the likely enemy action from charge, element and history | ⭐ **Predictive.** Expects the big hit at 5 charge and pre-shields, Discharges, or Quickens under it |
+| **8** | See statuses | ⚠️ **The big step.** Today's AI is *effect-blind*. Level 8 understands Ignite, Blind, streaks, Grace, Alignment — it won't swing while Blinded, and it will hold a cast to keep a streak alive |
+| **9** | Plan toward a payoff | **Resource planning** — counts to the 3rd Aqua cast for Waterlog, stacks Arcane Knowledge before Empowering, saves the big Lunar hit for a Full Moon |
+| **10** | Evaluate the action space against plausible replies | **Optimal — as a mixed strategy** |
+
+⭐ **Why level 10 must randomise.** In a *simultaneous*-turn game a
+deterministic "optimal" AI is a contradiction: whatever it always plays, a
+human learns and counters. True level 10 has to pick between near-equal options
+**unpredictably** — a mixed strategy, not a best move. Anything less is level 9
+with extra steps.
+
+⭐ **And this ladder is also the fix for the balance sim's known blind spot.**
+Every sim run so far has carried the same caveat — the AI is effect-blind, so
+it under-represents strategic archetypes. **Levels 5, 8 and 9 are precisely
+the missing competences**: counter-picking, status awareness, and resource
+planning. Building the ladder does double duty, giving the Phase 4 sim gate an
+opponent capable of actually playing Lunar timing, Sanctus streaks, Grace and
+dodge builds. Right now it cannot, which is why Flora's numbers have never been
+trustworthy.
+
+📝 **Notes for the enemies pass:**
+- ✅ **Intelligence is orthogonal to stats.** A frail level-9 caster is a
+  completely different threat from a level-1 tank with triple HP — which is
+  exactly the difficulty-that-isn't-numbers this section is for.
+- ⚠️ **`AiRoster` already carries persona numbers** (Wick 1, Brightgale 3,
+  Thornwall 5, Morwen 8, Procarius 12) that look like *levels*, not
+  intelligence. They need mapping onto this scale deliberately, not assumed to
+  match.
+- ❓ **Where does a boss sit?** A tier boss at intelligence 9–10 with modest
+  stats might be a better fight than one at 5 with inflated ones. Worth
+  playtesting both, since it is the whole thesis of this section.
 
 #### 7. Economy rulings from this session
 

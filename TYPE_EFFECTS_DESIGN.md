@@ -713,7 +713,13 @@ consolation prize; `Hallow` lets any loadout buy it deliberately.
 
 ---
 
-## 4d. Tempo — 📝 NEW (designed, not built)
+## 4d. Tempo — 📝 TABLED (designed, deliberately not built)
+
+⏸️ **Parked as of 2026-07-26.** Kept on the shelf as the clearest example of
+a **difficulty lever that isn't damage and health** — see GAME_DESIGN §6b,
+where it sits alongside the Intelligence ladder. The design below is complete;
+what it waits on is the netcode and accessibility questions in this section,
+none of which are worth answering until there is a reason to build it.
 
 ✅ **A status that shortens the afflicted mage's move clock** — the 10-second
 turn timer drops to **5 seconds**. Castable in PvP, and inflictable by
