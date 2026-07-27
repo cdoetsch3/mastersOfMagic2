@@ -65,6 +65,45 @@ class Stats {
   String _pc(int x, int n) => '${(100 * x / n).toStringAsFixed(1)}%';
 }
 
+/// A realistic loadout: ~5 elements and ~10 spells, drawn at random.
+///
+/// ⚠️ Simulating with the **whole** spellbook and every element measures a game
+/// nobody plays — a real mage brings 15 slots (PROGRESSION §1), so every result
+/// from an unconstrained sim overstates how much answer-to-everything a build
+/// has. These are the numbers that correspond to an actual loadout.
+class SimLoadout {
+  final List<MagicElement> elements;
+  final List<Spell> spells;
+  SimLoadout(this.elements, this.spells);
+
+  static SimLoadout random(Random rng, {int elementCount = 5, int spellCount = 10}) {
+    final els = List.of(MagicElement.values)..shuffle(rng);
+    final sp = List.of(Spellbook.all)..shuffle(rng);
+    // A loadout with no way to deal damage is not a loadout; guarantee one.
+    final picked = sp.take(spellCount).toList();
+    if (!picked.any((s) => s.isOffensive)) {
+      picked[0] = Spellbook.all.firstWhere((s) => s.isOffensive);
+    }
+    return SimLoadout(els.take(elementCount).toList(), picked);
+  }
+}
+
+/// ⚠️ Kept only for brains that cannot choose an element themselves.
+/// [LadderAi] takes its own `elements` pool, so level 5+ can counter-pick —
+/// wrapping it here would take that competence away.
+class LoadoutAi implements DuelAi {
+  final DuelAi inner;
+  final SimLoadout loadout;
+  final Random rng;
+  LoadoutAi(this.inner, this.loadout, this.rng);
+
+  @override
+  MageAction chooseAction(MageState self, MageState enemy, Random r) {
+    self.element ??= loadout.elements[r.nextInt(loadout.elements.length)];
+    return inner.chooseAction(self, enemy, r);
+  }
+}
+
 void main(List<String> args) {
   final n = args.isNotEmpty ? int.parse(args[0]) : 500;
   const cap = 200;
@@ -98,65 +137,141 @@ void main(List<String> args) {
   print('=== $n duels per config, cap $cap turns, '
       'fatigue from turn ${DuelEngine.fatigueThreshold + 1} ===\n');
 
-  run('random vs random, effects OFF', RandomAi.new, RandomAi.new,
+  run('i1 (random) vs i1, effects OFF', () => LadderAi(1), () => LadderAi(1),
       effects: false);
-  run('random vs random, effects ON', RandomAi.new, RandomAi.new,
+  run('i1 (random) vs i1, effects ON', () => LadderAi(1), () => LadderAi(1),
       effects: true);
   print('');
-  run('greedy vs greedy, effects OFF', GreedyAi.new, GreedyAi.new,
+  run('i7 vs i7, effects OFF', () => LadderAi(7), () => LadderAi(7),
       effects: false);
-  run('greedy vs greedy, effects ON', GreedyAi.new, GreedyAi.new,
+  run('i7 vs i7, effects ON', () => LadderAi(7), () => LadderAi(7),
       effects: true);
   print('');
   run(
-      'FLORA mirror (greedy), ON',
-      () => MonoElementAi(GreedyAi(), MagicElement.flora),
-      () => MonoElementAi(GreedyAi(), MagicElement.flora),
+      'FLORA mirror (i7), ON',
+      () => MonoElementAi(LadderAi(7), MagicElement.flora),
+      () => MonoElementAi(LadderAi(7), MagicElement.flora),
       effects: true);
   run(
-      'FLORA mirror (random), ON',
-      () => MonoElementAi(RandomAi(), MagicElement.flora),
-      () => MonoElementAi(RandomAi(), MagicElement.flora),
+      'FLORA mirror (i1), ON',
+      () => MonoElementAi(LadderAi(1), MagicElement.flora),
+      () => MonoElementAi(LadderAi(1), MagicElement.flora),
       effects: true);
 
-  // Full mono-element round robin (greedy, effects on): win% of the ROW
-  // element vs the COLUMN element. The three counter-triangles should show
-  // as >50% cells for each element vs its prey.
-  print('\n=== mono-element round robin (greedy, effects ON, '
-      '${max(100, n ~/ 2)} duels/pair) — row win% vs column ===');
-  final m = max(100, n ~/ 2);
-  final names =
-      MagicElement.values.map((e) => e.name.padRight(7).substring(0, 7));
-  print('        ${names.join(' ')}');
-  for (final row in MagicElement.values) {
+  // ---- The intelligence ladder, on realistic loadouts -----------------
+  print('\n=== intelligence ladder — random ~5 element / ~10 spell loadouts, '
+      'effects ON, $n duels/pair ===');
+  print('row win% vs column');
+  const rungs = [1, 3, 5, 7, 9, 10];
+  print('        ${rungs.map((r) => 'i$r'.padRight(6)).join(' ')}');
+  for (final row in rungs) {
     final cells = <String>[];
-    for (final col in MagicElement.values) {
+    for (final col in rungs) {
       if (row == col) {
-        cells.add('   —   ');
+        cells.add('  —   ');
         continue;
       }
-      final rng = Random(row.index * 100 + col.index);
+      final rng = Random(row * 100 + col);
       var wins = 0, decisive = 0;
-      for (var i = 0; i < m; i++) {
+      for (var i = 0; i < n; i++) {
         final m1 = MageState(name: 'R');
         final m2 = MageState(name: 'C');
-        final duel = DuelEngine(m1, m2, rng: rng);
-        final a1 = MonoElementAi(GreedyAi(), row);
-        final a2 = MonoElementAi(GreedyAi(), col);
+        final duel = DuelEngine(m1, m2, rng: rng, elementEffects: true);
+        final l1 = SimLoadout.random(rng);
+        final l2 = SimLoadout.random(rng);
+        final a1 =
+            LadderAi(row, spells: l1.spells, elements: l1.elements);
+        final a2 =
+            LadderAi(col, spells: l2.spells, elements: l2.elements);
         while (!duel.isOver && duel.turnNumber < cap) {
           duel.resolveTurn(
             a1.chooseAction(m1, m2, rng),
             a2.chooseAction(m2, m1, rng),
           );
         }
-        if (duel.isOver && !duel.isDraw) {
+        if (duel.isOver && duel.winner != null) {
           decisive++;
-          if (identical(duel.winner, m1)) wins++;
+          if (duel.winner == m1) wins++;
         }
       }
-      final pct = decisive == 0 ? 0 : (100 * wins / decisive).round();
-      cells.add('${'$pct%'.padLeft(5)}  ');
+      final pct = decisive == 0 ? 50.0 : wins * 100 / decisive;
+      cells.add('${pct.toStringAsFixed(0).padLeft(4)}% ');
     }
-    print('${row.name.padRight(7)} ${cells.join(' ')}');
+    print('i$row'.padRight(8) + cells.join(' '));
+  }
+
+  // ---- Mono-element round robin, at three points on the ladder --------
+  //
+  // ⚠️ Element is locked and skill is held constant, which is the *opposite*
+  // of the ladder table above: to measure whether the counter wheel is
+  // balanced you must hold skill fixed, and to measure skill you must not let
+  // element matchups swamp the signal. Two questions, two sims.
+  //
+  // ⭐ Run at three intelligences on purpose. A matchup table is only true for
+  // the skill it was measured at — an unaware brain cannot play Lunar timing,
+  // Astral stacking or Sanctus streaks, so it systematically under-reads the
+  // elements whose strength lives in planning. If an edge moves between i4 and
+  // i10, that edge depends on competence rather than on raw numbers.
+  void roundRobin(int intelligence, int duels) {
+    print('\n=== mono-element round robin — INTELLIGENCE $intelligence, '
+        'random ~10-spell loadouts, effects ON, $duels duels/pair ===');
+    print('row win% vs column');
+    final names =
+        MagicElement.values.map((e) => e.name.padRight(7).substring(0, 7));
+    print('        ${names.join(' ')}');
+    final rowAvg = <MagicElement, double>{};
+    for (final row in MagicElement.values) {
+      final cells = <String>[];
+      var sum = 0.0;
+      var counted = 0;
+      for (final col in MagicElement.values) {
+        if (row == col) {
+          cells.add('   —   ');
+          continue;
+        }
+        final rng = Random(row.index * 100 + col.index + intelligence * 7919);
+        var wins = 0, decisive = 0;
+        for (var i = 0; i < duels; i++) {
+          final m1 = MageState(name: 'R');
+          final m2 = MageState(name: 'C');
+          final duel = DuelEngine(m1, m2, rng: rng, elementEffects: true);
+          // Elements are locked, but the SPELL BOOK is drawn — nobody plays
+          // with all 25 spells, and pretending otherwise rewards a
+          // charge-to-five pattern that a real loadout cannot always run.
+          final a1 = MonoElementAi(
+              LadderAi(intelligence, spells: SimLoadout.random(rng).spells),
+              row);
+          final a2 = MonoElementAi(
+              LadderAi(intelligence, spells: SimLoadout.random(rng).spells),
+              col);
+          while (!duel.isOver && duel.turnNumber < cap) {
+            duel.resolveTurn(
+              a1.chooseAction(m1, m2, rng),
+              a2.chooseAction(m2, m1, rng),
+            );
+          }
+          if (duel.isOver && duel.winner != null) {
+            decisive++;
+            if (duel.winner == m1) wins++;
+          }
+        }
+        final pct = decisive == 0 ? 50.0 : wins * 100 / decisive;
+        sum += pct;
+        counted++;
+        cells.add('${pct.toStringAsFixed(0).padLeft(4)}%  ');
+      }
+      rowAvg[row] = counted == 0 ? 50 : sum / counted;
+      print('${row.name.padRight(8)}${cells.join('')}');
+    }
+    print('  overall win% (target 40-60):');
+    for (final e in MagicElement.values) {
+      final v = rowAvg[e]!;
+      final flag = (v < 40 || v > 60) ? '  <-- OUTSIDE' : '';
+      print('    ${e.name.padRight(9)}${v.toStringAsFixed(1)}%$flag');
+    }
+  }
+
+  for (final i in const [4, 7, 10]) {
+    roundRobin(i, max(60, n ~/ 4));
   }
 }

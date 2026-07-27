@@ -47,40 +47,28 @@ class AiPersona {
     required this.caution,
   });
 
-  /// Blunder rate implied by [intelligence] — the one place skill becomes a
-  /// number, so a persona can never drift out of step with its rating.
+  /// Blunder rate implied by [intelligence]. Retained for personas that still
+  /// want a fumbling brain rather than a laddered one.
   double get mistakeChance => blunderChanceForIntelligence(intelligence);
 
-  DuelAi buildBrain() => TunableAi(
-        spells: loadout.spells,
-        mistakeChance: mistakeChance,
-        aggression: aggression,
-        caution: caution,
-      );
+  /// ⭐ **The brain is [LadderAi], built from [intelligence] alone.**
+  ///
+  /// Skill is a *separate entity* from the character: the persona supplies the
+  /// body (level, loadout, look) and the rating supplies the mind, and the two
+  /// compose. The same loadout at intelligence 3 and at 9 is two genuinely
+  /// different opponents, and the same rating can be dropped on any monster
+  /// without borrowing anything else from a persona.
+  DuelAi buildBrain() =>
+      LadderAi(intelligence, spells: loadout.spells);
 }
 
-/// Blunder rate per intelligence rating. An explicit table rather than a fitted
-/// curve: ten discrete values are easier to tune by hand, and the shape matters
-/// far more at the low end than the high.
+/// Chance an enemy of the given [intelligence] throws away its turn.
 ///
-/// Top-level on purpose — the 1-10 ladder is shared enemy infrastructure, not a
-/// persona detail. Wild monsters, mini-bosses and bosses all rate on this same
-/// scale without going through [AiPersona].
-const Map<int, double> _blunderByIntelligence = {
-  1: 0.60, 2: 0.48, 3: 0.35, 4: 0.28, 5: 0.22,
-  6: 0.16, 7: 0.10, 8: 0.07, 9: 0.04, 10: 0.00,
-};
-
-/// Chance that an enemy of the given [intelligence] throws away its turn.
-///
-/// ⚠️ Blunder rate is only the part of the ladder that is **implemented**. The
-/// higher rungs are defined behaviourally in GAME_DESIGN §6b — 5 is
-/// counter-aware, 7 predicts, 9 is genuinely sharp — and `TunableAi` cannot do
-/// any of that yet: it is effect-blind and has no opponent model. So today a
-/// rating of 7 differs from 9 only by how often it fumbles, not by insight.
-/// Ratings above ~6 are declarative until the AI grows those competences.
+/// Delegates to the engine's table so there is exactly one curve — the AI and
+/// the design docs cannot drift apart. See `LadderAi` for the competence ladder
+/// this sits on top of.
 double blunderChanceForIntelligence(int intelligence) =>
-    _blunderByIntelligence[intelligence.clamp(1, 10)] ?? 0.25;
+    blunderRateForIntelligence(intelligence);
 
 /// The Phase-1 roster, weakest to strongest.
 abstract final class AiRoster {

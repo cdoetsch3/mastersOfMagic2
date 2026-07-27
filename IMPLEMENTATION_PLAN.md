@@ -305,29 +305,89 @@ isn't neutral.
 
 ---
 
-# Phase 4 — 🟡 PARTLY DONE — ⚠️ SIM GATE
+# Phase 4 — 🟡 RUN, AWAITING RULING — ⚠️ SIM GATE
 
-**File:** `packages/mom_engine/tool/balance_sim.dart` — extend the existing
-9×9 mono-element round-robin to **12×12**.
+**File:** `packages/mom_engine/tool/balance_sim.dart`. Run: `dart run
+tool/balance_sim.dart 600`.
 
-Report and hand to Christian:
+✅ **The sim was rebuilt before this run, because the old one could not be
+trusted.** Three changes, each of which moved the numbers:
 
-1. **Per-element overall win rate.** Investigate anything outside 40–60%.
-2. **Every counter edge** (12 within-tier + 4 macro-tier). Shipped Tier 2/3
-   edges previously landed at **65–77%**; new edges should sit in that band.
-3. **Duel length distribution** and the share of duels ending in Fatigue.
-   Long duels are *not* by themselves a problem — human playtesting confirmed
-   they're fun — but a spike in Fatigue finishes means a stall meta.
-4. **Aegis Sovereign exposure:** the shield-math change and Astral Alignment
-   both nerf shield play from different directions. Quantify shield-heavy
-   strategy win rates before *and* after.
+1. ❌ **`GreedyAi` deleted.** Every brain is now a rung of the intelligence
+   ladder (`LadderAi`). The old opponent was *effect-blind*, so it could not
+   play Lunar timing, Astral stacking or Sanctus streaks at all.
+2. ✅ **Realistic loadouts.** Every mage draws ~10 spells instead of holding all
+   25. A full book means Cataclysm is always available, which rewards a
+   charge-to-five pattern no real loadout can always run.
+3. ✅ **The matrix runs at intelligence 4, 7 and 10**, because a matchup table is
+   only true for the skill it was measured at.
 
-⚠️ **Known simulator limitation:** the AI is effect-blind, so it
-under-represents strategic archetypes (ITEMS §2.2). Treat the sim as a
-smoke detector for the extremes, not as proof a build is fine.
+### ⭐ Finding 1 — counter-edge decisiveness scales with intelligence
 
-**Gate:** Christian reviews and rules before Phase 5+. Expect tuning
-iterations here — that is the point of the gate.
+| Counter edge | i4 | i7 | i10 |
+|---|---|---|---|
+| pyro ▸ flora | 45% | 63% | 72% |
+| flora ▸ aqua | 95% | 94% | 96% |
+| aqua ▸ pyro | 65% | 73% | 78% |
+| electro ▸ aero | 73% | 81% | 91% |
+| aero ▸ geo | 61% | 73% | 78% |
+| geo ▸ electro | 73% | 79% | 87% |
+| solar ▸ lunar | 60% | 79% | 88% |
+| lunar ▸ astral | 71% | 76% | 85% |
+| astral ▸ solar | 69% | 78% | 89% |
+| sanctus ▸ umbra | 71% | 75% | 84% |
+| umbra ▸ arcane | 69% | 78% | 85% |
+| arcane ▸ sanctus | 75% | 73% | 86% |
+
+⚠️ **"Counter edges should sit at 65–77%" is not a well-formed target.** At
+**i4** almost every edge lands in that band. At **i10** eleven of twelve are
+above it. A smarter opponent exploits its type advantage harder, so the band
+only means something once a skill level is attached to it.
+
+❓ **Ruling needed: what intelligence is the balance target measured at?**
+Recommendation: **i7** — competent, status-aware, and roughly what a real
+opponent should feel like. At i7 the edges run 63–94%, so the band itself
+probably wants widening to ~70–85% rather than the numbers being nerfed.
+
+📝 **These are mono-element duels — the worst case.** Each side is locked to one
+element for the whole duel and can never switch. A real mage brings five, so a
+95% mono-element edge does *not* mean a 95% real matchup. The matrix isolates
+the element variable; it does not predict play.
+
+### ⭐ Finding 2 — eleven of twelve elements are fine; Flora alone is broken
+
+Overall win rate, target 40–60%:
+
+| | i4 | i7 | i10 |
+|---|---|---|---|
+| **flora** | **82.9%** | **75.6%** | **70.1%** |
+| everything else | 44–59% | 44–54% | 43–53% |
+
+⚠️ **Flora is over-tuned, and this is not an artifact of a weak AI** — it stays
+outside the band at every intelligence, including 10. Better play *reduces* the
+problem (82.9 → 70.1) without solving it.
+
+⭐ **The clinching evidence: Pyro, which counters Flora, LOSES to it at i4
+(45%).** An element whose own counter cannot beat it is over-tuned by
+definition.
+
+📝 **The likely cause is Photosynthesis**: every Flora cast adds a stack, with
+no condition attached — no hit required, no target state, nothing to play
+around. It is the only element effect that accrues for free, and it also blocks
+Waterlogged.
+
+❓ **Ruling needed on the Flora nerf.** Options, cheapest first: require the cast
+to *hit* rather than merely be cast; cap stacks at 2; slow the decay; or reduce
+the heal per stack.
+
+### ✅ Finding 3 — Geo's old failure was an artifact
+
+The previous baseline flagged Geo at 63.1%. Rebuilt, it measures **58.5 / 53.9 /
+53.0**. The old number came from the full spellbook and the blind brain, not
+from Geo.
+
+**Gate:** Christian rules on the target-skill question and the Flora nerf.
+Everything else in the roster is in band.
 
 ---
 

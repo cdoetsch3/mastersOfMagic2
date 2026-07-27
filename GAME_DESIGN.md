@@ -992,22 +992,61 @@ step a *qualitatively different* opponent.
 
 | Lvl | It can… | New capability |
 |---|---|---|
-| **1** | Flick, forever | One habit, repeated. Predictable and bad — it teaches the interface and cannot punish anything |
-| **2** | Charge to a fixed number, then cast one spell | Still fully readable, but it now uses the charge system |
-| **3** | Any legal move, uniformly | ⭐ **Random.** Unpredictable *and* incompetent — will burn a 5-charge cycle on a Flick |
-| **4** | Random among *sensible* moves | **Stops wasting charge** — no cheap spell out of a big cycle |
-| **5** | Read the enemy shield's element | ⭐ **Counter-aware.** Picks attacks that beat that shield, and avoids attacking into one that halves it (§0.3) |
-| **6** | Shield under threat; take a guaranteed kill | **Defensive sense** — reacts to a big enemy charge, never misses lethal |
-| **7** | Infer the likely enemy action from charge, element and history | ⭐ **Predictive.** Expects the big hit at 5 charge and pre-shields, Discharges, or Quickens under it |
-| **8** | See statuses | ⚠️ **The big step.** Today's AI is *effect-blind*. Level 8 understands Ignite, Blind, streaks, Grace, Alignment — it won't swing while Blinded, and it will hold a cast to keep a streak alive |
-| **9** | Plan toward a payoff | **Resource planning** — counts to the 3rd Aqua cast for Waterlog, stacks Arcane Knowledge before Empowering, saves the big Lunar hit for a Full Moon |
-| **10** | Evaluate the action space against plausible replies | **Optimal — as a mixed strategy** |
+| **1** | Any legal move, uniformly | ⭐ **Random.** Unpredictable *and* incompetent — burns a 5-charge cycle on a Flick. Measurably the weakest thing on the ladder (~3.0 dmg/turn) |
+| **2** | Repeat one cheap attack forever | One habit. Fully readable, cannot punish anything — what a new player should meet first |
+| **3** | Charge to a fixed number, then spend it | Uses the charge system on a rhythm anyone can read (~7.1 dmg/turn) |
+| **4** | Play sensibly, and **shield when threatened** | Stops wasting charge. ⭐ Shielding is core play, not an advanced tactic |
+| **5** | Read the enemy shield's element | ⭐ **Counter-aware.** Picks the *element* that beats the wall — ranking spells cannot do it, since one element's spells all scale alike |
+| **6** | Take a guaranteed kill | Never misses lethal |
+| **7** | See statuses | ⚠️ Counts damage already on the clock, and won't swing while Blinded |
+| **8** | Plan toward a payoff | Patience — holds for the cast that lands instead of poking on a rhythm |
+| **9** | Infer the enemy's action from charge | ⭐ **Predictive**, and the strongest single competence measured |
+| **10** | Everything 9 does, perfectly | **Never blunders** |
 
-⭐ **Why level 10 must randomise.** In a *simultaneous*-turn game a
-deterministic "optimal" AI is a contradiction: whatever it always plays, a
-human learns and counters. True level 10 has to pick between near-equal options
-**unpredictably** — a mixed strategy, not a best move. Anything less is level 9
-with extra steps.
+✅ **Two things carry difficulty, not one.**
+
+1. **Competences** (the table) make each rung a *qualitatively different*
+   opponent.
+2. ⭐ **A blunder rate** — a flat chance each turn of throwing the move away and
+   playing at random — falls as the ladder rises: 32% at level 2 down to **0% at
+   level 10**.
+
+⚠️ **The second is what makes it a usable dial.** With competences alone, levels
+6–9 sat within *two points* of each other in simulation: real differences in
+character, useless as a difficulty setting. With the blunder gradient the scale
+fans out properly — measured against a level-5 baseline over 7 000 duels per
+pair, five seeds, both seats, on realistic ~5-element/~10-spell loadouts:
+
+| vs level 5 | 1 | 2 | 3 | 4 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|
+| win % | 12.5 | 23.8 | 43.1 | 41.3 | 66.5 | 68.8 | 72.7 | 77.3 | 79.7 |
+
+✅ **Every adjacent rung now beats the one below it**, guarded by
+`packages/mom_engine/test/ladder_ai_test.dart`.
+
+⚠️ **Levels 1–3 are ordered by weakness, not by sophistication.** The first draft
+of this table had them the other way round — flick-forever at 1, random at 3 —
+which ran the bottom of the dial backwards, because a beginner who has unlocked
+the whole action space and has no judgement plays *worse* than one with a single
+narrow habit.
+
+⚠️ **The AI does not cheat.** Umbra's Creeping Dark hides the enemy's charging
+element (Shadow) and their charge and health (Dusk). The brain reads an
+`EnemyView`, not the raw state, so a hidden health bar really does deny it the
+lethal — otherwise Umbra's whole identity would work against humans and nobody
+else.
+
+📝 **Superseded: level 10 was going to play a mixed strategy.** The reasoning
+was that in a simultaneous-turn game a deterministic "optimal" is exploitable —
+whatever it always plays, a human learns and counters. That is still true, but
+mixing spell choice and cash-out timing is *deliberately suboptimal in
+isolation*, and it only pays against an opponent that learns patterns. Nothing
+in a simulation does, so level 10 was paying a real cost to collect nothing and
+measured **worse** than level 9. A perfect executor is the cleaner definition.
+
+💡 **Banked:** to make a mixed strategy provably better, the harness needs an
+*exploiter* opponent that records what you did in each state and pre-counters
+it. Worth building before ever revisiting this.
 
 ⭐ **And this ladder is also the fix for the balance sim's known blind spot.**
 Every sim run so far has carried the same caveat — the AI is effect-blind, so
@@ -1022,10 +1061,10 @@ trustworthy.
 - ✅ **Intelligence is orthogonal to stats.** A frail level-9 caster is a
   completely different threat from a level-1 tank with triple HP — which is
   exactly the difficulty-that-isn't-numbers this section is for.
-- ⚠️ **`AiRoster` already carries persona numbers** (Wick 1, Brightgale 3,
-  Thornwall 5, Morwen 8, Procarius 12) that look like *levels*, not
-  intelligence. They need mapping onto this scale deliberately, not assumed to
-  match.
+- ✅ **`AiRoster` personas now build a `LadderAi` from their rating alone**, so
+  intelligence is a separate entity from the character: the persona supplies the
+  body (level, loadout, look) and the rating supplies the mind. The same loadout
+  at 3 and at 9 is two genuinely different opponents.
 - ❓ **Where does a boss sit?** A tier boss at intelligence 9–10 with modest
   stats might be a better fight than one at 5 with inflated ones. Worth
   playtesting both, since it is the whole thesis of this section.

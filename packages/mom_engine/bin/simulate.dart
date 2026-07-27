@@ -16,9 +16,9 @@ void main(List<String> args) {
   final duels = args.isNotEmpty ? int.parse(args[0]) : 1000;
   final seed = args.length > 1 ? int.parse(args[1]) : 42;
 
-  _matchup('Greedy', GreedyAi(), 'Random', RandomAi(), duels, seed);
-  _matchup('Greedy', GreedyAi(), 'Greedy', GreedyAi(), duels, seed);
-  _matchup('Random', RandomAi(), 'Random', RandomAi(), duels, seed);
+  _matchup('i7', LadderAi(7), 'i1', LadderAi(1), duels, seed);
+  _matchup('i7', LadderAi(7), 'i7', LadderAi(7), duels, seed);
+  _matchup('i1', LadderAi(1), 'i1', LadderAi(1), duels, seed);
 }
 
 const _turnCap = 200;
@@ -59,8 +59,8 @@ void _verboseDuel({required int seed}) {
   final rng = Random(seed);
   final m1 = MageState(name: 'Aldric');
   final m2 = MageState(name: 'Morwen');
-  final ai1 = GreedyAi();
-  final ai2 = GreedyAi();
+  final ai1 = LadderAi(7);
+  final ai2 = LadderAi(7);
   final duel = DuelEngine(m1, m2, rng: rng);
   while (!duel.isOver && duel.turnNumber < _turnCap) {
     final result = duel.resolveTurn(

@@ -36,18 +36,18 @@ void main() {
   }
 
   test('AI duels run legally to completion', () {
-    final result = run(RandomAi(), RandomAi(), 200, 1);
+    final result = run(LadderAi(1), LadderAi(1), 200, 1);
     expect(result.unfinished, lessThan(10),
         reason: 'almost all random duels should end within the cap');
   });
 
   test('greedy AI convincingly beats random AI', () {
-    final result = run(GreedyAi(), RandomAi(), 200, 2);
+    final result = run(LadderAi(7), LadderAi(1), 200, 2);
     expect(result.wins1, greaterThan(result.wins2 * 2));
   });
 
   test('greedy mirror match is roughly fair', () {
-    final result = run(GreedyAi(), GreedyAi(), 300, 3);
+    final result = run(LadderAi(7), LadderAi(7), 300, 3);
     final decisive = result.wins1 + result.wins2;
     expect(decisive, greaterThan(0));
     final ratio = result.wins1 / decisive;

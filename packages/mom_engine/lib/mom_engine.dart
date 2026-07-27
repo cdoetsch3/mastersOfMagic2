@@ -6,6 +6,7 @@ library;
 
 export 'src/action.dart';
 export 'src/ai.dart';
+export 'src/ladder_ai.dart';
 export 'src/duel.dart';
 export 'src/element.dart';
 export 'src/events.dart';

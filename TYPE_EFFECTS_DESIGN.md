@@ -262,6 +262,52 @@ Fatigue).
 
 ---
 
+### ⚠️⚠️ 2.3a FLORA NEEDS TUNING — open, blocking nothing, but real
+
+📝 **Flagged 2026-07-26 from the rebuilt balance sim** (IMPLEMENTATION_PLAN
+Phase 4). Flora is the **only** element outside the 40–60% target band, and it
+is outside at every skill level:
+
+| Overall win rate | i4 | i7 | i10 |
+|---|---|---|---|
+| **Flora** | **82.9%** | **75.6%** | **70.1%** |
+| Every other element | 44–59% | 44–54% | 43–53% |
+
+⚠️ **This is not an artifact of a weak AI.** The sim was rebuilt first —
+`GreedyAi` deleted, realistic ~10-spell loadouts, the matrix run at three
+intelligences — precisely so this number could be trusted. Better play *reduces*
+Flora's edge (82.9 → 70.1) without bringing it into band.
+
+⭐ **The clinching evidence: Pyro, which counters Flora, LOSES to it at i4
+(45%).** It only wins at 72% once play reaches i10. An element whose own counter
+cannot beat it at ordinary skill is over-tuned by definition.
+
+⭐ **Why it is probably Photosynthesis.** It is the only element effect in the
+game that accrues **unconditionally** — *every Flora cast* adds a stack. No hit
+required, no proc roll, no target state, nothing for the opponent to play
+around. Compare: Ignite needs a hit *and* a 25% roll; Creeping Dark needs charge
+spent; Astral Alignment needs casts of a specific element; Arcane Knowledge
+needs 4+ charge spent. Flora needs only that you took your turn.
+
+⚠️ **Note the history**: stacks were already trimmed **5 → 3** after an earlier
+sim showed dominance (§8). That nerf reduced the symptom without touching the
+cause, which is the *free* trigger rather than the stack ceiling.
+
+❓ **Options, cheapest first — needs a ruling:**
+
+| Option | Effect | Risk |
+|---|---|---|
+| ⭐ **Require the cast to HIT** | Brings the trigger in line with Ignite's; gives the opponent counterplay via dodge and shields | Smallest change; may not be enough alone |
+| **Cap stacks at 2** | Straight −33% to the heal ceiling | Repeats the 5→3 nerf that did not fix it |
+| **Decay 2 stacks per idle turn** | Punishes breaking the cycle much harder | Could overshoot into unplayable |
+| **Heal 0.5% per stack** | Halves the payoff | Blunt; makes the effect feel pointless |
+
+📝 **Do not tune this and the counter-edge band in the same pass** — the band
+question (what intelligence is balance measured at?) is unresolved, and changing
+both at once makes the next sim unreadable.
+
+---
+
 ## 3. Tier 2 — The Kinetic Forces
 
 Action-queue disruption. **Triangle: Electro shocks Aero, Aero weathers Geo,
