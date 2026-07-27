@@ -778,8 +778,8 @@ Vespergate.
 
 ⭐ **And give the capital no crafting stations at all.** The instinct is to put
 everything in the capital; that would kill the other six towns overnight.
-Instead the capital owns what nowhere else can: **the bank, the auction/trade
-floor, contracts, and the PvP + Academy entrances**. You bank in the capital
+Instead the capital owns what nowhere else can: **the bank, the ✅ CONCORD
+MARKET, contracts, and the PvP + Academy entrances**. You bank in the capital
 and you *make things* out in the world.
 
 **Advanced nodes as previews** (the brief's own idea, and a good one):
@@ -852,13 +852,14 @@ key-fragment gates have been building toward.
 |---|---|
 | ⭐ **Every crafting station** | All six making-skills in one place — the only town that has them all |
 | ⭐ **Teleports to every other city** | The map folds up once you have earned it |
-| ⭐ **A player market** | ✅ **The same market as Concordance**, reached from a second door — *not* a second market. **10% tax on every sale** (below) |
+| ⭐ **The Concord Market** | ✅ **The same market as Concordance**, reached from a second door — *not* a second market, and it keeps the same name. **10% tax on every sale** (below) |
 | The unbinding enchant (ITEMS §6c) | The most consequential thing the economy allows |
 | Post-cap XP → motes (10 XP = 1 Dust, 250/day) | It only exists at level 50; its home should be a place only level-50s stand in |
 | Tier IV set assembly · the hardest repeatable content | Where the loop keeps going once the story stops |
 
-⭐ **One market, two doors — this is the detail that matters.** A second,
-separate marketplace would split liquidity: fewer listings in each, worse
+⭐ **One market, two doors — this is the detail that matters.** ✅ It is the
+**Concord Market** from both, and everything else in the world is a *shop* or a
+*store*, never a market. A second, separate marketplace would split liquidity: fewer listings in each, worse
 prices, and a player never sure which door to try. Because Concordance and the
 Zenith are **access points onto one shared order book**, the endgame town
 adds convenience without fragmenting the economy. Worth stating explicitly in
@@ -1280,17 +1281,16 @@ where the counter game has to be second nature.
    two-hand choice a playstyle decision, not just a stat trade: e.g. wand boosts
    1–2 charge spells; staff boosts 4–5 charge spells but costs the off-hand;
    off-hand shield strengthens shield spells; tome improves aux buffs.
-8. **Tiamonds** — a consumable/currency that instantly **skips time-gated
-   processes** (travel, crafting, researching/studying). ❓ Relationship to the
-   existing premium currency ("gems") TBD — Tiamonds may BE the premium currency
-   renamed, or a distinct time-skip item earned/bought separately.
-   ⚠️ *Review note (2026-07-21): ITEMS_DESIGN §3.6 now defines the same role
-   for "purple gems" (cooldown skips, "time crystals") — these are almost
-   certainly one concept under two names; reconcile before implementing
-   either.*
-9. **Timed travel** — traveling between locations takes real time. Early legs
-   ~10–15s; scales up to hours for distant regions. Skippable with [8] Tiamonds.
-   (Pairs with the crafting/research timers as the core freemium time-gate loop.)
+8. **Time Crystals** — a consumable that instantly **skips time-gated
+   processes** (travel, crafting, researching/studying). ✅ They are **crafted
+   from RESONANCE PRISMS ("RP")**, the premium currency — not bought directly
+   and not the same thing as it. ✅ RP is the renamed "gems" currency; the word
+   *gem* now means a socketed stone only (ITEMS §6d).
+9. **Timed travel** — ✅ **promoted out of the idea bank**; designed in
+   [WORLD_DESIGN.md](WORLD_DESIGN.md) §4b. Real time, ~5 min per leg, mounts as
+   speed multipliers, Travel vs Journey modes, skippable with [8] Time Crystals.
+   ⚠️ The "~10–15s early legs scaling to hours" sketch here is **superseded** —
+   minutes, not seconds, and never hours.
 10. **First-visit town gate** — unlocking a town for the first time requires
     completing a one-time **required adventure** (a gating encounter) before the
     town's services open. ❓ Design: towns currently have no adventure of their
@@ -1444,4 +1444,6 @@ Dust→Heart (ITEMS_DESIGN §8); only "set pieces Epic+?" remains there.
 7. Character name uniqueness & change policy.
 8. Bank/backpack storage split (see the Inventory note in §8 Navigation).
 9. Does Academy mode grant XP / quest credit? (§5)
-10. Tiamonds vs purple gems — one time-skip currency or two? (Idea bank #8)
+10. ✅ **CLOSED** — the premium currency is **Resonance Prisms ("RP")**, renamed
+    off "gems" so that *gem* means a socketed stone only (ITEMS §6d). Time
+    Crystals are crafted *from* RP and are a separate thing. (Idea bank #8)

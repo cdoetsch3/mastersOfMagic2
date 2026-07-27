@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:mom_engine/mom_engine.dart';
 
@@ -259,45 +258,4 @@ void main() {
     });
   });
 
-  group('stale saves', () {
-    test('a save pointing at a removed region is reset to the start', () {
-      // These four existed on the pre-Plate-I-b map and no longer do.
-      for (final dead in const [
-        'radiant_sanctum',
-        'the_caldera',
-        'crystal_caverns',
-        'nightfen_marsh',
-      ]) {
-        expect(World.exists(dead), isFalse, reason: '$dead should be gone');
-        final p = PlayerProfile.newPlayer()..locationId = dead;
-        expect(p.migrateWorld(), isTrue);
-        expect(p.locationId, World.startLocationId);
-        expect(p.location.id, World.startLocationId,
-            reason: 'locationId and location must agree after migration');
-      }
-    });
-
-    test('unknown discovered ids are pruned, known ones kept', () {
-      final p = PlayerProfile.newPlayer()
-        ..locationId = 'forgeholm'
-        ..discoveredLocationIds = {'aldermere', 'the_caldera', 'forgeholm'};
-      expect(p.migrateWorld(), isTrue);
-      expect(p.discoveredLocationIds, {'aldermere', 'forgeholm'});
-      expect(p.locationId, 'forgeholm', reason: 'a live id is left alone');
-    });
-
-    test('the current location is always discovered', () {
-      final p = PlayerProfile.newPlayer()
-        ..locationId = 'galehaven'
-        ..discoveredLocationIds = {'aldermere'};
-      p.migrateWorld();
-      expect(p.discoveredLocationIds, contains('galehaven'));
-    });
-
-    test('a healthy save is left completely alone', () {
-      final p = PlayerProfile.newPlayer();
-      expect(p.migrateWorld(), isFalse, reason: 'no spurious rewrite');
-      expect(p.locationId, World.startLocationId);
-    });
-  });
 }

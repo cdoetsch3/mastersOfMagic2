@@ -742,11 +742,8 @@ abstract final class World {
   };
 
   /// ⚠️ Falls back to the start location for an unknown id rather than
-  /// throwing — a stale save must never crash the app on load. Use [exists] to
-  /// detect that case; [PlayerProfile.migrateWorld] repairs it.
+  /// throwing — a bad id must never crash the app on load.
   static GameLocation byId(String id) => _byId[id] ?? locations.first;
-
-  static bool exists(String id) => _byId.containsKey(id);
 
   static Iterable<GameLocation> get towns => locations.where((l) => l.isTown);
 

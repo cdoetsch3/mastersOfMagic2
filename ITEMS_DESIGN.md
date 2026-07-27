@@ -35,7 +35,8 @@ define the endgame ceiling first, then scale the ladder down to it.
 - Items drop as **loot** from the campaign; a run's loot is lost on defeat,
   banked on "return to town".
 - **Luck** is a real stat (from items/enchants): more gold, better rare drops.
-- **Gold** (earned) and **gems** (premium) already exist on the profile.
+- **Gold** (earned) and **Resonance Prisms** ("RP", premium) already exist on
+  the profile. ⚠️ *Gem* means a socketed stone (§6d), never the currency.
 - Crafting and enchanting are **time-gated**, skippable with premium currency.
 - Creative north star: **RuneScape 3** equipment/skilling/economy feel.
 - Existing stub: the Inventory tab already previews three verbs —
@@ -232,8 +233,8 @@ Tier III and IV sets require **all three** of:
 
 ### 3.6 Monetization principle ✅ (the governing rule)
 
-> **Premium currency ("purple gems") only ever buys a shortcut. There must
-> never be anything you *have* to pay gems to do.**
+> **Premium currency (Resonance Prisms) only ever buys a shortcut. There must
+> never be anything you *have* to pay RP to do.**
 
 - ✅ **Allowed:** skipping/reducing crafting, enchanting and conversion
   **cooldowns**; "time crystals"; extra potion yield; buying better *odds*
@@ -246,7 +247,7 @@ Tier III and IV sets require **all three** of:
 components is not. The line is **acceleration, not access**.
 
 ✅ Rare Tier III/IV components are **Bound** (§6c), which is what keeps a
-player-to-player market from quietly reselling what drops were meant to gate.
+Concord Market from quietly reselling what drops were meant to gate.
 
 ---
 
@@ -945,6 +946,114 @@ low-tier insurance keeps 1, endgame insurance keeps several.
 
 ---
 
+## 6d. Gem sockets 📝 (needs refinement)
+
+Status: 📝 **draft — the idea captured, the shape sketched, the numbers open.**
+
+> High-level weapons and equipment roll **0–3 gem slots**. Gems are cut by
+> **Jewelry** from a stone plus a **Crystal / Core / Heart**, and socketing one
+> grants a bonus — `+health`, `+% damage`, `+flat damage`, and possibly **one
+> status per element**, piggybacking on the enchanting system.
+
+⭐ **Why this earns its place: it adds a BiS axis that is about the *item*, not
+the stat roll.** Today best-in-slot is "the right piece with the right enchant."
+Sockets make it "the right piece with **three** slots" — a genuinely different
+hunt, because slot count is a property of the drop and cannot be crafted onto it.
+A 3-slot blue can beat a 1-slot purple, which is exactly the kind of inversion
+that keeps loot interesting long after the level cap.
+
+### 6d.1 ⚠️ Naming collision — resolve this first
+
+**"Gem" meant three different things. ✅ Resolved by renaming the currency:**
+
+| Meaning | Where | Status |
+|---|---|---|
+| ~~Premium currency~~ | ~~`PlayerProfile.gems`~~ → ✅ renamed **Resonance Prisms** (`resonancePrisms`) | resolved |
+| **Socketed elemental stone** | The Concordant Crown's *"twelve empty gem slots"* and *"twelve elemental gems"* (GAME_DESIGN §3a) | in design |
+| **Socketed equipment stone** | this section | proposed |
+
+The second and third agree with each other — ⭐ **the Crown is simply the
+capstone of this system**, a twelve-slot item at the end of a game that taught
+you sockets on ordinary gear. That unification is worth having.
+
+The collision is with the **premium currency**, and ✅ **the ruling is to rename
+that**, not the stones — the socket meaning is used in two places already and is
+central to play, while the premium currency is one `int` and a label.
+
+✅ **The premium currency is RESONANCE PRISMS ("RP").**
+
+- It is a **raw material**: Time Crystals are *crafted from* RP. RP is not
+  itself a Time Crystal, and the two are not interchangeable.
+- ✅ **The art does not change** — same purple diamond, same colour
+  (`AppColors.gem`, `0xFF8B5CD6`). Only the name moves.
+- ✅ Renamed in code: `PlayerProfile.gems` → `PlayerProfile.resonancePrisms`,
+  and the persisted JSON key with it.
+- ⭐ *Resonance* is doing real work in the name — it reads as a property of magic
+  rather than a mineral, which keeps it clear of the twelve elements, the mote
+  ladder, and equipment gems all at once. "RP" is short enough for a currency
+  chip in the HUD.
+
+✅ **This closes GAME_DESIGN open question #10.** The word *gem* now means one
+thing everywhere: a socketed stone.
+
+### 6d.2 📝 How a gem is made
+
+Follows the mote ladder already settled in §6.0, so it needs no new economy:
+
+| Gem tier | Costs | Rarity it fits |
+|---|---|---|
+| **Lesser** | cut stone + **Crystal** (uncommon) | Green / Blue gear |
+| **Standard** | cut stone + **Core** (rare) | Purple |
+| **Greater** | cut stone + **Heart** (epic) | Orange / Iridescent |
+
+- **Jewelry** is the skill, which is already sited at **Rimeholt** ("the deep
+  stone is where gems come from") — so the crafting geography needs no change.
+- A gem is **element-bound** by the mote that made it, which is what lets it
+  carry that element's status.
+
+### 6d.3 📝 What a gem can grant
+
+Two families, and the split matters for §2.2:
+
+| Family | Examples | Note |
+|---|---|---|
+| **Universal** | +health, +flat damage, +% damage | Safe, linear, boring on purpose |
+| **Elemental** | one signature status per element, per §5.1 | ⚠️ The interesting half, and the dangerous one |
+
+⚠️ **Universal gems are an anti-meta hazard.** If `+% damage` is sluttable by
+anyone into anything, every player socks the same three gems and sockets become
+a stat tax rather than a decision. The §2.2 anti-meta guarantee wants the
+opposite. Two candidate fixes, both need testing:
+
+1. **Element-lock the strong ones** — the biggest bonuses only come on elemental
+   gems, so socketing commits you to elements you actually run.
+2. **Diminishing returns per repeated gem** — a second identical gem gives less,
+   pushing toward mixed sockets.
+
+### 6d.4 ⚠️ Risks this must be tested against
+
+- **The power budget (§2.1).** This is a **third** multiplicative axis on top of
+  set bonuses and enchants. Three Greater gems on every one of nine slots is 27
+  sources of bonus. The budget was not written with that in it — ⚠️ **re-sim
+  before committing.**
+- **Proc rates (§7.1).** Element statuses on gems multiply the number of proc
+  sources on a single mage. §7.1 already names proc stacking as the biggest
+  balance risk in the document; this makes it bigger.
+- **PvP gear gap (§7.4).** Socket count is unbounded loot luck, which widens the
+  gap the two-ladder rule exists to manage.
+
+### 6d.5 ❓ Open questions
+
+| Question | Why it matters |
+|---|---|
+| Are gems **removable**? | If not, a 3-slot BiS piece with wrong gems is ruined and the chase feels punishing. If freely, gems become currency. ⭐ The **unbinding enchant (§6c)** already exists as machinery — reuse it: removal is possible, costs an unbind, and destroys either the gem or nothing depending on the ruling. |
+| Slot-count distribution | What fraction of drops roll 3 slots decides whether it is a chase or a wall |
+| Do sockets appear below a rarity floor? | Sockets on White gear would flood the market with cheap fodder |
+| Can sockets be **added** to an item? | A "socketing" recipe would make slot count craftable — which destroys the point of it being a drop property |
+| Does the Concordant Crown use the same gems? | ⭐ It should. Twelve elemental gems, one per element, is the same system at maximum scale |
+
+---
+
 ## 7. Balance guardrails ⚠️
 
 ### 7.1 Proc rates and streak thresholds — the biggest risk
@@ -1203,7 +1312,7 @@ streaks/stacks), **charge retention vs the element cycle** (#38), **potion
 ordering in the P3 group** (#39), and the **compelled-forfeit wire-protocol/
 anti-cheat prerequisite** (§5b.1). GAME_DESIGN and PROGRESSION_DESIGN
 updated in the same pass (elements section marked shipped, storage split and
-Tiamonds/gems flagged, two-ladder Elo, §3 skills reconciliation, cost-based
+premium currency renamed to Resonance Prisms, two-ladder Elo, §3 skills reconciliation, cost-based
 §4.1 reasoning).
 
 **Rev 10** — Final rulings; only "set pieces Epic+?" remains open.

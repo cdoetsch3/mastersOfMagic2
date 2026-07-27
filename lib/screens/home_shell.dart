@@ -338,7 +338,7 @@ class PlayerHeader extends StatelessWidget {
           const SizedBox(width: 8),
           _Currency(
               leading: const Icon(Icons.diamond, size: 14, color: AppColors.gem),
-              value: p.gems),
+              value: p.resonancePrisms),
         ],
       ),
     );

@@ -53,7 +53,7 @@ the veil (**The Empyrean**), and re-enters at the summit.
 making Celestial the cosmic plane:
 
 - **Concordance is a Celestial-tier town and the trade capital of the world** —
-  bank, auction floor, contracts, player market, hour-long buffs. It is the most
+  bank, the Concord Market, contracts, hour-long buffs. It is the most
   civic, mundane, human place in the game. It cannot be on a cosmic plane.
 - **Meridian is an observatory**, and you observe the heavens *from* the world.
 - The zone names already insist on it: **Starfall Basin** is a crater field of
@@ -267,6 +267,223 @@ final act.**
 
 ---
 
+## 4b. Travel, mounts and trade 📝
+
+Status: 📝 **draft — designed here, nothing built.** Travel today is an instant
+graph hop; everything below is the model to build toward.
+
+### 4b.1 ✅ Travel is click-and-wait, on a real clock
+
+You click a connected location and arrive after a **duration**. That duration is
+the resource the whole trade economy is built on — if travel is free, none of
+the rest of this section has any tension in it.
+
+✅ **The clock is real, and tuned to be waitable.** ~**5 minutes** per leg as
+the baseline. Long enough that a mount is worth buying, short enough that
+waiting it out is a legitimate choice rather than a wall.
+
+⭐ **5 rather than 3 because Journey can beat it** (§4b.2). A fixed safe time
+that a skilled player can undercut by fighting is a better number than one they
+can only ever match — it means the baseline is the *ceiling* for a good player,
+not the floor for everyone.
+
+✅ **Every edge carries its own base time.** No terrain classes, no modifiers —
+each location simply stores a duration to each of its neighbours, and mounts
+multiply it. Deliberately the simplest thing that works.
+
+✅ **Time crystals expedite travel**, the same way they skip crafting and
+research timers (GAME_DESIGN idea bank #8/#9).
+
+📝 **Worked example — the thing to tune against.** Aldermere → Rimeholt is a
+long chain of legs. At ~5 minutes each on foot that is **~30 minutes**; the same
+trip is **~3 minutes** on a Giant Eagle and **~90 seconds** on a Veilcourser.
+That collapse *is* the mount ladder's appeal, and it is why the top tiers can be
+priced steeply.
+
+⚠️ 20 minutes is still a lot to ask of a player who has not bought a mount yet,
+which is what the alternate transports are for — ⭐ **a ferry from Pennycross to
+Concordance**, unlocked with Concordance itself, turns the worst early leg into
+a single hop. Every long overland chain wants a counterpart like it.
+
+⚠️ **This supersedes GAME_DESIGN idea bank #9**, which proposed ~10–15s early
+legs scaling to hours. Minutes-not-seconds is the settled scale; hours is too
+long to ever be waitable.
+
+⚠️ **Code implication.** `GameLocation.connections` is a `List<String>` — it has
+nowhere to put a duration. ✅ **Edges must become objects** (`TravelEdge { to,
+minutes }`). This is the first real refactor the section forces, and it is
+confirmed rather than optional.
+
+### 4b.2 ✅ Travel modes — "just get me there" vs "fight through"
+
+Two ways to cover the same ground:
+
+| | **Travel** | **Journey** |
+|---|---|---|
+| **Route** | ✅ direct between **any two towns** | leg by leg, ⚠️ **stopping at each town** |
+| **Duration** | fixed — the sum of the legs | ⭐ **variable** — how fast you clear what you meet |
+| **Encounters** | none | the road's encounter table |
+| **Rewards** | none | XP, gold, loot, motes |
+| **Cargo** | ✅ safe | ⚠️ **at risk** |
+
+⭐ **Journey is faster when you are good at it.** Clear encounters quickly and
+you beat the fixed Travel time; struggle and you lose to it. That makes the
+baseline a *ceiling for skilled play* rather than a floor everyone shares, and
+it is why the base leg is 5 minutes rather than 3.
+
+⭐ **Cargo risk is what stops Journey dominating.** Faster *and* more rewarding
+would leave Travel with no purpose — but a trader hauling 100 slots of stock
+cannot gamble it, so they take the safe direct route while an adventurer with an
+empty pack takes the road. Same map, two playstyles, no artificial gate between
+them.
+
+✅ **Travel is point-to-point between any two towns.** You do not hop
+town-by-town; you pick a destination and pay the summed duration. ✅ **Journey
+stops at every town on the way**, which is where you heal — so the long road is
+naturally broken into survivable stages.
+
+⚠️ **Code implication: this needs pathfinding.** Direct town-to-town travel means
+computing a route and its total duration over the edge graph, not just reading
+one edge. Together with §4b.1's `TravelEdge` refactor, that is the shape of the
+travel system's first build.
+
+- Gives the **push-your-luck adventure loop** (GAME_DESIGN §5) a natural home:
+  the road *is* the run.
+- ❓ Open: what "at risk" means — a fraction of cargo on defeat, or all of it?
+  Loot insurance (ITEMS §6b.4) is the existing lever.
+- ❓ Open: is Journey offered on every edge, or only ones with a designed
+  encounter table?
+
+### 4b.3 ✅ Mounts — a price ladder, plus a speed-vs-bulk fork
+
+✅ **No terrain rules.** A mount is a **speed multiplier** and a pile of **extra
+cargo slots**. Nothing else. Some mounts are simply better than others; that is
+intended, and price carries it.
+
+⭐ **The interesting part is that each price tier above the intro offers a
+speed play and a bulk play at the same cost**, so the ladder is a series of
+forks rather than a single line.
+
+| Tier | Mount | Speed | Cargo | Note |
+|---|---|---|---|---|
+| **1** | 🐐 **Goat** | 1× | +5 | Cheap intro. Walks beside you — you do not ride it |
+| **1** | 🫏 **Mule** | 1× | +20 | Also walked, not ridden. The first real hauler |
+| **2** | 🐴 **Horse** | 2× | +10 | The first time you are actually riding |
+| **3** | 🐎 **Quarter Horse** | **5×** | +10 | *the speed play* |
+| **3** | 🐴 **Clydesdale** | 2× | **+35** | *the bulk play* — same price as the Quarter Horse |
+| **4** | 🦅 **Giant Eagle** | **10×** | +8 | *speed* |
+| **4** | 🦁 **Griffon** | 4× | +28 | *middle* — 📝 proposed, see below |
+| **4** | 🐘 **Elephant** | 1.5× | **+60** | *bulk* |
+| **5** | 🐉 *speed monster* | **20×** | +20 | 📝 naming below |
+| **5** | 🐲 *bulk monster* | 5× | **+100** | 📝 naming below |
+
+📝 **The Griffon fills tier 4's middle slot** — it is literally an eagle joined
+to a horse, which is exactly where it sits mechanically between the Giant Eagle
+and the Elephant. If tier 4 only needs two options, drop it.
+
+### 4b.3a ✅ Tier 5 — the Ethereal three-pack
+
+⭐ **The top tier is three mounts, one per Ethereal element** — Umbra fast,
+Arcane balanced, Sanctus vast. The tier that ends the game is built out of the
+tier that ends the elements, and the speed/bulk fork of the lower tiers opens
+into a three-way choice at the top.
+
+| Mount | Element | Speed | Cargo | Reading |
+|---|---|---|---|---|
+| 🌑 **Veilcourser** | Umbra | **20×** | +20 | *the speed play* |
+| 🌀 **Riftwing** | Arcane | 10× | +50 | *the balance* |
+| ✨ **Hallowbearer** | Sanctus | 5× | **+100** | *the bulk play* |
+
+**Veilcourser** — a *courser* is a swift warhorse, so the name means "fast"
+before it means anything else, and it caps the Horse → Quarter Horse line at
+the top of the game. It runs *along* the Veil, taking the shortcut the world
+cannot, which is what earns the 20× rather than merely asserting it.
+⚠️ **It must not open the Veil** — the design rests on there being exactly two
+doors (§1.3). It skims; it does not cross wherever it likes.
+
+**Hallowbearer** — holy, enormous, and *bearer* says cargo in the name. Matches
+Hallowmarch, so the Sanctus vocabulary is consistent across the world.
+
+**Riftwing** — Arcane, flying, and the only tier-5 mount that is good at both
+without being best at either. 💡 **Codexwing** is the alternative if you want it
+tied to the Collapsed Academy and the Unwritten Library rather than to raw
+rifts.
+
+📝 Alternates considered: *Veilhound / Veilstag* (Umbra), *Thronebeast /
+Lamassu* (Sanctus), *Glyphwing / Cipher* (Arcane).
+
+⭐ **These should drop from the Eclipsed Citadel.** The final dungeon giving you
+your final mounts closes the loop between the campaign and the economy, and it
+gives the Citadel a reward that is not just gear.
+
+### 4b.4 📝 Boats
+
+The Galehaven ↔ Tidewrack passage is already sea-only in the graph. Boats
+generalise that:
+
+- Run only on sea edges, on a **schedule or for a fare** — the fare is a gold
+  sink that scales with cargo.
+- ⭐ **Carry mounts.** The only way to relocate an animal without walking it.
+- Cargo-heavy and slow: the bulk option against the horse's speed.
+
+### 4b.5 ✅ The Concord Market, and shops
+
+✅ **The player-to-player market is the CONCORD MARKET.** One name, one order
+book, **two access points** — Concordance and Zenith. It is called the Concord
+Market from both doors, because it *is* the same system; a second name would
+imply a second market and split liquidity (GAME_DESIGN §3b).
+
+✅ **Everything else is a "shop" or a "store"** — never a market. Keeping the
+word *market* exclusively for the player economy is what stops every UI label
+and design conversation needing a disambiguator.
+
+| | Concord Market | Town shops |
+|---|---|---|
+| **Where** | Concordance and Zenith | every town **past Pennycross** |
+| **Prices** | floating, set by players | **static**, per-town |
+| **Scope** | global, one shared book | local |
+| **Tax** | 10%, split evenly both sides | — |
+
+### 4b.6 ⭐ The trade loop
+
+Static local prices plus a floating global price is an **arbitrage engine**, and
+that is deliberate:
+
+> Travel to a town, buy what is cheap *there*, carry it back, sell it on the
+> Concord Market for the global price.
+
+Every travel mechanic above is a lever on that loop: **mounts' cargo** caps the
+profit per trip, **mounts' speed** caps trips per hour, **boats** move bulk, and
+**teleports** cut the outbound leg but strand your animal.
+
+⭐ **Pennycross earns a sharper job from this.** Shops start *past* it, so
+Pennycross is the last fixed-price town and the first place a price difference
+is visible — a better tutorial beat than "teaches buying and selling", which is
+what §4 of GAME_DESIGN currently claims. Update that line when this is built.
+
+⚠️ **The risk this had to solve: a static buy price permanently below the market
+floor is a gold faucet.** Players drive the *market* price down by flooding
+supply — that half is self-correcting — but the *town* price never moves, so the
+spread would only ever close from one side.
+
+✅ **The ruling: shop stock is per-player, limited, and restocks daily.** Each
+player has their own inventory at each shop, capped per day and replenished
+overnight. That caps the faucet at *N players × daily stock* instead of
+infinity, and it does it without any price simulation.
+
+⭐ **It also makes the trade loop a daily route rather than a grind.** You cannot
+stand in one shop and drain it; you visit several, take what each has, and come
+back tomorrow. That is a far better shape for a game with travel times in it —
+the constraint pushes players outward across the map instead of into a loop of
+one edge.
+
+- 📝 Some town prices should still sit *above* market, or routing is solved once
+  and never thought about again.
+- ❓ Open: whether shops also *buy* from players (a price floor, and a second
+  faucet to watch).
+
+---
+
 ## 5. Ideas salvaged from the rejected plates
 
 Plates II and III were not adopted as maps, but three things from them are:
@@ -460,7 +677,7 @@ not locked.
 > through here, and the city has arranged itself around that fact. You show
 > your Sigil at the gate. Nobody fights you; someone writes your name down.
 >
-> **Here** — The bank. The player market (10% tax, split evenly). Contracts.
+> **Here** — The bank. The **Concord Market** (10% tax, split evenly). Contracts.
 > PvP and Academy entrances. Hour-long district buffs. ⭐ **No crafting
 > stations, on purpose** — value *moves* here, it is not made here.
 
@@ -608,8 +825,8 @@ not locked.
 > into is a mark on it you could put a finger over.
 >
 > **Here** — **Every crafting station** — the only town with all six. Teleports
-> to every other city. The player market (the *same* order book as Concordance,
-> a second door — never a second market). The unbinding enchant. Post-cap
+> to every other city. The **Concord Market** — the *same* order book as
+> Concordance, a second door, never a second market. The unbinding enchant. Post-cap
 > XP→motes. Tier IV set assembly.
 >
 > ⚠️ **Reached from above, through the Citadel.** The last pitch cannot be
@@ -685,12 +902,16 @@ part. Counted twice.
 
 **Rev 2** (2026-07-26) — `world.dart` rebuilt from Plate I-b: 32 locations with
 tier, plane, elevation, station, gate, blurb and arrival text; the walkable
-graph; Zenith's teleport net. Added `WorldPlane`, `World.treeLineMetres`,
-`World.exists`, and the `hasThinAir` / `hasMoon` / `isAboveTreeLine` helpers.
-`test/world_test.dart` (25 tests) guards graph symmetry, reachability, the
-two-door Veil crossing, one-pure-zone-per-element, the tree line, and the
-Tidewrack/Molten Deep exceptions. `PlayerProfile.migrateWorld()` repairs saves
-that point at removed regions.
+graph; Zenith's teleport net. Added `WorldPlane`, `World.treeLineMetres`, and
+the `hasThinAir` / `hasMoon` / `isAboveTreeLine` helpers.
+`test/world_test.dart` guards graph symmetry, reachability, the two-door Veil
+crossing, one-pure-zone-per-element, the tree line, and the Tidewrack/Molten
+Deep exceptions.
+
+📝 **No save migration.** The game is in beta with no single-player progression
+built — no bestiary, no way to advance between areas — so there is nothing to
+convert. `World.byId` still falls back to the start town for an unrecognised id,
+which is enough. Revisit only once real progression exists to lose.
 
 **Rev 1** (2026-07-26) — Created. Settles the physical geography after a
 five-plate design pass: the world rises rather than spreads; **The Vault** named;
