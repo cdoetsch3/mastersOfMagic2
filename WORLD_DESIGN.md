@@ -412,9 +412,56 @@ rifts.
 📝 Alternates considered: *Veilhound / Veilstag* (Umbra), *Thronebeast /
 Lamassu* (Sanctus), *Glyphwing / Cipher* (Arcane).
 
-⭐ **These should drop from the Eclipsed Citadel.** The final dungeon giving you
-your final mounts closes the loop between the campaign and the economy, and it
-gives the Citadel a reward that is not just gear.
+### 4b.3b ✅ Earning a tier-5 mount — the tack chain
+
+✅ **All three are earned in the Eclipsed Citadel**, which gives the endless
+dungeon a reward that is not just gear, and closes the loop between the campaign
+and the economy.
+
+✅ **The chain:**
+
+1. The Citadel's final boss rarely drops a piece of **tack** — a **saddle**, a
+   **bridle**, or **reins**. ✅ **One set per mount**, so the pieces are
+   mount-specific: the Veilcourser's bridle is not the Hallowbearer's.
+2. Hold a **complete set of three**, then clear the Citadel **once more**.
+3. ✅ The mount is yours.
+
+⭐ **The re-clear is a taming, not a repeat.** This is the detail that keeps the
+final step from reading as "do it again because we said so": the tack is useless
+on its own, and *the creature lives in the Citadel*. Carrying a complete set is
+what lets you take it. Framed that way the last run has its own goal, and 📝 the
+encounter should differ — a taming rather than another kill — so the player is
+not replaying identical content for a checkbox.
+
+⭐ **Three simultaneous reasons to re-run the Citadel.** With the Concordant
+Crown (§GAME_DESIGN 3a) and the endless difficulty ladder (§3c) already there,
+the tack chain makes a third. An endless dungeon with one goal is a grind; with
+three overlapping ones it is a rotation.
+
+📝 **This is the fifth time the world uses "collect three, then return"** — the
+four tier gates (proofs, Sigil, essences, key fragments) and now the tack. That
+is deliberate rhyme rather than repetition: it is the game's signature shape, and
+the Crown's twelve-and-twelve is the same idea at maximum scale. ⚠️ But it does
+mean the *fiction* has to keep varying, the way the four gates escalate from a
+guard to a bureaucracy to a barrier to a lock with nobody behind it.
+
+⚠️ **Drop rates need coupon-collector maths, not a gut feel.** Three mounts × 3
+pieces is **nine** distinct rare drops, and a set is only useful complete. Naive
+uniform drops make the last piece of a set punishing, and the third *set*
+brutal. Levers worth having: bad-luck protection, a way to trade or convert
+duplicate pieces, or letting the player choose which mount's tack a drop rolls
+toward once they own one set.
+
+⚠️ **Tack must be protected from cargo loss.** Journey puts hauled goods at risk
+(§4b.2). Losing a rare tack piece to a bad road would be the most
+morale-destroying event the game can produce — tack should be flagged
+undroppable, or carried outside cargo entirely.
+
+❓ Open: are tack pieces **tradable** on the Concord Market? Tradable makes the
+chase feel solvable with gold and softens the coupon-collector problem;
+untradable keeps it an achievement. ITEMS §6c owns the ruling.
+
+
 
 ### 4b.4 📝 Boats
 
