@@ -73,9 +73,11 @@ Phase 1  12 elements ──► Phase 2  shield math ──► Phase 3  effects
                                                         │
                                                   ⚠️ Phase 4  SIM GATE
                                                         │
-                        Phase 5  progression + world map
+                        Phase 5  progression + world map  🟡 map done, gating off
                                    │
-                        Phase 6  enemy design ──► build
+                        Phase 5b travel + mounts + trade  ⬜ NEW
+                                   │
+                        Phase 6  enemy design ──► build  ⚠️ 24+ designs
                                    │
                         Phase 7  item + loot catalogue (design)
                                    │
@@ -329,44 +331,73 @@ iterations here — that is the point of the gate.
 
 ---
 
-# Phase 5 — ⬜ NEXT — Progression and the world map
+# Phase 5 — 🟡 PARTLY DONE — Progression and the world map
 
-⚠️ **Three live inconsistencies found while reviewing (2026-07-25).** These
-are shipped-and-wrong today, not merely unbuilt:
+✅ **The map half is built** (2026-07-26). `world.dart` was rebuilt from
+[WORLD_DESIGN.md](WORLD_DESIGN.md) and Plate I-b, and all three inconsistencies
+this phase was opened to fix are resolved:
 
-1. **`world.dart` still holds the OLD 18-region map.** The 12-pure + 9-hybrid
-   + 6-town map designed in GAME_DESIGN §5 was never built.
-2. **A region is still named "Radiant Sanctum"** — a leftover from the
-   Radiant→Sanctus rename, visible to players on the map. (The tooltip
-   consistency test guards spell/lore/catalogue text for exactly this, but
-   does not cover location names — worth extending.)
-3. **Four elements appear in no region at all**: Solar, Lunar, Astral and
-   Arcane. The world only references the other eight.
+| Was | Now |
+|---|---|
+| `world.dart` held the old 18-region map | ✅ 32 places: 12 pure, 10 hybrid, 9 towns, the Citadel |
+| A region was still named "Radiant Sanctum" | ✅ Gone with the rest of the old list |
+| Solar, Lunar, Astral, Arcane appeared in **no** region | ✅ Every element has exactly one pure zone, guarded by test |
 
-Plus the planned work: element and spell unlock gating are both still
-`=> true`, so nothing is level-gated yet.
+Also delivered beyond the original scope, because the design moved:
+`WorldPlane` (world vs Empyrean), per-place elevation, tier, crafting station,
+gate object, `opensAtLevel`, Zenith's teleport net, and the gazetteer's blurb +
+arrival text — so `world.dart` is the single source of player-facing location
+copy. `test/world_test.dart` covers this phase's whole "done when" list plus
+graph symmetry, the two-door Veil crossing and the tree line.
 
-**Files:** `lib/game/progression.dart`, `lib/game/world.dart`,
-`lib/screens/tabs/map_tab.dart`, `PROGRESSION_DESIGN.md` §4.
+⬜ **What is still open in this phase:**
 
-1. Unlock schedule: **Celestial L30**, **Ethereal L45**, `Hallow` at L25.
-   Level cap stays **50**.
-2. Rebuild `world.dart` from GAME_DESIGN §5's map: **12 pure zones + 9
-   hybrids + 6 towns**, replacing the old 8-element region list. Note the old
-   list used `Ice`, which is not an element — it is **Aqua + Aero**.
-3. **Ethereal zones carry enemy levels up to 60** while the player caps at 50.
-   The level shown on a zone is the **enemy** level, not a requirement.
-   ⚠️ The UI must make that unmistakable, or players read "58–60" as "come
-   back at 58" and never return — same legibility lesson as the move timer
-   and Midnight.
-4. ⚠️ **No enemy stat curve is implemented here.** Enemy HP/damage are
-   per-monster (Phase 0), so the baseline statline is a **Phase 6**
-   deliverable. Phase 5 only assigns each zone its enemy-level *band*.
+1. ⬜ **Unlock gating is still off.** `Progression.isSpellUnlockedAt` and
+   `isElementUnlockedAt` both `=> true`, and `enforceSlotLimits` is `false`.
+   The schedules and the 5→15 slot curve are all *data* already; only the
+   switches are unflipped. ⚠️ Deliberate — playtesting wants everything
+   available — so **turning these on is a decision, not an oversight.**
+2. ⬜ **`map_tab.dart` has not been touched.** It compiles against the new model
+   but shows none of it: no elevation, plane, station, gate or tier, and the
+   "Lv X–Y" label still reads as a requirement rather than an **enemy** band.
+   ⚠️ That legibility problem is called out in GAME_DESIGN §5 and is now live.
+3. ⬜ **Travel is still an instant graph hop.** WORLD_DESIGN §4b designs
+   click-and-wait travel, Travel vs Journey, mounts and the trade loop — none of
+   it is built, and it needs two refactors first: `connections` must become
+   **edge objects** carrying a duration, and direct town-to-town Travel needs
+   **pathfinding**.
 
-**Done when:** a world test asserts every element has exactly one pure zone,
-every hybrid names two real elements, level bands don't overlap tiers
-incorrectly, and the connection graph has no unreachable nodes.
-**Hand the map screen to Christian for visual review.**
+**Hand the map screen to Christian for visual review** once (2) is done.
+
+---
+
+# Phase 5b — ⬜ NEW — Travel, mounts and trade
+
+📝 **Did not exist when this plan was written**; designed in WORLD_DESIGN §4b
+after the geography pass. Sits here because it depends on the world graph
+(Phase 5) and is depended on by the economy (Phase 9).
+
+**Files:** `lib/game/world.dart`, `lib/game/travel.dart` (new),
+`lib/game/player_profile.dart`, `lib/screens/tabs/map_tab.dart`.
+
+1. **`TravelEdge`** — turn `connections` from `List<String>` into objects
+   carrying a base duration. Prerequisite for everything else here.
+2. **Pathfinding** — direct Travel between any two towns, priced as the summed
+   legs.
+3. **Travel vs Journey** — Travel is fixed-duration, encounter-free, cargo-safe;
+   Journey is leg-by-leg, stops at towns to heal, rolls encounters, and is
+   faster when cleared quickly. ⚠️ **Cargo is at risk on a Journey and nothing
+   is exempt** — that severity is the design, not an oversight.
+4. **Mounts** — speed multiplier + cargo slots, no terrain rules. Five price
+   tiers; tier 5 is the Ethereal three-pack earned via the Citadel tack chain.
+5. **Shops** — per-player stock, capped daily, restocking overnight. Static
+   prices, in every town past Pennycross.
+6. **The Concord Market** — one order book, two access points. ⚠️ Build it as
+   *one table with two entry points*, never two markets; splitting liquidity is
+   the failure mode called out in GAME_DESIGN §3b.
+
+⚠️ **Supersedes idea bank #9** (10–15s legs scaling to hours). The scale is
+minutes: ~5 min per leg.
 
 ---
 
@@ -396,6 +427,16 @@ response and are not part of the numbered plan:
 ---
 
 # Phase 6 — 📝 DESIGN THEN BUILD: enemies and enemy mechanics
+
+⚠️ **Scope grew with the geography pass.** WORLD_DESIGN settled 22 zones plus
+the Empyrean's three, each wanting a **pool of 3–5 mini-bosses and 1–2 bosses**
+(GAME_DESIGN §3d) — roughly **24+ designs beyond what the bestiary lists
+today**, and the single largest content task in this plan. Budget for it
+honestly rather than discovering it mid-phase.
+
+📝 Also now in scope: the **Thin Air** status for the Celestial shelf and the
+**no-moon** rule above the Veil (WORLD_DESIGN §4.1–4.2) — both are enemy/zone
+environment rules rather than item mechanics.
 
 🚫 **Strictly after Phase 5.** The zones defined there are what enemies
 populate — the roster is sized per zone, spawn tables key off zone ids, and
@@ -465,6 +506,12 @@ refinement ladder is an exchange between tiers of abundance, *not* a
 ---
 
 # Phase 8 — Items: data model and the modifier vocabulary
+
+📝 **Now also carries gem sockets** (ITEMS §6d): 0–3 slots rolled per drop, gems
+cut from a stone + Crystal/Core/Heart, universal and per-element families. ⚠️ A
+**third multiplicative power axis** on top of set bonuses and enchants — §2.1's
+budget was not written to hold it, so re-sim before committing. The Concordant
+Crown is the same system at twelve slots.
 
 **Goal:** the engine can accept a bundle of equipment modifiers; the app can
 represent, store, and equip items.

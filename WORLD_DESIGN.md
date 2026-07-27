@@ -429,14 +429,34 @@ and the economy.
 ⭐ **The re-clear is a taming, not a repeat.** This is the detail that keeps the
 final step from reading as "do it again because we said so": the tack is useless
 on its own, and *the creature lives in the Citadel*. Carrying a complete set is
-what lets you take it. Framed that way the last run has its own goal, and 📝 the
-encounter should differ — a taming rather than another kill — so the player is
-not replaying identical content for a checkbox.
+what lets you take it.
+
+✅ **The taming is a cutscene, not an encounter** — an animation on completion,
+not a second interactive fight. Cheap to build, and it keeps the reward as a
+*moment* rather than another skill check after the one that already mattered.
 
 ⭐ **Three simultaneous reasons to re-run the Citadel.** With the Concordant
 Crown (§GAME_DESIGN 3a) and the endless difficulty ladder (§3c) already there,
 the tack chain makes a third. An endless dungeon with one goal is a grind; with
 three overlapping ones it is a rotation.
+
+✅ **Higher difficulty improves rare-drop odds** — and 📝 possibly clear
+*streaks* too. That is what makes the endless ladder pay for itself: pushing
+higher is how you farm tack and Crown components faster, rather than being a
+separate score-chasing activity bolted on beside them.
+
+✅ **The Crown drops on *every* clear, and is skipped if the player already holds
+one.** Checking-then-skipping rather than first-clear-only costs nothing and
+quietly covers the case where a player loses it — ⭐ which matters a great deal
+now that nothing is exempt from cargo loss.
+
+📝 **The Citadel's content load is lighter than its design weight suggests.** It
+has had more design attention than any other zone, which makes it *feel* like
+the biggest build. In practice: the twelve-element boss just means every element
+unlocked on one enemy; the Crown and the nine tack pieces are entries on a rare
+drop table; the taming is an animation. The genuinely new mechanic is the
+difficulty ladder. Other zones will get comparable design passes and land in the
+same place.
 
 📝 **This is the fifth time the world uses "collect three, then return"** — the
 four tier gates (proofs, Sigil, essences, key fragments) and now the tack. That
@@ -445,21 +465,30 @@ the Crown's twelve-and-twelve is the same idea at maximum scale. ⚠️ But it d
 mean the *fiction* has to keep varying, the way the four gates escalate from a
 guard to a bureaucracy to a barrier to a lock with nobody behind it.
 
-⚠️ **Drop rates need coupon-collector maths, not a gut feel.** Three mounts × 3
-pieces is **nine** distinct rare drops, and a set is only useful complete. Naive
-uniform drops make the last piece of a set punishing, and the third *set*
-brutal. Levers worth having: bad-luck protection, a way to trade or convert
-duplicate pieces, or letting the player choose which mount's tack a drop rolls
-toward once they own one set.
+✅ **Every tack piece is tradable on the Concord Market — and so is the finished
+mount.** That is the answer to the coupon-collector problem: nine distinct rare
+drops across three sets would be punishing to complete from personal luck alone,
+but a liquid market means the last piece is a *purchase* rather than a wall. The
+grind converts into gold, which is what the trade economy is for.
 
-⚠️ **Tack must be protected from cargo loss.** Journey puts hauled goods at risk
-(§4b.2). Losing a rare tack piece to a bad road would be the most
-morale-destroying event the game can produce — tack should be flagged
-undroppable, or carried outside cargo entirely.
+⚠️ **Drop rates still want checking against the market, not against a solo
+player.** With tradability the question changes from "how long to complete a set
+alone" to "does enough supply enter the economy" — a rate tuned for solo
+completion would flood it.
 
-❓ Open: are tack pieces **tradable** on the Concord Market? Tradable makes the
-chase feel solvable with gold and softens the coupon-collector problem;
-untradable keeps it an achievement. ITEMS §6c owns the ruling.
+✅ **Nothing is exempt from cargo loss — including tack.** Journey risks
+everything you carry, deliberately. Holding something rare is precisely when you
+should be taking **Travel**, and choosing to Journey anyway is a real gamble with
+a real consequence. ⭐ The severity is the point: an exemption list would quietly
+remove the only teeth the mode has.
+
+💡 **Possible softener — N items kept.** A small number of slots the player
+*chooses* to protect on a loss. Worth exploring because it keeps the tension
+(you must decide what matters) while removing the worst outcome (losing the one
+thing you cannot replace). ⭐ Direct precedent in the project's stated north star:
+RuneScape's items-kept-on-death, where the count itself is a thing you can raise.
+❓ Undecided — count, whether it is bought or earned, and whether it applies to
+PvP.
 
 
 
