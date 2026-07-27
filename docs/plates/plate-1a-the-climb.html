@@ -1,0 +1,446 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Known World — Survey Plate I-a</title>
+<style>
+:root {
+  --paper:#E8E4DA; --paper-2:#DFDACE; --ink:#1E2A38; --ink-mid:#556374;
+  --sea:#B9C7CE; --brass:#8A6A3B; --rule:#1E2A3826; --card:#EFECE4;
+  --forest:#5FB35B; --desert:#F5B23E; --ice:#AFC3E8; --volc:#E25822;
+  --serif:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --cond:"Avenir Next Condensed","Roboto Condensed",ui-sans-serif,
+         "Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark) {
+  :root { --paper:#0E1420; --paper-2:#131B29; --ink:#C8D4E2; --ink-mid:#8C9BAE;
+    --sea:#16202F; --brass:#C9A063; --rule:#C8D4E22e; --card:#161F2E; }
+}
+:root[data-theme="dark"] { --paper:#0E1420; --paper-2:#131B29; --ink:#C8D4E2;
+  --ink-mid:#8C9BAE; --sea:#16202F; --brass:#C9A063; --rule:#C8D4E22e;
+  --card:#161F2E; }
+:root[data-theme="light"] { --paper:#E8E4DA; --paper-2:#DFDACE; --ink:#1E2A38;
+  --ink-mid:#556374; --sea:#B9C7CE; --brass:#8A6A3B; --rule:#1E2A3826;
+  --card:#EFECE4; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--serif); line-height:1.6; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:1120px; margin:0 auto; padding:48px 24px 96px;
+  display:flex; flex-direction:column; gap:44px; }
+header { display:flex; flex-direction:column; gap:10px;
+  border-bottom:1px solid var(--rule); padding-bottom:26px; }
+.eyebrow { font-family:var(--cond); font-size:12px; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--brass); }
+h1 { font-size:clamp(34px,6vw,58px); line-height:1.04; margin:0;
+  font-weight:500; letter-spacing:-.015em; text-wrap:balance; }
+.dek { margin:0; max-width:64ch; color:var(--ink-mid); font-size:17px; }
+.meta { display:flex; flex-wrap:wrap; gap:8px 26px; font-family:var(--mono);
+  font-size:11.5px; color:var(--ink-mid); letter-spacing:.04em; margin-top:6px; }
+.meta b { color:var(--brass); font-weight:400; }
+.plate-frame { background:var(--card); border:1px solid var(--rule);
+  padding:14px; overflow-x:auto; }
+svg.plate { display:block; width:100%; height:auto; min-width:660px; }
+svg.ascent { display:block; width:100%; height:auto; min-width:720px; }
+figcaption { font-family:var(--mono); font-size:11.5px; color:var(--ink-mid);
+  padding:10px 2px 0; letter-spacing:.03em; }
+figure { margin:0; display:flex; flex-direction:column; }
+
+.ocean { fill:var(--sea); }
+.sea-line { stroke:var(--ink); stroke-width:.4; opacity:.13; }
+.grat line { stroke:var(--brass); stroke-width:.5; opacity:.3; }
+.coast { fill:var(--paper-2); stroke:var(--ink); stroke-width:1.6;
+  stroke-linejoin:round; }
+.t-forest { fill:var(--forest); opacity:.15; }
+.t-desert { fill:var(--desert); opacity:.17; }
+.t-ice { fill:var(--ice); opacity:.2; }
+.t-northface { fill:#2B3550; opacity:.3; }
+.t-shadow { fill:#2B3550; opacity:.24; }
+.t-volcanic { fill:var(--volc); opacity:.13; }
+.t-marsh { fill:#5FB35B; opacity:.1; }
+.contour { fill:none; stroke:var(--ink); stroke-width:.7; opacity:.28; }
+.river { fill:none; stroke:#3D8BD9; stroke-width:2.4; opacity:.62;
+  stroke-linecap:round; }
+.glacier { fill:none; stroke:#AFC3E8; stroke-width:5; opacity:.6;
+  stroke-linecap:round; }
+.lake { fill:#3D8BD9; opacity:.34; stroke:#3D8BD9; stroke-width:1; }
+.ridge { fill:none; stroke:var(--ink); stroke-width:1.5; opacity:.62;
+  stroke-linejoin:round; stroke-linecap:round; }
+.crown .ridge { stroke-width:1.9; opacity:.8; }
+.dune,.shoal { fill:none; stroke:var(--ink); stroke-width:1; opacity:.34; }
+.road { fill:none; stroke:var(--brass); stroke-width:2.2; stroke-dasharray:7 5;
+  opacity:.85; stroke-linecap:round; }
+.climb { fill:none; stroke:var(--brass); stroke-width:1.8;
+  stroke-dasharray:2 5; opacity:.95; stroke-linecap:round; }
+.searoute { fill:none; stroke:#3D8BD9; stroke-width:1.6;
+  stroke-dasharray:9 6; opacity:.75; }
+.sr-lbl { font-family:var(--cond); font-size:11px; fill:#3D8BD9;
+  letter-spacing:.14em; opacity:.9; }
+.m-town { fill:var(--paper); stroke:var(--ink); stroke-width:2; }
+.m-ring { fill:none; stroke:var(--brass); stroke-width:1.6; }
+.m-citadel { fill:#8B5CD6; stroke:var(--ink); stroke-width:1.6; }
+.m-zenith { fill:var(--brass); stroke:var(--ink); stroke-width:1.4; }
+.m-zcore { fill:var(--paper); }
+.z-halo { fill:none; stroke:var(--brass); stroke-width:1;
+  stroke-dasharray:3 5; opacity:.8; }
+.m-zone { stroke:var(--ink); stroke-width:1.3; }
+.m-hyb-ring { fill:none; stroke:var(--ink); stroke-width:1.3; }
+.m-deep { fill:none; stroke:var(--ink); stroke-width:1.3;
+  stroke-dasharray:3 2.5; }
+.lbl-zone { font-family:var(--cond); font-size:13px; fill:var(--ink); }
+.lbl-town { font-family:var(--cond); font-size:15px; font-weight:700;
+  fill:var(--ink); letter-spacing:.05em; text-transform:uppercase; }
+.lbl-zenith { font-family:var(--cond); font-size:18px; font-weight:700;
+  fill:var(--brass); letter-spacing:.14em; }
+.lvl { font-family:var(--mono); font-size:10px; fill:var(--ink-mid);
+  letter-spacing:.03em; }
+.place { transition:opacity .18s ease; }
+.places:hover .place { opacity:.42; }
+.places .place:hover { opacity:1; }
+.gauge line { stroke:var(--brass); stroke-width:1; }
+.gauge .tick { opacity:.7; }
+.bd-e { fill:#8B5CD6; opacity:.75; } .bd-c { fill:#6E7BD6; opacity:.75; }
+.bd-k { fill:#9BB8C4; opacity:.75; } .bd-p { fill:#5FB35B; opacity:.75; }
+.g-tier { font-family:var(--cond); font-size:13px; font-weight:700;
+  letter-spacing:.16em; fill:var(--ink); }
+.g-sub { font-family:var(--mono); font-size:9.5px; fill:var(--ink-mid); }
+.c-ring { fill:none; stroke:var(--brass); stroke-width:1; }
+.c-needle { fill:none; stroke:var(--ink); stroke-width:1.2; }
+.c-north { fill:var(--ink); opacity:.8; }
+.c-lbl { font-family:var(--cond); font-size:13px; fill:var(--brass);
+  letter-spacing:.1em; }
+
+/* --- ascent section --- */
+.rock { fill:url(#rock); stroke:var(--ink); stroke-width:1.6; }
+.northface { fill:#2B3550; opacity:.34; }
+.alt-grid { stroke:var(--ink); stroke-width:.5; opacity:.18; }
+.alt-lbl { font-family:var(--mono); font-size:10.5px; fill:var(--ink-mid);
+  font-variant-numeric:tabular-nums; }
+.alt-unit { font-family:var(--mono); font-size:9.5px; fill:var(--ink-mid);
+  letter-spacing:.14em; opacity:.8; }
+.treeline { stroke:var(--ink); stroke-width:1; stroke-dasharray:8 6;
+  opacity:.5; }
+.tl-lbl { font-family:var(--mono); font-size:10.5px; fill:var(--ink-mid);
+  letter-spacing:.05em; }
+.route { fill:none; stroke:var(--brass); stroke-width:2.2;
+  stroke-dasharray:6 4; stroke-linejoin:round; }
+.thruRock { fill:none; stroke:var(--brass); stroke-width:1.3;
+  stroke-dasharray:2 4; opacity:.75; }
+.leader { stroke:var(--ink); stroke-width:.7; opacity:.4; }
+.p-town { fill:var(--paper); stroke:var(--ink); stroke-width:2; }
+.p-cit { fill:#8B5CD6; stroke:var(--ink); stroke-width:1.6; }
+.p-zenith { fill:var(--brass); stroke:var(--ink); stroke-width:1.4; }
+.p-ring { stroke:var(--ink); stroke-width:1.3; }
+.p-deep { stroke:var(--ink); stroke-width:1.3; stroke-dasharray:3 2.5; }
+.p-lbl { font-family:var(--cond); font-size:13px; fill:var(--ink); }
+.p-lbl-t { font-family:var(--cond); font-size:14px; font-weight:700;
+  fill:var(--ink); letter-spacing:.05em; text-transform:uppercase; }
+.p-lbl-z { font-family:var(--cond); font-size:17px; font-weight:700;
+  fill:var(--brass); letter-spacing:.14em; }
+.p-sub { font-family:var(--mono); font-size:10px; fill:var(--ink-mid); }
+.face-lbl { font-family:var(--cond); font-size:11.5px; fill:var(--ink-mid);
+  letter-spacing:.18em; text-anchor:middle; }
+.face-lbl.dk { fill:var(--ink-mid); }
+
+section { display:flex; flex-direction:column; gap:16px; }
+h2 { font-size:27px; font-weight:500; margin:0; letter-spacing:-.01em;
+  text-wrap:balance; }
+h3 { font-family:var(--cond); font-size:15px; letter-spacing:.02em; margin:0;
+  font-weight:700; }
+.kicker { font-family:var(--cond); font-size:13px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--brass); font-weight:700; }
+p { margin:0; max-width:68ch; }
+.grid { display:grid; gap:18px;
+  grid-template-columns:repeat(auto-fit,minmax(272px,1fr)); }
+.card { background:var(--card); border:1px solid var(--rule); padding:20px 22px;
+  display:flex; flex-direction:column; gap:9px; }
+.card p { font-size:15.5px; color:var(--ink-mid); }
+.tbl-wrap { overflow-x:auto; border:1px solid var(--rule);
+  background:var(--card); }
+table { border-collapse:collapse; width:100%; min-width:640px; font-size:14.5px; }
+th,td { text-align:left; padding:11px 15px; border-bottom:1px solid var(--rule);
+  vertical-align:top; }
+th { font-family:var(--cond); font-size:11.5px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--brass); font-weight:700;
+  white-space:nowrap; }
+tr:last-child td { border-bottom:none; }
+td.pl { font-weight:600; white-space:nowrap; }
+td.loc { font-family:var(--mono); font-size:12px; color:var(--brass);
+  white-space:nowrap; }
+td.el { font-family:var(--mono); font-size:12px; color:var(--ink-mid);
+  white-space:nowrap; }
+td.why { color:var(--ink-mid); }
+ul.key { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap;
+  gap:8px 20px; font-family:var(--cond); font-size:13.5px; }
+ul.key i { display:inline-block; width:11px; height:11px; margin-right:7px;
+  border:1px solid var(--ink); vertical-align:-1px; }
+.shapes { display:flex; flex-wrap:wrap; gap:10px 24px; font-family:var(--cond);
+  font-size:13.5px; color:var(--ink-mid); }
+.shapes b { color:var(--ink); font-weight:600; }
+.flag { border-left:3px solid var(--brass); padding:4px 0 4px 18px;
+  display:flex; flex-direction:column; gap:9px; }
+.flag p { font-size:15.5px; }
+@media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Masters of Magic II · Survey Plate I-a · revision of Plate I</div>
+  <h1>The Known World</h1>
+  <p class="dek">Plate I with one structural change: the world no longer spreads
+  outward, it <strong>rises</strong>. The Ironspine does not end in a polar plain
+  — it culminates in a single massif, the last two tiers are its shelf and its
+  ascent, and <strong>Zenith is the summit</strong>.</p>
+  <div class="meta">
+    <span><b>Projection</b> equirectangular, north up</span>
+    <span><b>Places</b> 32 surveyed</span>
+    <span><b>Vertical range</b> −400 → 5 200 m</span>
+    <span><b>Status</b> proposal — nothing built</span>
+  </div>
+</header>
+
+<figure>
+  <div class="plate-frame"><svg viewBox="0 0 1010 1470" class="plate" role="img"
+ aria-label="Physical geography of the world: a southern river basin rising
+ through the Ironspine to a high Celestial shelf, culminating in a single
+ glaciated massif whose summit is the city of Zenith.">
+ <defs>
+  <pattern id="sea" width="8" height="8" patternUnits="userSpaceOnUse">
+    <path d="M0 4 H8" class="sea-line"/></pattern>
+  <clipPath id="land"><path d="M 214 118 C 250 90 300 70 360 58
+    C 420 46 470 38 520 34 C 580 30 640 42 700 64 C 760 86 810 112 856 150
+    C 900 190 924 250 932 316 C 940 390 918 470 906 540
+    C 894 610 926 690 938 762 C 950 834 918 918 884 996
+    C 850 1074 812 1140 762 1206 C 712 1272 660 1320 596 1358
+    C 532 1396 470 1418 412 1424 C 354 1430 300 1414 262 1382
+    C 224 1350 204 1300 192 1246 C 180 1192 178 1140 170 1088
+    C 162 1036 140 986 146 932 C 152 878 178 846 190 806
+    C 196 786 188 772 196 752 C 206 726 168 690 160 646
+    C 152 602 172 556 186 510 C 200 470 176 456 210 436
+    C 244 416 196 344 194 268 C 192 196 196 140 214 118 Z"/></clipPath>
+ </defs>
+ <rect width="1010" height="1470" class="ocean"/>
+ <rect width="1010" height="1470" fill="url(#sea)" opacity=".5"/>
+ <g class="grat">
+  <line x1="96" y1="96" x2="1000" y2="96"/><line x1="96" y1="188" x2="1000" y2="188"/><line x1="96" y1="280" x2="1000" y2="280"/><line x1="96" y1="372" x2="1000" y2="372"/><line x1="96" y1="464" x2="1000" y2="464"/><line x1="96" y1="556" x2="1000" y2="556"/><line x1="96" y1="648" x2="1000" y2="648"/><line x1="96" y1="740" x2="1000" y2="740"/><line x1="96" y1="832" x2="1000" y2="832"/><line x1="96" y1="924" x2="1000" y2="924"/><line x1="96" y1="1016" x2="1000" y2="1016"/><line x1="96" y1="1108" x2="1000" y2="1108"/><line x1="96" y1="1200" x2="1000" y2="1200"/><line x1="96" y1="1292" x2="1000" y2="1292"/><line x1="96" y1="1384" x2="1000" y2="1384"/>
+  <line x1="188" y1="30" x2="188" y2="1440"/><line x1="280" y1="30" x2="280" y2="1440"/><line x1="372" y1="30" x2="372" y2="1440"/><line x1="464" y1="30" x2="464" y2="1440"/><line x1="556" y1="30" x2="556" y2="1440"/><line x1="648" y1="30" x2="648" y2="1440"/><line x1="740" y1="30" x2="740" y2="1440"/><line x1="832" y1="30" x2="832" y2="1440"/><line x1="924" y1="30" x2="924" y2="1440"/>
+ </g>
+ <path class="coast" d="M 214 118 C 250 90 300 70 360 58 C 420 46 470 38 520 34
+   C 580 30 640 42 700 64 C 760 86 810 112 856 150 C 900 190 924 250 932 316
+   C 940 390 918 470 906 540 C 894 610 926 690 938 762 C 950 834 918 918 884 996
+   C 850 1074 812 1140 762 1206 C 712 1272 660 1320 596 1358
+   C 532 1396 470 1418 412 1424 C 354 1430 300 1414 262 1382
+   C 224 1350 204 1300 192 1246 C 180 1192 178 1140 170 1088
+   C 162 1036 140 986 146 932 C 152 878 178 846 190 806 C 196 786 188 772 196 752
+   C 206 726 168 690 160 646 C 152 602 172 556 186 510 C 200 470 176 456 210 436
+   C 244 416 196 344 194 268 C 192 196 196 140 214 118 Z"/>
+ <g clip-path="url(#land)">
+   <ellipse cx="360" cy="1218" rx="200" ry="165" class="t-forest"/>
+   <ellipse cx="795" cy="678" rx="150" ry="140" class="t-desert"/>
+   <ellipse cx="838" cy="530" rx="95" ry="85" class="t-desert"/>
+   <ellipse cx="700" cy="496" rx="120" ry="70" class="t-shadow"/>
+   <ellipse cx="370" cy="1078" rx="86" ry="62" class="t-volcanic"/>
+   <ellipse cx="326" cy="1376" rx="76" ry="46" class="t-marsh"/>
+   <ellipse cx="474" cy="192" rx="250" ry="215" class="t-ice"/>
+   <ellipse cx="428" cy="136" rx="120" ry="86" class="t-northface"/>
+   <ellipse class="contour" cx="474" cy="210" rx="268" ry="232"/><ellipse class="contour" cx="474" cy="200" rx="224" ry="192"/><ellipse class="contour" cx="474" cy="190" rx="180" ry="152"/><ellipse class="contour" cx="474" cy="180" rx="138" ry="116"/><ellipse class="contour" cx="474" cy="170" rx="98" ry="82"/><ellipse class="contour" cx="474" cy="162" rx="62" ry="52"/><ellipse class="contour" cx="474" cy="156" rx="32" ry="27"/>
+   <path class="river" d="M 486 684 C 530 698 552 722 572 764
+     C 596 814 604 902 606 994 C 608 1086 598 1112 596 1152
+     C 594 1216 614 1274 646 1340"/>
+   <path class="river" d="M 424 1124 C 470 1168 512 1212 556 1256
+     C 512 1302 400 1340 326 1376 C 300 1392 288 1402 276 1414"/>
+   <path class="river" d="M 520 508 C 486 534 452 566 430 604"/>
+   <path class="glacier" d="M 444 192 C 404 262 354 322 324 388"/>
+   <path class="glacier" d="M 508 196 C 554 266 594 328 620 392"/>
+   <ellipse cx="520" cy="508" rx="48" ry="30" class="lake"/>
+   <g class="ridges"><path d="M 385 1034 L 398 1025 L 411 1034" class="ridge"/>
+<path d="M 377 982 L 390 973 L 403 982" class="ridge"/>
+<path d="M 387 932 L 400 923 L 413 932" class="ridge"/>
+<path d="M 373 882 L 386 873 L 399 882" class="ridge"/>
+<path d="M 357 832 L 370 823 L 383 832" class="ridge"/>
+<path d="M 341 784 L 354 775 L 367 784" class="ridge"/>
+<path d="M 331 732 L 344 723 L 357 732" class="ridge"/>
+<path d="M 339 682 L 352 673 L 365 682" class="ridge"/>
+<path d="M 359 634 L 372 625 L 385 634" class="ridge"/>
+<path d="M 383 588 L 396 579 L 409 588" class="ridge"/>
+<path d="M 407 542 L 420 533 L 433 542" class="ridge"/>
+<path d="M 431 496 L 444 487 L 457 496" class="ridge"/>
+<path d="M 449 452 L 462 443 L 475 452" class="ridge"/>
+<path d="M 459 420 L 472 411 L 485 420" class="ridge"/></g>
+   <g class="ridges"><path d="M 597 584 L 612 576 L 627 584" class="ridge"/>
+<path d="M 635 578 L 650 570 L 665 578" class="ridge"/>
+<path d="M 673 574 L 688 566 L 703 574" class="ridge"/>
+<path d="M 711 570 L 726 562 L 741 570" class="ridge"/>
+<path d="M 749 566 L 764 558 L 779 566" class="ridge"/>
+<path d="M 787 563 L 802 555 L 817 563" class="ridge"/>
+<path d="M 825 560 L 840 552 L 855 560" class="ridge"/>
+<path d="M 863 558 L 878 550 L 893 558" class="ridge"/></g>
+   <g class="ridges crown"><path d="M 313 236 L 324 228 L 335 236" class="ridge"/>
+<path d="M 371 206 L 382 198 L 393 206" class="ridge"/>
+<path d="M 423 182 L 434 174 L 445 182" class="ridge"/>
+<path d="M 503 182 L 514 174 L 525 182" class="ridge"/>
+<path d="M 555 206 L 566 198 L 577 206" class="ridge"/>
+<path d="M 613 236 L 624 228 L 635 236" class="ridge"/>
+<path d="M 345 140 L 356 132 L 367 140" class="ridge"/>
+<path d="M 581 140 L 592 132 L 603 140" class="ridge"/>
+<path d="M 405 104 L 416 96 L 427 104" class="ridge"/>
+<path d="M 521 104 L 532 96 L 543 104" class="ridge"/></g>
+   <path class="dune" d="M 700 630 q 18 -7 36 0"/><path class="dune" d="M 760 618 q 18 -7 36 0"/><path class="dune" d="M 820 640 q 18 -7 36 0"/><path class="dune" d="M 690 702 q 18 -7 36 0"/><path class="dune" d="M 752 720 q 18 -7 36 0"/><path class="dune" d="M 820 730 q 18 -7 36 0"/><path class="dune" d="M 716 760 q 18 -7 36 0"/><path class="dune" d="M 786 772 q 18 -7 36 0"/><path class="dune" d="M 796 504 q 18 -7 36 0"/><path class="dune" d="M 852 520 q 18 -7 36 0"/><path class="dune" d="M 812 570 q 18 -7 36 0"/><path class="dune" d="M 870 582 q 18 -7 36 0"/>
+ </g>
+ <!-- the King's Road, and the final ascent drawn as a climbing route -->
+ <path class="road" d="M 424 1274 L 596 1152 C 560 1090 470 1044 404 1000
+   L 410 906 L 348 862 L 198 806 L 306 770 C 420 724 490 716 556 712
+   C 612 664 634 620 652 574 C 592 520 524 452 472 398"/>
+ <path class="climb" d="M 472 398 L 444 330 L 412 240 L 370 116"/>
+ <path class="climb" d="M 444 330 L 520 282 L 474 214 L 474 152"/>
+ <path class="climb" d="M 520 282 L 624 196 L 556 116 L 474 152"/>
+ <!-- the one late zone reached by sea, not by climbing -->
+ <path class="searoute" d="M 198 806 C 150 720 140 570 238 468"/>
+ <text class="sr-lbl" x="132" y="640" transform="rotate(-84 132 640)"
+   text-anchor="middle">BY SEA FROM GALEHAVEN</text>
+ <path class="shoal" d="M 206 450 q 12 -5 24 0"/><path class="shoal" d="M 228 460 q 12 -5 24 0"/><path class="shoal" d="M 198 478 q 12 -5 24 0"/><path class="shoal" d="M 224 498 q 12 -5 24 0"/><path class="shoal" d="M 252 468 q 12 -5 24 0"/>
+ <g class="places"><g class="place"><circle cx="474" cy="152" r="31" class="z-halo"/><polygon points="474.0,130.0 478.0,145.1 493.1,141.0 482.0,152.0 493.1,163.0 478.0,158.9 474.0,174.0 470.0,158.9 454.9,163.0 466.0,152.0 454.9,141.0 470.0,145.1" class="m-zenith"/><circle cx="474" cy="152" r="5" class="m-zcore"/><text class="lbl-zenith" x="498" y="151" text-anchor="start">ZENITH</text><text class="lvl" x="498" y="164" text-anchor="start">5,200 m</text></g><g class="place"><polygon points="474.0,196.0 477.1,206.6 486.7,201.3 481.4,210.9 492.0,214.0 481.4,217.1 486.7,226.7 477.1,221.4 474.0,232.0 470.9,221.4 461.3,226.7 466.6,217.1 456.0,214.0 466.6,210.9 461.3,201.3 470.9,206.6" class="m-citadel"/><text class="lbl-town" x="457" y="213" text-anchor="end">The Eclipsed Citadel</text><text class="lvl" x="457" y="226" text-anchor="end">58–60 · +4,900 m</text></g><g class="place"><path d="M 556 106.5 A 9.5 9.5 0 0 1 556 125.5 Z" class="m-zone" style="fill:#8B5CD6"/><path d="M 556 125.5 A 9.5 9.5 0 0 1 556 106.5 Z" class="m-zone" style="fill:#D65AB8"/><circle cx="556" cy="116" r="9.5" class="m-hyb-ring"/><text class="lbl-zone" x="573" y="115" text-anchor="start">The Unwritten Library</text><text class="lvl" x="573" y="128" text-anchor="start">54–58 · +4,200 m</text></g><g class="place"><circle cx="370" cy="116" r="9.5" class="m-zone" style="fill:#8B5CD6"/><text class="lbl-zone" x="353" y="115" text-anchor="end">The Umbral Wastes</text><text class="lvl" x="353" y="128" text-anchor="end">47–51 · +3,600 m</text></g><g class="place"><circle cx="624" cy="196" r="9.5" class="m-zone" style="fill:#D65AB8"/><text class="lbl-zone" x="641" y="195" text-anchor="start">The Collapsed Academy</text><text class="lvl" x="641" y="208" text-anchor="start">50–54 · +3,900 m</text></g><g class="place"><path d="M 412 230.5 A 9.5 9.5 0 0 1 412 249.5 Z" class="m-zone" style="fill:#F2E7C9"/><path d="M 412 249.5 A 9.5 9.5 0 0 1 412 230.5 Z" class="m-zone" style="fill:#8B5CD6"/><circle cx="412" cy="240" r="9.5" class="m-deep"/><text class="lbl-zone" x="395" y="239" text-anchor="end">The Reliquary Deep</text><text class="lvl" x="395" y="252" text-anchor="end">52–56 · +3,300 m</text></g><g class="place"><rect x="512" y="274" width="16" height="16" transform="rotate(45 520 282)" class="m-town"/><text class="lbl-town" x="537" y="281" text-anchor="start">Vespergate</text><text class="lvl" x="537" y="294" text-anchor="start">~50 · +4,500 m</text></g><g class="place"><circle cx="444" cy="330" r="9.5" class="m-zone" style="fill:#F2E7C9"/><text class="lbl-zone" x="427" y="329" text-anchor="end">Hallowmarch</text><text class="lvl" x="427" y="342" text-anchor="end">45–49 · +3,150 m</text></g><g class="place"><rect x="464" y="390" width="16" height="16" transform="rotate(45 472 398)" class="m-town"/><text class="lbl-town" x="489" y="397" text-anchor="start">Rimeholt</text><text class="lvl" x="489" y="410" text-anchor="start">~45 · +2,900 m</text></g><g class="place"><path d="M 826 420.5 A 9.5 9.5 0 0 1 826 439.5 Z" class="m-zone" style="fill:#6E7BD6"/><path d="M 826 439.5 A 9.5 9.5 0 0 1 826 420.5 Z" class="m-zone" style="fill:#E8C547"/><circle cx="826" cy="430" r="9.5" class="m-hyb-ring"/><text class="lbl-zone" x="809" y="429" text-anchor="end">Shattered Orrery</text><text class="lvl" x="809" y="442" text-anchor="end">40–44 · +2,500 m</text></g><g class="place"><path d="M 238 458.5 A 9.5 9.5 0 0 1 238 477.5 Z" class="m-zone" style="fill:#AFC3E8"/><path d="M 238 477.5 A 9.5 9.5 0 0 1 238 458.5 Z" class="m-zone" style="fill:#3D8BD9"/><circle cx="238" cy="468" r="9.5" class="m-hyb-ring"/><text class="lbl-zone" x="255" y="467" text-anchor="start">Tidewrack Shoals</text><text class="lvl" x="255" y="480" text-anchor="start">36–40 · +20 m</text></g><g class="place"><path d="M 706 484.5 A 9.5 9.5 0 0 1 706 503.5 Z" class="m-zone" style="fill:#F5B23E"/><path d="M 706 503.5 A 9.5 9.5 0 0 1 706 484.5 Z" class="m-zone" style="fill:#AFC3E8"/><circle cx="706" cy="494" r="9.5" class="m-hyb-ring"/><text class="lbl-zone" x="723" y="493" text-anchor="start">The Sunless Reach</text><text class="lvl" x="723" y="506" text-anchor="start">38–42 · +2,650 m</text></g><g class="place"><circle cx="520" cy="508" r="9.5" class="m-zone" style="fill:#AFC3E8"/><text class="lbl-zone" x="503" y="507" text-anchor="end">The Mirrormere</text><text class="lvl" x="503" y="520" text-anchor="end">32–37 · +2,400 m</text></g><g class="place"><circle cx="838" cy="540" r="9.5" class="m-zone" style="fill:#6E7BD6"/><text class="lbl-zone" x="821" y="539" text-anchor="end">Starfall Basin</text><text class="lvl" x="821" y="552" text-anchor="end">34–39 · +2,300 m</text></g><g class="place"><rect x="644" y="566" width="16" height="16" transform="rotate(45 652 574)" class="m-town"/><text class="lbl-town" x="635" y="573" text-anchor="end">Meridian</text><text class="lvl" x="635" y="586" text-anchor="end">~36 · +2,600 m</text></g><g class="place"><circle cx="766" cy="672" r="9.5" class="m-zone" style="fill:#F5B23E"/><text class="lbl-zone" x="783" y="671" text-anchor="start">The Kiln Desert</text><text class="lvl" x="783" y="684" text-anchor="start">30–34 · +2,100 m</text></g><g class="place"><rect x="545" y="701" width="22" height="22" transform="rotate(45 556 712)" class="m-town"/><circle cx="556" cy="712" r="18" class="m-ring"/><text class="lbl-town" x="539" y="711" text-anchor="end">Concordance</text><text class="lvl" x="539" y="724" text-anchor="end">~30 · +1,700 m</text></g><g class="place"><path d="M 306 760.5 A 9.5 9.5 0 0 1 306 779.5 Z" class="m-zone" style="fill:#3D8BD9"/><path d="M 306 779.5 A 9.5 9.5 0 0 1 306 760.5 Z" class="m-zone" style="fill:#9BB8C4"/><circle cx="306" cy="770" r="9.5" class="m-hyb-ring"/><text class="lbl-zone" x="289" y="769" text-anchor="end">Frostfell Pass</text><text class="lvl" x="289" y="782" text-anchor="end">21–26 · +2,500 m</text></g><g class="place"><rect x="190" y="798" width="16" height="16" transform="rotate(45 198 806)" class="m-town"/><text class="lbl-town" x="181" y="805" text-anchor="end">Galehaven</text><text class="lvl" x="181" y="818" text-anchor="end">~22 · +5 m</text></g><g class="place"><circle cx="506" cy="820" r="9.5" class="m-zone" style="fill:#9BB8C4"/><text class="lbl-zone" x="523" y="819" text-anchor="start">Windward Steppe</text><text class="lvl" x="523" y="832" text-anchor="start">19–24 · +1,900 m</text></g><g class="place"><path d="M 348 852.5 A 9.5 9.5 0 0 1 348 871.5 Z" class="m-zone" style="fill:#E8C547"/><path d="M 348 871.5 A 9.5 9.5 0 0 1 348 852.5 Z" class="m-zone" style="fill:#9BB8C4"/><circle cx="348" cy="862" r="9.5" class="m-hyb-ring"/><text class="lbl-zone" x="365" y="861" text-anchor="start">Thunderspire Peaks</text><text class="lvl" x="365" y="874" text-anchor="start">23–28 · +2,400 m</text></g><g class="place"><circle cx="212" cy="892" r="9.5" class="m-zone" style="fill:#E8C547"/><text class="lbl-zone" x="195" y="891" text-anchor="end">Stormcliff Coast</text><text class="lvl" x="195" y="904" text-anchor="end">17–22 · +430 m</text></g><g class="place"><circle cx="410" cy="906" r="9.5" class="m-zone" style="fill:#9C7A4B"/><text class="lbl-zone" x="427" y="905" text-anchor="start">Old Quarry</text><text class="lvl" x="427" y="918" text-anchor="start">15–19 · +1,400 m</text></g><g class="place"><path d="M 318 966.5 A 9.5 9.5 0 0 1 318 985.5 Z" class="m-zone" style="fill:#E25822"/><path d="M 318 985.5 A 9.5 9.5 0 0 1 318 966.5 Z" class="m-zone" style="fill:#9C7A4B"/><circle cx="318" cy="976" r="9.5" class="m-deep"/><text class="lbl-zone" x="301" y="975" text-anchor="end">The Molten Deep</text><text class="lvl" x="301" y="988" text-anchor="end">25–29 · -400 m</text></g><g class="place"><rect x="396" y="992" width="16" height="16" transform="rotate(45 404 1000)" class="m-town"/><text class="lbl-town" x="421" y="999" text-anchor="start">Forgeholm</text><text class="lvl" x="421" y="1012" text-anchor="start">~15 · +1,080 m</text></g><g class="place"><path d="M 286 1096.5 A 9.5 9.5 0 0 1 286 1115.5 Z" class="m-zone" style="fill:#E25822"/><path d="M 286 1115.5 A 9.5 9.5 0 0 1 286 1096.5 Z" class="m-zone" style="fill:#5FB35B"/><circle cx="286" cy="1106" r="9.5" class="m-hyb-ring"/><text class="lbl-zone" x="269" y="1105" text-anchor="end">Ashfall Vale</text><text class="lvl" x="269" y="1118" text-anchor="end">10–14 · +700 m</text></g><g class="place"><circle cx="408" cy="1100" r="9.5" class="m-zone" style="fill:#E25822"/><text class="lbl-zone" x="425" y="1099" text-anchor="start">Cinderpeak Foothills</text><text class="lvl" x="425" y="1112" text-anchor="start">6–11 · +950 m</text></g><g class="place"><rect x="588" y="1144" width="16" height="16" transform="rotate(45 596 1152)" class="m-town"/><text class="lbl-town" x="613" y="1151" text-anchor="start">Pennycross</text><text class="lvl" x="613" y="1164" text-anchor="start">~8 · +360 m</text></g><g class="place"><circle cx="296" cy="1212" r="9.5" class="m-zone" style="fill:#5FB35B"/><text class="lbl-zone" x="279" y="1211" text-anchor="end">Whispering Woods</text><text class="lvl" x="279" y="1224" text-anchor="end">1–5 · +300 m</text></g><g class="place"><circle cx="556" cy="1256" r="9.5" class="m-zone" style="fill:#3D8BD9"/><text class="lbl-zone" x="573" y="1255" text-anchor="start">Glimmerbrook</text><text class="lvl" x="573" y="1268" text-anchor="start">3–8 · +180 m</text></g><g class="place"><rect x="416" y="1266" width="16" height="16" transform="rotate(45 424 1274)" class="m-town"/><text class="lbl-town" x="441" y="1273" text-anchor="start">Aldermere</text><text class="lvl" x="441" y="1286" text-anchor="start">L1 · +240 m</text></g><g class="place"><path d="M 326 1366.5 A 9.5 9.5 0 0 1 326 1385.5 Z" class="m-zone" style="fill:#5FB35B"/><path d="M 326 1385.5 A 9.5 9.5 0 0 1 326 1366.5 Z" class="m-zone" style="fill:#3D8BD9"/><circle cx="326" cy="1376" r="9.5" class="m-hyb-ring"/><text class="lbl-zone" x="326" y="1404" text-anchor="middle">Thornmire</text><text class="lvl" x="326" y="1417" text-anchor="middle">8–13 · +0 m</text></g></g>
+ <g class="gauge">
+  <line x1="46" y1="34" x2="46" y2="1430"/>
+  <line class="tick" x1="40" y1="34" x2="52" y2="34"/><line class="tick" x1="40" y1="121" x2="52" y2="121"/><line class="tick" x1="40" y1="208" x2="52" y2="208"/><line class="tick" x1="40" y1="295" x2="52" y2="295"/><line class="tick" x1="40" y1="382" x2="52" y2="382"/><line class="tick" x1="40" y1="469" x2="52" y2="469"/><line class="tick" x1="40" y1="556" x2="52" y2="556"/><line class="tick" x1="40" y1="643" x2="52" y2="643"/><line class="tick" x1="40" y1="730" x2="52" y2="730"/><line class="tick" x1="40" y1="817" x2="52" y2="817"/><line class="tick" x1="40" y1="904" x2="52" y2="904"/><line class="tick" x1="40" y1="991" x2="52" y2="991"/><line class="tick" x1="40" y1="1078" x2="52" y2="1078"/><line class="tick" x1="40" y1="1165" x2="52" y2="1165"/><line class="tick" x1="40" y1="1252" x2="52" y2="1252"/><line class="tick" x1="40" y1="1339" x2="52" y2="1339"/><line class="tick" x1="40" y1="1426" x2="52" y2="1426"/>
+  <rect class="bd-e" x="58" y="34" width="7" height="386"/>
+  <rect class="bd-c" x="58" y="420" width="7" height="320"/>
+  <rect class="bd-k" x="58" y="740" width="7" height="300"/>
+  <rect class="bd-p" x="58" y="1040" width="7" height="390"/>
+  <text class="g-tier" x="80" y="214">ETHEREAL</text>
+  <text class="g-sub" x="80" y="230">THE CLIMB · 2 900 – 5 200 m</text>
+  <text class="g-sub" x="80" y="242">polar night · Lv 45–60</text>
+  <text class="g-tier" x="80" y="586">CELESTIAL</text>
+  <text class="g-sub" x="80" y="602">THE HIGH SHELF · 1 700 – 2 700 m</text>
+  <text class="g-sub" x="80" y="614">thin air, hard sun · Lv 30–44</text>
+  <text class="g-tier" x="80" y="900">KINETIC</text>
+  <text class="g-sub" x="80" y="916">THE RANGE · −400 – 2 500 m</text>
+  <text class="g-sub" x="80" y="928">stone, storm, wind · Lv 15–29</text>
+  <text class="g-tier" x="80" y="1256">PRIMAL</text>
+  <text class="g-sub" x="80" y="1272">THE BASIN · 0 – 1 000 m</text>
+  <text class="g-sub" x="80" y="1284">long day, ordinary weather · Lv 1–14</text>
+ </g>
+ <g class="compass" transform="translate(922 1368)">
+  <circle r="34" class="c-ring"/>
+  <path d="M 0 -30 L 8 0 L 0 30 L -8 0 Z" class="c-needle"/>
+  <path d="M 0 -30 L 8 0 L -8 0 Z" class="c-north"/>
+  <text class="c-lbl" y="-40" text-anchor="middle">N</text>
+ </g>
+</svg></div>
+  <figcaption>Plan view. Closed contours mark the massif; the fine dotted lines
+  on it are climbing routes rather than roads. The one blue dashed track is the
+  sea passage to Tidewrack Shoals.</figcaption>
+</figure>
+
+<section>
+  <ul class="key"><li><i style="background:#5FB35B"></i>Flora</li><li><i style="background:#3D8BD9"></i>Aqua</li><li><i style="background:#E25822"></i>Pyro</li><li><i style="background:#9C7A4B"></i>Geo</li><li><i style="background:#E8C547"></i>Electro</li><li><i style="background:#9BB8C4"></i>Aero</li><li><i style="background:#F5B23E"></i>Solar</li><li><i style="background:#AFC3E8"></i>Lunar</li><li><i style="background:#6E7BD6"></i>Astral</li><li><i style="background:#F2E7C9"></i>Sanctus</li><li><i style="background:#8B5CD6"></i>Umbra</li><li><i style="background:#D65AB8"></i>Arcane</li></ul>
+  <div class="shapes">
+    <span><b>◆</b> town</span><span><b>◆ ringed</b> capital</span>
+    <span><b>●</b> pure zone</span><span><b>◑</b> hybrid zone</span>
+    <span><b>◌ dashed ring</b> subterranean</span>
+    <span><b>✦</b> the Citadel</span><span><b>✧ haloed</b> Zenith</span>
+    <span><b>– –</b> King's Road</span><span><b>· ·</b> climbing route</span>
+  </div>
+</section>
+
+<section>
+  <div class="kicker">What changed from Plate I</div>
+  <h2>Three consequences of making the finale a climb</h2>
+  <div class="grid"><article class="card"><h3>The Ethereal tier is now one mountain, not a region</h3><p>In Plate I the last six zones were spread across a polar plain — six dots in the snow, no relationship between them. Now they are <strong>faces and shoulders of a single massif</strong>: the Ironspine does not end, it culminates. Every Ethereal zone is defined by <em>where on the mountain</em> it sits, which is a far stronger organising idea than 'far north'.</p></article><article class="card"><h3>Zenith is the summit, and the Citadel is in the way</h3><p>The summit sits above the Citadel on the same ridge, so "you cannot reach Zenith without clearing the Citadel" stops being a rule the game enforces and becomes a fact of the terrain. Teleports to every city need no justification either — it is the one point in the world with line of sight to all of it.</p></article><article class="card"><h3>Celestial became the shelf you climb to</h3><p>Pushing Celestial up to 1 700–2 700 m makes the Kiln Desert <em>better</em> justified, not worse: high-altitude deserts are the sunniest places on Earth because thin air scatters less. Solar magic belongs on a cold high plateau with a brutal sun far more than it belongs in a low hot one.</p></article></div>
+</section>
+
+<figure>
+  <div class="plate-frame"><svg viewBox="0 0 1060 660" class="ascent" role="img"
+ aria-label="Section through the final massif: nine places climbing from
+ Rimeholt at 2900 metres to Zenith at the 5200 metre summit.">
+ <defs><linearGradient id="rock" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0" stop-color="#F2E7C9" stop-opacity=".22"/>
+   <stop offset="1" stop-color="#1E2A38" stop-opacity=".10"/>
+ </linearGradient></defs>
+ <g class="alt-axis">
+  <line class="alt-grid" x1="52" y1="511.0" x2="1046" y2="511.0"/><text class="alt-lbl" x="46" y="515.0" text-anchor="end">3,000</text><line class="alt-grid" x1="52" y1="429.4" x2="1046" y2="429.4"/><text class="alt-lbl" x="46" y="433.4" text-anchor="end">3,500</text><line class="alt-grid" x1="52" y1="347.8" x2="1046" y2="347.8"/><text class="alt-lbl" x="46" y="351.8" text-anchor="end">4,000</text><line class="alt-grid" x1="52" y1="266.2" x2="1046" y2="266.2"/><text class="alt-lbl" x="46" y="270.2" text-anchor="end">4,500</text><line class="alt-grid" x1="52" y1="184.6" x2="1046" y2="184.6"/><text class="alt-lbl" x="46" y="188.6" text-anchor="end">5,000</text>
+  <text class="alt-unit" x="46" y="169" text-anchor="end">METRES</text>
+ </g>
+ <!-- the massif in section: south flank left, summit right, north face beyond -->
+ <path class="northface" d="M 340 388.6 C 300 429.4
+   360 462.1 430 445.8 C 520 419.6 600 364.2
+   680 323.4 L 680 620 L 300 620 Z"/>
+ <path class="rock" d="M 40 620 L 40 550.2
+   C 140 517.6 190 484.9 250 468.6
+   C 330 445.8 380 406.6 460 377.2
+   C 545 346.2 610 310.3 700 285.8
+   C 780 263.0 830 220.5 880 191.2
+   L 962 145.5 L 1010 214.0 L 1046 256.4
+   L 1046 620 Z"/>
+ <line class="treeline" x1="40" y1="543.7" x2="1046" y2="543.7"/>
+ <text class="tl-lbl" x="1042" y="559.7" text-anchor="end">TREE LINE ·
+   2 800 m — every place on this section is above it</text>
+ <!-- the route -->
+ <path class="route" d="M 96 527.4 L 206 486.6
+   L 300 462.1 L 400 413.1 L 515 364.2
+   L 652 315.2 L 745 266.2 L 880 201.0
+   L 962 152.0"/>
+ <!-- the Reliquary Deep is inside the rock, so its link is drawn through it -->
+ <path class="thruRock" d="M 206 486.6 Q 250 481.7 300 462.1
+   Q 350 440.9 400 413.1"/>
+ <g class="pins"><g class="pin"><rect x="87" y="518.4" width="18" height="18" transform="rotate(45 96 527.4)" class="p-town"/><line class="leader" x1="96" y1="515.4" x2="96" y2="503.4"/><text class="p-lbl-t" x="96" y="495.4" text-anchor="middle">Rimeholt</text><text class="p-sub" x="96" y="508.4" text-anchor="middle">2,900 m · ~50 · basecamp</text></g><g class="pin"><circle cx="206" cy="486.6" r="10" class="p-ring" style="fill:#F2E7C9"/><line class="leader" x1="206" y1="498.6" x2="206" y2="514.6"/><text class="p-lbl" x="206" y="534.6" text-anchor="middle">Hallowmarch</text><text class="p-sub" x="206" y="547.6" text-anchor="middle">3,150 m · 45–49</text></g><g class="pin"><path d="M 300 452.1 A 10 10 0 0 1 300 472.1 Z" style="fill:#F2E7C9"/><path d="M 300 472.1 A 10 10 0 0 1 300 452.1 Z" style="fill:#8B5CD6"/><circle cx="300" cy="462.1" r="10" class="p-deep" style="fill:none"/><line class="leader" x1="300" y1="450.1" x2="300" y2="438.1"/><text class="p-lbl" x="300" y="430.1" text-anchor="middle">The Reliquary Deep</text><text class="p-sub" x="300" y="443.1" text-anchor="middle">3,300 m · 52–56</text></g><g class="pin"><circle cx="400" cy="413.1" r="10" class="p-ring" style="fill:#8B5CD6"/><line class="leader" x1="400" y1="425.1" x2="400" y2="441.1"/><text class="p-lbl" x="400" y="461.1" text-anchor="middle">The Umbral Wastes</text><text class="p-sub" x="400" y="474.1" text-anchor="middle">3,600 m · 47–51</text></g><g class="pin"><circle cx="515" cy="364.2" r="10" class="p-ring" style="fill:#D65AB8"/><line class="leader" x1="515" y1="352.2" x2="515" y2="340.2"/><text class="p-lbl" x="515" y="332.2" text-anchor="middle">The Collapsed Academy</text><text class="p-sub" x="515" y="345.2" text-anchor="middle">3,900 m · 50–54</text></g><g class="pin"><path d="M 652 305.2 A 10 10 0 0 1 652 325.2 Z" style="fill:#8B5CD6"/><path d="M 652 325.2 A 10 10 0 0 1 652 305.2 Z" style="fill:#D65AB8"/><circle cx="652" cy="315.2" r="10" class="p-ring" style="fill:none"/><line class="leader" x1="652" y1="327.2" x2="652" y2="343.2"/><text class="p-lbl" x="652" y="363.2" text-anchor="middle">The Unwritten Library</text><text class="p-sub" x="652" y="376.2" text-anchor="middle">4,200 m · 54–58</text></g><g class="pin"><rect x="736" y="257.2" width="18" height="18" transform="rotate(45 745 266.2)" class="p-town"/><line class="leader" x1="745" y1="254.2" x2="745" y2="242.2"/><text class="p-lbl-t" x="745" y="234.2" text-anchor="middle">Vespergate</text><text class="p-sub" x="745" y="247.2" text-anchor="middle">4,500 m · ~50 · high gate</text></g><g class="pin"><circle cx="880" cy="201.0" r="12" class="p-cit"/><line class="leader" x1="880" y1="213.0" x2="880" y2="229.0"/><text class="p-lbl-t" x="880" y="249.0" text-anchor="middle">The Eclipsed Citadel</text><text class="p-sub" x="880" y="262.0" text-anchor="middle">4,900 m · 58–60</text></g><g class="pin"><circle cx="962" cy="152.0" r="26" class="z-halo"/><circle cx="962" cy="152.0" r="11" class="p-zenith"/><line class="leader" x1="962" y1="140.0" x2="962" y2="128.0"/><text class="p-lbl-z" x="962" y="120.0" text-anchor="middle">ZENITH</text><text class="p-sub" x="962" y="133.0" text-anchor="middle">5,200 m · the summit</text></g></g>
+ <text class="face-lbl" x="150" y="600">SOUTH FLANK — lit, consecrated</text>
+ <text class="face-lbl dk" x="500" y="600">NORTH FACE — never sunlit</text>
+ <text class="face-lbl" x="900" y="600">SUMMIT RIDGE</text>
+</svg></div>
+  <figcaption>The massif in section. Vertical axis is true altitude; the route
+  is the campaign's last twenty levels. The Reliquary Deep's link is drawn
+  through the rock because that is where it goes.</figcaption>
+</figure>
+
+<section>
+  <div class="kicker">The mountain does the work</div>
+  <h2>One landform generates the whole Ethereal tier</h2>
+  <p>This is the same trick the Meridian Scarp pulled in Plate I — a sunlit face
+  and a shadowed face off one ridge — but at the scale of a tier. Each Ethereal
+  zone is now <em>a place on the mountain</em>, and two of the three Ethereal
+  counter edges fall out of the geometry rather than being asserted.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Where on the massif</th><th>Zone</th><th>Element</th>
+    <th>Why it can only be there</th></tr></thead>
+    <tbody><tr><td class="loc">South flank</td><td class="pl">Hallowmarch</td><td class="el">Sanctus</td><td class="why">Sun-facing, and the only side that thaws. A consecrated causeway up the warm flank — the approach a pilgrim would actually use.</td></tr><tr><td class="loc">North face</td><td class="pl">The Umbral Wastes</td><td class="el">Umbra</td><td class="why">A north wall at polar latitude receives no direct sun at any hour of any day. The dark needs no magical cause; the geometry supplies it.</td></tr><tr><td class="loc">Inside, between them</td><td class="pl">The Reliquary Deep</td><td class="el">Sanctus + Umbra</td><td class="why">A vault bored through the mountain from the lit side to the dark one. It is <em>literally</em> between its two parents — through the rock rather than across the ground.</td></tr><tr><td class="loc">East shoulder</td><td class="pl">The Collapsed Academy</td><td class="el">Arcane</td><td class="why">A school that read too far and built too high, on the shoulder where the ridge is broad enough to hold a building.</td></tr><tr><td class="loc">Upper north shoulder</td><td class="pl">The Unwritten Library</td><td class="el">Umbra + Arcane</td><td class="why">Between the Academy's shoulder and the dark face — the collection dragged up and around into the shade.</td></tr><tr><td class="loc">Summit ridge</td><td class="pl">The Eclipsed Citadel</td><td class="el">all twelve</td><td class="why">The last flat ground before the apex, and the only way onto it.</td></tr></tbody>
+  </table></div>
+  <div class="flag">
+    <p><strong>The Sanctus ▸ Umbra edge is now terrain.</strong> A north wall at
+    polar latitude never receives direct sun at any hour of any day, while the
+    south flank is the only side that thaws. Put the consecrated causeway on the
+    warm face and the wastes on the cold one, and bore the Reliquary Deep
+    between them — the counter edge, both its parents, and the hybrid that
+    teaches it are one mountain.</p>
+  </div>
+</section>
+
+<section>
+  <div class="kicker">Still open</div>
+  <h2>Four things this revision raises</h2>
+  <div class="grid">
+    <div class="card"><h3>The massif needs a name</h3>
+      <p>It is now the most important landform in the world and has none.
+      <strong>The Vault</strong> is my pick — the vault of the sky, and it
+      houses the Reliquary — which makes Zenith the vault's own apex. Others:
+      <em>the Last Rise</em>, <em>Heaven's Stair</em>, <em>the Crown</em>
+      (though that collides with the Concordant Crown).</p></div>
+    <div class="card"><h3>Two zones now sit off the climb</h3>
+      <p>Tidewrack Shoals is a level 36–40 zone at 20 m, reached by sea from
+      Galehaven rather than by ascent — which hands the port a genuine endgame
+      purpose the docs were looking for. The Molten Deep is the mirror: the one
+      zone that goes <em>down</em>. Worth keeping both as deliberate
+      exceptions.</p></div>
+    <div class="card"><h3>Gear-versus-altitude is a real design question</h3>
+      <p>The docs already say gear must be worth about ten levels across the
+      L45–60 band. If that band is also a physical climb, altitude is the
+      obvious place to hang it — thin air as a debuff answered by equipment. Or
+      that is a mechanic too many. Either way it should be a decision, not a
+      side effect of the map.</p></div>
+    <div class="card"><h3>Hallowmarch is no longer a marsh</h3>
+      <p>The name came from a drowned causeway at sea level. On a warm mountain
+      flank it reads as a <em>march</em> in the older sense — a borderland — which
+      still works, and glacial meltwater on a thawing south face is defensible.
+      But if it should stay literally marshy, it wants a different slot.</p></div>
+  </div>
+</section>
+</div>

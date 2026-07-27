@@ -12,7 +12,8 @@ and runs lockstep with commit-reveal netcode.
 | Doc | What it covers |
 |---|---|
 | **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** | ⭐ **The work queue.** Phased plan spanning every design doc, with dependency gates and rules of engagement. Read first. |
-| [GAME_DESIGN.md](GAME_DESIGN.md) | Core combat, priority/Haste, spells, world map, bestiary, app roadmap |
+| [GAME_DESIGN.md](GAME_DESIGN.md) | Core combat, priority/Haste, spells, the logical world map, bestiary, app roadmap |
+| [WORLD_DESIGN.md](WORLD_DESIGN.md) | The physical world: landforms, the two planes, altitude, and player-facing text for all 32 places. Visual plates in [docs/plates/](docs/plates/) |
 | [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) | Elements and their side-effects; turn phases and the precedence pipeline. §0 is the planned V2 twelve-element expansion |
 | [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) | Levels, XP, unlock schedule, charge caps |
 | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) | Equipment, sets, motes, crafting, enchanting, potions, the economy |

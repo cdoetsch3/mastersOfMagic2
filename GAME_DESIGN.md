@@ -1063,7 +1063,20 @@ Configurability makes that a tuning change rather than a rewrite.
 
 ---
 
-### World map — 📝 DRAFT v2: 12 pure zones + 9 hybrids
+### World map — 📝 DRAFT v2: 12 pure zones + 10 hybrids
+
+> ⚠️ **Superseded on physical geography.**
+> [WORLD_DESIGN.md](WORLD_DESIGN.md) now owns *where* everything is, the two
+> planes, the altitude structure, and the player-facing text for every place.
+> **This section remains authoritative for the logical map only** — which
+> elements pair with which, level bands, and counter-edge coverage.
+>
+> Changes settled there that contradict the tables below: the Ethereal tier is
+> one massif (**The Vault**) rather than a polar plain; the three **Arcane**
+> places sit above the veil in **The Empyrean**; **Zenith** is the sealed summit,
+> entered from above through the Citadel; **Tidewrack Shoals** is reached by sea
+> from Galehaven. Corrected the header count from 9 hybrids to 10 — the tables
+> below always listed ten.
 
 Rebuilt for the twelve-element roster. **Twelve pure zones — one per element**
 — each the undiluted home of that element's bestiary and its best mote drop

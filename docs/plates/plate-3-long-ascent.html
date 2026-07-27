@@ -1,0 +1,223 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Long Ascent — Plate III</title>
+<style>
+:root {
+  --bg:#E9ECEE; --bg2:#DFE4E7; --ink:#141C26; --ink-mid:#4A5A6B;
+  --accent:#A65E12; --rule:#141C2620; --card:#F1F3F5;
+  --pano-town:#EAE6DC;
+  --primal:#5FB35B; --kinetic:#9BB8C4; --celestial:#6E7BD6; --ethereal:#8B5CD6;
+  --disp:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  --body:system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark) {
+  :root { --bg:#0C1116; --bg2:#111820; --ink:#DCE3E9; --ink-mid:#8496A6;
+    --accent:#E0A24A; --rule:#DCE3E922; --card:#131B23; }
+}
+:root[data-theme="dark"] { --bg:#0C1116; --bg2:#111820; --ink:#DCE3E9;
+  --ink-mid:#8496A6; --accent:#E0A24A; --rule:#DCE3E922; --card:#131B23; }
+:root[data-theme="light"] { --bg:#E9ECEE; --bg2:#DFE4E7; --ink:#141C26;
+  --ink-mid:#4A5A6B; --accent:#A65E12; --rule:#141C2620; --card:#F1F3F5; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--body); line-height:1.62; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:1280px; margin:0 auto; padding:52px 22px 96px;
+  display:flex; flex-direction:column; gap:46px; }
+
+/* asymmetric header: title left, instrument readout right */
+header { display:grid; gap:26px; align-items:end;
+  grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+  border-bottom:2px solid var(--ink); padding-bottom:22px; }
+@media (max-width:760px) { header { grid-template-columns:1fr; } }
+.eyebrow { font-family:var(--disp); font-size:11px; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+h1 { font-size:clamp(32px,6.2vw,62px); line-height:.98; margin:0;
+  font-weight:800; letter-spacing:-.035em; text-wrap:balance; }
+.dek { margin:10px 0 0; color:var(--ink-mid); font-size:16.5px; max-width:52ch; }
+.readout { font-family:var(--disp); font-size:11.5px; display:flex;
+  flex-direction:column; gap:5px; color:var(--ink-mid); }
+.readout div { display:flex; justify-content:space-between; gap:14px;
+  border-bottom:1px dotted var(--rule); padding-bottom:4px; }
+.readout b { color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums; }
+
+.frame { background:#0B0916; border:1px solid var(--rule); overflow-x:auto; }
+svg.pano { display:block; width:100%; height:auto; min-width:940px; }
+.star { fill:#CBD8E6; opacity:.5; }
+.r-pole { fill:#1A1030; } .r-eth { fill:#24183F; }
+.r-cel { fill:#26305F; } .r-kin { fill:#27506B; }
+.r-pri { fill:#2E6E62; }
+.water { fill:#2F7C86; opacity:.55; }
+.treeline { stroke:#EAE6DC; stroke-width:1; stroke-dasharray:8 6; opacity:.6; }
+.tl-lbl { font-family:var(--disp); font-size:11px; fill:#EAE6DC; opacity:.75;
+  letter-spacing:.06em; }
+.pin-ring { stroke:#0B0916; stroke-width:1.5; }
+.pin-town { fill:var(--pano-town); stroke:#0B0916; stroke-width:1.5; }
+.pin-cit { fill:#8B5CD6; stroke:#EAE6DC; stroke-width:2; }
+.pin-n { font-family:var(--disp); font-size:11.5px; font-weight:700;
+  fill:#F2F5F8; }
+.pin-n.on-light { fill:#0B0916; }
+.pin { transition:opacity .16s ease; }
+.pin.sub .pin-ring { stroke-dasharray:3 3; }
+.pins:hover .pin { opacity:.35; }
+.pins .pin:hover { opacity:1; }
+.alt-grid { stroke:#EAE6DC; stroke-width:.5; opacity:.16; }
+.alt-lbl { font-family:var(--disp); font-size:10.5px; fill:#EAE6DC;
+  opacity:.6; font-variant-numeric:tabular-nums; }
+.alt-unit { font-family:var(--disp); font-size:9.5px; fill:#EAE6DC;
+  opacity:.45; letter-spacing:.14em; }
+.dir { font-family:var(--disp); font-size:11px; fill:#EAE6DC; opacity:.6;
+  letter-spacing:.14em; }
+.dir.hz { opacity:.8; }
+.z-isle { fill:#3A2E58; }
+.z-halo { fill:none; stroke:#E0A24A; stroke-width:1; stroke-dasharray:2 7;
+  opacity:.7; }
+.z-lbl { font-family:var(--disp); font-size:12px; letter-spacing:.22em;
+  fill:#E0A24A; }
+
+section { display:flex; flex-direction:column; gap:18px; }
+h2 { font-size:clamp(23px,3.4vw,34px); margin:0; font-weight:800;
+  letter-spacing:-.025em; text-wrap:balance; }
+.kicker { font-family:var(--disp); font-size:11px; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--accent); }
+p { margin:0; max-width:72ch; }
+.finds { display:grid; gap:20px;
+  grid-template-columns:repeat(auto-fit,minmax(292px,1fr)); }
+.find { background:var(--card); border:1px solid var(--rule);
+  border-top:3px solid var(--accent); padding:22px; display:flex;
+  flex-direction:column; gap:11px; }
+.find h3 { font-size:17px; margin:0; font-weight:700; letter-spacing:-.015em;
+  line-height:1.25; }
+.find p { font-size:15px; color:var(--ink-mid); }
+.find .conseq { font-family:var(--disp); font-size:12.5px; line-height:1.55;
+  border-top:1px dotted var(--rule); padding-top:11px; color:var(--ink); }
+
+.tbl { overflow-x:auto; border:1px solid var(--rule); background:var(--card); }
+table { border-collapse:collapse; width:100%; min-width:620px; font-size:14px; }
+th,td { text-align:left; padding:8px 14px; border-bottom:1px solid var(--rule); }
+tr.band th { font-family:var(--disp); font-size:10.5px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--accent); background:var(--bg2);
+  padding-top:13px; padding-bottom:11px; }
+td.num { font-family:var(--disp); font-size:12.5px; color:var(--ink-mid);
+  font-variant-numeric:tabular-nums; white-space:nowrap; width:1%; }
+td.alt { text-align:right; color:var(--ink); }
+td.pl { font-weight:500; white-space:nowrap; }
+td.pl i { display:inline-block; width:11px; height:11px; margin-right:9px;
+  border:1px solid var(--ink); vertical-align:-1px; }
+td.pl i.sw-town { background:var(--ink); }
+td.tier { font-family:var(--disp); font-size:11px; letter-spacing:.08em;
+  text-transform:uppercase; white-space:nowrap; }
+.t-primal { color:var(--primal); } .t-kinetic { color:var(--kinetic); }
+.t-celestial { color:var(--celestial); } .t-ethereal { color:var(--ethereal); }
+tr:last-child td { border-bottom:none; }
+.cost { background:var(--card); border-left:3px solid var(--accent);
+  padding:20px 22px; display:flex; flex-direction:column; gap:10px; }
+.cost p { font-size:15.5px; color:var(--ink-mid); }
+@media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <div class="eyebrow">Masters of Magic II · Plate III</div>
+    <h1>The Long Ascent</h1>
+    <p class="dek">The same world as a section rather than a map. Vertical axis
+    is <b>true altitude</b>; horizontal is roughly longitude; north is carried
+    by haze. Places are numbered <b>by height, not by level</b> — which is where
+    it gets interesting.</p>
+  </div>
+  <div class="readout">
+    <div><span>Projection</span><b>oblique elevation</b></div>
+    <div><span>Vertical range</span><b>−400 → 3 800 m</b></div>
+    <div><span>Tree line</span><b>2 800 m</b></div>
+    <div><span>Places plotted</span><b>31</b></div>
+    <div><span>Below sea level</span><b>1</b></div>
+  </div>
+</header>
+
+<div class="frame"><svg viewBox="-30 0 1330 900" class="pano" role="img"
+ aria-label="Oblique elevation panorama of the world looking north: terrain
+ rising from a southern shore through a mountain range to a polar summit,
+ with 31 numbered places plotted at true altitude.">
+ <defs>
+   <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+     <stop offset="0" stop-color="#080611"/>
+     <stop offset="0.55" stop-color="#161331"/>
+     <stop offset="1" stop-color="#2B2149"/>
+   </linearGradient>
+   <linearGradient id="aur" x1="0" y1="0" x2="0" y2="1">
+     <stop offset="0" stop-color="#4FB3A5" stop-opacity="0"/>
+     <stop offset="0.6" stop-color="#4FB3A5" stop-opacity=".30"/>
+     <stop offset="1" stop-color="#7E6BD6" stop-opacity="0"/>
+   </linearGradient>
+ </defs>
+ <rect x="-30" y="0" width="1330" height="900" fill="url(#sky)"/>
+ <path d="M 120 20 C 380 120 640 40 900 116 C 1060 160 1180 96 1300 140
+          L 1300 0 L 120 0 Z" fill="url(#aur)"/>
+ <circle class="star" cx="117" cy="87" r="0.7"/><circle class="star" cx="254" cy="166" r="0.7"/><circle class="star" cx="391" cy="245" r="1.2"/><circle class="star" cx="528" cy="74" r="0.7"/><circle class="star" cx="665" cy="153" r="0.7"/><circle class="star" cx="802" cy="232" r="1.2"/><circle class="star" cx="939" cy="61" r="0.7"/><circle class="star" cx="1076" cy="140" r="0.7"/><circle class="star" cx="1213" cy="219" r="1.2"/><circle class="star" cx="60" cy="48" r="0.7"/><circle class="star" cx="197" cy="127" r="0.7"/><circle class="star" cx="334" cy="206" r="1.2"/><circle class="star" cx="471" cy="35" r="0.7"/><circle class="star" cx="608" cy="114" r="0.7"/><circle class="star" cx="745" cy="193" r="1.2"/><circle class="star" cx="882" cy="22" r="0.7"/><circle class="star" cx="1019" cy="101" r="0.7"/><circle class="star" cx="1156" cy="180" r="1.2"/><circle class="star" cx="3" cy="9" r="0.7"/><circle class="star" cx="140" cy="88" r="0.7"/><circle class="star" cx="277" cy="167" r="1.2"/><circle class="star" cx="414" cy="246" r="0.7"/><circle class="star" cx="551" cy="75" r="0.7"/><circle class="star" cx="688" cy="154" r="1.2"/><circle class="star" cx="825" cy="233" r="0.7"/><circle class="star" cx="962" cy="62" r="0.7"/><circle class="star" cx="1099" cy="141" r="1.2"/><circle class="star" cx="1236" cy="220" r="0.7"/><circle class="star" cx="83" cy="49" r="0.7"/><circle class="star" cx="220" cy="128" r="1.2"/><circle class="star" cx="357" cy="207" r="0.7"/><circle class="star" cx="494" cy="36" r="0.7"/><circle class="star" cx="631" cy="115" r="1.2"/><circle class="star" cx="768" cy="194" r="0.7"/><circle class="star" cx="905" cy="23" r="0.7"/><circle class="star" cx="1042" cy="102" r="1.2"/><circle class="star" cx="1179" cy="181" r="0.7"/><circle class="star" cx="26" cy="10" r="0.7"/><circle class="star" cx="163" cy="89" r="1.2"/><circle class="star" cx="300" cy="168" r="0.7"/><circle class="star" cx="437" cy="247" r="0.7"/><circle class="star" cx="574" cy="76" r="1.2"/><circle class="star" cx="711" cy="155" r="0.7"/><circle class="star" cx="848" cy="234" r="0.7"/><circle class="star" cx="985" cy="63" r="1.2"/><circle class="star" cx="1122" cy="142" r="0.7"/><circle class="star" cx="1259" cy="221" r="0.7"/><circle class="star" cx="106" cy="50" r="1.2"/><circle class="star" cx="243" cy="129" r="0.7"/><circle class="star" cx="380" cy="208" r="0.7"/><circle class="star" cx="517" cy="37" r="1.2"/><circle class="star" cx="654" cy="116" r="0.7"/><circle class="star" cx="791" cy="195" r="0.7"/><circle class="star" cx="928" cy="24" r="1.2"/><circle class="star" cx="1065" cy="103" r="0.7"/><circle class="star" cx="1202" cy="182" r="0.7"/><circle class="star" cx="49" cy="11" r="1.2"/><circle class="star" cx="186" cy="90" r="0.7"/><circle class="star" cx="323" cy="169" r="0.7"/><circle class="star" cx="460" cy="248" r="1.2"/><circle class="star" cx="597" cy="77" r="0.7"/><circle class="star" cx="734" cy="156" r="0.7"/><circle class="star" cx="871" cy="235" r="1.2"/><circle class="star" cx="1008" cy="64" r="0.7"/><circle class="star" cx="1145" cy="143" r="0.7"/><circle class="star" cx="-8" cy="222" r="1.2"/><circle class="star" cx="129" cy="51" r="0.7"/><circle class="star" cx="266" cy="130" r="0.7"/><circle class="star" cx="403" cy="209" r="1.2"/><circle class="star" cx="540" cy="38" r="0.7"/><circle class="star" cx="677" cy="117" r="0.7"/><circle class="star" cx="814" cy="196" r="1.2"/><circle class="star" cx="951" cy="25" r="0.7"/><circle class="star" cx="1088" cy="104" r="0.7"/><circle class="star" cx="1225" cy="183" r="1.2"/><circle class="star" cx="72" cy="12" r="0.7"/><circle class="star" cx="209" cy="91" r="0.7"/><circle class="star" cx="346" cy="170" r="1.2"/><circle class="star" cx="483" cy="249" r="0.7"/><circle class="star" cx="620" cy="78" r="0.7"/><circle class="star" cx="757" cy="157" r="1.2"/><circle class="star" cx="894" cy="236" r="0.7"/><circle class="star" cx="1031" cy="65" r="0.7"/><circle class="star" cx="1168" cy="144" r="1.2"/><circle class="star" cx="15" cy="223" r="0.7"/><circle class="star" cx="152" cy="52" r="0.7"/><circle class="star" cx="289" cy="131" r="1.2"/><circle class="star" cx="426" cy="210" r="0.7"/><circle class="star" cx="563" cy="39" r="0.7"/><circle class="star" cx="700" cy="118" r="1.2"/><circle class="star" cx="837" cy="197" r="0.7"/><circle class="star" cx="974" cy="26" r="0.7"/><circle class="star" cx="1111" cy="105" r="1.2"/><circle class="star" cx="1248" cy="184" r="0.7"/><circle class="star" cx="95" cy="13" r="0.7"/><circle class="star" cx="232" cy="92" r="1.2"/><circle class="star" cx="369" cy="171" r="0.7"/><circle class="star" cx="506" cy="250" r="0.7"/><circle class="star" cx="643" cy="79" r="1.2"/><circle class="star" cx="780" cy="158" r="0.7"/><circle class="star" cx="917" cy="237" r="0.7"/><circle class="star" cx="1054" cy="66" r="1.2"/><circle class="star" cx="1191" cy="145" r="0.7"/><circle class="star" cx="38" cy="224" r="0.7"/><circle class="star" cx="175" cy="53" r="1.2"/><circle class="star" cx="312" cy="132" r="0.7"/><circle class="star" cx="449" cy="211" r="0.7"/><circle class="star" cx="586" cy="40" r="1.2"/><circle class="star" cx="723" cy="119" r="0.7"/><circle class="star" cx="860" cy="198" r="0.7"/><circle class="star" cx="997" cy="27" r="1.2"/><circle class="star" cx="1134" cy="106" r="0.7"/><circle class="star" cx="-19" cy="185" r="0.7"/><circle class="star" cx="118" cy="14" r="1.2"/><circle class="star" cx="255" cy="93" r="0.7"/><circle class="star" cx="392" cy="172" r="0.7"/><circle class="star" cx="529" cy="251" r="1.2"/><circle class="star" cx="666" cy="80" r="0.7"/><circle class="star" cx="803" cy="159" r="0.7"/>
+
+ <g class="zenith" transform="translate(706 62)">
+   <ellipse rx="46" ry="11" class="z-isle"/>
+   <path d="M -30 2 L 0 30 L 30 2 Z" class="z-isle"/>
+   <circle r="60" class="z-halo"/>
+   <text class="z-lbl" x="0" y="-26" text-anchor="middle">ZENITH</text>
+ </g>
+
+ <path class="r-pole" d="M -20 900 L -20 300 L 340 300 L 470 210 L 560 175 L 640 150 L 706 112 L 790 158 L 880 196 L 1000 240 L 1160 270 L 1280 290 L 1300 900 Z"/><path class="r-eth" d="M -20 900 L -20 360 L 240 360 L 400 300 L 500 272 L 574 282 L 672 258 L 756 236 L 842 268 L 960 318 L 1120 340 L 1280 352 L 1300 900 Z"/><path class="r-cel" d="M -20 900 L -20 470 L 200 470 L 340 430 L 480 404 L 548 382 L 700 392 L 800 368 L 876 356 L 940 398 L 1058 378 L 1156 352 L 1280 420 L 1300 900 Z"/>
+ <path class="r-kin" d="M -20 900 L -20 560 L 120 560 L 196 486 L 296 436 L 396 404 L 500 470 L 612 438 L 700 520 L 830 560 L 1000 586 L 1180 600 L 1280 610 L 1300 900 Z"/><path class="r-pri" d="M -20 900 L -20 690 L 100 690 L 240 672 L 352 652 L 452 664 L 566 676 L 648 662 L 760 690 L 900 700 L 1080 706 L 1280 712 L 1300 900 Z"/>
+ <path class="water" d="M -20 900 L -20 677.8 L 1300 677.8
+   L 1300 900 Z"/>
+
+ <line class="treeline" x1="-20" y1="284.7" x2="1240" y2="284.7"/>
+ <text class="tl-lbl" x="1236" y="276.7" text-anchor="end">
+   TREE LINE · 2 800 m — above here nothing grows, and only Rimeholt holds</text>
+
+ <g class="pins"><g class="pin sub"><path d="M 380 722.0 A 12 12 0 0 1 380 746.0 Z" style="fill:#E25822"/><path d="M 380 746.0 A 12 12 0 0 1 380 722.0 Z" style="fill:#9C7A4B"/><circle cx="380" cy="734.0" r="12" class="pin-ring"/><text class="pin-n on-light" x="380" y="738.0" text-anchor="middle">1</text></g><g class="pin"><path d="M 432 665.8 A 12 12 0 0 1 432 689.8 Z" style="fill:#5FB35B"/><path d="M 432 689.8 A 12 12 0 0 1 432 665.8 Z" style="fill:#3D8BD9"/><circle cx="432" cy="677.8" r="12" class="pin-ring"/><text class="pin-n on-light" x="432" y="681.8" text-anchor="middle">2</text></g><g class="pin"><rect x="140" y="665.1" width="24" height="24" transform="rotate(45 152 677.1)" class="pin-town"/><text class="pin-n" x="152" y="681.1" text-anchor="middle">3</text></g><g class="pin"><path d="M 248 663.0 A 12 12 0 0 1 248 687.0 Z" style="fill:#AFC3E8"/><path d="M 248 687.0 A 12 12 0 0 1 248 663.0 Z" style="fill:#3D8BD9"/><circle cx="248" cy="675.0" r="12" class="pin-ring"/><text class="pin-n on-light" x="248" y="679.0" text-anchor="middle">4</text></g><g class="pin"><circle cx="566" cy="652.5" r="12" class="pin-ring" style="fill:#3D8BD9"/><text class="pin-n" x="566" y="656.5" text-anchor="middle">5</text></g><g class="pin"><rect x="440" y="632.1" width="24" height="24" transform="rotate(45 452 644.1)" class="pin-town"/><text class="pin-n" x="452" y="648.1" text-anchor="middle">6</text></g><g class="pin"><circle cx="352" cy="635.7" r="12" class="pin-ring" style="fill:#5FB35B"/><text class="pin-n" x="352" y="639.7" text-anchor="middle">7</text></g><g class="pin"><rect x="636" y="615.3" width="24" height="24" transform="rotate(45 648 627.3)" class="pin-town"/><text class="pin-n" x="648" y="631.3" text-anchor="middle">8</text></g><g class="pin"><circle cx="196" cy="617.4" r="12" class="pin-ring" style="fill:#E8C547"/><text class="pin-n on-light" x="196" y="621.4" text-anchor="middle">9</text></g><g class="pin"><path d="M 318 567.5 A 12 12 0 0 1 318 591.5 Z" style="fill:#E25822"/><path d="M 318 591.5 A 12 12 0 0 1 318 567.5 Z" style="fill:#5FB35B"/><circle cx="318" cy="579.5" r="12" class="pin-ring"/><text class="pin-n on-light" x="318" y="583.5" text-anchor="middle">10</text></g><g class="pin"><circle cx="424" cy="544.4" r="12" class="pin-ring" style="fill:#E25822"/><text class="pin-n" x="424" y="548.4" text-anchor="middle">11</text></g><g class="pin"><rect x="480" y="514.2" width="24" height="24" transform="rotate(45 492 526.2)" class="pin-town"/><text class="pin-n" x="492" y="530.2" text-anchor="middle">12</text></g><g class="pin"><circle cx="524" cy="481.2" r="12" class="pin-ring" style="fill:#9C7A4B"/><text class="pin-n" x="524" y="485.2" text-anchor="middle">13</text></g><g class="pin"><circle cx="940" cy="446.1" r="12" class="pin-ring" style="fill:#F5B23E"/><text class="pin-n on-light" x="940" y="450.1" text-anchor="middle">14</text></g><g class="pin"><rect x="687" y="426.1" width="26" height="26" transform="rotate(45 700 439.1)" class="pin-town"/><text class="pin-n" x="700" y="443.1" text-anchor="middle">15</text></g><g class="pin"><circle cx="612" cy="411.0" r="12" class="pin-ring" style="fill:#9BB8C4"/><text class="pin-n on-light" x="612" y="415.0" text-anchor="middle">16</text></g><g class="pin"><circle cx="1058" cy="390.0" r="12" class="pin-ring" style="fill:#6E7BD6"/><text class="pin-n" x="1058" y="394.0" text-anchor="middle">17</text></g><g class="pin"><circle cx="548" cy="368.9" r="12" class="pin-ring" style="fill:#AFC3E8"/><text class="pin-n on-light" x="548" y="372.9" text-anchor="middle">18</text></g><g class="pin"><path d="M 1156 342.9 A 12 12 0 0 1 1156 366.9 Z" style="fill:#6E7BD6"/><path d="M 1156 366.9 A 12 12 0 0 1 1156 342.9 Z" style="fill:#E8C547"/><circle cx="1156" cy="354.9" r="12" class="pin-ring"/><text class="pin-n on-light" x="1156" y="358.9" text-anchor="middle">19</text></g><g class="pin sub"><path d="M 634 335.9 A 12 12 0 0 1 634 359.9 Z" style="fill:#F2E7C9"/><path d="M 634 359.9 A 12 12 0 0 1 634 335.9 Z" style="fill:#8B5CD6"/><circle cx="634" cy="347.9" r="12" class="pin-ring"/><text class="pin-n on-light" x="634" y="351.9" text-anchor="middle">20</text></g><g class="pin"><path d="M 396 328.8 A 12 12 0 0 1 396 352.8 Z" style="fill:#E8C547"/><path d="M 396 352.8 A 12 12 0 0 1 396 328.8 Z" style="fill:#9BB8C4"/><circle cx="396" cy="340.8" r="12" class="pin-ring"/><text class="pin-n on-light" x="396" y="344.8" text-anchor="middle">21</text></g><g class="pin"><path d="M 296 314.8 A 12 12 0 0 1 296 338.8 Z" style="fill:#3D8BD9"/><path d="M 296 338.8 A 12 12 0 0 1 296 314.8 Z" style="fill:#9BB8C4"/><circle cx="296" cy="326.8" r="12" class="pin-ring"/><text class="pin-n on-light" x="296" y="330.8" text-anchor="middle">22</text></g><g class="pin"><rect x="788" y="300.8" width="24" height="24" transform="rotate(45 800 312.8)" class="pin-town"/><text class="pin-n" x="800" y="316.8" text-anchor="middle">23</text></g><g class="pin"><path d="M 876 293.7 A 12 12 0 0 1 876 317.7 Z" style="fill:#F5B23E"/><path d="M 876 317.7 A 12 12 0 0 1 876 293.7 Z" style="fill:#AFC3E8"/><circle cx="876" cy="305.7" r="12" class="pin-ring"/><text class="pin-n on-light" x="876" y="309.7" text-anchor="middle">24</text></g><g class="pin"><rect x="562" y="258.6" width="24" height="24" transform="rotate(45 574 270.6)" class="pin-town"/><text class="pin-n" x="574" y="274.6" text-anchor="middle">25</text></g><g class="pin"><circle cx="672" cy="256.6" r="12" class="pin-ring" style="fill:#F2E7C9"/><text class="pin-n on-light" x="672" y="260.6" text-anchor="middle">26</text></g><g class="pin"><circle cx="408" cy="242.6" r="12" class="pin-ring" style="fill:#8B5CD6"/><text class="pin-n" x="408" y="246.6" text-anchor="middle">27</text></g><g class="pin"><circle cx="842" cy="228.5" r="12" class="pin-ring" style="fill:#D65AB8"/><text class="pin-n" x="842" y="232.5" text-anchor="middle">28</text></g><g class="pin"><path d="M 500 209.5 A 12 12 0 0 1 500 233.5 Z" style="fill:#8B5CD6"/><path d="M 500 233.5 A 12 12 0 0 1 500 209.5 Z" style="fill:#D65AB8"/><circle cx="500" cy="221.5" r="12" class="pin-ring"/><text class="pin-n on-light" x="500" y="225.5" text-anchor="middle">29</text></g><g class="pin"><rect x="744" y="188.4" width="24" height="24" transform="rotate(45 756 200.4)" class="pin-town"/><text class="pin-n" x="756" y="204.4" text-anchor="middle">30</text></g><g class="pin"><circle cx="706" cy="144.3" r="15" class="pin-cit"/><text class="pin-n" x="706" y="148.3" text-anchor="middle">31</text></g></g>
+
+ <g class="alt-axis">
+   <line x1="-20" y1="677.8" x2="1240" y2="677.8" class="alt-grid"/><text class="alt-lbl" x="-24" y="681.8" text-anchor="end">0</text><line x1="-20" y1="537.4" x2="1240" y2="537.4" class="alt-grid"/><text class="alt-lbl" x="-24" y="541.4" text-anchor="end">1,000</text><line x1="-20" y1="397.0" x2="1240" y2="397.0" class="alt-grid"/><text class="alt-lbl" x="-24" y="401.0" text-anchor="end">2,000</text><line x1="-20" y1="256.6" x2="1240" y2="256.6" class="alt-grid"/><text class="alt-lbl" x="-24" y="260.6" text-anchor="end">3,000</text><line x1="-20" y1="116.2" x2="1240" y2="116.2" class="alt-grid"/><text class="alt-lbl" x="-24" y="120.2" text-anchor="end">4,000</text>
+   <text class="alt-unit" x="-24" y="100" text-anchor="end">METRES</text>
+ </g>
+ <text class="dir" x="-16" y="884">◀ WEST</text>
+ <text class="dir" x="1236" y="884" text-anchor="end">EAST ▶</text>
+ <text class="dir hz" x="610" y="884" text-anchor="middle">
+   ▲ NORTH — into haze, into night</text>
+</svg></div>
+
+<section>
+  <div class="kicker">What a section shows that a map cannot</div>
+  <h2>Three findings that only appear once you plot height</h2>
+  <div class="finds"><article class="find"><h3>Altitude and difficulty are different axes</h3><p>Numbering the places by height instead of by level makes the mismatches impossible to miss. <b>Tidewrack Shoals</b> is a level 36–40 zone sitting at 20 m — lower than Aldermere. <b>Galehaven</b> is a Kinetic port at sea level, while <b>Ashfall Vale</b> is late-Primal content at 700 m. The plan view hides this completely; here it is the first thing you see.</p><p class="conseq">Consequence: any rule of the form "higher means harder" is wrong. Height is a <i>climate</i> input, not a difficulty input.</p></article><article class="find"><h3>The tree line is the only hard number in the docs</h3><p>Rimeholt is described as “the last mortal outpost, above the tree line.” That is the single explicit altitude constraint anywhere in the design, and this is the only projection that can honour it. Put the line at 2 800 m and it does real work: it sorts the Ethereal band from everything else, and it explains why Rimeholt is an outpost rather than a city.</p><p class="conseq">Consequence: Ethereal is not merely far, it is <i>uninhabitable</i>. Vespergate brewing its own potions stops being flavour.</p></article><article class="find"><h3>Two zones are underground, and it matters</h3><p><b>The Molten Deep</b> sits at −400 m — the only place on the map below sea level, which is exactly right for magma reached through a quarry. <b>The Reliquary Deep</b> is a vault at 2 350 m: underground, yet higher than most of the world's surface. “Sanctity buried in the dark” and “deep” mean two different things, and only a section shows that.</p><p class="conseq">Consequence: these two want interiors, not outdoor art — a different art-production task from the other twenty-nine.</p></article></div>
+</section>
+
+<section>
+  <div class="kicker">The register</div>
+  <h2>All thirty-one places, lowest to highest</h2>
+  <p>Ordered by altitude, so tier and height can be compared directly. Where a
+  tier colour appears out of sequence, that is a place whose difficulty and
+  elevation disagree — and every one of those is deliberate rather than an
+  error.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>№</th><th>Place</th><th style="text-align:right">Elev.</th>
+    <th>Enemy Lv</th><th>Tier</th></tr></thead>
+    <tbody><tr class="band"><th colspan="5">Below sea level</th></tr><tr><td class="num">1</td><td class="pl"><i style="background:linear-gradient(90deg,#E25822 50%,#9C7A4B 50%)"></i>The Molten Deep</td><td class="num alt">-400 m</td><td class="num">25–29</td><td class="tier t-kinetic">Kinetic</td></tr><tr class="band"><th colspan="5">Lowland  0 – 500 m</th></tr><tr><td class="num">2</td><td class="pl"><i style="background:linear-gradient(90deg,#5FB35B 50%,#3D8BD9 50%)"></i>Thornmire</td><td class="num alt">+0 m</td><td class="num">8–13</td><td class="tier t-primal">Primal</td></tr><tr><td class="num">3</td><td class="pl"><i class="sw-town"></i>Galehaven</td><td class="num alt">+5 m</td><td class="num">~22</td><td class="tier t-kinetic">Kinetic</td></tr><tr><td class="num">4</td><td class="pl"><i style="background:linear-gradient(90deg,#AFC3E8 50%,#3D8BD9 50%)"></i>Tidewrack Shoals</td><td class="num alt">+20 m</td><td class="num">36–40</td><td class="tier t-celestial">Celestial</td></tr><tr><td class="num">5</td><td class="pl"><i style="background:#3D8BD9"></i>Glimmerbrook</td><td class="num alt">+180 m</td><td class="num">3–8</td><td class="tier t-primal">Primal</td></tr><tr><td class="num">6</td><td class="pl"><i class="sw-town"></i>Aldermere</td><td class="num alt">+240 m</td><td class="num">L1</td><td class="tier t-primal">Primal</td></tr><tr><td class="num">7</td><td class="pl"><i style="background:#5FB35B"></i>Whispering Woods</td><td class="num alt">+300 m</td><td class="num">1–5</td><td class="tier t-primal">Primal</td></tr><tr><td class="num">8</td><td class="pl"><i class="sw-town"></i>Pennycross</td><td class="num alt">+360 m</td><td class="num">~8</td><td class="tier t-primal">Primal</td></tr><tr><td class="num">9</td><td class="pl"><i style="background:#E8C547"></i>Stormcliff Coast</td><td class="num alt">+430 m</td><td class="num">17–22</td><td class="tier t-kinetic">Kinetic</td></tr><tr class="band"><th colspan="5">Upland  500 – 1 500 m</th></tr><tr><td class="num">10</td><td class="pl"><i style="background:linear-gradient(90deg,#E25822 50%,#5FB35B 50%)"></i>Ashfall Vale</td><td class="num alt">+700 m</td><td class="num">10–14</td><td class="tier t-primal">Primal</td></tr><tr><td class="num">11</td><td class="pl"><i style="background:#E25822"></i>Cinderpeak Foothills</td><td class="num alt">+950 m</td><td class="num">6–11</td><td class="tier t-primal">Primal</td></tr><tr><td class="num">12</td><td class="pl"><i class="sw-town"></i>Forgeholm</td><td class="num alt">+1,080 m</td><td class="num">~15</td><td class="tier t-kinetic">Kinetic</td></tr><tr><td class="num">13</td><td class="pl"><i style="background:#9C7A4B"></i>Old Quarry</td><td class="num alt">+1,400 m</td><td class="num">15–19</td><td class="tier t-kinetic">Kinetic</td></tr><tr class="band"><th colspan="5">Highland  1 500 – 2 500 m</th></tr><tr><td class="num">14</td><td class="pl"><i style="background:#F5B23E"></i>The Kiln Desert</td><td class="num alt">+1,650 m</td><td class="num">30–34</td><td class="tier t-celestial">Celestial</td></tr><tr><td class="num">15</td><td class="pl"><i class="sw-town"></i>Concordance</td><td class="num alt">+1,700 m</td><td class="num">~30</td><td class="tier t-celestial">Celestial</td></tr><tr><td class="num">16</td><td class="pl"><i style="background:#9BB8C4"></i>Windward Steppe</td><td class="num alt">+1,900 m</td><td class="num">19–24</td><td class="tier t-kinetic">Kinetic</td></tr><tr><td class="num">17</td><td class="pl"><i style="background:#6E7BD6"></i>Starfall Basin</td><td class="num alt">+2,050 m</td><td class="num">34–39</td><td class="tier t-celestial">Celestial</td></tr><tr><td class="num">18</td><td class="pl"><i style="background:#AFC3E8"></i>The Mirrormere</td><td class="num alt">+2,200 m</td><td class="num">32–37</td><td class="tier t-celestial">Celestial</td></tr><tr><td class="num">19</td><td class="pl"><i style="background:linear-gradient(90deg,#6E7BD6 50%,#E8C547 50%)"></i>The Shattered Orrery</td><td class="num alt">+2,300 m</td><td class="num">40–44</td><td class="tier t-celestial">Celestial</td></tr><tr><td class="num">20</td><td class="pl"><i style="background:linear-gradient(90deg,#F2E7C9 50%,#8B5CD6 50%)"></i>The Reliquary Deep</td><td class="num alt">+2,350 m</td><td class="num">52–56</td><td class="tier t-ethereal">Ethereal</td></tr><tr><td class="num">21</td><td class="pl"><i style="background:linear-gradient(90deg,#E8C547 50%,#9BB8C4 50%)"></i>Thunderspire Peaks</td><td class="num alt">+2,400 m</td><td class="num">23–28</td><td class="tier t-kinetic">Kinetic</td></tr><tr class="band"><th colspan="5">Above the tree line  2 800 m +</th></tr><tr><td class="num">22</td><td class="pl"><i style="background:linear-gradient(90deg,#3D8BD9 50%,#9BB8C4 50%)"></i>Frostfell Pass</td><td class="num alt">+2,500 m</td><td class="num">21–26</td><td class="tier t-kinetic">Kinetic</td></tr><tr><td class="num">23</td><td class="pl"><i class="sw-town"></i>Meridian</td><td class="num alt">+2,600 m</td><td class="num">~36</td><td class="tier t-celestial">Celestial</td></tr><tr><td class="num">24</td><td class="pl"><i style="background:linear-gradient(90deg,#F5B23E 50%,#AFC3E8 50%)"></i>The Sunless Reach</td><td class="num alt">+2,650 m</td><td class="num">38–42</td><td class="tier t-celestial">Celestial</td></tr><tr><td class="num">25</td><td class="pl"><i class="sw-town"></i>Rimeholt</td><td class="num alt">+2,900 m</td><td class="num">~45</td><td class="tier t-ethereal">Ethereal</td></tr><tr><td class="num">26</td><td class="pl"><i style="background:#F2E7C9"></i>Hallowmarch</td><td class="num alt">+3,000 m</td><td class="num">45–49</td><td class="tier t-ethereal">Ethereal</td></tr><tr><td class="num">27</td><td class="pl"><i style="background:#8B5CD6"></i>The Umbral Wastes</td><td class="num alt">+3,100 m</td><td class="num">47–51</td><td class="tier t-ethereal">Ethereal</td></tr><tr><td class="num">28</td><td class="pl"><i style="background:#D65AB8"></i>The Collapsed Academy</td><td class="num alt">+3,200 m</td><td class="num">50–54</td><td class="tier t-ethereal">Ethereal</td></tr><tr><td class="num">29</td><td class="pl"><i style="background:linear-gradient(90deg,#8B5CD6 50%,#D65AB8 50%)"></i>The Unwritten Library</td><td class="num alt">+3,250 m</td><td class="num">54–58</td><td class="tier t-ethereal">Ethereal</td></tr><tr><td class="num">30</td><td class="pl"><i class="sw-town"></i>Vespergate</td><td class="num alt">+3,400 m</td><td class="num">~50</td><td class="tier t-ethereal">Ethereal</td></tr><tr><td class="num">31</td><td class="pl"><i style="background:#8B5CD6"></i>The Eclipsed Citadel</td><td class="num alt">+3,800 m</td><td class="num">58–60</td><td class="tier t-ethereal">Ethereal</td></tr></tbody>
+  </table></div>
+</section>
+
+<section>
+  <div class="cost">
+    <p class="kicker" style="margin:0">What it costs</p>
+    <p><b>A section cannot show east–west <i>and</i> north–south at once.</b>
+    Latitude is collapsed into haze here, so this plate cannot tell you that
+    Frostfell Pass lies between the coast and the steppe, or that the Reliquary
+    Deep sits on the seam between Hallowmarch and the Wastes. It is the wrong
+    drawing for planning routes and the right one for setting art direction,
+    climate, and enemy biome — the atmosphere bands are effectively a lighting
+    brief for each tier.</p>
+    <p>Read alongside Plate I it is complementary rather than competing: Plate I
+    fixes <i>where</i>, this fixes <i>how high</i> and <i>how lit</i>. The one
+    number here that Plate I should adopt outright is the <b>2 800 m tree
+    line</b>, because the docs already imply it and nothing else pins it down.</p>
+  </div>
+</section>
+</div>
