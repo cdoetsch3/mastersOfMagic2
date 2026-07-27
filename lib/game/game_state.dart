@@ -30,6 +30,8 @@ class GameState extends ChangeNotifier {
     for (final preset in state.profile.presets) {
       preset.clampToCaps();
     }
+    // ...and saves that point at regions the Plate I-b rebuild removed.
+    state.profile.migrateWorld();
     await state._persist();
     return state;
   }
@@ -49,6 +51,7 @@ class GameState extends ChangeNotifier {
         for (final preset in profile.presets) {
           preset.clampToCaps();
         }
+        profile.migrateWorld();
       } else {
         // First time on this account — seed the cloud with the current
         // (guest) profile so nothing is lost.

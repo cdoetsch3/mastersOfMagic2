@@ -178,6 +178,31 @@ class PlayerProfile {
 
   GameLocation get location => World.byId(locationId);
 
+  /// Repairs a save written against an older map.
+  ///
+  /// The Plate I-b rebuild renamed and removed regions (`radiant_sanctum`,
+  /// `the_caldera`, `crystal_caverns`, `nightfen_marsh`). Without this, an old
+  /// save keeps an id that no longer resolves: [location] silently falls back
+  /// to the start town while [locationId] still reads as the dead region, and
+  /// the two disagree until the player happens to travel.
+  ///
+  /// Returns true if anything was changed, so callers can note the reset.
+  bool migrateWorld() {
+    var changed = false;
+    if (!World.exists(locationId)) {
+      locationId = World.startLocationId;
+      changed = true;
+    }
+    final live = discoveredLocationIds.where(World.exists).toSet();
+    if (live.length != discoveredLocationIds.length) {
+      discoveredLocationIds = live;
+      changed = true;
+    }
+    // Never leave the player with nowhere discovered.
+    if (discoveredLocationIds.add(locationId)) changed = true;
+    return changed;
+  }
+
   LoadoutPreset get activePreset =>
       presets[activePresetIndex.clamp(0, presets.length - 1)];
 

@@ -1,7 +1,10 @@
 # World Design — geography, places, and in-game text
 
-Status: 📝 **draft — nothing built.** `lib/game/world.dart` still holds the old
-18-region Phase-1 map and does not match this document.
+Status: 📝 **draft — geography built, content not.** `lib/game/world.dart` now
+matches this document: all 32 places, the two planes, the graph, elevations and
+the player-facing text below. Guarded by `test/world_test.dart`. Still unbuilt:
+the bestiary, the three-section zone structure, resource nodes, gate
+enforcement, and the Thin Air / no-moon mechanics of §4.
 
 **What this document owns.** The *physical* world: landforms, where each place
 sits and why, the two planes, the environmental mechanics that come out of the
@@ -666,7 +669,9 @@ not locked.
 | ❓ Concordance's hour-long buffs — needs the real-time buff machinery | capital content | ITEMS §6b.1 |
 | ❓ Does the mini-boss/boss pool reroll per run or per day? | zone replay | GAME_DESIGN §3d |
 | ⚠️ **Bestiary must grow**: 3–5 mini-bosses and 1–2 bosses *per zone* | the enemies pass | GAME_DESIGN §3d |
-| ⚠️ `world.dart` does not match this document at all | Phase 5 | IMPLEMENTATION_PLAN |
+| ✅ ~~`world.dart` does not match this document~~ — **rebuilt**, 32 places, guarded by `test/world_test.dart` | — | done |
+| ⚠️ Zone gates are recorded as data (`GameLocation.gate`) but **not enforced** — nothing checks them yet | Phase 5 | IMPLEMENTATION_PLAN |
+| ⚠️ Zenith's teleports are **one-way** in the graph; the return trip needs the Crown check | Phase 5 | IMPLEMENTATION_PLAN |
 
 ### 7.1 ⚠️ Discrepancy found while taking inventory
 
@@ -677,6 +682,15 @@ part. Counted twice.
 ---
 
 ## 8. Revision history
+
+**Rev 2** (2026-07-26) — `world.dart` rebuilt from Plate I-b: 32 locations with
+tier, plane, elevation, station, gate, blurb and arrival text; the walkable
+graph; Zenith's teleport net. Added `WorldPlane`, `World.treeLineMetres`,
+`World.exists`, and the `hasThinAir` / `hasMoon` / `isAboveTreeLine` helpers.
+`test/world_test.dart` (25 tests) guards graph symmetry, reachability, the
+two-door Veil crossing, one-pure-zone-per-element, the tree line, and the
+Tidewrack/Molten Deep exceptions. `PlayerProfile.migrateWorld()` repairs saves
+that point at removed regions.
 
 **Rev 1** (2026-07-26) — Created. Settles the physical geography after a
 five-plate design pass: the world rises rather than spreads; **The Vault** named;
