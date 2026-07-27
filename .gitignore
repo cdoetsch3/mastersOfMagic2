@@ -30,7 +30,11 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+# Unanchored on purpose. Flutter's template ships `/build/`, which only matches
+# the repo root — so `packages/mom_engine/build/` (created by `flutter test` in
+# that package) was being tracked, including a 4MB .dill cache that churned on
+# every test run. This form matches build/ at any depth.
+build/
 /coverage/
 
 # Symbolication related
