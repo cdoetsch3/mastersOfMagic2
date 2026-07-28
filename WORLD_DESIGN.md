@@ -1,7 +1,7 @@
 # World Design — geography, places, and in-game text
 
 Status: 📝 **draft — geography built, content not.** `lib/game/world.dart` now
-matches this document: all 32 places, the two planes, the graph, elevations and
+matches this document: all 32 places, the two planes, the graph and
 the player-facing text below. Guarded by `test/world_test.dart`. Still unbuilt:
 the bestiary, the three-section zone structure, resource nodes, gate
 enforcement, and the Thin Air / no-moon mechanics of §4.
@@ -25,7 +25,7 @@ Companion plates are checked in as self-contained HTML under
 |---|---|---|
 | [**I**](docs/plates/plate-1-known-world.html) | plan view, climate causation | superseded by I-a/I-b |
 | [**II**](docs/plates/plate-2-wheel.html) | concentric wheel — rings and marches | ❌ not adopted; two ideas salvaged (§5) |
-| [**III**](docs/plates/plate-3-long-ascent.html) | elevation section, places numbered by height | ❌ not adopted as the map; **tree line adopted** |
+| [**III**](docs/plates/plate-3-long-ascent.html) | elevation section, places numbered by height | ❌ not adopted; ⚠️ its altitudes are **no longer canon** |
 | [**I-a**](docs/plates/plate-1a-the-climb.html) | plan view + ascent — the finale becomes a climb | superseded by I-b |
 | ✅ [**I-b**](docs/plates/plate-1b-one-crossing.html) | **the settled map** — one world, one crossing | **canonical** |
 
@@ -89,7 +89,7 @@ door rather than a wall at the end of a corridor.
 
 ### 1.4 ✅ Zenith is the summit, sealed and visible
 
-Zenith sits at 5 200 m at the apex of The Vault. It is **visible for the whole
+Zenith sits at the apex of The Vault. It is **visible for the whole
 final act and unreachable from below.** Its doors open when the Concordant
 Crown is finished.
 
@@ -163,8 +163,7 @@ from *Celestial* (sky-as-observed) and *Ethereal* (the tier name), and it does
 not collide with the names GAME_DESIGN already ruled out. Runners-up: *the
 Firmament*, *the Pale*, *the Lattice*.
 
-- **No altitude.** Places above the veil have no elevation; the vertical axis
-  stops meaning anything.
+- **No ground.** Places above the veil are not on the world at all.
 - **No weather, no moon** (see §4.2).
 - Contains exactly three places: **The Collapsed Academy**, **The Unwritten
   Library**, **The Eclipsed Citadel**.
@@ -178,42 +177,45 @@ something:
 
 | Place | Why it is off the climb |
 |---|---|
-| **Tidewrack Shoals** — Lv 36–40 at **20 m** | Reached **by sea from Galehaven**, not by ascent. ⭐ This finally gives the port an endgame purpose, which §4 of GAME_DESIGN was explicitly hunting for. |
-| **The Molten Deep** — Lv 25–29 at **−400 m** | The one zone that goes *down*. The mirror of everything else, and exactly right for magma reached through a quarry. |
+| **Tidewrack Shoals** — Lv 36–40 | Reached **by sea from Galehaven**, not by ascent. ⭐ This finally gives the port an endgame purpose, which §4 of GAME_DESIGN was explicitly hunting for. |
+| **The Molten Deep** — Lv 25–29 | The one zone that goes *down*. The mirror of everything else, and exactly right for magma reached through a quarry. |
 
 ---
 
 ## 3. The vertical structure ✅
 
-| Tier | Band | Altitude | Climate & character | Lv |
-|---|---|---|---|---|
-| **Primal** | the basin | 0 – 1 000 m | Low, temperate, well-watered. The only part of the world with ordinary weather. | 1–14 |
-| **Kinetic** | the range | −400 – 2 500 m | Where the ground takes over from the climate. Stone, storm, wind. | 15–29 |
-| **Celestial** | the high shelf | 1 700 – 2 700 m | Thin air, brutal sun, hard dark. The heavens touching the ground. | 30–44 |
-| **Ethereal** | the climb | 2 900 – 5 200 m | Above the tree line. Ice, rock, and the two faces of one mountain. | 45–60 |
-| **The Empyrean** | above the veil | *no elevation* | No ground, no weather, no moon. | 50–60 |
+| Tier | Band | Climate & character | Lv |
+|---|---|---|---|
+| **Primal** | the basin | Low, temperate, well-watered. The only part of the world with ordinary weather. | 1–14 |
+| **Kinetic** | the range | Where the ground takes over from the climate. Stone, storm, wind. | 15–29 |
+| **Celestial** | the high shelf | Thin air, brutal sun, hard dark. The heavens touching the ground. | 30–44 |
+| **Ethereal** | the climb | Above the tree line. Ice, rock, and the two faces of one mountain. | 45–60 |
+| **The Empyrean** | beyond the Veil | No ground, no weather, no moon. | 50–60 |
 
-### 3.1 ✅ The tree line is 2 800 m
+📝 **Altitude is described, not tracked.** ⚠️ An earlier revision gave every
+place a figure in metres and pinned the tree line at 2 800 m. That is
+**removed**: nothing consumed the numbers, they invited a precision the design
+does not need, and the *map* carries the world's rise far better than a column
+of figures ever did — ice, ranges, and the Vault standing over everything.
 
-The only hard altitude the existing docs ever implied — Rimeholt is *"the last
-mortal outpost, above the tree line."*
+⭐ **What survives is the shape**, which is what mattered: basin, range, shelf,
+climb. Rimeholt is still "the last mortal outpost, above the tree line" — that
+describes a place, and it needs no number to be true.
 
-⭐ Pinning it does real work: it sorts the Ethereal band from everything else,
-and it explains why Rimeholt is an **outpost** and not a city. Ethereal is not
-merely far, it is *uninhabitable* — which makes Vespergate brewing its own
-potions a consequence rather than flavour.
+### 3.1 ⚠️ Height is not difficulty
 
-### 3.2 ⚠️ Altitude is not difficulty
+**A place's level band is not a function of how high it stands.** Three
+deliberate exceptions make the point, and must survive any tidying:
 
-Numbering places by height instead of level exposes real mismatches, and they
-are all deliberate:
+- **Tidewrack Shoals** — Celestial-band content on a *shore*, reached by sea
+  from Galehaven rather than by climbing.
+- **The Molten Deep** — Kinetic content reached by going *down*, through the
+  Old Quarry.
+- **Ashfall Vale** — late-Primal content well up the volcanic slope.
 
-- **Tidewrack Shoals** — Lv 36–40 at 20 m, lower than Aldermere.
-- **Galehaven** — a Kinetic town at sea level.
-- **Ashfall Vale** — late-Primal content at 700 m, above several Kinetic places.
-
-⚠️ **Therefore no rule of the form "higher means harder."** Height is a *climate*
-input, not a difficulty input. The UI must never imply otherwise.
+Guarded by `test/world_test.dart`, which now asserts the *intent* — that
+Tidewrack connects to the port and the Molten Deep is an interior under the
+quarry — rather than any figure.
 
 ---
 
@@ -242,7 +244,7 @@ a hidden multiplier, or it reads as "numbers feel bad up here." The
 implementation is small.
 
 - Countered by: equipment, and Vespergate/alchemy consumables.
-- ❓ Magnitude, and whether it scales with altitude within the shelf or is flat.
+- ❓ Magnitude, and whether it varies across the shelf or is flat.
 - ❓ Whether acclimatisation is purchasable, timed, or permanent per zone.
 
 ### 4.2 📝 No moon in The Empyrean
@@ -566,8 +568,7 @@ Plates II and III were not adopted as maps, but three things from them are:
 
 | From | Idea | Status |
 |---|---|---|
-| III | **The 2 800 m tree line** | ✅ adopted (§3.1) |
-| III | Altitude ≠ difficulty, stated explicitly | ✅ adopted (§3.2) |
+| III | Height ≠ difficulty, stated explicitly | ✅ adopted (§3.1) |
 | II | **Every tier's counter triangle opens with its radiant element** — Pyro ▸ Flora, Electro ▸ Aero, Solar ▸ Lunar, Sanctus ▸ Umbra. Verified against `_counters` in `element.dart`, not asserted anywhere in the docs. | 📝 true and unused — a possible hook for lore or UI grouping |
 | II | Zenith at the hub / equidistant from everywhere | ❌ superseded by Zenith-at-the-summit, which achieves the same end |
 
@@ -591,9 +592,9 @@ not locked.
 
 ---
 
-### 6.1 Primal — the basin · Lv 1–14 · 0–1 000 m
+### 6.1 Primal — the basin · Lv 1–14
 
-#### 🏠 Aldermere · town · 240 m
+#### 🏠 Aldermere · town
 > **Blurb** — A wooded river valley where every mage begins.
 >
 > **Arrival** — Alders lean over the water, and the whole valley smells of wet
@@ -604,7 +605,7 @@ not locked.
 > wants to see your three proofs before he opens the north road. An **Adamant
 > Vein** you cannot touch until Mining 40.
 
-#### Whispering Woods · pure · Flora · Lv 1–5 · 300 m
+#### Whispering Woods · pure · Flora · Lv 1–5
 > **Blurb** — Sun-dappled woods that murmur when nothing is moving them.
 >
 > **Arrival** — The murmur is not wind. It comes from the ground, from the roots
@@ -612,7 +613,7 @@ not locked.
 >
 > **Here** — The best Flora motes in the world. Felling. First-clear reward.
 
-#### Glimmerbrook · pure · Aqua · Lv 3–8 · 180 m
+#### Glimmerbrook · pure · Aqua · Lv 3–8
 > **Blurb** — Springs and shallows east of Aldermere, bright enough to hurt.
 >
 > **Arrival** — The brook runs over pale stones and throws the light back at
@@ -621,7 +622,7 @@ not locked.
 >
 > **Here** — Best Aqua motes. Foraging along the banks.
 
-#### Cinderpeak Foothills · pure · Pyro · Lv 6–11 · 950 m
+#### Cinderpeak Foothills · pure · Pyro · Lv 6–11
 > **Blurb** — The first rise north, where the ground is warm through your boots.
 >
 > **Arrival** — The grass gives out and the slope turns to grey grit that
@@ -630,7 +631,7 @@ not locked.
 >
 > **Here** — Best Pyro motes. Mining. The descent to The Molten Deep.
 
-#### Thornmire · hybrid · Flora + Aqua *(Flora ▸ Aqua)* · Lv 8–13 · 0 m
+#### Thornmire · hybrid · Flora + Aqua *(Flora ▸ Aqua)* · Lv 8–13
 > **Blurb** — Where the woods drown in the brook's outflow.
 >
 > **Arrival** — The path becomes a suggestion, then a rumour, then water. Trees
@@ -640,7 +641,7 @@ not locked.
 > **Here** — Flora **and** Aqua motes from one zone. Bog-iron and reed
 > materials found nowhere else. Denser encounters than a pure zone of its level.
 
-#### Ashfall Vale · hybrid · Pyro + Flora *(Pyro ▸ Flora)* · Lv 10–14 · 700 m
+#### Ashfall Vale · hybrid · Pyro + Flora *(Pyro ▸ Flora)* · Lv 10–14
 > **Blurb** — Downwind of the cone: the burn scar where ash falls on forest.
 >
 > **Arrival** — Grey settles on every leaf until the whole valley looks like a
@@ -650,7 +651,7 @@ not locked.
 > **Here** — Pyro **and** Flora motes. Ashwood, which only grows back burnt.
 > ⭐ The proving ground for the Pyro ▸ Flora matchup.
 
-#### ⛲ Pennycross · town · 360 m
+#### ⛲ Pennycross · town
 > **Blurb** — The first market, where the river road crosses the mountain road.
 >
 > **Arrival** — Two roads meet and a town happened. Stalls have grown into
@@ -662,9 +663,9 @@ not locked.
 
 ---
 
-### 6.2 Kinetic — the range · Lv 15–29 · −400–2 500 m
+### 6.2 Kinetic — the range · Lv 15–29
 
-#### ⛏️ Forgeholm · town · 1 080 m · **unlocks Kinetic (L15)**
+#### ⛏️ Forgeholm · town · **unlocks Kinetic (L15)**
 > **Blurb** — The last flat ground before the Ironspine.
 >
 > **Arrival** — The town is built into the hill rather than on it. Ore goes in
@@ -673,7 +674,7 @@ not locked.
 >
 > **Here** — Metalworking. Mining. The road into the range.
 
-#### Old Quarry · pure · Geo · Lv 15–19 · 1 400 m
+#### Old Quarry · pure · Geo · Lv 15–19
 > **Blurb** — Cut into the range's southern flank, and cut too deep.
 >
 > **Arrival** — Terraces step down into shadow, each one squarer than anything
@@ -682,7 +683,7 @@ not locked.
 >
 > **Here** — Best Geo motes. Mining. The upper entrance to The Molten Deep.
 
-#### Stormcliff Coast · pure · Electro · Lv 17–22 · 430 m
+#### Stormcliff Coast · pure · Electro · Lv 17–22
 > **Blurb** — Where the western ocean's weather hits a wall and has nowhere to go.
 >
 > **Arrival** — The cliffs take the whole Atlantic of it. Spray comes up further
@@ -691,7 +692,7 @@ not locked.
 >
 > **Here** — Best Electro motes. Fulgurite, formed where lightning meets sand.
 
-#### ⚓ Galehaven · town · 5 m
+#### ⚓ Galehaven · town
 > **Blurb** — The one notch in a hundred miles of cliff.
 >
 > **Arrival** — The harbour is impossibly calm for what is happening outside it.
@@ -701,7 +702,7 @@ not locked.
 > **Here** — Tailoring. Foraging. ⭐ **The sea passage to Tidewrack Shoals** —
 > the reason to come back at level 36.
 
-#### Windward Steppe · pure · Aero · Lv 19–24 · 1 900 m
+#### Windward Steppe · pure · Aero · Lv 19–24
 > **Blurb** — A high tableland east of the crest, scoured flat.
 >
 > **Arrival** — Nothing here is taller than your knee, and everything leans the
@@ -710,7 +711,7 @@ not locked.
 >
 > **Here** — Best Aero motes. Foraging.
 
-#### Frostfell Pass · hybrid · Aqua + Aero · Lv 21–26 · 2 500 m
+#### Frostfell Pass · hybrid · Aqua + Aero · Lv 21–26
 > **Blurb** — The way through. Sea air lifted over the crest and frozen there.
 >
 > **Arrival** — The pass is a white corridor between two black walls. Your
@@ -720,7 +721,7 @@ not locked.
 > **Here** — Aqua **and** Aero motes. ❄️ **Ice** exists nowhere else — every
 > recipe that wants it wants this place. ⭐ The road north *must* use the pass.
 
-#### Thunderspire Peaks · hybrid · Electro + Aero *(Electro ▸ Aero)* · Lv 23–28 · 2 400 m
+#### Thunderspire Peaks · hybrid · Electro + Aero *(Electro ▸ Aero)* · Lv 23–28
 > **Blurb** — The summit line where coastal storm meets steppe wind.
 >
 > **Arrival** — You are inside the weather rather than under it. The cloud is
@@ -729,7 +730,7 @@ not locked.
 >
 > **Here** — Electro **and** Aero motes. ⭐ The proving ground for Electro ▸ Aero.
 
-#### The Molten Deep · hybrid · Pyro + Geo · Lv 25–29 · **−400 m**
+#### The Molten Deep · hybrid · Pyro + Geo · Lv 25–29
 > **Blurb** — Under the quarry, under the mountain, under the sea's level.
 >
 > **Arrival** — The quarry's deepest gallery keeps going after the tool marks
@@ -742,11 +743,11 @@ not locked.
 
 ---
 
-### 6.3 Celestial — the high shelf · Lv 30–44 · 1 700–2 700 m
+### 6.3 Celestial — the high shelf · Lv 30–44
 
 ⚠️ **Thin Air applies across this band** (§4.1).
 
-#### 🏛️ Concordance · capital · 1 700 m · **unlocks Celestial (L30)**
+#### 🏛️ Concordance · capital · **unlocks Celestial (L30)**
 > **Blurb** — The trade capital, at the head of navigation on the River Concord.
 >
 > **Arrival** — Everything that moves by water or road in this world passes
@@ -757,7 +758,7 @@ not locked.
 > PvP and Academy entrances. Hour-long district buffs. ⭐ **No crafting
 > stations, on purpose** — value *moves* here, it is not made here.
 
-#### The Kiln Desert · pure · Solar · Lv 30–34 · 2 100 m
+#### The Kiln Desert · pure · Solar · Lv 30–34
 > **Blurb** — A cold high desert in the range's rain shadow, and the sunniest
 > ground in the world.
 >
@@ -768,7 +769,7 @@ not locked.
 > **Here** — Best Solar motes. ⭐ Physically the strongest zone on the map: high
 > altitude *and* rain shadow is how the real world builds its sunniest places.
 
-#### The Mirrormere · pure · Lunar · Lv 32–37 · 2 400 m
+#### The Mirrormere · pure · Lunar · Lv 32–37
 > **Blurb** — A high still lake that holds the moon better than the sky does.
 >
 > **Arrival** — Not a ripple. The surface gives you back the mountains, the
@@ -778,7 +779,7 @@ not locked.
 > **Here** — Best Lunar motes. ❓ Whether the reflected phase matches the real
 > one is a mechanic waiting to be used.
 
-#### Starfall Basin · pure · Astral · Lv 34–39 · 2 300 m
+#### Starfall Basin · pure · Astral · Lv 34–39
 > **Blurb** — A crater field, preserved because nothing grows to cover it.
 >
 > **Arrival** — Bowl after bowl in the pale ground, each with something at the
@@ -787,7 +788,7 @@ not locked.
 >
 > **Here** — Best Astral motes. Star-iron from the crater floors.
 
-#### 🔭 Meridian · town · 2 600 m
+#### 🔭 Meridian · town
 > **Blurb** — An observatory on the crest of the Scarp: the highest dark-sky
 > ground there is.
 >
@@ -798,7 +799,7 @@ not locked.
 > **Here** — Enchanting — the only skill that works on motes rather than
 > matter, and the only town where it can be practised.
 
-#### Tidewrack Shoals · hybrid · Lunar + Aqua · Lv 36–40 · **20 m**
+#### Tidewrack Shoals · hybrid · Lunar + Aqua · Lv 36–40
 > **Blurb** — Tides that obey the moon exactly, on the northern shore.
 >
 > **Arrival** — The water goes out further than seems survivable and comes back
@@ -808,7 +809,7 @@ not locked.
 > **Here** — Lunar **and** Aqua motes. ⭐ **Reached by sea from Galehaven, not
 > by the climb** — the port's endgame purpose.
 
-#### The Sunless Reach · hybrid · Solar + Lunar *(Solar ▸ Lunar)* · Lv 38–42 · 2 650 m
+#### The Sunless Reach · hybrid · Solar + Lunar *(Solar ▸ Lunar)* · Lv 38–42
 > **Blurb** — The Scarp's north face. Direct sun never reaches the floor.
 >
 > **Arrival** — You come over the crest out of glare into a valley that has
@@ -818,7 +819,7 @@ not locked.
 > **Here** — Solar **and** Lunar motes. ⭐ The proving ground for Solar ▸ Lunar —
 > and both faces of one ridge.
 
-#### The Shattered Orrery · hybrid · Astral + Electro · Lv 40–44 · 2 500 m
+#### The Shattered Orrery · hybrid · Astral + Electro · Lv 40–44
 > **Blurb** — A broken model of the heavens, still trying to run.
 >
 > **Arrival** — Rings the size of bridges, half of them fallen, and the fallen
@@ -831,12 +832,12 @@ not locked.
 
 ---
 
-### 6.4 Ethereal — the climb · Lv 45–60 · 2 900–5 200 m
+### 6.4 Ethereal — the climb · Lv 45–60
 
 ⚠️ **Enemies here out-level you by up to ten. Gear closes the gap, not XP**
 (GAME_DESIGN §5). Everything in this band is above the tree line.
 
-#### 🏔️ Rimeholt · town · 2 900 m · **unlocks Ethereal (L45)**
+#### 🏔️ Rimeholt · town · **unlocks Ethereal (L45)**
 > **Blurb** — Basecamp. The last mortal outpost, above the tree line.
 >
 > **Arrival** — There is no wood here, so nothing is built of it. The town is
@@ -847,7 +848,7 @@ not locked.
 > outpost is where they get cut. Mining. The charged Celestial Totem passes the
 > barrier above the town.
 
-#### Hallowmarch · pure · Sanctus · Lv 45–49 · 3 150 m
+#### Hallowmarch · pure · Sanctus · Lv 45–49
 > **Blurb** — The Vault's south flank: a consecrated causeway up the only side
 > that thaws.
 >
@@ -858,7 +859,7 @@ not locked.
 > **Here** — Best Sanctus motes. 📝 **Not a marsh** — *march* in the older
 > borderland sense. Glacial meltwater on a thawing face.
 
-#### The Umbral Wastes · pure · Umbra · Lv 47–51 · 3 600 m
+#### The Umbral Wastes · pure · Umbra · Lv 47–51
 > **Blurb** — The Vault's north face. No direct sun at any hour of any day.
 >
 > **Arrival** — You round the shoulder and the light stops. Not dusk — an
@@ -868,7 +869,7 @@ not locked.
 > **Here** — Best Umbra motes. ⭐ The dark needs no magical cause: a north wall
 > at polar latitude simply never sees the sun.
 
-#### The Reliquary Deep · hybrid · Sanctus + Umbra *(Sanctus ▸ Umbra)* · Lv 52–56 · 3 300 m
+#### The Reliquary Deep · hybrid · Sanctus + Umbra *(Sanctus ▸ Umbra)* · Lv 52–56
 > **Blurb** — A vault bored through the mountain from the lit side to the dark.
 >
 > **Arrival** — The door is on the warm flank and the far end opens onto the
@@ -878,11 +879,11 @@ not locked.
 > **Here** — Sanctus **and** Umbra motes. ⭐ **Literally between its two
 > parents** — through the rock rather than across the ground. ⚠️ Interior art.
 
-#### *The upper icefall* · no zone · ~4 000 m
+#### *The upper icefall* · no zone
 > Deliberately empty. Pure ascent between the Wastes and the crossing, so the
 > climb has a stretch that is only climbing.
 
-#### 🚪 Vespergate · town · 4 500 m · **the crossing**
+#### 🚪 Vespergate · town · **the crossing**
 > **Blurb** — Where the ground runs out. The last place with a supply line.
 >
 > **Arrival** — A fortress at the top of the world, facing the wrong way — not
@@ -893,7 +894,7 @@ not locked.
 > **Here** — Potions and Alchemy — a threshold fortress that cannot resupply
 > from behind has to brew its own. ⭐ **The only door out of the world.**
 
-#### ✧ Zenith · town · 5 200 m · **sealed until the Crown is finished**
+#### ✧ Zenith · town · **sealed until the Crown is finished**
 > **Blurb** — The summit. Visible from everywhere below, and shut.
 >
 > **Arrival** *(on opening)* — The doors were never locked from the inside. From
@@ -979,7 +980,8 @@ part. Counted twice.
 **Rev 2** (2026-07-26) — `world.dart` rebuilt from Plate I-b: 32 locations with
 tier, plane, elevation, station, gate, blurb and arrival text; the walkable
 graph; Zenith's teleport net. Added `WorldPlane`, `World.treeLineMetres`, and
-the `hasThinAir` / `hasMoon` / `isAboveTreeLine` helpers.
+the `hasThinAir` / `hasMoon` / `isAboveTreeLine` helpers. *(The altitude ones
+were removed again in Rev 4 — see above.)*
 `test/world_test.dart` guards graph symmetry, reachability, the two-door Veil
 crossing, one-pure-zone-per-element, the tree line, and the Tidewrack/Molten
 Deep exceptions.

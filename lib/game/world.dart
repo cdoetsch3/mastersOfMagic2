@@ -56,11 +56,6 @@ class GameLocation {
   final int minLevel;
   final int maxLevel;
 
-  /// Metres above sea level. `null` above the Veil, where altitude stops
-  /// meaning anything. ⚠️ Elevation is **not** difficulty (WORLD_DESIGN §3.2)
-  /// — Tidewrack Shoals is a Lv 36-40 zone at 20 m.
-  final int? elevationMetres;
-
   /// The one crafting skill practised here, if any. Decentralised on purpose:
   /// each town is the *only* place its skill can be learned, until Zenith.
   final String? station;
@@ -91,7 +86,6 @@ class GameLocation {
     this.tier,
     this.minLevel = 0,
     this.maxLevel = 0,
-    this.elevationMetres,
     this.station,
     this.gate,
     this.opensAtLevel,
@@ -105,10 +99,6 @@ class GameLocation {
 
   /// A hybrid zone teaches the matchup of the two elements that meet there.
   bool get isHybrid => elements.length == 2;
-
-  /// Above the tree line (2 800 m), nothing grows and only Rimeholt holds.
-  bool get isAboveTreeLine =>
-      elevationMetres != null && elevationMetres! >= World.treeLineMetres;
 
   /// Thin Air applies across the Celestial shelf (WORLD_DESIGN §4.1).
   bool get hasThinAir => tier == MagicTier.celestial && plane == WorldPlane.world;
@@ -125,11 +115,6 @@ class GameLocation {
 /// the Eclipsed Citadel — ⭐ **the summit is never climbed.**
 abstract final class World {
   static const String startLocationId = 'aldermere';
-
-  /// Above this, nothing grows (WORLD_DESIGN §3.1). The only hard altitude the
-  /// design ever implied: Rimeholt is "the last mortal outpost, above the tree
-  /// line."
-  static const int treeLineMetres = 2800;
 
   /// Every town, in the order the campaign meets them. Zenith's teleport net
   /// is built from this.
@@ -154,7 +139,6 @@ abstract final class World {
       name: 'Aldermere',
       kind: LocationKind.town,
       tier: MagicTier.primal,
-      elevationMetres: 240,
       opensAtLevel: 1,
       station: 'Woodcarving',
       gate: 'Three ordinary proofs, shown to the guard on the north road',
@@ -178,7 +162,6 @@ abstract final class World {
       elements: [MagicElement.flora],
       minLevel: 1,
       maxLevel: 5,
-      elevationMetres: 300,
       blurb: 'Sun-dappled woods that murmur when nothing is moving them.',
       arrival: 'The murmur is not wind. It comes from the ground, from the '
           'roots crossing under the path, and it stops the moment you stand '
@@ -193,7 +176,6 @@ abstract final class World {
       elements: [MagicElement.aqua],
       minLevel: 3,
       maxLevel: 8,
-      elevationMetres: 180,
       blurb: 'Springs and shallows east of Aldermere, bright enough to hurt.',
       arrival: 'The brook runs over pale stones and throws the light back at '
           'you in pieces. Fish hang in the current without swimming. The water '
@@ -208,7 +190,6 @@ abstract final class World {
       elements: [MagicElement.pyro],
       minLevel: 6,
       maxLevel: 11,
-      elevationMetres: 950,
       blurb: 'The first rise north, where the ground is warm through your boots.',
       arrival: 'The grass gives out and the slope turns to grey grit that '
           'shifts under you. Somewhere above, the mountain is breathing. The '
@@ -229,7 +210,6 @@ abstract final class World {
       elements: [MagicElement.flora, MagicElement.aqua],
       minLevel: 8,
       maxLevel: 13,
-      elevationMetres: 0,
       blurb: "Where the woods drown in the brook's outflow.",
       arrival: 'The path becomes a suggestion, then a rumour, then water. '
           'Trees stand in it up to their knees and have made peace with that. '
@@ -245,7 +225,6 @@ abstract final class World {
       elements: [MagicElement.pyro, MagicElement.flora],
       minLevel: 10,
       maxLevel: 14,
-      elevationMetres: 700,
       blurb: 'Downwind of the cone: the burn scar where ash falls on forest.',
       arrival: 'Grey settles on every leaf until the whole valley looks like a '
           'charcoal drawing of itself. New shoots are already pushing up '
@@ -258,7 +237,6 @@ abstract final class World {
       name: 'Pennycross',
       kind: LocationKind.town,
       tier: MagicTier.primal,
-      elevationMetres: 360,
       opensAtLevel: 8,
       blurb: 'The first market, where the river road crosses the mountain road.',
       arrival: 'Two roads meet and a town happened. Stalls have grown into '
@@ -275,7 +253,6 @@ abstract final class World {
       name: 'Forgeholm',
       kind: LocationKind.town,
       tier: MagicTier.kinetic,
-      elevationMetres: 1080,
       opensAtLevel: 15,
       station: 'Metalworking',
       blurb: 'The last flat ground before the Ironspine.',
@@ -292,7 +269,6 @@ abstract final class World {
       elements: [MagicElement.geo],
       minLevel: 15,
       maxLevel: 19,
-      elevationMetres: 1400,
       blurb: "Cut into the range's southern flank, and cut too deep.",
       arrival: 'Terraces step down into shadow, each one squarer than anything '
           'nature makes. The tool marks are old. Whatever was quarried out of '
@@ -307,7 +283,6 @@ abstract final class World {
       elements: [MagicElement.electro],
       minLevel: 17,
       maxLevel: 22,
-      elevationMetres: 430,
       blurb: "Where the western ocean's weather hits a wall and has nowhere "
           'to go.',
       arrival: 'The cliffs take the whole weight of it. Spray comes up further '
@@ -320,7 +295,6 @@ abstract final class World {
       name: 'Galehaven',
       kind: LocationKind.town,
       tier: MagicTier.kinetic,
-      elevationMetres: 5,
       opensAtLevel: 22,
       station: 'Tailoring',
       blurb: 'The one notch in a hundred miles of cliff.',
@@ -338,7 +312,6 @@ abstract final class World {
       elements: [MagicElement.aero],
       minLevel: 19,
       maxLevel: 24,
-      elevationMetres: 1900,
       blurb: 'A high tableland east of the crest, scoured flat.',
       arrival: 'Nothing here is taller than your knee, and everything leans '
           'the same way. The wind does not gust; it simply blows, and has been '
@@ -354,7 +327,6 @@ abstract final class World {
       elements: [MagicElement.aqua, MagicElement.aero],
       minLevel: 21,
       maxLevel: 26,
-      elevationMetres: 2500,
       blurb: 'The way through. Sea air lifted over the crest and frozen there.',
       arrival: 'The pass is a white corridor between two black walls. Your '
           'breath goes up and does not come down. The road is under here '
@@ -375,7 +347,6 @@ abstract final class World {
       elements: [MagicElement.electro, MagicElement.aero],
       minLevel: 23,
       maxLevel: 28,
-      elevationMetres: 2400,
       blurb: 'The summit line where coastal storm meets steppe wind.',
       arrival: 'You are inside the weather rather than under it. The cloud is '
           'lit from within at intervals, and the intervals are getting '
@@ -395,8 +366,6 @@ abstract final class World {
       elements: [MagicElement.pyro, MagicElement.geo],
       minLevel: 25,
       maxLevel: 29,
-      // ⚠️ The only place in the world below sea level.
-      elevationMetres: -400,
       blurb: "Under the quarry, under the mountain, under the sea's level.",
       arrival: "The quarry's deepest gallery keeps going after the tool marks "
           'stop. The rock gets warm, then hot, then lit from below. There is a '
@@ -413,7 +382,6 @@ abstract final class World {
       name: 'Concordance',
       kind: LocationKind.town,
       tier: MagicTier.celestial,
-      elevationMetres: 1700,
       opensAtLevel: 30,
       gate: 'The Kinetic Sigil, in three parts, shown at the gate',
       // ⭐ No crafting station on purpose — value MOVES here, it is not made.
@@ -438,7 +406,6 @@ abstract final class World {
       elements: [MagicElement.solar],
       minLevel: 30,
       maxLevel: 34,
-      elevationMetres: 2100,
       blurb: "A cold high desert in the range's rain shadow, and the sunniest "
           'ground in the world.',
       arrival: 'The air is too thin to hold heat, so the sun burns while the '
@@ -454,7 +421,6 @@ abstract final class World {
       elements: [MagicElement.lunar],
       minLevel: 32,
       maxLevel: 37,
-      elevationMetres: 2400,
       blurb: 'A high still lake that holds the moon better than the sky does.',
       arrival: 'Not a ripple. The surface gives you back the mountains, the '
           'stars, and the moon at a size the moon has no right to be. Walking '
@@ -475,7 +441,6 @@ abstract final class World {
       elements: [MagicElement.astral],
       minLevel: 34,
       maxLevel: 39,
-      elevationMetres: 2300,
       blurb: 'A crater field, preserved because nothing grows to cover it.',
       arrival: 'Bowl after bowl in the pale ground, each with something at the '
           'bottom that is not from here. Nothing has grown over them because '
@@ -487,7 +452,6 @@ abstract final class World {
       name: 'Meridian',
       kind: LocationKind.town,
       tier: MagicTier.celestial,
-      elevationMetres: 2600,
       opensAtLevel: 36,
       station: 'Enchanting',
       blurb: 'An observatory on the crest of the Scarp: the highest dark-sky '
@@ -512,8 +476,6 @@ abstract final class World {
       elements: [MagicElement.lunar, MagicElement.aqua],
       minLevel: 36,
       maxLevel: 40,
-      // ⭐ A Lv 36-40 zone at 20 m: elevation is not difficulty.
-      elevationMetres: 20,
       blurb: 'Tides that obey the moon exactly, on the northern shore.',
       arrival: 'The water goes out further than seems survivable and comes '
           'back faster. What it uncovers has been down there a long time. '
@@ -529,7 +491,6 @@ abstract final class World {
       elements: [MagicElement.solar, MagicElement.lunar],
       minLevel: 38,
       maxLevel: 42,
-      elevationMetres: 2650,
       blurb: "The Scarp's north face. Direct sun never reaches the floor.",
       arrival: 'You come over the crest out of glare into a valley that has '
           'never been lit. The rock is the same rock. The desert is a thousand '
@@ -545,7 +506,6 @@ abstract final class World {
       elements: [MagicElement.astral, MagicElement.electro],
       minLevel: 40,
       maxLevel: 44,
-      elevationMetres: 2500,
       blurb: 'A broken model of the heavens, still trying to run.',
       arrival: 'Rings the size of bridges, half of them fallen, and the fallen '
           'half still turning. The arcing is not weather; it is the mechanism. '
@@ -563,7 +523,6 @@ abstract final class World {
       name: 'Rimeholt',
       kind: LocationKind.town,
       tier: MagicTier.ethereal,
-      elevationMetres: 2900,
       opensAtLevel: 45,
       station: 'Jewelry',
       gate: 'A Celestial Totem charged with the Solar, Lunar and Astral '
@@ -583,7 +542,6 @@ abstract final class World {
       elements: [MagicElement.sanctus],
       minLevel: 45,
       maxLevel: 49,
-      elevationMetres: 3150,
       // 📝 Not a marsh — *march* in the older borderland sense.
       blurb: "The Vault's south flank: a consecrated causeway up the only side "
           'that thaws.',
@@ -601,7 +559,6 @@ abstract final class World {
       elements: [MagicElement.umbra],
       minLevel: 47,
       maxLevel: 51,
-      elevationMetres: 3600,
       blurb: "The Vault's north face. No direct sun at any hour of any day.",
       arrival: 'You round the shoulder and the light stops. Not dusk — an '
           'absence with an edge to it. The ice here has never melted and holds '
@@ -618,7 +575,6 @@ abstract final class World {
       elements: [MagicElement.sanctus, MagicElement.umbra],
       minLevel: 52,
       maxLevel: 56,
-      elevationMetres: 3300,
       blurb: 'A vault bored through the mountain from the lit side to the dark.',
       arrival: 'The door is on the warm flank and the far end opens onto the '
           'ice. In between, a corridor that someone consecrated and someone '
@@ -631,7 +587,6 @@ abstract final class World {
       name: 'Vespergate',
       kind: LocationKind.town,
       tier: MagicTier.ethereal,
-      elevationMetres: 4500,
       opensAtLevel: 50,
       station: 'Potions and Alchemy',
       blurb: 'Where the ground runs out. The last place with a supply line.',
@@ -711,7 +666,6 @@ abstract final class World {
       name: 'Zenith',
       kind: LocationKind.town,
       tier: MagicTier.ethereal,
-      elevationMetres: 5200,
       opensAtLevel: 60,
       station: 'Every station — the only town with all six',
       gate: 'The Concordant Crown: twelve elemental gems and twelve Cores, '

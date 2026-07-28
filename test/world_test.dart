@@ -113,8 +113,6 @@ void main() {
         'the_eclipsed_citadel',
       });
       for (final l in empyrean) {
-        expect(l.elevationMetres, isNull,
-            reason: '${l.id} is above the Veil and has no altitude');
         expect(l.hasMoon, isFalse, reason: 'no moon above the Veil');
       }
     });
@@ -179,32 +177,26 @@ void main() {
     });
   });
 
-  group('altitude', () {
-    test('the tree line sorts the Ethereal band from everything below', () {
-      expect(World.treeLineMetres, 2800);
-      // Rimeholt is the design's own anchor: "above the tree line".
-      expect(byId['rimeholt']!.isAboveTreeLine, isTrue);
-      for (final l in World.locations.where(
-          (l) => l.tier == MagicTier.ethereal && l.plane == WorldPlane.world)) {
-        expect(l.isAboveTreeLine, isTrue,
-            reason: '${l.id} is Ethereal and must be above the tree line');
-      }
+  group('the two deliberate exceptions to the climb', () {
+    // 📝 Altitude is no longer tracked as data — the terrain carries it. But
+    // the design intent behind these two places is not about numbers, and if
+    // either is ever "tidied" onto the main road the point is lost.
+
+    test('Tidewrack Shoals is a late zone reached by SEA, not by climbing', () {
+      final tidewrack = byId['tidewrack_shoals']!;
+      expect(tidewrack.minLevel, greaterThan(35),
+          reason: 'it is Celestial-band content');
+      expect(tidewrack.connections, contains('galehaven'),
+          reason: 'the sea passage is what gives the port an endgame purpose');
     });
 
-    test('altitude is NOT difficulty — the deliberate exceptions survive', () {
-      // If these ever "get fixed" into the climb, the design intent is lost.
-      final tidewrack = byId['tidewrack_shoals']!;
-      expect(tidewrack.elevationMetres, 20);
-      expect(tidewrack.minLevel, greaterThan(35),
-          reason: 'a late zone at sea level, reached by sea from Galehaven');
-      expect(tidewrack.connections, contains('galehaven'));
-
+    test('the Molten Deep is reached by going DOWN through the quarry', () {
       final molten = byId['the_molten_deep']!;
-      expect(molten.elevationMetres, lessThan(0),
-          reason: 'the one zone that goes down');
-      expect(
-          World.locations.where((l) => (l.elevationMetres ?? 0) < 0).length, 1,
-          reason: 'only the Molten Deep is below sea level');
+      expect(molten.kind, LocationKind.dungeon,
+          reason: 'it is an interior, not open ground');
+      expect(molten.connections,
+          containsAll(<String>['old_quarry', 'cinderpeak_foothills']),
+          reason: 'the descent runs under both');
     });
 
     test('Thin Air covers the Celestial shelf and nothing else', () {
