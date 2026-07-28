@@ -104,6 +104,50 @@ void main() {
     });
   });
 
+  group('Photosynthesis text matches the streak-gated mechanic', () {
+    // ⚠️ This class of drift already bit us: the effect was rewritten from
+    // per-cast stacking to a 5-cast streak gate, and every tooltip, the
+    // element sheet and the status catalogue still described stacks. The
+    // name-matching test above passes either way, so it caught nothing.
+
+    String floraText() {
+      final lore = elementLore[MagicElement.flora]!;
+      final info = StatusCatalog.byId('photosynthesis')!;
+      return '${lore.description} ${lore.trigger} ${lore.beatsEffect} '
+              '${lore.weakEffect} ${info.description} ${info.trigger}'
+          .toLowerCase();
+    }
+
+    test('no Photosynthesis text still talks about stacks', () {
+      expect(floraText(), isNot(contains('stack')),
+          reason: 'Photosynthesis has no stacks — it is on or off');
+    });
+
+    test('the text states the real streak threshold', () {
+      final threshold = PhotosynthesisStatus.streakThreshold;
+      expect(threshold, 5);
+      expect(floraText(), contains('5'),
+          reason: 'the player must be told how many casts it takes');
+    });
+
+    test('the text states the real heal rate', () {
+      expect(PhotosynthesisStatus.healPercent, 1);
+      expect(floraText(), contains('1%'),
+          reason: 'the heal rate in the tooltip must match the engine');
+    });
+
+    test('Pyro and Aqua describe their Flora interactions correctly', () {
+      // Ignite breaks the STREAK now, and a bloom (not a stack) blocks
+      // Waterlogged.
+      final pyro = elementLore[MagicElement.pyro]!.beatsEffect.toLowerCase();
+      expect(pyro, contains('streak'),
+          reason: 'Ignite breaks the streak, not stacks: "$pyro"');
+
+      final aqua = elementLore[MagicElement.aqua]!.weakEffect.toLowerCase();
+      expect(aqua, isNot(contains('stack')), reason: aqua);
+    });
+  });
+
   group('no player-facing text references removed concepts', () {
     // Sentinels for renames that already bit us once.
     const gone = ['radiant', 'ice ', 'holy'];

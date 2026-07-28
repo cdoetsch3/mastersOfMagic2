@@ -84,7 +84,9 @@ class MageState {
   /// The element this mage engaged this turn — set for a channel or a
   /// committed cast (fizzled/missed casts included: they "behave like a
   /// charge" of the cycling element), null on a forfeited turn. Drives
-  /// activity-based stack decay (Photosynthesis; later, Creeping Dark).
+  /// activity-based stack decay — Creeping Dark and Astral Alignment.
+  /// (Photosynthesis no longer uses it: it is streak-gated, and streaks are
+  /// built by casts alone.)
   MagicElement? activeElementThisTurn;
 
   // ---- Precedence-pipeline modifiers (§5.2) -----------------------------

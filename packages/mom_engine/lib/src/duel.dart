@@ -113,7 +113,7 @@ class DuelEngine {
   static const int fatigueThreshold = 50;
   static const int fatiguePerTurn = 3;
 
-  /// Whether element side-effects (Ignite procs, Photosynthesis stacks,
+  /// Whether element side-effects (Ignite procs, Photosynthesis blooms,
   /// Waterlogged, …) fire on casts. Always true in real duels; tests of core
   /// resolution semantics (priority, shields, Haste) may switch them off so
   /// hand-computed expectations aren't perturbed by procs.
@@ -663,18 +663,16 @@ class DuelEngine {
           _applyIgnite(target, rawDamage, e);
         }
       case MagicElement.flora:
-        // Photosynthesis — every Flora cast adds a stack.
-        final photo = _statusOf<PhotosynthesisStatus>(caster);
-        if (photo == null) {
-          caster.statuses.add(PhotosynthesisStatus());
-        } else {
-          photo.addStack();
+        // Photosynthesis — ⭐ streak-gated like Tailwind. Nothing happens for
+        // the first four consecutive Flora casts; from the 5th onward the
+        // caster heals 1% max HP per turn and cannot be Waterlogged.
+        if (PhotosynthesisStatus.activeFor(caster)) {
+          if (_statusOf<PhotosynthesisStatus>(caster) == null) {
+            caster.statuses.add(PhotosynthesisStatus());
+            e.add(BuffAppliedEvent(caster, 'Photosynthesis — in bloom',
+                statusId: 'photosynthesis'));
+          }
         }
-        e.add(BuffAppliedEvent(
-            caster,
-            'Photosynthesis '
-                '(${_statusOf<PhotosynthesisStatus>(caster)!.stacks} stacks)',
-            statusId: 'photosynthesis'));
       case MagicElement.aqua:
         // Waterlogged — every 3rd consecutive Aqua cast slows the opponent's
         // next action by +10 priority, unless they hold Photosynthesis.
@@ -890,11 +888,20 @@ class DuelEngine {
   }
 
   /// Applies (or refreshes) Ignite on [target]: a burn of 10% of [rawDamage]
-  /// per tick. Landing Ignite clears the target's Photosynthesis stacks.
+  /// per tick. Landing Ignite breaks the target's Flora streak, which ends
+  /// any Photosynthesis bloom — stripping the status alone would let it return
+  /// on their very next Flora cast.
   void _applyIgnite(MageState target, int rawDamage, List<DuelEvent> e) {
     final perTick = (rawDamage * 0.10).round();
     if (perTick < 1) return; // a sub-1 burn is no burn
     if (_graceBlocks(target, e)) return;
+    // ⚠️ Break the STREAK, not just the status. Photosynthesis is derived from
+    // the streak now, so removing the status alone would let it reappear on the
+    // very next Flora cast and Ignite would counter nothing.
+    if (target.streakElement == MagicElement.flora) {
+      target.streakElement = null;
+      target.streakCount = 0;
+    }
     target.statuses.removeWhere((s) => s is PhotosynthesisStatus);
     final existing = _statusOf<IgniteStatus>(target);
     if (existing != null) {

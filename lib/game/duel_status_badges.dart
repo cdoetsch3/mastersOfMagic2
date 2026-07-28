@@ -49,8 +49,10 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
   // --- Buffs (mine) -----------------------------------------------------
   final photo = snap['photosynthesis'];
   if (photo != null) {
-    badges.add(StatusBadge('Photo ×${photo.stacks}',
-        sub: 'heal',
+    // Streak-gated now: in bloom or not, so no count. The Flora streak pip
+    // already shows the run that sustains it.
+    badges.add(StatusBadge('Photo',
+        sub: 'in bloom',
         color: MagicElement.flora.style.color,
         kind: BadgeKind.buff));
   }

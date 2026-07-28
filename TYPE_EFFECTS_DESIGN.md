@@ -244,67 +244,72 @@ effectively **"your next action goes last."**
   stacks on application (§2 table). The short refresh-only window is
   deliberate — it keeps the Aqua-shield cleanse worth casting.
 
-### 2.3 Flora — Photosynthesis
-- ✅ **Trigger:** every Flora cast adds a stack (**max 3** — trimmed from 5
-  after sims showed even 5-with-decay dominating; see §8).
-- ✅ **Effect:** heals **1% max HP per stack** in the end-of-turn heal band
-  (§5.1).
-- ✅ **Decay:** each turn without Flora activity (a Flora cast **or charge**)
-  sheds one stack — an ongoing commitment, mirroring Creeping Dark's activity
-  rule. The shedding turn still heals at the pre-decay count (bookkeeping runs
-  last). Per §5.4, a fizzled/missed Flora cast counts as activity (it behaves
-  like a charge of the cycling element).
-- ✅ **Cleared** (all stacks) when Ignite is applied; **grants** Waterlogged
-  immunity while ≥1 stack.
+### 2.3 Flora — Photosynthesis ✅ **REWRITTEN (streak-gated)**
 
-⚠️ Stall risk — see **Mechanics to Watch (§8)** (largely defused by decay +
-Fatigue).
+- ✅ **Trigger:** from the **5th consecutive Flora cast** onward. The first four
+  do nothing at all. ⭐ Mirrors Aero's Tailwind (§2.6), which gates on a 3-cast
+  streak.
+- ✅ **Effect:** heals **1% of max HP** per turn in the end-of-turn heal band
+  (§5.1) — a flat rate, not per stack. There are no stacks.
+- ✅ **Ends** the moment the streak breaks: one cast of any other element and the
+  bloom is over. **Charging does not sustain it** — only casts build a streak.
+- ✅ **Ignite breaks the streak itself**, not merely the status. ⚠️ Stripping the
+  status alone would let it return on the very next Flora cast, and Ignite would
+  counter nothing.
+- ✅ **Grants** Waterlogged immunity while in bloom.
 
----
+⭐ **Why this shape.** The old design was the only element effect in the game
+that accrued **unconditionally** — every Flora cast added a stack, with no hit
+required, no proc roll and no target state. Compare Ignite (needs a hit *and* a
+25% roll), Creeping Dark (charge spent), Arcane Knowledge (4+ charge spent). A
+streak gate costs five turns of commitment before paying anything, is visible to
+the opponent the whole time, and switches off the moment it is interrupted.
 
-### ⚠️⚠️ 2.3a FLORA NEEDS TUNING — open, blocking nothing, but real
+#### ✅ 2.3a Resolved — the Flora rebalance, measured
 
-📝 **Flagged 2026-07-26 from the rebuilt balance sim** (IMPLEMENTATION_PLAN
-Phase 4). Flora is the **only** element outside the 40–60% target band, and it
-is outside at every skill level:
+📝 Flora had been the **only** element outside the 40–60% band, at every skill
+level. The rebuilt sim (IMPLEMENTATION_PLAN Phase 4) before and after:
 
 | Overall win rate | i4 | i7 | i10 |
 |---|---|---|---|
-| **Flora** | **82.9%** | **75.6%** | **70.1%** |
-| Every other element | 44–59% | 44–54% | 43–53% |
+| Flora — stacking (old) | 82.9% | 75.6% | 70.1% |
+| ✅ Flora — streak-gated | **54.7%** | **51.0%** | **50.5%** |
 
-⚠️ **This is not an artifact of a weak AI.** The sim was rebuilt first —
-`GreedyAi` deleted, realistic ~10-spell loadouts, the matrix run at three
-intelligences — precisely so this number could be trusted. Better play *reduces*
-Flora's edge (82.9 → 70.1) without bringing it into band.
+⭐ **The clinching symptom is gone.** Pyro *counters* Flora but used to **lose**
+to it at ordinary skill; now it beats it as designed:
 
-⭐ **The clinching evidence: Pyro, which counters Flora, LOSES to it at i4
-(45%).** It only wins at 72% once play reaches i10. An element whose own counter
-cannot beat it at ordinary skill is over-tuned by definition.
+| `pyro ▸ flora` | i4 | i7 | i10 |
+|---|---|---|---|
+| old | 45% ⚠️ | 63% | 72% |
+| ✅ new | **70%** | **79%** | **87%** |
 
-⭐ **Why it is probably Photosynthesis.** It is the only element effect in the
-game that accrues **unconditionally** — *every Flora cast* adds a stack. No hit
-required, no proc roll, no target state, nothing for the opponent to play
-around. Compare: Ignite needs a hit *and* a 25% roll; Creeping Dark needs charge
-spent; Astral Alignment needs casts of a specific element; Arcane Knowledge
-needs 4+ charge spent. Flora needs only that you took your turn.
+⭐ **The change was surgical.** Of the twelve counter edges, **only the two Flora
+edges moved** — every other edge came back byte-identical across all three
+intelligence levels. That is the strongest evidence available that the fix
+addressed Flora rather than shifting the whole wheel.
 
-⚠️ **Note the history**: stacks were already trimmed **5 → 3** after an earlier
-sim showed dominance (§8). That nerf reduced the symptom without touching the
-cause, which is the *free* trigger rather than the stack ceiling.
+`flora ▸ aqua` fell from 95/94/96 to **73/84/91**, which puts it in line with
+`electro ▸ aero` (91%) and `astral ▸ solar` (89%) rather than standing alone.
 
-❓ **Options, cheapest first — needs a ruling:**
+⚠️ **Two earlier nerfs failed** before this one: stacks trimmed 5 → 3, then the
+decay rule. Both treated the *ceiling*; the problem was always the **free
+trigger**.
 
-| Option | Effect | Risk |
-|---|---|---|
-| ⭐ **Require the cast to HIT** | Brings the trigger in line with Ignite's; gives the opponent counterplay via dodge and shields | Smallest change; may not be enough alone |
-| **Cap stacks at 2** | Straight −33% to the heal ceiling | Repeats the 5→3 nerf that did not fix it |
-| **Decay 2 stacks per idle turn** | Punishes breaking the cycle much harder | Could overshoot into unplayable |
-| **Heal 0.5% per stack** | Halves the payoff | Blunt; makes the effect feel pointless |
+✅ **Nothing else is out of band.** A first pass at 150 duels/pair showed Geo at
+62.0% and looked like a new problem; at **600 duels/pair it settles to 59.7 /
+56.1 / 55.1** and every one of the twelve elements is inside 40–60% at every
+intelligence level.
 
-📝 **Do not tune this and the counter-edge band in the same pass** — the band
-question (what intelligence is balance measured at?) is unresolved, and changing
-both at once makes the next sim unreadable.
+⚠️ **Worth remembering as a method note:** 150 duels per pair is not enough
+resolution to call a 2-point overshoot. Geo *is* the strongest element, but it
+is inside the band, and the earlier reading was sample noise rather than signal.
+
+📝 **Why every element rose slightly.** Flora was suppressing the whole roster,
+so fixing it lifted everyone: +1.4 to +3.5 across the board at i4, with Geo
+(+3.5) and Electro (+3.5) gaining most. Geo did not get stronger — it stopped
+losing to Flora (31% → 70% at i4), and that one cell was its **only** changed
+matchup.
+
 
 ---
 

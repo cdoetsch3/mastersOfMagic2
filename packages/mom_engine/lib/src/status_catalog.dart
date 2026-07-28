@@ -106,9 +106,9 @@ abstract final class StatusCatalog {
       id: 'photosynthesis',
       name: 'Photosynthesis',
       description:
-          'Heals you a little at the end of every turn, more per stack (max '
-          '3), and makes you immune to Waterlogged. Sheds a stack on any turn '
-          'you neither cast nor charge Flora; Ignite clears it outright.',
+          'From your 5th Flora cast in a row, heals 1% of your maximum health '
+          'at the end of every turn and makes you immune to Waterlogged. Cast '
+          'anything else and the bloom ends; Ignite breaks it outright.',
       trigger: 'Any Flora cast.',
       kind: StatusKind.buff,
       element: MagicElement.flora,

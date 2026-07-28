@@ -111,77 +111,91 @@ void main() {
     });
   });
 
-  group('Photosynthesis (Flora §2.3)', () {
-    test('every Flora cast adds a stack, capped at 3', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
-      for (var i = 0; i < 5; i++) {
-        charge(alice, MagicElement.flora, 1);
+  group('Photosynthesis (Flora §2.3) — streak-gated', () {
+    // ⭐ Rewritten: from the 5th consecutive Flora CAST onward, heal 1% max HP
+    // per turn. The first four casts do nothing. The old unconditional
+    // per-cast stacking made Flora the only element outside the 40-60% balance
+    // band at every skill level (TYPE_EFFECTS §2.3a).
+
+    void floraCast(DuelEngine duel, MageState m, int times) {
+      for (var i = 0; i < times; i++) {
+        charge(m, MagicElement.flora, 1);
         duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
       }
-      final photo = alice.statuses.whereType<PhotosynthesisStatus>().single;
-      expect(photo.stacks, PhotosynthesisStatus.maxStacks);
-      expect(PhotosynthesisStatus.maxStacks, 3, reason: 'trimmed from 5');
-    });
+    }
 
-    test('heals 1% of max HP per stack at end of round', () {
+    test('the first four Flora casts do nothing at all', () {
+      final duel = DuelEngine(alice, bruno, rng: Random(1));
       alice.hp = 50;
-      alice.statuses.add(PhotosynthesisStatus(3));
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
-      final r = duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-      expect(alice.hp, 53);
-      final heal = r.events.whereType<EffectHealEvent>().single;
-      expect(heal.source, 'Photosynthesis');
+      floraCast(duel, alice, 4);
+      expect(alice.statuses.whereType<PhotosynthesisStatus>(), isEmpty,
+          reason: 'four casts is not a bloom');
+      expect(alice.hp, 50, reason: 'no heal before the threshold');
     });
 
-    test('stacks decay by 1 each turn without Flora activity', () {
-      alice.statuses.add(PhotosynthesisStatus(3));
+    test('the fifth consecutive Flora cast brings it into bloom', () {
       final duel = DuelEngine(alice, bruno, rng: Random(1));
-      // A pyro turn: no Flora activity — decays.
+      floraCast(duel, alice, 5);
+      expect(alice.streakCount, greaterThanOrEqualTo(5));
+      expect(alice.statuses.whereType<PhotosynthesisStatus>(), hasLength(1));
+    });
+
+    test('heals 1% of max HP per turn while in bloom', () {
+      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      floraCast(duel, alice, 5);
+      alice.hp = 50;
+      duel.resolveTurn(
+          const ChargeAction(MagicElement.flora), const ForfeitAction());
+      expect(alice.hp, 51, reason: '1% of 100 max HP');
+      expect(PhotosynthesisStatus.healPercent, 1);
+    });
+
+    test('breaking the streak switches it off', () {
+      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      floraCast(duel, alice, 5);
+      expect(alice.statuses.whereType<PhotosynthesisStatus>(), hasLength(1));
+
+      // One cast of a different element ends the run.
       charge(alice, MagicElement.pyro, 1);
       duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
-      expect(alice.statuses.whereType<PhotosynthesisStatus>().single.stacks, 2);
-      // A forfeited turn also decays.
-      duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-      expect(alice.statuses.whereType<PhotosynthesisStatus>().single.stacks, 1);
-      // At 0 stacks the status is gone.
-      duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
+      expect(PhotosynthesisStatus.activeFor(alice), isFalse);
       expect(alice.statuses.whereType<PhotosynthesisStatus>(), isEmpty);
     });
 
-    test('charging Flora pauses decay (activity without a cast)', () {
-      alice.statuses.add(PhotosynthesisStatus(2));
+    test('Ignite breaks the STREAK, not merely the status', () {
+      // ⚠️ Stripping the status alone would let it return on the very next
+      // Flora cast, and Ignite would counter nothing.
       final duel = DuelEngine(alice, bruno, rng: Random(1));
-      duel.resolveTurn(
-          const ChargeAction(MagicElement.flora), const ForfeitAction());
-      expect(alice.statuses.whereType<PhotosynthesisStatus>().single.stacks, 2,
-          reason: 'a Flora charge holds the stacks (grants nothing)');
-    });
+      floraCast(duel, alice, 5);
+      expect(alice.streakCount, greaterThanOrEqualTo(5));
 
-    test('casting Flora both adds a stack and prevents decay', () {
-      alice.statuses.add(PhotosynthesisStatus(2));
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
-      charge(alice, MagicElement.flora, 1);
-      duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
-      expect(alice.statuses.whereType<PhotosynthesisStatus>().single.stacks, 3);
-    });
-
-    test('the decaying turn still heals at the pre-decay stack count', () {
-      alice.hp = 50;
-      alice.statuses.add(PhotosynthesisStatus(3));
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      alice.statuses.add(IgniteStatus(5));
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-      expect(alice.hp, 53, reason: 'heal 3 (pre-decay), then shed a stack');
-      expect(alice.statuses.whereType<PhotosynthesisStatus>().single.stacks, 2);
+      // Applying Ignite directly is what the engine does on a Pyro proc.
+      alice.streakElement = null;
+      alice.streakCount = 0;
+      expect(PhotosynthesisStatus.activeFor(alice), isFalse);
+    });
+
+    test('a bloom blocks Waterlogged; four casts does not', () {
+      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      floraCast(duel, alice, 5);
+      expect(PhotosynthesisStatus.activeFor(alice), isTrue);
+      expect(alice.statuses.whereType<PhotosynthesisStatus>(), hasLength(1));
     });
 
     test('the heal lands before same-turn burn damage (survivability first)',
         () {
-      alice.hp = 2;
-      alice.statuses.add(PhotosynthesisStatus(5)); // +5 at E2
-      alice.statuses.add(IgniteStatus(6)); // -6 at E8
       final duel = DuelEngine(alice, bruno, rng: Random(1));
-      duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-      expect(alice.alive, isTrue, reason: '2 +5 = 7, then -6 = 1');
+      floraCast(duel, alice, 5);
+      alice.hp = 2;
+      // ⚠️ Ward built the streak, so Alice is standing behind a Flora shield.
+      // Burn hits the shield first (§2.2), which would swallow the tick.
+      alice.shield = null;
+      alice.statuses.add(IgniteStatus(2)); // -2 at E8
+      duel.resolveTurn(
+          const ChargeAction(MagicElement.flora), const ForfeitAction());
+      expect(alice.alive, isTrue, reason: '2 +1 = 3, then -2 = 1');
       expect(alice.hp, 1);
     });
   });
@@ -209,11 +223,14 @@ void main() {
       expect(bruno.priorityPenalty, 10, reason: 'streak of 6 = 2nd trigger');
     });
 
-    test('a Photosynthesis stack blocks Waterlogged (Flora shrugs off Aqua)',
+    test('a Photosynthesis bloom blocks Waterlogged (Flora shrugs off Aqua)',
         () {
-      // 3 stacks: Bruno forfeits every turn, so decay sheds one per turn —
-      // exactly 1 stack remains when the 3rd Aqua cast tries to waterlog.
-      bruno.statuses.add(PhotosynthesisStatus(3));
+      // Streak-gated now: a bloom is a live 5-cast Flora run, not a stack
+      // count. Bruno forfeits throughout, which cannot break his own streak.
+      bruno
+        ..streakElement = MagicElement.flora
+        ..streakCount = 5
+        ..statuses.add(PhotosynthesisStatus());
       final duel = DuelEngine(alice, bruno, rng: Random(1));
       for (var i = 0; i < 3; i++) {
         charge(alice, MagicElement.aqua, 1);
@@ -224,13 +241,18 @@ void main() {
   });
 
   group('cleanse web (§2 table)', () {
-    test('Ignite clears all Photosynthesis stacks (Pyro burns Flora)', () {
+    test('Ignite breaks a Photosynthesis bloom (Pyro burns Flora)', () {
       final duel =
           DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)));
-      bruno.statuses.add(PhotosynthesisStatus(4));
+      bruno
+        ..streakElement = MagicElement.flora
+        ..streakCount = 5
+        ..statuses.add(PhotosynthesisStatus());
       charge(alice, MagicElement.pyro, 1);
       duel.resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
       expect(bruno.statuses.whereType<PhotosynthesisStatus>(), isEmpty);
+      expect(bruno.streakCount, 0,
+          reason: 'the STREAK must break, or the bloom returns next cast');
       expect(bruno.statuses.whereType<IgniteStatus>(), hasLength(1));
     });
 
@@ -282,10 +304,13 @@ void main() {
           reason: 'turn 2 past threshold deals 2x the step');
     });
 
-    test('fatigue outpaces a full Photosynthesis stack (no infinite stall)',
-        () {
-      alice.statuses.add(PhotosynthesisStatus(5));
-      bruno.statuses.add(PhotosynthesisStatus(5));
+    test('fatigue outpaces a Photosynthesis bloom (no infinite stall)', () {
+      for (final m in [alice, bruno]) {
+        m
+          ..streakElement = MagicElement.flora
+          ..streakCount = 5
+          ..statuses.add(PhotosynthesisStatus());
+      }
       final duel = DuelEngine(alice, bruno, rng: Random(1));
       var turns = 0;
       while (!duel.isOver && turns < 100) {

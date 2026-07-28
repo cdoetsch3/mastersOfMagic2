@@ -41,44 +41,55 @@ class IgniteStatus extends TurnStatus implements Debuff {
   bool advanceAndCheckExpiry(MageState holder) => --turnsLeft <= 0;
 }
 
-/// **Photosynthesis** (Flora). A stacking self-buff (max 3) that heals 1% of
-/// max HP per stack at the end of each turn, in the heal band (E2) — so it
-/// out-survives same-turn DoTs. While the holder has ≥1 stack they cannot be
-/// Waterlogged. Cleared instantly by Ignite landing; otherwise it **decays**:
-/// each turn without Flora activity (a Flora cast or charge) sheds one stack,
+/// **Photosynthesis** (Flora). ⭐ **Streak-gated, like Aero's Tailwind**: from
+/// the **5th consecutive Flora cast** onward the holder heals **1% of max HP**
+/// at the end of each turn, in the heal band (E2), and cannot be Waterlogged.
+/// The first four casts do nothing at all.
+///
+/// ⚠️ **Rewritten 2026-07-26 because the old design made Flora the only
+/// element outside the 40–60% balance band at every skill level** (82.9% at
+/// intelligence 4, still 70.1% at 10 — see TYPE_EFFECTS §2.3a). The cause was
+/// the *trigger*, not the ceiling: every Flora cast added a stack
+/// unconditionally, with no hit required, no proc roll and nothing for the
+/// opponent to play around. Trimming stacks 5→3 had already failed to fix it,
+/// because it treated the symptom.
+///
+/// A streak gate fixes the trigger instead. It costs five turns of commitment
+/// before paying anything, it is visible to the opponent the whole time, and
+/// breaking the streak — including with Ignite — switches it straight off.
+///
+/// Superseded design, for the record: a stacking self-buff (max 3) healing 1%
+/// per stack, which **decayed**: each turn without Flora activity (a cast or
+/// charge) shed one stack,
 /// so the buff is an ongoing commitment, not a fire-and-forget.
 class PhotosynthesisStatus extends TurnStatus {
-  static const int maxStacks = 3;
-  int stacks;
+  /// Consecutive Flora casts required before the effect does anything.
+  static const int streakThreshold = 5;
 
-  PhotosynthesisStatus([this.stacks = 1]);
-
-  void addStack() {
-    if (stacks < maxStacks) stacks++;
-  }
+  /// Percent of max HP healed per turn while active.
+  static const int healPercent = 1;
 
   @override
   String get id => 'photosynthesis';
 
+  /// Whether [holder]'s Flora streak currently sustains the effect.
+  static bool activeFor(MageState holder) =>
+      holder.streakElement == MagicElement.flora &&
+      holder.streakCount >= streakThreshold;
+
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) {
-    if (phase != TurnPhase.end) return const [];
-    final heal = (holder.maxHp * stacks / 100).round();
+    if (phase != TurnPhase.end || !activeFor(holder)) return const [];
+    final heal = (holder.maxHp * healPercent / 100).round();
     return heal > 0
         ? [StatusHeal(heal, lane: Lane.heal, source: 'Photosynthesis')]
         : const [];
   }
 
   @override
-  bool advanceAndCheckExpiry(MageState holder) {
-    // The turn's heal (if any) has already landed — decay applies after, in
-    // the bookkeeping band, mirroring Creeping Dark's activity rule.
-    if (holder.activeElementThisTurn != MagicElement.flora) {
-      stacks--;
-    }
-    return stacks <= 0;
-  }
+  bool advanceAndCheckExpiry(MageState holder) => !activeFor(holder);
 }
+
 
 /// **Blind** (Solar in the V2 roster). The holder's harmful spells have a 50%
 /// chance to miss for their next 3 turns (not the turn it lands — [missChance]
@@ -189,8 +200,9 @@ class ArcaneKnowledgeStatus extends TurnStatus {
 /// **Astral Alignment** (Astral — TYPE_EFFECTS §4b.4). A stacking self-buff
 /// that grows with **charge spent**, not cast count: **+1 per charge** on an
 /// Astral cast (so a 5-charge spell grants 5), capped at **20**, and −1 on
-/// turns without Astral activity — the same commit-or-lose decay as
-/// Photosynthesis. Each stack routes **1%** of every attack's damage straight
+/// turns without Astral activity — a commit-or-lose rule. (Photosynthesis used
+/// to share it; it is streak-gated now and no longer decays.) Each stack
+/// routes **1%** of every attack's damage straight
 /// to health, bypassing the shield (applied in the engine's `_attack`, not as
 /// a StatusOp), so a maxed Alignment pierces **20%**. Not a [Debuff] — it's
 /// the caster's own buff, so Absolution never touches it.

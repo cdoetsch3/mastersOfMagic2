@@ -466,8 +466,9 @@ class LadderAi implements DuelAi {
       }
     }
 
-    // Stacking payoffs (Astral Alignment, Photosynthesis) reward staying on
-    // the same element rather than cashing out the moment a cast is legal.
+    // Payoffs that reward staying on one element — Astral Alignment stacks
+    // with charge spent, and a Photosynthesis bloom persists as long as the
+    // Flora streak is not broken by casting something else.
     final building = self.statuses.any(
         (s) => s is AstralAlignmentStatus || s is PhotosynthesisStatus);
     if (building && safe && self.charge < 4) return ChargeAction(arg());

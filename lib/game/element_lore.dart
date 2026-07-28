@@ -36,7 +36,7 @@ const Map<MagicElement, ElementLore> elementLore = {
     description: 'Burns 10% of the attack\'s total damage at end of turn for '
         '3 turns (this one included). Burn is regular damage — it hits the '
         'shield first. Re-igniting refreshes; it never stacks.',
-    beatsEffect: 'Ignite clears their Photosynthesis stacks',
+    beatsEffect: 'Ignite breaks their Photosynthesis streak',
     weakEffect: 'Their Aqua shield douses your Ignite',
   ),
   MagicElement.aqua: ElementLore(
@@ -46,16 +46,17 @@ const Map<MagicElement, ElementLore> elementLore = {
         '+10 priority — it resolves dead last. Does not stack; refreshes. '
         'Casting any Aqua shield also douses Ignite on you.',
     beatsEffect: 'Your shield douses their Ignite',
-    weakEffect: 'Their Photosynthesis blocks your Waterlogged',
+    weakEffect: 'Their Photosynthesis bloom blocks your Waterlogged',
   ),
   MagicElement.flora: ElementLore(
     effectName: 'Photosynthesis',
-    trigger: 'every Flora cast (max 3 stacks)',
-    description: 'Heals 1% of max HP per stack at end of turn — before any '
-        'burn lands. Sheds a stack each turn you don\'t cast or charge Flora. '
-        'While you hold a stack you can\'t be Waterlogged.',
-    beatsEffect: 'A stack blocks their Waterlogged',
-    weakEffect: 'Their Ignite clears all your stacks',
+    trigger: 'your 5th Flora cast in a row',
+    description: 'The first four casts do nothing. From the 5th onward you '
+        'heal 1% of max HP at end of turn — before any burn lands — and you '
+        'can\'t be Waterlogged. Cast any other element and the bloom ends. '
+        'Charging doesn\'t count; only casts build the streak.',
+    beatsEffect: 'A bloom blocks their Waterlogged',
+    weakEffect: 'Their Ignite breaks your streak',
   ),
 
   // ---- Tier 2 — Kinetic -----------------------------------------------

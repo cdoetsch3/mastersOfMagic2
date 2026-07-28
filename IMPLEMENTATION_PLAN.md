@@ -354,7 +354,30 @@ element for the whole duel and can never switch. A real mage brings five, so a
 95% mono-element edge does *not* mean a 95% real matchup. The matrix isolates
 the element variable; it does not predict play.
 
-### ⭐ Finding 2 — eleven of twelve elements are fine; Flora alone is broken
+### ✅ Finding 2 — RESOLVED. Flora rebalanced; the whole roster is now in band
+
+**Photosynthesis was rewritten as a streak gate** (TYPE_EFFECTS §2.3): from the
+5th consecutive Flora cast, heal 1% max HP per turn. The first four casts do
+nothing. Mirrors Aero's Tailwind.
+
+| Flora overall | i4 | i7 | i10 |
+|---|---|---|---|
+| stacking (old) | 82.9% | 75.6% | 70.1% |
+| ✅ streak-gated | **54.2%** | **51.1%** | **51.4%** |
+
+✅ **All twelve elements are now inside 40–60% at every intelligence level**
+(600 duels/pair). ⭐ **The fix was surgical** — of the twelve counter edges only
+the two Flora edges moved; the other ten came back byte-identical at all three
+levels. And `pyro ▸ flora` went **45% → 70%** at i4, so Pyro beats its own prey
+at ordinary skill again.
+
+⚠️ **Method note:** a first pass at 150 duels/pair put Geo at 62% and looked
+like a new failure. At 600/pair it is 59.7%. Do not call a 2-point overshoot at
+that sample size.
+
+<details><summary>The original finding, for the record</summary>
+
+### ⭐ Finding 2 (original) — eleven of twelve elements are fine; Flora alone is broken
 
 Overall win rate, target 40–60%:
 
@@ -386,8 +409,13 @@ The previous baseline flagged Geo at 63.1%. Rebuilt, it measures **58.5 / 53.9 /
 53.0**. The old number came from the full spellbook and the blind brain, not
 from Geo.
 
-**Gate:** Christian rules on the target-skill question and the Flora nerf.
-Everything else in the roster is in band.
+</details>
+
+**Gate:** ❓ **One question left — what intelligence is the balance target
+measured at?** The Flora question is closed. Everything in the roster is in band
+at every level, so the only open item is whether the 65–77% counter-edge band
+should be restated against a stated skill (recommendation: i7, band widened to
+~70–85%).
 
 ---
 

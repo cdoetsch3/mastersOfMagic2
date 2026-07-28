@@ -63,8 +63,10 @@ class StatusSnapshot {
     // Statuses proper.
     for (final s in m.statuses) {
       switch (s) {
-        case PhotosynthesisStatus(:final stacks):
-          out.add(StatusView(id: 'photosynthesis', stacks: stacks));
+        case PhotosynthesisStatus():
+          // Streak-gated now: it is on or off, so the pip carries no count.
+          // The Flora streak itself is already shown by the 'streak' pip above.
+          out.add(const StatusView(id: 'photosynthesis', stacks: 1));
         case ArcaneKnowledgeStatus(:final stacks, :final bonusPercent):
           out.add(StatusView(
               id: 'arcaneKnowledge', stacks: stacks, magnitude: bonusPercent));

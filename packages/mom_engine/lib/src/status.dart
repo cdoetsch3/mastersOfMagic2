@@ -96,7 +96,8 @@ abstract class TurnStatus {
 
   /// End-of-turn bookkeeping (runs after all end-phase ops): advance
   /// duration/stacks and return true when the status should be removed.
-  /// [holder] enables activity-based decay (e.g. Photosynthesis de-stacks on
-  /// turns without Flora activity — see [MageState.activeElementThisTurn]).
+  /// [holder] enables activity-based decay (e.g. Creeping Dark sheds a stack
+  /// on turns without Umbra activity — see [MageState.activeElementThisTurn])
+  /// and streak-gated expiry (Photosynthesis ends when the run breaks).
   bool advanceAndCheckExpiry(MageState holder);
 }
