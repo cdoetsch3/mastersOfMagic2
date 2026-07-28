@@ -271,7 +271,11 @@ void main(List<String> args) {
     }
   }
 
+  // ⚠️ Full sample per pair, not a quarter. A round robin at 125 duels/pair
+  // once read Geo at 62% and looked like a balance failure; at 500 it is
+  // 59.7%. Two-point overshoots are not callable at low resolution, and this
+  // is the table people make rulings from.
   for (final i in const [4, 7, 10]) {
-    roundRobin(i, max(60, n ~/ 4));
+    roundRobin(i, n);
   }
 }

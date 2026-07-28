@@ -1,5 +1,6 @@
 import 'element.dart';
 import 'mage.dart';
+import 'element_tuning.dart';
 import 'status.dart';
 
 /// Tier 1 — Primal element statuses. See TYPE_EFFECTS_DESIGN.md §2. Built on
@@ -64,10 +65,10 @@ class IgniteStatus extends TurnStatus implements Debuff {
 /// so the buff is an ongoing commitment, not a fire-and-forget.
 class PhotosynthesisStatus extends TurnStatus {
   /// Consecutive Flora casts required before the effect does anything.
-  static const int streakThreshold = 5;
+  static const int streakThreshold = ElementTuning.photosynthesisStreak;
 
   /// Percent of max HP healed per turn while active.
-  static const int healPercent = 1;
+  static const int healPercent = ElementTuning.photosynthesisHealPercent;
 
   @override
   String get id => 'photosynthesis';
@@ -136,10 +137,10 @@ class BlindStatus extends TurnStatus implements Blinding, Debuff {
 ///   15  Midnight — enemy can't see their OWN charge or health bar
 /// Cleared entirely when the holder is Blinded (Sanctus banishes Umbra).
 class CreepingDarkStatus extends TurnStatus {
-  static const int maxStacks = 15;
-  static const int shadowThreshold = 5;
-  static const int duskThreshold = 10;
-  static const int midnightThreshold = 15;
+  static const int maxStacks = ElementTuning.creepingDarkMaxStacks;
+  static const int shadowThreshold = ElementTuning.shadowThreshold;
+  static const int duskThreshold = ElementTuning.duskThreshold;
+  static const int midnightThreshold = ElementTuning.midnightThreshold;
 
   int stacks;
 
@@ -174,8 +175,9 @@ class CreepingDarkStatus extends TurnStatus {
 /// while under the opponent's Dusk or Midnight (Umbra corrupts Arcane). The
 /// engine mirrors stacks into [MageState.bonusDamagePercent].
 class ArcaneKnowledgeStatus extends TurnStatus {
-  static const int maxStacks = 5;
-  static const int percentPerStack = 5;
+  static const int maxStacks = ElementTuning.arcaneKnowledgeMaxStacks;
+  static const int percentPerStack =
+      ElementTuning.arcaneKnowledgePercentPerStack;
 
   int stacks;
 
@@ -207,11 +209,11 @@ class ArcaneKnowledgeStatus extends TurnStatus {
 /// a StatusOp), so a maxed Alignment pierces **20%**. Not a [Debuff] — it's
 /// the caster's own buff, so Absolution never touches it.
 class AstralAlignmentStatus extends TurnStatus {
-  static const int maxStacks = 20;
+  static const int maxStacks = ElementTuning.alignmentMaxStacks;
 
   /// Pierce per stack. 1% × 20 stacks = 20% max — deliberately *not* the old
   /// 5%/stack, which at a 20 cap would have pierced 100% and deleted shields.
-  static const int percentPerStack = 1;
+  static const int percentPerStack = ElementTuning.alignmentPercentPerStack;
   int stacks;
 
   AstralAlignmentStatus([this.stacks = 1]);

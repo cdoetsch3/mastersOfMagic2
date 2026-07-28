@@ -104,47 +104,114 @@ void main() {
     });
   });
 
-  group('Photosynthesis text matches the streak-gated mechanic', () {
-    // ⚠️ This class of drift already bit us: the effect was rewritten from
-    // per-cast stacking to a 5-cast streak gate, and every tooltip, the
-    // element sheet and the status catalogue still described stacks. The
-    // name-matching test above passes either way, so it caught nothing.
+  group('every element sheet quotes the engine\'s real numbers', () {
+    // ⚠️ This class of drift already bit us. Photosynthesis was reworked from
+    // per-cast stacking to a 5-cast streak gate, and every tooltip still
+    // described stacks — while this file passed, because the only cross-check
+    // was that the effect NAME matched the catalogue. A name test cannot see a
+    // mechanic change.
+    //
+    // Now every number a player is told comes from [ElementTuning], which the
+    // engine itself reads. Change a value there and this fails until the text
+    // is updated with it.
 
-    String floraText() {
-      final lore = elementLore[MagicElement.flora]!;
-      final info = StatusCatalog.byId('photosynthesis')!;
+    String sheetFor(MagicElement e) {
+      final lore = elementLore[e]!;
       return '${lore.description} ${lore.trigger} ${lore.beatsEffect} '
-              '${lore.weakEffect} ${info.description} ${info.trigger}'
-          .toLowerCase();
+          '${lore.weakEffect}';
     }
 
-    test('no Photosynthesis text still talks about stacks', () {
-      expect(floraText(), isNot(contains('stack')),
-          reason: 'Photosynthesis has no stacks — it is on or off');
+    /// True when [n] appears in [text] as a standalone number — so 5 does not
+    /// match the 5 inside 50 or 15.
+    bool quotes(String text, int n) =>
+        RegExp('(?<![0-9])$n(?![0-9])').hasMatch(text);
+
+    // Every numeric claim each element sheet must make, sourced from the
+    // engine rather than retyped.
+    final claims = <MagicElement, Map<String, int>>{
+      MagicElement.pyro: {
+        'proc chance': ElementTuning.ignitePercent,
+        'burn share': ElementTuning.igniteBurnPercentOfDamage,
+        'tick count': ElementTuning.igniteTicks,
+      },
+      MagicElement.aqua: {
+        'cast cadence': ElementTuning.waterloggedEveryNthCast,
+        'priority penalty': ElementTuning.waterloggedPriorityPenalty,
+      },
+      MagicElement.flora: {
+        'streak length': ElementTuning.photosynthesisStreak,
+        'heal percent': ElementTuning.photosynthesisHealPercent,
+      },
+      MagicElement.electro: {
+        'proc chance': ElementTuning.staticFeedbackPercent,
+      },
+      MagicElement.aero: {
+        'streak length': ElementTuning.tailwindStreak,
+      },
+      MagicElement.geo: {
+        'cast cadence': ElementTuning.staggerEveryNthCast,
+        'damage share': ElementTuning.staggerDamagePercent,
+      },
+      MagicElement.solar: {
+        'chance per charge': ElementTuning.blindPercentPerCharge,
+        'miss chance': ElementTuning.blindMissPercent,
+        'duration': ElementTuning.blindTurns,
+      },
+      MagicElement.lunar: {
+        'cycle length': ElementTuning.moonCycleTurns,
+        'full moon bonus': ElementTuning.lunarFullMoonBonusPercent,
+      },
+      MagicElement.astral: {
+        'stack ceiling': ElementTuning.alignmentMaxStacks,
+        'pierce per stack': ElementTuning.alignmentPercentPerStack,
+      },
+      MagicElement.sanctus: {
+        'cast cadence': ElementTuning.absolutionEveryNthCast,
+        'dark seared': ElementTuning.absolutionSearsDark,
+      },
+      MagicElement.umbra: {
+        'stack ceiling': ElementTuning.creepingDarkMaxStacks,
+        'shadow threshold': ElementTuning.shadowThreshold,
+        'dusk threshold': ElementTuning.duskThreshold,
+      },
+      MagicElement.arcane: {
+        'min charge': ElementTuning.arcaneKnowledgeMinCharge,
+        'stack ceiling': ElementTuning.arcaneKnowledgeMaxStacks,
+      },
+    };
+
+    test('all twelve elements are covered', () {
+      expect(claims.keys.toSet(), MagicElement.values.toSet(),
+          reason: 'a new element needs its numbers guarded too');
     });
 
-    test('the text states the real streak threshold', () {
-      final threshold = PhotosynthesisStatus.streakThreshold;
-      expect(threshold, 5);
-      expect(floraText(), contains('5'),
-          reason: 'the player must be told how many casts it takes');
+    for (final entry in claims.entries) {
+      test('${entry.key.name} states its real numbers', () {
+        final sheet = sheetFor(entry.key);
+        entry.value.forEach((label, value) {
+          expect(quotes(sheet, value), isTrue,
+              reason: '${entry.key.name}: the sheet never mentions $value '
+                  '($label). Either the engine changed or the text is stale.\n'
+                  'Sheet: $sheet');
+        });
+      });
+    }
+
+    test('Photosynthesis text no longer talks about stacks', () {
+      // The specific regression that started all this.
+      final text = '${sheetFor(MagicElement.flora)} '
+              '${StatusCatalog.byId('photosynthesis')!.description}'
+          .toLowerCase();
+      expect(text, isNot(contains('stack')),
+          reason: 'Photosynthesis has no stacks — it is in bloom or it is not');
     });
 
-    test('the text states the real heal rate', () {
-      expect(PhotosynthesisStatus.healPercent, 1);
-      expect(floraText(), contains('1%'),
-          reason: 'the heal rate in the tooltip must match the engine');
-    });
-
-    test('Pyro and Aqua describe their Flora interactions correctly', () {
-      // Ignite breaks the STREAK now, and a bloom (not a stack) blocks
-      // Waterlogged.
-      final pyro = elementLore[MagicElement.pyro]!.beatsEffect.toLowerCase();
-      expect(pyro, contains('streak'),
-          reason: 'Ignite breaks the streak, not stacks: "$pyro"');
-
-      final aqua = elementLore[MagicElement.aqua]!.weakEffect.toLowerCase();
-      expect(aqua, isNot(contains('stack')), reason: aqua);
+    test('the Flora interactions on Pyro and Aqua match the new mechanic', () {
+      expect(elementLore[MagicElement.pyro]!.beatsEffect.toLowerCase(),
+          contains('streak'),
+          reason: 'Ignite breaks the streak now, not stacks');
+      expect(elementLore[MagicElement.aqua]!.weakEffect.toLowerCase(),
+          isNot(contains('stack')));
     });
   });
 

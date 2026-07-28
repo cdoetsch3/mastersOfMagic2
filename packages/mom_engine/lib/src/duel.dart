@@ -4,6 +4,7 @@ import 'dart:math';
 import 'action.dart';
 import 'element.dart';
 import 'element_status.dart';
+import 'element_tuning.dart';
 import 'events.dart';
 import 'mage.dart';
 import 'spell.dart';
@@ -659,7 +660,8 @@ class DuelEngine {
       // ---- Tier 1 — Primal ---------------------------------------------
       case MagicElement.pyro:
         // Ignite — 25% on a damaging hit (even a fully-shielded one).
-        if (rawDamage > 0 && rng.nextDouble() < 0.25) {
+        if (rawDamage > 0 &&
+            rng.nextDouble() < ElementTuning.ignitePercent / 100) {
           _applyIgnite(target, rawDamage, e);
         }
       case MagicElement.flora:
@@ -677,10 +679,10 @@ class DuelEngine {
         // Waterlogged — every 3rd consecutive Aqua cast slows the opponent's
         // next action by +10 priority, unless they hold Photosynthesis.
         if (caster.streakElement == MagicElement.aqua &&
-            caster.streakCount % 3 == 0) {
+            caster.streakCount % ElementTuning.waterloggedEveryNthCast == 0) {
           if (_statusOf<PhotosynthesisStatus>(target) == null &&
               !_graceBlocks(target, e)) {
-            target.priorityPenalty = 10;
+            target.priorityPenalty = ElementTuning.waterloggedPriorityPenalty;
             e.add(BuffAppliedEvent(
                 target, 'Waterlogged — next action slowed',
                 statusId: 'waterlogged'));
@@ -709,7 +711,9 @@ class DuelEngine {
           // Static Feedback — 20% on hit strips one charge. Grounded out by
           // a Geo shield still standing after the hit.
           final grounded = target.shield?.element == MagicElement.geo;
-          if (!grounded && target.charge > 0 && rng.nextDouble() < 0.20) {
+          if (!grounded &&
+              target.charge > 0 &&
+              rng.nextDouble() < ElementTuning.staticFeedbackPercent / 100) {
             target.charge--;
             e.add(ChargeDrainedEvent(target, 1));
             if (target.charge == 0) target.element = null;
@@ -720,7 +724,7 @@ class DuelEngine {
         // grabs the Haste token (applied after normal Haste transfer, so the
         // wind always wins the turn's initiative scramble).
         if (caster.streakElement == MagicElement.aero &&
-            caster.streakCount >= 3) {
+            caster.streakCount >= ElementTuning.tailwindStreak) {
           _tailwindGrab = caster;
         }
       case MagicElement.geo:
@@ -728,11 +732,12 @@ class DuelEngine {
         // next offensive spell to 50% damage. Whiffs against an active
         // Tailwind streak of 3+ (Aero weathers Geo).
         if (caster.streakElement == MagicElement.geo &&
-            caster.streakCount % 4 == 0) {
+            caster.streakCount % ElementTuning.staggerEveryNthCast == 0) {
           final windShielded = target.streakElement == MagicElement.aero &&
               target.streakCount >= 3;
           if (!windShielded && !_graceBlocks(target, e)) {
-            target.nextOffensiveDamageScale = 0.5;
+            target.nextOffensiveDamageScale =
+              ElementTuning.staggerDamagePercent / 100;
             e.add(BuffAppliedEvent(
                 target, 'Staggered — next offensive spell halved',
                 statusId: 'stagger'));
@@ -747,7 +752,8 @@ class DuelEngine {
         // present, Blind also eclipses the target's moon to New (§4b.3).
         if (rawDamage > 0 &&
             chargeSpent > 0 &&
-            rng.nextDouble() < 0.10 * chargeSpent) {
+            rng.nextDouble() <
+                ElementTuning.blindPercentPerCharge / 100 * chargeSpent) {
           _applyBlind(target, e);
         }
       case MagicElement.lunar:
