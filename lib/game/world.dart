@@ -97,11 +97,20 @@ class GameLocation {
   /// Non-town locations host adventures (a duel encounter in Phase 1).
   bool get hasAdventure => kind != LocationKind.town;
 
+  /// The enemy level band, phrased so it cannot be misread.
+  ///
+  /// ⚠️ One owner for this string. "Lv 58-60" on its own reads as a
+  /// *requirement* — players see "come back at 58" and never return
+  /// (GAME_DESIGN §5). Every surface that shows a level band reads this, and
+  /// `test/world_map_test.dart` fails the build if one builds its own.
+  String get enemyBandLabel => 'Enemies Lv $minLevel–$maxLevel';
+
   /// A hybrid zone teaches the matchup of the two elements that meet there.
   bool get isHybrid => elements.length == 2;
 
   /// Thin Air applies across the Celestial shelf (WORLD_DESIGN §4.1).
-  bool get hasThinAir => tier == MagicTier.celestial && plane == WorldPlane.world;
+  bool get hasThinAir =>
+      tier == MagicTier.celestial && plane == WorldPlane.world;
 
   /// No moon above the Veil, so Lunar's Full Moon bonus never fires.
   bool get hasMoon => plane == WorldPlane.world;
@@ -143,7 +152,8 @@ abstract final class World {
       station: 'Woodcarving',
       gate: 'Three ordinary proofs, shown to the guard on the north road',
       blurb: 'A wooded river valley where every mage begins.',
-      arrival: 'Alders lean over the water, and the whole valley smells of wet '
+      arrival:
+          'Alders lean over the water, and the whole valley smells of wet '
           'bark and woodsmoke. Someone is sharpening something. Nobody looks '
           'up when you pass, which is its own kind of welcome.',
       connections: [
@@ -163,7 +173,8 @@ abstract final class World {
       minLevel: 1,
       maxLevel: 5,
       blurb: 'Sun-dappled woods that murmur when nothing is moving them.',
-      arrival: 'The murmur is not wind. It comes from the ground, from the '
+      arrival:
+          'The murmur is not wind. It comes from the ground, from the '
           'roots crossing under the path, and it stops the moment you stand '
           'still to listen.',
       connections: ['aldermere', 'thornmire', 'ashfall_vale'],
@@ -177,7 +188,8 @@ abstract final class World {
       minLevel: 3,
       maxLevel: 8,
       blurb: 'Springs and shallows east of Aldermere, bright enough to hurt.',
-      arrival: 'The brook runs over pale stones and throws the light back at '
+      arrival:
+          'The brook runs over pale stones and throws the light back at '
           'you in pieces. Fish hang in the current without swimming. The water '
           'is colder than the season should allow.',
       connections: ['aldermere', 'thornmire', 'pennycross'],
@@ -190,8 +202,10 @@ abstract final class World {
       elements: [MagicElement.pyro],
       minLevel: 6,
       maxLevel: 11,
-      blurb: 'The first rise north, where the ground is warm through your boots.',
-      arrival: 'The grass gives out and the slope turns to grey grit that '
+      blurb:
+          'The first rise north, where the ground is warm through your boots.',
+      arrival:
+          'The grass gives out and the slope turns to grey grit that '
           'shifts under you. Somewhere above, the mountain is breathing. The '
           'air tastes of struck flint.',
       connections: [
@@ -211,7 +225,8 @@ abstract final class World {
       minLevel: 8,
       maxLevel: 13,
       blurb: "Where the woods drown in the brook's outflow.",
-      arrival: 'The path becomes a suggestion, then a rumour, then water. '
+      arrival:
+          'The path becomes a suggestion, then a rumour, then water. '
           'Trees stand in it up to their knees and have made peace with that. '
           'Everything green here is winning.',
       connections: ['aldermere', 'whispering_woods', 'glimmerbrook'],
@@ -226,7 +241,8 @@ abstract final class World {
       minLevel: 10,
       maxLevel: 14,
       blurb: 'Downwind of the cone: the burn scar where ash falls on forest.',
-      arrival: 'Grey settles on every leaf until the whole valley looks like a '
+      arrival:
+          'Grey settles on every leaf until the whole valley looks like a '
           'charcoal drawing of itself. New shoots are already pushing up '
           'through it. Fire came through here, and something is arguing about '
           'whether it won.',
@@ -238,8 +254,10 @@ abstract final class World {
       kind: LocationKind.town,
       tier: MagicTier.primal,
       opensAtLevel: 8,
-      blurb: 'The first market, where the river road crosses the mountain road.',
-      arrival: 'Two roads meet and a town happened. Stalls have grown into '
+      blurb:
+          'The first market, where the river road crosses the mountain road.',
+      arrival:
+          'Two roads meet and a town happened. Stalls have grown into '
           'buildings, and the buildings still look like stalls. Everyone is '
           'halfway through a transaction.',
       connections: ['aldermere', 'glimmerbrook', 'forgeholm'],
@@ -256,7 +274,8 @@ abstract final class World {
       opensAtLevel: 15,
       station: 'Metalworking',
       blurb: 'The last flat ground before the Ironspine.',
-      arrival: 'The town is built into the hill rather than on it. Ore goes in '
+      arrival:
+          'The town is built into the hill rather than on it. Ore goes in '
           'one end and comes out the other as something with a name. It is '
           'never quiet and never cold.',
       connections: ['cinderpeak_foothills', 'pennycross', 'old_quarry'],
@@ -270,7 +289,8 @@ abstract final class World {
       minLevel: 15,
       maxLevel: 19,
       blurb: "Cut into the range's southern flank, and cut too deep.",
-      arrival: 'Terraces step down into shadow, each one squarer than anything '
+      arrival:
+          'Terraces step down into shadow, each one squarer than anything '
           'nature makes. The tool marks are old. Whatever was quarried out of '
           'here left a shape, and the shape has started to move.',
       connections: ['forgeholm', 'the_molten_deep', 'thunderspire_peaks'],
@@ -283,9 +303,11 @@ abstract final class World {
       elements: [MagicElement.electro],
       minLevel: 17,
       maxLevel: 22,
-      blurb: "Where the western ocean's weather hits a wall and has nowhere "
+      blurb:
+          "Where the western ocean's weather hits a wall and has nowhere "
           'to go.',
-      arrival: 'The cliffs take the whole weight of it. Spray comes up further '
+      arrival:
+          'The cliffs take the whole weight of it. Spray comes up further '
           'than it should and your hair lifts before you hear the crack. The '
           'rock is scorched in long vertical lines.',
       connections: ['thunderspire_peaks', 'galehaven'],
@@ -298,7 +320,8 @@ abstract final class World {
       opensAtLevel: 22,
       station: 'Tailoring',
       blurb: 'The one notch in a hundred miles of cliff.',
-      arrival: 'The harbour is impossibly calm for what is happening outside '
+      arrival:
+          'The harbour is impossibly calm for what is happening outside '
           'it. Cloth and dye come off the boats in bales; nothing here is made '
           'locally except the ships.',
       // ⭐ The sea passage to Tidewrack Shoals is the port's endgame purpose.
@@ -313,7 +336,8 @@ abstract final class World {
       minLevel: 19,
       maxLevel: 24,
       blurb: 'A high tableland east of the crest, scoured flat.',
-      arrival: 'Nothing here is taller than your knee, and everything leans '
+      arrival:
+          'Nothing here is taller than your knee, and everything leans '
           'the same way. The wind does not gust; it simply blows, and has been '
           'blowing since before there was anyone to notice.',
       connections: ['thunderspire_peaks', 'frostfell_pass', 'concordance'],
@@ -328,7 +352,8 @@ abstract final class World {
       minLevel: 21,
       maxLevel: 26,
       blurb: 'The way through. Sea air lifted over the crest and frozen there.',
-      arrival: 'The pass is a white corridor between two black walls. Your '
+      arrival:
+          'The pass is a white corridor between two black walls. Your '
           'breath goes up and does not come down. The road is under here '
           'somewhere, and other people have been sure of that too.',
       connections: [
@@ -348,7 +373,8 @@ abstract final class World {
       minLevel: 23,
       maxLevel: 28,
       blurb: 'The summit line where coastal storm meets steppe wind.',
-      arrival: 'You are inside the weather rather than under it. The cloud is '
+      arrival:
+          'You are inside the weather rather than under it. The cloud is '
           'lit from within at intervals, and the intervals are getting '
           'shorter. Metal hums.',
       connections: [
@@ -367,7 +393,8 @@ abstract final class World {
       minLevel: 25,
       maxLevel: 29,
       blurb: "Under the quarry, under the mountain, under the sea's level.",
-      arrival: "The quarry's deepest gallery keeps going after the tool marks "
+      arrival:
+          "The quarry's deepest gallery keeps going after the tool marks "
           'stop. The rock gets warm, then hot, then lit from below. There is a '
           'floor down here that moves like water because it is not water.',
       connections: ['old_quarry', 'cinderpeak_foothills'],
@@ -385,8 +412,10 @@ abstract final class World {
       opensAtLevel: 30,
       gate: 'The Kinetic Sigil, in three parts, shown at the gate',
       // ⭐ No crafting station on purpose — value MOVES here, it is not made.
-      blurb: 'The trade capital, at the head of navigation on the River Concord.',
-      arrival: 'Everything that moves by water or road in this world passes '
+      blurb:
+          'The trade capital, at the head of navigation on the River Concord.',
+      arrival:
+          'Everything that moves by water or road in this world passes '
           'through here, and the city has arranged itself around that fact. '
           'You show your Sigil at the gate. Nobody fights you; someone writes '
           'your name down.',
@@ -406,9 +435,11 @@ abstract final class World {
       elements: [MagicElement.solar],
       minLevel: 30,
       maxLevel: 34,
-      blurb: "A cold high desert in the range's rain shadow, and the sunniest "
+      blurb:
+          "A cold high desert in the range's rain shadow, and the sunniest "
           'ground in the world.',
-      arrival: 'The air is too thin to hold heat, so the sun burns while the '
+      arrival:
+          'The air is too thin to hold heat, so the sun burns while the '
           'wind bites. There is no shade anywhere and no water for a day\'s '
           'walk. Your shadow is the hardest-edged thing you have ever seen.',
       connections: ['concordance', 'meridian', 'the_sunless_reach'],
@@ -422,7 +453,8 @@ abstract final class World {
       minLevel: 32,
       maxLevel: 37,
       blurb: 'A high still lake that holds the moon better than the sky does.',
-      arrival: 'Not a ripple. The surface gives you back the mountains, the '
+      arrival:
+          'Not a ripple. The surface gives you back the mountains, the '
           'stars, and the moon at a size the moon has no right to be. Walking '
           'the shore, you are careful not to look down for too long.',
       connections: [
@@ -442,7 +474,8 @@ abstract final class World {
       minLevel: 34,
       maxLevel: 39,
       blurb: 'A crater field, preserved because nothing grows to cover it.',
-      arrival: 'Bowl after bowl in the pale ground, each with something at the '
+      arrival:
+          'Bowl after bowl in the pale ground, each with something at the '
           'bottom that is not from here. Nothing has grown over them because '
           'nothing grows. At night the sky is so clear it looks like a threat.',
       connections: ['meridian', 'the_shattered_orrery'],
@@ -454,9 +487,11 @@ abstract final class World {
       tier: MagicTier.celestial,
       opensAtLevel: 36,
       station: 'Enchanting',
-      blurb: 'An observatory on the crest of the Scarp: the highest dark-sky '
+      blurb:
+          'An observatory on the crest of the Scarp: the highest dark-sky '
           'ground there is.',
-      arrival: 'A town of long roofs that open. Everyone keeps different hours '
+      arrival:
+          'A town of long roofs that open. Everyone keeps different hours '
           'and nobody explains. From the crest you can see the desert on one '
           'side and, on the other, a valley with no light in it at all.',
       connections: [
@@ -477,7 +512,8 @@ abstract final class World {
       minLevel: 36,
       maxLevel: 40,
       blurb: 'Tides that obey the moon exactly, on the northern shore.',
-      arrival: 'The water goes out further than seems survivable and comes '
+      arrival:
+          'The water goes out further than seems survivable and comes '
           'back faster. What it uncovers has been down there a long time. '
           'Everything is timed to something overhead.',
       connections: ['galehaven', 'the_mirrormere'],
@@ -492,7 +528,8 @@ abstract final class World {
       minLevel: 38,
       maxLevel: 42,
       blurb: "The Scarp's north face. Direct sun never reaches the floor.",
-      arrival: 'You come over the crest out of glare into a valley that has '
+      arrival:
+          'You come over the crest out of glare into a valley that has '
           'never been lit. The rock is the same rock. The desert is a thousand '
           'feet away and on the other side of the world.',
       connections: ['meridian', 'the_kiln_desert', 'the_mirrormere'],
@@ -507,7 +544,8 @@ abstract final class World {
       minLevel: 40,
       maxLevel: 44,
       blurb: 'A broken model of the heavens, still trying to run.',
-      arrival: 'Rings the size of bridges, half of them fallen, and the fallen '
+      arrival:
+          'Rings the size of bridges, half of them fallen, and the fallen '
           'half still turning. The arcing is not weather; it is the mechanism. '
           'Something is being calculated and has been for a very long time.',
       connections: ['starfall_basin'],
@@ -525,10 +563,12 @@ abstract final class World {
       tier: MagicTier.ethereal,
       opensAtLevel: 45,
       station: 'Jewelry',
-      gate: 'A Celestial Totem charged with the Solar, Lunar and Astral '
+      gate:
+          'A Celestial Totem charged with the Solar, Lunar and Astral '
           'essences, to pass the barrier above the town',
       blurb: 'Basecamp. The last mortal outpost, above the tree line.',
-      arrival: 'There is no wood here, so nothing is built of it. The town is '
+      arrival:
+          'There is no wood here, so nothing is built of it. The town is '
           'stone and rope and hide, dug in against a slope that goes up out of '
           'sight. Everyone you meet is either arriving or leaving; nobody is '
           'from here.',
@@ -543,9 +583,11 @@ abstract final class World {
       minLevel: 45,
       maxLevel: 49,
       // 📝 Not a marsh — *march* in the older borderland sense.
-      blurb: "The Vault's south flank: a consecrated causeway up the only side "
+      blurb:
+          "The Vault's south flank: a consecrated causeway up the only side "
           'that thaws.',
-      arrival: 'A raised road, and someone built it. The sun reaches this face '
+      arrival:
+          'A raised road, and someone built it. The sun reaches this face '
           'for a few hours and the meltwater runs beside you the whole way. '
           'Every mile or so there is a marker, and every marker has been '
           'maintained.',
@@ -560,7 +602,8 @@ abstract final class World {
       minLevel: 47,
       maxLevel: 51,
       blurb: "The Vault's north face. No direct sun at any hour of any day.",
-      arrival: 'You round the shoulder and the light stops. Not dusk — an '
+      arrival:
+          'You round the shoulder and the light stops. Not dusk — an '
           'absence with an edge to it. The ice here has never melted and holds '
           'its shape like something that has been thought about.',
       // Reached through the Reliquary, or over the upper icefall to Vespergate.
@@ -575,8 +618,10 @@ abstract final class World {
       elements: [MagicElement.sanctus, MagicElement.umbra],
       minLevel: 52,
       maxLevel: 56,
-      blurb: 'A vault bored through the mountain from the lit side to the dark.',
-      arrival: 'The door is on the warm flank and the far end opens onto the '
+      blurb:
+          'A vault bored through the mountain from the lit side to the dark.',
+      arrival:
+          'The door is on the warm flank and the far end opens onto the '
           'ice. In between, a corridor that someone consecrated and someone '
           'else did not leave alone. It is warmer in the middle than at either '
           'end.',
@@ -590,7 +635,8 @@ abstract final class World {
       opensAtLevel: 50,
       station: 'Potions and Alchemy',
       blurb: 'Where the ground runs out. The last place with a supply line.',
-      arrival: 'A fortress at the top of the world, facing the wrong way — not '
+      arrival:
+          'A fortress at the top of the world, facing the wrong way — not '
           'outward at an enemy but upward, at nothing. Above it the rock goes '
           'vertical and stops being a route. They have been brewing their own '
           'everything for a long time.',
@@ -616,7 +662,8 @@ abstract final class World {
       minLevel: 50,
       maxLevel: 54,
       blurb: 'A school that read too far, and left.',
-      arrival: 'It is not ruined so much as unfinished in the wrong direction. '
+      arrival:
+          'It is not ruined so much as unfinished in the wrong direction. '
           'Staircases arrive at rooms that were never built. The syllabus is '
           'still on the wall and the last three items on it are not in any '
           'language you have.',
@@ -633,7 +680,8 @@ abstract final class World {
       minLevel: 54,
       maxLevel: 58,
       blurb: 'Knowledge that eats its keeper. The shelves are still filling.',
-      arrival: 'Every book here is being written right now, by nobody. The '
+      arrival:
+          'Every book here is being written right now, by nobody. The '
           'shelves go up past where a ceiling would be. Something is taking '
           'dictation and it would like your name for the record.',
       connections: ['the_collapsed_academy', 'the_eclipsed_citadel'],
@@ -651,7 +699,8 @@ abstract final class World {
       maxLevel: 60,
       gate: 'Three Ethereal key fragments',
       blurb: 'The door back into the world, and the thing standing in it.',
-      arrival: 'Below it, through a gap in nothing, is the summit of the '
+      arrival:
+          'Below it, through a gap in nothing, is the summit of the '
           'mountain you could not climb. The Citadel is between you and it. '
           'That is what the name has always meant.',
       // ⭐ The way back IN. Beyond it: the summit, and Zenith.
@@ -668,10 +717,12 @@ abstract final class World {
       tier: MagicTier.ethereal,
       opensAtLevel: 60,
       station: 'Every station — the only town with all six',
-      gate: 'The Concordant Crown: twelve elemental gems and twelve Cores, '
+      gate:
+          'The Concordant Crown: twelve elemental gems and twelve Cores, '
           'bound with a purchased binding spell',
       blurb: 'The summit. Visible from everywhere below, and shut.',
-      arrival: 'The doors were never locked from the inside. From up here the '
+      arrival:
+          'The doors were never locked from the inside. From up here the '
           'whole world is one thing, and every city you have ever walked into '
           'is a mark on it you could put a finger over.',
       // Reached only through the Citadel — the last pitch cannot be climbed.

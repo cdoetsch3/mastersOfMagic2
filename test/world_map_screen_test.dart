@@ -61,6 +61,14 @@ void main() {
         Offset((at.dx - b.center.dx) * k, (at.dy - b.center.dy) * k);
   }
 
+  /// Screen point -> map coordinates, from the canvas's real transformed rect.
+  Offset mapPointAt(WidgetTester tester, Offset screen) {
+    final rect = tester.getRect(canvasFinder());
+    final b = WorldMapGeometry.bounds;
+    final k = min(rect.width / b.width, rect.height / b.height);
+    return b.center + (screen - rect.center) / k;
+  }
+
   Future<void> dismissSheet(WidgetTester tester) async {
     await tester.tapAt(const Offset(8, 100));
     await tester.pumpAndSettle();
@@ -199,8 +207,33 @@ void main() {
     expect(find.text('Travel to Pennycross'), findsOneWidget);
     await dismissSheet(tester);
 
-    // ...and 90 screen px off must not be anything.
-    await tester.tapAt(at + const Offset(90, 0));
+    // ...and 90 screen px off must not be anything. The direction is chosen
+    // from the geometry rather than hard-coded: a fixed offset silently
+    // becomes a hit the moment a neighbouring zone is moved on the map.
+    final here = WorldMapGeometry.positions['pennycross']!;
+    final away =
+        [
+              const Offset(90, 0),
+              const Offset(-90, 0),
+              const Offset(0, 90),
+              const Offset(0, -90),
+            ]
+            .map((d) {
+              final p = at + d;
+              final nearest = WorldMapGeometry.positions.entries
+                  .where((e) => e.key != 'pennycross')
+                  .map((e) => (e.value - mapPointAt(tester, p)).distance)
+                  .reduce(min);
+              return (d, nearest);
+            })
+            .reduce((a, b) => a.$2 > b.$2 ? a : b);
+    expect(
+      away.$2,
+      greaterThan(60),
+      reason: 'no empty direction near ${here.dx},${here.dy}',
+    );
+
+    await tester.tapAt(at + away.$1);
     await tester.pumpAndSettle();
     expect(
       find.byType(BottomSheet),

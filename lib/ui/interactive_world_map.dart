@@ -434,15 +434,7 @@ class PlaceSheet extends StatelessWidget {
               children: [
                 if (elements.isNotEmpty) _Chip(text: elements),
                 if (location.hasAdventure)
-                  // ⚠️ The ENEMY level, not a requirement. Said in full, because
-                  // "Lv 58-60" alone reads as "come back at 58" and players
-                  // never return.
-                  _Chip(
-                    text:
-                        'Enemies Lv ${location.minLevel}'
-                        '–${location.maxLevel}',
-                    color: AppColors.ember,
-                  ),
+                  _Chip(text: location.enemyBandLabel, color: AppColors.ember),
                 if (location.station != null)
                   _Chip(text: location.station!, color: AppColors.teal),
                 if (location.plane == WorldPlane.empyrean)

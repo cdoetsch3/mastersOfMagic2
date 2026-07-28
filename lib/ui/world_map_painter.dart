@@ -118,10 +118,10 @@ class WorldMapPainter extends CustomPainter {
   );
   static final List<Offset> _ashwood = WorldMapGeometry.scatter(
     Random(12),
-    298,
-    1110,
-    72,
-    46,
+    700,
+    1058,
+    66,
+    44,
     18,
   );
   static final List<Offset> _dunes = WorldMapGeometry.scatter(
@@ -350,9 +350,9 @@ class WorldMapPainter extends CustomPainter {
     blob(332, 1384, 126, 76, MapColors.marsh, rough: .26, seed: 33);
     blob(802, 678, 172, 156, MapColors.desert, rough: .21, seed: 34);
     blob(842, 514, 110, 100, MapColors.desertHi, rough: .24, seed: 35);
-    blob(704, 480, 134, 80, MapColors.shadow, rough: .22, seed: 36, alpha: .6);
-    blob(372, 1080, 102, 76, MapColors.volcanic, rough: .24, seed: 37);
-    blob(358, 1092, 56, 38, MapColors.caldera, rough: .3, seed: 38);
+    blob(756, 458, 128, 80, MapColors.shadow, rough: .22, seed: 36, alpha: .6);
+    blob(760, 1010, 150, 118, MapColors.volcanic, rough: .24, seed: 37);
+    blob(740, 1036, 62, 40, MapColors.caldera, rough: .3, seed: 38);
     blob(474, 208, 278, 238, MapColors.ice, rough: .15, seed: 39);
     blob(
       430,

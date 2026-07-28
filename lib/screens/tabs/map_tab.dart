@@ -94,7 +94,7 @@ class MapTab extends StatelessWidget {
           title: 'Begin adventure',
           subtitle:
               'Fight ${World.opponentNameFor(here)} '
-              '(Lv ${here.minLevel}-${here.maxLevel})',
+              '(${here.enemyBandLabel})',
           onTap: () => launchAiDuel(
             context,
             loadout: game.profile.activePreset.toLoadout(),
@@ -178,6 +178,55 @@ class _CurrentLocationCard extends StatelessWidget {
             location.blurb,
             style: const TextStyle(color: AppColors.textDim, fontSize: 13),
           ),
+          if (location.hasAdventure) ...[
+            const SizedBox(height: 6),
+            Text(
+              location.enemyBandLabel,
+              style: const TextStyle(color: AppColors.ember, fontSize: 12),
+            ),
+          ],
+          if (location.station != null ||
+              location.plane == WorldPlane.empyrean) ...[
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                if (location.station != null)
+                  _MiniTag(
+                    icon: Icons.handyman,
+                    text: location.station!,
+                    color: AppColors.teal,
+                  ),
+                if (location.plane == WorldPlane.empyrean)
+                  const _MiniTag(
+                    icon: Icons.auto_awesome,
+                    text: 'Beyond the Veil',
+                    color: AppColors.gem,
+                  ),
+              ],
+            ),
+          ],
+          if (location.gate != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.lock_outline, size: 14, color: AppColors.gold),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    location.gate!,
+                    style: const TextStyle(
+                      color: AppColors.gold,
+                      fontSize: 12,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           if (location.elements.isNotEmpty) ...[
             const SizedBox(height: 8),
             Row(
@@ -257,9 +306,10 @@ class _TravelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subtitle = location.isTown
-        ? 'Town'
-        : 'Lv ${location.minLevel}-${location.maxLevel}';
+    // ⚠️ Reads GameLocation.enemyBandLabel rather than assembling its own.
+    // A bare "Lv 58-60" here contradicted the place sheet and reads as a
+    // requirement — "come back at 58" — so players never return (§5).
+    final subtitle = location.isTown ? 'Town' : location.enemyBandLabel;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: GamePanel(
@@ -283,6 +333,42 @@ class _TravelCard extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
+                  // What the new world model knows and this card used to hide:
+                  // who you'll meet, what is taught here, and what bars the way.
+                  if (location.elements.isNotEmpty ||
+                      location.station != null ||
+                      location.gate != null ||
+                      location.plane == WorldPlane.empyrean)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          for (final e in location.elements)
+                            elementGlyph(e, size: 14),
+                          if (location.station != null)
+                            _MiniTag(
+                              icon: Icons.handyman,
+                              text: location.station!,
+                              color: AppColors.teal,
+                            ),
+                          if (location.plane == WorldPlane.empyrean)
+                            const _MiniTag(
+                              icon: Icons.auto_awesome,
+                              text: 'Beyond the Veil',
+                              color: AppColors.gem,
+                            ),
+                          if (location.gate != null)
+                            const _MiniTag(
+                              icon: Icons.lock_outline,
+                              text: 'Gated',
+                              color: AppColors.gold,
+                            ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -314,3 +400,21 @@ String _kindLabel(LocationKind kind) => switch (kind) {
   LocationKind.route => 'Route',
   LocationKind.dungeon => 'Dungeon',
 };
+
+/// A small labelled fact on a location card — station, plane, gate.
+class _MiniTag extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final Color color;
+  const _MiniTag({required this.icon, required this.text, required this.color});
+
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon, size: 12, color: color),
+      const SizedBox(width: 4),
+      Text(text, style: TextStyle(color: color, fontSize: 11.5)),
+    ],
+  );
+}
