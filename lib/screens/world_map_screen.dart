@@ -113,17 +113,20 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
     });
   }
 
-  /// Screen point -> map coordinates, undoing the interactive transform.
+  /// Child-space tap position -> map coordinates.
   ///
-  /// The affine terms are read straight out of the matrix rather than going
-  /// through `Vector3`, which keeps `vector_math` out of this file's imports.
+  /// ⚠️ No matrix work here, deliberately. The [GestureDetector] sits *inside*
+  /// the [InteractiveViewer]'s transformed subtree, so Flutter's hit-testing
+  /// has already un-transformed the position — `localPosition` arrives in
+  /// child space. An earlier version applied the inverse view transform on top
+  /// of that (a double inversion): taps were ~43 px off at fit scale and the
+  /// responsive spot left the screen entirely at 3× zoom. Guarded by
+  /// `world_map_screen_test.dart`, which taps real pin positions at both fit
+  /// and zoomed scales.
   Offset _toMap(Offset local, Size size) {
-    final s = Matrix4.inverted(_controller.value).storage;
-    final x = s[0] * local.dx + s[4] * local.dy + s[12];
-    final y = s[1] * local.dx + s[5] * local.dy + s[13];
     final b = WorldMapGeometry.bounds;
     final unit = size.width / b.width;
-    return Offset(x / unit + b.left, y / unit + b.top);
+    return Offset(local.dx / unit + b.left, local.dy / unit + b.top);
   }
 
   void _tap(Offset local, Size size) {
@@ -197,6 +200,12 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
             children: [
               InteractiveViewer(
                 transformationController: _controller,
+                // ⚠️ The map is taller than most viewports. Constrained (the
+                // default) would clamp the child to the viewport height: the
+                // canvas still paints (CustomPaint does not clip) but the hit
+                // area shrinks, so the bottom of the map draws yet cannot be
+                // tapped on short-wide windows.
+                constrained: false,
                 // ⚠️ Must go below the fit scale, or a tall map can never be
                 // seen whole on a wide window.
                 minScale: 0.05,
@@ -307,7 +316,11 @@ class _PlaceSheet extends StatelessWidget {
         .map((e) => e.name[0].toUpperCase() + e.name.substring(1))
         .join(' + ');
     return SafeArea(
-      child: Padding(
+      // ⚠️ Scrollable, not a bare Column. Content-heavy places (a long arrival
+      // passage plus a gate requirement) overflow the modal's height budget on
+      // small screens — found because the tap-regression tests opened the
+      // sheet for real and the overflow threw.
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
