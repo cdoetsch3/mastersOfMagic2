@@ -1,12 +1,14 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../game/element_style.dart';
 import '../game/world.dart';
 import '../game/world_map_geometry.dart';
 import 'app_theme.dart';
+import 'map_camera.dart';
 
 /// Palette for the drawn world. Separate from [AppColors] because this is
 /// *terrain*, not chrome — the map is a place, and it keeps its own light.
@@ -74,6 +76,12 @@ class WorldMapPainter extends CustomPainter {
   final String? currentId;
 
   /// Places reachable from [currentId] — teal ring.
+  ///
+  /// ⚠️ Copied on the way in, along with [seen]. Callers naturally hand over
+  /// live collections they own (`profile.discoveredLocationIds`), and when the
+  /// old and new painter hold the *same* instance no dirty check can work — it
+  /// is comparing an object with itself. The painter takes its own snapshot so
+  /// no call site can get this wrong.
   final Set<String> reachable;
 
   /// Places the player has been. Everything else is dimmed.
@@ -89,14 +97,15 @@ class WorldMapPainter extends CustomPainter {
   /// Labels for the named geography (ranges, rivers, seas).
   final bool showFeatureLabels;
 
-  const WorldMapPainter({
+  WorldMapPainter({
     this.currentId,
-    this.reachable = const {},
-    this.seen = const {},
+    Set<String> reachable = const {},
+    Set<String> seen = const {},
     this.selectedId,
     this.showPins = true,
     this.showFeatureLabels = true,
-  });
+  }) : reachable = Set.unmodifiable(reachable),
+       seen = Set.unmodifiable(seen);
 
   // ---- cached procedural scatter --------------------------------------
   static final List<Offset> _forest = WorldMapGeometry.scatter(
@@ -184,8 +193,36 @@ class WorldMapPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final b = WorldMapGeometry.bounds;
+
+    // ⭐ CONTAIN, not scale-to-width: the whole world is drawn inside whatever
+    // box this is handed, centred. That is what lets one widget serve a square
+    // card and a wide window — and it moves centring out of the view
+    // transform, which InteractiveViewer clamps and therefore fought.
+    //
+    // ⚠️ The fit is asked of [MapCamera] rather than recomputed here. Both had
+    // it right, independently — and that is the setup for a silent drift: the
+    // hit-test would keep answering for a layout the drawing no longer used,
+    // and every tap would land somewhere plausible but wrong. One owner.
+    final cam = MapCamera(viewport: size);
+    final k = cam.unit;
+    final dx = cam.letterbox.dx;
+    final dy = cam.letterbox.dy;
+
+    // Continue the sea and the void into the letterbox bands, so the drawing
+    // runs to the edge of the box instead of sitting on bare background.
+    final horizon = dy + (WorldMapGeometry.veilY - b.top) * k;
+    canvas.drawRect(
+      Rect.fromLTWH(0, horizon, size.width, size.height - horizon),
+      Paint()..color = MapColors.sea,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, horizon),
+      Paint()..color = MapColors.void_,
+    );
+
     canvas.save();
-    canvas.scale(size.width / b.width);
+    canvas.translate(dx, dy);
+    canvas.scale(k);
     canvas.translate(-b.left, -b.top);
 
     _paintVoid(canvas);
@@ -708,6 +745,9 @@ class WorldMapPainter extends CustomPainter {
       old.selectedId != selectedId ||
       old.showPins != showPins ||
       old.showFeatureLabels != showFeatureLabels ||
-      old.reachable.length != reachable.length ||
-      old.seen.length != seen.length;
+      // ⚠️ setEquals, not .length. A quest revealing a location, a scrying
+      // spell or a multiplayer presence update can change *which* places are
+      // known without changing how many — and the map would not repaint.
+      !setEquals(old.reachable, reachable) ||
+      !setEquals(old.seen, seen);
 }

@@ -72,6 +72,28 @@ and expect its sheet.
 
 ### P0-adjacent: `InteractiveViewer` is `constrained: true` (default)
 
+> ✅ **Fixed, then superseded.** `constrained: false` was the right fix for the
+> child as it stood. The child itself was the deeper problem: a tall
+> scale-to-width canvas centred by *translation*, which `InteractiveViewer`
+> clamps against its own boundary on every gesture — so the viewer spent the
+> whole time undoing the centring. Users saw stuttering pans and a map that
+> snapped to the left edge. The map is now **contained** in the box and
+> centred by layout, making the child exactly the viewport; `constrained` is
+> back to its default and there is nothing left to fight. `MapCamera` owns the
+> containment and the painter asks it for the fit, so the drawing and the
+> hit-test cannot disagree.
+>
+> ⚠️ **Containment alone was a regression, and the first round of tests
+> asserted it as a feature.** Opening the map *fitted* puts the whole world on
+> screen — so `InteractiveViewer` refuses every drag, correctly, because there
+> is nowhere to go — while on a wide window the world shrinks to a strip with
+> two thirds of the space empty ocean. Reported as "it's drawn but I can't pan
+> there", in both views. The camera now also knows `coverScale` (the scale that
+> **fills** the box) and both views open there, framed on the player, with
+> "Whole world" one tap away. The lesson worth keeping: a test that asserts
+> *nothing moves* should always be read twice — the map passed it by being
+> unusable.
+
 The child `SizedBox` is taller than most viewports (aspect 1150:1890). With
 `constrained: true` the child is forced to the incoming constraints when the
 viewport is shorter than the painted height: the canvas keeps painting
@@ -102,6 +124,13 @@ is handed.
 
 ### 2. Aliased mutable state + length-based dirty checking
 
+> ✅ **Fixed.** The painter now snapshots `reachable`/`seen` with
+> `Set.unmodifiable` **in its own constructor** — so no call site can hand it a
+> live collection by accident — and `shouldRepaint` compares with `setEquals`.
+> Both halves were mutation-tested: reverting either one fails a named test in
+> `world_map_test.dart`. (Note the copy is the load-bearing half: `setEquals`
+> alone still compares an aliased set with itself.)
+
 `seen: widget.game.profile.discoveredLocationIds` hands the painter **the live
 mutable Set from the profile**. After travel, the old and new painter hold the
 *same instance* — so `old.seen.length != seen.length` compares an object with
@@ -117,6 +146,11 @@ repaint, and nothing will say why.
 `setEquals`, not `.length`.
 
 ### 3. The screen never listens to `GameState`
+
+> ✅ **Fixed.** The screen is wrapped in a `ListenableBuilder` on `game`, and
+> `travelTo` is awaited with failures surfaced in a snackbar. Guarded by a test
+> that moves the player from *outside* the widget and expects the app bar to
+> follow; it fails when the listener is removed.
 
 `WorldMapScreen` takes `game` by constructor and never subscribes
 (`ListenableBuilder` / `GameStateScope.of` are absent). Travel appears to work
@@ -135,6 +169,16 @@ dropped — persistence failures (offline Firestore) vanish. Await it or route
 errors somewhere visible.
 
 ### 4. Camera math is scattered, and the map can be lost
+
+> ✅ **Fixed.** `lib/ui/map_camera.dart` is now the single owner:
+> `mapToChild`/`childToMap`/`mapToScreen`/`screenToMap`,
+> `fitted`/`centredOn`/`zoomedBy`/`clamped`/`resized`, and
+> `screenToMapDistance` for tap targets. All six call sites go through it,
+> `minScale` is the fit scale (the world can no longer be flung away), and
+> `test/map_camera_test.dart` asserts 15 properties **with no widget tree** —
+> including that `childToMap` and `screenToMap` differ, which is P0 stated as a
+> unit test. The tap radius is now 26 screen px, replacing the fixed 34 map
+> units called out in §6.
 
 `_fitScale`, `_fitWorld`, `_centreOn`, `_zoomBy`, `_toMap`, and the
 thumbnail's `_focus` each independently re-derive the unit conversion
@@ -256,10 +300,11 @@ mis-centres.
 
 ## Suggested order of work
 
-1. **Fix P0** (delete the double inversion; `constrained: false`) + a widget
-   regression test that taps a pin's true screen position. Small and urgent.
-2. **`MapCamera`** — one owner for all transform math; screen-space tap
-   radius falls out of it.
+1. ~~**Fix P0**~~ ✅ done — double inversion deleted, `constrained: false`,
+   five regression tests.
+2. ~~**`MapCamera`**~~ ✅ done — with P1 #2 (dirty checking) and P1 #3
+   (listening) alongside it, since a screen that rebuilds in front of a painter
+   that will not repaint is only half a fix.
 3. **Picture-cache the terrain**; split static/dynamic painters; thumbnail
    reuses the picture.
 4. **Purify the painter** — takes locations + view-model state as arguments;
@@ -267,5 +312,96 @@ mis-centres.
 5. **Derive duplicated geometry** (isles, veil, lake) from single sources;
    replace the citadel string special-case with data.
 
-Items 1–2 are an afternoon; 3–5 are opportunistic and can ride along with
-Phase 5b, which touches the same files.
+Also done since: the Map-tab card is no longer a picture with a tap-to-open
+overlay — it is the same `InteractiveWorldMap` widget, so panning, zooming and
+travelling all work without leaving the tab. Expanding buys room and the
+geography labels, not capability.
+
+Items 1–2 are done (plus P1 #2 and #3). Items 3–5 remain, and P1 #1 — the
+painter reading global `World` — is the one still open at P1, deliberately: it
+pairs naturally with item 4, and both are cheapest to do while Phase 5b is
+already rewriting the same constructor for edge objects.
+
+**See the addendum at the end of this document** for three defects that
+survived this work and were caught in playtesting.
+
+---
+
+# Addendum — 2026-07-28, after playtesting
+
+The work above was implemented in one sitting. Three defects survived it and
+were caught by a player, not by the suite. All three are fixed and guarded;
+they are recorded here because *why the tests missed them* is more useful than
+the fixes.
+
+## The three defects
+
+### A. The southern fifth of the world was drawn outside the canvas
+
+`WorldMapPainter.paint` applied `canvas.translate(-b.left, -b.top)` **twice** —
+a line re-inserted by a scripted edit onto one that was already there. The map
+was drawn 130 px low and 28 px right of where it belonged. Because the child
+is now sized exactly to the canvas, the strip that fell off the bottom was
+unreachable by panning *and* invisible when zoomed out.
+
+**Why nothing caught it.** Every test derived its expected position from
+`MapCamera` — the hit-test did too. Painter and hit-test disagreed, but the
+tests only ever compared the hit-test against itself. The suite could not see
+the drawing at all: the sole rendering test asserted "paints without throwing".
+
+**The guard.** `world_map_test.dart` now renders the painter to a real image,
+scans for the land's true top and bottom edges, and compares them against
+`MapCamera`'s prediction at three window shapes. Reintroducing the duplicated
+line fails three tests.
+
+> ⭐ The general rule: when a value type owns a layout, *something must compare
+> rendered pixels against it*. Two consumers agreeing with each other proves
+> nothing if both read the same oracle.
+
+### B. The card could not be panned vertically at all
+
+The map card lived inside the Map tab's `ListView`. A pannable surface inside a
+scrolling list loses the gesture arena every time: measured, a 250 px drag
+scrolled the page 230 px and moved the map's transform by exactly zero. The
+card now sits **above** the list, which also keeps it visible while the travel
+options scroll.
+
+### C. A wheel or trackpad scroll zoomed instead of panning
+
+`InteractiveViewer` treats every mouse-wheel scroll as zoom. Scrolling down —
+the obvious way to move south — zoomed out instead, reached the whole-world
+limit in three notches, and then stopped responding entirely. It reads exactly
+like a wall.
+
+Scrolling now pans; ⌘/Ctrl + scroll zooms. Note the mechanism: the viewer
+mutates its controller **directly** in `_receivedPointerSignal`, without the
+`PointerSignalResolver`, so a competing handler cannot preempt it. It can only
+outlive it — `GestureBinding` resolves pointer signals after every listener has
+been dispatched, so the registered callback runs last. The pre-zoom camera is
+captured on the way in, because by then the viewer has already changed scale.
+
+## What this cost, and the lesson
+
+Three rounds of "still broken" before the cause was found, because each round
+diagnosed from geometry the tests already agreed with. What broke the deadlock
+was measuring instead of reasoning: rendering the painter to pixels and
+scanning them, and instrumenting the gesture path to see which recognizer won.
+
+One test in the first round asserted *"at fit scale a pan cannot move the map
+AT ALL"*. It passed because the map was unusable. **A test that asserts nothing
+happens deserves a second reading** — it is as easily satisfied by a broken
+feature as by a correct one.
+
+## Still open
+
+Unchanged from the list above: P1 #1 (painter reads global `World`), P2 items
+3–5. Two additions:
+
+- **The letterbox bands.** At full zoom-out on a wide window the world sits in
+  a column of open ocean — honest, since the map is far taller than a laptop
+  screen, and only visible at maximum zoom-out. If it ever grates, the answer
+  is a tighter `bounds` (the land occupies 810×1400 of a 1150×1890 rect), not
+  a different fit.
+- **Scroll capture.** The card takes wheel events for panning, so the Map tab
+  cannot be scrolled with the cursor over the map. Acceptable while the map is
+  a fixed header above the list; revisit if the tab layout changes.

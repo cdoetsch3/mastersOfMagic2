@@ -24,20 +24,32 @@ class MapTab extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const PlayerHeader(title: 'Map'),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
-            children: [
-              // The world, small. Tap for the real thing.
-              WorldMapThumbnail(
+        // ⚠️ The map lives ABOVE the list, not inside it. A pannable map inside
+        // a ListView cannot be panned vertically at all: the list's drag
+        // recognizer wins the gesture arena every time, so a drag south
+        // scrolled the page and left the map exactly where it was. Measured —
+        // the map's transform did not move by a single pixel.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
+          child: Center(
+            child: ConstrainedBox(
+              // A square, unless that would eat the screen on a short window.
+              constraints: const BoxConstraints(maxHeight: 340),
+              child: WorldMapCard(
                 game: game,
-                onTap: () => Navigator.of(context).push(
+                onExpand: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => WorldMapScreen(game: game),
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
+            children: [
               _CurrentLocationCard(location: here),
               const SizedBox(height: 12),
               const SectionLabel('Here you can'),

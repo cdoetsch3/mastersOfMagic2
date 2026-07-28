@@ -1,9 +1,12 @@
 import 'dart:math';
 
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:masters_of_magic_2/game/world_map_geometry.dart';
+import 'package:masters_of_magic_2/ui/map_camera.dart';
 import 'package:masters_of_magic_2/ui/world_map_painter.dart';
 
 /// Guards the seam between the world graph and the drawing of it.
@@ -324,27 +327,58 @@ void main() {
 
   group('the painter repaints when it must', () {
     test('moving, selecting or hiding pins all trigger a repaint', () {
-      const base = WorldMapPainter(currentId: 'aldermere');
+      final base = WorldMapPainter(currentId: 'aldermere');
       expect(
-        base.shouldRepaint(const WorldMapPainter(currentId: 'pennycross')),
+        base.shouldRepaint(WorldMapPainter(currentId: 'pennycross')),
         isTrue,
       );
       expect(
         base.shouldRepaint(
-          const WorldMapPainter(currentId: 'aldermere', selectedId: 'x'),
+          WorldMapPainter(currentId: 'aldermere', selectedId: 'x'),
         ),
         isTrue,
       );
       expect(
         base.shouldRepaint(
-          const WorldMapPainter(currentId: 'aldermere', showPins: false),
+          WorldMapPainter(currentId: 'aldermere', showPins: false),
         ),
         isTrue,
       );
       expect(
-        base.shouldRepaint(const WorldMapPainter(currentId: 'aldermere')),
+        base.shouldRepaint(WorldMapPainter(currentId: 'aldermere')),
         isFalse,
       );
+    });
+
+    test('discovering a place repaints, even at the same count', () {
+      // ⚠️ The old check compared `.length`. Swapping one known place for
+      // another — a quest reveal, a scrying spell, a multiplayer sighting —
+      // left the count identical, so the map silently kept the stale dimming.
+      final before = WorldMapPainter(seen: {'aldermere', 'thornmire'});
+      final after = WorldMapPainter(seen: {'aldermere', 'pennycross'});
+      expect(before.shouldRepaint(after), isTrue);
+      expect(
+        before.shouldRepaint(WorldMapPainter(seen: {'thornmire', 'aldermere'})),
+        isFalse,
+        reason: 'set equality, not order',
+      );
+    });
+
+    test('a caller\'s live set cannot defeat the dirty check', () {
+      // ⚠️ The real shape of the bug: the screen handed over
+      // profile.discoveredLocationIds itself, so old and new painters held one
+      // instance and every comparison was an object against itself.
+      final live = <String>{'aldermere'};
+      final before = WorldMapPainter(seen: live);
+      live.add('thornmire');
+      final after = WorldMapPainter(seen: live);
+      expect(
+        before.shouldRepaint(after),
+        isTrue,
+        reason: 'the painter must have snapshotted, not aliased',
+      );
+      expect(before.seen, {'aldermere'});
+      expect(() => before.seen.add('x'), throwsUnsupportedError);
     });
   });
 
@@ -365,5 +399,88 @@ void main() {
       ),
     );
     expect(tester.takeException(), isNull);
+  });
+
+  group('the DRAWING lands where the camera says it does', () {
+    // ⚠️ The gap that let a real defect ship. A stray duplicated
+    // `canvas.translate(-b.left, -b.top)` shifted the whole map down 130 px
+    // and right 28 px, pushing the southern fifth of the world outside the
+    // canvas — unreachable at any zoom, because the canvas *is* the child.
+    // Every existing test passed: the hit-test and the test helpers both used
+    // MapCamera and agreed with each other, while the drawing agreed with
+    // neither. Nothing compared rendered pixels to the camera until this.
+    Future<void> checkFit(WidgetTester tester, Size size) async {
+      final recorder = ui.PictureRecorder();
+      WorldMapPainter(currentId: 'aldermere').paint(Canvas(recorder), size);
+      final picture = recorder.endRecording();
+
+      await tester.runAsync(() async {
+        final image = await picture.toImage(
+          size.width.toInt(),
+          size.height.toInt(),
+        );
+        final bytes = (await image.toByteData(
+          format: ui.ImageByteFormat.rawRgba,
+        ))!.buffer.asUint8List();
+        int pixel(int x, int y) {
+          final i = (y * size.width.toInt() + x) * 4;
+          return (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
+        }
+
+        // Land is the only strongly green thing; sea and void are not.
+        bool isLand(int c) {
+          final r = (c >> 16) & 0xff, g = (c >> 8) & 0xff, b = c & 0xff;
+          return g > r && g > b + 20;
+        }
+
+        var top = -1, bottom = -1;
+        for (var y = 0; y < size.height.toInt(); y++) {
+          for (var x = 0; x < size.width.toInt(); x += 2) {
+            if (isLand(pixel(x, y))) {
+              if (top < 0) top = y;
+              bottom = y;
+              break;
+            }
+          }
+        }
+        expect(top, greaterThan(0), reason: 'no land drawn at all in $size');
+
+        final cam = MapCamera(viewport: size);
+        final coast = WorldMapGeometry.coastline().getBounds();
+        final wantTop = cam.mapToChild(Offset(0, coast.top)).dy;
+        final wantBottom = cam.mapToChild(Offset(0, coast.bottom)).dy;
+
+        // Generous tolerance: the coast's extreme points are narrow, so a
+        // sampled scan finds them a few rows in. A transform error is tens of
+        // pixels, which this still catches.
+        expect(
+          top.toDouble(),
+          closeTo(wantTop, 12),
+          reason: 'north edge, $size',
+        );
+        expect(
+          bottom.toDouble(),
+          closeTo(wantBottom, 12),
+          reason: 'south edge, $size — the coast must not run off the canvas',
+        );
+        expect(
+          bottom,
+          lessThan(size.height.toInt() - 1),
+          reason: 'the south of the world must be inside the box, $size',
+        );
+      });
+    }
+
+    testWidgets('on a wide window', (tester) async {
+      await checkFit(tester, const Size(1400, 744));
+    });
+
+    testWidgets('in a square card', (tester) async {
+      await checkFit(tester, const Size(380, 380));
+    });
+
+    testWidgets('on a tall phone', (tester) async {
+      await checkFit(tester, const Size(390, 780));
+    });
   });
 }
