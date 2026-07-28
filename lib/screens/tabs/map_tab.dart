@@ -7,6 +7,7 @@ import '../../game/game_state.dart';
 import '../../game/world.dart';
 import '../../ui/app_theme.dart';
 import '../home_shell.dart';
+import '../world_map_screen.dart';
 
 /// Where the player is in the world, what they can do here, and where they can
 /// travel next. Adventures (a duel encounter in Phase 1) launch from here.
@@ -27,6 +28,16 @@ class MapTab extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
             children: [
+              // The world, small. Tap for the real thing.
+              WorldMapThumbnail(
+                game: game,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => WorldMapScreen(game: game),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               _CurrentLocationCard(location: here),
               const SizedBox(height: 12),
               const SectionLabel('Here you can'),
@@ -69,7 +80,8 @@ class MapTab extends StatelessWidget {
           icon: Icons.local_fire_department,
           color: AppColors.ember,
           title: 'Begin adventure',
-          subtitle: 'Fight ${World.opponentNameFor(here)} '
+          subtitle:
+              'Fight ${World.opponentNameFor(here)} '
               '(Lv ${here.minLevel}-${here.maxLevel})',
           onTap: () => launchAiDuel(
             context,
@@ -89,11 +101,14 @@ class MapTab extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.panel,
-        title: Text('$what is coming soon',
-            style: const TextStyle(color: AppColors.text, fontSize: 17)),
+        title: Text(
+          '$what is coming soon',
+          style: const TextStyle(color: AppColors.text, fontSize: 17),
+        ),
         content: const Text(
-            'Shops arrive with the item and crafting update (Phase 2).',
-            style: TextStyle(color: AppColors.textDim)),
+          'Shops arrive with the item and crafting update (Phase 2).',
+          style: TextStyle(color: AppColors.textDim),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -121,39 +136,51 @@ class _CurrentLocationCard extends StatelessWidget {
             children: [
               Icon(_kindIcon(location.kind), color: AppColors.gold, size: 20),
               const SizedBox(width: 8),
-              Text(location.name,
-                  style: const TextStyle(
-                      color: AppColors.text,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600)),
+              Text(
+                location.name,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(width: 8),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.borderDim,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(_kindLabel(location.kind),
-                    style: const TextStyle(
-                        color: AppColors.textDim, fontSize: 11)),
+                child: Text(
+                  _kindLabel(location.kind),
+                  style: const TextStyle(
+                    color: AppColors.textDim,
+                    fontSize: 11,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(location.blurb,
-              style: const TextStyle(color: AppColors.textDim, fontSize: 13)),
+          Text(
+            location.blurb,
+            style: const TextStyle(color: AppColors.textDim, fontSize: 13),
+          ),
           if (location.elements.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Row(children: [
-              const Text('Monsters: ',
-                  style: TextStyle(color: AppColors.textFaint, fontSize: 12)),
-              for (final e in location.elements)
-                Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: elementGlyph(e, size: 15),
+            Row(
+              children: [
+                const Text(
+                  'Monsters: ',
+                  style: TextStyle(color: AppColors.textFaint, fontSize: 12),
                 ),
-            ]),
+                for (final e in location.elements)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: elementGlyph(e, size: 15),
+                  ),
+              ],
+            ),
           ],
         ],
       ),
@@ -189,12 +216,17 @@ class _ActionTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                          color: AppColors.text, fontSize: 14)),
-                  Text(subtitle,
-                      style: const TextStyle(
-                          color: AppColors.textDim, fontSize: 12)),
+                  Text(
+                    title,
+                    style: const TextStyle(color: AppColors.text, fontSize: 14),
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: AppColors.textDim,
+                      fontSize: 12,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -222,26 +254,32 @@ class _TravelCard extends StatelessWidget {
         onTap: onTravel,
         child: Row(
           children: [
-            Icon(_kindIcon(location.kind),
-                color: AppColors.teal, size: 20),
+            Icon(_kindIcon(location.kind), color: AppColors.teal, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(location.name,
-                      style: const TextStyle(
-                          color: AppColors.text, fontSize: 14)),
-                  Text(subtitle,
-                      style: const TextStyle(
-                          color: AppColors.textDim, fontSize: 12)),
+                  Text(
+                    location.name,
+                    style: const TextStyle(color: AppColors.text, fontSize: 14),
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: AppColors.textDim,
+                      fontSize: 12,
+                    ),
+                  ),
                 ],
               ),
             ),
             const Row(
               children: [
-                Text('Travel',
-                    style: TextStyle(color: AppColors.teal, fontSize: 12)),
+                Text(
+                  'Travel',
+                  style: TextStyle(color: AppColors.teal, fontSize: 12),
+                ),
                 SizedBox(width: 2),
                 Icon(Icons.chevron_right, color: AppColors.teal),
               ],
@@ -254,13 +292,13 @@ class _TravelCard extends StatelessWidget {
 }
 
 IconData _kindIcon(LocationKind kind) => switch (kind) {
-      LocationKind.town => Icons.location_city,
-      LocationKind.route => Icons.route,
-      LocationKind.dungeon => Icons.dark_mode,
-    };
+  LocationKind.town => Icons.location_city,
+  LocationKind.route => Icons.route,
+  LocationKind.dungeon => Icons.dark_mode,
+};
 
 String _kindLabel(LocationKind kind) => switch (kind) {
-      LocationKind.town => 'Town',
-      LocationKind.route => 'Route',
-      LocationKind.dungeon => 'Dungeon',
-    };
+  LocationKind.town => 'Town',
+  LocationKind.route => 'Route',
+  LocationKind.dungeon => 'Dungeon',
+};
