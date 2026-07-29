@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:mom_engine/mom_engine.dart';
 
 /// How a place is presented on the map.
@@ -31,6 +32,60 @@ enum WorldPlane {
 /// Source of truth: **[WORLD_DESIGN.md](../../WORLD_DESIGN.md) and Plate I-b**
 /// (`docs/plates/plate-1b-one-crossing.html`). Coordinates are not stored —
 /// the plate holds the geometry, this holds the graph and the text.
+/// How a road is travelled, which is not the same as how long it takes.
+///
+/// ⚠️ Kind exists before duration deliberately. Every edge draws as the same
+/// dashed line today, so the **Galehaven–Tidewrack sea passage is
+/// indistinguishable from a road** even though WORLD_DESIGN §2.5 makes it
+/// design-significant. Kind is also what decides whether a leg can be walked
+/// at all, once mounts and boats arrive (§4b.3–4b.4).
+enum TravelEdgeKind {
+  /// Overland. The default.
+  road,
+
+  /// Open water — the Galehaven–Tidewrack crossing.
+  sea,
+
+  /// Across the Veil, between the world and the Empyrean.
+  veil,
+}
+
+/// One leg of the road network: where it goes, and what it costs.
+///
+/// ⭐ **Duration is the resource the whole trade economy is built on.** If
+/// travel is free, nothing in WORLD_DESIGN §4b has any tension in it — no
+/// reason to buy a mount, no profit in hauling goods, no cost to a bad route.
+///
+/// ✅ The baseline is **5 minutes** per leg (§4b.1): long enough that a mount
+/// is worth buying, short enough that waiting it out stays a real choice.
+/// Legs in the starting valley are shorter, the high country longer, and the
+/// two crossings longer still.
+@immutable
+class TravelEdge {
+  /// The location id this road leads to.
+  final String to;
+
+  /// Base minutes on foot, before any mount multiplier.
+  final int minutes;
+
+  final TravelEdgeKind kind;
+
+  const TravelEdge(this.to, this.minutes, {this.kind = TravelEdgeKind.road});
+
+  @override
+  bool operator ==(Object other) =>
+      other is TravelEdge &&
+      other.to == to &&
+      other.minutes == minutes &&
+      other.kind == kind;
+
+  @override
+  int get hashCode => Object.hash(to, minutes, kind);
+
+  @override
+  String toString() => 'TravelEdge($to, ${minutes}m, ${kind.name})';
+}
+
 class GameLocation {
   final String id;
   final String name;
@@ -66,9 +121,27 @@ class GameLocation {
   /// The level this place tends to open up at. Towns only; `null` elsewhere.
   final int? opensAtLevel;
 
-  /// Ids of directly reachable locations. Walkable and **bidirectional** —
-  /// guarded by `test/world_test.dart`.
-  final List<String> connections;
+  /// Roads out of here, with what each one costs to walk.
+  ///
+  /// ⚠️ **Bidirectional, and symmetric in duration** — guarded by
+  /// `test/world_test.dart`. A road that is quicker one way than the other is
+  /// a design decision nobody has made.
+  final List<TravelEdge> edges;
+
+  /// Ids of directly reachable locations.
+  ///
+  /// Derived from [edges] rather than stored, so adjacency and duration
+  /// cannot disagree. Everything that only cares *where* you can go reads
+  /// this; everything that cares *what it costs* reads [edges].
+  List<String> get connections => [for (final e in edges) e.to];
+
+  /// The road to [id], or null if there is none.
+  TravelEdge? edgeTo(String id) {
+    for (final e in edges) {
+      if (e.to == id) return e;
+    }
+    return null;
+  }
 
   /// One-way teleport destinations. Zenith alone has these; the return trip
   /// is not modelled yet because it needs the Crown check.
@@ -80,7 +153,7 @@ class GameLocation {
     required this.kind,
     required this.blurb,
     required this.arrival,
-    required this.connections,
+    required this.edges,
     this.plane = WorldPlane.world,
     this.elements = const [],
     this.tier,
@@ -156,12 +229,12 @@ abstract final class World {
           'Alders lean over the water, and the whole valley smells of wet '
           'bark and woodsmoke. Someone is sharpening something. Nobody looks '
           'up when you pass, which is its own kind of welcome.',
-      connections: [
-        'whispering_woods',
-        'glimmerbrook',
-        'thornmire',
-        'cinderpeak_foothills',
-        'pennycross',
+      edges: [
+        TravelEdge('whispering_woods', 3),
+        TravelEdge('glimmerbrook', 3),
+        TravelEdge('thornmire', 3),
+        TravelEdge('cinderpeak_foothills', 3),
+        TravelEdge('pennycross', 3),
       ],
     ),
     GameLocation(
@@ -177,7 +250,11 @@ abstract final class World {
           'The murmur is not wind. It comes from the ground, from the '
           'roots crossing under the path, and it stops the moment you stand '
           'still to listen.',
-      connections: ['aldermere', 'thornmire', 'ashfall_vale'],
+      edges: [
+        TravelEdge('aldermere', 3),
+        TravelEdge('thornmire', 3),
+        TravelEdge('ashfall_vale', 3),
+      ],
     ),
     GameLocation(
       id: 'glimmerbrook',
@@ -192,7 +269,11 @@ abstract final class World {
           'The brook runs over pale stones and throws the light back at '
           'you in pieces. Fish hang in the current without swimming. The water '
           'is colder than the season should allow.',
-      connections: ['aldermere', 'thornmire', 'pennycross'],
+      edges: [
+        TravelEdge('aldermere', 3),
+        TravelEdge('thornmire', 3),
+        TravelEdge('pennycross', 3),
+      ],
     ),
     GameLocation(
       id: 'cinderpeak_foothills',
@@ -208,11 +289,11 @@ abstract final class World {
           'The grass gives out and the slope turns to grey grit that '
           'shifts under you. Somewhere above, the mountain is breathing. The '
           'air tastes of struck flint.',
-      connections: [
-        'aldermere',
-        'ashfall_vale',
-        'forgeholm',
-        'the_molten_deep',
+      edges: [
+        TravelEdge('aldermere', 3),
+        TravelEdge('ashfall_vale', 3),
+        TravelEdge('forgeholm', 5),
+        TravelEdge('the_molten_deep', 5),
       ],
     ),
     GameLocation(
@@ -229,7 +310,11 @@ abstract final class World {
           'The path becomes a suggestion, then a rumour, then water. '
           'Trees stand in it up to their knees and have made peace with that. '
           'Everything green here is winning.',
-      connections: ['aldermere', 'whispering_woods', 'glimmerbrook'],
+      edges: [
+        TravelEdge('aldermere', 3),
+        TravelEdge('whispering_woods', 3),
+        TravelEdge('glimmerbrook', 3),
+      ],
     ),
     GameLocation(
       id: 'ashfall_vale',
@@ -246,7 +331,10 @@ abstract final class World {
           'charcoal drawing of itself. New shoots are already pushing up '
           'through it. Fire came through here, and something is arguing about '
           'whether it won.',
-      connections: ['whispering_woods', 'cinderpeak_foothills'],
+      edges: [
+        TravelEdge('whispering_woods', 3),
+        TravelEdge('cinderpeak_foothills', 3),
+      ],
     ),
     GameLocation(
       id: 'pennycross',
@@ -260,7 +348,11 @@ abstract final class World {
           'Two roads meet and a town happened. Stalls have grown into '
           'buildings, and the buildings still look like stalls. Everyone is '
           'halfway through a transaction.',
-      connections: ['aldermere', 'glimmerbrook', 'forgeholm'],
+      edges: [
+        TravelEdge('aldermere', 3),
+        TravelEdge('glimmerbrook', 3),
+        TravelEdge('forgeholm', 5),
+      ],
     ),
 
     // ---------------------------------------------------------------
@@ -278,7 +370,11 @@ abstract final class World {
           'The town is built into the hill rather than on it. Ore goes in '
           'one end and comes out the other as something with a name. It is '
           'never quiet and never cold.',
-      connections: ['cinderpeak_foothills', 'pennycross', 'old_quarry'],
+      edges: [
+        TravelEdge('cinderpeak_foothills', 5),
+        TravelEdge('pennycross', 5),
+        TravelEdge('old_quarry', 5),
+      ],
     ),
     GameLocation(
       id: 'old_quarry',
@@ -293,7 +389,11 @@ abstract final class World {
           'Terraces step down into shadow, each one squarer than anything '
           'nature makes. The tool marks are old. Whatever was quarried out of '
           'here left a shape, and the shape has started to move.',
-      connections: ['forgeholm', 'the_molten_deep', 'thunderspire_peaks'],
+      edges: [
+        TravelEdge('forgeholm', 5),
+        TravelEdge('the_molten_deep', 5),
+        TravelEdge('thunderspire_peaks', 5),
+      ],
     ),
     GameLocation(
       id: 'stormcliff_coast',
@@ -310,7 +410,7 @@ abstract final class World {
           'The cliffs take the whole weight of it. Spray comes up further '
           'than it should and your hair lifts before you hear the crack. The '
           'rock is scorched in long vertical lines.',
-      connections: ['thunderspire_peaks', 'galehaven'],
+      edges: [TravelEdge('thunderspire_peaks', 5), TravelEdge('galehaven', 5)],
     ),
     GameLocation(
       id: 'galehaven',
@@ -325,7 +425,11 @@ abstract final class World {
           'it. Cloth and dye come off the boats in bales; nothing here is made '
           'locally except the ships.',
       // ⭐ The sea passage to Tidewrack Shoals is the port's endgame purpose.
-      connections: ['stormcliff_coast', 'frostfell_pass', 'tidewrack_shoals'],
+      edges: [
+        TravelEdge('stormcliff_coast', 5),
+        TravelEdge('frostfell_pass', 5),
+        TravelEdge('tidewrack_shoals', 12, kind: TravelEdgeKind.sea),
+      ],
     ),
     GameLocation(
       id: 'windward_steppe',
@@ -340,7 +444,11 @@ abstract final class World {
           'Nothing here is taller than your knee, and everything leans '
           'the same way. The wind does not gust; it simply blows, and has been '
           'blowing since before there was anyone to notice.',
-      connections: ['thunderspire_peaks', 'frostfell_pass', 'concordance'],
+      edges: [
+        TravelEdge('thunderspire_peaks', 5),
+        TravelEdge('frostfell_pass', 5),
+        TravelEdge('concordance', 5),
+      ],
     ),
     GameLocation(
       id: 'frostfell_pass',
@@ -356,11 +464,11 @@ abstract final class World {
           'The pass is a white corridor between two black walls. Your '
           'breath goes up and does not come down. The road is under here '
           'somewhere, and other people have been sure of that too.',
-      connections: [
-        'thunderspire_peaks',
-        'windward_steppe',
-        'galehaven',
-        'concordance',
+      edges: [
+        TravelEdge('thunderspire_peaks', 5),
+        TravelEdge('windward_steppe', 5),
+        TravelEdge('galehaven', 5),
+        TravelEdge('concordance', 5),
       ],
     ),
     GameLocation(
@@ -377,11 +485,11 @@ abstract final class World {
           'You are inside the weather rather than under it. The cloud is '
           'lit from within at intervals, and the intervals are getting '
           'shorter. Metal hums.',
-      connections: [
-        'old_quarry',
-        'stormcliff_coast',
-        'windward_steppe',
-        'frostfell_pass',
+      edges: [
+        TravelEdge('old_quarry', 5),
+        TravelEdge('stormcliff_coast', 5),
+        TravelEdge('windward_steppe', 5),
+        TravelEdge('frostfell_pass', 5),
       ],
     ),
     GameLocation(
@@ -397,7 +505,10 @@ abstract final class World {
           "The quarry's deepest gallery keeps going after the tool marks "
           'stop. The rock gets warm, then hot, then lit from below. There is a '
           'floor down here that moves like water because it is not water.',
-      connections: ['old_quarry', 'cinderpeak_foothills'],
+      edges: [
+        TravelEdge('old_quarry', 5),
+        TravelEdge('cinderpeak_foothills', 5),
+      ],
     ),
 
     // ---------------------------------------------------------------
@@ -419,12 +530,12 @@ abstract final class World {
           'through here, and the city has arranged itself around that fact. '
           'You show your Sigil at the gate. Nobody fights you; someone writes '
           'your name down.',
-      connections: [
-        'frostfell_pass',
-        'windward_steppe',
-        'the_kiln_desert',
-        'the_mirrormere',
-        'meridian',
+      edges: [
+        TravelEdge('frostfell_pass', 5),
+        TravelEdge('windward_steppe', 5),
+        TravelEdge('the_kiln_desert', 5),
+        TravelEdge('the_mirrormere', 6),
+        TravelEdge('meridian', 5),
       ],
     ),
     GameLocation(
@@ -442,7 +553,11 @@ abstract final class World {
           'The air is too thin to hold heat, so the sun burns while the '
           'wind bites. There is no shade anywhere and no water for a day\'s '
           'walk. Your shadow is the hardest-edged thing you have ever seen.',
-      connections: ['concordance', 'meridian', 'the_sunless_reach'],
+      edges: [
+        TravelEdge('concordance', 5),
+        TravelEdge('meridian', 5),
+        TravelEdge('the_sunless_reach', 6),
+      ],
     ),
     GameLocation(
       id: 'the_mirrormere',
@@ -457,12 +572,12 @@ abstract final class World {
           'Not a ripple. The surface gives you back the mountains, the '
           'stars, and the moon at a size the moon has no right to be. Walking '
           'the shore, you are careful not to look down for too long.',
-      connections: [
-        'concordance',
-        'meridian',
-        'tidewrack_shoals',
-        'the_sunless_reach',
-        'rimeholt',
+      edges: [
+        TravelEdge('concordance', 6),
+        TravelEdge('meridian', 6),
+        TravelEdge('tidewrack_shoals', 6),
+        TravelEdge('the_sunless_reach', 6),
+        TravelEdge('rimeholt', 6),
       ],
     ),
     GameLocation(
@@ -478,7 +593,7 @@ abstract final class World {
           'Bowl after bowl in the pale ground, each with something at the '
           'bottom that is not from here. Nothing has grown over them because '
           'nothing grows. At night the sky is so clear it looks like a threat.',
-      connections: ['meridian', 'the_shattered_orrery'],
+      edges: [TravelEdge('meridian', 6), TravelEdge('the_shattered_orrery', 6)],
     ),
     GameLocation(
       id: 'meridian',
@@ -494,13 +609,13 @@ abstract final class World {
           'A town of long roofs that open. Everyone keeps different hours '
           'and nobody explains. From the crest you can see the desert on one '
           'side and, on the other, a valley with no light in it at all.',
-      connections: [
-        'concordance',
-        'the_kiln_desert',
-        'the_mirrormere',
-        'starfall_basin',
-        'the_sunless_reach',
-        'rimeholt',
+      edges: [
+        TravelEdge('concordance', 5),
+        TravelEdge('the_kiln_desert', 5),
+        TravelEdge('the_mirrormere', 6),
+        TravelEdge('starfall_basin', 6),
+        TravelEdge('the_sunless_reach', 6),
+        TravelEdge('rimeholt', 6),
       ],
     ),
     GameLocation(
@@ -516,7 +631,10 @@ abstract final class World {
           'The water goes out further than seems survivable and comes '
           'back faster. What it uncovers has been down there a long time. '
           'Everything is timed to something overhead.',
-      connections: ['galehaven', 'the_mirrormere'],
+      edges: [
+        TravelEdge('galehaven', 12, kind: TravelEdgeKind.sea),
+        TravelEdge('the_mirrormere', 6),
+      ],
     ),
     GameLocation(
       id: 'the_sunless_reach',
@@ -532,7 +650,11 @@ abstract final class World {
           'You come over the crest out of glare into a valley that has '
           'never been lit. The rock is the same rock. The desert is a thousand '
           'feet away and on the other side of the world.',
-      connections: ['meridian', 'the_kiln_desert', 'the_mirrormere'],
+      edges: [
+        TravelEdge('meridian', 6),
+        TravelEdge('the_kiln_desert', 6),
+        TravelEdge('the_mirrormere', 6),
+      ],
     ),
     GameLocation(
       id: 'the_shattered_orrery',
@@ -548,7 +670,7 @@ abstract final class World {
           'Rings the size of bridges, half of them fallen, and the fallen '
           'half still turning. The arcing is not weather; it is the mechanism. '
           'Something is being calculated and has been for a very long time.',
-      connections: ['starfall_basin'],
+      edges: [TravelEdge('starfall_basin', 6)],
     ),
 
     // ---------------------------------------------------------------
@@ -572,7 +694,11 @@ abstract final class World {
           'stone and rope and hide, dug in against a slope that goes up out of '
           'sight. Everyone you meet is either arriving or leaving; nobody is '
           'from here.',
-      connections: ['meridian', 'the_mirrormere', 'hallowmarch'],
+      edges: [
+        TravelEdge('meridian', 6),
+        TravelEdge('the_mirrormere', 6),
+        TravelEdge('hallowmarch', 6),
+      ],
     ),
     GameLocation(
       id: 'hallowmarch',
@@ -591,7 +717,11 @@ abstract final class World {
           'for a few hours and the meltwater runs beside you the whole way. '
           'Every mile or so there is a marker, and every marker has been '
           'maintained.',
-      connections: ['rimeholt', 'the_reliquary_deep', 'vespergate'],
+      edges: [
+        TravelEdge('rimeholt', 6),
+        TravelEdge('the_reliquary_deep', 8),
+        TravelEdge('vespergate', 6),
+      ],
     ),
     GameLocation(
       id: 'the_umbral_wastes',
@@ -607,7 +737,7 @@ abstract final class World {
           'absence with an edge to it. The ice here has never melted and holds '
           'its shape like something that has been thought about.',
       // Reached through the Reliquary, or over the upper icefall to Vespergate.
-      connections: ['the_reliquary_deep', 'vespergate'],
+      edges: [TravelEdge('the_reliquary_deep', 8), TravelEdge('vespergate', 8)],
     ),
     GameLocation(
       id: 'the_reliquary_deep',
@@ -625,7 +755,7 @@ abstract final class World {
           'ice. In between, a corridor that someone consecrated and someone '
           'else did not leave alone. It is warmer in the middle than at either '
           'end.',
-      connections: ['hallowmarch', 'the_umbral_wastes'],
+      edges: [TravelEdge('hallowmarch', 8), TravelEdge('the_umbral_wastes', 8)],
     ),
     GameLocation(
       id: 'vespergate',
@@ -642,10 +772,10 @@ abstract final class World {
           'everything for a long time.',
       // ⭐ The only door out of the world. The last pitch cannot be climbed,
       // so there is no connection from here to zenith.
-      connections: [
-        'hallowmarch',
-        'the_umbral_wastes',
-        'the_collapsed_academy',
+      edges: [
+        TravelEdge('hallowmarch', 6),
+        TravelEdge('the_umbral_wastes', 8),
+        TravelEdge('the_collapsed_academy', 12, kind: TravelEdgeKind.veil),
       ],
     ),
 
@@ -667,7 +797,10 @@ abstract final class World {
           'Staircases arrive at rooms that were never built. The syllabus is '
           'still on the wall and the last three items on it are not in any '
           'language you have.',
-      connections: ['vespergate', 'the_unwritten_library'],
+      edges: [
+        TravelEdge('vespergate', 12, kind: TravelEdgeKind.veil),
+        TravelEdge('the_unwritten_library', 8),
+      ],
     ),
     GameLocation(
       id: 'the_unwritten_library',
@@ -684,7 +817,10 @@ abstract final class World {
           'Every book here is being written right now, by nobody. The '
           'shelves go up past where a ceiling would be. Something is taking '
           'dictation and it would like your name for the record.',
-      connections: ['the_collapsed_academy', 'the_eclipsed_citadel'],
+      edges: [
+        TravelEdge('the_collapsed_academy', 8),
+        TravelEdge('the_eclipsed_citadel', 8),
+      ],
     ),
     GameLocation(
       id: 'the_eclipsed_citadel',
@@ -704,7 +840,10 @@ abstract final class World {
           'mountain you could not climb. The Citadel is between you and it. '
           'That is what the name has always meant.',
       // ⭐ The way back IN. Beyond it: the summit, and Zenith.
-      connections: ['the_unwritten_library', 'zenith'],
+      edges: [
+        TravelEdge('the_unwritten_library', 8),
+        TravelEdge('zenith', 12, kind: TravelEdgeKind.veil),
+      ],
     ),
 
     // ---------------------------------------------------------------
@@ -726,7 +865,9 @@ abstract final class World {
           'whole world is one thing, and every city you have ever walked into '
           'is a mark on it you could put a finger over.',
       // Reached only through the Citadel — the last pitch cannot be climbed.
-      connections: ['the_eclipsed_citadel'],
+      edges: [
+        TravelEdge('the_eclipsed_citadel', 12, kind: TravelEdgeKind.veil),
+      ],
       // ⭐ Line of sight to everywhere is why the teleport net exists at all.
       // One-way for now: the return trip needs a Crown check that is unbuilt.
       teleportsTo: [
@@ -749,6 +890,10 @@ abstract final class World {
   /// ⚠️ Falls back to the start location for an unknown id rather than
   /// throwing — a bad id must never crash the app on load.
   static GameLocation byId(String id) => _byId[id] ?? locations.first;
+
+  /// Whether an id names a real place. [byId] falls back to the first
+  /// location, so callers that must distinguish "missing" ask this.
+  static bool exists(String id) => _byId.containsKey(id);
 
   static Iterable<GameLocation> get towns => locations.where((l) => l.isTown);
 

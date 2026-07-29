@@ -75,7 +75,7 @@ Phase 1  12 elements ──► Phase 2  shield math ──► Phase 3  effects
                                                         │
                         Phase 5  progression + world map  🟡 map done, gating off
                                    │
-                        Phase 5b travel + mounts + trade  ⬜ NEW
+                        Phase 5b travel + mounts + trade  🟡 travel done
                                    │
                         Phase 6  enemy design ──► build  ⚠️ 24+ designs
                                    │
@@ -445,21 +445,24 @@ graph symmetry, the two-door Veil crossing and the tree line.
    The schedules and the 5→15 slot curve are all *data* already; only the
    switches are unflipped. ⚠️ Deliberate — playtesting wants everything
    available — so **turning these on is a decision, not an oversight.**
-2. ⬜ **`map_tab.dart` has not been touched.** It compiles against the new model
-   but shows none of it: no elevation, plane, station, gate or tier, and the
-   "Lv X–Y" label still reads as a requirement rather than an **enemy** band.
-   ⚠️ That legibility problem is called out in GAME_DESIGN §5 and is now live.
-3. ⬜ **Travel is still an instant graph hop.** WORLD_DESIGN §4b designs
-   click-and-wait travel, Travel vs Journey, mounts and the trade loop — none of
-   it is built, and it needs two refactors first: `connections` must become
-   **edge objects** carrying a duration, and direct town-to-town Travel needs
-   **pathfinding**.
+2. ✅ **`map_tab.dart` now shows the model.** Travel cards and the current
+   location card carry monster elements, the crafting station, Beyond the Veil
+   and whether a place is gated. The "Lv X–Y" label that read as a requirement
+   is gone: `GameLocation.enemyBandLabel` is the one owner of that string and
+   every surface reads it, so the sheet and the cards cannot contradict each
+   other about the most consequential number on screen (GAME_DESIGN §5).
+3. 🟡 **Travel is still an instant graph hop in the UI**, but the model
+   underneath it is built — see Phase 5b, steps 1–2. What remains here is
+   wiring the clock into the game: a departure time on the profile, arrival
+   while the app is closed, and the Map tab showing a trip in progress.
 
-**Hand the map screen to Christian for visual review** once (2) is done.
+✅ **Map screen reviewed by Christian** (2026-07-28) across three rounds: the
+map is interactive in both the tab card and full screen, opens filling the
+window, and the Cinderlands were moved south-east to fill the empty quarter.
 
 ---
 
-# Phase 5b — ⬜ NEW — Travel, mounts and trade
+# Phase 5b — 🟡 PARTLY DONE — Travel, mounts and trade
 
 📝 **Did not exist when this plan was written**; designed in WORLD_DESIGN §4b
 after the geography pass. Sits here because it depends on the world graph
@@ -468,14 +471,36 @@ after the geography pass. Sits here because it depends on the world graph
 **Files:** `lib/game/world.dart`, `lib/game/travel.dart` (new),
 `lib/game/player_profile.dart`, `lib/screens/tabs/map_tab.dart`.
 
-1. **`TravelEdge`** — turn `connections` from `List<String>` into objects
-   carrying a base duration. Prerequisite for everything else here.
-2. **Pathfinding** — direct Travel between any two towns, priced as the summed
-   legs.
-3. **Travel vs Journey** — Travel is fixed-duration, encounter-free, cargo-safe;
-   Journey is leg-by-leg, stops at towns to heal, rolls encounters, and is
-   faster when cleared quickly. ⚠️ **Cargo is at risk on a Journey and nothing
-   is exempt** — that severity is the design, not an oversight.
+1. ✅ **`TravelEdge`** — done. `connections` is now a *derived* getter over
+   `edges`, so adjacency and duration cannot disagree. Each edge carries its
+   own tunable `minutes` plus a `kind` (`road` / `sea` / `veil`), which finally
+   distinguishes the Galehaven–Tidewrack crossing from an ordinary road
+   (WORLD_DESIGN §2.5).
+2. ✅ **Pathfinding** — done. `lib/game/travel.dart` solves the whole network
+   once into a `{minutes, nextHop}` table (Floyd–Warshall over 32 nodes) and
+   reads back in constant time. `TravelRoute` carries the stops, the legs, the
+   summed minutes, `townStops` and `needsPassage`. **Derived from the edges,
+   never authored** — a hand-written matrix would be ~500 numbers to revisit
+   every time one of the 47 roads changed.
+3. ⛔ **Travel vs Journey — BLOCKED ON PHASE 6.** Travel (the safe, fixed-price,
+   point-to-point half) is what steps 1–2 built, and it is enough to move
+   around the world on a clock. **Journey cannot be built yet**: it *is* the
+   road's encounter table, and there are no enemies, no encounter tables and no
+   spawn rules until Phase 6. Building it now would mean inventing the content
+   it is made of.
+
+   When Phase 6 lands, Journey needs: leg-by-leg movement stopping at each town
+   to heal, encounter rolls per leg, a variable duration that rewards clearing
+   quickly, and cargo at risk on defeat. ⚠️ **Cargo is at risk on a Journey and
+   nothing is exempt** — that severity is the design, not an oversight.
+
+   ❓ Still open, and answerable only once encounters exist: what "at risk"
+   means (a fraction of cargo on defeat, or all of it), and whether Journey is
+   offered on every edge or only ones with a designed encounter table.
+
+   ⚠️ **Nothing in the shipped code implies Journey exists.** `TravelRoute`
+   exposes `townStops` — the healing stages a Journey will use — and that is
+   the only foothold; there is no half-built mode to find and no dead switch.
 4. **Mounts** — speed multiplier + cargo slots, no terrain rules. Five price
    tiers; tier 5 is the Ethereal three-pack earned via the Citadel tack chain.
 5. **Shops** — per-player stock, capped daily, restocking overnight. Static
@@ -486,6 +511,19 @@ after the geography pass. Sits here because it depends on the world graph
 
 ⚠️ **Supersedes idea bank #9** (10–15s legs scaling to hours). The scale is
 minutes: ~5 min per leg.
+
+📝 **Two tuning facts the built graph produced**, both worth a decision before
+the travel UI ships:
+
+- **Aldermere → Rimeholt costs 39 minutes, not the ~30** in WORLD_DESIGN
+  §4b.1's worked example. The 5-minute baseline is honoured exactly — the real
+  chain is **8 legs**, not the ~6 the example assumed. Either correct the
+  example to 39 or shorten some legs; `test/travel_test.dart` pins 39 so the
+  change shows up as a changed journey rather than a silent number.
+- **The Pennycross → Concordance ferry does not exist in the graph.** §4b.1
+  proposes it to fix "the worst early leg" — and that leg measures **28
+  minutes**, so the instinct was right. Adding it is a new edge plus an unlock
+  condition, i.e. design work rather than refactoring.
 
 ---
 
