@@ -21,6 +21,12 @@ class TurnExchange {
 /// human, or a friend — the combat logic never knows the difference.
 abstract interface class OpponentDriver {
   String get opponentName;
+
+  /// The opponent's character level, which scales their health and damage
+  /// (ElementTuning.percentPerLevel). A practice foe fights at the level its
+  /// persona is written for, so beating Procarius means beating a level-60
+  /// mage rather than a level-1 one with a good brain.
+  int get opponentLevel;
   MageApparel get opponentApparel;
 
   /// Whether the local player is "host" (engine mage1). Remote duels assign
@@ -69,6 +75,9 @@ class LocalAiDriver implements OpponentDriver {
   String get opponentName => persona.name;
 
   @override
+  int get opponentLevel => persona.level;
+
+  @override
   MageApparel get opponentApparel => persona.apparel;
 
   @override
@@ -106,6 +115,9 @@ class RemoteDuelDriver implements OpponentDriver {
   @override
   final String opponentName;
 
+  @override
+  final int opponentLevel;
+
   static const opponentTimeout = Duration(seconds: 25);
 
   final _rng = Random.secure();
@@ -118,6 +130,7 @@ class RemoteDuelDriver implements OpponentDriver {
     required this.isHost,
     required this.masterSeed,
     required this.opponentName,
+    this.opponentLevel = 1,
   });
 
   String get _roomPath => 'duels/$roomId';
@@ -140,34 +153,44 @@ class RemoteDuelDriver implements OpponentDriver {
   Future<TurnExchange> exchangeTurn(int turn, MageAction playerAction) async {
     final path = _turnPath(turn);
     final myWire = encodeAction(playerAction);
-    final myNonce =
-        List.generate(4, (_) => _rng.nextInt(0x40000000).toRadixString(16))
-            .join();
+    final myNonce = List.generate(
+      4,
+      (_) => _rng.nextInt(0x40000000).toRadixString(16),
+    ).join();
 
     // 1. Commit.
-    await FirestoreRest.set(path, {'${_me}Commit': commitmentOf(myWire, myNonce)});
+    await FirestoreRest.set(path, {
+      '${_me}Commit': commitmentOf(myWire, myNonce),
+    });
 
     // 2. Wait for their commitment (or declare a forfeit on timeout).
     var data = await _pollTurn(
-        path, (d) => d['${_them}Commit'] != null, opponentTimeout);
+      path,
+      (d) => d['${_them}Commit'] != null,
+      opponentTimeout,
+    );
     if (data == null) {
       await FirestoreRest.set(path, {'${_them}Forfeit': true});
       data = await FirestoreRest.get(path) ?? {};
     }
-    final theirForfeit = data['${_them}Forfeit'] == true &&
-        data['${_them}Commit'] == null;
+    final theirForfeit =
+        data['${_them}Forfeit'] == true && data['${_them}Commit'] == null;
 
     // 3. Reveal (safe now: both commitments are locked, or they forfeited).
-    await FirestoreRest.set(path, {'${_me}Move': myWire, '${_me}Nonce': myNonce});
+    await FirestoreRest.set(path, {
+      '${_me}Move': myWire,
+      '${_me}Nonce': myNonce,
+    });
 
     String theirWire;
     if (theirForfeit) {
       theirWire = encodeAction(const ForfeitAction());
     } else {
       final revealed = await _pollTurn(
-          path,
-          (d) => d['${_them}Move'] != null && d['${_them}Nonce'] != null,
-          opponentTimeout);
+        path,
+        (d) => d['${_them}Move'] != null && d['${_them}Nonce'] != null,
+        opponentTimeout,
+      );
       if (revealed == null) {
         theirWire = encodeAction(const ForfeitAction());
       } else {
@@ -187,8 +210,11 @@ class RemoteDuelDriver implements OpponentDriver {
   /// Polls the turn doc until [ready] passes, or returns null on timeout
   /// (or as soon as the opponent is known to have surrendered — no point
   /// waiting out the clock for a move that will never come).
-  Future<Map<String, dynamic>?> _pollTurn(String path,
-      bool Function(Map<String, dynamic>) ready, Duration timeout) async {
+  Future<Map<String, dynamic>?> _pollTurn(
+    String path,
+    bool Function(Map<String, dynamic>) ready,
+    Duration timeout,
+  ) async {
     final deadline = DateTime.now().add(timeout);
     while (DateTime.now().isBefore(deadline)) {
       if (_theySurrendered) return null;
@@ -204,8 +230,10 @@ class RemoteDuelDriver implements OpponentDriver {
   @override
   Future<void> reportSurrender() async {
     try {
-      await FirestoreRest.set(
-          _roomPath, {'${_me}Surrendered': true, 'status': 'ended'});
+      await FirestoreRest.set(_roomPath, {
+        '${_me}Surrendered': true,
+        'status': 'ended',
+      });
     } catch (_) {
       // Best effort — the opponent's move timeouts still end the duel.
     }
@@ -214,8 +242,7 @@ class RemoteDuelDriver implements OpponentDriver {
   @override
   void watchOpponentSurrender(void Function() onSurrendered) {
     _surrenderWatch?.cancel();
-    _surrenderWatch =
-        Timer.periodic(const Duration(seconds: 2), (timer) async {
+    _surrenderWatch = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
         final room = await FirestoreRest.get(_roomPath);
         if (room?['${_them}Surrendered'] == true) {

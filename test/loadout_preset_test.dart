@@ -36,8 +36,11 @@ void main() {
         'spellIds': ['flick'],
       });
 
-      expect(preset.elements,
-          [MagicElement.solar, MagicElement.lunar, MagicElement.astral]);
+      expect(preset.elements, [
+        MagicElement.solar,
+        MagicElement.lunar,
+        MagicElement.astral,
+      ]);
       expect(preset.unknownElementIds, isEmpty);
     });
 

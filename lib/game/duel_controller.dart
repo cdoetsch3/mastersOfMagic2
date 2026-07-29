@@ -63,9 +63,8 @@ class DuelController extends ChangeNotifier {
   /// While a turn is being animated this is the moon that actually governed
   /// **that** turn, so it matches the Lunar damage the player is watching land.
   /// Once the turn finishes it advances to the turn they are about to act in.
-  MoonPhase get shownMoonPhase => _replaying
-      ? moonPhaseForTurn(engine.turnNumber)
-      : engine.moonPhase;
+  MoonPhase get shownMoonPhase =>
+      _replaying ? moonPhaseForTurn(engine.turnNumber) : engine.moonPhase;
 
   /// The phase after [shownMoonPhase] — the "next turn" preview.
   MoonPhase get shownNextMoonPhase => _replaying
@@ -90,7 +89,14 @@ class DuelController extends ChangeNotifier {
 
   final List<String> battleLog = [];
 
-  DuelController({required this.loadout, required this.driver}) {
+  /// The player's character level, for health and damage scaling.
+  final int playerLevel;
+
+  DuelController({
+    required this.loadout,
+    required this.driver,
+    this.playerLevel = 1,
+  }) {
     newDuel();
     driver.watchOpponentSurrender(_onOpponentSurrendered);
   }
@@ -98,8 +104,11 @@ class DuelController extends ChangeNotifier {
   bool get playerIsHost => driver.playerIsHost;
 
   void newDuel() {
-    player = MageState(name: 'You');
-    enemy = MageState(name: driver.opponentName);
+    // ⭐ Level scales health and damage on both sides (4%/level). An
+    // even-level duel plays exactly as it always did; a level gap is now
+    // worth something.
+    player = MageState(name: 'You', level: playerLevel);
+    enemy = MageState(name: driver.opponentName, level: driver.opponentLevel);
     final host = playerIsHost ? player : enemy;
     final guest = playerIsHost ? enemy : player;
     engine = DuelEngine(host, guest, rng: _rng);
@@ -141,11 +150,15 @@ class DuelController extends ChangeNotifier {
       spell.xCost ? player.charge >= 1 : spell.chargeCost <= player.charge;
 
   bool canAct(Spell spell) =>
-      !animating && !engine.isOver && canAfford(spell) &&
+      !animating &&
+      !engine.isOver &&
+      canAfford(spell) &&
       (player.charge > 0 || pendingElement != null);
 
   bool get canCharge =>
-      !animating && !engine.isOver && player.charge < MageState.maxCharge &&
+      !animating &&
+      !engine.isOver &&
+      player.charge < MageState.maxCharge &&
       (player.charge > 0 || pendingElement != null);
 
   void selectElement(MagicElement element) {
@@ -203,8 +216,9 @@ class DuelController extends ChangeNotifier {
       playerDefeated = true;
       shownPlayerHp = 0;
       battleLog.add(
-          'You forfeited $forfeitLimit turns in a row and surrender. '
-          '${enemy.name} wins.');
+        'You forfeited $forfeitLimit turns in a row and surrender. '
+        '${enemy.name} wins.',
+      );
       driver.reportSurrender(); // fire-and-forget: tell the remote peer
     } else if (_theirForfeitStreak >= forfeitLimit) {
       engine.concede(enemy);
@@ -256,7 +270,12 @@ class DuelController extends ChangeNotifier {
           enemyIsCharging = false;
           revealedEnemyElement = element;
         }
-      case ShieldRaisedEvent(:final mage, :final element, :final isBarrier, :final strength):
+      case ShieldRaisedEvent(
+        :final mage,
+        :final element,
+        :final isBarrier,
+        :final strength,
+      ):
         final snapshot = ShownShield(
           element: element,
           isBarrier: isBarrier,
@@ -277,11 +296,11 @@ class DuelController extends ChangeNotifier {
           shownEnemyShield = snapshot;
         }
       case DamageEvent(
-          :final target,
-          :final toShield,
-          :final shieldBroken,
-          :final barrierPopped
-        ):
+        :final target,
+        :final toShield,
+        :final shieldBroken,
+        :final barrierPopped,
+      ):
         if (barrierPopped) {
           // One point ate the hit; the shield behind it is intact.
           if (target == player) {
@@ -290,8 +309,9 @@ class DuelController extends ChangeNotifier {
             shownEnemyBarrier = (shownEnemyBarrier - 1).clamp(0, 3);
           }
         } else {
-          final shield =
-              target == player ? shownPlayerShield : shownEnemyShield;
+          final shield = target == player
+              ? shownPlayerShield
+              : shownEnemyShield;
           if (shieldBroken) {
             if (target == player) {
               shownPlayerShield = null;
@@ -311,12 +331,12 @@ class DuelController extends ChangeNotifier {
           shownEnemyHp = (shownEnemyHp + amount).clamp(0, enemy.maxHp);
         }
       case EffectDamageEvent(
-          :final target,
-          :final toShield,
-          :final toHp,
-          :final shieldBroken,
-          :final barrierPopped
-        ):
+        :final target,
+        :final toShield,
+        :final toHp,
+        :final shieldBroken,
+        :final barrierPopped,
+      ):
         // A status tick (e.g. Ignite) — same display bookkeeping as a hit.
         if (barrierPopped) {
           if (target == player) {
@@ -325,8 +345,9 @@ class DuelController extends ChangeNotifier {
             shownEnemyBarrier = (shownEnemyBarrier - 1).clamp(0, 3);
           }
         } else {
-          final shield =
-              target == player ? shownPlayerShield : shownEnemyShield;
+          final shield = target == player
+              ? shownPlayerShield
+              : shownEnemyShield;
           if (shieldBroken) {
             if (target == player) {
               shownPlayerShield = null;

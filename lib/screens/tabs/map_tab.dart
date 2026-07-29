@@ -4,17 +4,24 @@ import '../../game/ai_personas.dart';
 import '../../game/duel_launcher.dart';
 import '../../game/element_style.dart';
 import '../../game/game_state.dart';
+import '../../game/travel.dart';
 import '../../game/world.dart';
 import '../../ui/app_theme.dart';
+import '../../ui/travel_progress_card.dart';
 import '../home_shell.dart';
 import '../world_map_screen.dart';
 
 /// Where the player is in the world, what they can do here, and where they can
 /// travel next. Adventures (a duel encounter in Phase 1) launch from here.
-class MapTab extends StatelessWidget {
+class MapTab extends StatefulWidget {
   final ValueChanged<int> onSelectTab;
   const MapTab({super.key, required this.onSelectTab});
 
+  @override
+  State<MapTab> createState() => _MapTabState();
+}
+
+class _MapTabState extends State<MapTab> {
   @override
   Widget build(BuildContext context) {
     final game = GameStateScope.of(context);
@@ -24,32 +31,31 @@ class MapTab extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const PlayerHeader(title: 'Map'),
-        // ⚠️ The map lives ABOVE the list, not inside it. A pannable map inside
-        // a ListView cannot be panned vertically at all: the list's drag
-        // recognizer wins the gesture arena every time, so a drag south
-        // scrolled the page and left the map exactly where it was. Measured —
-        // the map's transform did not move by a single pixel.
-        Padding(
-          padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
-          child: Center(
-            child: ConstrainedBox(
-              // A square, unless that would eat the screen on a short window.
-              constraints: const BoxConstraints(maxHeight: 340),
-              child: WorldMapCard(
-                game: game,
-                onExpand: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => WorldMapScreen(game: game),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
+            children: [
+              // ⭐ The map scrolls with the page, and still pans under your
+              // finger — see InteractiveWorldMap.insideScrollable.
+              LayoutBuilder(
+                builder: (context, c) => SizedBox(
+                  // ⚠️ Capped by the screen, not just square. A full-width
+                  // square map ate over half a phone screen and pushed every
+                  // travel option below the fold.
+                  height: c.maxWidth.clamp(0.0, 320.0),
+                  child: WorldMapCard(
+                    game: game,
+                    onExpand: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => WorldMapScreen(game: game),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
-            children: [
+              const SizedBox(height: 12),
+              // The journey in progress, when there is one.
+              if (game.isTravelling) TravelProgressCard(game: game),
               _CurrentLocationCard(location: here),
               const SizedBox(height: 12),
               const SectionLabel('Here you can'),
@@ -59,6 +65,11 @@ class MapTab extends StatelessWidget {
               for (final id in here.connections)
                 _TravelCard(
                   location: World.byId(id),
+                  // ⚠️ One journey at a time. While travelling the cards stay
+                  // visible but inert, so the map still reads as a map rather
+                  // than emptying out mid-trip.
+                  minutes: Travel.minutesBetween(here.id, id),
+                  enabled: !game.isTravelling,
                   onTravel: () => game.travelTo(id),
                 ),
             ],
@@ -84,7 +95,7 @@ class MapTab extends StatelessWidget {
           color: AppColors.sky,
           title: 'Arcane Sanctum',
           subtitle: 'Change your spells and loadouts',
-          onTap: () => onSelectTab(3),
+          onTap: () => widget.onSelectTab(3),
         ),
       ],
       if (here.hasAdventure)
@@ -148,12 +159,18 @@ class _CurrentLocationCard extends StatelessWidget {
             children: [
               Icon(_kindIcon(location.kind), color: AppColors.gold, size: 20),
               const SizedBox(width: 8),
-              Text(
-                location.name,
-                style: const TextStyle(
-                  color: AppColors.text,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+              // ⚠️ Flexible: a long place name beside its kind chip overflowed
+              // the row on a narrow phone. "The Collapsed Academy" is 21
+              // characters and there are three more like it.
+              Flexible(
+                child: Text(
+                  location.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -302,7 +319,17 @@ class _ActionTile extends StatelessWidget {
 class _TravelCard extends StatelessWidget {
   final GameLocation location;
   final VoidCallback onTravel;
-  const _TravelCard({required this.location, required this.onTravel});
+
+  /// How long the walk takes, shown so the cost of a trip is visible before
+  /// committing to it rather than discovered afterwards.
+  final int? minutes;
+  final bool enabled;
+  const _TravelCard({
+    required this.location,
+    required this.onTravel,
+    this.minutes,
+    this.enabled = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -312,77 +339,83 @@ class _TravelCard extends StatelessWidget {
     final subtitle = location.isTown ? 'Town' : location.enemyBandLabel;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: GamePanel(
-        onTap: onTravel,
-        child: Row(
-          children: [
-            Icon(_kindIcon(location.kind), color: AppColors.teal, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    location.name,
-                    style: const TextStyle(color: AppColors.text, fontSize: 14),
-                  ),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      color: AppColors.textDim,
-                      fontSize: 12,
-                    ),
-                  ),
-                  // What the new world model knows and this card used to hide:
-                  // who you'll meet, what is taught here, and what bars the way.
-                  if (location.elements.isNotEmpty ||
-                      location.station != null ||
-                      location.gate != null ||
-                      location.plane == WorldPlane.empyrean)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          for (final e in location.elements)
-                            elementGlyph(e, size: 14),
-                          if (location.station != null)
-                            _MiniTag(
-                              icon: Icons.handyman,
-                              text: location.station!,
-                              color: AppColors.teal,
-                            ),
-                          if (location.plane == WorldPlane.empyrean)
-                            const _MiniTag(
-                              icon: Icons.auto_awesome,
-                              text: 'Beyond the Veil',
-                              color: AppColors.gem,
-                            ),
-                          if (location.gate != null)
-                            const _MiniTag(
-                              icon: Icons.lock_outline,
-                              text: 'Gated',
-                              color: AppColors.gold,
-                            ),
-                        ],
+      child: Opacity(
+        opacity: enabled ? 1 : 0.45,
+        child: GamePanel(
+          onTap: enabled ? onTravel : null,
+          child: Row(
+            children: [
+              Icon(_kindIcon(location.kind), color: AppColors.teal, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      location.name,
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontSize: 14,
                       ),
                     ),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: AppColors.textDim,
+                        fontSize: 12,
+                      ),
+                    ),
+                    // What the new world model knows and this card used to hide:
+                    // who you'll meet, what is taught here, and what bars the way.
+                    if (location.elements.isNotEmpty ||
+                        location.station != null ||
+                        location.gate != null ||
+                        location.plane == WorldPlane.empyrean)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            for (final e in location.elements)
+                              elementGlyph(e, size: 14),
+                            if (location.station != null)
+                              _MiniTag(
+                                icon: Icons.handyman,
+                                text: location.station!,
+                                color: AppColors.teal,
+                              ),
+                            if (location.plane == WorldPlane.empyrean)
+                              const _MiniTag(
+                                icon: Icons.auto_awesome,
+                                text: 'Beyond the Veil',
+                                color: AppColors.gem,
+                              ),
+                            if (location.gate != null)
+                              const _MiniTag(
+                                icon: Icons.lock_outline,
+                                text: 'Gated',
+                                color: AppColors.gold,
+                              ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  Text(
+                    minutes == null ? 'Travel' : '$minutes min',
+                    style: const TextStyle(color: AppColors.teal, fontSize: 12),
+                  ),
+                  const SizedBox(width: 2),
+                  const Icon(Icons.chevron_right, color: AppColors.teal),
                 ],
               ),
-            ),
-            const Row(
-              children: [
-                Text(
-                  'Travel',
-                  style: TextStyle(color: AppColors.teal, fontSize: 12),
-                ),
-                SizedBox(width: 2),
-                Icon(Icons.chevron_right, color: AppColors.teal),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

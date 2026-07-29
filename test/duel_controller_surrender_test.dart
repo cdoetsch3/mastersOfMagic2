@@ -10,6 +10,9 @@ import 'package:masters_of_magic_2/game/opponent_driver.dart';
 /// A scriptable stand-in for a remote opponent: records surrender reports,
 /// exposes the surrender callback, and can hold an exchange in flight.
 class FakeRemoteDriver implements OpponentDriver {
+  @override
+  int get opponentLevel => 1;
+
   bool surrenderReported = false;
   void Function()? onOpponentSurrendered;
   Completer<TurnExchange>? pendingExchange;
@@ -58,8 +61,7 @@ void main() {
 
   setUp(() {
     driver = FakeRemoteDriver();
-    controller =
-        DuelController(loadout: Loadout.starter, driver: driver);
+    controller = DuelController(loadout: Loadout.starter, driver: driver);
   });
 
   test('surrendering tells the driver so the remote peer finds out', () {
@@ -70,8 +72,11 @@ void main() {
   });
 
   test('opponent surrender while idle ends the duel as a win', () {
-    expect(driver.onOpponentSurrendered, isNotNull,
-        reason: 'controller must start the surrender watch');
+    expect(
+      driver.onOpponentSurrendered,
+      isNotNull,
+      reason: 'controller must start the surrender watch',
+    );
     driver.onOpponentSurrendered!();
     expect(controller.gameOver, isTrue);
     expect(controller.playerWon, isTrue);
@@ -79,26 +84,34 @@ void main() {
     expect(controller.battleLog.last, contains('surrenders'));
   });
 
-  test('opponent surrender lands mid-exchange without resolving the turn',
-      () async {
-    final events =
-        controller.submitTurn(const ChargeAction(MagicElement.pyro));
-    driver.onOpponentSurrendered!(); // surrender arrives while we wait
-    // The (now moot) exchange completes afterwards.
-    driver.pendingExchange!
-        .complete(const TurnExchange(ForfeitAction(), 42));
-    expect(await events, isEmpty,
-        reason: 'no turn events after the duel already ended');
-    expect(controller.gameOver, isTrue);
-    expect(controller.playerWon, isTrue);
-    expect(controller.turnNumber, 0, reason: 'the turn never resolved');
-  });
+  test(
+    'opponent surrender lands mid-exchange without resolving the turn',
+    () async {
+      final events = controller.submitTurn(
+        const ChargeAction(MagicElement.pyro),
+      );
+      driver.onOpponentSurrendered!(); // surrender arrives while we wait
+      // The (now moot) exchange completes afterwards.
+      driver.pendingExchange!.complete(const TurnExchange(ForfeitAction(), 42));
+      expect(
+        await events,
+        isEmpty,
+        reason: 'no turn events after the duel already ended',
+      );
+      expect(controller.gameOver, isTrue);
+      expect(controller.playerWon, isTrue);
+      expect(controller.turnNumber, 0, reason: 'the turn never resolved');
+    },
+  );
 
   test('opponent surrender after the duel is over is ignored', () {
     controller.surrender();
     driver.onOpponentSurrendered!(); // late arrival — must not throw
-    expect(controller.playerWon, isFalse,
-        reason: 'our surrender stands; the duel outcome does not flip');
+    expect(
+      controller.playerWon,
+      isFalse,
+      reason: 'our surrender stands; the duel outcome does not flip',
+    );
   });
 
   group('forfeit streaks (closed tab / AFK)', () {
@@ -111,12 +124,14 @@ void main() {
       }
       expect(controller.gameOver, isTrue);
       expect(controller.playerWon, isFalse);
-      expect(driver.surrenderReported, isTrue,
-          reason: 'the remote peer must be told, so their duel ends too');
+      expect(
+        driver.surrenderReported,
+        isTrue,
+        reason: 'the remote peer must be told, so their duel ends too',
+      );
     });
 
-    test('an opponent forfeiting 3 turns in a row hands us the win',
-        () async {
+    test('an opponent forfeiting 3 turns in a row hands us the win', () async {
       driver.autoRespond = const ForfeitAction();
       for (var i = 0; i < DuelController.forfeitLimit; i++) {
         expect(controller.gameOver, isFalse);
@@ -140,8 +155,11 @@ void main() {
       controller.finishTurn();
       await controller.submitTurn(const ForfeitAction());
       controller.finishTurn();
-      expect(controller.gameOver, isFalse,
-          reason: 'streak broke at 2 — never reached the limit');
+      expect(
+        controller.gameOver,
+        isFalse,
+        reason: 'streak broke at 2 — never reached the limit',
+      );
       expect(driver.surrenderReported, isFalse);
     });
   });

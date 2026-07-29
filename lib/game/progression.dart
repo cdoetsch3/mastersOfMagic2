@@ -80,40 +80,51 @@ abstract final class Progression {
   /// a later-phase refinement).
   static bool isElementUnlockedAt(MagicElement element, int level) => true;
 
-  // ---- Loadout slot pool ---------------------------------------------
+  // ---- Loadout pools -------------------------------------------------
   //
-  // ⭐ Elements and spells share ONE pool. Spending a slot on a fourth element
-  // is spending it away from a tenth spell — that tension is the strategy.
+  // ⭐ Elements and spells are SEPARATE pools, each with its own unlock
+  // schedule. A fourth element does not cost a tenth spell.
+  //
+  // 📝 PLANNED — not yet enforced. The schedules below are the intended
+  // gating (PROGRESSION_DESIGN §"Slot pool"); [enforceSlotLimits] stays false
+  // until the campaign can hand spells back, which is one of the last things
+  // before v1. Until then every element and spell is available for
+  // playtesting, and these are data only.
 
-  /// Slots from levelling alone: **5 at level 1, 15 at level 50.**
-  static const int startingSlots = 5;
-  static const int slotsAtCap = 15;
+  /// Elements known at level 1, growing to [Loadout.maxElementSlots] = 5.
+  static const int startingElements = 1;
 
-  /// The extra slots equipment can grant on top of the level curve, taking the
-  /// ceiling to [Loadout.maxSlots] = 20.
-  static const int maxEquipmentSlots = 5;
+  /// Levels that grant a new element: 10, 20, 30, 40 — four gains on top of
+  /// the one you start with, reaching five at level 40.
+  static const List<int> elementUnlockLevels = [10, 20, 30, 40];
 
-  /// Levels at which a slot is granted — ten gains across levels 1-50, spaced
-  /// so the early ones land close together (a new player feels the pool open
-  /// up) and later ones stretch out.
-  static const List<int> slotUnlockLevels = [
-    3, 6, 10, 15, 20, 26, 32, 38, 44, 50,
-  ];
+  /// Spells known at level 1, growing to [Loadout.maxSpellSlots] = 10.
+  static const int startingSpells = 4;
 
-  /// Slots unlocked by levelling at [level] — [startingSlots] plus one per
-  /// threshold passed, so exactly [slotsAtCap] at 50.
-  static int slotsAtLevel(int level) =>
-      startingSlots + slotUnlockLevels.where((l) => l <= level).length;
+  /// Levels that grant a new spell: 8, 16, 24, 32, 40, 48 — six gains on top
+  /// of the four you start with, reaching ten at level 48.
+  static const List<int> spellUnlockLevels = [8, 16, 24, 32, 40, 48];
 
-  /// ⚠️ TEMPORARY: the pool is not level-gated yet. Enforcing [slotsAtLevel] is
-  /// deliberately one of the LAST things to turn on, because playtesting needs
-  /// every element and spell available at once. Until then the effective cap is
-  /// the absolute ceiling, and [slotsAtLevel] is data only.
+  /// Elements a player of [level] has unlocked, by the schedule above.
+  static int elementsAtLevel(int level) =>
+      startingElements + elementUnlockLevels.where((l) => l <= level).length;
+
+  /// Spells a player of [level] has unlocked, by the schedule above.
+  static int spellsAtLevel(int level) =>
+      startingSpells + spellUnlockLevels.where((l) => l <= level).length;
+
+  /// ⚠️ TEMPORARY: pools are not level-gated yet — see the note above. Until
+  /// this flips, the usable caps are the absolute ceilings and the schedules
+  /// are data only.
   static const bool enforceSlotLimits = false;
 
-  /// Slots a player of [level] may actually fill right now.
-  static int usableSlotsAtLevel(int level) =>
-      enforceSlotLimits ? slotsAtLevel(level) : Loadout.maxSlots;
+  /// Elements a player of [level] may actually fill right now.
+  static int usableElementsAtLevel(int level) =>
+      enforceSlotLimits ? elementsAtLevel(level) : Loadout.maxElementSlots;
+
+  /// Spells a player of [level] may actually fill right now.
+  static int usableSpellsAtLevel(int level) =>
+      enforceSlotLimits ? spellsAtLevel(level) : Loadout.maxSpellSlots;
 
   /// The elements a brand-new player's first preset is filled with.
   static const List<String> starterPresetElementIds = ['pyro', 'aqua', 'flora'];

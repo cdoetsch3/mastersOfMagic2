@@ -143,13 +143,29 @@ void main() {
   });
 
   group('Overload', () {
-    test('deals ~8-12 per point of the enemy charge', () {
+    test('deals ~7-11 per point of the charge the enemy HOLDS', () {
       charge(alice, MagicElement.pyro, 2);
       charge(bruno, MagicElement.aqua, 3);
-      // Bruno casts Bolt (priority 9, after Overload) so his charge reads 3.
+      // Bruno holds his charge (forfeits), so Overload punishes all 3 of it.
+      duel.resolveTurn(
+          CastAction(Spellbook.overload), const ForfeitAction());
+      expect(bruno.hp, inInclusiveRange(100 - 33, 100 - 21));
+    });
+
+    test('a same-priority enemy cast spends the charge before Overload reads it',
+        () {
+      // ⚠️ TIE BEHAVIOUR, FLAGGED FOR A RULING. With no Haste, same-priority
+      // casts pay simultaneously — so Bruno's Bolt commits his charge in the
+      // same instant, and Overload finds nothing to punish. This makes two
+      // mutual Overloads both fizzle (each sees the other already empty), which
+      // is the stated intent — but it also means Overload does NOT out-speed a
+      // tied attack, which the spec's other line wanted. The two cannot both
+      // hold; this is the version that keeps the mutual-Overload rule.
+      charge(alice, MagicElement.pyro, 2);
+      charge(bruno, MagicElement.aqua, 3);
       duel.resolveTurn(
           CastAction(Spellbook.overload), CastAction(Spellbook.bolt));
-      expect(bruno.hp, inInclusiveRange(100 - 36, 100 - 24));
+      expect(bruno.hp, 100, reason: 'Bruno spent his charge casting Bolt');
     });
 
     test('does nothing to a chargeless enemy', () {
@@ -167,7 +183,8 @@ void main() {
       // Bruno channels 2 -> 3 at priority 4, before Overload reads it at 7.
       duel.resolveTurn(
           CastAction(Spellbook.overload), const ChargeAction());
-      expect(bruno.hp, inInclusiveRange(100 - 36, 100 - 24),
+      // 7-11 per point of the target's charge: 3 charge is 21-33.
+      expect(bruno.hp, inInclusiveRange(100 - 33, 100 - 21),
           reason: 'Overload read Bruno at 3 charge, not 2');
     });
 

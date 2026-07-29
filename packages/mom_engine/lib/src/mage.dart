@@ -1,4 +1,6 @@
+import 'dart:math';
 import 'element.dart';
+import 'element_tuning.dart';
 import 'status.dart';
 
 /// A raised shield occupying the mage's (single, in v1) shield slot.
@@ -133,13 +135,45 @@ class MageState {
   /// damage can't go negative.
   int deflectAmount = 0;
 
-  MageState({required this.name, this.maxHp = 100}) : hp = maxHp;
+  /// The mage's character level. Drives [levelScale]; 1 is the baseline every
+  /// balance figure in the design docs was measured at.
+  final int level;
+
+  /// Multiplier on max health and outgoing damage, from [level].
+  ///
+  /// ⭐ **Geometric, not linear** (ruling, 2026-07-28). At 4%/level compounding
+  /// a level-50 mage is ~6.8x a level-1, where linear would be ~3x. That is
+  /// deliberate: a fifty-level gap *should* be no contest, and it is what
+  /// makes fighting monsters a few levels above you a real decision rather
+  /// than a rounding error. Linear does not bite hard enough late.
+  ///
+  /// ⚠️ Both sides scale identically, so an even-level duel plays exactly as
+  /// it always did — which is what keeps the intelligence ladder and every
+  /// balance figure measured against it valid.
+  double get levelScale => levelScaleFor(level);
+
+  static double levelScaleFor(int level) =>
+      pow(1 + ElementTuning.percentPerLevel / 100, level - 1).toDouble();
+
+  /// Max health for a mage of [level], from the [base] at level 1.
+  static int scaledMaxHp(int level, {int base = 100}) =>
+      (base * levelScaleFor(level)).round();
+
+  MageState({required this.name, this.level = 1, int? maxHp})
+      : maxHp = maxHp ?? scaledMaxHp(level),
+        hp = maxHp ?? scaledMaxHp(level);
 
   /// Records a resolved cast for streak tracking. Not called for charges,
   /// forfeits, fizzles, or misses (those behave like a charge — no change).
   void recordCastForStreak(MagicElement element) {
     if (streakElement == element) {
-      streakCount++;
+      // ⚠️ Gated streaks stop at their gate. Flora blooms at 5 and gains
+      // nothing from a 9th cast, and a pip counting past the payoff promises
+      // one that is not coming. Cadence elements (Aqua, Geo, Sanctus) fire
+      // every Nth cast and are deliberately left uncapped — see
+      // [ElementTuning.streakCap].
+      final cap = ElementTuning.streakCap(element);
+      if (cap == null || streakCount < cap) streakCount++;
     } else {
       streakElement = element;
       streakCount = 1;

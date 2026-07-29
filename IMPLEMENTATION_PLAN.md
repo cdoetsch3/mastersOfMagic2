@@ -742,6 +742,30 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
 
 ## Deferred / banked — do not build without an explicit ask
 
+- **⛔ Third-party sign-in (Google / Apple / Facebook SSO).** Requested
+  2026-07-28. Big, and deliberately later: each provider is its own OAuth
+  setup, platform config (Apple needs an entitlement and its own "Sign in with
+  Apple" button rules), and a Firebase Auth provider wiring, plus an
+  account-linking story for guests who already have a local profile. The
+  social tab now has separate **Create account** / **Sign in** buttons; SSO
+  slots in beside them when built.
+- **⛔ Loadout unlock schedule (level-gated elements & spells).** The pools are
+  separate and capped (5 elements, 10 spells), and `Progression` now carries
+  the intended schedule as data — elements at 10/20/30/40 (1→5), spells at
+  8/16/24/32/40/48 (4→10) — but `enforceSlotLimits` is **false**. Turning it
+  on is one of the LAST things before v1, alongside spell gating, because it
+  cannot ship until the campaign can hand a taken-away spell back. The
+  schedule itself is provisional and expected to be retuned against
+  playtesting (the numbers were picked, not measured).
+- **⛔ App-shell caching / no full re-download on relaunch — ✅ DONE 2026-07-28.**
+  Kept here as the record: `firebase.json` was sending `no-cache` on every
+  asset, so a cold start re-fetched all 41 MB — 37 MB of which is canvaskit,
+  which had no cache header at all. Now canvaskit is `immutable` for a year
+  (it is SDK-versioned, not ours), assets/icons cache for a day, and only the
+  entry points (`index.html`, bootstrap, service worker, `main.dart.*`) stay
+  `no-cache`. If a stale build is ever served after a deploy, the suspect is
+  one of those entry points silently gaining a long cache lifetime.
+
 - **TYPE_EFFECTS §7a** — 16 banked spell ideas.
 - **Phase 7 of the original type-effects build** — making the AI aware of
   statuses. Overlaps Phase 6 item 3 above; decide there.

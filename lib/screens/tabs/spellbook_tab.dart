@@ -4,7 +4,6 @@ import 'package:mom_engine/mom_engine.dart';
 import '../../game/element_style.dart';
 import '../../game/game_state.dart';
 import '../../game/player_profile.dart';
-import '../../game/loadout.dart';
 import '../../game/progression.dart';
 import '../../ui/app_theme.dart';
 import '../element_detail_dialog.dart';
@@ -41,18 +40,19 @@ class SpellbookTab extends StatelessWidget {
               const SizedBox(height: 10),
               _guideLink(context),
               const SizedBox(height: 12),
-              // One shared pool: show what the whole loadout costs, then the
-              // per-kind breakdown, so the trade-off is visible while editing.
-              SectionLabel('Loadout  ·  ${preset.slotsUsed}/'
-                  '${Progression.usableSlotsAtLevel(p.level)} slots'
-                  '   (elements and spells share these)'),
-              const SizedBox(height: 12),
-              SectionLabel('Elements  ·  ${preset.elementIds.length}'
-                  '   (tap ⓘ for details)'),
+              // Two separate pools, each shown against its own cap.
+              SectionLabel(
+                'Elements  ·  ${preset.elementIds.length}/'
+                '${Progression.usableElementsAtLevel(p.level)}'
+                '   (tap ⓘ for details)',
+              ),
               _elementGrid(context, game, p, preset, canEdit),
               const SizedBox(height: 14),
-              SectionLabel('Spells  ·  ${preset.spellIds.length}'
-                  '   (tap ⓘ for details)'),
+              SectionLabel(
+                'Spells  ·  ${preset.spellIds.length}/'
+                '${Progression.usableSpellsAtLevel(p.level)}'
+                '   (tap ⓘ for details)',
+              ),
               _spellGrid(context, game, p, preset, canEdit),
             ],
           ),
@@ -78,8 +78,10 @@ class SpellbookTab extends StatelessWidget {
             Icon(Icons.school, size: 18, color: AppColors.gold),
             SizedBox(width: 10),
             Expanded(
-              child: Text('How dueling works',
-                  style: TextStyle(color: AppColors.text, fontSize: 14)),
+              child: Text(
+                'How dueling works',
+                style: TextStyle(color: AppColors.text, fontSize: 14),
+              ),
             ),
             Icon(Icons.chevron_right, color: AppColors.textFaint),
           ],
@@ -104,9 +106,10 @@ class SpellbookTab extends StatelessWidget {
           SizedBox(width: 8),
           Expanded(
             child: Text(
-                'Travel to a town and visit the Arcane Sanctum to edit '
-                'your loadout.',
-                style: TextStyle(color: AppColors.text, fontSize: 12)),
+              'Travel to a town and visit the Arcane Sanctum to edit '
+              'your loadout.',
+              style: TextStyle(color: AppColors.text, fontSize: 12),
+            ),
           ),
         ],
       ),
@@ -117,61 +120,80 @@ class SpellbookTab extends StatelessWidget {
     final chips = <Widget>[];
     for (var i = 0; i < p.presets.length; i++) {
       final active = i == p.activePresetIndex;
-      chips.add(GestureDetector(
-        onTap: () => game.selectPreset(i),
-        child: Container(
-          margin: const EdgeInsets.only(right: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: active ? AppColors.gold.withValues(alpha: 0.16) : AppColors.panelHi,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                color: active ? AppColors.gold : AppColors.border),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.menu_book,
+      chips.add(
+        GestureDetector(
+          onTap: () => game.selectPreset(i),
+          child: Container(
+            margin: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: active
+                  ? AppColors.gold.withValues(alpha: 0.16)
+                  : AppColors.panelHi,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: active ? AppColors.gold : AppColors.border,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.menu_book,
                   size: 14,
-                  color: active ? AppColors.gold : AppColors.textDim),
-              const SizedBox(width: 6),
-              Text(p.presets[i].name,
+                  color: active ? AppColors.gold : AppColors.textDim,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  p.presets[i].name,
                   style: TextStyle(
-                      color: active ? AppColors.text : AppColors.textDim,
-                      fontSize: 13)),
-            ],
+                    color: active ? AppColors.text : AppColors.textDim,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ));
+      );
     }
     // Locked future preset slots.
     final total = Progression.presetSlotUnlockLevels.length;
     for (var i = p.presets.length; i < total; i++) {
       final unlockLevel = Progression.presetSlotUnlockLevels[i];
       final unlocked = p.level >= unlockLevel;
-      chips.add(GestureDetector(
-        onTap: unlocked ? game.addPresetSlot : null,
-        child: Container(
-          margin: const EdgeInsets.only(right: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppColors.panelHi,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.borderDim),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(unlocked ? Icons.add : Icons.lock,
-                  size: 14, color: AppColors.textFaint),
-              const SizedBox(width: 6),
-              Text(unlocked ? 'Add loadout' : 'Lv $unlockLevel',
+      chips.add(
+        GestureDetector(
+          onTap: unlocked ? game.addPresetSlot : null,
+          child: Container(
+            margin: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.panelHi,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.borderDim),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  unlocked ? Icons.add : Icons.lock,
+                  size: 14,
+                  color: AppColors.textFaint,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  unlocked ? 'Add loadout' : 'Lv $unlockLevel',
                   style: const TextStyle(
-                      color: AppColors.textFaint, fontSize: 13)),
-            ],
+                    color: AppColors.textFaint,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ));
+      );
     }
     return SizedBox(
       height: 40,
@@ -179,8 +201,13 @@ class SpellbookTab extends StatelessWidget {
     );
   }
 
-  Widget _elementGrid(BuildContext context, GameState game, PlayerProfile p,
-      LoadoutPreset preset, bool canEdit) {
+  Widget _elementGrid(
+    BuildContext context,
+    GameState game,
+    PlayerProfile p,
+    LoadoutPreset preset,
+    bool canEdit,
+  ) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -191,8 +218,14 @@ class SpellbookTab extends StatelessWidget {
     );
   }
 
-  Widget _elementTile(BuildContext context, GameState game, PlayerProfile p,
-      LoadoutPreset preset, MagicElement element, bool canEdit) {
+  Widget _elementTile(
+    BuildContext context,
+    GameState game,
+    PlayerProfile p,
+    LoadoutPreset preset,
+    MagicElement element,
+    bool canEdit,
+  ) {
     final style = element.style;
     final slot = preset.elementIds.indexOf(element.name);
     final selected = slot >= 0;
@@ -203,12 +236,17 @@ class SpellbookTab extends StatelessWidget {
       if (selected) {
         if (ids.length <= 1) return; // keep at least one
         ids.remove(element.name);
-      } else if (preset.slotsUsed < Progression.usableSlotsAtLevel(p.level) &&
-          ids.length < Loadout.maxElementSlots) {
+      } else if (ids.length < Progression.usableElementsAtLevel(p.level)) {
         ids.add(element.name);
       }
-      game.savePreset(p.activePresetIndex,
-          LoadoutPreset(name: preset.name, elementIds: ids, spellIds: preset.spellIds));
+      game.savePreset(
+        p.activePresetIndex,
+        LoadoutPreset(
+          name: preset.name,
+          elementIds: ids,
+          spellIds: preset.spellIds,
+        ),
+      );
     }
 
     return Opacity(
@@ -226,8 +264,9 @@ class SpellbookTab extends StatelessWidget {
                     : AppColors.panelHi,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                    color: selected ? style.color : AppColors.border,
-                    width: selected ? 1.6 : 1),
+                  color: selected ? style.color : AppColors.border,
+                  width: selected ? 1.6 : 1,
+                ),
               ),
               child: Column(
                 children: [
@@ -236,21 +275,24 @@ class SpellbookTab extends StatelessWidget {
                     children: [
                       elementGlyph(element, size: 18),
                       const SizedBox(width: 6),
-                      Text(style.label,
-                          style: TextStyle(
-                              color: selected
-                                  ? AppColors.text
-                                  : AppColors.textDim,
-                              fontSize: 12.5)),
+                      Text(
+                        style.label,
+                        style: TextStyle(
+                          color: selected ? AppColors.text : AppColors.textDim,
+                          fontSize: 12.5,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 3),
-                  Text(selected ? 'Slot ${slot + 1}' : '—',
-                      style: TextStyle(
-                          color:
-                              selected ? style.color : AppColors.textFaint,
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w600)),
+                  Text(
+                    selected ? 'Slot ${slot + 1}' : '—',
+                    style: TextStyle(
+                      color: selected ? style.color : AppColors.textFaint,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -277,8 +319,13 @@ class SpellbookTab extends StatelessWidget {
     );
   }
 
-  Widget _spellGrid(BuildContext context, GameState game, PlayerProfile p,
-      LoadoutPreset preset, bool canEdit) {
+  Widget _spellGrid(
+    BuildContext context,
+    GameState game,
+    PlayerProfile p,
+    LoadoutPreset preset,
+    bool canEdit,
+  ) {
     return GridView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -297,8 +344,14 @@ class SpellbookTab extends StatelessWidget {
     );
   }
 
-  Widget _spellTile(BuildContext context, GameState game, PlayerProfile p,
-      LoadoutPreset preset, Spell spell, bool canEdit) {
+  Widget _spellTile(
+    BuildContext context,
+    GameState game,
+    PlayerProfile p,
+    LoadoutPreset preset,
+    Spell spell,
+    bool canEdit,
+  ) {
     final slot = preset.spellIds.indexOf(spell.id);
     final selected = slot >= 0;
     final unlocked = p.isSpellUnlocked(spell);
@@ -309,12 +362,17 @@ class SpellbookTab extends StatelessWidget {
       if (selected) {
         if (ids.length <= 1) return;
         ids.remove(spell.id);
-      } else if (preset.slotsUsed < Progression.usableSlotsAtLevel(p.level) &&
-          ids.length < Loadout.maxSpellSlots) {
+      } else if (ids.length < Progression.usableSpellsAtLevel(p.level)) {
         ids.add(spell.id);
       }
-      game.savePreset(p.activePresetIndex,
-          LoadoutPreset(name: preset.name, elementIds: preset.elementIds, spellIds: ids));
+      game.savePreset(
+        p.activePresetIndex,
+        LoadoutPreset(
+          name: preset.name,
+          elementIds: preset.elementIds,
+          spellIds: ids,
+        ),
+      );
     }
 
     return Tooltip(
@@ -329,66 +387,75 @@ class SpellbookTab extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             decoration: BoxDecoration(
-              color: selected
-                  ? const Color(0xFF2B2150)
-                  : AppColors.panelHi,
+              color: selected ? const Color(0xFF2B2150) : AppColors.panelHi,
               borderRadius: BorderRadius.circular(11),
               border: Border.all(
-                  color: selected ? AppColors.gold : AppColors.border,
-                  width: selected ? 1.5 : 1),
+                color: selected ? AppColors.gold : AppColors.border,
+                width: selected ? 1.5 : 1,
+              ),
             ),
             child: Row(
               children: [
                 Icon(
-                    unlocked
-                        ? (spellIcons[spell.id] ?? Icons.auto_fix_high)
-                        : Icons.lock,
-                    size: 18,
-                    color: selected ? AppColors.gold : AppColors.textDim),
+                  unlocked
+                      ? (spellIcons[spell.id] ?? Icons.auto_fix_high)
+                      : Icons.lock,
+                  size: 18,
+                  color: selected ? AppColors.gold : AppColors.textDim,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(spell.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color: unlocked
-                                  ? AppColors.text
-                                  : AppColors.textFaint,
-                              fontSize: 12.5)),
                       Text(
-                          unlocked
-                              ? (spell.xCost
+                        spell.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: unlocked
+                              ? AppColors.text
+                              : AppColors.textFaint,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                      Text(
+                        unlocked
+                            ? (spell.xCost
                                   ? 'cost X'
                                   : 'cost ${spell.chargeCost}')
-                              : 'Level $unlockLevel',
-                          style: const TextStyle(
-                              color: AppColors.textDim, fontSize: 10)),
+                            : 'Level $unlockLevel',
+                        style: const TextStyle(
+                          color: AppColors.textDim,
+                          fontSize: 10,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 if (selected)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 5, vertical: 2),
+                      horizontal: 5,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.bg,
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(color: AppColors.border),
                     ),
                     child: Text(
-                        slot < _spellKeyLabels.length
-                            ? _spellKeyLabels[slot]
-                            : '•',
-                        style: const TextStyle(
-                            color: AppColors.gold,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold)),
+                      slot < _spellKeyLabels.length
+                          ? _spellKeyLabels[slot]
+                          : '•',
+                      style: const TextStyle(
+                        color: AppColors.gold,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                if (unlocked)
-                  _infoDot(() => showSpellDetail(context, spell)),
+                if (unlocked) _infoDot(() => showSpellDetail(context, spell)),
               ],
             ),
           ),
@@ -402,19 +469,25 @@ class _EditableName extends StatelessWidget {
   final LoadoutPreset preset;
   final bool canEdit;
   final GameState game;
-  const _EditableName(
-      {required this.preset, required this.canEdit, required this.game});
+  const _EditableName({
+    required this.preset,
+    required this.canEdit,
+    required this.game,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
-          child: Text(preset.name,
-              style: const TextStyle(
-                  color: AppColors.text,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600)),
+          child: Text(
+            preset.name,
+            style: const TextStyle(
+              color: AppColors.text,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
         if (canEdit)
           IconButton(
@@ -431,8 +504,10 @@ class _EditableName extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.panel,
-        title: const Text('Rename loadout',
-            style: TextStyle(color: AppColors.text, fontSize: 16)),
+        title: const Text(
+          'Rename loadout',
+          style: TextStyle(color: AppColors.text, fontSize: 16),
+        ),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -453,11 +528,13 @@ class _EditableName extends StatelessWidget {
     );
     if (name != null && name.trim().isNotEmpty) {
       game.savePreset(
-          game.profile.activePresetIndex,
-          LoadoutPreset(
-              name: name.trim(),
-              elementIds: preset.elementIds,
-              spellIds: preset.spellIds));
+        game.profile.activePresetIndex,
+        LoadoutPreset(
+          name: name.trim(),
+          elementIds: preset.elementIds,
+          spellIds: preset.spellIds,
+        ),
+      );
     }
   }
 }

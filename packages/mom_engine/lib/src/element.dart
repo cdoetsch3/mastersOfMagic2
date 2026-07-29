@@ -179,3 +179,13 @@ MoonPhase moonPhaseForTurn(int turnNumber) => switch (turnNumber % 4) {
 /// were considered and shelved as too strong — TYPE_EFFECTS §4b.2.
 int lunarAttackPercent(MoonPhase phase) =>
     phase == MoonPhase.full ? 20 : 0;
+
+/// How an element is written in player-facing text.
+///
+/// ⭐ Elements are proper nouns — "Arcane Overload", not "arcane Overload".
+/// Every log line, tooltip and narration goes through this, so the game
+/// cannot say it two different ways in the same sentence.
+extension MagicElementName on MagicElement {
+  String get displayName => name[0].toUpperCase() + name.substring(1);
+}
+

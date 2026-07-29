@@ -1,93 +1,54 @@
 import 'package:mom_engine/mom_engine.dart';
 
-/// One loadout slot: an element **or** a spell, never both.
+/// What the player brings into a duel: **a pool of elements and a separate
+/// pool of spells.**
 ///
-/// Elements and spells draw from a single shared pool, so the two are the same
-/// kind of thing as far as capacity is concerned — see [Loadout].
-class LoadoutSlot {
-  final MagicElement? element;
-  final Spell? spell;
-
-  const LoadoutSlot.element(MagicElement this.element) : spell = null;
-  const LoadoutSlot.spell(Spell this.spell) : element = null;
-
-  bool get isElement => element != null;
-  bool get isSpell => spell != null;
-
-  /// Stable identifier for saving — element names and spell ids share a
-  /// namespace check in [Loadout.fromIds].
-  String get id => element?.name ?? spell!.id;
-
-  @override
-  bool operator ==(Object other) =>
-      other is LoadoutSlot &&
-      other.element == element &&
-      other.spell?.id == spell?.id;
-
-  @override
-  int get hashCode => Object.hash(element, spell?.id);
-}
-
-/// What the player brings into a duel: **one ordered pool of slots**, each
-/// holding an element or a spell.
+/// ⭐ The two pools are firmly separate, and small on purpose. A duel is partly
+/// about reading your opponent — what they might charge, what they might cast —
+/// and that only works if the set they can draw from is legible. Five elements
+/// and ten spells is a knowable hand; a single merged pool of twenty was not.
+/// (This reverts an earlier experiment that merged them into one budget; the
+/// flexibility cost more counterplay than it bought.)
 ///
-/// ⭐ The single pool is the point. Elements and spells compete for the same
-/// capacity, so "do I want a fourth element or a tenth spell?" is a real
-/// strategic choice rather than two independent budgets. [elements] and
-/// [spells] are *views* over [slots], not separate storage — nothing can drift
-/// out of sync because there is only one source of truth.
-///
-/// Slots are ORDERED: keyboard shortcuts bind to position within each view
-/// (1-8 for elements, QWERT/ASDFG for spells), not to specific
-/// elements/spells.
+/// Both pools are ORDERED: keyboard shortcuts bind to position (1-5 for
+/// elements, QWERT/ASDFG for spells), not to specific elements or spells.
 class Loadout {
-  /// The one true collection. Order is preserved as authored.
-  final List<LoadoutSlot> slots;
+  /// Element slots, in order. Key "1" activates the first.
+  final List<MagicElement> elements;
 
-  const Loadout.fromSlots(this.slots);
+  /// Spell slots, in order. QWERT = 1-5, ASDFG = 6-10.
+  final List<Spell> spells;
 
-  /// Convenience constructor for the common "these elements, these spells"
-  /// shape. Concatenates into the shared pool, elements first.
-  Loadout({
-    required List<MagicElement> elements,
-    required List<Spell> spells,
-  }) : slots = [
-          ...elements.map(LoadoutSlot.element),
-          ...spells.map(LoadoutSlot.spell),
-        ];
-
-  /// Element slots, in pool order. Key "1" activates the first (index 0).
-  List<MagicElement> get elements =>
-      [for (final s in slots) if (s.element != null) s.element!];
-
-  /// Spell slots, in pool order. QWERT = 1-5, ASDFG = 6-10.
-  List<Spell> get spells =>
-      [for (final s in slots) if (s.spell != null) s.spell!];
-
-  /// Slots filled, counting elements and spells alike.
-  int get slotsUsed => slots.length;
+  const Loadout({required this.elements, required this.spells});
 
   // ---- Capacity ------------------------------------------------------
   //
-  // See Progression.slotsAtLevel for the 5 -> 15 curve. These are the ceilings
-  // the UI must be able to draw, not what any given player has unlocked.
+  // ⭐ Two independent caps, never a shared budget. A fourth element does not
+  // cost a tenth spell — they are different resources. See Progression for the
+  // per-pool unlock schedules (gating not yet enforced).
 
-  /// The most slots any player can reach: 15 from levelling + 5 from equipment.
-  static const int maxSlots = 20;
+  /// The most elements a loadout can hold. Also the number of element
+  /// shortcut keys the arena binds (1-5).
+  static const int maxElementSlots = 5;
 
-  /// Per-kind ceilings the *arena* must still respect — the duel screen has
-  /// only 8 element keys and 10 spell keys, so even a 20-slot pool cannot be
-  /// spent entirely on one kind.
-  static const int maxElementSlots = 8;
+  /// The most spells a loadout can hold. Also the number of spell shortcut
+  /// keys the arena binds (QWERT + ASDFG).
   static const int maxSpellSlots = 10;
 
-  /// Default starter kit: every element, and a rounded spell selection.
+  /// Default starter kit: a rounded five elements and ten spells.
   ///
-  /// ⚠️ Deliberately over the level curve — level gating is intentionally the
-  /// *last* thing to be enforced so playtesting has everything available
-  /// (PROGRESSION_DESIGN §"Slot pool").
+  /// ⚠️ Deliberately fills both pools to the cap while level gating is off, so
+  /// playtesting has a full hand available. The per-pool *unlock schedule*
+  /// (PROGRESSION_DESIGN §"Slot pool") does not bind until gating turns on,
+  /// which is one of the last things before v1.
   static final Loadout starter = Loadout(
-    elements: List.of(MagicElement.values),
+    elements: const [
+      MagicElement.pyro,
+      MagicElement.aqua,
+      MagicElement.flora,
+      MagicElement.electro,
+      MagicElement.geo,
+    ],
     spells: [
       Spellbook.flick,
       Spellbook.bolt,
@@ -102,23 +63,24 @@ class Loadout {
     ],
   );
 
-  /// Rebuilds a pool from saved ids, skipping anything unrecognised. Ids are
-  /// resolved as elements first, then spells.
-  static Loadout fromIds(Iterable<String> ids) {
-    final slots = <LoadoutSlot>[];
-    for (final id in ids) {
-      final element =
-          MagicElement.values.where((e) => e.name == id).firstOrNull;
-      if (element != null) {
-        slots.add(LoadoutSlot.element(element));
-        continue;
-      }
-      final spell = Spellbook.all.where((s) => s.id == id).firstOrNull;
-      if (spell != null) slots.add(LoadoutSlot.spell(spell));
+  /// Rebuilds a loadout from saved ids, skipping anything unrecognised.
+  static Loadout fromIds({
+    required Iterable<String> elementIds,
+    required Iterable<String> spellIds,
+  }) {
+    final elements = <MagicElement>[];
+    for (final id in elementIds) {
+      final e = MagicElement.values.where((e) => e.name == id).firstOrNull;
+      if (e != null) elements.add(e);
     }
-    return Loadout.fromSlots(slots);
+    final spells = <Spell>[];
+    for (final id in spellIds) {
+      final s = Spellbook.all.where((s) => s.id == id).firstOrNull;
+      if (s != null) spells.add(s);
+    }
+    return Loadout(elements: elements, spells: spells);
   }
 
-  /// Ids in pool order, for saving.
-  List<String> toIds() => [for (final s in slots) s.id];
+  List<String> elementIds() => [for (final e in elements) e.name];
+  List<String> spellIds() => [for (final s in spells) s.id];
 }

@@ -57,6 +57,8 @@ class WorldMapCard extends StatelessWidget {
         // the pins under your thumb.
         focusOnPlayer: true,
         initialZoom: 1.6,
+        // The tab card sits in a scrolling list; see the flag's doc.
+        insideScrollable: true,
       ),
     ),
   );

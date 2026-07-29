@@ -248,12 +248,18 @@ class DuelEngine {
       if (twoCasts && startHolder != null) {
         // Haste tiebreak: the holder resolves first; if it kills the
         // opponent, the opponent's same-priority spell never fires.
+        //
+        // ⭐ The holder also PAYS first, which is what makes Haste matter to
+        // Overload: the holder reads a full enemy charge bar, and the
+        // opponent's Overload then reads the zero the holder just left behind.
         final first =
             identical(group[0].caster, startHolder) ? group[0] : group[1];
         final second = identical(first, group[0]) ? group[1] : group[0];
+        _spendFor(first);
         _resolveEntry(first, events);
         first.endEventIndex = events.length;
         if (second.caster.alive) {
+          _spendFor(second);
           _resolveEntry(second, events);
         }
         second.endEventIndex = events.length;
@@ -262,11 +268,19 @@ class DuelEngine {
         // not block a same-priority attack), then channels. No mid-group
         // alive re-check, so same-priority mutual kills are still possible
         // when nobody holds Haste.
+        //
+        // ⭐ Everyone PAYS before anyone resolves. With no Haste there is no
+        // "first", so neither caster may read a charge bar the other has
+        // already committed: two Overloads thrown at each other both find
+        // nothing to punish, and two Discharges both end on zero.
         final ordered = [
           ...group.where((e) => e.isOffensive),
           ...group.where((e) => !e.isOffensive && !e.isChannel),
           ...group.where((e) => e.isChannel),
         ];
+        for (final e in ordered) {
+          _spendFor(e);
+        }
         for (final e in ordered) {
           _resolveEntry(e, events);
           e.endEventIndex = events.length;
@@ -275,15 +289,12 @@ class DuelEngine {
       i = j;
     }
 
-    // Casting consumes all charge and ends the element cycle. Channels keep
-    // their charge; so do fizzles (the spell never went off — you keep what
-    // you had, per Static Feedback's "you'd still have 3 charge").
-    for (final e in entries) {
-      if (!e.isChannel && !e.fizzled) {
-        e.caster.charge = 0;
-        e.caster.element = null;
-      }
-    }
+    // ⚠️ Charge is spent in [_spendFor] as each cast resolves, NOT swept up
+    // after the turn. The sweep was a real defect: a mage who cast a shield at
+    // priority 3 still showed a full charge bar to an Overload at priority 9,
+    // so Overload punished charge its target had already committed. Fizzles
+    // and channels keep what they had, per Static Feedback's "you'd still have
+    // 3 charge".
 
     _updateHaste(entries, startHolder, events);
 
@@ -383,11 +394,31 @@ class DuelEngine {
     _resolveCast(e, events);
   }
 
-  /// Whether [caster] still has the charge [spell] needs at resolution time
-  /// (charge may have been stripped by Static Feedback / a same-turn
-  /// Discharge since the action was committed).
-  bool _hasChargeToCast(MageState caster, Spell spell) =>
-      spell.xCost ? caster.charge >= 1 : caster.charge >= spell.chargeCost;
+  /// Whether [spell] could be cast with [charge] in the bar.
+  bool _hasChargeToCast(Spell spell, int charge) =>
+      spell.xCost ? charge >= 1 : charge >= spell.chargeCost;
+
+  /// Commit a cast's charge, at the moment it resolves.
+  ///
+  /// ⭐ Casting spends **all** charge and ends the element cycle — the cost is
+  /// a floor to cast at all, not a price. Doing this at resolution rather than
+  /// after the turn is what lets a spell see the board as it actually stands:
+  /// charge already committed to an earlier-priority spell is gone.
+  ///
+  /// Channels keep their charge. So do fizzles — but a fizzle is only known
+  /// once we try to resolve, so [_resolveCast] hands it back via [_refund].
+  void _spendFor(_Entry entry) {
+    if (entry.isChannel) return;
+    entry.chargeAtCast = entry.caster.charge;
+    entry.caster.charge = 0;
+    entry.caster.element = null;
+  }
+
+  /// Undo a payment for a cast that never went off.
+  void _refund(_Entry entry) {
+    entry.caster.charge = entry.chargeAtCast;
+    entry.caster.element = entry.element;
+  }
 
   int _consumePriorityPenalty(MageState mage) {
     final p = mage.priorityPenalty;
@@ -400,10 +431,14 @@ class DuelEngine {
     final spell = cast.spell!;
 
     // Precedence step 1 — Fizzle: a committed spell whose charge was pulled
-    // below its cost does not cast. Like a charge, it keeps its remaining
-    // charge and advances no streak (see the post-resolution charge sweep).
-    if (!_hasChargeToCast(caster, spell)) {
+    // below its cost does not cast.
+    //
+    // ⚠️ Tests what this cast PAID, not the caster's live charge — by now the
+    // payment has already zeroed it. A fizzle hands the charge straight back:
+    // the spell never went off, so it was never really spent.
+    if (!_hasChargeToCast(spell, cast.chargeAtCast)) {
       cast.fizzled = true;
+      _refund(cast);
       events.add(SpellFizzledEvent(caster, spell));
       return;
     }
@@ -433,9 +468,9 @@ class DuelEngine {
     caster.recordCastForStreak(cast.element);
 
     events.add(SpellCastEvent(caster, spell, cast.element));
-    // Casting consumes ALL charge; capture it now for charge-spent triggers
-    // (Sanctus/Umbra/Arcane) before effects read or mutate it.
-    final chargeSpent = caster.charge;
+    // ⚠️ What this cast PAID, not the live bar — payment happens before
+    // resolution now, so the live bar reads zero by the time we get here.
+    final chargeSpent = cast.chargeAtCast;
 
     // Precedence step 2/4 — Stagger is consumed by any harmful spell that
     // resolves (Discharge too — a harmless "stagger-eater").
@@ -482,7 +517,10 @@ class DuelEngine {
         );
       case BarrageEffect(:final minPerCharge, :final maxPerCharge):
         final buffs = caster.consumeOffensiveBuffs();
-        final charge = caster.charge; // live — a same-turn Discharge fizzles it
+        // What this cast actually paid. Still reflects an earlier-priority
+        // Discharge, because payment happens at resolution and Discharge (7)
+        // resolves before Barrage (9).
+        final charge = cast.chargeAtCast;
         // One hit PER CHARGE, each rolled independently — the Volley shape.
         // Same damage band as the old single roll, but every hit meets the
         // shield, a Barrier point, crit and deflection on its own. The fizzle
@@ -1185,8 +1223,15 @@ class _Entry {
   final int priority;
 
   /// Set true when the cast fizzled (charge pulled below cost at resolution),
-  /// so the post-resolution sweep leaves the caster's charge intact.
+  /// so the caster keeps the charge they had.
   bool fizzled = false;
+
+  /// The caster's charge at the moment they paid for this cast.
+  ///
+  /// ⚠️ Needed because payment happens **when the cast resolves**, not in a
+  /// sweep after the whole turn. Barrage scales with its own caster's charge,
+  /// which by resolution time has already been spent — so it reads this.
+  int chargeAtCast = 0;
 
   /// Index just past this entry's last emitted event. Lets the Haste transfer
   /// be reported immediately after the cast that seized it (its rules need to

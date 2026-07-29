@@ -17,7 +17,7 @@ class ChargedEvent extends DuelEvent {
 
   @override
   String toString() =>
-      '${mage.name} channels ${element.name} (charge $newCharge)';
+      '${mage.name} channels ${element.displayName} (charge $newCharge)';
 }
 
 class SpellCastEvent extends DuelEvent {
@@ -29,7 +29,7 @@ class SpellCastEvent extends DuelEvent {
 
   @override
   String toString() =>
-      '${caster.name} casts ${element.name} ${spell.name}';
+      '${caster.name} casts ${element.displayName} ${spell.name}';
 }
 
 /// A shield went up. Carries an immutable **snapshot** of the shield as raised

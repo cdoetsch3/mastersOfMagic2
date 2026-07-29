@@ -58,29 +58,30 @@ void main() {
     }
   });
 
-  // Elements and spells share one pool now, so a persona's kit has to fit the
-  // pool a *player* of that level would have — otherwise the opponent is
-  // carrying more than the person fighting it. This caught Wick at 8 slots
-  // against a level-1 budget of 5.
-  test('every persona fits the slot pool for its own level', () {
+  // Personas fit what a player of their level may field. Elements and spells
+  // are separate pools now; while gating is off that means the caps (5 / 10).
+  // The provisional per-level schedule (§11) is deliberately not asserted —
+  // it starts at one element and is flagged for redesign, so holding a
+  // persona to it would ban interesting low-level opponents for a rule not in
+  // force.
+  test('every persona fits what a player of its level may field', () {
     for (final p in AiRoster.all) {
-      expect(p.loadout.slotsUsed,
-          lessThanOrEqualTo(Progression.slotsAtLevel(p.level)),
-          reason: '${p.name} (L${p.level}) fills ${p.loadout.slotsUsed} slots, '
-              'but L${p.level} grants ${Progression.slotsAtLevel(p.level)}');
+      expect(p.loadout.elements.length,
+          lessThanOrEqualTo(Progression.usableElementsAtLevel(p.level)),
+          reason: '${p.name} holds ${p.loadout.elements.length} elements');
+      expect(p.loadout.spells.length,
+          lessThanOrEqualTo(Progression.usableSpellsAtLevel(p.level)),
+          reason: '${p.name} holds ${p.loadout.spells.length} spells');
     }
   });
 
-  test('loadouts respect the per-kind keybind limits and scale with level',
-      () {
+  test('loadouts respect the per-pool caps and hold no duplicates', () {
     for (final p in AiRoster.all) {
       expect(p.loadout.elements.length,
           inInclusiveRange(1, Loadout.maxElementSlots),
           reason: p.name);
       expect(p.loadout.spells.length,
           inInclusiveRange(1, Loadout.maxSpellSlots),
-          reason: p.name);
-      expect(p.loadout.slotsUsed, lessThanOrEqualTo(Loadout.maxSlots),
           reason: p.name);
       expect(p.loadout.elements.toSet().length, p.loadout.elements.length,
           reason: '${p.name} lists a duplicate element');
@@ -89,11 +90,13 @@ void main() {
           reason: '${p.name} lists a duplicate spell');
     }
 
-    // A level-50 opponent should bring what a level-50 player brings: the full
-    // 15-slot pool, not the 8 a persona used to carry.
+    // A level-50 opponent should bring what a level-50 player brings: both
+    // pools full — 5 elements and 10 spells.
     for (final p in AiRoster.all.where((p) => p.level >= 50)) {
-      expect(p.loadout.slotsUsed, Progression.slotsAtCap,
-          reason: '${p.name} is under-equipped for its level');
+      expect(p.loadout.elements.length, Loadout.maxElementSlots,
+          reason: '${p.name} is under-equipped on elements for its level');
+      expect(p.loadout.spells.length, Loadout.maxSpellSlots,
+          reason: '${p.name} is under-equipped on spells for its level');
     }
   });
 

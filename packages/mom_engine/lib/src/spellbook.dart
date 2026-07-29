@@ -47,7 +47,7 @@ abstract final class Spellbook {
       effect: DamageEffect(7, 10, hits: 4));
   static const barrage = Spell(
       id: 'barrage', name: 'Barrage', chargeCost: 1, xCost: true, priority: 9,
-      effect: BarrageEffect(10, 12));
+      effect: BarrageEffect(7, 10));
 
   // Lifesteal (priority 9) — heals for HALF the damage dealt to health.
   // Never heals for damage a shield soaked (only [DamageEvent.toHp] counts),
@@ -101,16 +101,23 @@ abstract final class Spellbook {
       grantsHaste: true, effect: HasteEffect());
 
   // Charge control: wipes all of the opponent's charge (no damage). At
-  // priority 7 it beats a priority-9 Barrage/Overload, fizzling them.
+  // priority 7 it beats the priority-9 attacks — Barrage and Overload both
+  // fizzle against a well-timed Discharge.
   static const discharge = Spell(
       id: 'discharge', name: 'Discharge', chargeCost: 2, priority: 7,
       effect: DischargeEffect());
 
-  // Punish: ~8-12 damage per point of the ENEMY's charge (a full attack —
-  // respects shields, benefits from Empower/Phase). Read live at resolution.
+  // Punish: ~7-11 damage per point of the ENEMY's charge (a full attack —
+  // respects shields, benefits from Empower/Phase).
+  //
+  // ⭐ Priority 9, the regular-attack slot (ruling, 2026-07-28). It is an
+  // offensive spell and belongs on the same clock as one; sitting at 7 gave it
+  // a quick-spell's timing on a full attack's payload. At 9 it reads the
+  // board *after* the turn's shields and quick attacks have landed, so
+  // punishing a charge bar means punishing one its owner chose to keep.
   static const overload = Spell(
-      id: 'overload', name: 'Overload', chargeCost: 2, priority: 7,
-      effect: OverloadEffect(8, 12));
+      id: 'overload', name: 'Overload', chargeCost: 2, priority: 9,
+      effect: OverloadEffect(7, 11));
 
   // Status defence: banks Grace (blocks the next debuff). Element-neutral, so
   // any loadout can answer a status deck without playing Sanctus. Priority 7,

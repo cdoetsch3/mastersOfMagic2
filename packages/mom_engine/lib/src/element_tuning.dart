@@ -1,3 +1,5 @@
+import 'element.dart';
+
 /// Every tunable number behind the twelve element side-effects, in one place.
 ///
 /// ⚠️ **These exist so the engine and the tooltips cannot disagree.** The
@@ -12,6 +14,8 @@
 /// is updated with it.
 ///
 /// Specification: TYPE_EFFECTS_DESIGN.md §2 and §4.
+
+
 abstract final class ElementTuning {
   // ---- Tier 1 — Primal ------------------------------------------------
 
@@ -46,7 +50,33 @@ abstract final class ElementTuning {
   static const int staticFeedbackChargeDrain = 1;
 
   /// Tailwind (Aero): consecutive Aero casts before it seizes Haste.
+  /// How much a single level is worth, as a percent, applied to **both**
+  /// max health and outgoing damage.
+  ///
+  /// ⭐ Both sides scale together, so a duel between equal levels plays
+  /// exactly as it did before — which is what keeps the intelligence ladder
+  /// and every balance figure measured against it still valid. Levels buy an
+  /// advantage over *lower* levels, and nothing else.
+  static const int percentPerLevel = 4;
+
   static const int tailwindStreak = 3;
+
+  /// The point past which counting a streak stops meaning anything.
+  ///
+  /// ⭐ A streak that is *gated* — Flora blooms at 5, Aero's Tailwind at 3 —
+  /// gains nothing from climbing further, and a pip reading "Flora 9" invites
+  /// the player to expect a payoff that does not exist. Those counters stop at
+  /// the gate.
+  ///
+  /// ⚠️ Returns null for the **cadence** elements, which fire every Nth cast
+  /// (Aqua's Waterlogged, Geo's Stagger, Sanctus's Absolution). Capping those
+  /// would not tidy a display — it would silently switch the effect off
+  /// forever once the cap was reached.
+  static int? streakCap(MagicElement element) => switch (element) {
+    MagicElement.flora => photosynthesisStreak,
+    MagicElement.aero => tailwindStreak,
+    _ => null,
+  };
 
   /// Stagger (Geo): every Nth consecutive Geo cast applies it.
   static const int staggerEveryNthCast = 4;

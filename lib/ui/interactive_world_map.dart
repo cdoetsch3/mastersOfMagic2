@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../game/game_state.dart';
 import '../game/world.dart';
+import '../game/travel.dart';
 import '../game/world_map_geometry.dart';
 import 'app_theme.dart';
 import 'map_camera.dart';
@@ -46,6 +47,17 @@ class InteractiveWorldMap extends StatefulWidget {
   /// Open framed on the player rather than on the middle of the world.
   final bool focusOnPlayer;
 
+  /// Set when this map lives inside a scrolling list.
+  ///
+  /// ⚠️ A pannable map inside a `ListView` cannot be panned vertically by
+  /// default: the list's drag recognizer wins the gesture arena, and the map's
+  /// transform does not move by a pixel. Disabling the list's *physics* does
+  /// not help — the list still wins the gesture and merely refuses to move,
+  /// so the map still gets nothing. Beating it takes a competing recognizer,
+  /// which is what this switches on: a vertical drag handler deeper in the
+  /// tree than the list's, panning the map directly.
+  final bool insideScrollable;
+
   const InteractiveWorldMap({
     super.key,
     required this.game,
@@ -54,6 +66,7 @@ class InteractiveWorldMap extends StatefulWidget {
     this.onExpand,
     this.initialZoom = 1,
     this.focusOnPlayer = false,
+    this.insideScrollable = false,
   });
 
   @override
@@ -134,6 +147,18 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
     _showDetails(World.byId(id));
   }
 
+  /// Pan by a screen-pixel delta, clamped to the world.
+  void _panBy(Offset delta) {
+    final cam = _live;
+    _apply(
+      MapCamera(
+        viewport: cam.viewport,
+        scale: cam.scale,
+        offset: cam.offset + delta,
+      ).clamped(),
+    );
+  }
+
   /// A wheel scroll **pans**; hold ⌘/Ctrl to zoom.
   ///
   /// ⚠️ `InteractiveViewer` treats a mouse-wheel scroll as zoom. On a laptop
@@ -176,6 +201,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
 
   Future<void> _showDetails(GameLocation loc) async {
     final connected = _here.connections.contains(loc.id);
+    final travelling = widget.game.isTravelling;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.panel,
@@ -187,6 +213,10 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
         location: loc,
         isHere: loc.id == _here.id,
         canTravel: connected,
+        // ⚠️ One journey at a time. Offering Travel mid-trip would silently do
+        // nothing, which reads as a broken button.
+        isTravelling: travelling,
+        minutes: Travel.minutesBetween(_here.id, loc.id),
         onTravel: () {
           Navigator.of(ctx).pop();
           _travel(loc);
@@ -265,6 +295,12 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTapUp: (d) => _tap(d.localPosition),
+                      // ⭐ Only inside a list: claims the vertical drag before
+                      // the list can, so the map pans under your finger while
+                      // a drag anywhere else on the page still scrolls.
+                      onVerticalDragUpdate: widget.insideScrollable
+                          ? (d) => _panBy(Offset(0, d.delta.dy))
+                          : null,
                       child: CustomPaint(
                         isComplex: true,
                         painter: WorldMapPainter(
@@ -382,12 +418,20 @@ class PlaceSheet extends StatelessWidget {
   final bool canTravel;
   final VoidCallback onTravel;
 
+  /// A journey is already under way.
+  final bool isTravelling;
+
+  /// The walk from here, shown so the cost is visible before committing.
+  final int? minutes;
+
   const PlaceSheet({
     super.key,
     required this.location,
     required this.isHere,
     required this.canTravel,
     required this.onTravel,
+    this.isTravelling = false,
+    this.minutes,
   });
 
   @override
@@ -480,7 +524,9 @@ class PlaceSheet extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: canTravel && !isHere ? onTravel : null,
+                onPressed: canTravel && !isHere && !isTravelling
+                    ? onTravel
+                    : null,
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.teal,
                   foregroundColor: AppColors.bg,
@@ -489,9 +535,13 @@ class PlaceSheet extends StatelessWidget {
                 child: Text(
                   isHere
                       ? 'You are already here'
-                      : canTravel
+                      : isTravelling
+                      ? 'Already travelling'
+                      : !canTravel
+                      ? 'No road from here'
+                      : minutes == null
                       ? 'Travel to ${location.name}'
-                      : 'No road from here',
+                      : 'Travel to ${location.name} — $minutes min',
                 ),
               ),
             ),

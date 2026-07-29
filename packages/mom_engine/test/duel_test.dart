@@ -205,8 +205,8 @@ void main() {
       alice.element = MagicElement.electro;
       duel.resolveTurn(
           CastAction(Spellbook.barrage), const ChargeAction(MagicElement.aero));
-      expect(bruno.hp, inInclusiveRange(52, 60),
-          reason: '4 charges at 10-12 per charge is 40-48');
+      expect(bruno.hp, inInclusiveRange(60, 72),
+          reason: '4 charges at 7-10 per charge is 28-40');
       expect(alice.charge, 0);
     });
 

@@ -16,6 +16,7 @@ import '../game/status_fx.dart';
 import '../game/opponent_driver.dart';
 import '../game/progression.dart';
 import '../ui/app_theme.dart';
+import '../ui/element_text.dart';
 import 'home_shell.dart';
 
 /// The landscape duel arena. Keyboard: 1-8 = element slots, QWERT/ASDFG =
@@ -35,12 +36,16 @@ class DuelScreen extends StatefulWidget {
   /// the player won. Lets the caller grant XP/gold. Draws report `false`.
   final void Function(bool playerWon)? onResult;
 
+  /// The player's character level — scales their health and damage.
+  final int playerLevel;
+
   const DuelScreen({
     super.key,
     required this.loadout,
     required this.driver,
     this.campaign = false,
     this.onResult,
+    this.playerLevel = 1,
   });
 
   @override
@@ -51,11 +56,16 @@ enum _FxKind { none, projectile, impact, shieldUp, charge, heal, flash, status }
 
 class _DuelScreenState extends State<DuelScreen>
     with SingleTickerProviderStateMixin {
-  late final DuelController c =
-      DuelController(loadout: widget.loadout, driver: widget.driver);
+  late final DuelController c = DuelController(
+    loadout: widget.loadout,
+    driver: widget.driver,
+    playerLevel: widget.playerLevel,
+  );
   bool _resultReported = false;
   late final AnimationController _fx = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 400));
+    vsync: this,
+    duration: const Duration(milliseconds: 400),
+  );
 
   _FxKind _fxKind = _FxKind.none;
   Color _fxColor = Colors.white;
@@ -110,8 +120,9 @@ class _DuelScreenState extends State<DuelScreen>
   void _startClock(double seconds, {required bool forfeitOnExpiry}) {
     _moveTimer?.cancel();
     _clockTotal = seconds;
-    _moveDeadline =
-        DateTime.now().add(Duration(milliseconds: (seconds * 1000).round()));
+    _moveDeadline = DateTime.now().add(
+      Duration(milliseconds: (seconds * 1000).round()),
+    );
     setState(() => _secondsLeft = seconds);
     _moveTimer = Timer.periodic(const Duration(milliseconds: 100), (t) {
       if (!mounted) {
@@ -202,15 +213,17 @@ class _DuelScreenState extends State<DuelScreen>
     _messageShownAt = DateTime.now();
   }
 
-  Future<void> _runFx(_FxKind kind,
-      {required bool atEnemy,
-      Color color = Colors.white,
-      String? text,
-      double intensity = 1,
-      int projectiles = 1,
-      double shake = 0,
-      StatusMotion motion = StatusMotion.dim,
-      int ms = 400}) async {
+  Future<void> _runFx(
+    _FxKind kind, {
+    required bool atEnemy,
+    Color color = Colors.white,
+    String? text,
+    double intensity = 1,
+    int projectiles = 1,
+    double shake = 0,
+    StatusMotion motion = StatusMotion.dim,
+    int ms = 400,
+  }) async {
     setState(() {
       _fxKind = kind;
       _fxMotion = motion;
@@ -243,8 +256,10 @@ class _DuelScreenState extends State<DuelScreen>
     // Move locked in. For remote duels, keep a visible countdown running so
     // the wait reads as "opponent has N seconds left", not a frozen app.
     if (widget.driver is RemoteDuelDriver) {
-      _startClock(RemoteDuelDriver.opponentTimeout.inSeconds.toDouble(),
-          forfeitOnExpiry: false);
+      _startClock(
+        RemoteDuelDriver.opponentTimeout.inSeconds.toDouble(),
+        forfeitOnExpiry: false,
+      );
     } else {
       _stopMoveTimer();
     }
@@ -276,36 +291,41 @@ class _DuelScreenState extends State<DuelScreen>
     switch (event) {
       case ChargedEvent(:final mage, :final element, :final newCharge):
         final isEnemy = mage == c.enemy;
-        final color =
-            isEnemy ? const Color(0xFF8E8E9E) : element.style.color;
-        await _runFx(_FxKind.charge,
-            atEnemy: isEnemy,
-            color: color,
-            intensity: 1 + newCharge * 0.35,
-            ms: 550);
+        final color = isEnemy ? const Color(0xFF8E8E9E) : element.style.color;
+        await _runFx(
+          _FxKind.charge,
+          atEnemy: isEnemy,
+          color: color,
+          intensity: 1 + newCharge * 0.35,
+          ms: 550,
+        );
       case SpellCastEvent(:final caster, :final spell, :final element):
         _castElement = element;
         _castSpell = spell;
-        _castCharge =
-            caster == c.player ? c.shownPlayerCharge : c.shownEnemyCharge;
+        _castCharge = caster == c.player
+            ? c.shownPlayerCharge
+            : c.shownEnemyCharge;
         final isEnemy = caster == c.enemy;
         await _showMessage(
-            isEnemy
-                ? '${c.enemy.name} casts ${element.style.label} ${spell.name}'
-                : 'You cast ${element.style.label} ${spell.name}',
-            element.style.color);
-        await _runFx(_FxKind.flash,
-            atEnemy: isEnemy,
-            color: element.style.color,
-            intensity: 1 + _castWeight * 0.3,
-            ms: 300 + _castWeight * 40);
+          isEnemy
+              ? '${c.enemy.name} casts ${element.style.label} ${spell.name}'
+              : 'You cast ${element.style.label} ${spell.name}',
+          element.style.color,
+        );
+        await _runFx(
+          _FxKind.flash,
+          atEnemy: isEnemy,
+          color: element.style.color,
+          intensity: 1 + _castWeight * 0.3,
+          ms: 300 + _castWeight * 40,
+        );
       case DamageEvent(
-          :final target,
-          :final toShield,
-          :final toHp,
-          :final shieldMultiplierPercent,
-          :final shieldBroken
-        ):
+        :final target,
+        :final toShield,
+        :final toHp,
+        :final shieldMultiplierPercent,
+        :final shieldBroken,
+      ):
         final isEnemy = target == c.enemy;
         final color = _castElement?.style.color ?? Colors.white;
         // The spell's own weight drives every flourish below, so a Flick looks
@@ -323,11 +343,13 @@ class _DuelScreenState extends State<DuelScreen>
         // of the spell — otherwise every bolt of a 5-charge Barrage would land
         // like a Cataclysm.
         final perHit = weight / hitCount;
-        await _runFx(_FxKind.projectile,
-            atEnemy: isEnemy,
-            color: color,
-            intensity: 1 + perHit * 0.35,
-            ms: isMultiHit ? 240 : max(280, 420 - weight * 20));
+        await _runFx(
+          _FxKind.projectile,
+          atEnemy: isEnemy,
+          color: color,
+          intensity: 1 + perHit * 0.35,
+          ms: isMultiHit ? 240 : max(280, 420 - weight * 20),
+        );
         final text = [
           if (toHp > 0) '-$toHp',
           if (toHp == 0 && toShield > 0) 'blocked',
@@ -335,56 +357,66 @@ class _DuelScreenState extends State<DuelScreen>
             '$t vs shield',
           if (shieldBroken) 'shield shattered',
         ].join('  ');
-        await _runFx(_FxKind.impact,
-            atEnemy: isEnemy,
-            color: color,
-            text: text,
-            intensity: 1 + perHit * 0.45,
-            shake: perHit >= 3 ? (perHit - 2) * 3.5 : 0,
-            ms: isMultiHit ? 320 : 440 + weight * 50);
+        await _runFx(
+          _FxKind.impact,
+          atEnemy: isEnemy,
+          color: color,
+          text: text,
+          intensity: 1 + perHit * 0.45,
+          shake: perHit >= 3 ? (perHit - 2) * 3.5 : 0,
+          ms: isMultiHit ? 320 : 440 + weight * 50,
+        );
       case ShieldRaisedEvent(
-          :final mage,
-          :final element,
-          :final isBarrier,
-          :final strength
-        ):
+        :final mage,
+        :final element,
+        :final isBarrier,
+        :final strength,
+      ):
         final isEnemy = mage == c.enemy;
         final color = isBarrier ? Colors.white : element!.style.color;
-        await _runFx(_FxKind.shieldUp,
-            atEnemy: isEnemy,
-            color: color,
-            intensity: isBarrier ? 1.6 : 0.8 + strength / 40,
-            ms: 480);
+        await _runFx(
+          _FxKind.shieldUp,
+          atEnemy: isEnemy,
+          color: color,
+          intensity: isBarrier ? 1.6 : 0.8 + strength / 40,
+          ms: 480,
+        );
       case HealedEvent(:final mage, :final amount):
-        await _runFx(_FxKind.heal,
-            atEnemy: mage == c.enemy,
-            color: const Color(0xFF58B368),
-            text: '+$amount',
-            intensity: 1 + amount / 30,
-            ms: 500);
+        await _runFx(
+          _FxKind.heal,
+          atEnemy: mage == c.enemy,
+          color: const Color(0xFF58B368),
+          text: '+$amount',
+          intensity: 1 + amount / 30,
+          ms: 500,
+        );
       case EffectDamageEvent(
-          :final target,
-          :final toHp,
-          :final toShield,
-          :final source
-        ):
+        :final target,
+        :final toHp,
+        :final toShield,
+        :final source,
+      ):
         // A status tick (DoT). Small impact pulse; no projectile.
-        await _runFx(_FxKind.impact,
-            atEnemy: target == c.enemy,
-            color: const Color(0xFFE2732C),
-            text: toHp > 0
-                ? '-$toHp $source'
-                : (toShield > 0 ? '$source blocked' : source),
-            intensity: 1.1,
-            ms: 460);
+        await _runFx(
+          _FxKind.impact,
+          atEnemy: target == c.enemy,
+          color: const Color(0xFFE2732C),
+          text: toHp > 0
+              ? '-$toHp $source'
+              : (toShield > 0 ? '$source blocked' : source),
+          intensity: 1.1,
+          ms: 460,
+        );
       case EffectHealEvent(:final mage, :final amount, :final source):
         if (amount > 0) {
-          await _runFx(_FxKind.heal,
-              atEnemy: mage == c.enemy,
-              color: const Color(0xFF58B368),
-              text: '+$amount $source',
-              intensity: 1 + amount / 30,
-              ms: 460);
+          await _runFx(
+            _FxKind.heal,
+            atEnemy: mage == c.enemy,
+            color: const Color(0xFF58B368),
+            text: '+$amount $source',
+            intensity: 1 + amount / 30,
+            ms: 460,
+          );
         }
       case BuffAppliedEvent(:final mage, :final description, :final statusId):
         // Each status has its own colour and motion (see status_fx.dart), so
@@ -392,56 +424,72 @@ class _DuelScreenState extends State<DuelScreen>
         // flourish and the message together.
         final fx = statusFxFor(statusId);
         await _showMessage(
-            '${mage == c.enemy ? c.enemy.name : 'You'}: $description', fx.color);
-        await _runFx(_FxKind.status,
-            atEnemy: mage == c.enemy,
-            color: fx.color,
-            motion: fx.motion,
-            ms: 1700);
+          '${mage == c.enemy ? c.enemy.name : 'You'}: $description',
+          fx.color,
+        );
+        await _runFx(
+          _FxKind.status,
+          atEnemy: mage == c.enemy,
+          color: fx.color,
+          motion: fx.motion,
+          ms: 1700,
+        );
       case ChargeDrainedEvent(:final mage, :final amount):
         if (amount > 0) {
-          await _runFx(_FxKind.impact,
-              atEnemy: mage == c.enemy,
-              color: const Color(0xFF8B5CD6),
-              text: 'charge drained',
-              ms: 500);
+          await _runFx(
+            _FxKind.impact,
+            atEnemy: mage == c.enemy,
+            color: const Color(0xFF8B5CD6),
+            text: 'charge drained',
+            ms: 500,
+          );
         }
       case HasteChangedEvent(:final holder):
         await _showMessage(
-            holder == null
-                ? 'Haste is contested'
-                : '${holder == c.enemy ? c.enemy.name : 'You'} '
+          holder == null
+              ? 'Haste is contested'
+              : '${holder == c.enemy ? c.enemy.name : 'You'} '
                     'seize${holder == c.enemy ? 's' : ''} the initiative',
-            const Color(0xFF7FD4E8));
-        await _runFx(_FxKind.flash,
-            atEnemy: holder == c.enemy,
-            color: const Color(0xFF7FD4E8),
-            ms: 450);
+          const Color(0xFF7FD4E8),
+        );
+        await _runFx(
+          _FxKind.flash,
+          atEnemy: holder == c.enemy,
+          color: const Color(0xFF7FD4E8),
+          ms: 450,
+        );
       case ForfeitedEvent(:final mage):
         await _showMessage(
-            mage == c.enemy
-                ? '${c.enemy.name} forfeits the turn'
-                : 'You ran out of time — turn forfeited',
-            const Color(0xFFD85A30));
+          mage == c.enemy
+              ? '${c.enemy.name} forfeits the turn'
+              : 'You ran out of time — turn forfeited',
+          const Color(0xFFD85A30),
+        );
         await Future<void>.delayed(const Duration(milliseconds: 650));
       case SpellFizzledEvent(:final caster, :final spell):
         await _showMessage(
-            '${caster == c.enemy ? c.enemy.name : 'You'}: '
-            '${spell.name} fizzled — charge disrupted',
-            const Color(0xFFE8C547));
-        await _runFx(_FxKind.flash,
-            atEnemy: caster == c.enemy,
-            color: const Color(0xFFE8C547),
-            ms: 450);
+          '${caster == c.enemy ? c.enemy.name : 'You'}: '
+          '${spell.name} fizzled — charge disrupted',
+          const Color(0xFFE8C547),
+        );
+        await _runFx(
+          _FxKind.flash,
+          atEnemy: caster == c.enemy,
+          color: const Color(0xFFE8C547),
+          ms: 450,
+        );
       case SpellMissedEvent(:final caster, :final spell):
         await _showMessage(
-            '${caster == c.enemy ? c.enemy.name : 'You'}: '
-            '${spell.name} missed — blinded',
-            const Color(0xFFF2E7C9));
-        await _runFx(_FxKind.flash,
-            atEnemy: caster == c.enemy,
-            color: const Color(0xFFF2E7C9),
-            ms: 450);
+          '${caster == c.enemy ? c.enemy.name : 'You'}: '
+          '${spell.name} missed — blinded',
+          const Color(0xFFF2E7C9),
+        );
+        await _runFx(
+          _FxKind.flash,
+          atEnemy: caster == c.enemy,
+          color: const Color(0xFFF2E7C9),
+          ms: 450,
+        );
       case DefeatedEvent():
         await Future<void>.delayed(const Duration(milliseconds: 700));
     }
@@ -501,24 +549,40 @@ class _DuelScreenState extends State<DuelScreen>
     if (size.height > size.width) {
       // Portrait: the arena needs landscape. Devices auto-rotate via the
       // orientation lock; web/desktop users see this prompt instead.
+      //
+      // ⚠️ The key matters. Both branches root at a Scaffold, so without
+      // distinct keys Flutter reconciles the portrait subtree INTO the
+      // landscape one on rotation rather than rebuilding — reusing render
+      // objects whose pointer regions are now laid out for the wrong
+      // orientation. That is the "tap one button, another responds" report
+      // after rotating: the hit-test geometry was stale. Distinct keys force
+      // a clean teardown of one tree and a fresh build of the other.
       return Scaffold(
+        key: const ValueKey('duel-portrait'),
         backgroundColor: const Color(0xFF141021),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.screen_rotation,
-                  size: 56, color: Color(0xFFE8C547)),
+              const Icon(
+                Icons.screen_rotation,
+                size: 56,
+                color: Color(0xFFE8C547),
+              ),
               const SizedBox(height: 18),
-              const Text('Rotate your device',
-                  style: TextStyle(
-                      color: Color(0xFFECE7F8),
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600)),
+              const Text(
+                'Rotate your device',
+                style: TextStyle(
+                  color: Color(0xFFECE7F8),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 6),
-              const Text('Duels are fought in landscape.',
-                  style:
-                      TextStyle(color: Color(0xFF9C93C4), fontSize: 13)),
+              const Text(
+                'Duels are fought in landscape.',
+                style: TextStyle(color: Color(0xFF9C93C4), fontSize: 13),
+              ),
               const SizedBox(height: 22),
               OutlinedButton.icon(
                 onPressed: () => Navigator.of(context).pop(),
@@ -531,6 +595,7 @@ class _DuelScreenState extends State<DuelScreen>
       );
     }
     return Scaffold(
+      key: const ValueKey('duel-arena'),
       backgroundColor: const Color(0xFF141021),
       body: Focus(
         autofocus: true,
@@ -553,7 +618,9 @@ class _DuelScreenState extends State<DuelScreen>
                   final dx = sin(_fx.value * pi * 10) * shakeAmount;
                   final dy = cos(_fx.value * pi * 8) * shakeAmount * 0.6;
                   return Transform.translate(
-                      offset: Offset(dx, dy), child: child);
+                    offset: Offset(dx, dy),
+                    child: child,
+                  );
                 },
                 child: Stack(
                   children: [
@@ -566,8 +633,9 @@ class _DuelScreenState extends State<DuelScreen>
                         margin: EdgeInsets.symmetric(horizontal: w * 0.08),
                         decoration: BoxDecoration(
                           color: const Color(0xFF1B1531),
-                          borderRadius:
-                              BorderRadius.all(Radius.elliptical(w * 0.4, 26)),
+                          borderRadius: BorderRadius.all(
+                            Radius.elliptical(w * 0.4, 26),
+                          ),
                         ),
                       ),
                     ),
@@ -594,15 +662,17 @@ class _DuelScreenState extends State<DuelScreen>
                       ),
                     ),
                     Positioned(
-                        left: 10,
-                        top: 8,
-                        width: w * 0.30,
-                        child: _playerPanel()),
+                      left: 10,
+                      top: 8,
+                      width: w * 0.30,
+                      child: _playerPanel(),
+                    ),
                     Positioned(
-                        right: 10,
-                        top: 8,
-                        width: w * 0.30,
-                        child: _enemyPanel()),
+                      right: 10,
+                      top: 8,
+                      width: w * 0.30,
+                      child: _enemyPanel(),
+                    ),
                     Positioned(
                       top: 8,
                       left: 0,
@@ -617,26 +687,31 @@ class _DuelScreenState extends State<DuelScreen>
                         child: Center(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 6),
+                              horizontal: 14,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xCC1B1531),
                               borderRadius: BorderRadius.circular(20),
-                              border:
-                                  Border.all(color: _bannerColor, width: 1),
+                              border: Border.all(color: _bannerColor, width: 1),
                             ),
-                            child: Text(_banner!,
-                                style: TextStyle(
-                                    color: _bannerColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600)),
+                            child: Text(
+                              _banner!,
+                              style: TextStyle(
+                                color: _bannerColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: _actionBar(context)),
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: _actionBar(context),
+                    ),
                     if (c.gameOver) _gameOverOverlay(),
                   ],
                 ),
@@ -688,8 +763,8 @@ class _DuelScreenState extends State<DuelScreen>
                       shieldColor: shield == null
                           ? null
                           : (shield.isBarrier
-                              ? Colors.white
-                              : shield.element!.style.color),
+                                ? Colors.white
+                                : shield.element!.style.color),
                       shieldRemaining: shield?.remaining ?? 0,
                       barrierPoints: barrierPoints,
                       spriteHeight: height,
@@ -716,18 +791,17 @@ class _DuelScreenState extends State<DuelScreen>
       MoonPhase.full => ('🌕', 'Full'),
       MoonPhase.waning => ('🌘', 'Waning'),
     };
-    final color =
-        isFull ? const Color(0xFFF5E6A8) : const Color(0xFF9C93C4);
+    final color = isFull ? const Color(0xFFF5E6A8) : const Color(0xFF9C93C4);
     return Tooltip(
       message: isFull
           ? 'Full Moon — Lunar attacks deal +20% this turn'
           : '$label moon — Lunar attacks are unmodified.\n'
-              'Next turn: ${switch (c.shownNextMoonPhase) {
-              MoonPhase.newMoon => 'New',
-              MoonPhase.waxing => 'Waxing',
-              MoonPhase.full => 'Full Moon (+20% Lunar)',
-              MoonPhase.waning => 'Waning',
-            }}',
+                'Next turn: ${switch (c.shownNextMoonPhase) {
+                  MoonPhase.newMoon => 'New',
+                  MoonPhase.waxing => 'Waxing',
+                  MoonPhase.full => 'Full Moon (+20% Lunar)',
+                  MoonPhase.waning => 'Waning',
+                }}',
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
@@ -742,11 +816,14 @@ class _DuelScreenState extends State<DuelScreen>
           children: [
             Text(glyph, style: const TextStyle(fontSize: 11)),
             const SizedBox(width: 4),
-            Text(label,
-                style: TextStyle(
-                    color: color,
-                    fontSize: 12,
-                    fontWeight: isFull ? FontWeight.w700 : FontWeight.w400)),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: isFull ? FontWeight.w700 : FontWeight.w400,
+              ),
+            ),
           ],
         ),
       ),
@@ -765,8 +842,10 @@ class _DuelScreenState extends State<DuelScreen>
             color: const Color(0xFF1B1531),
             borderRadius: BorderRadius.circular(14),
           ),
-          child: Text('Turn ${c.turnNumber + 1}',
-              style: const TextStyle(color: Color(0xFF9C93C4), fontSize: 12)),
+          child: Text(
+            'Turn ${c.turnNumber + 1}',
+            style: const TextStyle(color: Color(0xFF9C93C4), fontSize: 12),
+          ),
         ),
         const SizedBox(width: 6),
         _moonChip(),
@@ -777,9 +856,14 @@ class _DuelScreenState extends State<DuelScreen>
           child: Container(
             padding: const EdgeInsets.all(5),
             decoration: const BoxDecoration(
-                color: Color(0xFF1B1531), shape: BoxShape.circle),
-            child: const Icon(Icons.receipt_long,
-                size: 14, color: Color(0xFF9C93C4)),
+              color: Color(0xFF1B1531),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.receipt_long,
+              size: 14,
+              color: Color(0xFF9C93C4),
+            ),
           ),
         ),
         const SizedBox(width: 6),
@@ -798,9 +882,13 @@ class _DuelScreenState extends State<DuelScreen>
               children: [
                 const Icon(Icons.flag, size: 12, color: Color(0xFFD85A30)),
                 const SizedBox(width: 4),
-                Text(widget.campaign ? 'Flee' : 'Surrender',
-                    style: const TextStyle(
-                        color: Color(0xFFD85A30), fontSize: 11)),
+                Text(
+                  widget.campaign ? 'Flee' : 'Surrender',
+                  style: const TextStyle(
+                    color: Color(0xFFD85A30),
+                    fontSize: 11,
+                  ),
+                ),
               ],
             ),
           ),
@@ -822,8 +910,8 @@ class _DuelScreenState extends State<DuelScreen>
     final color = !showClock
         ? const Color(0xFF6E6A7A)
         : waiting
-            ? AppColors.gold
-            : (urgent ? const Color(0xFFD85A30) : const Color(0xFF7FD4E8));
+        ? AppColors.gold
+        : (urgent ? const Color(0xFFD85A30) : const Color(0xFF7FD4E8));
     return SizedBox(
       width: 26,
       height: 26,
@@ -837,11 +925,14 @@ class _DuelScreenState extends State<DuelScreen>
             valueColor: AlwaysStoppedAnimation(color),
           ),
           if (showClock)
-            Text('$secs',
-                style: TextStyle(
-                    color: color,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold)),
+            Text(
+              '$secs',
+              style: TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
         ],
       ),
     );
@@ -853,10 +944,14 @@ class _DuelScreenState extends State<DuelScreen>
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1B1531),
-        title: Text(widget.campaign ? 'Flee the battle?' : 'Surrender the duel?',
-            style: const TextStyle(color: Colors.white, fontSize: 17)),
-        content: const Text('This counts as a loss.',
-            style: TextStyle(color: Color(0xFF9C93C4))),
+        title: Text(
+          widget.campaign ? 'Flee the battle?' : 'Surrender the duel?',
+          style: const TextStyle(color: Colors.white, fontSize: 17),
+        ),
+        content: const Text(
+          'This counts as a loss.',
+          style: TextStyle(color: Color(0xFF9C93C4)),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -864,8 +959,10 @@ class _DuelScreenState extends State<DuelScreen>
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(widget.campaign ? 'Flee' : 'Surrender',
-                style: const TextStyle(color: Color(0xFFD85A30))),
+            child: Text(
+              widget.campaign ? 'Flee' : 'Surrender',
+              style: const TextStyle(color: Color(0xFFD85A30)),
+            ),
           ),
         ],
       ),
@@ -917,15 +1014,15 @@ class _DuelScreenState extends State<DuelScreen>
   Widget _actionBar(BuildContext context) {
     final spells = c.loadout.spells;
     Widget spellRow(int offset) => Row(
-          children: [
-            for (var i = offset; i < offset + 5; i++)
-              Expanded(
-                child: i < spells.length
-                    ? _spellButton(spells[i], i)
-                    : _emptySlot(i),
-              ),
-          ],
-        );
+      children: [
+        for (var i = offset; i < offset + 5; i++)
+          Expanded(
+            child: i < spells.length
+                ? _spellButton(spells[i], i)
+                : _emptySlot(i),
+          ),
+      ],
+    );
     return Container(
       color: const Color(0xE6100C1B),
       padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
@@ -989,24 +1086,31 @@ class _DuelScreenState extends State<DuelScreen>
                     ? style.color
                     : style.color.withValues(alpha: 0.16),
                 border: Border.all(
-                    color: active ? Colors.white : style.color, width: 1.5),
+                  color: active ? Colors.white : style.color,
+                  width: 1.5,
+                ),
               ),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  elementGlyph(element,
-                      size: 16,
-                      color: active ? const Color(0xFF141021) : style.color),
+                  elementGlyph(
+                    element,
+                    size: 16,
+                    color: active ? const Color(0xFF141021) : style.color,
+                  ),
                   Positioned(
                     right: 2,
                     bottom: 0,
-                    child: Text('${slot + 1}',
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.bold,
-                            color: active
-                                ? const Color(0xFF141021)
-                                : style.color.withValues(alpha: 0.9))),
+                    child: Text(
+                      '${slot + 1}',
+                      style: TextStyle(
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.bold,
+                        color: active
+                            ? const Color(0xFF141021)
+                            : style.color.withValues(alpha: 0.9),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -1026,9 +1130,10 @@ class _DuelScreenState extends State<DuelScreen>
         border: Border.all(color: const Color(0xFF241D3D)),
       ),
       child: Center(
-        child: Text(_spellKeyLabels[slot],
-            style:
-                const TextStyle(color: Color(0xFF352C55), fontSize: 10)),
+        child: Text(
+          _spellKeyLabels[slot],
+          style: const TextStyle(color: Color(0xFF352C55), fontSize: 10),
+        ),
       ),
     );
   }
@@ -1037,7 +1142,7 @@ class _DuelScreenState extends State<DuelScreen>
     final usable = c.canAct(spell);
     final elementColor =
         (c.shownPlayerElement ?? c.pendingElement)?.style.color ??
-            const Color(0xFF6E6A7A);
+        const Color(0xFF6E6A7A);
     return Tooltip(
       message: spellTooltip(spell),
       waitDuration: const Duration(milliseconds: 350),
@@ -1058,40 +1163,53 @@ class _DuelScreenState extends State<DuelScreen>
               ),
               child: Row(
                 children: [
-                  Icon(spellIcons[spell.id] ?? Icons.auto_fix_high,
-                      size: 19, color: elementColor),
+                  Icon(
+                    spellIcons[spell.id] ?? Icons.auto_fix_high,
+                    size: 19,
+                    color: elementColor,
+                  ),
                   const SizedBox(width: 7),
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(spell.name,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                color: Color(0xFFECE7F8), fontSize: 11.5)),
                         Text(
-                            spell.xCost
-                                ? 'cost X'
-                                : 'cost ${spell.chargeCost}',
-                            style: const TextStyle(
-                                color: Color(0xFF9C93C4), fontSize: 9)),
+                          spell.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFFECE7F8),
+                            fontSize: 11.5,
+                          ),
+                        ),
+                        Text(
+                          spell.xCost ? 'cost X' : 'cost ${spell.chargeCost}',
+                          style: const TextStyle(
+                            color: Color(0xFF9C93C4),
+                            fontSize: 9,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 5,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF141021),
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(color: const Color(0xFF443A6A)),
                     ),
-                    child: Text(_spellKeyLabels[slot],
-                        style: const TextStyle(
-                            color: Color(0xFF9C93C4),
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.bold)),
+                    child: Text(
+                      _spellKeyLabels[slot],
+                      style: const TextStyle(
+                        color: Color(0xFF9C93C4),
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -1118,18 +1236,22 @@ class _DuelScreenState extends State<DuelScreen>
             foregroundColor: const Color(0xFF141021),
             disabledBackgroundColor: const Color(0xFF2A2342),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.upload, size: 22),
               const SizedBox(height: 2),
-              const Text('Channel',
-                  style:
-                      TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-              const Text('C',
-                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
+              const Text(
+                'Channel',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+              const Text(
+                'C',
+                style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         ),
@@ -1162,20 +1284,30 @@ class _DuelScreenState extends State<DuelScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                    won
-                        ? Icons.emoji_events
-                        : (c.isDraw ? Icons.handshake : Icons.sentiment_dissatisfied),
-                    color: accent,
-                    size: 40),
+                  won
+                      ? Icons.emoji_events
+                      : (c.isDraw
+                            ? Icons.handshake
+                            : Icons.sentiment_dissatisfied),
+                  color: accent,
+                  size: 40,
+                ),
                 const SizedBox(height: 6),
-                Text(title,
-                    style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: accent)),
-                Text('vs ${c.enemy.name}',
-                    style: const TextStyle(
-                        color: Color(0xFF9C93C4), fontSize: 13)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: accent,
+                  ),
+                ),
+                Text(
+                  'vs ${c.enemy.name}',
+                  style: const TextStyle(
+                    color: Color(0xFF9C93C4),
+                    fontSize: 13,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 _rewardRow(
                   leading: const CoinIcon(size: 20),
@@ -1184,15 +1316,21 @@ class _DuelScreenState extends State<DuelScreen>
                 ),
                 const SizedBox(height: 8),
                 _rewardRow(
-                  leading: const Icon(Icons.star_rounded,
-                      color: Color(0xFF7FD4E8), size: 22),
+                  leading: const Icon(
+                    Icons.star_rounded,
+                    color: Color(0xFF7FD4E8),
+                    size: 22,
+                  ),
                   label: 'Experience',
                   value: xpEarned > 0 ? '+$xpEarned XP' : '—',
                 ),
                 const SizedBox(height: 8),
                 _rewardRow(
-                  leading: const Icon(Icons.military_tech,
-                      color: Color(0xFF6E6A7A), size: 22),
+                  leading: const Icon(
+                    Icons.military_tech,
+                    color: Color(0xFF6E6A7A),
+                    size: 22,
+                  ),
                   label: 'Ranking',
                   value: 'coming soon',
                   muted: true,
@@ -1200,11 +1338,15 @@ class _DuelScreenState extends State<DuelScreen>
                 const SizedBox(height: 10),
                 TextButton.icon(
                   onPressed: () => _showLog(context),
-                  icon: const Icon(Icons.receipt_long,
-                      size: 17, color: Color(0xFF9C93C4)),
-                  label: const Text('Review battle log',
-                      style:
-                          TextStyle(color: Color(0xFF9C93C4), fontSize: 13)),
+                  icon: const Icon(
+                    Icons.receipt_long,
+                    size: 17,
+                    color: Color(0xFF9C93C4),
+                  ),
+                  label: const Text(
+                    'Review battle log',
+                    style: TextStyle(color: Color(0xFF9C93C4), fontSize: 13),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -1216,12 +1358,15 @@ class _DuelScreenState extends State<DuelScreen>
                             Navigator.of(context).pop();
                           } else {
                             HomeShell.goHome();
-                            Navigator.of(context)
-                                .popUntil((route) => route.isFirst);
+                            Navigator.of(
+                              context,
+                            ).popUntil((route) => route.isFirst);
                           }
                         },
-                        icon: Icon(widget.campaign ? Icons.map : Icons.home,
-                            size: 18),
+                        icon: Icon(
+                          widget.campaign ? Icons.map : Icons.home,
+                          size: 18,
+                        ),
                         label: Text(widget.campaign ? 'Leave' : 'Home'),
                       ),
                     ),
@@ -1270,17 +1415,19 @@ class _DuelScreenState extends State<DuelScreen>
           leading,
           const SizedBox(width: 10),
           Expanded(
-            child: Text(label,
-                style: const TextStyle(
-                    color: Color(0xFFECE7F8), fontSize: 14)),
+            child: Text(
+              label,
+              style: const TextStyle(color: Color(0xFFECE7F8), fontSize: 14),
+            ),
           ),
-          Text(value,
-              style: TextStyle(
-                  color: muted
-                      ? const Color(0xFF6E6A7A)
-                      : const Color(0xFFE8C547),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600)),
+          Text(
+            value,
+            style: TextStyle(
+              color: muted ? const Color(0xFF6E6A7A) : const Color(0xFFE8C547),
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -1303,22 +1450,32 @@ class _DuelScreenState extends State<DuelScreen>
               padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
               child: Row(
                 children: [
-                  const Icon(Icons.receipt_long,
-                      size: 18, color: Color(0xFFE8C547)),
+                  const Icon(
+                    Icons.receipt_long,
+                    size: 18,
+                    color: Color(0xFFE8C547),
+                  ),
                   const SizedBox(width: 8),
                   const Expanded(
-                    child: Text('Battle log',
-                        style: TextStyle(
-                            color: Color(0xFFECE7F8),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600)),
+                    child: Text(
+                      'Battle log',
+                      style: TextStyle(
+                        color: Color(0xFFECE7F8),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                  const Text('newest first',
-                      style:
-                          TextStyle(color: Color(0xFF6E6A7A), fontSize: 11)),
+                  const Text(
+                    'newest first',
+                    style: TextStyle(color: Color(0xFF6E6A7A), fontSize: 11),
+                  ),
                   IconButton(
-                    icon: const Icon(Icons.close,
-                        size: 20, color: Color(0xFF9C93C4)),
+                    icon: const Icon(
+                      Icons.close,
+                      size: 20,
+                      color: Color(0xFF9C93C4),
+                    ),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
@@ -1328,26 +1485,32 @@ class _DuelScreenState extends State<DuelScreen>
             Expanded(
               child: c.battleLog.isEmpty
                   ? const Center(
-                      child: Text('No turns fought yet.',
-                          style: TextStyle(
-                              color: Color(0xFF6E6A7A), fontSize: 13)),
+                      child: Text(
+                        'No turns fought yet.',
+                        style: TextStyle(
+                          color: Color(0xFF6E6A7A),
+                          fontSize: 13,
+                        ),
+                      ),
                     )
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                       children: [
                         for (final line in c.battleLog.reversed)
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 2),
-                            child: Text(line,
-                                style: TextStyle(
-                                    color: line.startsWith('—')
-                                        ? const Color(0xFFE8C547)
-                                        : const Color(0xFFB9B2D6),
-                                    fontWeight: line.startsWith('—')
-                                        ? FontWeight.w600
-                                        : FontWeight.w400,
-                                    fontSize: 12.5)),
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: ElementRichText(
+                              line,
+                              style: TextStyle(
+                                color: line.startsWith('—')
+                                    ? const Color(0xFFE8C547)
+                                    : const Color(0xFFB9B2D6),
+                                fontWeight: line.startsWith('—')
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                fontSize: 12.5,
+                              ),
+                            ),
                           ),
                       ],
                     ),
@@ -1406,25 +1569,34 @@ class _StatusPanel extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        crossAxisAlignment:
-            alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: alignEnd
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment:
-                alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment: alignEnd
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
             children: [
-              Text(name,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600)),
+              Text(
+                name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(width: 8),
               if (barsVeiled)
                 _veilPill()
               else
-                Text('$hp/$maxHp',
-                    style: const TextStyle(
-                        color: Color(0xFF9C93C4), fontSize: 12)),
+                Text(
+                  '$hp/$maxHp',
+                  style: const TextStyle(
+                    color: Color(0xFF9C93C4),
+                    fontSize: 12,
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 4),
@@ -1443,10 +1615,11 @@ class _StatusPanel extends StatelessWidget {
                     FractionallySizedBox(
                       widthFactor: value.clamp(0, 1),
                       child: Container(
-                          height: 8,
-                          color: value > 0.35
-                              ? const Color(0xFF58B368)
-                              : const Color(0xFFD85A30)),
+                        height: 8,
+                        color: value > 0.35
+                            ? const Color(0xFF58B368)
+                            : const Color(0xFFD85A30),
+                      ),
                     ),
                   ],
                 ),
@@ -1455,32 +1628,40 @@ class _StatusPanel extends StatelessWidget {
           const SizedBox(height: 5),
           if (barsVeiled)
             Row(
-              mainAxisAlignment:
-                  alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
+              mainAxisAlignment: alignEnd
+                  ? MainAxisAlignment.end
+                  : MainAxisAlignment.start,
               children: const [
                 Icon(Icons.nightlight_round, size: 12, color: _umbra),
                 SizedBox(width: 5),
-                Text('charge veiled',
-                    style: TextStyle(
-                        color: _umbra,
-                        fontSize: 11,
-                        fontStyle: FontStyle.italic)),
+                Text(
+                  'charge veiled',
+                  style: TextStyle(
+                    color: _umbra,
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
               ],
             )
           else
             Row(
-              mainAxisAlignment:
-                  alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
+              mainAxisAlignment: alignEnd
+                  ? MainAxisAlignment.end
+                  : MainAxisAlignment.start,
               children: [
                 if (!alignEnd) ..._chargeRow(pipColor),
                 if (elementHidden)
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Text('?',
-                        style: TextStyle(
-                            color: Color(0xFF8E8E9E),
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold)),
+                    child: Text(
+                      '?',
+                      style: TextStyle(
+                        color: Color(0xFF8E8E9E),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   )
                 else if (element != null)
                   Padding(
@@ -1498,9 +1679,11 @@ class _StatusPanel extends StatelessWidget {
             children: [
               if (shield != null) _shieldBadge(),
               if (barrier > 0)
-                _badge(barrier > 1 ? 'Barrier ×$barrier' : 'Barrier',
-                    Colors.white,
-                    icon: Icons.shield_moon),
+                _badge(
+                  barrier > 1 ? 'Barrier ×$barrier' : 'Barrier',
+                  Colors.white,
+                  icon: Icons.shield_moon,
+                ),
               for (final b in badges) _statusChip(b),
             ],
           ),
@@ -1523,12 +1706,15 @@ class _StatusPanel extends StatelessWidget {
         children: [
           const Icon(Icons.nightlight_round, size: 10, color: _umbra),
           const SizedBox(width: 3),
-          Text((veilLabel ?? 'Veiled').toUpperCase(),
-              style: const TextStyle(
-                  color: _umbra,
-                  fontSize: 10,
-                  letterSpacing: 0.6,
-                  fontWeight: FontWeight.w700)),
+          Text(
+            (veilLabel ?? 'Veiled').toUpperCase(),
+            style: const TextStyle(
+              color: _umbra,
+              fontSize: 10,
+              letterSpacing: 0.6,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
@@ -1557,23 +1743,28 @@ class _StatusPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: debuff ? b.color : b.color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-            color: b.color, width: debuff ? 0 : 0.9),
+        border: Border.all(color: b.color, width: debuff ? 0 : 0.9),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(b.label,
-              style: TextStyle(
-                  color: fg, fontSize: 10.5, fontWeight: FontWeight.w600)),
+          Text(
+            b.label,
+            style: TextStyle(
+              color: fg,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           if (b.sub != null) ...[
             const SizedBox(width: 4),
-            Text(b.sub!,
-                style: TextStyle(
-                    color: debuff
-                        ? const Color(0xFF141021)
-                        : AppColors.textFaint,
-                    fontSize: 9.5)),
+            Text(
+              b.sub!,
+              style: TextStyle(
+                color: debuff ? const Color(0xFF141021) : AppColors.textFaint,
+                fontSize: 9.5,
+              ),
+            ),
           ],
         ],
       ),
@@ -1581,23 +1772,25 @@ class _StatusPanel extends StatelessWidget {
   }
 
   List<Widget> _chargeRow(Color color) => [
-        for (var i = 0; i < 5; i++)
-          Container(
-            width: 11,
-            height: 11,
-            margin: const EdgeInsets.symmetric(horizontal: 1.5),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: i < charge ? color : Colors.transparent,
-              border: Border.all(
-                  color: i < charge ? color : const Color(0xFF443A6A)),
-            ),
+    for (var i = 0; i < 5; i++)
+      Container(
+        width: 11,
+        height: 11,
+        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: i < charge ? color : Colors.transparent,
+          border: Border.all(
+            color: i < charge ? color : const Color(0xFF443A6A),
           ),
-      ];
+        ),
+      ),
+  ];
 
   Widget _shieldBadge() {
-    final color =
-        shield!.isBarrier ? Colors.white : shield!.element!.style.color;
+    final color = shield!.isBarrier
+        ? Colors.white
+        : shield!.element!.style.color;
     final label = shield!.isBarrier
         ? 'Barrier'
         : '${shield!.element!.style.label} ${shield!.remaining}';
@@ -1631,14 +1824,19 @@ class _VeilHatchPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     canvas.drawRect(
-        Offset.zero & size, Paint()..color = const Color(0xFF221A38));
+      Offset.zero & size,
+      Paint()..color = const Color(0xFF221A38),
+    );
     final stripe = Paint()
       ..color = const Color(0x558B5CD6)
       ..strokeWidth = 3;
     const gap = 7.0;
     for (double x = -size.height; x < size.width + size.height; x += gap) {
       canvas.drawLine(
-          Offset(x, size.height), Offset(x + size.height, 0), stripe);
+        Offset(x, size.height),
+        Offset(x + size.height, 0),
+        stripe,
+      );
     }
   }
 
@@ -1680,20 +1878,33 @@ class _FxPainter extends CustomPainter {
           final stagger = projectiles > 1 ? p * 0.55 / projectiles : 0.0;
           final pt = ((t - stagger) / (1 - stagger)).clamp(0.0, 1.0);
           if (pt <= 0) continue;
-          final arc = projectiles > 1 ? (p - (projectiles - 1) / 2) * 26.0 : 0.0;
+          final arc = projectiles > 1
+              ? (p - (projectiles - 1) / 2) * 26.0
+              : 0.0;
           final base = Offset.lerp(from, to, Curves.easeIn.transform(pt))!;
           final lift = sin(pt * pi) * arc;
           final pos = base + Offset(0, -lift.abs() - sin(pt * pi) * 14);
           for (var i = 0; i < 3 + intensity.round(); i++) {
             final trailT = (pt - i * 0.06).clamp(0.0, 1.0);
-            final trailBase =
-                Offset.lerp(from, to, Curves.easeIn.transform(trailT))!;
-            final trailPos = trailBase +
-                Offset(0, -(sin(trailT * pi) * arc).abs() - sin(trailT * pi) * 14);
+            final trailBase = Offset.lerp(
+              from,
+              to,
+              Curves.easeIn.transform(trailT),
+            )!;
+            final trailPos =
+                trailBase +
+                Offset(
+                  0,
+                  -(sin(trailT * pi) * arc).abs() - sin(trailT * pi) * 14,
+                );
             paint.color = color.withValues(
-                alpha: ((1 - i * 0.2) * 0.9).clamp(0.0, 1.0));
+              alpha: ((1 - i * 0.2) * 0.9).clamp(0.0, 1.0),
+            );
             canvas.drawCircle(
-                trailPos, (5.5 + intensity * 2.5) - i * 1.3, paint);
+              trailPos,
+              (5.5 + intensity * 2.5) - i * 1.3,
+              paint,
+            );
           }
           paint.color = Colors.white.withValues(alpha: 0.85);
           canvas.drawCircle(pos, 2.5 + intensity, paint);
@@ -1703,7 +1914,11 @@ class _FxPainter extends CustomPainter {
         for (var r = 0; r < rings; r++) {
           final rt = ((t - r * 0.12).clamp(0.0, 1.0));
           paint.color = color.withValues(alpha: (1 - rt) * 0.55);
-          canvas.drawCircle(to, (10 + 30 * rt) * (0.8 + intensity * 0.35), paint);
+          canvas.drawCircle(
+            to,
+            (10 + 30 * rt) * (0.8 + intensity * 0.35),
+            paint,
+          );
         }
         paint.color = Colors.white.withValues(alpha: (1 - t) * 0.9);
         canvas.drawCircle(to, (5 + 10 * t) * (0.8 + intensity * 0.2), paint);
@@ -1712,16 +1927,22 @@ class _FxPainter extends CustomPainter {
           paint.color = Colors.white.withValues(alpha: (1 - t) * 0.22);
           canvas.drawRect(Offset.zero & size, paint);
         }
-        _drawText(canvas, to + Offset(0, -40 - 28 * t), 1 - t * 0.7,
-            fontSize: 15 + intensity * 3);
+        _drawText(
+          canvas,
+          to + Offset(0, -40 - 28 * t),
+          1 - t * 0.7,
+          fontSize: 15 + intensity * 3,
+        );
       case _FxKind.shieldUp:
         final ringPaint = Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 3 + intensity
           ..color = color.withValues(alpha: 1 - t * 0.4);
         canvas.drawCircle(
-            to, (26 + 42 * Curves.easeOut.transform(t)) * (0.7 + intensity * 0.25),
-            ringPaint);
+          to,
+          (26 + 42 * Curves.easeOut.transform(t)) * (0.7 + intensity * 0.25),
+          ringPaint,
+        );
       case _FxKind.charge:
         final particles = 3 + (intensity * 2.2).round();
         for (var i = 0; i < particles; i++) {
@@ -1729,15 +1950,19 @@ class _FxPainter extends CustomPainter {
           final radius = (48 + intensity * 12) * (1 - t * 0.7);
           paint.color = color.withValues(alpha: 0.35 + 0.5 * t);
           canvas.drawCircle(
-              to + Offset(cos(angle) * radius, sin(angle) * radius * 0.6),
-              3 + intensity + 2 * t,
-              paint);
+            to + Offset(cos(angle) * radius, sin(angle) * radius * 0.6),
+            3 + intensity + 2 * t,
+            paint,
+          );
         }
       case _FxKind.heal:
         paint.color = color.withValues(alpha: (1 - t) * 0.8);
         for (var i = 0; i < 3; i++) {
           canvas.drawCircle(
-              to + Offset((i - 1) * 22.0, 10 - 55 * t + i * 8), 5, paint);
+            to + Offset((i - 1) * 22.0, 10 - 55 * t + i * 8),
+            5,
+            paint,
+          );
         }
         _drawText(canvas, to + Offset(0, -30 - 25 * t), 1 - t * 0.6);
       case _FxKind.flash:
@@ -1765,7 +1990,10 @@ class _FxPainter extends CustomPainter {
           final sway = sin((p * 3 + i) * pi) * 9;
           paint.color = c.withValues(alpha: (1 - p) * 0.9 * a);
           canvas.drawCircle(
-              to + Offset((i - 3) * 9.0 + sway, 34 - 78 * p), 3.4 - p * 1.8, paint);
+            to + Offset((i - 3) * 9.0 + sway, 34 - 78 * p),
+            3.4 - p * 1.8,
+            paint,
+          );
         }
 
       case StatusMotion.sink:
@@ -1774,12 +2002,20 @@ class _FxPainter extends CustomPainter {
           final p = ((t * 1.3) + i / 6) % 1.0;
           paint.color = c.withValues(alpha: (1 - p * 0.6) * 0.85 * a);
           canvas.drawCircle(
-              to + Offset((i - 2.5) * 11.0, -34 + 74 * p), 3.2, paint);
+            to + Offset((i - 2.5) * 11.0, -34 + 74 * p),
+            3.2,
+            paint,
+          );
         }
         paint.color = c.withValues(alpha: 0.35 * a * t);
         canvas.drawOval(
-            Rect.fromCenter(center: to + const Offset(0, 40),
-                width: 66 * t, height: 12 * t), paint);
+          Rect.fromCenter(
+            center: to + const Offset(0, 40),
+            width: 66 * t,
+            height: 12 * t,
+          ),
+          paint,
+        );
 
       case StatusMotion.orbit:
         // Motes circle the mage — accumulating knowledge.
@@ -1787,8 +2023,10 @@ class _FxPainter extends CustomPainter {
           final ang = t * 2 * pi + i * 2 * pi / 5;
           paint.color = c.withValues(alpha: 0.9 * a);
           canvas.drawCircle(
-              to + Offset(cos(ang) * 44, sin(ang) * 26 - 4),
-              3.0, paint);
+            to + Offset(cos(ang) * 44, sin(ang) * 26 - 4),
+            3.0,
+            paint,
+          );
         }
 
       case StatusMotion.converge:
@@ -1798,8 +2036,10 @@ class _FxPainter extends CustomPainter {
           final r = 78 * (1 - t);
           paint.color = c.withValues(alpha: t * 0.95 * a);
           canvas.drawCircle(
-              to + Offset(cos(ang) * r, sin(ang) * r * 0.62 - 4),
-              3.4, paint);
+            to + Offset(cos(ang) * r, sin(ang) * r * 0.62 - 4),
+            3.4,
+            paint,
+          );
         }
 
       case StatusMotion.scatter:
@@ -1809,8 +2049,10 @@ class _FxPainter extends CustomPainter {
           final r = 14 + 66 * t;
           paint.color = c.withValues(alpha: (1 - t) * 0.95);
           canvas.drawCircle(
-              to + Offset(cos(ang) * r, sin(ang) * r * 0.62 - 4),
-              3.6 - t * 2, paint);
+            to + Offset(cos(ang) * r, sin(ang) * r * 0.62 - 4),
+            3.6 - t * 2,
+            paint,
+          );
         }
 
       case StatusMotion.bloom:
@@ -1829,14 +2071,18 @@ class _FxPainter extends CustomPainter {
         for (var i = 0; i < 5; i++) {
           final ang = i * 2 * pi / 5 + 0.3;
           final len = 58 * min(1.0, t * 2.2);
-          final mid = to + Offset(cos(ang) * len * 0.55,
-              sin(ang) * len * 0.4 - 4);
-          final end = to +
+          final mid =
+              to + Offset(cos(ang) * len * 0.55, sin(ang) * len * 0.4 - 4);
+          final end =
+              to +
               Offset(cos(ang + 0.22) * len, sin(ang + 0.22) * len * 0.7 - 4);
           canvas.drawPath(
-              Path()..moveTo(to.dx, to.dy - 4)..lineTo(mid.dx, mid.dy)
-                ..lineTo(end.dx, end.dy),
-              stroke);
+            Path()
+              ..moveTo(to.dx, to.dy - 4)
+              ..lineTo(mid.dx, mid.dy)
+              ..lineTo(end.dx, end.dy),
+            stroke,
+          );
         }
 
       case StatusMotion.streak:
@@ -1866,9 +2112,12 @@ class _FxPainter extends CustomPainter {
           final y = to.dy + 26 - 60 * p;
           final w = 15 + i * 5.0;
           canvas.drawPath(
-              Path()..moveTo(to.dx - w, y + 9)..lineTo(to.dx, y)
-                ..lineTo(to.dx + w, y + 9),
-              stroke);
+            Path()
+              ..moveTo(to.dx - w, y + 9)
+              ..lineTo(to.dx, y)
+              ..lineTo(to.dx + w, y + 9),
+            stroke,
+          );
         }
 
       case StatusMotion.ghost:
@@ -1876,10 +2125,13 @@ class _FxPainter extends CustomPainter {
         paint.color = c.withValues(alpha: (1 - t) * 0.45);
         for (final dir in [-1.0, 1.0]) {
           canvas.drawOval(
-              Rect.fromCenter(
-                  center: to + Offset(dir * 30 * t, -4),
-                  width: 44 - 8 * t, height: 76 - 12 * t),
-              paint);
+            Rect.fromCenter(
+              center: to + Offset(dir * 30 * t, -4),
+              width: 44 - 8 * t,
+              height: 76 - 12 * t,
+            ),
+            paint,
+          );
         }
 
       case StatusMotion.align:
@@ -1904,8 +2156,12 @@ class _FxPainter extends CustomPainter {
     _drawText(canvas, to + Offset(0, -58 - 10 * t), a * 0.9, fontSize: 14);
   }
 
-  void _drawText(Canvas canvas, Offset pos, double opacity,
-      {double fontSize = 17}) {
+  void _drawText(
+    Canvas canvas,
+    Offset pos,
+    double opacity, {
+    double fontSize = 17,
+  }) {
     if (text == null || text!.isEmpty) return;
     final painter = TextPainter(
       text: TextSpan(

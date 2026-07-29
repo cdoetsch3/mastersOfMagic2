@@ -36,24 +36,31 @@ class SocialTab extends StatelessWidget {
                   children: const [
                     Icon(Icons.groups, color: AppColors.textFaint, size: 40),
                     SizedBox(height: 10),
-                    Text('Friends are coming soon',
-                        style:
-                            TextStyle(color: AppColors.text, fontSize: 15)),
+                    Text(
+                      'Friends are coming soon',
+                      style: TextStyle(color: AppColors.text, fontSize: 15),
+                    ),
                     SizedBox(height: 4),
                     Text(
-                        'Add friends, challenge rivals, and climb the ranked '
-                        'ladder once online play is live.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: AppColors.textDim, fontSize: 12)),
+                      'Add friends, challenge rivals, and climb the ranked '
+                      'ladder once online play is live.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppColors.textDim, fontSize: 12),
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
               const SectionLabel('Planned'),
               const _Soon(icon: Icons.person_add, title: 'Add friends'),
-              const _Soon(icon: Icons.emoji_events, title: 'Ranked ladder (Elo)'),
-              const _Soon(icon: Icons.sports_kabaddi, title: 'Challenge a friend'),
+              const _Soon(
+                icon: Icons.emoji_events,
+                title: 'Ranked ladder (Elo)',
+              ),
+              const _Soon(
+                icon: Icons.sports_kabaddi,
+                title: 'Challenge a friend',
+              ),
             ],
           ),
         ),
@@ -78,20 +85,47 @@ class _SignInButton extends StatelessWidget {
             foregroundColor: AppColors.bg,
             padding: const EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => const AccountScreen()),
+            MaterialPageRoute<void>(
+              builder: (_) => const AccountScreen(startInCreateMode: true),
+            ),
+          ),
+          icon: const Icon(Icons.person_add_alt_1, size: 20),
+          label: const Text(
+            'Create account',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          ),
+        ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.gold,
+            side: const BorderSide(color: AppColors.gold),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const AccountScreen(startInCreateMode: false),
+            ),
           ),
           icon: const Icon(Icons.login, size: 20),
-          label: const Text('Sign in or create account',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+          label: const Text(
+            'Sign in',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          ),
         ),
         const SizedBox(height: 6),
         const Text(
-            'Save your progress across devices and duel other mages online.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.textDim, fontSize: 12)),
+          'Save your progress across devices and duel other mages online.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: AppColors.textDim, fontSize: 12),
+        ),
       ],
     );
   }
@@ -102,9 +136,9 @@ class _AccountCard extends StatelessWidget {
   const _AccountCard({required this.auth});
 
   void _open(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const AccountScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const AccountScreen()));
   }
 
   @override
@@ -122,26 +156,33 @@ class _AccountCard extends StatelessWidget {
                 Row(
                   children: [
                     Flexible(
-                      child: Text(auth.displayName ?? 'Mage',
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              color: AppColors.text, fontSize: 14)),
+                      child: Text(
+                        auth.displayName ?? 'Mage',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.text,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 7),
                     // Your own dot — the same indicator friends will carry, so
                     // the mechanism is visible (and verifiable) before the
                     // friends list exists.
                     PresenceDot(
-                        lastSeen:
-                            GameStateScope.of(context).profile.lastSeenAt),
+                      lastSeen: GameStateScope.of(context).profile.lastSeenAt,
+                    ),
                   ],
                 ),
                 Text(
-                    auth.emailVerified
-                        ? '${auth.email} · verified'
-                        : '${auth.email} · unverified',
-                    style: const TextStyle(
-                        color: AppColors.textDim, fontSize: 12)),
+                  auth.emailVerified
+                      ? '${auth.email} · verified'
+                      : '${auth.email} · unverified',
+                  style: const TextStyle(
+                    color: AppColors.textDim,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
@@ -169,9 +210,10 @@ class _Soon extends StatelessWidget {
               Icon(icon, color: AppColors.gem, size: 22),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(title,
-                    style: const TextStyle(
-                        color: AppColors.text, fontSize: 14)),
+                child: Text(
+                  title,
+                  style: const TextStyle(color: AppColors.text, fontSize: 14),
+                ),
               ),
               const Icon(Icons.lock, color: AppColors.textFaint, size: 16),
             ],

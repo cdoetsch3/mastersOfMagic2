@@ -2,21 +2,22 @@ import 'package:mom_engine/mom_engine.dart';
 
 import 'loadout.dart';
 import 'progression.dart';
+import 'active_trip.dart';
 import 'world.dart';
 
 /// Every valid element id, for validating ids read off disk.
-final Set<String> _elementNames =
-    MagicElement.values.map((e) => e.name).toSet();
+final Set<String> _elementNames = MagicElement.values
+    .map((e) => e.name)
+    .toSet();
 
 /// Every valid spell id, for the same disk-validation of stale saves.
 final Set<String> _spellIds = Spellbook.all.map((s) => s.id).toSet();
 
-/// A saved loadout: ordered element and spell slots by id. Persisted as part
-/// of the player document; converts to a runtime [Loadout] for combat.
+/// A saved loadout: ordered element and spell ids. Persisted as part of the
+/// player document; converts to a runtime [Loadout] for combat.
 ///
-/// ⭐ Capacity is a **single shared pool** — see [slotsUsed]. The wire format
-/// keeps two id lists only for backward compatibility with saves written before
-/// the pools merged; it is a storage detail, not two separate budgets.
+/// ⭐ Elements and spells are **two separate pools**, each with its own cap
+/// (5 and 10). Filling one has no effect on the other.
 class LoadoutPreset {
   String name;
   List<String> elementIds;
@@ -29,41 +30,30 @@ class LoadoutPreset {
   });
 
   factory LoadoutPreset.starter(String name) => LoadoutPreset(
-        name: name,
-        elementIds: List.of(Progression.starterPresetElementIds),
-        spellIds: List.of(Progression.starterPresetSpellIds),
-      );
+    name: name,
+    elementIds: List.of(Progression.starterPresetElementIds),
+    spellIds: List.of(Progression.starterPresetSpellIds),
+  );
 
-  /// Slots this preset fills, elements and spells counted alike — the pool is
-  /// shared, so a fourth element costs what a tenth spell would have.
-  int get slotsUsed => elementIds.length + spellIds.length;
+  int get elementCount => elementIds.length;
+  int get spellCount => spellIds.length;
 
-  /// Truncates to the current caps (used to migrate saves made when the caps
-  /// were larger). Clamps the per-kind *arena* limits first — the duel screen
-  /// has a fixed number of shortcut keys — then the shared pool, trimming
-  /// spells before elements since elements are the scarcer, more foundational
-  /// pick.
+  /// Truncates each pool to its own cap. Migrates saves written when the pools
+  /// were merged and either could run larger — a preset with 8 elements, say,
+  /// loses the last three rather than crashing on load.
   ///
-  /// [slotBudget] defaults to the absolute ceiling, which with per-kind limits
-  /// of 8 and 10 can never actually bite (8 + 10 = 18 < 20). It becomes the
-  /// binding constraint once level gating turns on, at which point callers pass
-  /// `Progression.usableSlotsAtLevel(level)`. Taking it as a parameter now means
-  /// that switch is a one-line change at the call site rather than a rewrite.
-  void clampToCaps({int slotBudget = Loadout.maxSlots}) {
-    if (elementIds.length > Loadout.maxElementSlots) {
-      elementIds = elementIds.sublist(0, Loadout.maxElementSlots);
+  /// [elementBudget]/[spellBudget] default to the absolute ceilings; callers
+  /// pass `Progression.usableElementsAtLevel(level)` and the spell equivalent
+  /// once level gating turns on, so that switch stays a one-line change.
+  void clampToCaps({
+    int elementBudget = Loadout.maxElementSlots,
+    int spellBudget = Loadout.maxSpellSlots,
+  }) {
+    if (elementIds.length > elementBudget) {
+      elementIds = elementIds.sublist(0, elementBudget);
     }
-    if (spellIds.length > Loadout.maxSpellSlots) {
-      spellIds = spellIds.sublist(0, Loadout.maxSpellSlots);
-    }
-    var overflow = slotsUsed - slotBudget;
-    if (overflow <= 0) return;
-
-    final spellsToDrop = overflow.clamp(0, spellIds.length);
-    spellIds = spellIds.sublist(0, spellIds.length - spellsToDrop);
-    overflow -= spellsToDrop;
-    if (overflow > 0) {
-      elementIds = elementIds.sublist(0, elementIds.length - overflow);
+    if (spellIds.length > spellBudget) {
+      spellIds = spellIds.sublist(0, spellBudget);
     }
   }
 
@@ -102,17 +92,16 @@ class LoadoutPreset {
   bool get isValid => elementIds.isNotEmpty && spellIds.isNotEmpty;
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'elementIds': elementIds,
-        'spellIds': spellIds,
-      };
+    'name': name,
+    'elementIds': elementIds,
+    'spellIds': spellIds,
+  };
 
   factory LoadoutPreset.fromJson(Map<String, dynamic> json) => LoadoutPreset(
-        name: json['name'] as String? ?? 'Loadout',
-        elementIds:
-            (json['elementIds'] as List?)?.cast<String>().toList() ?? [],
-        spellIds: (json['spellIds'] as List?)?.cast<String>().toList() ?? [],
-      );
+    name: json['name'] as String? ?? 'Loadout',
+    elementIds: (json['elementIds'] as List?)?.cast<String>().toList() ?? [],
+    spellIds: (json['spellIds'] as List?)?.cast<String>().toList() ?? [],
+  );
 }
 
 /// The player's persistent save. One-to-one with a future Firestore document
@@ -131,6 +120,13 @@ class PlayerProfile {
   int resonancePrisms;
 
   String locationId;
+
+  /// The journey in progress, if any.
+  ///
+  /// ⚠️ While this is set, [locationId] is where the trip **began**, not where
+  /// the player is. Ask [ActiveTrip.stopReachedAt] for that — the answer
+  /// depends on the clock, so it cannot be a stored field.
+  ActiveTrip? trip;
 
   /// Locations the player has visited (unlocks fast context; travel itself is
   /// still gated by the connection graph).
@@ -159,17 +155,17 @@ class PlayerProfile {
     this.gold = 0,
     this.resonancePrisms = 0,
     String? locationId,
+    this.trip,
     Set<String>? discoveredLocationIds,
     List<LoadoutPreset>? presets,
     this.activePresetIndex = 0,
     Map<String, int>? inventory,
     this.duelsWon = 0,
     this.duelsLost = 0,
-  })  : locationId = locationId ?? World.startLocationId,
-        discoveredLocationIds =
-            discoveredLocationIds ?? {World.startLocationId},
-        presets = presets ?? [LoadoutPreset.starter('Loadout I')],
-        inventory = inventory ?? {};
+  }) : locationId = locationId ?? World.startLocationId,
+       discoveredLocationIds = discoveredLocationIds ?? {World.startLocationId},
+       presets = presets ?? [LoadoutPreset.starter('Loadout I')],
+       inventory = inventory ?? {};
 
   factory PlayerProfile.newPlayer({String name = 'Apprentice'}) =>
       PlayerProfile(name: name);
@@ -183,7 +179,6 @@ class PlayerProfile {
 
   GameLocation get location => World.byId(locationId);
 
-
   LoadoutPreset get activePreset =>
       presets[activePresetIndex.clamp(0, presets.length - 1)];
 
@@ -196,39 +191,45 @@ class PlayerProfile {
   // ---- Serialization ---------------------------------------------------
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'lastSeenAt': lastSeenAt?.toUtc().toIso8601String(),
-        'xp': xp,
-        'gold': gold,
-        'resonancePrisms': resonancePrisms,
-        'locationId': locationId,
-        'discoveredLocationIds': discoveredLocationIds.toList(),
-        'presets': presets.map((p) => p.toJson()).toList(),
-        'activePresetIndex': activePresetIndex,
-        'inventory': inventory,
-        'duelsWon': duelsWon,
-        'duelsLost': duelsLost,
-        'schemaVersion': 1,
-      };
+    'name': name,
+    'lastSeenAt': lastSeenAt?.toUtc().toIso8601String(),
+    'xp': xp,
+    'gold': gold,
+    'resonancePrisms': resonancePrisms,
+    'locationId': locationId,
+    'trip': trip?.toJson(),
+    'discoveredLocationIds': discoveredLocationIds.toList(),
+    'presets': presets.map((p) => p.toJson()).toList(),
+    'activePresetIndex': activePresetIndex,
+    'inventory': inventory,
+    'duelsWon': duelsWon,
+    'duelsLost': duelsLost,
+    'schemaVersion': 1,
+  };
 
   factory PlayerProfile.fromJson(Map<String, dynamic> json) {
-    final presets = (json['presets'] as List?)
+    final presets =
+        (json['presets'] as List?)
             ?.map((p) => LoadoutPreset.fromJson(p as Map<String, dynamic>))
             .toList() ??
         [LoadoutPreset.starter('Loadout I')];
     return PlayerProfile(
       name: json['name'] as String? ?? 'Apprentice',
-      lastSeenAt: DateTime.tryParse(json['lastSeenAt'] as String? ?? '')?.toLocal(),
+      lastSeenAt: DateTime.tryParse(
+        json['lastSeenAt'] as String? ?? '',
+      )?.toLocal(),
       xp: (json['xp'] as num?)?.toInt() ?? 0,
       gold: (json['gold'] as num?)?.toInt() ?? 0,
-      resonancePrisms:
-          (json['resonancePrisms'] as num?)?.toInt() ?? 0,
+      resonancePrisms: (json['resonancePrisms'] as num?)?.toInt() ?? 0,
       locationId: json['locationId'] as String?,
-      discoveredLocationIds:
-          (json['discoveredLocationIds'] as List?)?.cast<String>().toSet(),
+      trip: ActiveTrip.fromJson(json['trip'] as Map<String, dynamic>?),
+      discoveredLocationIds: (json['discoveredLocationIds'] as List?)
+          ?.cast<String>()
+          .toSet(),
       presets: presets,
       activePresetIndex: (json['activePresetIndex'] as num?)?.toInt() ?? 0,
-      inventory: (json['inventory'] as Map?)?.map(
+      inventory:
+          (json['inventory'] as Map?)?.map(
             (k, v) => MapEntry(k as String, (v as num).toInt()),
           ) ??
           {},

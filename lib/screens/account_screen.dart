@@ -12,14 +12,18 @@ import 'home_shell.dart';
 /// saves. Required to create an account: character name, email, password, and
 /// (planned) an App Check captcha; email verification is sent on signup.
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key});
+  /// Which mode to open in. The social tab offers "Sign in" and "Create
+  /// account" as separate buttons, so it says which one the player picked
+  /// rather than making them toggle after arriving.
+  final bool startInCreateMode;
+  const AccountScreen({super.key, this.startInCreateMode = true});
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  bool _createMode = true;
+  late bool _createMode = widget.startInCreateMode;
   bool _busy = false;
   String? _error;
 
@@ -66,7 +70,8 @@ class _AccountScreenState extends State<AccountScreen> {
         ? await auth.signUp(
             email: _email.text,
             password: _password.text,
-            characterName: _name.text)
+            characterName: _name.text,
+          )
         : await auth.signIn(email: _email.text, password: _password.text);
     if (!mounted) return;
     setState(() {
@@ -91,9 +96,11 @@ class _AccountScreenState extends State<AccountScreen> {
       backgroundColor: AppColors.bg,
       appBar: AppBar(
         backgroundColor: AppColors.bg,
-        title: Text(auth.signedIn
-            ? 'Account'
-            : (_createMode ? 'Create account' : 'Sign in')),
+        title: Text(
+          auth.signedIn
+              ? 'Account'
+              : (_createMode ? 'Create account' : 'Sign in'),
+        ),
       ),
       body: SafeArea(
         child: Center(
@@ -120,18 +127,27 @@ class _AccountScreenState extends State<AccountScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (_createMode)
-          _field(_name, 'Character name', icon: Icons.person),
-        _field(_email, 'Email',
-            icon: Icons.mail, keyboard: TextInputType.emailAddress),
+        if (_createMode) _field(_name, 'Character name', icon: Icons.person),
+        _field(
+          _email,
+          'Email',
+          icon: Icons.mail,
+          keyboard: TextInputType.emailAddress,
+        ),
         _field(_password, 'Password', icon: Icons.lock, obscure: true),
         if (_createMode)
-          _field(_confirm, 'Confirm password',
-              icon: Icons.lock_outline, obscure: true),
+          _field(
+            _confirm,
+            'Confirm password',
+            icon: Icons.lock_outline,
+            obscure: true,
+          ),
         if (_error != null) ...[
           const SizedBox(height: 6),
-          Text(_error!,
-              style: const TextStyle(color: AppColors.ember, fontSize: 13)),
+          Text(
+            _error!,
+            style: const TextStyle(color: AppColors.ember, fontSize: 13),
+          ),
         ],
         const SizedBox(height: 16),
         SizedBox(
@@ -141,7 +157,8 @@ class _AccountScreenState extends State<AccountScreen> {
               backgroundColor: AppColors.ember,
               foregroundColor: AppColors.bg,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: _busy ? null : () => _submit(auth),
             child: _busy
@@ -149,20 +166,29 @@ class _AccountScreenState extends State<AccountScreen> {
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2, color: AppColors.bg))
-                : Text(_createMode ? 'Create account' : 'Sign in',
+                      strokeWidth: 2,
+                      color: AppColors.bg,
+                    ),
+                  )
+                : Text(
+                    _createMode ? 'Create account' : 'Sign in',
                     style: const TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.w600)),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
           ),
         ),
         if (!_createMode)
           TextButton(
             onPressed: _busy
                 ? null
-                : () => Navigator.of(context).push(MaterialPageRoute<void>(
+                : () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
                       builder: (_) =>
                           ForgotPasswordScreen(initialEmail: _email.text),
-                    )),
+                    ),
+                  ),
             child: const Text('Forgot your password?'),
           ),
         const SizedBox(height: 4),
@@ -170,12 +196,14 @@ class _AccountScreenState extends State<AccountScreen> {
           onPressed: _busy
               ? null
               : () => setState(() {
-                    _createMode = !_createMode;
-                    _error = null;
-                  }),
-          child: Text(_createMode
-              ? 'Already have an account? Sign in'
-              : 'Need an account? Create one'),
+                  _createMode = !_createMode;
+                  _error = null;
+                }),
+          child: Text(
+            _createMode
+                ? 'Already have an account? Sign in'
+                : 'Need an account? Create one',
+          ),
         ),
         const SizedBox(height: 8),
         const Row(
@@ -185,9 +213,9 @@ class _AccountScreenState extends State<AccountScreen> {
             SizedBox(width: 6),
             Flexible(
               child: Text(
-                  'Bot protection (App Check captcha) arrives before public launch.',
-                  style:
-                      TextStyle(color: AppColors.textFaint, fontSize: 11)),
+                'Bot protection (App Check captcha) arrives before public launch.',
+                style: TextStyle(color: AppColors.textFaint, fontSize: 11),
+              ),
             ),
           ],
         ),
@@ -195,10 +223,13 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _field(TextEditingController controller, String label,
-      {required IconData icon,
-      bool obscure = false,
-      TextInputType? keyboard}) {
+  Widget _field(
+    TextEditingController controller,
+    String label, {
+    required IconData icon,
+    bool obscure = false,
+    TextInputType? keyboard,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
@@ -241,21 +272,31 @@ class _AccountView extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.account_circle,
-                      color: AppColors.gold, size: 36),
+                  const Icon(
+                    Icons.account_circle,
+                    color: AppColors.gold,
+                    size: 36,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(auth.displayName ?? 'Mage',
-                            style: const TextStyle(
-                                color: AppColors.text,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600)),
-                        Text(auth.email ?? '',
-                            style: const TextStyle(
-                                color: AppColors.textDim, fontSize: 13)),
+                        Text(
+                          auth.displayName ?? 'Mage',
+                          style: const TextStyle(
+                            color: AppColors.text,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          auth.email ?? '',
+                          style: const TextStyle(
+                            color: AppColors.textDim,
+                            fontSize: 13,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -265,23 +306,26 @@ class _AccountView extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                      auth.emailVerified
-                          ? Icons.verified
-                          : Icons.mark_email_unread,
-                      size: 16,
-                      color: auth.emailVerified
-                          ? AppColors.green
-                          : AppColors.gold),
+                    auth.emailVerified
+                        ? Icons.verified
+                        : Icons.mark_email_unread,
+                    size: 16,
+                    color: auth.emailVerified
+                        ? AppColors.green
+                        : AppColors.gold,
+                  ),
                   const SizedBox(width: 6),
                   Text(
-                      auth.emailVerified
-                          ? 'Email verified'
-                          : 'Email not verified',
-                      style: TextStyle(
-                          color: auth.emailVerified
-                              ? AppColors.green
-                              : AppColors.gold,
-                          fontSize: 13)),
+                    auth.emailVerified
+                        ? 'Email verified'
+                        : 'Email not verified',
+                    style: TextStyle(
+                      color: auth.emailVerified
+                          ? AppColors.green
+                          : AppColors.gold,
+                      fontSize: 13,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -290,8 +334,9 @@ class _AccountView extends StatelessWidget {
         if (!auth.emailVerified) ...[
           const SizedBox(height: 12),
           const Text(
-              'Check your inbox for a verification link, then refresh.',
-              style: TextStyle(color: AppColors.textDim, fontSize: 13)),
+            'Check your inbox for a verification link, then refresh.',
+            style: TextStyle(color: AppColors.textDim, fontSize: 13),
+          ),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -318,7 +363,8 @@ class _AccountView extends StatelessWidget {
           builder: (context) => OutlinedButton.icon(
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
-                  builder: (_) => const ChangePasswordScreen()),
+                builder: (_) => const ChangePasswordScreen(),
+              ),
             ),
             icon: const Icon(Icons.lock_reset, size: 18),
             label: const Text('Change password'),
@@ -328,8 +374,10 @@ class _AccountView extends StatelessWidget {
         TextButton.icon(
           onPressed: () => auth.signOut(),
           icon: const Icon(Icons.logout, color: AppColors.ember),
-          label: const Text('Sign out',
-              style: TextStyle(color: AppColors.ember)),
+          label: const Text(
+            'Sign out',
+            style: TextStyle(color: AppColors.ember),
+          ),
         ),
       ],
     );
@@ -352,17 +400,21 @@ class _AboutPanel extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Masters of Magic 2',
-                    style: TextStyle(color: AppColors.text, fontSize: 13.5)),
-                Text('An elemental mage-dueling game — early preview',
-                    style:
-                        TextStyle(color: AppColors.textDim, fontSize: 11.5)),
+                Text(
+                  'Masters of Magic 2',
+                  style: TextStyle(color: AppColors.text, fontSize: 13.5),
+                ),
+                Text(
+                  'An elemental mage-dueling game — early preview',
+                  style: TextStyle(color: AppColors.textDim, fontSize: 11.5),
+                ),
               ],
             ),
           ),
-          Text('v$appVersion ($appBuild)',
-              style:
-                  const TextStyle(color: AppColors.textFaint, fontSize: 12)),
+          Text(
+            'v$appVersion ($appBuild)',
+            style: const TextStyle(color: AppColors.textFaint, fontSize: 12),
+          ),
         ],
       ),
     );

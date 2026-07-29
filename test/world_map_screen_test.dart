@@ -32,12 +32,26 @@ class _MemStorage implements ProfileStorage {
   Future<void> clear() async => stored = null;
 }
 
+/// ⚠️ Travel is on a real clock now. Tests move time rather than waiting three
+/// real minutes for a journey, which is the whole reason GameState takes its
+/// clock as a parameter.
+var _clock = DateTime.utc(2026, 1, 1, 12);
+DateTime _now() => _clock;
+
+Future<void> arrive(WidgetTester tester, GameState game) async {
+  _clock = _clock.add(const Duration(hours: 2));
+  await game.tick();
+  await tester.pumpAndSettle();
+}
+
 void main() {
+  setUp(() => _clock = DateTime.utc(2026, 1, 1, 12));
+
   Future<GameState> pumpMap(WidgetTester tester, Size viewport) async {
     tester.view.physicalSize = viewport;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
-    final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
+    final game = GameState(_MemStorage(), PlayerProfile.newPlayer(), now: _now);
     await tester.pumpWidget(MaterialApp(home: WorldMapScreen(game: game)));
     await tester.pumpAndSettle();
     return game;
@@ -93,10 +107,15 @@ void main() {
 
     await tester.tapAt(screenPositionOf(tester, 'whispering_woods'));
     await tester.pumpAndSettle();
-    expect(find.text('Travel to Whispering Woods'), findsOneWidget);
+    expect(find.textContaining('Travel to Whispering Woods'), findsOneWidget);
 
-    await tester.tap(find.text('Travel to Whispering Woods'));
+    await tester.tap(find.textContaining('Travel to Whispering Woods'));
     await tester.pumpAndSettle();
+    // ⭐ Travel takes time now: tapping departs, it does not teleport.
+    expect(game.isTravelling, isTrue);
+    expect(game.profile.locationId, 'aldermere');
+
+    await arrive(tester, game);
     expect(game.profile.locationId, 'whispering_woods');
     expect(
       find.text('Whispering Woods'),
@@ -136,7 +155,7 @@ void main() {
     await tester.tapAt(screenPositionOf(tester, 'thornmire'));
     await tester.pumpAndSettle();
     expect(
-      find.text('Travel to Thornmire'),
+      find.textContaining('Travel to Thornmire'),
       findsOneWidget,
       reason: 'a pin deep in the clamped zone must still take taps',
     );
@@ -145,7 +164,7 @@ void main() {
     // And the far south of the map — beyond any plausible clamp.
     await tester.tapAt(screenPositionOf(tester, 'glimmerbrook'));
     await tester.pumpAndSettle();
-    expect(find.text('Travel to Glimmerbrook'), findsOneWidget);
+    expect(find.textContaining('Travel to Glimmerbrook'), findsOneWidget);
     expect(
       game.profile.locationId,
       'aldermere',
@@ -184,7 +203,7 @@ void main() {
     expect(find.text('Aldermere'), findsWidgets);
 
     await game.travelTo('thornmire');
-    await tester.pumpAndSettle();
+    await arrive(tester, game);
 
     expect(
       find.text('Thornmire'),
@@ -204,7 +223,7 @@ void main() {
     final at = screenPositionOf(tester, 'pennycross');
     await tester.tapAt(at + const Offset(0, 20));
     await tester.pumpAndSettle();
-    expect(find.text('Travel to Pennycross'), findsOneWidget);
+    expect(find.textContaining('Travel to Pennycross'), findsOneWidget);
     await dismissSheet(tester);
 
     // ...and 90 screen px off must not be anything. The direction is chosen
@@ -294,7 +313,7 @@ void main() {
 
     await tester.tapAt(south);
     await tester.pumpAndSettle();
-    expect(find.text('Travel to Thornmire'), findsOneWidget);
+    expect(find.textContaining('Travel to Thornmire'), findsOneWidget);
   });
 
   testWidgets('"Whole world" still gets back to everything at once', (
@@ -344,7 +363,11 @@ void main() {
       tester.view.physicalSize = const Size(420, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
-      final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
+      final game = GameState(
+        _MemStorage(),
+        PlayerProfile.newPlayer(),
+        now: _now,
+      );
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -380,8 +403,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tapAt(screenPositionOf(tester, 'whispering_woods'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Travel to Whispering Woods'));
-      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Travel to Whispering Woods'));
+      await arrive(tester, game);
 
       expect(game.profile.locationId, 'whispering_woods');
     });
@@ -480,7 +503,7 @@ void main() {
     tester.view.physicalSize = const Size(420, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
-    final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
+    final game = GameState(_MemStorage(), PlayerProfile.newPlayer(), now: _now);
     await tester.pumpWidget(
       MaterialApp(
         home: GameStateScope(

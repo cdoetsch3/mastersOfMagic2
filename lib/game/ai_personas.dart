@@ -58,8 +58,7 @@ class AiPersona {
   /// compose. The same loadout at intelligence 3 and at 9 is two genuinely
   /// different opponents, and the same rating can be dropped on any monster
   /// without borrowing anything else from a persona.
-  DuelAi buildBrain() =>
-      LadderAi(intelligence, spells: loadout.spells);
+  DuelAi buildBrain() => LadderAi(intelligence, spells: loadout.spells);
 }
 
 /// Chance an enemy of the given [intelligence] throws away its turn.
