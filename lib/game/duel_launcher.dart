@@ -26,6 +26,10 @@ Future<void> launchDuel(
         loadout: loadout,
         driver: driver,
         campaign: campaign,
+        // Scales the player's health and damage (4%/level, compounding).
+        // Without this the duel screen defaults to level 1 and everyone
+        // fights at 100 HP regardless of their real level.
+        playerLevel: game.profile.level,
         onResult: (won) => game.recordDuelResult(won: won),
       ),
     ),
