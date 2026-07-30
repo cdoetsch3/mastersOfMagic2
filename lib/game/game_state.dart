@@ -190,15 +190,23 @@ class GameState extends ChangeNotifier {
   // ---- Duel results ----------------------------------------------------
 
   /// Applies XP/gold for a finished duel and flags any level-up.
-  Future<void> recordDuelResult({required bool won}) async {
+  Future<void> recordDuelResult({
+    required bool won,
+    int opponentLevel = 1,
+  }) async {
     final before = profile.level;
     await _mutate(() {
+      // ⭐ XP scales with who you beat (10/level), so the fight worth taking
+      // is the one that pays. Gold is deliberately still flat — scaling both
+      // would make the economy climb as steeply as the power curve.
+      profile.xp += Progression.xpForDuel(
+        won: won,
+        opponentLevel: opponentLevel,
+      );
       if (won) {
-        profile.xp += Progression.winXp;
         profile.gold += Progression.winGold;
         profile.duelsWon++;
       } else {
-        profile.xp += Progression.lossXp;
         profile.gold += Progression.lossGold;
         profile.duelsLost++;
       }

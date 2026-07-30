@@ -19,8 +19,10 @@ void main() {
   ).where((b) => b.kind == BadgeKind.streak).firstOrNull;
 
   group('the Flora streak is visible before it blooms', () {
-    test('Flora 1 through 5 each show a counted pip', () {
-      for (var n = 1; n <= 5; n++) {
+    test('Flora 1 through 4 each show a counted pip', () {
+      // 5 is the bloom, where the counter hands over to the Photo pip — see
+      // the paid-off group below.
+      for (var n = 1; n <= 4; n++) {
         final badge = streakBadge(snap(MagicElement.flora, n));
         expect(badge, isNotNull, reason: 'no pip at Flora $n');
         expect(badge!.label, 'Flora $n');
@@ -33,20 +35,15 @@ void main() {
     });
   });
 
-  test('once in bloom, Photo shows ALONGSIDE the Flora 5 streak', () {
-    // At 5 the streak pip still reads Flora 5 (it is capped there by the
-    // engine) and the Photosynthesis buff pip appears next to it.
+  test('in bloom, Photo REPLACES the Flora counter', () {
     final badges = badgesFromSnapshot(
       StatusSnapshot(const [
         StatusView(id: 'streak', stacks: 5, element: MagicElement.flora),
         StatusView(id: 'photosynthesis', stacks: 1),
       ]),
     );
-    expect(
-      badges.any((b) => b.kind == BadgeKind.streak && b.label == 'Flora 5'),
-      isTrue,
-    );
     expect(badges.any((b) => b.label == 'Photo'), isTrue);
+    expect(badges.where((b) => b.kind == BadgeKind.streak), isEmpty);
   });
 
   test('the other counted streaks still show', () {
@@ -58,5 +55,53 @@ void main() {
   test('an element with no streak mechanic shows no streak pip', () {
     // Pyro has no consecutive-cast effect.
     expect(streakBadge(snap(MagicElement.pyro, 4)), isNull);
+  });
+
+  group('a paid-off streak stops taking up space with a number', () {
+    test('Flora drops its counter entirely once in bloom', () {
+      // The "Photo / in bloom" pip already says everything "Flora 5" would.
+      final badges = badgesFromSnapshot(
+        StatusSnapshot(const [
+          StatusView(id: 'streak', stacks: 5, element: MagicElement.flora),
+          StatusView(id: 'photosynthesis', stacks: 1),
+        ]),
+      );
+      expect(
+        badges.where((b) => b.kind == BadgeKind.streak),
+        isEmpty,
+        reason: 'the counter is redundant beside the Photo pip',
+      );
+      expect(badges.any((b) => b.label == 'Photo'), isTrue);
+    });
+
+    test('Aero becomes "Tailwind" with no number', () {
+      // Tailwind has no pip of its own, so the streak pip becomes it.
+      final badge = streakBadge(snap(MagicElement.aero, 3))!;
+      expect(badge.label, 'Tailwind');
+      expect(badge.sub, isNull);
+      expect(badge.color, MagicElement.aero.style.color);
+    });
+
+    test('but they still COUNT on the way up', () {
+      expect(streakBadge(snap(MagicElement.aero, 2))!.label, 'Aero 2');
+      expect(streakBadge(snap(MagicElement.flora, 4))!.label, 'Flora 4');
+    });
+
+    test('cadence streaks keep counting forever', () {
+      // For Aqua/Geo/Sanctus the number IS the mechanic — it says how far off
+      // the next proc is — so it must never be replaced by a label.
+      expect(streakBadge(snap(MagicElement.aqua, 9))!.label, 'Aqua 9');
+      expect(streakBadge(snap(MagicElement.geo, 12))!.label, 'Geo 12');
+    });
+  });
+
+  test('Empower reads as a state, not a stack count', () {
+    // ⚠️ "×2" beside pips like "Dark 7" read as TWO Empowers. It does not
+    // stack; it doubles.
+    final badges = badgesFromSnapshot(
+      StatusSnapshot(const [StatusView(id: 'empower', magnitude: 2)]),
+    );
+    final empower = badges.firstWhere((b) => b.label == 'Empower');
+    expect(empower.sub, isNull);
   });
 }

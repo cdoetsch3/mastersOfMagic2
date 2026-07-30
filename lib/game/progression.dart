@@ -39,6 +39,21 @@ abstract final class Progression {
   static const int lossXp = 15;
   static const int lossGold = 0;
 
+  /// XP per level of the defeated opponent.
+  ///
+  /// ⭐ Reward tracks who you beat, not merely that you won. Flat XP made
+  /// farming the easiest reachable enemy the optimal way to level, which is
+  /// the opposite of what the campaign wants — the fight worth taking should
+  /// be the one that pays.
+  static const int xpPerOpponentLevel = 10;
+
+  /// XP for a duel against an opponent of [opponentLevel].
+  ///
+  /// A loss still pays [lossXp] — a floor, deliberately not scaled, so losing
+  /// to something far above you is consolation rather than a payday.
+  static int xpForDuel({required bool won, required int opponentLevel}) =>
+      won ? winXp + xpPerOpponentLevel * opponentLevel : lossXp;
+
   // ---- Loadout preset slots ------------------------------------------
 
   /// A new preset slot unlocks at each of these levels (up to 5 total).

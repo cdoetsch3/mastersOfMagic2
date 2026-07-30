@@ -33,6 +33,12 @@ String? _streakMechanic(MagicElement element) => switch (element) {
   _ => null, // only these five carry consecutive-streak effects
 };
 
+/// What a gated streak reads once it has paid off and stopped counting.
+String _streakPayoffLabel(MagicElement element) => switch (element) {
+  MagicElement.aero => 'Tailwind',
+  _ => element.style.label,
+};
+
 /// Badges for one mage, built from a [StatusSnapshot] rather than live engine
 /// state — that is what lets the duel screen reveal a pip at the moment its
 /// event animates instead of showing every status the instant the turn
@@ -41,15 +47,29 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
   final badges = <StatusBadge>[];
 
   // --- Streak (only the elements that build toward something) -----------
+  //
+  // ⭐ A counter is only worth screen space while it is still *counting*. Once
+  // a gated streak has paid off, the count is frozen at its threshold and says
+  // nothing the payoff pip does not — so it makes way:
+  //   • Flora  — drops out entirely; the "Photo / in bloom" pip below covers it.
+  //   • Aero   — becomes "Tailwind", since Tailwind has no pip of its own.
+  // Cadence streaks (Aqua/Geo/Sanctus) keep counting, because for those the
+  // number is the mechanic: it says how far off the next proc is.
   final streak = snap['streak'];
   if (streak != null && streak.element != null) {
-    final mechanic = _streakMechanic(streak.element!);
-    if (mechanic != null) {
+    final element = streak.element!;
+    final mechanic = _streakMechanic(element);
+    final cap = ElementTuning.streakCap(element);
+    final paidOff = cap != null && streak.stacks >= cap;
+
+    if (mechanic != null && !(paidOff && element == MagicElement.flora)) {
       badges.add(
         StatusBadge(
-          '${streak.element!.style.label} ${streak.stacks}',
-          sub: mechanic,
-          color: streak.element!.style.color,
+          paidOff
+              ? _streakPayoffLabel(element)
+              : '${element.style.label} ${streak.stacks}',
+          sub: paidOff ? null : mechanic,
+          color: element.style.color,
           kind: BadgeKind.streak,
         ),
       );
@@ -125,15 +145,11 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       const StatusBadge('Haste', color: AppColors.teal, kind: BadgeKind.buff),
     );
   }
-  final empower = snap['empower'];
-  if (empower != null) {
+  if (snap['empower'] != null) {
+    // ⚠️ No "×2" subtitle. Next to a stack count like "Dark 7" it read as
+    // *two* Empowers rather than a doubling — and Empower does not stack.
     badges.add(
-      StatusBadge(
-        'Empower',
-        sub: '×${empower.magnitude}',
-        color: AppColors.gold,
-        kind: BadgeKind.buff,
-      ),
+      const StatusBadge('Empower', color: AppColors.gold, kind: BadgeKind.buff),
     );
   }
   if (snap['quicken'] != null) {

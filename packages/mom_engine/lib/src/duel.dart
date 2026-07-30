@@ -549,7 +549,12 @@ class DuelEngine {
           events: events,
         );
       case ShieldEffect(:final minStrength, :final maxStrength):
-        final strength = _roll(minStrength, maxStrength);
+        // ⭐ Shields scale with level on the same 4% curve as health and
+        // damage. Without it a level-60's shield soaks a level-60's hit for
+        // one tenth as long as a level-1's does against a level-1 — defence
+        // would quietly stop being a strategy as the game went on.
+        final strength =
+            (_roll(minStrength, maxStrength) * caster.levelScale).round();
         caster.shield = ActiveShield.elemental(cast.element, strength);
         events.add(ShieldRaisedEvent(caster,
             element: cast.element, isBarrier: false, strength: strength));
@@ -638,7 +643,12 @@ class DuelEngine {
     var totalToHp = 0;
     var totalRaw = 0;
     for (var h = 0; h < hits; h++) {
-      var perHit = (_roll(minPerHit, maxPerHit) * scale).round();
+      // ⭐ Level scales damage as well as health (4%/level, compounding), so a
+      // level advantage is a real advantage rather than just a bigger pool to
+      // grind through. Without this a level-60 boss has 683 HP and still hits
+      // for level-1 numbers — which is exactly how it shipped once.
+      var perHit =
+          (_roll(minPerHit, maxPerHit) * scale * caster.levelScale).round();
 
       // Crit (§5.2 step 4/5, per hit). Guarded on chance > 0 so a no-crit
       // build rolls nothing. The bonus is a multiplier atop the damage mods.

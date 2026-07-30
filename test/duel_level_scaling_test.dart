@@ -9,6 +9,7 @@ import 'package:masters_of_magic_2/game/loadout.dart';
 import 'package:masters_of_magic_2/game/opponent_driver.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
+import 'package:masters_of_magic_2/game/progression.dart';
 import 'package:masters_of_magic_2/screens/duel_screen.dart';
 import 'package:mom_engine/mom_engine.dart';
 
@@ -93,6 +94,97 @@ void main() {
       findsWidgets,
       reason: 'a level-3 mage fights at 108 HP, not 100',
     );
+  });
+
+  group('XP tracks who you beat', () {
+    test('a win pays a base plus 10 per opponent level', () {
+      expect(
+        Progression.xpForDuel(won: true, opponentLevel: 1),
+        Progression.winXp + 10,
+      );
+      expect(
+        Progression.xpForDuel(won: true, opponentLevel: 60),
+        Progression.winXp + 600,
+      );
+    });
+
+    test('beating something tougher always pays more', () {
+      var previous = 0;
+      for (var level = 1; level <= 60; level++) {
+        final xp = Progression.xpForDuel(won: true, opponentLevel: level);
+        expect(
+          xp,
+          greaterThan(previous),
+          reason: 'level $level must beat level ${level - 1}',
+        );
+        previous = xp;
+      }
+    });
+
+    test('a loss pays the flat floor, however big the enemy', () {
+      // ⚠️ Deliberately unscaled: losing to a level-60 must be consolation,
+      // not a payday you could farm by throwing fights.
+      expect(
+        Progression.xpForDuel(won: false, opponentLevel: 60),
+        Progression.lossXp,
+      );
+      expect(
+        Progression.xpForDuel(won: false, opponentLevel: 1),
+        Progression.lossXp,
+      );
+    });
+
+    testWidgets('the launcher reports the opponent level it fought', (
+      tester,
+    ) async {
+      // ⚠️ Same seam that swallowed the player's level once already: only the
+      // launcher crosses it, so only a test that goes through the launcher
+      // can see a level dropped here.
+      tester.view.physicalSize = const Size(1280, 720);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
+      final xpBefore = game.profile.xp;
+      final foe = AiRoster.all.last; // the highest-level persona
+      expect(foe.level, greaterThan(1));
+
+      late BuildContext ctx;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GameStateScope(
+            state: game,
+            child: Builder(
+              builder: (c) {
+                ctx = c;
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+
+      unawaited(
+        launchDuel(
+          ctx,
+          loadout: Loadout.starter,
+          driver: LocalAiDriver(persona: foe, rng: Random(1)),
+          campaign: true,
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      final screen = tester.widget<DuelScreen>(find.byType(DuelScreen));
+      screen.onResult!(true);
+      await tester.pump();
+
+      expect(
+        game.profile.xp - xpBefore,
+        Progression.xpForDuel(won: true, opponentLevel: foe.level),
+        reason: 'beating a level-${foe.level} foe must pay for that level',
+      );
+    });
   });
 }
 

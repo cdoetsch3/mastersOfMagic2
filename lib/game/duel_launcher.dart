@@ -30,7 +30,14 @@ Future<void> launchDuel(
         // Without this the duel screen defaults to level 1 and everyone
         // fights at 100 HP regardless of their real level.
         playerLevel: game.profile.level,
-        onResult: (won) => game.recordDuelResult(won: won),
+        // ⚠️ Both levels cross this seam. The player's scales their health
+        // and damage; the opponent's scales the XP the win is worth. This is
+        // the only path a real player takes, so a level dropped here is
+        // invisible to every test that builds DuelScreen directly.
+        onResult: (won) => game.recordDuelResult(
+          won: won,
+          opponentLevel: driver.opponentLevel,
+        ),
       ),
     ),
   );
@@ -41,8 +48,10 @@ Future<void> launchDuel(
     messenger.showSnackBar(
       SnackBar(
         backgroundColor: AppColors.panel,
-        content: Text('Level up! You are now level $level.',
-            style: const TextStyle(color: AppColors.gold)),
+        content: Text(
+          'Level up! You are now level $level.',
+          style: const TextStyle(color: AppColors.gold),
+        ),
       ),
     );
   }
@@ -54,10 +63,9 @@ Future<void> launchAiDuel(
   required Loadout loadout,
   required AiPersona persona,
   required bool campaign,
-}) =>
-    launchDuel(
-      context,
-      loadout: loadout,
-      driver: LocalAiDriver(persona: persona),
-      campaign: campaign,
-    );
+}) => launchDuel(
+  context,
+  loadout: loadout,
+  driver: LocalAiDriver(persona: persona),
+  campaign: campaign,
+);

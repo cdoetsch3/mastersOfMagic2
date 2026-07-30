@@ -420,6 +420,30 @@ MoM2 adds **spell slots** unlocked via leveling.
   - ✅ Monsters fight by the **exact same rules** as players (elements, charges, spells,
     shields) with an AI brain.
 
+### 📝 Alternate character modes — to consider (2026-07-28)
+
+Raised while designing achievements; recorded, not designed.
+
+- 💡 **Permadeath mode** (name TBD) — the character is gone on death.
+- 💡 **No-trading mode** (name TBD) — everything must be **found or crafted**;
+  no shops, no Concord Market. A self-sufficiency run.
+- 💡 **Both at once** — the strictest mode.
+
+⭐ **These force a decision the codebase has not made: character vs account.**
+Today `PlayerProfile` is both — one document at `players/{uid}`. A permadeath
+run only means something as a *separate character* alongside your main, so
+these modes cannot exist until progress belongs to a character rather than to
+a login. ✅ Related ruling already made: achievements and progress are
+**character-level, and characters are 100% separate** from each other
+(ACHIEVEMENTS_DESIGN §2).
+
+⚠️ Cheapest moment to make that split is **before** anything else starts
+writing to the profile document; retrofitting means migrating every save.
+
+⚠️ No-trading mode also needs a ruling on whether its achievements are
+*distinct* from the normal ones — the same achievement earned without a market
+is a different accomplishment.
+
 ### Adventure loop (push-your-luck)
 - ✅ **HP persists between encounters** within an adventure. After each encounter the
   player chooses **"return to town"** (bank the loot) or **"keep going"**.

@@ -742,6 +742,24 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
 
 ## Deferred / banked — do not build without an explicit ask
 
+- **📝 Achievements + character progress — designed, not built.** See
+  `ACHIEVEMENTS_DESIGN.md` (2026-07-28). ~140 achievements: three per zone
+  (clear / purge every enemy / collect every drop), 5-tier charge-based
+  mastery per element, wealth, duelling and world. Rewards are XP, gold, RP,
+  and selectable prefix/suffix titles — never power. Points are public;
+  individual achievements are private. Later mirror to Play Games / Game
+  Center.
+  ⛔ **Blocked on a character-progress subcollection that does not exist**:
+  zone *clearing* is not recorded anywhere (`hasAdventure` says a zone has an
+  encounter, not that you beat it), per-element **charge counts** are not
+  tracked, and neither is lifetime gold earned. All are worth adding
+  regardless of achievements.
+  ⚠️ Also surfaces an unmade architectural decision — **character vs
+  account**. `PlayerProfile` is currently both. Progress and achievements are
+  ruled **character-level**, and the alternate modes in GAME_DESIGN §5
+  (permadeath, no-trading) depend on the split. Cheapest to do before more
+  things write to the profile document.
+
 - **⛔ Third-party sign-in (Google / Apple / Facebook SSO).** Requested
   2026-07-28. Big, and deliberately later: each provider is its own OAuth
   setup, platform config (Apple needs an entitlement and its own "Sign in with
