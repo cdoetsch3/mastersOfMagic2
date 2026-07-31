@@ -203,7 +203,7 @@ void main() {
               '${StatusCatalog.byId('photosynthesis')!.description}'
           .toLowerCase();
       expect(text, isNot(contains('stack')),
-          reason: 'Photosynthesis has no stacks — it is in bloom or it is not');
+          reason: 'Photosynthesis has no stacks — it is active or it is not');
     });
 
     test('the Flora interactions on Pyro and Aqua match the new mechanic', () {

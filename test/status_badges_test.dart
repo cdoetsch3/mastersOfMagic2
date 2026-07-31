@@ -7,7 +7,7 @@ import 'package:mom_engine/mom_engine.dart';
 ///
 /// ⚠️ Flora used to produce NO streak pip — `_streakMechanic` covered the four
 /// cadence elements but not Flora, so a Flora run was invisible until it
-/// bloomed. Reported from play: "Flora count not working, not seeing the
+/// activated. Reported from play: "Flora count not working, not seeing the
 /// status PIP showing the streak."
 void main() {
   StatusSnapshot snap(MagicElement element, int count) => StatusSnapshot([
@@ -18,9 +18,9 @@ void main() {
     s,
   ).where((b) => b.kind == BadgeKind.streak).firstOrNull;
 
-  group('the Flora streak is visible before it blooms', () {
+  group('the Flora streak is visible before Photosynthesis activates', () {
     test('Flora 1 through 4 each show a counted pip', () {
-      // 5 is the bloom, where the counter hands over to the Photo pip — see
+      // 5 is where the counter hands over to the Photo pip — see
       // the paid-off group below.
       for (var n = 1; n <= 4; n++) {
         final badge = streakBadge(snap(MagicElement.flora, n));
@@ -31,11 +31,11 @@ void main() {
     });
 
     test('the pip names what the streak builds toward', () {
-      expect(streakBadge(snap(MagicElement.flora, 3))!.sub, 'BLOOM');
+      expect(streakBadge(snap(MagicElement.flora, 3))!.sub, 'PHOTO');
     });
   });
 
-  test('in bloom, Photo REPLACES the Flora counter', () {
+  test('once active, Photo REPLACES the Flora counter', () {
     final badges = badgesFromSnapshot(
       StatusSnapshot(const [
         StatusView(id: 'streak', stacks: 5, element: MagicElement.flora),
@@ -58,8 +58,8 @@ void main() {
   });
 
   group('a paid-off streak stops taking up space with a number', () {
-    test('Flora drops its counter entirely once in bloom', () {
-      // The "Photo / in bloom" pip already says everything "Flora 5" would.
+    test('Flora drops its counter entirely once Photosynthesis is active', () {
+      // The "Photo / active" pip already says everything "Flora 5" would.
       final badges = badgesFromSnapshot(
         StatusSnapshot(const [
           StatusView(id: 'streak', stacks: 5, element: MagicElement.flora),

@@ -114,11 +114,20 @@ class DuelEngine {
   static const int fatigueThreshold = 50;
   static const int fatiguePerTurn = 3;
 
-  /// Whether element side-effects (Ignite procs, Photosynthesis blooms,
+  /// Whether element side-effects (Ignite procs, Photosynthesis,
   /// Waterlogged, …) fire on casts. Always true in real duels; tests of core
   /// resolution semantics (priority, shields, Haste) may switch them off so
   /// hand-computed expectations aren't perturbed by procs.
   final bool elementEffects;
+
+  /// The entries being resolved this turn.
+  ///
+  /// ⚠️ Held so a drain can reach charge that has already been **committed**
+  /// to a cast which has not resolved yet. Same-priority casts all pay before
+  /// any of them resolves (so neither can read a bar the other has spent), and
+  /// without this a Static Feedback or Discharge landing in that window would
+  /// find a zeroed bar and silently do nothing.
+  List<_Entry> _turnEntries = const [];
 
   /// The mage grabbing Haste via Tailwind this turn (last grab wins if both
   /// somehow qualify). Applied after normal Haste transfer — the wind always
@@ -233,6 +242,7 @@ class DuelEngine {
       }
     }
     entries.sort((a, b) => a.priority.compareTo(b.priority));
+    _turnEntries = entries;
 
     // Resolve in priority order, grouped by equal priority.
     var i = 0;
@@ -385,6 +395,7 @@ class DuelEngine {
   }
 
   void _resolveEntry(_Entry e, List<DuelEvent> events) {
+    e.resolved = true;
     if (e.isChannel) {
       e.caster.element ??= e.element;
       e.caster.charge++;
@@ -397,6 +408,44 @@ class DuelEngine {
   /// Whether [spell] could be cast with [charge] in the bar.
   bool _hasChargeToCast(Spell spell, int charge) =>
       spell.xCost ? charge >= 1 : charge >= spell.chargeCost;
+
+  /// Charge that can still be taken from [mage] — live, plus anything
+  /// committed to a cast of theirs that has not resolved yet.
+  int _drainableCharge(MageState mage) {
+    var total = mage.charge;
+    for (final e in _turnEntries) {
+      if (identical(e.caster, mage) && !e.isChannel && !e.resolved) {
+        total += e.chargeAtCast;
+      }
+    }
+    return total;
+  }
+
+  /// Take up to [amount] charge from [mage]; returns how much was actually
+  /// taken.
+  ///
+  /// ⭐ Drains live charge first, then eats into charge already **committed**
+  /// to an unresolved cast — which is what lets a same-priority strip drop a
+  /// spell below its cost and fizzle it. Without the second half, Static
+  /// Feedback and Discharge would be no-ops against anyone casting at their
+  /// own priority, because payment has already zeroed the visible bar.
+  int _drainCharge(MageState mage, int amount) {
+    var remaining = amount;
+    final live = mage.charge < remaining ? mage.charge : remaining;
+    mage.charge -= live;
+    remaining -= live;
+
+    for (final e in _turnEntries) {
+      if (remaining <= 0) break;
+      if (identical(e.caster, mage) && !e.isChannel && !e.resolved) {
+        final taken = e.chargeAtCast < remaining ? e.chargeAtCast : remaining;
+        e.chargeAtCast -= taken;
+        remaining -= taken;
+      }
+    }
+    if (mage.charge == 0) mage.element = null;
+    return amount - remaining;
+  }
 
   /// Commit a cast's charge, at the moment it resolves.
   ///
@@ -587,8 +636,9 @@ class DuelEngine {
         break;
       case DischargeEffect():
         final target = cast.target;
-        final drained = target.charge;
-        target.charge = 0;
+        // Takes everything, including charge already committed to a cast of
+        // theirs that has not gone off yet — which is what fizzles it.
+        final drained = _drainCharge(target, _drainableCharge(target));
         target.element = null;
         events.add(ChargeDrainedEvent(target, drained));
       case HallowEffect():
@@ -719,7 +769,7 @@ class DuelEngine {
         if (PhotosynthesisStatus.activeFor(caster)) {
           if (_statusOf<PhotosynthesisStatus>(caster) == null) {
             caster.statuses.add(PhotosynthesisStatus());
-            e.add(BuffAppliedEvent(caster, 'Photosynthesis — in bloom',
+            e.add(BuffAppliedEvent(caster, 'Photosynthesis — active',
                 statusId: 'photosynthesis'));
           }
         }
@@ -760,11 +810,10 @@ class DuelEngine {
           // a Geo shield still standing after the hit.
           final grounded = target.shield?.element == MagicElement.geo;
           if (!grounded &&
-              target.charge > 0 &&
+              _drainableCharge(target) > 0 &&
               rng.nextDouble() < ElementTuning.staticFeedbackPercent / 100) {
-            target.charge--;
-            e.add(ChargeDrainedEvent(target, 1));
-            if (target.charge == 0) target.element = null;
+            final taken = _drainCharge(target, 1);
+            if (taken > 0) e.add(ChargeDrainedEvent(target, taken));
           }
         }
       case MagicElement.aero:
@@ -943,7 +992,7 @@ class DuelEngine {
 
   /// Applies (or refreshes) Ignite on [target]: a burn of 10% of [rawDamage]
   /// per tick. Landing Ignite breaks the target's Flora streak, which ends
-  /// any Photosynthesis bloom — stripping the status alone would let it return
+  /// any active Photosynthesis — stripping the status alone would let it return
   /// on their very next Flora cast.
   void _applyIgnite(MageState target, int rawDamage, List<DuelEvent> e) {
     final perTick = (rawDamage * 0.10).round();
@@ -1235,6 +1284,10 @@ class _Entry {
   /// Set true when the cast fizzled (charge pulled below cost at resolution),
   /// so the caster keeps the charge they had.
   bool fizzled = false;
+
+  /// True once this entry has been resolved, so a later drain in the same turn
+  /// cannot retroactively strip charge from a spell that already went off.
+  bool resolved = false;
 
   /// The caster's charge at the moment they paid for this cast.
   ///

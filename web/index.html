@@ -20,6 +20,24 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Masters of Magic 2 — a simultaneous-turn elemental mage-duel game.">
 
+  <!--
+    ⚠️ Deliberate, load-bearing, and absent from Flutter's own template — do
+    not remove. Without a viewport meta the browser lays the page out on a
+    legacy ~980px viewport and picks a page scale at FIRST PAINT, before the
+    Flutter engine boots and injects its own meta. That initial scale is
+    computed for whichever orientation the app happened to LOAD in, and mobile
+    Safari preserves it across rotations — so an app opened in portrait and
+    rotated to landscape renders at the new size while pointer events keep the
+    stale scale: every tap lands offset from what it visually hits. (Reported
+    from device testing 2026-07-28: hitboxes wrong after portrait→landscape,
+    fine when loaded in landscape.) Declaring the viewport up front means the
+    first paint is already at device width, so there is no stale scale to
+    inherit. user-scalable=no matches what the engine enforces anyway — page
+    pinch-zoom would break hit testing the same way; viewport-fit=cover lets
+    landscape content extend around the notch (SafeArea handles the rest).
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">

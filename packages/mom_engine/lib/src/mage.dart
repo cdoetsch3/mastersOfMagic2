@@ -167,7 +167,7 @@ class MageState {
   /// forfeits, fizzles, or misses (those behave like a charge — no change).
   void recordCastForStreak(MagicElement element) {
     if (streakElement == element) {
-      // ⚠️ Gated streaks stop at their gate. Flora blooms at 5 and gains
+      // ⚠️ Gated streaks stop at their gate. Flora activates at 5 and gains
       // nothing from a 9th cast, and a pip counting past the payoff promises
       // one that is not coming. Cadence elements (Aqua, Geo, Sanctus) fire
       // every Nth cast and are deliberately left uncapped — see

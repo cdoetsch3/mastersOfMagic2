@@ -89,7 +89,7 @@ void main() {
     );
   });
 
-  test('Ignite breaks the whole Flora streak, not just the bloom', () {
+  test('Ignite breaks the whole Flora streak, not just Photosynthesis', () {
     // ⚠️ Stripping only the Photosynthesis status would let it return on the
     // very next Flora cast, so Ignite would counter nothing.
     final a = MageState(name: 'A');

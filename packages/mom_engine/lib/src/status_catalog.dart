@@ -108,7 +108,7 @@ abstract final class StatusCatalog {
       description:
           'From your 5th Flora cast in a row, heals 1% of your maximum health '
           'at the end of every turn and makes you immune to Waterlogged. Cast '
-          'anything else and the bloom ends; Ignite breaks it outright.',
+          'anything else and it ends; Ignite breaks it outright.',
       trigger: 'Any Flora cast.',
       kind: StatusKind.buff,
       element: MagicElement.flora,

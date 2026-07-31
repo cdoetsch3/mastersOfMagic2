@@ -15,7 +15,6 @@ import 'element.dart';
 ///
 /// Specification: TYPE_EFFECTS_DESIGN.md §2 and §4.
 
-
 abstract final class ElementTuning {
   // ---- Tier 1 — Primal ------------------------------------------------
 
@@ -35,10 +34,10 @@ abstract final class ElementTuning {
   /// Waterlogged: priority added to the victim's next action, sending it last.
   static const int waterloggedPriorityPenalty = 10;
 
-  /// Photosynthesis (Flora): consecutive Flora casts before it blooms.
+  /// Photosynthesis (Flora): consecutive Flora casts before it activates.
   static const int photosynthesisStreak = 5;
 
-  /// Photosynthesis: percent of max HP healed per turn while in bloom.
+  /// Photosynthesis: percent of max HP healed per turn while active.
   static const int photosynthesisHealPercent = 1;
 
   // ---- Tier 2 — Kinetic -----------------------------------------------
@@ -63,7 +62,8 @@ abstract final class ElementTuning {
 
   /// The point past which counting a streak stops meaning anything.
   ///
-  /// ⭐ A streak that is *gated* — Flora blooms at 5, Aero's Tailwind at 3 —
+  /// ⭐ A streak that is *gated* — Flora's Photosynthesis at 5, Aero's
+  /// Tailwind at 3 —
   /// gains nothing from climbing further, and a pip reading "Flora 9" invites
   /// the player to expect a payoff that does not exist. Those counters stop at
   /// the gate.

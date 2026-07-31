@@ -251,12 +251,13 @@ effectively **"your next action goes last."**
   streak.
 - ✅ **Effect:** heals **1% of max HP** per turn in the end-of-turn heal band
   (§5.1) — a flat rate, not per stack. There are no stacks.
-- ✅ **Ends** the moment the streak breaks: one cast of any other element and the
-  bloom is over. **Charging does not sustain it** — only casts build a streak.
+- ✅ **Ends** the moment the streak breaks: one cast of any other element and
+  Photosynthesis is over. **Charging does not sustain it** — only casts build a
+  streak.
 - ✅ **Ignite breaks the streak itself**, not merely the status. ⚠️ Stripping the
   status alone would let it return on the very next Flora cast, and Ignite would
   counter nothing.
-- ✅ **Grants** Waterlogged immunity while in bloom.
+- ✅ **Grants** Waterlogged immunity while active.
 
 ⭐ **Why this shape.** The old design was the only element effect in the game
 that accrued **unconditionally** — every Flora cast added a stack, with no hit

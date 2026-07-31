@@ -33,7 +33,8 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.pyro: ElementLore(
     effectName: 'Ignite',
     trigger: '25% on hit · even through a shield',
-    description: 'Burns 10% of the attack\'s total damage at end of turn for '
+    description:
+        'Burns 10% of the attack\'s total damage at end of turn for '
         '3 turns (this one included). Burn is regular damage — it hits the '
         'shield first. Re-igniting refreshes; it never stacks.',
     beatsEffect: 'Ignite breaks their Photosynthesis streak',
@@ -42,20 +43,22 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.aqua: ElementLore(
     effectName: 'Waterlogged',
     trigger: 'every 3rd consecutive Aqua cast',
-    description: 'The opponent\'s next action (including a charge) is dragged '
+    description:
+        'The opponent\'s next action (including a charge) is dragged '
         '+10 priority — it resolves dead last. Does not stack; refreshes. '
         'Casting any Aqua shield also douses Ignite on you.',
     beatsEffect: 'Your shield douses their Ignite',
-    weakEffect: 'Their Photosynthesis bloom blocks your Waterlogged',
+    weakEffect: 'Their Photosynthesis blocks your Waterlogged',
   ),
   MagicElement.flora: ElementLore(
     effectName: 'Photosynthesis',
     trigger: 'your 5th Flora cast in a row',
-    description: 'The first four casts do nothing. From the 5th onward you '
+    description:
+        'The first four casts do nothing. From the 5th onward you '
         'heal 1% of max HP at end of turn — before any burn lands — and you '
-        'can\'t be Waterlogged. Cast any other element and the bloom ends. '
+        'can\'t be Waterlogged. Cast any other element and it ends. '
         'Charging doesn\'t count; only casts build the streak.',
-    beatsEffect: 'A bloom blocks their Waterlogged',
+    beatsEffect: 'Photosynthesis blocks their Waterlogged',
     weakEffect: 'Their Ignite breaks your streak',
   ),
 
@@ -63,7 +66,8 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.electro: ElementLore(
     effectName: 'Static Feedback',
     trigger: '20% on hit',
-    description: 'Strips one charge from the target. If they locked in a spell '
+    description:
+        'Strips one charge from the target. If they locked in a spell '
         'they can no longer afford, it fizzles — they keep the rest of their '
         'charge but waste the turn. Every Electro attack also scatters their '
         'Tailwind streak (their held Haste survives).',
@@ -73,7 +77,8 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.aero: ElementLore(
     effectName: 'Tailwind',
     trigger: '3rd consecutive Aero cast onward',
-    description: 'Seizes the Haste token — while the streak lives you re-grab '
+    description:
+        'Seizes the Haste token — while the streak lives you re-grab '
         'it every cast, winning every same-speed tie. At a streak of 3+ you '
         'also shrug off Stagger.',
     beatsEffect: 'A 3+ streak shrugs off their Stagger',
@@ -82,7 +87,8 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.geo: ElementLore(
     effectName: 'Stagger',
     trigger: 'every 4th consecutive Geo cast',
-    description: 'The opponent\'s next offensive spell deals 50% damage — it '
+    description:
+        'The opponent\'s next offensive spell deals 50% damage — it '
         'lingers until they cast one. Whiffs against a Tailwind streak of 3+. '
         'A standing Geo shield also grounds enemy Static Feedback.',
     beatsEffect: 'Your shield grounds their Static Feedback',
@@ -93,7 +99,8 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.solar: ElementLore(
     effectName: 'Blind',
     trigger: '10% per charge spent, on attack',
-    description: 'For the opponent\'s next 3 turns, each offensive spell has a '
+    description:
+        'For the opponent\'s next 3 turns, each offensive spell has a '
         '50% chance to miss — no effect, but the charge is spent. Astral spells '
         'are exempt. A Blind also eclipses a Lunar mage\'s moon to New.',
     beatsEffect: 'Blind eclipses their moon to New',
@@ -102,16 +109,19 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.lunar: ElementLore(
     effectName: 'Phases of the Moon',
     trigger: 'a shared, public 4-turn cycle',
-    description: 'The moon turns every turn for both players. On a Full Moon '
+    description:
+        'The moon turns every turn for both players. On a Full Moon '
         'your Lunar attacks hit 20% harder; the other phases do nothing for '
         'now. Time your big Lunar turns for the Full Moon.',
-    beatsEffect: 'A Lunar hit strips their Astral Alignment (all of it at Full)',
+    beatsEffect:
+        'A Lunar hit strips their Astral Alignment (all of it at Full)',
     weakEffect: 'Their Blind eclipses your moon, denying the Full Moon',
   ),
   MagicElement.astral: ElementLore(
     effectName: 'Astral Alignment',
     trigger: '+1 stack per charge spent (max 20)',
-    description: 'Each stack routes 1% of every attack past shields, straight '
+    description:
+        'Each stack routes 1% of every attack past shields, straight '
         'to health — up to 20%, ignoring shield counter math and piercing '
         'Barriers. Sheds a stack on any turn without an Astral cast. Astral '
         'spells never miss.',
@@ -123,7 +133,8 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.sanctus: ElementLore(
     effectName: 'Absolution',
     trigger: 'every 3rd consecutive Sanctus cast',
-    description: 'Purges one random debuff from you, before end-of-turn burns '
+    description:
+        'Purges one random debuff from you, before end-of-turn burns '
         'tick. Nothing to purge? Bank Grace — the next debuff on you is blocked '
         '(max 1). Every Absolution also sears 5 Creeping Dark off the enemy.',
     beatsEffect: 'Absolution sears their Creeping Dark (−5)',
@@ -132,7 +143,8 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.umbra: ElementLore(
     effectName: 'Creeping Dark',
     trigger: '+1 stack per charge spent (max 15)',
-    description: 'Sheds a stack each turn without Umbra activity. Thresholds '
+    description:
+        'Sheds a stack each turn without Umbra activity. Thresholds '
         'blind the enemy: 5 Shadow (hides your element), 10 Dusk (hides your '
         'charge & health), 15 Midnight (hides their own). Dusk+ also stops '
         'them gaining Arcane Knowledge.',
@@ -142,7 +154,8 @@ const Map<MagicElement, ElementLore> elementLore = {
   MagicElement.arcane: ElementLore(
     effectName: 'Arcane Knowledge',
     trigger: '4+ charge Arcane cast (max 5 stacks)',
-    description: '+5% damage per stack on every spell, permanent for the duel '
+    description:
+        '+5% damage per stack on every spell, permanent for the duel '
         '— never decays or is consumed. Blocked while the opponent\'s darkness '
         'has you at Dusk or worse.',
     beatsEffect: 'An Arcane hit resets their Sanctus rite',

@@ -25,7 +25,7 @@ class StatusBadge {
 
 /// The mechanic a consecutive streak of [element] is building toward.
 String? _streakMechanic(MagicElement element) => switch (element) {
-  MagicElement.flora => 'BLOOM',
+  MagicElement.flora => 'PHOTO',
   MagicElement.aqua => 'WATERLOG',
   MagicElement.aero => 'TAILWIND',
   MagicElement.geo => 'STAGGER',
@@ -51,7 +51,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
   // ⭐ A counter is only worth screen space while it is still *counting*. Once
   // a gated streak has paid off, the count is frozen at its threshold and says
   // nothing the payoff pip does not — so it makes way:
-  //   • Flora  — drops out entirely; the "Photo / in bloom" pip below covers it.
+  //   • Flora  — drops out entirely; the "Photo / active" pip below covers it.
   //   • Aero   — becomes "Tailwind", since Tailwind has no pip of its own.
   // Cadence streaks (Aqua/Geo/Sanctus) keep counting, because for those the
   // number is the mechanic: it says how far off the next proc is.
@@ -79,12 +79,12 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
   // --- Buffs (mine) -----------------------------------------------------
   final photo = snap['photosynthesis'];
   if (photo != null) {
-    // Streak-gated now: in bloom or not, so no count. The Flora streak pip
+    // Streak-gated now: active or not, so no count. The Flora streak pip
     // already shows the run that sustains it.
     badges.add(
       StatusBadge(
         'Photo',
-        sub: 'in bloom',
+        sub: 'active',
         color: MagicElement.flora.style.color,
         kind: BadgeKind.buff,
       ),
