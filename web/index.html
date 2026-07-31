@@ -59,6 +59,48 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
+  <script>
+    // ⚠️ Safari-only rotation band-aid — do not remove without testing
+    // portrait→landscape on a real iPhone IN SAFARI (Chrome behaves fine, on
+    // iOS included, so it cannot catch a regression here).
+    //
+    // Mobile Safari's collapsing toolbar changes the viewport geometry
+    // DURING a rotation, and Safari fires orientationchange/resize before
+    // that geometry has settled. Two failure modes follow:
+    //   1. The page is left subtly panned (a nonzero visualViewport offset),
+    //      so every pointer event reaches Flutter shifted by the pan — taps
+    //      land on the widget next to the one touched.
+    //   2. The engine latches dimensions from Safari's premature resize
+    //      event and never re-reads the final ones.
+    // Neither happens when the app LOADS in landscape, because the initial
+    // geometry is computed at rest — which is exactly the reported symptom.
+    //
+    // The shim re-pins the page to (0,0) and re-dispatches a resize once
+    // Safari has settled (twice, because settle time varies with toolbar
+    // animation). Inert on browsers that get this right: scrolling an
+    // unscrolled page is a no-op, and Flutter re-reading unchanged
+    // dimensions changes nothing.
+    (function () {
+      function settle() {
+        window.scrollTo(0, 0);
+        window.dispatchEvent(new Event('resize'));
+      }
+      window.addEventListener('orientationchange', function () {
+        setTimeout(settle, 200);
+        setTimeout(settle, 700);
+      });
+      if (window.visualViewport) {
+        // A pan without a rotation (toolbar show/hide) offsets taps the same
+        // way; keep the layout viewport pinned whenever the visual one moves.
+        window.visualViewport.addEventListener('scroll', function () {
+          if (window.visualViewport.offsetTop !== 0 ||
+              window.visualViewport.offsetLeft !== 0) {
+            window.scrollTo(0, 0);
+          }
+        });
+      }
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
