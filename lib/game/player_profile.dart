@@ -132,6 +132,29 @@ class PlayerProfile {
   /// still gated by the connection graph).
   Set<String> discoveredLocationIds;
 
+  /// How many times this character has beaten each zone's **boss**.
+  ///
+  /// ⚠️ **Not the same as [discoveredLocationIds]** — walking somewhere is not
+  /// clearing it, and the two must never be conflated. Discovery is about the
+  /// map; this is about the bestiary.
+  ///
+  /// ⭐ **A count, not a flag**, because two separate features need the number:
+  /// ACHIEVEMENTS §2.3 tracks `clearCount` per zone, and ENEMIES §2e's
+  /// repeat-clear encounters ask "has this character been here before".
+  /// `cleared` is derivable from the count; the count is not derivable from a
+  /// flag.
+  ///
+  /// ⭐ **Per character, not per account.** Two mages who played different
+  /// routes should meet different content.
+  ///
+  /// ⚠️ **This is the ONE zone fact that lives on the character document.**
+  /// ACHIEVEMENTS §2.1 puts zone progress in a `progress/` subcollection, and
+  /// that is right for `enemiesDefeated` and `dropsSeen` — both unbounded. It
+  /// is wrong for this one: bounded at 26 entries, written at most once per
+  /// clear, and needed by the map on **every** app open. See the §2.3
+  /// amendment.
+  Map<String, int> zoneClears;
+
   List<LoadoutPreset> presets;
   int activePresetIndex;
 
@@ -157,6 +180,7 @@ class PlayerProfile {
     String? locationId,
     this.trip,
     Set<String>? discoveredLocationIds,
+    Map<String, int>? zoneClears,
     List<LoadoutPreset>? presets,
     this.activePresetIndex = 0,
     Map<String, int>? inventory,
@@ -164,6 +188,7 @@ class PlayerProfile {
     this.duelsLost = 0,
   }) : locationId = locationId ?? World.startLocationId,
        discoveredLocationIds = discoveredLocationIds ?? {World.startLocationId},
+       zoneClears = zoneClears ?? {},
        presets = presets ?? [LoadoutPreset.starter('Loadout I')],
        inventory = inventory ?? {};
 
@@ -171,6 +196,22 @@ class PlayerProfile {
       PlayerProfile(name: name);
 
   // ---- Derived ---------------------------------------------------------
+
+  /// Whether this character has beaten [locationId]'s boss at least once.
+  ///
+  /// ⭐ Read this — never `zoneClears[id]` directly — so the one definition of
+  /// "cleared" stays in one place.
+  bool hasCleared(String locationId) => clearCountFor(locationId) > 0;
+
+  /// How many times this character has cleared [locationId].
+  ///
+  /// ⭐ ACHIEVEMENTS §5.1's First Clear needs `>= 1`; the Purge tier needs
+  /// several, because the mini pool shows 2 of 4 and the boss pool 1 of 2 —
+  /// about **4.2 clears** to meet every elevated enemy in a zone.
+  int clearCountFor(String locationId) => zoneClears[locationId] ?? 0;
+
+  /// How many distinct combat zones this character has finished.
+  int get zonesCleared => zoneClears.length;
 
   int get level => Progression.levelForXp(xp);
   int get xpIntoLevel => Progression.xpIntoLevel(xp);
@@ -199,6 +240,7 @@ class PlayerProfile {
     'locationId': locationId,
     'trip': trip?.toJson(),
     'discoveredLocationIds': discoveredLocationIds.toList(),
+    'zoneClears': zoneClears,
     'presets': presets.map((p) => p.toJson()).toList(),
     'activePresetIndex': activePresetIndex,
     'inventory': inventory,
@@ -226,6 +268,14 @@ class PlayerProfile {
       discoveredLocationIds: (json['discoveredLocationIds'] as List?)
           ?.cast<String>()
           .toSet(),
+      // Absent on saves from before clears were tracked — an old character
+      // reads as "has cleared nothing", which is the safe direction: it can
+      // only withhold repeat-clear content, never grant it early.
+      zoneClears:
+          (json['zoneClears'] as Map?)?.map(
+            (k, v) => MapEntry(k as String, (v as num).toInt()),
+          ) ??
+          {},
       presets: presets,
       activePresetIndex: (json['activePresetIndex'] as num?)?.toInt() ?? 0,
       inventory:

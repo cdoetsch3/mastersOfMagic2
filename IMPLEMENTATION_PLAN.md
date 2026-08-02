@@ -742,6 +742,25 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
 
 ## Deferred / banked — do not build without an explicit ask
 
+- **📝 `PlayerProfile.zoneClears` exists but nothing sets it yet.**
+  ✅ The field (`Map<String, int>` of zone id → times cleared), persistence,
+  `hasCleared()`, `clearCountFor()` and the `bossDefeated:` parameter on
+  `GameState.recordDuelResult` all landed 2026-08-02 and are tested. ⚠️ **No
+  caller passes `bossDefeated: true`**, because Phase-1 adventures are a single
+  ordinary duel and there are no boss encounters yet. ⭐ **Deliberately not
+  wired to "won any duel here"** — that would mark a zone cleared on a random
+  win and hand out repeat-clear content (ENEMIES §2e) the moment real bosses
+  land. **One call site to update when zone structure arrives**, in
+  `duel_launcher.dart`.
+
+  ⚠️ **The two sibling trackers are NOT built and must not go on the profile:**
+  `enemiesDefeated` (275 creature types) and `dropsSeen` (unbounded) belong in
+  the `progress/` subcollection per ACHIEVEMENTS §2.1. ⭐ `zoneClears` is on the
+  character as a deliberate, argued exception — bounded at 26 and needed by the
+  map on every open — and the risk is someone adding the unbounded two beside
+  it because that is where clears already live. See the §2.3 amendment.
+
+
 - **📝 `AiPersona.aggression` / `.caution` are DEAD FIELDS.** Found in the
   2026-08-02 code audit (ENEMIES §2.4). Both are declared and documented as
   *"personality dials — orthogonal to intelligence"*, but `buildBrain()`

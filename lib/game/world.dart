@@ -342,6 +342,7 @@ abstract final class World {
       kind: LocationKind.town,
       tier: MagicTier.primal,
       opensAtLevel: 8,
+      station: 'Tailoring',
       blurb:
           'The first market, where the river road crosses the mountain road.',
       arrival:
@@ -418,7 +419,7 @@ abstract final class World {
       kind: LocationKind.town,
       tier: MagicTier.kinetic,
       opensAtLevel: 22,
-      station: 'Tailoring',
+      station: 'Potions and Alchemy',
       blurb: 'The one notch in a hundred miles of cliff.',
       arrival:
           'The harbour is impossibly calm for what is happening outside '
@@ -767,7 +768,6 @@ abstract final class World {
       kind: LocationKind.town,
       tier: MagicTier.ethereal,
       opensAtLevel: 50,
-      station: 'Potions and Alchemy',
       blurb: 'Where the ground runs out. The last place with a supply line.',
       arrival:
           'A fortress at the top of the world, facing the wrong way — not '

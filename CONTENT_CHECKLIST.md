@@ -36,6 +36,7 @@ Design lives elsewhere — this file only tracks *state*:
 | 14 | **Drop-M** | Drop table for mini-bosses | Minis |
 | 15 | **Drop-B** | Drop table for bosses — incl. Bound set components | Boss |
 | 16 | **Ach** | The 3 achievements (Clear / Purge / Collect) | Roster, Drop-* |
+| | | ⭐ **Clear** is unblocked — `PlayerProfile.zoneClears` exists. **Purge** needs a per-enemy defeat log (~4.2 clears per zone, since the pool shows 2 of 4 minis and 1 of 2 bosses). **Collect** needs items *and* a permanent seen-log separate from inventory. ACHIEVEMENTS §2.3 | |
 | 17 | **Story** | Tier-1 narrative beat, if this zone gets one | GAME_DESIGN §5 |
 
 ⭐ **Columns 1–3 are already mostly done for every zone** — that is 3 of 17
@@ -66,8 +67,12 @@ pipeline, a licensing question, and download weight.
 Thornback Sprite · Brook Naiad · Ashjaw Brute · Mirewalker · Cinderbloom Husk.
 Good names; all five were **kept as their roster's anchor**.
 
-📝 **Themes, 5 commons, 4 minis and 2 bosses are now drafted for all five
-Primal zones** — see [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) §2d. What that
+📝 **Themes, 5 commons, 4 minis and 2 bosses are now drafted for ALL 25
+rostered zones** (ENEMIES §2d–2e; the Citadel is exempt and needs its own
+structure). ⚠️ **Minis and bosses are names + premises only — no archetypes
+assigned yet**, which ENEMIES §2f flags as the blocking gap.
+
+📝 **Originally drafted for the five Primal zones** — see [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) §2d. What that
 leaves for the Primal quarter is columns **5b, 8, 9, 10–17**: move sets,
 boss effects, painter recipes, materials, nodes, drop tables and achievements.
 
@@ -93,39 +98,45 @@ Thornmire have no materials assigned yet.
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Old Quarry** | ✅ 15–19 | ✅ Geo | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Stormcliff Coast** | ✅ 17–22 | ✅ Electro | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Windward Steppe** | ✅ 19–24 | ✅ Aero | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Yew | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Frostfell Pass** | ✅ 21–26 | ✅ Aqua+Aero | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Thunderspire Peaks** | ✅ 23–28 | ✅ Electro+Aero | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟡 Rowan | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Molten Deep** 🏰 | ✅ 25–29 | ✅ Pyro+Geo | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 1 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Old Quarry** | ✅ 15–19 | ✅ Geo | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Stormcliff Coast** | ✅ 17–22 | ✅ Electro | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Windward Steppe** | ✅ 19–24 | ✅ Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Yew | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Frostfell Pass** | ✅ 21–26 | ✅ Aqua+Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Thunderspire Peaks** | ✅ 23–28 | ✅ Electro+Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Rowan | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Molten Deep** 🏰 | ✅ 25–29 | ✅ Pyro+Geo | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 ### Celestial (30–44)
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **The Kiln Desert** | ✅ 30–34 | ✅ Solar | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Ironwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Mirrormere** | ✅ 32–37 | ✅ Lunar | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Bloodwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Starfall Basin** | ✅ 34–39 | ✅ Astral | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Tidewrack Shoals** | ✅ 36–40 | ✅ Lunar+Aqua | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 1 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Sunless Reach** | ✅ 38–42 | ✅ Solar+Lunar | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟡 Ebony | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Shattered Orrery** 🏰 | ✅ 40–44 | ✅ Astral+Electro | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Glass Archive** 🏰 | ✅ 43–47 | ✅ Solar+Arcane | ✅ | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Kiln Desert** | ✅ 30–34 | ✅ Solar | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Ironwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Mirrormere** | ✅ 32–37 | ✅ Lunar | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Bloodwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Starfall Basin** | ✅ 34–39 | ✅ Astral | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Tidewrack Shoals** | ✅ 36–40 | ✅ Lunar+Aqua | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Sunless Reach** | ✅ 38–42 | ✅ Solar+Lunar | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Ebony | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Shattered Orrery** 🏰 | ✅ 40–44 | ✅ Astral+Electro | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Glass Archive** 🏰 | ✅ 43–47 | ✅ Solar+Arcane | ✅ | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 ### Ethereal (45–60)
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Hallowmarch** | ✅ 45–49 | ✅ Sanctus | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Spiritwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Umbral Wastes** | ✅ 47–51 | ✅ Umbra | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Collapsed Academy** 🏰 | ✅ 50–54 | ✅ Arcane | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Aetherwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Reliquary Deep** 🏰 | ✅ 52–56 | ✅ Sanctus+Umbra | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Unwritten Library** 🏰 | ✅ 54–58 | ✅ Umbra+Arcane | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Hallowmarch** | ✅ 45–49 | ✅ Sanctus | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Spiritwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Umbral Wastes** | ✅ 47–51 | ✅ Umbra | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Collapsed Academy** 🏰 | ✅ 50–54 | ✅ Arcane | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Aetherwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Reliquary Deep** 🏰 | ✅ 52–56 | ✅ Sanctus+Umbra | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Unwritten Library** 🏰 | ✅ 54–58 | ✅ Umbra+Arcane | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **The Buried Sky** 🏰 | ✅ 46–50 | ✅ Geo+Astral | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **The Sealed Garden** | ✅ 49–53 | ✅ Flora+Sanctus | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Eclipsed Citadel** 🏰 | ✅ 58–60 | ✅ all | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Eclipsed Citadel** 🏰 | ✅ 58–60 | ✅ all | 🟡 | ❓ | 🟡 1 | ⬜ | ❓ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 🏰 = dungeon rather than route.
+
+❓ **The Citadel is deliberately NOT on the 5/4/2 template.** It is the finale
+and carries all twelve elements; a flat roster of five commons cannot express
+that. ENEMIES §2e proposes its encounters be **echoes of bosses the player has
+already beaten**, which is the only structure that can field twelve elements
+and costs almost nothing in new content. Needs a ruling.
 
 ✅ **The Sealed Garden and The Buried Sky are built** — locations, map pins,
 roads, themed opponents, `blurb` and `arrival` text. Routing is derived from
@@ -167,16 +178,15 @@ station recipes, prices, and the per-character daily stock (ITEMS §9b.7).
 | **Aldermere** | 1 | ✅ Woodcarving | ⬜ | ⬜ | ⬜ |
 | **Pennycross** | 8 | ✅ Tailoring | ⬜ | ⬜ | ⬜ |
 | **Forgeholm** | 15 | ✅ Metalworking | ⬜ | ⬜ | ⬜ |
-| **Galehaven** | 22 | 🟡 Potions & Alchemy ⚠️ | ⬜ | ⬜ | ⬜ |
+| **Galehaven** | 22 | ✅ Potions & Alchemy | ⬜ | ⬜ | ⬜ |
 | **Concordance** | 30 | — (trade capital) | ⬜ | — | ⬜ |
 | **Meridian** | 36 | ✅ Enchanting | ⬜ | ⬜ | ⬜ |
 | **Rimeholt** | 45 | ✅ Jewelry | ⬜ | ⬜ | ⬜ |
 | **Vespergate** | 50 | — | ⬜ | — | ⬜ |
 | **Zenith** | 60 | ✅ all six | ⬜ | ⬜ | ⬜ |
 
-⚠️ **Galehaven and Vespergate are decided in the docs but not yet changed in
-`world.dart`** — the code still has Tailoring at Galehaven and Potions at
-Vespergate. Pending edit, see ITEMS §9b.1.
+✅ **Stations now match the design in `world.dart`** — Pennycross has
+Tailoring, Galehaven has Potions & Alchemy, and Vespergate has none.
 
 ---
 
@@ -199,15 +209,21 @@ expensive columns are:
 📝 **Suggested order per zone** (demand before supply, per the earlier ruling):
 Roster → Names → Minis/Boss → Mats → Nodes → Drop tables → Art → Ach → Story.
 
-✅ **Resolved (2026-08-02): every region gets its own complete, coherent
-roster** — 5 mini-bosses and 3 bosses, hybrids included (ENEMIES §4). No zone
-borrows from a parent element.
+✅ **Resolved (2026-08-02): every region has its own complete, coherent
+roster** — **4 mini-bosses and 2 bosses**, hybrids included. No zone borrows
+from a parent element.
 
-⚠️ **The scope that commits to: 92 mini-bosses and 46 bosses across 23 zones**
-— 20 and 10 for the Primal quarter alone. Still the single biggest content
-task in the project. The archetype layer absorbs the statlines; what remains
-new per enemy is a creature, a name, a move set and art.
+✅ **Drafted in full for all 25 rostered zones** (ENEMIES §2d–2e):
+**125 commons, 100 mini-bosses, 50 bosses — 172 distinct names.** Every theme
+was recovered from that zone's own `arrival` passage rather than invented.
 
-📝 **12 pure zones** can start from GAME_DESIGN §5's existing per-element names
-(3 of 5 minis each). **11 zones** — the 10 hybrids plus the Eclipsed Citadel —
-have nothing today and need rosters built from scratch.
+⛔ **What is NOT done, and it is the half that decides whether a fight is
+good:** all 150 mini-bosses and bosses are **names and premises with no
+archetype attached**. §2.2–2.3 define seven elevated archetypes and none of the
+150 is mapped to one. Nothing can be built or balance-simmed until they are.
+
+⚠️ **Other gaps §2f found:** Adept appears in only 10 of 25 zones despite being
+the yardstick every other archetype is felt against; the Siphon is in 12 of 25,
+which dilutes the one archetype meant to be a shock; two Drudges sit at levels
+45–54 where a 0.80/0.70 "barely fights" enemy is a wasted slot; and Stormcliff
+Coast and Thunderspire Peaks are adjacent Electro zones built on the same idea.

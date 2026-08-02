@@ -102,9 +102,58 @@ zones: {
 }
 ```
 
-⚠️ **`cleared` does not exist anywhere today.** `GameLocation.hasAdventure`
-says a zone *has* an encounter, not that you beat it. This is a
-campaign-progression feature that achievements merely depend on.
+#### ✅ Amendment (2026-08-02) — `cleared` lives on the CHARACTER, the rest does not
+
+✅ **Built:** `PlayerProfile.zoneClears` is a `Map<String, int>` of zone id →
+times cleared, with `hasCleared()` and `clearCountFor()`. Written by
+`GameState.recordDuelResult(bossDefeated: …)`.
+
+⚠️ **That contradicts §2.1's "a subcollection, not fields on the character" —
+deliberately, and only for this one field.** §2.1 gives three reasons to move
+zone progress off the character, and clear counts fail all three:
+
+| §2.1's reason | Does `zoneClears` trigger it? |
+|---|---|
+| **Write volume** | ❌ At most once per clear — about 106 writes over a whole playthrough, piggybacked on the XP/gold write that already happens |
+| **Unbounded growth** | ❌ Hard-bounded at **26 entries**, one per combat zone. A few hundred bytes |
+| **Partial reads** | ❌ Inverted — the **map wants this on every app open**, so a subcollection would mean a second read on the hottest path |
+
+⭐ **`enemiesDefeated` and `dropsSeen` still belong in `progress/`** — those are
+the unbounded ones §2.1 was written for (275 creature types, and an item log
+with no ceiling at all). ⚠️ **The precedent to guard is exactly that:** the
+danger is someone adding `enemiesDefeated` next to `zoneClears` because that is
+where clears already live.
+
+⭐ **A count, not a flag**, because two features need the number: this doc's
+`clearCount`, and ENEMIES §2e's repeat-clear encounters.
+
+⚠️ **Nothing sets it yet.** `bossDefeated` is a caller-supplied parameter and
+no caller passes `true`, because Phase-1 adventures are a single ordinary duel
+with no boss. Wiring it to "won any duel here" would have been wrong — see
+IMPLEMENTATION_PLAN.
+
+#### ⭐ What the pool structure costs a completionist (measured)
+
+A zone holds **11 creature types**: 5 commons, 4 mini-bosses, 2 bosses. But a
+run draws only **2 of the 4 minis and 1 of the 2 bosses** (GAME_DESIGN §3d), so
+Purge cannot be done in one visit:
+
+| Target | Expected clears |
+|---|---|
+| Both bosses | **3.0** |
+| All four mini-bosses | **3.8** |
+| ⭐ **Every elevated enemy in one zone** | **4.2** |
+| Purge across all 25 rostered zones | **~106 clears** |
+
+⭐ **This is what makes the random pool matter.** Without a completionist
+reason the pool is only variety; with Purge it becomes a target, and the
+"come back and run it again" loop the resource areas already want (WORLD_DESIGN
+§4b) gets a second reason to exist. ✅ ~4 clears per zone is a real ask without
+being a wall.
+
+⚠️ **The Collector tier is still fully blocked** — "every possible drop" needs
+items, drop tables, and a permanent *seen* log that is separate from inventory
+(you can sell a thing and must not lose the credit). None of that exists.
 
 ---
 

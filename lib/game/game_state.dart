@@ -190,9 +190,18 @@ class GameState extends ChangeNotifier {
   // ---- Duel results ----------------------------------------------------
 
   /// Applies XP/gold for a finished duel and flags any level-up.
+  ///
+  /// ⚠️ **[bossDefeated] must come from the caller, not be inferred here.**
+  /// A zone counts as cleared when its *boss* falls, and this method cannot
+  /// tell a boss from a wandering common — so it is passed in. ⭐ Deliberately
+  /// **not** defaulted to `won`: an adventure in Phase 1 is a single ordinary
+  /// duel, and treating any win as a clear would hand out repeat-clear content
+  /// (ENEMIES §2e) the moment real bosses land.
   Future<void> recordDuelResult({
     required bool won,
     int opponentLevel = 1,
+    bool bossDefeated = false,
+    String? locationId,
   }) async {
     final before = profile.level;
     await _mutate(() {
@@ -206,6 +215,10 @@ class GameState extends ChangeNotifier {
       if (won) {
         profile.gold += Progression.winGold;
         profile.duelsWon++;
+        if (bossDefeated) {
+          final zone = locationId ?? profile.locationId;
+          profile.zoneClears[zone] = profile.clearCountFor(zone) + 1;
+        }
       } else {
         profile.gold += Progression.lossGold;
         profile.duelsLost++;

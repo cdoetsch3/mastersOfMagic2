@@ -378,9 +378,21 @@ void main() {
         reason: 'two towns claim the same station',
       );
       expect(names.length, 6, reason: 'six making-skills across the towns');
-      // Concordance and Pennycross are civic on purpose.
+
+      // ⭐ Which town teaches what, per ITEMS §9b. Each skill is learnable in
+      // exactly ONE place until Zenith, so moving one is a real design change
+      // and should fail here rather than pass quietly.
+      expect(byId['aldermere']!.station, 'Woodcarving');
+      expect(byId['pennycross']!.station, 'Tailoring');
+      expect(byId['forgeholm']!.station, 'Metalworking');
+      expect(byId['galehaven']!.station, 'Potions and Alchemy');
+      expect(byId['meridian']!.station, 'Enchanting');
+      expect(byId['rimeholt']!.station, 'Jewelry');
+
+      // Concordance and Vespergate are civic on purpose — the trade capital
+      // and the last supply post before the world runs out.
       expect(byId['concordance']!.station, isNull);
-      expect(byId['pennycross']!.station, isNull);
+      expect(byId['vespergate']!.station, isNull);
       // Zenith alone has everything.
       expect(byId['zenith']!.station, isNotNull);
     });

@@ -477,6 +477,495 @@ hybrid theme yet.
 
 ---
 
+## 2e. ✅ The rest of the world — themes and rosters (all 26 zones)
+
+📝 **Every theme below was recovered from that zone's `arrival` passage**, the
+same method as §2d. None were invented alongside. ⭐ **The passages carry a
+claim about how each place works, and the roster falls out of taking the claim
+literally** — the quote that produced each theme is given so nobody has to
+guess later.
+
+⭐ **Boss pools are the two sides of the zone's premise**, per the pattern §2d
+established. That is now the rule for every hybrid *and* every pure zone: which
+boss you draw should tell you which half of the place you are fighting.
+
+✅ Existing names are marked — anchors from `World.opponentNameFor` and
+mini/boss names from the element rosters in GAME_DESIGN §5.
+
+---
+
+### Kinetic · 15–29
+
+#### Old Quarry · 15–19 · Geo
+> *"Whatever was quarried out of here left a shape, and the shape has started to move."*
+
+⭐ **Theme: the hole remembers what filled it.** The threat is the **absence**,
+not the stone — negative space gone solid.
+
+⭐ **Deliberate rhyme with The Umbral Wastes (47–51), not a repeat.** They are
+**inverse operations**: here something was **removed** and the hole is animate;
+there dark was **imposed** and given a shape. Subtraction against addition,
+thirty levels and two elements apart. ⚠️ **Stated so nobody "fixes" it later**
+by rethinking one of them — unstated, it reads as duplication.
+
+| Common | Archetype |
+|---|---|
+| **Quarry Golem** ✅ | Bruiser |
+| **Tailings Drudge** | Drudge |
+| **Chiselback** | Skirmisher |
+| **Gravelswarm** | Lasher |
+| **Plumbline Sentry** | Sentinel |
+
+**Minis:** Earth Titan ✅ · Obsidian Golem ✅ · The Overseer · Deadweight
+**Bosses:** ⭐ **Mountain Heart** ✅ *(what was taken)* · **The Empty Course** *(the shape of what is gone, walking)*
+
+#### Stormcliff Coast · 17–22 · Electro
+> *"The cliffs take the whole weight of it… the rock is scorched in **long vertical lines**."*
+
+⭐ **Theme: everything here is a path to the ground, including you.** The
+vertical scorch marks are the tell — the coast is not a *target*, it is a
+**conductor**. Things here are charged in passing rather than struck.
+
+⚠️ **Retheme, 2026-08-02.** This zone was "the warning before the strike",
+which was the same idea as Thunderspire Peaks two bands later (§2f). ⭐ **The
+split is now space vs time:** Stormcliff is *where the lightning goes*,
+Thunderspire is *when it comes*.
+
+| Common | Archetype |
+|---|---|
+| **Stormcliff Tidecaller** ✅ | Adept |
+| **Fulgurite Crawler** | Sentinel — ⭐ fulgurite is the glass left where lightning passed *through* sand |
+| **Sparkwing** | Glasswing |
+| **Static Shoal** | Lasher — the sea is one enormous electrode |
+| **Groundling** | Skirmisher — survives by staying low |
+
+**Minis:** Storm Shaman ✅ · Voltgeist ✅ · The Long Line · Brinecharge
+**Bosses:** ⭐⭐ **Storm Lord** ✅ *(what comes down)* · **The Return Stroke**
+*(what goes back up)* — the return stroke is the bright half of a real bolt and
+it travels **upward**: the ground answering the sky
+
+#### Windward Steppe · 19–24 · Aero
+> *"The wind does not gust; it simply blows, and has been blowing since before there was anyone to notice."*
+
+⭐ **Theme: one direction, forever — everything here has stopped resisting.**
+Not violence. **Relentlessness**, which no other Aero zone claims.
+
+| Common | Archetype |
+|---|---|
+| **Steppe Harrier** ✅ | Skirmisher |
+| **Leanstone** | Sentinel |
+| **Chaff** | Lasher |
+| **Tumblehusk** | Drudge |
+| **Kitewing** | Glasswing |
+
+**Minis:** Wind Wraith ✅ · Gale Serpent ✅ · Sky Titan ✅ · Old Lean
+**Bosses:** ⭐ **Tempest Monarch** ✅ *(the gust — the exception)* · **The Unbroken Blow** *(the constant)*
+
+#### Frostfell Pass · 21–26 · Aqua + Aero ⭐ hybrid
+> *"Your breath goes up and does not come down. The road is under here somewhere, and other people have been sure of that too."*
+
+⭐ **Theme: everything that moves through here gets held.** The fusion is
+**breath frozen mid-air** — Aero stopped by Aqua — and the second sentence is
+the threat: the confident dead are still here.
+
+| Common | Archetype |
+|---|---|
+| **Rime Stalker** ✅ | Skirmisher |
+| **Hoarbound** | Sentinel |
+| **Breathfrost** | Glasswing |
+| **Cairnwight** | Blighter |
+| **Snowblind Wanderer** | Drudge |
+
+**Minis:** The Certain Road · Hoarking · Coldsnap · The Last Cairn
+**Bosses:** ⭐ **NOT a mirror — a boss and its cause.** **The Road Under**
+*(what is buried)* · **The White Corridor** *(what buried it)*. ⚠️ Killing the
+Corridor does **not** free the Road — nothing you do down here digs anyone out.
+⭐ The pool reads as futility rather than symmetry, which suits a pass whose
+arrival text is about people who were also sure.
+
+#### Thunderspire Peaks · 23–28 · Electro + Aero ⭐ hybrid
+> *"The cloud is lit from within at intervals, and the intervals are getting shorter."*
+
+⭐ **Theme: you are inside the storm, and it is building to something.** The
+fusion is a storm as a **single accelerating event** rather than weather.
+⚠️ Deliberately distinct from Stormcliff: that zone is one strike's warning,
+this one is a countdown.
+
+| Common | Archetype |
+|---|---|
+| **Stormcrest Roc** ✅ | Bruiser |
+| **Humming Ore** | Sentinel |
+| **Flashcount** | Lasher |
+| **Updraft Wisp** | Glasswing |
+| **Ionwake** | Skirmisher |
+
+**Minis:** Thunder Roc ✅ · The Shortening · Anvilhead · Crown Fire
+**Bosses:** ⭐ **The Strike That Lands** · **The Storm That Passes**
+
+#### The Molten Deep · 25–29 · Pyro + Geo ⭐ hybrid · 🏰
+> *"There is a floor down here that moves like water because it is not water."*
+
+⭐ **Theme: the stone is a liquid and has been the whole time.** The fusion is
+Geo revealed as Pyro's slow state — the ground you trusted was only cool.
+
+| Common | Archetype |
+|---|---|
+| **Molten Warden** ✅ | Sentinel |
+| **Slagswimmer** | Skirmisher |
+| **Crustwalker** | Bruiser |
+| **Ember Vent** | Blighter |
+| **Cooling Thing** | Glasswing |
+
+**Minis:** Magma Behemoth ✅ *(re-homed)* · Pyroclast · The Floor · Firstmelt
+**Bosses:** ⭐ **Efreet** ✅ *(re-homed — what burns)* · **The Slow Stone** *(what has not melted yet)*
+
+---
+
+### Celestial · 30–47
+
+#### The Kiln Desert · 30–34 · Solar
+> *"The air is too thin to hold heat, so the sun burns while the wind bites."*
+
+⭐ **Theme: burning and freezing at once.** The zone is a **contradiction**, not
+a heat. That is what makes it Solar-at-altitude rather than a second desert.
+
+| Common | Archetype |
+|---|---|
+| **Sunstruck Pilgrim** ✅ | Drudge |
+| **Glasspan Crawler** | Sentinel |
+| **Mirage** | Glasswing |
+| **Shadeless** | Skirmisher |
+| **Kiln Moth** | Lasher |
+
+**Minis:** Sun Templar ✅ · Prism Sentinel ✅ · The Shadeless Hour · Saltmarch Wraith
+**Bosses:** ⭐ **Solar Deity** ✅ *(the sun)* · **The Cold Shadow** *(what it cannot reach)*
+
+#### The Mirrormere · 32–37 · Lunar
+> *"The moon at a size the moon has no right to be… you are careful not to look down for too long."*
+
+⭐ **Theme: the reflection is bigger than the thing, and it is looking back.**
+
+| Common | Archetype |
+|---|---|
+| **Mirror Wraith** ✅ | Adept |
+| **Stillface** | Sentinel |
+| **Undershine** | **Siphon** |
+| **Ripplecut** | Skirmisher |
+| **Palefish Shoal** | Lasher |
+
+**Minis:** ⭐ Herald of the Waxing ✅ · Stalker of the New Moon ✅ · The Waning Wraith ✅ · The Second You
+**Bosses:** ⭐⭐ **Luna Plena, the Full Moon** ✅ *(the moon above)* · **The Moon Below** *(the moon in the water)* — **which one is real is the fight**
+
+#### Starfall Basin · 34–39 · Astral
+> *"At night the sky is so clear it looks like a threat."*
+
+⭐ **Theme: things fell here, and the sky is still aiming.**
+
+| Common | Archetype |
+|---|---|
+| **Crater Revenant** ✅ | Bruiser |
+| **Sky-Iron Husk** | Sentinel |
+| **Fallpoint** | Glasswing |
+| **Scatterling** | Lasher |
+| **Cold Ejecta** | Skirmisher |
+
+**Minis:** Rift Walker ✅ · Constellation Warden ✅ · Echo of the Between ✅ · The Zodiac Ascendant ✅
+**Bosses:** ⭐ **NOT a mirror — the same thing at two scales.** **What Landed**
+*(small, already at the bottom of a crater)* · **The Next One** *(enormous, and
+still inbound)*. ⭐ Drawing the small one is a **warning about the big one**,
+which is exactly what *"the sky is so clear it looks like a threat"* promises.
+
+#### Tidewrack Shoals · 36–40 · Lunar + Aqua ⭐ hybrid
+> *"Everything is timed to something overhead."*
+
+⭐ **Theme: the sea is on a schedule it did not choose, and it keeps uncovering
+things.** The fusion is **obedience** — Aqua doing what Lunar says.
+
+| Common | Archetype |
+|---|---|
+| **Tidewrack Drowned** ✅ | Drudge |
+| **Wrackcrab** | Sentinel |
+| **Lowwater Thing** | **Siphon** |
+| **Gullbone Flock** | Lasher |
+| **Spindrift** | Glasswing |
+
+**Minis:** Tidal Empress ✅ · Maelstrom Horror ✅ · Leviathan ✅ *(re-homed)* · The Turning
+**Bosses:** ⭐ **Kraken** ✅ *(re-homed — what the tide uncovers)* · **The Undertow** *(what it takes back)*
+
+#### The Sunless Reach · 38–42 · Solar + Lunar ⭐ hybrid
+> *"The rock is the same rock. The desert is a thousand feet away and on the other side of the world."*
+
+⭐⭐ **Theme: identical ground, opposite worlds, one line between them.** The
+fusion is **a boundary, not a blend** — and that is the best possible Solar+Lunar
+premise, because the two elements refuse to mix by nature.
+
+| Common | Archetype |
+|---|---|
+| **Eclipse Herald** ✅ | Adept |
+| **Crestline Warden** | Sentinel |
+| **Nightglare** | Glasswing |
+| **Coldlight Swarm** | Lasher |
+| **Shadowpitch Stalker** | Skirmisher |
+
+**Minis:** Solar Archon ✅ · The Crest · Duskmarch · Both-Sided Thing
+**Bosses:** ⭐ **The Last Light** · **The First Dark**
+
+#### The Shattered Orrery · 40–44 · Astral + Electro ⭐ hybrid · 🏰
+> *"Something is being calculated and has been for a very long time."*
+
+⭐ **Theme: a broken machine still computing, and nobody knows what toward.**
+The fusion is **the heavens as mechanism** — Electro is the power, Astral is
+what it is modelling.
+
+| Common | Archetype |
+|---|---|
+| **Orrery Automaton** ✅ | Sentinel |
+| **Gear-Ghost** | Glasswing |
+| **Armature** | Bruiser |
+| **Arcflock** | Lasher |
+| **Errant Ring** | Skirmisher |
+
+**Minis:** Escapement · The Remainder · Long Division · Sidereal Fault
+**Bosses:** ⭐⭐ **The Calculation** *(the process)* · **The Answer** *(the result)* — **drawing the Answer means it finished**
+
+#### The Glass Archive · 43–47 · Solar + Arcane ⭐ hybrid · 🏰
+> *"They wrote it in light, and light does not keep."* (WORLD_DESIGN §4c.1c)
+
+⭐ **Theme: an archive readable only at noon, which the reading destroys.**
+
+| Common | Archetype |
+|---|---|
+| **Glasswright** ✅ | Sentinel |
+| **Noonmark** | Glasswing |
+| **Palimpsest** | **Siphon** — a page scraped clean and rewritten; it takes what is yours |
+| **Readerless** | Drudge |
+| **Lensfly** | Skirmisher |
+
+**Minis:** The Marginalia · Burnt Index · The Last Reader · Aperture
+**Bosses:** ⭐ **What Was Written** · **What Is Left Of It**
+
+---
+
+### Ethereal · 45–60
+
+#### Hallowmarch · 45–49 · Sanctus
+> *"Every mile or so there is a marker, and every marker has been maintained."*
+
+⭐ **Theme: someone is still doing the upkeep, and nobody has seen them.**
+⚠️ **Load-bearing:** the causeway leads to The Sealed Garden, and the same oath
+maintains both. Changing this theme breaks that zone too.
+
+| Common | Archetype |
+|---|---|
+| **Causeway Warden** ✅ | Sentinel |
+| **Marker-Sworn** | Adept |
+| **Meltwater Choir** | Lasher |
+| **Votive** | Glasswing |
+| **Pilgrim's Remnant** | Drudge |
+
+**Minis:** Vestal Warden ✅ · Seraph Judicant ✅ · The Upkeep · Milestone
+**Bosses:** ⭐ **The Hierophant Eternal** ✅ *(who ordered it)* · **The Keeper of the Road** *(who still does it)*
+
+#### The Umbral Wastes · 47–51 · Umbra
+> *"Not dusk — an absence with an edge to it… the ice holds its shape like something that has been thought about."*
+
+⭐ **Theme: the dark here is deliberate. Something decided its shape.** Not
+absence — **design**. That is what separates Umbra from "night".
+
+| Common | Archetype |
+|---|---|
+| **Umbral Devourer** ✅ | **Siphon** |
+| **Edgewalker** | Skirmisher |
+| **Considered Ice** | Sentinel |
+| **Nightspill** | Blighter |
+| **Thoughtform** | Glasswing |
+
+**Minis:** Void Stalker ✅ · Umbral Knight ✅ · Eclipse Weaver ✅ · The Edge
+**Bosses:** ⭐ **Nightbringer** ✅ *(who made it dark)* · **What Was Thought About** *(the shape it was given)*
+
+#### The Buried Sky · 46–50 · Geo + Astral ⭐ hybrid · 🏰
+Full design in WORLD_DESIGN §4c.1b. ⭐ *The rock remembers a sky that no longer exists.*
+**Commons:** Stratum Warden ✅ (Sentinel) · Constellate (Lasher) · Fadelight (Glasswing) · Corebiter (**Siphon**) · Deadreckoner (Adept)
+**Minis:** Bedrock Colossus · Nadir · The Long Count · Stonefall Herald
+**Bosses:** **The Overburden** *(what buries)* · **The Buried Constellation** *(what survives)*
+
+#### The Sealed Garden · 49–53 · Flora + Sanctus ⭐ hybrid
+Full design in WORLD_DESIGN §4c.1a. ⭐ *Still perfect, still guarded, still not allowed in.*
+**Commons:** Orchard Warden ✅ (Sentinel) · Windfall (**Siphon**) · Whisperling (Blighter) · Chorister Vine (Adept) · Thornpenitent (Bruiser)
+**Minis:** Cherub of the Turning Blade · The Last Gardener · Root Matriarch ✅ · The Kept Vow
+**Bosses:** **Guardian of the World Tree** ✅ *(the rule)* · **The Serpent in the Branches** *(the invitation)*
+
+#### The Collapsed Academy · 50–54 · Arcane · 🏰 · Empyrean
+> *"Not ruined so much as unfinished in the wrong direction… the last three items on the syllabus are not in any language you have."*
+
+⭐ **Theme: it was not destroyed — it was continued past the point where
+building makes sense.** ⚠️ **Over-completion, not ruin**, and that distinction
+is the whole zone.
+
+| Common | Archetype |
+|---|---|
+| **Unfinished Scholar** ✅ | Adept |
+| **Stairhead** | Sentinel |
+| **Chalkwraith** | Skirmisher |
+| **Marginal Note** | Blighter |
+| **Emeritus** | Drudge |
+
+**Minis:** Spell Weaver ✅ · Mana Golem ✅ · Arcane Chimera ✅ · The Fourth Item
+**Bosses:** ⭐ **The Archmage** ✅ *(who read too far)* · **The Last Three Items** *(what they read)*
+
+#### The Reliquary Deep · 52–56 · Sanctus + Umbra ⭐ hybrid · 🏰
+> *"Someone consecrated it and someone else did not leave it alone. It is warmer in the middle than at either end."*
+
+⭐ **Theme: two hands worked on this, and the second has not finished.**
+⭐ **The warmth in the middle is the tell** — the corridor is not empty.
+
+| Common | Archetype |
+|---|---|
+| **Reliquary Keeper** ✅ | Sentinel |
+| **The Unleft** | Blighter |
+| **Censer-Wraith** | Glasswing |
+| **Bone-Reliquary** | Bruiser |
+| **Corridor Crawler** | **Siphon** |
+
+**Minis:** Reliquary Colossus ✅ · The Second Hand · Warm Middle · Antechoir
+**Bosses:** ⭐⭐ **What Was Consecrated** · **What Did Not Leave It Alone** — both lifted straight from the arrival line
+
+#### The Unwritten Library · 54–58 · Umbra + Arcane ⭐ hybrid · 🏰 · Empyrean
+> *"Every book here is being written right now, by nobody… it would like your name for the record."*
+
+⭐ **Theme: it is still writing, and it wants you in it.** The fusion is
+**authorship with no author** — Arcane supplies the writing, Umbra supplies the
+nobody.
+
+| Common | Archetype |
+|---|---|
+| **The Dictating Hand** ✅ | Adept |
+| **Blankspine** | Sentinel |
+| **Footnote** | Lasher |
+| **Erratum** | Skirmisher |
+| **Ink-Drinker** | **Siphon** |
+
+**Minis:** The Index · Redaction · Colophon · The Amanuensis
+**Bosses:** **The Author** *(who is writing)* · **The Record** *(what is written)*
+⭐ **plus a third draw available only on a repeat clear: *Your Entry*** — the
+first visit gave it your name, and it has been writing ever since. Gated on
+`PlayerProfile.hasCleared('the_unwritten_library')`. ⚠️ **The only encounter in
+the game that cannot exist on a first visit**, which is the point.
+
+#### ⚠️ The Eclipsed Citadel · 58–60 · all twelve · 🏰 · Empyrean
+
+> *"The Citadel is between you and it. That is what the name has always meant."*
+
+⭐ **Theme: the last thing in the way.** Not a place — an **obstruction**.
+
+⚠️ **This zone should NOT use the 5-commons / 4-minis / 2-bosses template, and
+forcing it to would be a mistake.** It is the finale, it carries all twelve
+elements, and a flat roster of five commons cannot express that.
+
+📝 **Proposal — the Citadel's roster is the game replaying itself.** Its
+encounters are **echoes of bosses the player has already beaten**, drawn from
+the zones they cleared. ⭐ Three things recommend it: it is the only structure
+that can legitimately field twelve elements; it makes the finale personal to
+each character's route; and it costs almost nothing in new content because the
+statlines and painter recipes already exist.
+
+**Boss:** Procarius, the Eclipsed ✅ — ❓ **does the 2-boss pool apply here?**
+A finale with a coin-flip boss may undercut the ending. Worth a ruling.
+
+---
+
+## 2f. ⚠️ Overlap audit (2026-08-02) — what the full rosters exposed
+
+Run across all 25 rostered zones (the Citadel is exempt, §2e). **172 distinct
+creature names, 125 commons, 100 mini-bosses, 50 bosses.**
+
+### ✅ Clean
+
+- ✅ **One name collision, fixed.** *Obsidian Golem* was a mini in both Old
+  Quarry and The Molten Deep — both Geo. The Molten Deep took **Pyroclast**.
+- ✅ **No zone repeats an archetype inside its own five commons.** Every zone
+  fields five genuinely different fights.
+
+### ⛔ The real gap: minis and bosses have no archetypes
+
+⛔ **Every mini-boss and boss in §2d–2e is a NAME and a premise, with no
+archetype attached.** §2.2 defines four mini archetypes (Champion, Redoubt,
+Executioner, Hexer) and §2.3 three boss archetypes (Juggernaut, Tyrant,
+Aspect), and not one of the 150 elevated encounters is mapped to any of them.
+
+⚠️ **This is the half that decides whether a fight is any good.** A name and a
+premise tell you what a boss *means*; the archetype tells you what it *does*.
+Until they are assigned, none of these can be built or balance-simmed.
+
+### ⚠️ Archetype distribution is lopsided
+
+| Archetype | Zones | |
+|---|---|---|
+| Sentinel | 23 | ⚠️ near-universal |
+| Skirmisher · Glasswing | 19 each | |
+| Lasher | 14 | |
+| **Siphon** | 12 | ⚠️ see below |
+| Bruiser · **Adept** | 10 each | ⚠️ see below |
+| Drudge · Blighter | 9 each | |
+
+⚠️ **Adept appears in only 10 of 25 zones, and it is the yardstick.** §2.1 calls
+it "the honest mirror-match; the yardstick every other archetype is felt
+against." ⭐ **In the 15 zones without one, the player has no baseline** — every
+fight is an exception to a rule they never met. Adept should arguably be
+mandatory in every zone.
+
+⚠️ **The Siphon is in 12 of 25 zones and that dilutes it.** §2.6's whole case is
+that it is "the first enemy that invalidates a strategy rather than punishing a
+mistake." ⭐ **A shock that happens in half the zones is not a shock.** It
+should be concentrated where absorption is the zone's actual idea — Thornmire,
+The Sealed Garden, The Umbral Wastes — and cut elsewhere.
+
+⚠️ **Drudge appears at levels 45–54** (Pilgrim's Remnant in Hallowmarch,
+Emeritus in The Collapsed Academy). A Drudge is 0.80 HP / 0.70 damage and
+"barely fights" — ⭐ **it is the level 1–3 teaching dummy, and at level 50 it is
+a wasted encounter slot** in the hardest content in the game. Either re-skin
+those two or accept they are flavour, not fights.
+
+### ⚠️ Thematic collisions
+
+| Pair | Risk |
+|---|---|
+| **Stormcliff Coast** (17–22, *the warning before the strike*) vs **Thunderspire Peaks** (23–28, *the countdown to the strike*) | ⚠️ **The real one.** Adjacent bands, both Electro, both built on anticipation. A player goes straight from one to the other. One of them needs a different idea |
+| **The Glass Archive** (43–47) vs **The Buried Sky** (46–50) | ✅ Deliberate opposition — light that keeps nothing vs stone that keeps everything. Documented in WORLD_DESIGN §4c.1c so it is not "fixed" later |
+| **Old Quarry** (*absence made solid*) vs **The Umbral Wastes** (*dark given a shape*) | 📝 Same idea, 30 levels apart. Probably fine; worth not making it a third time |
+
+### ⚠️ The structural risk nobody will notice until playtest
+
+⭐ **Every boss pool is now "X versus its opposite."** The pattern is excellent
+— it is why Ashfall Vale, The Sealed Garden and The Buried Sky all land. But it
+is now applied to **all 25 zones**, and ⚠️ **a player will decode the formula
+around zone six and stop being surprised by it for the remaining nineteen.**
+
+📝 **Worth deliberately breaking in perhaps a third of zones.** Alternatives
+that still give the pool a reason to exist:
+
+- **Two of the same thing at different scales** — the small one is the warning.
+- **A boss and its cause** — kill the wrong one and nothing changes.
+- **One boss and one absence** — sometimes the arena is empty, and that is
+  worse.
+- **A boss that is only there on the second clear.**
+
+✅ **Applied 2026-08-02 — three zones now break the mirror:**
+
+| Zone | Structure | Why it is better than a mirror |
+|---|---|---|
+| **Starfall Basin** | two scales | *What Landed* is small and already down; *The Next One* is enormous and inbound. Drawing the small one is a **warning about the big one** |
+| **Frostfell Pass** | boss and its cause | Killing *The White Corridor* does not free *The Road Under*. ⭐ Reads as **futility**, which suits a pass full of people who were also sure |
+| **Windward Steppe** | 📝 the empty arena | The premise is a wind that has never stopped, so one draw is *nothing at all* — you reach the end and it just keeps blowing. ⚠️ **Mechanically awkward** — a zone-clear with no fight — so it probably needs to be a very short encounter rather than literally empty. Worth trying because no other zone would do it |
+
+⭐ **And the strongest one, now unblocked:** **The Unwritten Library** gets a
+**third boss that only exists on a repeat clear**. The zone's premise is *"it
+would like your name for the record"* — so the first clear takes your name, and
+every clear after that can draw **you**, written in. ✅ `PlayerProfile` now
+carries `zoneClears`, which is what this needs.
+
+---
+
 ## 3. Moves — enemies are creatures, not mages ✅ (ruling 2026-08-02)
 
 ⚠️ **Correcting an assumption baked into §2:** the archetype tables above
