@@ -43,7 +43,7 @@ a claim the player has to be told. A world that rises makes late content
 *above*, which they can see. It also converts the campaign into one continuous
 gradient — sea to summit — instead of four regions in a row.
 
-### 1.2 ✅ One world, one crossing — and only Arcane leaves it
+### 1.2 ✅ One world, one crossing — and only Celestial+ may leave it
 
 Everything is physical ground up to The Vault's upper flanks. Then the route
 leaves the world at **Vespergate**, passes through three Arcane places above
@@ -72,29 +72,38 @@ problem rather than adding flavour.
 consequences, not a second world to populate. This bounds the art cost and stops
 the finale happening somewhere the player has no stake in.
 
-#### ✅ Amendment (2026-08-02) — Arcane left through exactly one door
+#### ✅ Amendment (2026-08-02) — the off-world rule is a guideline
 
-⚠️ **The Glass Archive (§4c.1c) is the single Arcane place in the world.** It
-was added for the level curve, and it collided head-on with the rule above —
-worth recording honestly rather than quietly relaxing.
+The original rule was **"only Arcane leaves the world"**, and every Arcane place
+sat above the Veil. The Glass Archive (§4c.1c) is Solar + Arcane and stands on
+the ground, which broke it.
 
-⭐ **Why the exception is a strengthening, not a leak.** As written, Arcane's
-departure had no *location*: it simply is not here, and then it is above the
-Veil. No scar, no door, no evidence. The Glass Archive is the outstation it
-worked from before it went, which turns "Arcane left" from a stated fact into
-a historical event with a place attached.
+✅ **Christian's ruling: that was never meant to be strict.** It is a
+**guideline**, and the latitude is wider than Arcane — **anything Celestial or
+above may sit off-world**: Solar, Lunar, Astral, Sanctus, Umbra, Arcane.
 
-⭐ **And it does not give Arcane terrain.** The Archive is a **Solar** place —
-a hillside, lenses, sunlight. Arcane is what was *done* there, not what lives
-there. §1.2's argument is that Arcane has no natural referent and so cannot
-own ground; a worksite is not ownership. ⚠️ **A second Arcane place in the
-world would break that reading**, so `world_test.dart` asserts there is
-**exactly one**, by id.
+⚠️ **What IS strict is the other direction, and it is the half worth
+guarding:** ⭐ **Primal and Kinetic elements are physical and must stay on the
+ground.** Pyro is fire, Aqua is water, Geo is stone, Aero is wind — none of
+them has any business above the Veil, in a place §2.4 gives no ground, no
+weather and no moon. `test/world_test.dart` enforces exactly that, and nothing
+narrower.
 
-❓ **If this trade is not wanted**, the one-line revert is to swap Arcane for
-Astral in the Archive's element list — the zone survives, Arcane drops back to
-2 zones, and the coverage guard in `world_test.dart` has to come back down to
-a floor of 2.
+⭐ **Why the looser rule is the better one.** The old version was really two
+claims wearing one coat: *"Arcane has no natural referent"* (true, and still
+the reason the Empyrean is Arcane-flavoured) and *"therefore no other element
+may leave"* (never argued for, and it was the half that broke). Splitting them
+keeps the good argument and drops the one that was only ever a side effect.
+
+⚠️ **The Empyrean is still capped at three places, not a tier** — that limit is
+about art cost and about the finale happening somewhere the player has a stake
+in. Loosening *which* elements may go off-world does not loosen *how many*
+places are up there.
+
+⭐ **And the Glass Archive still earns its ground on its own terms:** it is a
+Solar hillside covered in lenses. Arcane is what was *done* there, not what
+lives there — which is why it reads as the door Arcane left through rather than
+as a home it kept.
 
 ### 1.3 ✅ The Citadel is the way back **in**
 
@@ -867,8 +876,8 @@ Arcane is the element that **left the world** (§1.2). The Academy at 50–54 is
 working from when it was still here.** The player grinds it to earn passage,
 crosses the Veil at Vespergate, and finds where that same school ended up.
 ⭐ **The gate stops being an errand and becomes the seam between the two halves
-of Arcane's story.** See the §1.2 amendment for the world-rule trade this
-required.
+of Arcane's story.** ✅ Its on-the-ground placement is settled — see the §1.2
+amendment, which loosened the off-world rule to a guideline.
 
 #### ⭐ Deliberately the opposite of The Buried Sky
 

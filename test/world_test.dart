@@ -139,28 +139,27 @@ void main() {
       }
     });
 
-    test('only Arcane left the world — and it left from exactly one door', () {
-      // ⭐ Arcane has no terrain of its own (WORLD_DESIGN §1.2), with ONE
-      // bounded exception: The Glass Archive, the outstation it worked from
-      // before it went. That is Solar ground Arcane *used*, not Arcane ground.
-      // ⚠️ Exactly one. A second would give Arcane a home and undo the rule.
-      final arcaneZones = World
-          .withElement(MagicElement.arcane)
-          .where((l) => !l.isTown)
-          .toList();
-      final inTheWorld = arcaneZones
-          .where((l) => l.plane == WorldPlane.world)
-          .toList();
-      expect(
-        inTheWorld.map((l) => l.id),
-        ['the_glass_archive'],
-        reason:
-            'Arcane may mark exactly one place in the world — the door it '
-            'left through. Everything else Arcane is above the Veil.',
-      );
-      for (final l in arcaneZones.where((l) => l.id != 'the_glass_archive')) {
-        expect(l.plane, WorldPlane.empyrean, reason: '${l.id} carries Arcane');
+    test('only Celestial and above may leave the world', () {
+      // ⭐ Christian, 2026-08-02: "only Arcane leaves it" is a GUIDELINE, not a
+      // strict rule — anything Celestial or higher may sit off-world.
+      // ⚠️ What stays strict is the other direction: Primal and Kinetic are
+      // physical elements. Fire, water, stone and wind cannot be above the
+      // Veil, in a place WORLD_DESIGN §2.4 gives no ground, weather or moon.
+      for (final l in World.locations) {
+        if (l.plane != WorldPlane.empyrean) continue;
+        // The Citadel is the twelvefold finale and carries every element.
+        if (l.id == 'the_eclipsed_citadel') continue;
+        for (final e in l.elements) {
+          expect(
+            e.tier.index,
+            greaterThanOrEqualTo(MagicTier.celestial.index),
+            reason:
+                '${l.id} is above the Veil but carries ${e.name}, which is '
+                '${e.tier.name} — a physical element with nowhere to be.',
+          );
+        }
       }
+
       // Sanctus and Umbra stayed on the mountain.
       for (final e in [MagicElement.sanctus, MagicElement.umbra]) {
         final onTheVault = World.withElement(e).where(
