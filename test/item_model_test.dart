@@ -1,0 +1,320 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:masters_of_magic_2/game/items/carrying.dart';
+import 'package:masters_of_magic_2/game/items/item_def.dart';
+import 'package:masters_of_magic_2/game/items/item_instance.dart';
+import 'package:masters_of_magic_2/game/items/item_naming.dart';
+import 'package:mom_engine/mom_engine.dart';
+
+/// Sample definitions. ⚠️ Deliberately NOT the real catalogue — these exist to
+/// exercise the shape, and the catalogue is a separate job.
+const _staff = EquipmentDef(
+  id: 'oak_quarterstaff',
+  rarity: Rarity.common,
+  lore: 'Cut green and dried slowly. Most mages start with one.',
+  slot: EquipSlot.mainHand,
+  form: 'Quarterstaff',
+  material: 'Oak',
+  socketCount: 1,
+  salvage: [SalvageYield('oak_log', 1, 2)],
+);
+
+const _log = MaterialDef(
+  id: 'oak_log',
+  rarity: Rarity.common,
+  lore: 'Heavy, and heavier once it rains.',
+  skill: CraftSkill.woodcarving,
+  tier: 1,
+);
+
+const _dust = MoteDef(
+  id: 'flora_dust',
+  rarity: Rarity.common,
+  lore: 'The residue a living thing leaves when it is unmade.',
+  tier: MoteTier.dust,
+  element: MagicElement.flora,
+);
+
+const _component = ComponentDef(
+  id: 'heartwood_splinter',
+  rarity: Rarity.mythic,
+  lore: 'It is still warm.',
+  sourceId: 'whispering_woods',
+);
+
+const _ration = ConsumableDef(
+  id: 'field_ration',
+  rarity: Rarity.common,
+  lore: 'Filling, and that is the only good thing about it.',
+);
+
+const _tonic = BeltableDef(
+  id: 'lesser_tonic',
+  rarity: Rarity.common,
+  lore: 'Bitter enough that you remember drinking it.',
+);
+
+const _key = KeyDef(
+  id: 'celestial_totem',
+  rarity: Rarity.legendary,
+  lore: 'Three essences, and a barrier that only reads all three.',
+  gates: 'rimeholt',
+);
+
+void main() {
+  group('fungibility is the axis the storage model turns on', () {
+    test('things with per-instance rolls are not fungible', () {
+      expect(_staff.isFungible, isFalse);
+      expect(
+        const ToolDef(
+          id: 'oak_hatchet',
+          rarity: Rarity.common,
+          lore: '',
+          skill: CraftSkill.woodcarving,
+          tier: 1,
+        ).isFungible,
+        isFalse,
+        reason: 'tools roll a quality, so two are not interchangeable',
+      );
+    });
+
+    test('things fully described by their definition are fungible', () {
+      for (final d in <ItemDef>[_log, _dust, _component, _key]) {
+        expect(d.isFungible, isTrue, reason: '${d.id} should be fungible');
+      }
+    });
+
+    test('a fungible slot must NOT carry an instance id', () {
+      expect(
+        () => InventorySlot.forDef(_log, instanceId: 'uuid-1'),
+        throwsArgumentError,
+        reason: 'two oak logs are interchangeable; the id would be dead state',
+      );
+      expect(InventorySlot.forDef(_log).instanceId, isNull);
+    });
+
+    test('a non-fungible slot MUST carry an instance id', () {
+      expect(
+        () => InventorySlot.forDef(_staff),
+        throwsArgumentError,
+        reason: 'its quality, aspect, sockets and enchant have nowhere to live',
+      );
+      expect(
+        InventorySlot.forDef(_staff, instanceId: 'uuid-1').instanceId,
+        'uuid-1',
+      );
+    });
+  });
+
+  group('inventory is one item per slot', () {
+    test('twenty oak logs occupy twenty slots', () {
+      // ⭐ ITEMS §10.3a — this is what makes carrying capacity a resource.
+      final pack = [for (var i = 0; i < 20; i++) InventorySlot.forDef(_log)];
+      expect(pack, hasLength(20));
+      expect(pack.every((s) => s.defId == 'oak_log'), isTrue);
+    });
+  });
+
+  group('instances survive the round trip', () {
+    test('every roll is preserved', () {
+      const inst = ItemInstance(
+        instanceId: 'uuid-7',
+        defId: 'oak_quarterstaff',
+        quality: Quality.ornate,
+        aspect: MagicElement.flora,
+        socketed: ['ruby_chip'],
+        enchantId: 'unbinding',
+      );
+      final back = ItemInstance.fromJson(inst.toJson());
+      expect(back.instanceId, 'uuid-7');
+      expect(back.quality, Quality.ornate);
+      expect(back.aspect, MagicElement.flora);
+      expect(back.socketed, ['ruby_chip']);
+      expect(back.enchantId, 'unbinding');
+    });
+
+    test('an unrolled instance stays unrolled', () {
+      const inst = ItemInstance(
+        instanceId: 'uuid-8',
+        defId: 'oak_quarterstaff',
+      );
+      final back = ItemInstance.fromJson(inst.toJson());
+      expect(back.quality, isNull);
+      expect(back.aspect, isNull);
+      expect(back.socketed, isEmpty);
+    });
+
+    test('an unknown enum name degrades to null rather than throwing', () {
+      // A save written by a newer build must not crash an older one outright.
+      final back = ItemInstance.fromJson({
+        'instanceId': 'uuid-9',
+        'defId': 'x',
+        'quality': 'transcendent',
+      });
+      expect(back.quality, isNull);
+    });
+  });
+
+  group('the name is composed from the facts, never stored', () {
+    test('quality, material and form in that order', () {
+      expect(
+        composeItemName(
+          quality: Quality.ornate,
+          material: 'Bloodwood',
+          form: 'Quarterstaff',
+        ),
+        'Ornate Bloodwood Quarterstaff',
+      );
+    });
+
+    test('Standard is unwritten, so ordinary items read plainly', () {
+      expect(
+        composeItemName(
+          quality: Quality.standard,
+          material: 'Oak',
+          form: 'Wand',
+        ),
+        'Oak Wand',
+      );
+    });
+
+    test('a dropped item leads with its aspect', () {
+      expect(
+        composeItemName(
+          aspectPrefix: aspectPrefixes['flora'],
+          material: 'Yew',
+          form: 'Robe',
+        ),
+        'Overgrown Yew Robe',
+      );
+    });
+
+    test('there is an aspect prefix for all twelve elements', () {
+      for (final e in MagicElement.values) {
+        expect(
+          aspectPrefixes[e.name],
+          isNotNull,
+          reason: '${e.name} has no aspect prefix (ITEMS §9b.5b)',
+        );
+      }
+      expect(aspectPrefixes.values.toSet(), hasLength(12));
+    });
+
+    test('no aspect prefix collides with reserved vocabulary', () {
+      // ⚠️ README §3: Bound, Sudden Death, Eclipsed and every element status
+      // name already mean something specific.
+      const reserved = {
+        'Bound',
+        'Eclipsed',
+        'Ignite',
+        'Waterlogged',
+        'Photosynthesis',
+        'Tailwind',
+        'Stagger',
+        'Blind',
+      };
+      for (final p in aspectPrefixes.values) {
+        expect(reserved.contains(p), isFalse, reason: '"$p" is reserved');
+      }
+    });
+  });
+
+  group('rules the model must not let anyone break', () {
+    test('the belt is a real slot, and never carries a set', () {
+      expect(EquipSlot.values, contains(EquipSlot.belt));
+      expect(EquipSlot.values, hasLength(10));
+      expect(
+        EquipSlot.belt.carriesSet,
+        isFalse,
+        reason: 'the belt is the one slot whose value is not combat power',
+      );
+    });
+
+    test('only the five armour slots may carry a set', () {
+      const armour = [
+        EquipSlot.hat,
+        EquipSlot.robeTop,
+        EquipSlot.robeBottom,
+        EquipSlot.boots,
+        EquipSlot.gloves,
+      ];
+      for (final s in EquipSlot.values) {
+        expect(s.carriesSet, armour.contains(s), reason: '$s (ITEMS §3.2)');
+      }
+    });
+
+    test('a Component is Bound by construction, and is not a Material', () {
+      expect(_component.tradability, Tradability.bound);
+      expect(
+        _component,
+        isNot(isA<MaterialDef>()),
+        reason:
+            'modelling it as a Material lets bulk crafting reach it, '
+            'which is the loophole ITEMS §6c closed',
+      );
+    });
+
+    test('a Key is Bound and worthless, so it can never be sold or traded', () {
+      expect(_key.tradability, Tradability.bound);
+      expect(_key.value, 0);
+    });
+
+    test('salvage only exists on things that can be broken down', () {
+      expect(_staff, isA<Salvageable>());
+      expect(_log, isA<Salvageable>());
+      expect(_dust, isNot(isA<Salvageable>()));
+      expect(_key, isNot(isA<Salvageable>()));
+    });
+
+    test('only equipment is enchantable and socketed', () {
+      expect(_staff, isA<Enchantable>());
+      expect(_staff, isA<Socketed>());
+      expect(_staff.socketCount, 1);
+      expect(_dust, isNot(isA<Enchantable>()));
+    });
+  });
+
+  group('the four containers each have one job', () {
+    test('only Beltable things reach combat', () {
+      expect(Carrying.accepts(Container.belt, _tonic), isTrue);
+      expect(
+        Carrying.accepts(Container.belt, _ration),
+        isFalse,
+        reason: 'a field ration is a between-encounters item',
+      );
+      expect(Carrying.accepts(Container.belt, _staff), isFalse);
+    });
+
+    test('every other container takes anything — space, not legality', () {
+      for (final c in [
+        Container.storeroom,
+        Container.backpack,
+        Container.mount,
+      ]) {
+        for (final d in <ItemDef>[_staff, _log, _ration, _tonic, _key]) {
+          expect(Carrying.accepts(c, d), isTrue, reason: '$c / ${d.id}');
+        }
+      }
+    });
+
+    test('beltable is a TYPE, not a flag someone can forget to check', () {
+      expect(_tonic, isA<Beltable>());
+      expect(_ration, isNot(isA<Beltable>()));
+    });
+
+    test('the belt grows, but is clamped', () {
+      expect(Carrying.beltSlotsFor(), Carrying.baseBeltSlots);
+      expect(Carrying.beltSlotsFor(fromProgression: 3, fromGear: 2), 7);
+      expect(
+        Carrying.beltSlotsFor(fromProgression: 50),
+        Carrying.maxBeltSlots,
+        reason: 'past the cap, "which do I bring?" stops being a decision',
+      );
+    });
+
+    test('the Storeroom is unbounded; the backpack is not', () {
+      // ⭐ The scarcity in a Storeroom is WHICH CITY it is in, not its size.
+      expect(Carrying.storeroomSlots, isNull);
+      expect(Carrying.backpackSlots, greaterThan(0));
+    });
+  });
+}

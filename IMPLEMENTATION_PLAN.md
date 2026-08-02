@@ -812,7 +812,16 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
   the cheapest place to get personality back if fights feel samey.
 
 
-- **⛔ TO DO before item stats ship: a content-version handshake in
+- **⛔ TO DO before item stats ship: a LOGIN content-version gate.**
+  ✅ **Approach settled 2026-08-02 (Christian):** the server stores a current
+  content version; if a client's version differs at login it is forced to
+  update/refresh. ⭐ **Better than the per-match ticket compare below** — a
+  ticket only stops a mismatched *pairing*, a login gate stops a mismatched
+  client existing at all, and it covers PvE, crafting and prices too. It is
+  also what makes item definitions-in-code safe (ITEMS §10.1). The original
+  framing, kept for the reasoning:
+
+- **⛔ (superseded framing) a content-version handshake in
   matchmaking.** Verified 2026-08-02 — `matchmaking.dart` compares **no
   version at all**. Harmless today, because nothing a duel resolves against
   varies by build. The moment **item stats exist**, it becomes a silent

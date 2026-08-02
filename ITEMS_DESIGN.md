@@ -17,13 +17,14 @@ define the endgame ceiling first, then scale the ladder down to it.
 
 ✅ Already settled before this session:
 
-- **Nine slots** ✅ (naming settled):
+- **Ten slots** ✅ (naming settled):
 
   | Group | Slots |
   |---|---|
   | **Set slots** (the primary robe set, §3.2) | Hat · Robe Top · Robe Bottom · Boots · **Gloves** |
   | **Jewelry** | Neck · Ring |
   | **Held** | **Main hand** · **Off hand** |
+  | **Utility** | ⭐ **Belt** (added 2026-08-02, §10.3c) |
 
   ✅ Held items are **Main hand / Off hand**, never "left/right" — this keeps
   them clearly distinct from the worn **Gloves** slot (gloves/bracers), which
@@ -196,8 +197,11 @@ archetypes viable, rather than the meta collapsing to one.
 ### 3.2 Which slots carry a set? ✅
 
 The **five armor slots** — **Hat, Robe Top, Robe Bottom, Boots, Gloves** — are
-the set ("primary robe set") slots. **Neck, Ring, and both hands** are always
-free for weapons and tech.
+the set ("primary robe set") slots. **Neck, Ring, both hands and the Belt** are
+always free for weapons, tech and utility.
+
+⚠️ **The Belt never carries a set piece.** It is the one slot whose value is
+not combat power, and folding it into a set would undo that.
 
 This makes mix-and-match exactly as described: 5 armor slots with bonuses at
 3/4/5 means you can run a full 5-piece, or **3+2** (one 3-piece bonus, the
@@ -802,6 +806,7 @@ Every slot now has a maker, and every gathering skill has a sink:
 | Foraging (herbs) | **Potions** | consumables | — |
 | Mining (gems) + other reagents | **Jewelry** | rings & amulets | Neck, Ring |
 | Felling (wood) | **Woodcarving** | staves & wands | Main hand, Off hand |
+| Foraging (hides/leather) 📝 | **Tailoring** | ⭐ **belts** | Belt |
 | Mining (ore) | **Metalworking** | refined metal — ingots, fittings, settings | ✅ feeds other recipes |
 | Combat + gathering (motes) | **Enchanting** | the element axis | applies to any gear |
 
@@ -1844,3 +1849,268 @@ architecture; modifier vocabulary with risk ratings; complete catalogue of
 existing statuses/effects/hooks; mote economy tied to existing region
 elements; balance guardrails on proc rates, shield piercing, on-hit, and PvP
 gear; rarity ladder; level-band scaling.
+
+---
+
+## 10. The Item model — code shape (session 2026-08-02)
+
+### 10.1 ⚠️ Definitions and instances are two different things
+
+⚠️ **The single most important distinction in this section, and the one that
+will cause the most damage if it is blurred.** Christian's framing was "an
+Items collection in the DB with info about the item". That is right for **half**
+of it:
+
+| | What it is | Where it lives | Why |
+|---|---|---|---|
+| **Definition** | *What a Bloodwood Quarterstaff IS* — base stats, slot, rarity, tradability, equip level | ⭐ **CODE** | ⚠️ **The duel resolves against it.** Lockstep commit-reveal means both clients must agree exactly; server data adds a second way to disagree, timed by whenever each last refreshed (ENEMIES §1.2) |
+| **Instance** | *That YOU own three, that this one rolled Ornate, has a Core socketed and a Sunbleached enchant* | ✅ **DB** | Exactly Christian's reason — start on one machine, continue on another |
+
+⭐ **The version gate Christian proposed is what makes definitions-in-code
+safe, and it is a better answer than the one the plan had.** The server holds a
+current content version; a client whose version differs at login is forced to
+refresh. ⭐ **Then every live client provably shares identical definitions** —
+which is precisely the guarantee lockstep needs, achieved once at login instead
+of negotiated per match.
+
+✅ **This supersedes the matchmaking-ticket handshake** logged in
+IMPLEMENTATION_PLAN. A ticket compare only stops a *mismatched pairing*; a
+login gate stops a mismatched client existing at all, and also covers PvE,
+crafting and prices.
+
+⚠️ **What still must be in the DB regardless:** inventory, bank, equipped
+loadout, `dropsSeen`, and anything a player can lose or gain. Those are
+instances, and they sync.
+
+⭐ **`dropsSeen` therefore costs almost nothing** — a `Set<String>` of
+definition ids. The names, icons and rarities it renders come from code.
+
+### 10.2 What an item can carry — the full property list
+
+Gathered from every ruling already made in this document.
+
+**Every item**
+| Property | Notes |
+|---|---|
+| `id` | Stable, never displayed. Save files and `dropsSeen` key on it |
+| `rarity` | Six-tier ladder (§8) |
+| `tradability` | Tradeable · Untradeable · Bound (§6c) |
+| `equipLevel` | ✅ Every item has one (§9b.3). ✅ Quality never raises it |
+| `value` | Gold. ⚠️ A **tuning knob** — may be server-side (ENEMIES §1.2) |
+| `lore` | ⭐ Christian's "players who care can learn more" channel |
+| `painter` | ⚠️ A recipe, **never a bitmap** — this project has no image assets |
+
+⭐ **`name` is COMPUTED, not stored.** §9b.5a fixes the grammar: aspect prefix +
+quality adjective + material + form, each component carrying exactly one fact.
+⚠️ **Storing the string lets it drift from the facts it is supposed to encode**
+— an item could be renamed without being changed, or changed without being
+renamed. One composer function, and a drift-guard test.
+⚠️ Uniques are the exception: boss drops have bespoke names (§9b.5) and need a
+`displayNameOverride`.
+
+**Equipment** — slot · setId/setTier (five armour slots only, §3.2) ·
+modifiers (§4 vocabulary) · sockets (§6d) · enchant · quality
+(Rough→Master, §9b.4) · material tier · form · aspect (drops only, §9b.5b)
+
+**Consumable** — effect · ⭐ `usableInDuel` (§6b.3 makes this a real ruling,
+not a flag) · stack size
+
+**Mote** — element (or neutral) · mote tier (Dust→Heart, §6.0)
+
+**Material** — which of the six skills consumes it · tier
+
+**Component** — ⚠️ **not** a Material. Tier III/IV set parts (§3.5): Bound,
+never gathered, never bulk. Modelling them as Materials would let bulk-crafting
+logic touch them, which is the exact loophole §6c closed
+
+**Tool** — gathering (§9b.7a) · which skill · tier
+
+**Gem** — socketable (§6d)
+
+**Key** — ⭐ **These already exist and are unmodelled.** `world.dart` names
+four gate items in prose: *Three ordinary proofs*, *The Kinetic Sigil, in three
+parts*, *A Celestial Totem charged with Solar, Lunar and Astral essences*,
+*Three Ethereal key fragments*, and the **Concordant Crown** itself. ⚠️ Every
+tier gate in the game is currently a **string with no item behind it**
+
+### 10.3 📝 Proposed shape — sealed kinds, mixin traits
+
+⚠️ **A deep hierarchy is the wrong instinct here** (`Item → Equipment → Weapon
+→ Staff`). It breaks immediately, because several things are two things at
+once: a crafted staff is Equipment **and** Salvageable; a mote is a Material
+**and** stackable **and** a crafting reagent; a Tool is Equipment-like but
+occupies no combat slot.
+
+⭐ **Sealed kinds for what a thing IS, mixins for what it CAN DO.**
+
+```dart
+sealed class ItemDef {
+  final String id;
+  final Rarity rarity;
+  final Tradability tradability;
+  final int equipLevel;
+  final String lore;
+}
+
+class EquipmentDef  extends ItemDef with Salvageable, Enchantable, Socketed
+class ConsumableDef extends ItemDef with Stackable
+class MaterialDef   extends ItemDef with Stackable, Salvageable
+class MoteDef       extends ItemDef with Stackable
+class ComponentDef  extends ItemDef             // Bound, never bulk
+class ToolDef       extends ItemDef with Salvageable
+class GemDef        extends ItemDef with Stackable
+class KeyDef        extends ItemDef             // gate items; never traded
+```
+
+⭐ **Sealed buys exhaustiveness.** Dart's switch is exhaustive over a sealed
+type, so adding a kind becomes a **compile error everywhere it matters** rather
+than a silent fallthrough. That is the same reasoning `LocationKind` already
+uses — "the UI switches exhaustively on this enum, so widening it is a breaking
+change rather than an additive one".
+
+**Instances, the DB half:**
+
+```dart
+class ItemStack    { String defId; int count; }        // stackables collapse
+class ItemInstance {                                    // things with identity
+  String instanceId, defId;
+  Quality? quality;          // rolled at craft time
+  MagicElement? aspect;      // drops only
+  Enchant? enchant;
+  List<String> socketed;     // gem defIds
+}
+```
+
+### 10.3a ✅ Inventory is one item per slot; storage collapses (Christian)
+
+✅ **Ruling:** the two containers behave differently, and the axis that decides
+everything is **fungibility**, not stacking.
+
+| Container | Shape | Example |
+|---|---|---|
+| **Inventory** (the backpack you carry) | ⭐ **One item per slot** — 20 Oak Logs occupy **20 slots** | `[oak_log, oak_log, …]` |
+| **Storage** (bank) | Collapses to counts | `{oak_log: 1000}` |
+
+⭐ **This makes inventory capacity a real resource**, the way a gathering trip
+should feel — you come back when you are full, not when you are bored. It is
+also a natural gold sink (bigger packs) that costs no combat power, which §2.2
+explicitly wants more of.
+
+✅ **Fungible items need no identity; everything else needs a UUID.**
+
+- **Fungible** — two are interchangeable because the *definition* fully
+  determines the item: materials, motes, gems, consumables, components, keys.
+  A slot holding one stores only a `defId`.
+- **Non-fungible** — carries per-instance rolls (quality, aspect, enchant,
+  sockets): equipment and tools. Each needs its own **UUID**, generated at
+  craft or drop time.
+
+⭐ **This retires the `Stackable` trait entirely.** "Can it stack" is not an
+independent property — it is a *consequence* of fungibility, and modelling both
+would let them disagree. One axis, one field: `ItemDef.isFungible`.
+
+### 10.3b ✅ The four containers (Christian, 2026-08-02)
+
+✅ **This supersedes §6b.2's "carry as many potions as you like".** The backpack
+is bounded like everything else; there is simply no *separate* potion cap.
+
+| # | Container | Shape | Where | Notes |
+|---|---|---|---|---|
+| 1 | **Stash** 📝 *name TBD* | Unlimited | One city, unlocked or purchased | The long-term hoard |
+| 2 | **Backpack** | ✅ **20 slots**, one item each | Carried everywhere | ⚠️ **Defined in exactly one place** — 25 is a plausible balance change |
+| 3 | **Belt** | A few slots | Carried | ⭐ The only container reachable **during** combat |
+| 4 | **Mount / companion** | +35 → +100 cargo (WORLD_DESIGN §4b.3) | Travel only | ⚠️ **Does not enter a zone** |
+
+⭐ **The mount not entering zones is what gives the backpack teeth.** Cargo
+capacity is a *travel and trade* stat; on an adventure you have 20 slots and
+nothing else, so a gathering run ends when you are full. ✅ That is already
+consistent with §4b.3 making mounts a speed-vs-bulk fork for the road, and with
+Journey risking everything you carry.
+
+#### ✅ The belt, and why using it costs a turn
+
+✅ **Beltable consumables are loaded from the backpack before or at the start of
+combat**, and using one **spends your turn**.
+
+⭐ **That single ruling is what makes potions a decision instead of a tax.** In
+a simultaneous-turn duel, a turn spent drinking is a turn not casting — and the
+opponent committed their move blind, so a heal can be *baited*. ⭐ **Potions
+become mind-games rather than a resource check**, which is the same axis the
+whole game already runs on.
+
+✅ **Between encounters on an adventure**, a player may consume from the
+**backpack** and rearrange the **belt**. ⭐ So out-of-combat recovery is a
+backpack job and the belt is purely a combat loadout — two containers with two
+jobs, rather than one container with a mode.
+
+✅ **Both the backpack and the belt can grow**, within reason — progression and
+equipment bonuses (§6b.2's `+1 slot` modifier axis, now `beltSlots`).
+
+### 10.3c ✅ The Storeroom is PER CITY (Christian, 2026-08-02)
+
+✅ **Named the Storeroom.** ✅ **Every city has its own, bought or unlocked
+separately.**
+⚠️ **They are not a shared pool.** What you leave in Aldermere is in Aldermere.
+Moving it means **carrying it there yourself**.
+
+⭐ **This is the decision that makes the rest of the world's systems load
+bearing**, and it is worth being explicit about how much it changes:
+
+| System | Was | Becomes |
+|---|---|---|
+| **Mount cargo** (+35 → +100, WORLD_DESIGN §4b.3) | A trade convenience | ⭐ The reason mounts exist. Relocating a hoard is a *logistics* problem |
+| **Journey risking cargo** (§4b.2) | A gamble on loot | ⭐ A gamble on **everything you own that is in transit** |
+| **Decentralised crafting stations** (§9b.1) | Flavour — one skill per town | ⭐ Genuinely structural: your wood is in Aldermere and your cloth is in Pennycross |
+| **Concordance, the trade capital** | A market | ⭐ The natural hub, because it is where routes meet |
+
+⚠️ **The friction risk, stated plainly.** Per-city storage *plus* decentralised
+stations *plus* per-city shops can compound into busywork rather than strategy
+— three separate reasons to travel before you can make one item. ⭐ **Watch for
+the moment a player's plan is "spend ten minutes moving things"**, and if it
+arrives, the release valve is a paid courier or a per-city stash upgrade, not
+making storage global.
+
+✅ **Name: the Storeroom.** *Coffer* was rejected — it reads as money only —
+and ⚠️ **"Vault" was never available**, since WORLD_DESIGN §2.3 gives it to the
+massif the whole Ethereal quarter climbs.
+
+### 10.3d ✅ The Belt is an equipment slot
+
+✅ **Belt joins the nine, making ten** (§1). It is the one slot whose value is
+deliberately **not** combat power.
+
+✅ **What a belt grants today: `beltSlots`** — how many consumables reach a duel
+at all.
+
+📝 **More belt modifiers are expected**, shaping what those consumables *do*
+rather than how many fit. ⚠️ Not designed yet; *"potions from this belt heal 20%
+more"* was an illustration, not a spec, and is **not** implemented.
+
+⭐ **The reason to want a second axis eventually:** with only capacity, belts
+are a strictly-better ladder — more slots always wins. A second axis makes
+wide-and-weak against narrow-and-strong a genuine build choice. ⚠️ Whatever it
+turns out to be, it should **trade against capacity**, not stack with it.
+
+✅ **Belts are a Tailoring product** (leather), which gives §6a.1's Tailoring a
+second product line and gives the new slot a maker.
+
+✅ **"Beltable" survives as the trait name** — it now reads as "goes on the
+belt", which is literal rather than metaphorical.
+
+### 10.4 ❓ Open questions
+
+- ❓ **Do Tomes (GAME_DESIGN §5, Tier-2 lore books) become an item kind?** As
+  items they are lootable and Concord-tradeable, which interacts with
+  **Discordant** mode; as a separate collection that question disappears.
+- ❓ **Where do instances live** — a list on the character document, or a
+  subcollection? ⚠️ Bank + inventory is unbounded over a playthrough, which
+  argues subcollection, but every duel needs the equipped set, which argues
+  for keeping *equipped* on the character.
+- ❓ **Is `value` (gold price) server-side?** ENEMIES §1.2 already carves out
+  prices as a legitimate tuning knob; the login version gate may make that
+  unnecessary.
+- ❓ **Recipes: a field on the item, or their own data?** ⭐ Recommend their own
+  — a recipe has inputs, a skill, a level, a station requirement and an output,
+  and hanging all of that off the output item makes "what can I make from Oak?"
+  a scan of every item in the game.
+
