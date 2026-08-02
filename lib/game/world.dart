@@ -670,7 +670,10 @@ abstract final class World {
           'Rings the size of bridges, half of them fallen, and the fallen '
           'half still turning. The arcing is not weather; it is the mechanism. '
           'Something is being calculated and has been for a very long time.',
-      edges: [TravelEdge('starfall_basin', 6)],
+      edges: [
+        TravelEdge('starfall_basin', 6),
+        TravelEdge('the_glass_archive', 7),
+      ],
     ),
 
     // ---------------------------------------------------------------
@@ -721,6 +724,7 @@ abstract final class World {
         TravelEdge('rimeholt', 6),
         TravelEdge('the_reliquary_deep', 8),
         TravelEdge('vespergate', 6),
+        TravelEdge('the_sealed_garden', 6),
       ],
     ),
     GameLocation(
@@ -775,8 +779,71 @@ abstract final class World {
       edges: [
         TravelEdge('hallowmarch', 6),
         TravelEdge('the_umbral_wastes', 8),
+        TravelEdge('the_buried_sky', 8),
         TravelEdge('the_collapsed_academy', 12, kind: TravelEdgeKind.veil),
       ],
+    ),
+
+    // ⭐ Two late hybrids that reach BACK for under-used elements
+    // (WORLD_DESIGN §4c). Both pair an Ethereal-band level range with
+    // elements from earlier tiers — deliberate, and the reason they exist:
+    // without them Flora ends at 14 and Geo at 29.
+    GameLocation(
+      id: 'the_sealed_garden',
+      name: 'The Sealed Garden',
+      kind: LocationKind.route,
+      tier: MagicTier.ethereal,
+      // ⭐ The game's FIRST element guarded by its LAST. Flora is where the
+      // player started; Sanctus is where they are now.
+      elements: [MagicElement.flora, MagicElement.sanctus],
+      minLevel: 49,
+      maxLevel: 53,
+      blurb: 'A garden nobody has been let into for a very long time.',
+      arrival:
+          'The wall is low enough to see over and that is the whole '
+          'cruelty of it. Inside, everything is in leaf and in season at '
+          'once. The gate is shut, the guard is still at the gate, and the '
+          'faith that posted him has been gone for centuries.',
+      // ⭐ Hallowmarch's causeway was built to reach HERE — which is why its
+      // markers are still maintained by an order that no longer exists.
+      edges: [TravelEdge('hallowmarch', 6)],
+    ),
+    GameLocation(
+      id: 'the_glass_archive',
+      name: 'The Glass Archive',
+      kind: LocationKind.dungeon,
+      tier: MagicTier.celestial,
+      // ⭐ Solar's side-effect is Blind and Arcane's is Arcane Knowledge, so
+      // the theme falls out of the pairing rather than being imposed on it:
+      // too bright to read, too much to know.
+      elements: [MagicElement.solar, MagicElement.arcane],
+      minLevel: 43,
+      maxLevel: 47,
+      blurb: 'They wrote it in light, and light does not keep.',
+      arrival:
+          'Lenses on every roof, and all of them still aimed. Around '
+          'midday the hillside fills with writing you can almost read, and by '
+          'the time your eyes adjust it has moved on. Whatever they recorded '
+          'here, they recorded onto the one thing that will not hold still.',
+      // ⭐ Below the Rimeholt barrier on purpose — this is where a player
+      // grinds out the Celestial Totem that gets them past it.
+      edges: [TravelEdge('the_shattered_orrery', 7)],
+    ),
+    GameLocation(
+      id: 'the_buried_sky',
+      name: 'The Buried Sky',
+      kind: LocationKind.dungeon,
+      tier: MagicTier.ethereal,
+      elements: [MagicElement.geo, MagicElement.astral],
+      minLevel: 46,
+      maxLevel: 50,
+      blurb: 'The oldest rock in the world, and it is full of stars.',
+      arrival:
+          'You climb to the top of everything in order to go down. The '
+          'shaft cuts through band after band of stone, and every band holds '
+          'a scatter of light in it. None of the patterns match the sky you '
+          'walked in under.',
+      edges: [TravelEdge('vespergate', 8)],
     ),
 
     // ---------------------------------------------------------------
@@ -932,6 +999,9 @@ abstract final class World {
       'hallowmarch': 'Causeway Warden',
       'the_umbral_wastes': 'Umbral Devourer',
       'the_reliquary_deep': 'Reliquary Keeper',
+      'the_sealed_garden': 'Orchard Warden',
+      'the_buried_sky': 'Stratum Warden',
+      'the_glass_archive': 'Glasswright',
       // The Empyrean
       'the_collapsed_academy': 'Unfinished Scholar',
       'the_unwritten_library': 'The Dictating Hand',

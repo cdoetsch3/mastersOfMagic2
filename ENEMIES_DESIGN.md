@@ -428,6 +428,25 @@ pattern wherever a hybrid zone has a genuine tension.**
 
 ---
 
+### 📝 Beyond the Primal quarter — the two late hybrids
+
+The only other zones with finished themes and rosters are the two built to
+close the element-coverage gap. Their designs live in WORLD_DESIGN because
+they are as much map decisions as bestiary ones:
+
+| Zone | Band | Theme | Design |
+|---|---|---|---|
+| **The Buried Sky** | 46–50 | The rock remembers a sky that no longer exists | WORLD_DESIGN §4c.1b |
+| **The Sealed Garden** | 49–53 | The garden is still perfect, still guarded, and you are still not allowed in | WORLD_DESIGN §4c.1a |
+
+⭐ **Both follow the §2b rule and both use the boss pool as their premise's two
+sides** — the same trick as Ashfall Vale. ⚠️ **Three hybrids now do this, which
+makes it a pattern worth stating:** *a hybrid zone's boss pool should be the
+two sides of its premise.* The remaining seven hybrids have no themes yet, and
+applying the rule to them is a content decision rather than an automatic one.
+
+---
+
 ### ⭐ Why each theme was chosen — the reasoning to preserve
 
 ⚠️ **Read this before rewriting a zone theme.** Each one was derived from

@@ -72,6 +72,30 @@ problem rather than adding flavour.
 consequences, not a second world to populate. This bounds the art cost and stops
 the finale happening somewhere the player has no stake in.
 
+#### ✅ Amendment (2026-08-02) — Arcane left through exactly one door
+
+⚠️ **The Glass Archive (§4c.1c) is the single Arcane place in the world.** It
+was added for the level curve, and it collided head-on with the rule above —
+worth recording honestly rather than quietly relaxing.
+
+⭐ **Why the exception is a strengthening, not a leak.** As written, Arcane's
+departure had no *location*: it simply is not here, and then it is above the
+Veil. No scar, no door, no evidence. The Glass Archive is the outstation it
+worked from before it went, which turns "Arcane left" from a stated fact into
+a historical event with a place attached.
+
+⭐ **And it does not give Arcane terrain.** The Archive is a **Solar** place —
+a hillside, lenses, sunlight. Arcane is what was *done* there, not what lives
+there. §1.2's argument is that Arcane has no natural referent and so cannot
+own ground; a worksite is not ownership. ⚠️ **A second Arcane place in the
+world would break that reading**, so `world_test.dart` asserts there is
+**exactly one**, by id.
+
+❓ **If this trade is not wanted**, the one-line revert is to swap Arcane for
+Astral in the Archive's element list — the zone survives, Arcane drops back to
+2 zones, and the coverage guard in `world_test.dart` has to come back down to
+a floor of 2.
+
 ### 1.3 ✅ The Citadel is the way back **in**
 
 The Vault's last pitch is **impassable**. The summit is never climbed.
@@ -604,10 +628,19 @@ hours. That is the real gap, and it is exactly where Christian expected it.
 | Zone | Elements | Effect |
 |---|---|---|
 | ✅ **The Sealed Garden** — Flora + Sanctus | flora 3 → **4**, sanctus 2 → **3** | ⭐ Gives Flora its late home. See §4c.1a |
-| 📝 **Geo + Astral** | geo 2 → **3**, astral 2 → **3** | Both currently top out mid-game |
+| ✅ **The Buried Sky** — Geo + Astral | geo 2 → **3**, astral 2 → **3** | Both topped out mid-game. See §4c.1b |
 
-Result: **no element below 3**, and only Solar and Arcane stay at 2 — both of
-which already reach bands 42 and 58, so their *spread* is healthy.
+| ✅ **The Glass Archive** — Solar + Arcane | solar 2 → **3**, arcane 2 → **3** | Fills the thinnest stretch in the back half. See §4c.1c |
+
+✅ **Result: every element now sits at 3 or 4 zones** — the target met exactly,
+with nothing starved and nothing dominant. `test/world_test.dart` asserts the
+3–4 range rather than a floor, so any future zone that unbalances it fails.
+
+✅ **All three zones are now BUILT** (`world.dart`, `world_map_geometry.dart`), and
+`test/world_test.dart` guards the outcome: no element may fall below 2 zones,
+and ⚠️ **no element may top out below band 28** — the guard against the
+"Flora dies at 14" bug recurring. ⚠️ **Solar and Arcane remain at 2**, which is
+the one place this still falls short of the 3–4 target.
 
 ⭐ **Flora + Sanctus is the strong one, and it pays off the Primal arc
 directly.** Sanctus is consecration — temples, oaths, reliquaries
@@ -712,6 +745,153 @@ between Hallowmarch (45–49) and the Collapsed Academy (50–54). ❓ **Exact b
 and travel edges are open**, and adding a zone touches the Floyd–Warshall
 routing table and the map painter, so this is a real code task rather than a
 data edit.
+
+### 4c.1b ✅ The Buried Sky — Geo + Astral, dungeon, Lv 46–50
+
+⭐ **Theme: the rock remembers a sky that no longer exists.**
+
+Geology is deep time; Astral is the heavens. ⭐ **The fusion is strata as a
+record of the sky** — dig down through the bands of stone and each one holds a
+scatter of light in it, and none of the patterns match what is overhead now.
+Neither element states that alone: Geo supplies the *layers*, Astral supplies
+the *heavens*, and the premise is the two read together.
+
+⭐ **Its claim is SCALE, and that is what the quarter was missing.** The other
+late zones make claims about accord (the Sealed Garden) and about the elements
+contending (ENEMIES §2d). This one says something none of them do: **this has
+all happened before, and the record is in the rock.**
+
+⭐ **Why it is a dungeon that goes DOWN in a quarter that goes UP.** The Vault
+is the highest rock in the world, so its exposed strata are the oldest
+anywhere. ⭐ **You climb to the top of everything in order to go down** — and
+that image is the zone. Precedent exists: the Molten Deep and the Reliquary
+Deep both descend while the world rises (§2.5).
+
+| Common | Archetype | Fiction |
+|---|---|---|
+| **Stratum Warden** | Sentinel | Stone laid down in bands; you break through it one age at a time |
+| **Constellate** | Lasher | A scatter of star-points that arrives as many small pieces |
+| **Fadelight** | Glasswing | ⭐ The last light of a star that is already gone — brilliant, and barely there |
+| **Corebiter** | **Siphon** | Chews through rock and takes what it finds |
+| **Deadreckoner** | Adept | Navigates by stars that no longer exist, and is still mostly right |
+
+**Mini-bosses:** Bedrock Colossus (Redoubt) · **Nadir** (Executioner — the
+lowest point of the shaft) · The Long Count (Hexer) · Stonefall Herald
+(Champion).
+
+**Bosses — ⭐ the pool is the tension, as in the other two hybrids:**
+
+| Boss | It is |
+|---|---|
+| ✅ **The Overburden** | **What buries.** ⭐ A real mining term for the rock sitting on top of a seam — Geo vocabulary that happens to mean exactly the right thing |
+| ✅ **The Buried Constellation** | **What survives.** An old star-pattern still alight down here, refusing to be past tense |
+
+⭐ **Which boss you draw says whether the zone is about what buries or what
+lasts.** That is now the third hybrid built this way — Ashfall Vale (10–14),
+The Sealed Garden (49–53), The Buried Sky (46–50). ⚠️ **Three is where a
+pattern becomes a rule**, so it is worth saying plainly: *a hybrid zone's boss
+pool should be the two sides of its premise.* Applying it to the remaining
+seven hybrids is a real content decision, not an automatic one.
+
+#### ⚠️ Both new zones pair elements across non-adjacent tiers
+
+The Sealed Garden is Primal + Ethereal; The Buried Sky is Kinetic + Celestial
+in an Ethereal band. ✅ **That is the point, not an oversight** — reaching back
+for under-used elements is the reason these zones exist. The existing guard in
+`world_test.dart` only constrains **pure** zones to their element's tier, and
+Frostfell Pass (Primal Aqua + Kinetic Aero) is the precedent.
+
+⭐ **The Sealed Garden's pairing is the strongest argument for the whole
+approach:** Flora is the first element a player ever meets, Sanctus is among
+the last. The zone is *the beginning of the world guarded by the end of it*,
+which is a better reason for the pairing than "Flora needed a late zone."
+
+#### ✅ Placement and roads
+
+| Zone | Pin | Roads |
+|---|---|---|
+| **The Sealed Garden** | (536, 366) | Hallowmarch 6m · Vespergate 7m |
+| **The Buried Sky** | (636, 412) | Rimeholt 7m · Vespergate 8m |
+
+⭐ **The Garden's road pays off a passage that was already written.**
+Hallowmarch's arrival text reads *"A raised road, and someone built it… every
+mile or so there is a marker, and every marker has been maintained."* ⭐ **The
+causeway was built to reach the Garden**, and the markers are still maintained
+by the same oath that still holds the gate. ⚠️ **That edge is load-bearing
+lore, not just a road** — `world_test.dart` asserts it so it cannot be severed
+casually.
+
+### 4c.1c ✅ The Glass Archive — Solar + Arcane, dungeon, Lv 43–47
+
+⭐ **Theme: they wrote it in light, and light does not keep.**
+
+An archive that can only be read at noon, and which the reading destroys.
+
+⭐ **The elements wrote this theme, not the designer.** Solar's side-effect is
+**Blind**; Arcane's is **Arcane Knowledge**. Put those two together and you get
+*too bright to see by, too much to know* — the premise falls out of the
+pairing instead of being imposed on it. ⚠️ **That is the standard to hold new
+hybrids to**, and it is a stronger test than "do the two elements sound good
+together."
+
+#### ⭐ The band is the whole argument
+
+**43–45 is the thinnest three-level stretch in the back half of the game** —
+one zone each, measured from `world.dart`:
+
+| Lv | Zones covering it |
+|---|---|
+| 41–42 | 2 |
+| **43** | **1** — Shattered Orrery |
+| **44** | **1** — Shattered Orrery |
+| **45** | **1** — Hallowmarch |
+| 46+ | 2–4 |
+
+⭐ **And Solar and Arcane's own bands bracket that hole exactly.** Solar's last
+zone ends at **42**; Arcane's first begins at **50**. A Solar+Arcane zone at
+43–47 is the only pairing in the game whose two elements point at the gap by
+themselves — it hands off from Solar's last zone to Arcane's first.
+
+⭐ **It also sits where the player is grinding hardest.** The Rimeholt barrier
+(a Celestial Totem of Solar, Lunar and Astral essences) is the tier gate at 45,
+so 43–45 is simultaneously the least content and the biggest wall. ✅ **The
+Archive is placed BELOW the gate** — reached only from The Shattered Orrery —
+so it is where a player farms the Totem rather than something the Totem locks.
+⚠️ `world_test.dart` asserts that single connection; adding a road from above
+the gate would let the Archive bypass the thing it exists to serve.
+
+#### ⭐ It is the prequel to The Collapsed Academy
+
+Arcane is the element that **left the world** (§1.2). The Academy at 50–54 is
+"a school that read too far, and left." ⭐ **The Glass Archive is where it was
+working from when it was still here.** The player grinds it to earn passage,
+crosses the Veil at Vespergate, and finds where that same school ended up.
+⭐ **The gate stops being an errand and becomes the seam between the two halves
+of Arcane's story.** See the §1.2 amendment for the world-rule trade this
+required.
+
+#### ⭐ Deliberately the opposite of The Buried Sky
+
+The two sit three levels apart and are both archives, which reads as a
+collision until you say the thing out loud:
+
+| Zone | Medium | Claim |
+|---|---|---|
+| **The Buried Sky** (46–50) | stone | ⭐ The most durable record there is — *it keeps a sky that no longer exists* |
+| **The Glass Archive** (43–47) | light | ⭐ The least durable — *it keeps nothing at all* |
+
+⚠️ **State this wherever the two are described**, or someone will later "fix"
+the overlap by making one of them something else.
+
+#### Placement
+
+Pin at **(850, 260)** — the far north-east, the remotest and sunniest corner of
+the continent, and previously empty map. One road: **The Shattered Orrery, 7m**.
+
+📝 **Roster is not designed.** The anchor name is **Glasswright**
+(`opponentNameFor`); commons, four minis and two bosses are still to do. ⭐ The
+boss pool should be the two sides of its premise, like the other three hybrids
+— presumably *what was written* against *what is left of it*.
 
 ### 4c.2 ❓ The quarter-3 amplification event — bank it, but reframe it
 

@@ -148,6 +148,11 @@ abstract final class WorldMapGeometry {
     'the_umbral_wastes': Offset(388, 124),
     'the_reliquary_deep': Offset(416, 238),
     'vespergate': Offset(556, 286),
+    // ⭐ The three late zones are pushed into the empty north rather than
+    // packed around the Vault — the centre of this map is crowded enough.
+    'the_sealed_garden': Offset(230, 270),
+    'the_buried_sky': Offset(710, 150),
+    'the_glass_archive': Offset(850, 260),
     'the_collapsed_academy': Offset(726, -148),
     'the_unwritten_library': Offset(606, -186),
     'the_eclipsed_citadel': Offset(474, -132),

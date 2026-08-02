@@ -139,12 +139,26 @@ void main() {
       }
     });
 
-    test('only Arcane left the world', () {
-      // Every Arcane place is above the Veil; nothing else is.
-      final arcaneZones = World.withElement(
-        MagicElement.arcane,
-      ).where((l) => !l.isTown);
-      for (final l in arcaneZones) {
+    test('only Arcane left the world — and it left from exactly one door', () {
+      // ⭐ Arcane has no terrain of its own (WORLD_DESIGN §1.2), with ONE
+      // bounded exception: The Glass Archive, the outstation it worked from
+      // before it went. That is Solar ground Arcane *used*, not Arcane ground.
+      // ⚠️ Exactly one. A second would give Arcane a home and undo the rule.
+      final arcaneZones = World
+          .withElement(MagicElement.arcane)
+          .where((l) => !l.isTown)
+          .toList();
+      final inTheWorld = arcaneZones
+          .where((l) => l.plane == WorldPlane.world)
+          .toList();
+      expect(
+        inTheWorld.map((l) => l.id),
+        ['the_glass_archive'],
+        reason:
+            'Arcane may mark exactly one place in the world — the door it '
+            'left through. Everything else Arcane is above the Veil.',
+      );
+      for (final l in arcaneZones.where((l) => l.id != 'the_glass_archive')) {
         expect(l.plane, WorldPlane.empyrean, reason: '${l.id} carries Arcane');
       }
       // Sanctus and Umbra stayed on the mountain.
@@ -195,6 +209,79 @@ void main() {
               'sits in the ${l.tier?.name} band',
         );
       }
+    });
+
+    test('every element gets enough of the world to be worth playing', () {
+      // ⭐ WORLD_DESIGN §4c. The Citadel carries all twelve and would make
+      // this pass trivially, so it is excluded.
+      final counts = <MagicElement, int>{};
+      for (final l in World.locations) {
+        if (l.id == 'the_eclipsed_citadel') continue;
+        for (final e in l.elements) {
+          counts[e] = (counts[e] ?? 0) + 1;
+        }
+      }
+      for (final e in MagicElement.values) {
+        expect(
+          counts[e] ?? 0,
+          inInclusiveRange(3, 4),
+          reason:
+              '${e.name} appears in ${counts[e] ?? 0} zones. ⭐ Every element '
+              'gets 3-4 (WORLD_DESIGN §4c) — enough to be worth committing '
+              'to, few enough that none dominates.',
+        );
+      }
+    });
+
+    test('no element is stranded in the early game', () {
+      // ⚠️ The bug this guards: Flora once appeared ONLY in zones ending at
+      // level 14, so a player who loved it had 46 levels with nowhere to take
+      // it. The Sealed Garden fixed that; this stops it recurring.
+      final top = <MagicElement, int>{};
+      for (final l in World.locations) {
+        if (l.id == 'the_eclipsed_citadel') continue;
+        for (final e in l.elements) {
+          final best = top[e] ?? 0;
+          if (l.maxLevel > best) top[e] = l.maxLevel;
+        }
+      }
+      for (final e in MagicElement.values) {
+        expect(
+          top[e] ?? 0,
+          greaterThanOrEqualTo(28),
+          reason:
+              '${e.name} tops out at band ${top[e] ?? 0}. Every element needs '
+              'a zone late enough that committing to it is not a dead end.',
+        );
+      }
+    });
+
+    test('the three late hybrids reach back for under-used elements', () {
+      final garden = byId['the_sealed_garden']!;
+      final sky = byId['the_buried_sky']!;
+      final archive = byId['the_glass_archive']!;
+
+      // ⭐ The game's first element guarded by its last.
+      expect(garden.elements, [MagicElement.flora, MagicElement.sanctus]);
+      expect(sky.elements, [MagicElement.geo, MagicElement.astral]);
+      expect(archive.elements, [MagicElement.solar, MagicElement.arcane]);
+      for (final l in [garden, sky, archive]) {
+        expect(l.isHybrid, isTrue);
+        expect(l.minLevel, greaterThanOrEqualTo(43));
+      }
+      for (final l in [garden, sky]) {
+        expect(l.tier, MagicTier.ethereal);
+      }
+
+      // ⚠️ The Archive must stay BELOW the Rimeholt barrier — it is where the
+      // player farms the Celestial Totem that gets them past it. Reaching it
+      // must not require anything above Rimeholt.
+      expect(archive.tier, MagicTier.celestial);
+      expect(archive.connections, ['the_shattered_orrery']);
+
+      // ⭐ Hallowmarch's causeway exists BECAUSE of the Garden — that is what
+      // explains its maintained markers. Severing this edge breaks the lore.
+      expect(garden.connections, contains('hallowmarch'));
     });
 
     test('the Citadel is a hybrid of all twelve', () {

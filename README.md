@@ -50,6 +50,7 @@ surface it and ask; do not decide it in code.
 |---|---|
 | Which places exist, how they connect, what is in them | [WORLD_DESIGN.md](WORLD_DESIGN.md) |
 | Travel times, mounts, trade, the Concord Market | [WORLD_DESIGN.md](WORLD_DESIGN.md) §4b |
+| 🗺️ **The current world map, rendered and labelled** | [docs/plates/world-map.html](docs/plates/world-map.html) |
 | How the map is *drawn* (and the bugs that shaped it) | [docs/reviews/](docs/reviews/) |
 | Visual plates / map artwork history | [docs/plates/](docs/plates/) |
 
@@ -75,6 +76,7 @@ surface it and ask; do not decide it in code.
 | ⭐ **The Primal quarter's story arc** — what the five themes add up to | [GAME_DESIGN.md](GAME_DESIGN.md) §5 |
 | Element coverage across the world, and the late-zone proposal | [WORLD_DESIGN.md](WORLD_DESIGN.md) §4c |
 | ⭐ **The Sealed Garden** — the late Flora+Sanctus zone, and why Eden matters to the endgame | [WORLD_DESIGN.md](WORLD_DESIGN.md) **§4c.1a** |
+| ⭐ **The Buried Sky** — the late Geo+Astral zone | [WORLD_DESIGN.md](WORLD_DESIGN.md) **§4c.1b** |
 | ⭐ **What content each zone still needs** — the tracking grid | [CONTENT_CHECKLIST.md](CONTENT_CHECKLIST.md) |
 | Boss/mini-boss names per element, zone structure | [GAME_DESIGN.md](GAME_DESIGN.md) §5, §3d |
 
@@ -150,10 +152,24 @@ GAME_DESIGN §5, narrative screens).
 
 ```sh
 flutter test                              # app tests
-dart test packages/mom_engine             # engine tests
+(cd packages/mom_engine && dart test)     # engine tests — must run FROM the package
 flutter analyze                           # must be clean
 dart run packages/mom_engine/tool/balance_sim.dart
+
+flutter test tool/render_map_test.dart   # redraw the world map plate...
+python3 tool/build_map_plate.py          # ...then overlay its labels
 ```
+
+⚠️ **Regenerate the map plate after any change to positions, roads or level
+bands**, or `docs/plates/world-map.html` silently goes stale. It is two steps
+because `flutter test` substitutes a placeholder font that draws every glyph as
+a box — the terrain is painted by the real painter with text off, and the names
+are overlaid as SVG.
+
+⚠️ **The engine suite must be run from inside `packages/mom_engine`.** Invoking
+`dart test packages/mom_engine` from the repo root fails with *"You need to add
+a dev_dependency on package:test"* — it resolves the app's pubspec, not the
+package's. The README said the wrong thing until 2026-08-02.
 
 **Both suites must pass and `flutter analyze` must be clean before a commit.**
 

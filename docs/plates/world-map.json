@@ -1,0 +1,668 @@
+{
+  "scale": 1.4,
+  "bounds": {
+    "l": -70.0,
+    "t": -330.0,
+    "w": 1150.0,
+    "h": 1890.0
+  },
+  "veilY": -60.0,
+  "features": [
+    {
+      "text": "THE EMPYREAN",
+      "x": 300.0,
+      "y": -250.0,
+      "size": 27.0,
+      "tracking": 7.0,
+      "rot": 0.0,
+      "tone": "beyond"
+    },
+    {
+      "text": "THE VEIL",
+      "x": 860.0,
+      "y": -78.0,
+      "size": 17.0,
+      "tracking": 5.0,
+      "rot": 0.0,
+      "tone": "veil"
+    },
+    {
+      "text": "THE VAULT",
+      "x": 644.0,
+      "y": 206.0,
+      "size": 27.0,
+      "tracking": 7.0,
+      "rot": 0.0,
+      "tone": "cold"
+    },
+    {
+      "text": "THE MERIDIAN SCARP",
+      "x": 880.0,
+      "y": 598.0,
+      "size": 21.0,
+      "tracking": 5.0,
+      "rot": 0.0,
+      "tone": "dry"
+    },
+    {
+      "text": "THE KILN DESERT",
+      "x": 792.0,
+      "y": 792.0,
+      "size": 27.0,
+      "tracking": 7.0,
+      "rot": 0.0,
+      "tone": "dry"
+    },
+    {
+      "text": "THE IRONSPINE",
+      "x": 300.0,
+      "y": 700.0,
+      "size": 24.0,
+      "tracking": 7.0,
+      "rot": 0.0,
+      "tone": "land"
+    },
+    {
+      "text": "THE VERDANT BASIN",
+      "x": 352.0,
+      "y": 1306.0,
+      "size": 27.0,
+      "tracking": 7.0,
+      "rot": 0.0,
+      "tone": "land"
+    },
+    {
+      "text": "CINDERLANDS",
+      "x": 760.0,
+      "y": 940.0,
+      "size": 27.0,
+      "tracking": 7.0,
+      "rot": 0.0,
+      "tone": "warm"
+    },
+    {
+      "text": "RIVER CONCORD",
+      "x": 646.0,
+      "y": 1178.0,
+      "size": 19.0,
+      "tracking": 4.0,
+      "rot": 0.0,
+      "tone": "river"
+    },
+    {
+      "text": "THE IRONRUN",
+      "x": 500.0,
+      "y": 560.0,
+      "size": 16.0,
+      "tracking": 3.0,
+      "rot": 0.0,
+      "tone": "river"
+    },
+    {
+      "text": "THE MIRRORFALL",
+      "x": 620.0,
+      "y": 620.0,
+      "size": 16.0,
+      "tracking": 3.0,
+      "rot": 0.0,
+      "tone": "river"
+    },
+    {
+      "text": "THE SOUTHERN SHALLOWS",
+      "x": 560.0,
+      "y": 1470.0,
+      "size": 27.0,
+      "tracking": 7.0,
+      "rot": 0.0,
+      "tone": "sea"
+    },
+    {
+      "text": "WESTERN OCEAN",
+      "x": 30.0,
+      "y": 700.0,
+      "size": 27.0,
+      "tracking": 8.0,
+      "rot": -1.5707963267948966,
+      "tone": "sea"
+    }
+  ],
+  "places": [
+    {
+      "id": "aldermere",
+      "name": "Aldermere",
+      "kind": "town",
+      "x": 424.0,
+      "y": 1274.0,
+      "band": "",
+      "tier": "primal",
+      "colors": [],
+      "elements": []
+    },
+    {
+      "id": "whispering_woods",
+      "name": "Whispering Woods",
+      "kind": "route",
+      "x": 296.0,
+      "y": 1212.0,
+      "band": "Lv 1-5",
+      "tier": "primal",
+      "colors": [
+        "#5fb35b"
+      ],
+      "elements": [
+        "Flora"
+      ]
+    },
+    {
+      "id": "glimmerbrook",
+      "name": "Glimmerbrook",
+      "kind": "route",
+      "x": 556.0,
+      "y": 1256.0,
+      "band": "Lv 3-8",
+      "tier": "primal",
+      "colors": [
+        "#3d8bd9"
+      ],
+      "elements": [
+        "Aqua"
+      ]
+    },
+    {
+      "id": "cinderpeak_foothills",
+      "name": "Cinderpeak Foothills",
+      "kind": "route",
+      "x": 690.0,
+      "y": 1104.0,
+      "band": "Lv 6-11",
+      "tier": "primal",
+      "colors": [
+        "#e25822"
+      ],
+      "elements": [
+        "Pyro"
+      ]
+    },
+    {
+      "id": "thornmire",
+      "name": "Thornmire",
+      "kind": "route",
+      "x": 326.0,
+      "y": 1376.0,
+      "band": "Lv 8-13",
+      "tier": "primal",
+      "colors": [
+        "#5fb35b",
+        "#3d8bd9"
+      ],
+      "elements": [
+        "Flora",
+        "Aqua"
+      ]
+    },
+    {
+      "id": "ashfall_vale",
+      "name": "Ashfall Vale",
+      "kind": "route",
+      "x": 762.0,
+      "y": 1014.0,
+      "band": "Lv 10-14",
+      "tier": "primal",
+      "colors": [
+        "#e25822",
+        "#5fb35b"
+      ],
+      "elements": [
+        "Pyro",
+        "Flora"
+      ]
+    },
+    {
+      "id": "pennycross",
+      "name": "Pennycross",
+      "kind": "town",
+      "x": 598.0,
+      "y": 1096.0,
+      "band": "",
+      "tier": "primal",
+      "colors": [],
+      "elements": []
+    },
+    {
+      "id": "forgeholm",
+      "name": "Forgeholm",
+      "kind": "town",
+      "x": 404.0,
+      "y": 1000.0,
+      "band": "",
+      "tier": "kinetic",
+      "colors": [],
+      "elements": []
+    },
+    {
+      "id": "old_quarry",
+      "name": "Old Quarry",
+      "kind": "route",
+      "x": 410.0,
+      "y": 906.0,
+      "band": "Lv 15-19",
+      "tier": "kinetic",
+      "colors": [
+        "#9c7a4b"
+      ],
+      "elements": [
+        "Geo"
+      ]
+    },
+    {
+      "id": "stormcliff_coast",
+      "name": "Stormcliff Coast",
+      "kind": "route",
+      "x": 212.0,
+      "y": 892.0,
+      "band": "Lv 17-22",
+      "tier": "kinetic",
+      "colors": [
+        "#e8c547"
+      ],
+      "elements": [
+        "Electro"
+      ]
+    },
+    {
+      "id": "galehaven",
+      "name": "Galehaven",
+      "kind": "town",
+      "x": 198.0,
+      "y": 806.0,
+      "band": "",
+      "tier": "kinetic",
+      "colors": [],
+      "elements": []
+    },
+    {
+      "id": "windward_steppe",
+      "name": "Windward Steppe",
+      "kind": "route",
+      "x": 506.0,
+      "y": 820.0,
+      "band": "Lv 19-24",
+      "tier": "kinetic",
+      "colors": [
+        "#9bb8c4"
+      ],
+      "elements": [
+        "Aero"
+      ]
+    },
+    {
+      "id": "frostfell_pass",
+      "name": "Frostfell Pass",
+      "kind": "route",
+      "x": 306.0,
+      "y": 770.0,
+      "band": "Lv 21-26",
+      "tier": "kinetic",
+      "colors": [
+        "#3d8bd9",
+        "#9bb8c4"
+      ],
+      "elements": [
+        "Aqua",
+        "Aero"
+      ]
+    },
+    {
+      "id": "thunderspire_peaks",
+      "name": "Thunderspire Peaks",
+      "kind": "route",
+      "x": 348.0,
+      "y": 862.0,
+      "band": "Lv 23-28",
+      "tier": "kinetic",
+      "colors": [
+        "#e8c547",
+        "#9bb8c4"
+      ],
+      "elements": [
+        "Electro",
+        "Aero"
+      ]
+    },
+    {
+      "id": "the_molten_deep",
+      "name": "The Molten Deep",
+      "kind": "dungeon",
+      "x": 826.0,
+      "y": 912.0,
+      "band": "Lv 25-29",
+      "tier": "kinetic",
+      "colors": [
+        "#e25822",
+        "#9c7a4b"
+      ],
+      "elements": [
+        "Pyro",
+        "Geo"
+      ]
+    },
+    {
+      "id": "concordance",
+      "name": "Concordance",
+      "kind": "town",
+      "x": 556.0,
+      "y": 712.0,
+      "band": "",
+      "tier": "celestial",
+      "colors": [],
+      "elements": []
+    },
+    {
+      "id": "the_kiln_desert",
+      "name": "The Kiln Desert",
+      "kind": "route",
+      "x": 766.0,
+      "y": 672.0,
+      "band": "Lv 30-34",
+      "tier": "celestial",
+      "colors": [
+        "#f5b23e"
+      ],
+      "elements": [
+        "Solar"
+      ]
+    },
+    {
+      "id": "the_mirrormere",
+      "name": "The Mirrormere",
+      "kind": "route",
+      "x": 520.0,
+      "y": 508.0,
+      "band": "Lv 32-37",
+      "tier": "celestial",
+      "colors": [
+        "#afc3e8"
+      ],
+      "elements": [
+        "Lunar"
+      ]
+    },
+    {
+      "id": "starfall_basin",
+      "name": "Starfall Basin",
+      "kind": "route",
+      "x": 838.0,
+      "y": 540.0,
+      "band": "Lv 34-39",
+      "tier": "celestial",
+      "colors": [
+        "#6e7bd6"
+      ],
+      "elements": [
+        "Astral"
+      ]
+    },
+    {
+      "id": "meridian",
+      "name": "Meridian",
+      "kind": "town",
+      "x": 652.0,
+      "y": 574.0,
+      "band": "",
+      "tier": "celestial",
+      "colors": [],
+      "elements": []
+    },
+    {
+      "id": "tidewrack_shoals",
+      "name": "Tidewrack Shoals",
+      "kind": "route",
+      "x": 238.0,
+      "y": 468.0,
+      "band": "Lv 36-40",
+      "tier": "celestial",
+      "colors": [
+        "#afc3e8",
+        "#3d8bd9"
+      ],
+      "elements": [
+        "Lunar",
+        "Aqua"
+      ]
+    },
+    {
+      "id": "the_sunless_reach",
+      "name": "The Sunless Reach",
+      "kind": "route",
+      "x": 760.0,
+      "y": 466.0,
+      "band": "Lv 38-42",
+      "tier": "celestial",
+      "colors": [
+        "#f5b23e",
+        "#afc3e8"
+      ],
+      "elements": [
+        "Solar",
+        "Lunar"
+      ]
+    },
+    {
+      "id": "the_shattered_orrery",
+      "name": "The Shattered Orrery",
+      "kind": "dungeon",
+      "x": 826.0,
+      "y": 430.0,
+      "band": "Lv 40-44",
+      "tier": "celestial",
+      "colors": [
+        "#6e7bd6",
+        "#e8c547"
+      ],
+      "elements": [
+        "Astral",
+        "Electro"
+      ]
+    },
+    {
+      "id": "rimeholt",
+      "name": "Rimeholt",
+      "kind": "town",
+      "x": 472.0,
+      "y": 398.0,
+      "band": "",
+      "tier": "ethereal",
+      "colors": [],
+      "elements": []
+    },
+    {
+      "id": "hallowmarch",
+      "name": "Hallowmarch",
+      "kind": "route",
+      "x": 444.0,
+      "y": 330.0,
+      "band": "Lv 45-49",
+      "tier": "ethereal",
+      "colors": [
+        "#f2e7c9"
+      ],
+      "elements": [
+        "Sanctus"
+      ]
+    },
+    {
+      "id": "the_umbral_wastes",
+      "name": "The Umbral Wastes",
+      "kind": "route",
+      "x": 388.0,
+      "y": 124.0,
+      "band": "Lv 47-51",
+      "tier": "ethereal",
+      "colors": [
+        "#8b5cd6"
+      ],
+      "elements": [
+        "Umbra"
+      ]
+    },
+    {
+      "id": "the_reliquary_deep",
+      "name": "The Reliquary Deep",
+      "kind": "dungeon",
+      "x": 416.0,
+      "y": 238.0,
+      "band": "Lv 52-56",
+      "tier": "ethereal",
+      "colors": [
+        "#f2e7c9",
+        "#8b5cd6"
+      ],
+      "elements": [
+        "Sanctus",
+        "Umbra"
+      ]
+    },
+    {
+      "id": "vespergate",
+      "name": "Vespergate",
+      "kind": "town",
+      "x": 556.0,
+      "y": 286.0,
+      "band": "",
+      "tier": "ethereal",
+      "colors": [],
+      "elements": []
+    },
+    {
+      "id": "the_sealed_garden",
+      "name": "The Sealed Garden",
+      "kind": "route",
+      "x": 230.0,
+      "y": 270.0,
+      "band": "Lv 49-53",
+      "tier": "ethereal",
+      "colors": [
+        "#5fb35b",
+        "#f2e7c9"
+      ],
+      "elements": [
+        "Flora",
+        "Sanctus"
+      ]
+    },
+    {
+      "id": "the_glass_archive",
+      "name": "The Glass Archive",
+      "kind": "dungeon",
+      "x": 850.0,
+      "y": 260.0,
+      "band": "Lv 43-47",
+      "tier": "celestial",
+      "colors": [
+        "#f5b23e",
+        "#d65ab8"
+      ],
+      "elements": [
+        "Solar",
+        "Arcane"
+      ]
+    },
+    {
+      "id": "the_buried_sky",
+      "name": "The Buried Sky",
+      "kind": "dungeon",
+      "x": 710.0,
+      "y": 150.0,
+      "band": "Lv 46-50",
+      "tier": "ethereal",
+      "colors": [
+        "#9c7a4b",
+        "#6e7bd6"
+      ],
+      "elements": [
+        "Geo",
+        "Astral"
+      ]
+    },
+    {
+      "id": "the_collapsed_academy",
+      "name": "The Collapsed Academy",
+      "kind": "dungeon",
+      "x": 726.0,
+      "y": -148.0,
+      "band": "Lv 50-54",
+      "tier": "ethereal",
+      "colors": [
+        "#d65ab8"
+      ],
+      "elements": [
+        "Arcane"
+      ]
+    },
+    {
+      "id": "the_unwritten_library",
+      "name": "The Unwritten Library",
+      "kind": "dungeon",
+      "x": 606.0,
+      "y": -186.0,
+      "band": "Lv 54-58",
+      "tier": "ethereal",
+      "colors": [
+        "#8b5cd6",
+        "#d65ab8"
+      ],
+      "elements": [
+        "Umbra",
+        "Arcane"
+      ]
+    },
+    {
+      "id": "the_eclipsed_citadel",
+      "name": "The Eclipsed Citadel",
+      "kind": "dungeon",
+      "x": 474.0,
+      "y": -132.0,
+      "band": "Lv 58-60",
+      "tier": "ethereal",
+      "colors": [
+        "#3d8bd9",
+        "#e25822",
+        "#5fb35b",
+        "#e8c547",
+        "#9bb8c4",
+        "#9c7a4b",
+        "#f5b23e",
+        "#afc3e8",
+        "#6e7bd6",
+        "#f2e7c9",
+        "#8b5cd6",
+        "#d65ab8"
+      ],
+      "elements": [
+        "Aqua",
+        "Pyro",
+        "Flora",
+        "Electro",
+        "Aero",
+        "Geo",
+        "Solar",
+        "Lunar",
+        "Astral",
+        "Sanctus",
+        "Umbra",
+        "Arcane"
+      ]
+    },
+    {
+      "id": "zenith",
+      "name": "Zenith",
+      "kind": "town",
+      "x": 474.0,
+      "y": 152.0,
+      "band": "",
+      "tier": "ethereal",
+      "colors": [],
+      "elements": []
+    }
+  ]
+}

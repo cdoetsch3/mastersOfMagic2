@@ -1,8 +1,10 @@
 # Content checklist — combat zones
 
 **Single source of truth for what content each combat zone still needs.**
-23 combat zones. Towns are tracked separately (§4) because they need entirely
-different things.
+**26 combat zones, all built.** ✅ The region list is CLOSED — The Sealed
+Garden, The Buried Sky and The Glass Archive were the last three, and all now
+exist in `world.dart`, on the map, and in the routing table. Towns are tracked
+separately (§4) because they need entirely different things.
 
 Design lives elsewhere — this file only tracks *state*:
 [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) ·
@@ -72,7 +74,7 @@ boss effects, painter recipes, materials, nodes, drop tables and achievements.
 📝 **Story is now specified but not written.** Each Primal zone's Tier-1 beat
 is defined by the quarter's arc (GAME_DESIGN §5) — the `arrival` text poses the
 question, and a **zone-clear passage** answers it. The beats are decided; the
-23 clear passages are not yet drafted.
+**26** clear passages are not yet drafted (one per combat zone).
 
 ⭐ **The order to do them in is `Mats → Nodes → Drop-*`, not left-to-right.**
 Drop tables cannot be written before the materials exist, and three of the five
@@ -91,36 +93,67 @@ Thornmire have no materials assigned yet.
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Old Quarry** | ✅ 15–19 | ✅ Geo | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Stormcliff Coast** | ✅ 17–22 | ✅ Electro | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Windward Steppe** | ✅ 19–24 | ✅ Aero | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟡 Yew | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Old Quarry** | ✅ 15–19 | ✅ Geo | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Stormcliff Coast** | ✅ 17–22 | ✅ Electro | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Windward Steppe** | ✅ 19–24 | ✅ Aero | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Yew | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **Frostfell Pass** | ✅ 21–26 | ✅ Aqua+Aero | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **Thunderspire Peaks** | ✅ 23–28 | ✅ Electro+Aero | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟡 Rowan | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Molten Deep** 🏰 | ✅ 25–29 | ✅ Pyro+Geo | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Molten Deep** 🏰 | ✅ 25–29 | ✅ Pyro+Geo | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 1 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 ### Celestial (30–44)
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **The Kiln Desert** | ✅ 30–34 | ✅ Solar | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟡 Ironwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Mirrormere** | ✅ 32–37 | ✅ Lunar | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟡 Bloodwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Starfall Basin** | ✅ 34–39 | ✅ Astral | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Tidewrack Shoals** | ✅ 36–40 | ✅ Lunar+Aqua | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Kiln Desert** | ✅ 30–34 | ✅ Solar | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Ironwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Mirrormere** | ✅ 32–37 | ✅ Lunar | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Bloodwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Starfall Basin** | ✅ 34–39 | ✅ Astral | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Tidewrack Shoals** | ✅ 36–40 | ✅ Lunar+Aqua | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 1 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **The Sunless Reach** | ✅ 38–42 | ✅ Solar+Lunar | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟡 Ebony | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **The Shattered Orrery** 🏰 | ✅ 40–44 | ✅ Astral+Electro | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Glass Archive** 🏰 | ✅ 43–47 | ✅ Solar+Arcane | ✅ | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 ### Ethereal (45–60)
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Hallowmarch** | ✅ 45–49 | ✅ Sanctus | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟡 Spiritwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Umbral Wastes** | ✅ 47–51 | ✅ Umbra | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Collapsed Academy** 🏰 | ✅ 50–54 | ✅ Arcane | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟡 Aetherwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Hallowmarch** | ✅ 45–49 | ✅ Sanctus | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Spiritwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Umbral Wastes** | ✅ 47–51 | ✅ Umbra | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Collapsed Academy** 🏰 | ✅ 50–54 | ✅ Arcane | 🟡 | ⬜ | 🟡 1 | ⬜ | 🟡 3 | 🟡 1 | ⬜ | ⬜ | 🟡 Aetherwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **The Reliquary Deep** 🏰 | ✅ 52–56 | ✅ Sanctus+Umbra | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **The Unwritten Library** 🏰 | ✅ 54–58 | ✅ Umbra+Arcane | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Eclipsed Citadel** 🏰 | ✅ 58–60 | ✅ all | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Buried Sky** 🏰 | ✅ 46–50 | ✅ Geo+Astral | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Sealed Garden** | ✅ 49–53 | ✅ Flora+Sanctus | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Eclipsed Citadel** 🏰 | ✅ 58–60 | ✅ all | 🟡 | ⬜ | 🟡 1 | ⬜ | ⬜ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 🏰 = dungeon rather than route.
+
+✅ **The Sealed Garden and The Buried Sky are built** — locations, map pins,
+roads, themed opponents, `blurb` and `arrival` text. Routing is derived from
+edges, so Floyd–Warshall picked them up with no change to `travel.dart`;
+verified reachable from Aldermere in both directions with zero unreachable
+same-plane pairs. Design in WORLD_DESIGN §4c.1a–1b.
+
+⭐ **Both are the only zones whose Lore is ✅ rather than 🟡** — their `arrival`
+passages were written *after* the theme, so for once the text states the theme
+outright instead of the theme being recovered from it.
+
+🟡 **Minis/Boss partial credit comes from the element rosters** in GAME_DESIGN
+§5, which name 3 mini-bosses and 1 boss per element. For the nine non-Primal
+**pure** zones that mapping is 1:1, so each already has candidate names against
+the 4-and-2 target. ⚠️ **The Primal pure zones get no such credit** — their
+element rosters were epic-scale and were either re-homed (§2c) or replaced
+outright by the ENEMIES §2d rosters.
+
+🟡 **Two hybrids inherited a re-homed name each:** The Molten Deep took Efreet
+and Magma Behemoth; Tidewrack Shoals took Kraken and Leviathan.
+
+✅ **Every element now sits in 3–4 zones** — the target met exactly.
+`test/world_test.dart` asserts the 3–4 range (not just a floor) and that no
+element tops out below band 28.
+
+🗺️ **[docs/plates/world-map.html](docs/plates/world-map.html) is the current
+map.** Regenerate it after any change to positions, roads or bands with
+`flutter test tool/render_map_test.dart`.
 
 ---
 
