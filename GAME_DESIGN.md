@@ -516,6 +516,58 @@ a real decision, not a detail:
   same intro on every alt is a strong argument for account-level here, and
   would be the first exception.
 
+### ⭐ The Primal quarter's story — ✅ the arc the zone themes carry
+
+⭐ **This is not decoration bolted onto the bestiary; the five Primal zone
+themes (ENEMIES §2d) build an argument in the order the player plays them,
+and that argument is the prologue to the whole game.**
+
+| Order | Zone | Band | Theme | What the player learns |
+|---|---|---|---|---|
+| 1 | Whispering Woods | 1–5 | The wood is one creature, and you are standing on it | An element can be **aware** |
+| 2 | Glimmerbrook | 3–8 | Everything is holding still, which is the wrong thing for water to do | An element can act **against its own nature** |
+| 3 | Cinderpeak Foothills | 6–11 | The mountain is breathing, and it is breathing faster | An element can be **preparing for something** |
+| 4 | Thornmire | 8–13 | The green has beaten the water and is drinking it | Where two elements meet, **one can win** |
+| 5 | Ashfall Vale | 10–14 | An argument between fire and regrowth, still unresolved | …and sometimes it is **still being decided** |
+
+⭐ **The thesis: elements are not forces, they are parties.** They want things,
+they take sides, and where they meet they contend. The three pure zones show a
+single element having a will; the two hybrids show what happens where two wills
+touch — Thornmire settled, Ashfall Vale still live.
+
+⭐ **Why this is the right prologue specifically for THIS game.** The endgame is
+the Concordant Crown: twelve elements, all of them, brought into accord. A
+first quarter whose whole lesson is *"the elements disagree"* makes that goal
+mean something. Without it the crown is a collection checklist; with it, it is
+the answer to a problem the player met at level 1.
+
+📝 **Glimmerbrook is the mystery seed, and it should stay quiet.** Water
+refusing to move is the only theme in the quarter that is a *symptom* rather
+than a nature — the others are elements being intensely themselves. It is the
+first hint that something larger is interfering. ⚠️ **Do not explain it in the
+Primal quarter.** Its payoff belongs much later; a zone-clear text that solves
+it wastes the only thread the opening leaves dangling.
+
+⭐ **Ashfall Vale's two-boss pool carries the arc's final beat mechanically.**
+**The Blackened Crown** (fire won) and **The Rooting** (green won) — which one
+you draw is the game telling you the argument is genuinely unresolved, not
+narrating that it is. ⭐ **That is the pattern to reuse:** where a hybrid zone
+has a real tension, let the boss pool *be* the tension rather than describing
+it.
+
+#### ✅ What this means for the narrative-screen feature
+
+⭐ **Arrival poses the question; the clear answers it.** The 32 `arrival`
+passages already written are all setup — they establish each zone's theme in
+the player's second-person present-tense voice and deliberately resolve
+nothing. The missing half is a **zone-clear passage per zone**, in the same
+voice, delivering the line in the "what the player learns" column above.
+
+⚠️ **This gives the Tier-1 feature a concrete content spec it did not have
+before:** 32 arrival texts ✅ written, **23 clear texts** 📝 to write. It also
+settles the earlier worry that Tier 1 needed "a screen, not new writing" — it
+needs both, but the new writing is bounded, short, and already outlined.
+
 ### Adventure loop (push-your-luck)
 - ✅ **HP persists between encounters** within an adventure. After each encounter the
   player chooses **"return to town"** (bank the loot) or **"keep going"**.
@@ -545,17 +597,51 @@ a real decision, not a detail:
 
 ### Bestiary — 📝 DRAFT (from the V2 inspiration doc + boss design pass)
 
-Enemy rosters per element zone. Each zone runs **5–7 monster types**, three
-**mini-bosses**, and a **final boss** (per the adventure-loop rules above).
-Bosses drop the best loot — and are the natural home for the rare Tier III/IV
-set components ([ITEMS_DESIGN.md](ITEMS_DESIGN.md) §3.5) and for Core-tier
-motes.
+Enemy rosters per element. Each zone runs **5–7 monster types**, a pool of
+**4 mini-bosses** and **2 bosses** (§3d). Bosses drop the best loot — and are
+the natural home for the rare Tier III/IV set components
+([ITEMS_DESIGN.md](ITEMS_DESIGN.md) §3.5) and for Core-tier motes.
+
+⚠️ **This table is an element roster, NOT a zone roster — do not read a row as
+"the monsters of one zone."** It was written before the map fixed each
+element's level band, and the two disagree badly. ⭐ **The names here are
+epic-scale; three of the elements that carry them are early-game elements.**
+
+✅ **Resolved: the epic Primal names are re-homed to the later zones that carry
+those elements**, where the scale fits the fight.
+
+| Name | Element | Now belongs to | Band | Why |
+|---|---|---|---|---|
+| **Kraken**, **Leviathan** | Aqua | Tidewrack Shoals | 36–40 | ⭐ A Kraken in a brook a level-5 character walks to is absurd, and it spends a great name on a fight nobody remembers |
+| **Efreet**, **Magma Behemoth** | Pyro | The Molten Deep | 25–29 | Same reasoning — an Efreet wants a volcano, not foothills |
+| **Guardian of the World Tree** | Flora | ✅ **The Sealed Garden** | ≈49–53 | ⭐ It was always a name for a garden with a tree at the middle of it |
+
+⚠️ **Flora has no late-game home at all.** It appears only in Whispering Woods
+(1–5), Thornmire (8–13) and Ashfall Vale (10–14). ⭐ **The naming problem is
+the small half of this.** The real issue is that a player who falls in love
+with Flora in the tutorial zone has nowhere to take it after level 14, while
+an Aqua or Pyro player gets a zone in every quarter. ❓ **Needs a ruling:**
+✅ **Resolved — a late Flora + Sanctus zone, The Sealed Garden (≈49–53).**
+Full design in **WORLD_DESIGN §4c.1a**, which also audits element coverage
+across all 22 zones and finds Flora was the only element whose zones all ended
+early.
+
+⭐ **It is the Garden of Eden, played heavy-handed** — and it does three jobs
+at once: gives Flora a late home, thickens the thinnest stretch of the game
+(the Ethereal quarter runs 5 zones on 3 elements), and **establishes that the
+elemental accord the Concordant Crown chases already existed once and was shut
+away.** ⭐ That last one matters most: it turns the crown from a collection
+checklist into the restoration of something taken.
+
+✅ **The Primal quarter's actual zone rosters live in
+[ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) §2d**, built per-zone from the themes
+below. This table remains useful as a name bank for the other nine elements.
 
 | Element | Mini-bosses | Final boss |
 |---|---|---|
 | **Aqua** | Tidal Empress · Maelstrom Horror · Leviathan | **Kraken** |
 | **Pyro** | Inferno Lord · Magma Behemoth · Phoenix | **Efreet** |
-| **Flora** | Root Matriarch · Spore Warlord · Thorn Colossus | **Guardian of the World Tree** |
+| **Flora** | Root Matriarch ➜ *Sealed Garden* · Spore Warlord · Thorn Colossus | **Guardian of the World Tree** ➜ *Sealed Garden* |
 | **Electro** | Storm Shaman · Thunder Roc · Voltgeist | **Storm Lord** |
 | **Aero** | Wind Wraith · Gale Serpent · Sky Titan | **Tempest Monarch** |
 | **Geo** | Earth Titan · Obsidian Golem · Sandstorm Djinn | **Mountain Heart** |
@@ -810,7 +896,7 @@ climbs toward the late game, so a Primal route is a short outing and an
 Ethereal one is an expedition.
 
 ✅ **Each zone keeps a POOL, and a run draws from it.** Not a fixed roster —
-**3–5 mini-bosses and 1–2 bosses** exist per zone, and every run rolls a
+**4 mini-bosses and 2 bosses** exist per zone (✅ final), and every run rolls a
 random combination. Two mini-bosses and one boss appear; which ones is a
 surprise.
 
@@ -824,9 +910,9 @@ back.
 📝 **Consequences to carry forward:**
 
 1. ⚠️ **The bestiary needs to GROW, not shrink.** It currently lists three
-   mini-bosses and one boss per element; the pool wants **3–5 and 1–2**. That
-   is up to twelve more mini-bosses and twelve more bosses to design, and it
-   is the single largest content task the enemies pass now carries.
+   mini-bosses and one boss per element; the pool wants **4 and 2 per zone**.
+   Across 23 zones that is **92 mini-bosses and 46 bosses** — the single
+   largest content task in the game. See CONTENT_CHECKLIST.md for the grid.
 2. ✅ **Three sections means three resource areas** — one at each mini-boss and
    one at the boss (§4b). A natural gathering ramp: the deeper you push in a
    run, the richer the ground.
@@ -1062,9 +1148,9 @@ map:
 | The **crown's name** — The Concordant Crown, The Twelvefold Crown, or another | naming, any time |
 
 ⚠️ **One item is a task rather than a question, and it is large:** the bestiary
-needs to **grow** to pools of 3–5 mini-bosses and 1–2 bosses per zone, against
-the three-and-one it lists today. Up to twelve more mini-bosses and twelve more
-bosses. That is the biggest single content job the enemies pass now carries.
+needs to **grow** to pools of **4 mini-bosses and 2 bosses per zone** — 92 and
+46 across the 23 zones — against the three-and-one it lists today. That is the
+biggest single content job in the game. Tracked in CONTENT_CHECKLIST.md.
 
 #### 6b. Difficulty levers that aren't damage and health ⭐
 

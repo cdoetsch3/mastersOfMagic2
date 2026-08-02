@@ -65,6 +65,19 @@ surface it and ask; do not decide it in code.
 | 🚫 **Monetization — read before touching anything purchasable** | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) **§3.6** |
 | Achievements and character progress | [ACHIEVEMENTS_DESIGN.md](ACHIEVEMENTS_DESIGN.md) |
 
+### "I want to work on enemies or zone content"
+
+| Question | Doc |
+|---|---|
+| ⭐ **The 16 enemy archetypes, and how an enemy is built** | [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) §1–2 |
+| ⭐ **Why a creature's fiction picks its archetype** — the rule everything else follows | [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) **§2b** |
+| ⭐ **Primal-quarter zone themes and full rosters** (commons, minis, bosses) | [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) **§2d** |
+| ⭐ **The Primal quarter's story arc** — what the five themes add up to | [GAME_DESIGN.md](GAME_DESIGN.md) §5 |
+| Element coverage across the world, and the late-zone proposal | [WORLD_DESIGN.md](WORLD_DESIGN.md) §4c |
+| ⭐ **The Sealed Garden** — the late Flora+Sanctus zone, and why Eden matters to the endgame | [WORLD_DESIGN.md](WORLD_DESIGN.md) **§4c.1a** |
+| ⭐ **What content each zone still needs** — the tracking grid | [CONTENT_CHECKLIST.md](CONTENT_CHECKLIST.md) |
+| Boss/mini-boss names per element, zone structure | [GAME_DESIGN.md](GAME_DESIGN.md) §5, §3d |
+
 ### "I want to know what to work on"
 
 ⭐ **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the work queue.** It

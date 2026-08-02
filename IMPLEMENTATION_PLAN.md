@@ -742,6 +742,33 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
 
 ## Deferred / banked — do not build without an explicit ask
 
+- **📝 `AiPersona.aggression` / `.caution` are DEAD FIELDS.** Found in the
+  2026-08-02 code audit (ENEMIES §2.4). Both are declared and documented as
+  *"personality dials — orthogonal to intelligence"*, but `buildBrain()`
+  returns `LadderAi(intelligence, spells:)`, which accepts neither. They work
+  only on `TunableAi` — the older brain, now used in exactly one lockstep
+  test. The behavioural axis was designed and then lost when the brain was
+  replaced. **Either reconnect them to `LadderAi` or delete them**; leaving
+  documented fields that do nothing is worse than either. Not urgent —
+  stats + intelligence + move set covers 12 of the 15 archetypes — but this is
+  the cheapest place to get personality back if fights feel samey.
+
+
+- **⛔ TO DO before item stats ship: a content-version handshake in
+  matchmaking.** Verified 2026-08-02 — `matchmaking.dart` compares **no
+  version at all**. Harmless today, because nothing a duel resolves against
+  varies by build. The moment **item stats exist**, it becomes a silent
+  desync: a player on 0.12 and a player on 0.13 disagree about what a staff
+  does, the lockstep commit-reveal duel diverges, and it will present as a
+  netcode bug rather than a data bug.
+  **Fix:** put a content version (app version, or a hash of the item/spell
+  tables) in the matchmaking ticket and refuse to pair mismatches. ⚠️ Cheap
+  now; nasty to diagnose later. Also the deciding argument for keeping item
+  definitions **in code** rather than server-loaded (DATA architecture, §9b /
+  ENEMIES_DESIGN §1) — server data adds a *second* way for two clients to
+  disagree, timed by when each last refreshed.
+
+
 - **📝 Alternate character modes — named, not built.** ✅ **Discordant** (no
   trading/shops/Concord Market — everything found or crafted), ✅ **Mortal**
   (one life; defeat ends the character), ✅ **Discordant Mortal** (both). Full

@@ -562,6 +562,190 @@ one edge.
 
 ---
 
+## 4c. ⭐ Element coverage across the world — audit + the late-zone question
+
+**Measured from `world.dart`, 2026-08-02.** 22 element-bearing zones; the
+Eclipsed Citadel is excluded (it carries all twelve).
+
+| Element | Zones | Highest band | Where it appears |
+|---|---|---|---|
+| **Aqua** | 4 | 40 | Glimmerbrook 3–8 · Thornmire 8–13 · Frostfell Pass 21–26 · Tidewrack Shoals 36–40 |
+| **Flora** | 3 | ⚠️ **14** | Whispering Woods 1–5 · Thornmire 8–13 · Ashfall Vale 10–14 |
+| **Pyro** | 3 | 29 | Cinderpeak 6–11 · Ashfall Vale 10–14 · The Molten Deep 25–29 |
+| **Electro** | 3 | 44 | Stormcliff 17–22 · Thunderspire 23–28 · Shattered Orrery 40–44 |
+| **Aero** | 3 | 28 | Windward Steppe 19–24 · Frostfell Pass 21–26 · Thunderspire 23–28 |
+| **Lunar** | 3 | 42 | Mirrormere 32–37 · Tidewrack 36–40 · Sunless Reach 38–42 |
+| **Umbra** | 3 | 58 | Umbral Wastes 47–51 · Reliquary Deep 52–56 · Unwritten Library 54–58 |
+| **Geo** | ⚠️ 2 | 29 | Old Quarry 15–19 · The Molten Deep 25–29 |
+| **Solar** | ⚠️ 2 | 42 | Kiln Desert 30–34 · Sunless Reach 38–42 |
+| **Astral** | ⚠️ 2 | 44 | Starfall Basin 34–39 · Shattered Orrery 40–44 |
+| **Sanctus** | ⚠️ 2 | 56 | Hallowmarch 45–49 · Reliquary Deep 52–56 |
+| **Arcane** | ⚠️ 2 | 58 | Collapsed Academy 50–54 · Unwritten Library 54–58 |
+
+⭐ **The headline: count was never really the problem — spread is.** The target
+of 3–4 zones per element is already nearly met; the range is 2–4, and no
+element is starved outright. ⚠️ **But Flora is the only element whose zones
+all end early.** Every other element reaches at least band 28; Flora stops at
+**14**. A player who falls for Flora in the tutorial has 46 levels with nothing
+to look forward to, while an Aqua player gets a zone in every quarter.
+
+⚠️ **The second finding, and it is the one that matters more:** the **Ethereal
+quarter is the thinnest stretch of the game** — 5 zones drawing on only 3
+elements (Sanctus, Umbra, Arcane) to cover levels 45–58. ⭐ **Zone count per
+quarter is flat, but time-per-level is not.** Levels 45→60 take far longer to
+earn than 1→14, so the same five zones must sustain several times the play
+hours. That is the real gap, and it is exactly where Christian expected it.
+
+### 4c.1 📝 Proposal — two late hybrid zones
+
+⭐ **One change fixes all three problems at once:** put the new zones in the
+45–60 band, and pair an Ethereal element with an under-used earlier one.
+
+| Zone | Elements | Effect |
+|---|---|---|
+| ✅ **The Sealed Garden** — Flora + Sanctus | flora 3 → **4**, sanctus 2 → **3** | ⭐ Gives Flora its late home. See §4c.1a |
+| 📝 **Geo + Astral** | geo 2 → **3**, astral 2 → **3** | Both currently top out mid-game |
+
+Result: **no element below 3**, and only Solar and Arcane stay at 2 — both of
+which already reach bands 42 and 58, so their *spread* is healthy.
+
+⭐ **Flora + Sanctus is the strong one, and it pays off the Primal arc
+directly.** Sanctus is consecration — temples, oaths, reliquaries
+(GAME_DESIGN §5). A consecrated place that Flora has grown through and
+outlived is a premise that needs both elements to state, which is the bar
+§2d sets for a hybrid. ⭐ **And it closes a 45-level loop:** the first thing
+the game teaches is that the wood in Whispering Woods is one aware organism.
+Meeting that same organism at level 50, having outlasted a religion, is the
+payoff for a lesson learned at level 1.
+
+⚠️ **Sanctus naming trap:** GAME_DESIGN §5 warns that a Sanctus name which
+could plausibly be Solar is the wrong name. The same applies to the zone —
+this must read as *overgrown consecration*, never as *sunlit grove*.
+
+### 4c.1a ✅ The Sealed Garden — Flora + Sanctus, and it is Eden
+
+✅ **Christian's call: play the Garden of Eden reference heavy-handed.** Not a
+sly allusion — the zone *is* the garden, and should be recognised as such
+within seconds of arriving.
+
+⭐ **Theme: the garden is still perfect, it is still guarded, and you are still
+not allowed in.**
+
+⭐ **The turn that makes it more than a costume:** the religion that set the
+guard is **gone**. Hallowmarch is a march, the Reliquary Deep is a *deep* —
+Sanctus in this world is already something in decline. Nobody has come to
+relieve the watch in an age, and the watch has not noticed. ⚠️ **The guardians
+are not defending a faith. They are keeping a promise that outlived everyone
+who cared about it.** That is a colder idea than "overgrown temple", and it is
+the version to write.
+
+#### ⭐ Why this zone earns its place in the story, not just the level curve
+
+The endgame is the **Concordant Crown** — twelve elements brought into accord.
+⭐ **The Sealed Garden is the proof that the accord already happened once.** A
+place where the elements agreed, and which was then shut. That reframes the
+whole endgame: the crown is not inventing something new, it is **restoring
+something that was taken away** — and the player has *stood outside the gate
+of it* at level 50.
+
+⭐ **It also closes the loop opened in the first five minutes of the game.**
+Whispering Woods teaches that the wood is one aware organism (ENEMIES §2d).
+The Sealed Garden is that same awareness fifty levels later, and it has been
+keeping a rule since before the player's civilisation existed.
+
+#### Roster — the Eden furniture, mapped by the §2b rule
+
+| Common | Archetype | Fiction |
+|---|---|---|
+| **Orchard Warden** | Sentinel | Rooted at the tree it was set to watch; has not moved in an age |
+| **Windfall** | **Siphon** | ⭐ Fallen fruit that drinks whoever picks it up — *the temptation, written as a stat block* |
+| **Whisperling** | Blighter | A small coiled thing in the branches. It offers you something. It talks |
+| **Chorister Vine** | Adept | A vine still singing the hours to an empty cloister |
+| **Thornpenitent** | Bruiser | Briar grown through and around a kneeling figure |
+
+**Mini-bosses:** **Cherub of the Turning Blade** (⭐ the flaming sword that
+turns every way — the single most recognisable image in the myth) · **The Last
+Gardener** (⭐ the only mortal still inside, and *not hostile until you reach
+for anything*) · **Root Matriarch** (✅ re-homed from the orphaned Flora roster)
+· **The Kept Vow** (an oath with a body).
+
+**Bosses — ⭐ and the pool IS the theme again:**
+
+| Boss | It is |
+|---|---|
+| ✅ **Guardian of the World Tree** | **The rule.** It will not let you in |
+| ✅ **The Serpent in the Branches** | **The invitation.** It would very much like to |
+
+⭐ **Which boss you draw decides whether the garden confronts you or tempts
+you.** That is the Ashfall Vale pattern (ENEMIES §2d) landing at the opposite
+end of the game — the opening hybrid's pool asks *"who won?"*, the closing
+hybrid's asks *"will you be let in, or talked in?"* ⭐ **Two hybrid zones, 45
+levels apart, using the same structural trick to ask the quarter's central
+question. That rhyme is worth protecting.**
+
+✅ **This finally homes `Guardian of the World Tree`**, which GAME_DESIGN §5
+flagged as the one element boss with nowhere to go. It was always a name for a
+garden with a tree at the middle of it.
+
+#### ⚠️ Guardrails
+
+- ⚠️ **Keep it to the garden myth, not to scripture.** Use the *roles* — the
+  Gardener, the Guardian, the Serpent, the Vow — and do not name real
+  religious figures or quote text. ⭐ **This is what makes it heavy-handed and
+  still unmistakably THIS world's myth** rather than a crossover; it also keeps
+  the tone archetypal instead of denominational.
+- 🚫 **"Bloom" is reserved** — it was renamed to Photosynthesis across the
+  project. No Flora enemy or item here may use it.
+- ⚠️ **The Sanctus naming trap** (GAME_DESIGN §5): a Sanctus name that could
+  plausibly be Solar is the wrong name. ⭐ Eden imagery helps here — gates,
+  orchards, vows and wardens carry no sun imagery at all.
+- ⚠️ **Do not seal the zone after clearing it.** The myth's ending is "you may
+  not come back", but §4b makes resource areas a standing reason to return, and
+  a one-shot zone would be the only one in the game. ⭐ **Put the expulsion in
+  the Tier-1 clear passage instead:** you beat the Guardian and the game still
+  does not let you take the tree. The beat lands; the content stays repeatable.
+
+#### 📝 Placement — needs map work
+
+📝 **Adjacent to Hallowmarch**, on the Vault massif (§2.3), band **≈49–53** —
+between Hallowmarch (45–49) and the Collapsed Academy (50–54). ❓ **Exact band
+and travel edges are open**, and adding a zone touches the Floyd–Warshall
+routing table and the map painter, so this is a real code task rather than a
+data edit.
+
+### 4c.2 ❓ The quarter-3 amplification event — bank it, but reframe it
+
+Christian's second idea: an event in the third quarter that sends the player
+back to re-clear parts of the Primal quarter at amplified level. ⭐ **His own
+hesitation is well-placed, and it is worth naming exactly why.**
+
+- ⚠️ **It does not actually solve the Flora problem.** A level-50 Whispering
+  Woods is still Whispering Woods. Flora would gain levels, not a *destination*.
+- ⚠️ **It works against the story just written.** The Primal arc (GAME_DESIGN
+  §5) depends on those five zones being the player's **first impression** —
+  the questions the game opens with. Re-running them as a difficulty tier
+  dilutes the one part of the game with a settled narrative.
+- ✅ **But its strength is real:** it is the cheapest content in the game per
+  hour delivered — map, rosters, painters, materials and drop tables all
+  already exist. That is not nothing when the Ethereal quarter is thin.
+
+⭐ **The reframe that keeps the strength and drops the cost: make the event the
+CAUSE of the new late zones, not a re-clear mechanic.** If something in the
+third quarter makes the elements spill into combinations that did not exist
+before, then a late Flora+Sanctus zone stops being a balance patch and becomes
+a **consequence** — new ground, new rosters, adjacent to the old world without
+overwriting it.
+
+⭐ **Why that is strictly better:** the player gets the narrative escalation
+(the argument they met at level 1 is spreading), the world gets genuinely new
+content rather than a difficulty slider, and the Primal quarter keeps its job
+as the opening statement. ⚠️ **The one thing to watch** is that this event
+must not compete with the Concordant Crown for being the story's engine — it
+should be *evidence* that the elements are drifting apart, which is the
+problem the crown exists to answer.
+
+---
+
 ## 5. Ideas salvaged from the rejected plates
 
 Plates II and III were not adopted as maps, but three things from them are:
