@@ -1,53 +1,184 @@
-# Masters of Magic 2
+# Masters of Magic 2 — START HERE
 
-A simultaneous-turn elemental mage-duel game. Flutter, targeting phones,
-tablets, and browsers. Live at <https://mastersofmagic2.web.app>.
+A simultaneous-turn elemental mage-duel game. Flutter — phones, tablets, and
+browsers. Live at <https://mastersofmagic2.web.app>.
 
-Both players lock in a move each turn, then the round resolves — prediction
-and mind-games are the point. The duel engine is pure Dart, deterministic,
-and runs lockstep with commit-reveal netcode.
+Both players lock in a move each turn, then the round resolves together —
+prediction and mind-games are the point. The duel engine is pure Dart,
+deterministic, and runs lockstep with commit-reveal netcode.
 
-## Start here
+> **This file is the index.** It exists so a human or an AI arriving cold can
+> find the right document in one hop instead of grepping. If you add a design
+> doc, add a row here.
 
-| Doc | What it covers |
+---
+
+## 1. Read this first, whoever you are
+
+**The status legend, used in every design doc:**
+
+| Mark | Meaning |
 |---|---|
-| **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** | ⭐ **The work queue.** Phased plan spanning every design doc, with dependency gates and rules of engagement. Read first. |
-| [GAME_DESIGN.md](GAME_DESIGN.md) | Core combat, priority/Haste, spells, the logical world map, bestiary, app roadmap |
-| [WORLD_DESIGN.md](WORLD_DESIGN.md) | The physical world: landforms, the two planes, altitude, and player-facing text for all 32 places. Visual plates in [docs/plates/](docs/plates/) |
-| [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) | Elements and their side-effects; turn phases and the precedence pipeline. §0 is the planned V2 twelve-element expansion |
-| [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) | Levels, XP, unlock schedule, charge caps |
-| [ITEMS_DESIGN.md](ITEMS_DESIGN.md) | Equipment, sets, motes, crafting, enchanting, potions, the economy |
+| ✅ | **Decided.** Safe to build against. |
+| 📝 | **Draft.** Shape agreed, details may move. Safe to build against. |
+| 💡 | **Idea bank.** Not adopted. Do not build. |
+| ❓ | **Open question.** Needs a human ruling. Do not guess. |
+| ⚠️ | **Risk / gotcha.** Balance concern, abuse vector, or a trap someone already fell into. |
+| ⭐ | **Load-bearing rationale.** The *why* behind a decision — read before changing it. |
 
-Docs use a status legend: ✅ decided · 📝 draft · 💡 idea bank · ❓ open
-question · ⚠️ balance or abuse concern. **Only ✅ and 📝 are safe to build.**
+🚫 **Only ✅ and 📝 are safe to build.** If a design question is marked ❓,
+surface it and ask; do not decide it in code.
 
-## Layout
+---
+
+## 2. Where to go, by what you want to do
+
+### "I want to change gameplay"
+
+| Question | Doc |
+|---|---|
+| How does a turn resolve? Priority, Haste, charge? | [GAME_DESIGN.md](GAME_DESIGN.md) §1 |
+| What do the twelve elements *do*? | [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) |
+| Exact resolution order / precedence pipeline | [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) §5.1–5.2 |
+| Spell list, costs, priorities | [GAME_DESIGN.md](GAME_DESIGN.md) §3 |
+| Levels, XP, unlock schedules | [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) |
+| Game modes (PvP, campaign, Discordant, Mortal) | [GAME_DESIGN.md](GAME_DESIGN.md) §5 |
+
+### "I want to change the world or the map"
+
+| Question | Doc |
+|---|---|
+| Which places exist, how they connect, what is in them | [WORLD_DESIGN.md](WORLD_DESIGN.md) |
+| Travel times, mounts, trade, the Concord Market | [WORLD_DESIGN.md](WORLD_DESIGN.md) §4b |
+| How the map is *drawn* (and the bugs that shaped it) | [docs/reviews/](docs/reviews/) |
+| Visual plates / map artwork history | [docs/plates/](docs/plates/) |
+
+### "I want to change items, crafting, or the economy"
+
+| Question | Doc |
+|---|---|
+| Equipment slots, sets, rarity, modifiers | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §1–4, §8 |
+| Motes and the crafting currency ladder | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §6 |
+| Skills — gathering and processing | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §6a |
+| ⭐ **Crafting model, quality tiers, stations, gathering nodes, the wood ladder, naming grammar** | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) **§9b** — the newest and most concrete section |
+| What can be traded, and what can never be | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §6c |
+| 🚫 **Monetization — read before touching anything purchasable** | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) **§3.6** |
+| Achievements and character progress | [ACHIEVEMENTS_DESIGN.md](ACHIEVEMENTS_DESIGN.md) |
+
+### "I want to know what to work on"
+
+⭐ **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the work queue.** It
+holds the phase order, dependency gates, what is done, what is blocked and why,
+and a *Deferred / banked* list of things deliberately **not** being built yet.
+Read its §0 "Rules of engagement" before writing code — those are conventions
+learned the hard way.
+
+---
+
+## 3. The rules that are easiest to break by accident
+
+Four decisions cut across everything. Violating one usually looks fine locally
+and breaks something distant.
+
+1. 🚫 **Reserved vocabulary.** These words already mean something specific; do
+   not reuse them for anything else:
+   - **Bound** — permanently untradeable (ITEMS §6c). Not a name for modes,
+     items, or statuses.
+   - **Sudden Death** — the turn-51 fatigue mechanic (TYPE_EFFECTS §8).
+   - **Eclipsed** — both the Lunar/Blind lock and the Eclipsed Citadel.
+   - Every element's status name (Ignite, Waterlogged, Tailwind, Stagger,
+     Creeping Dark, …). See ITEMS §9b.5b for the twelve aspect prefixes chosen
+     specifically to avoid them.
+
+2. ⚠️ **Determinism is load-bearing.** The duel is lockstep with commit-reveal
+   netcode. **Every roll must draw from the shared per-turn seed** — a stray
+   `Random()` in resolution code desyncs the two clients instantly.
+
+3. ⚠️ **Fizzled, missed and fully-shielded casts behave like a charge** for
+   every counter and trigger: they do not advance streaks, do not reset them,
+   do not proc, do not grant stacks (TYPE_EFFECTS §5.4).
+
+4. 🚫 **Monetization (ITEMS §3.6): nothing purchasable with RP may be
+   unobtainable with gold.** RP buys *time*, and may even buy *gold*; there are
+   no RP-only functional items (cosmetics excepted). ⭐ What actually enforces
+   this is **tradability, not price** — so making a Bound item tradeable is a
+   monetization decision, not an economy one.
+
+---
+
+## 4. Code layout
 
 ```
 lib/                        Flutter app
-  game/                     game logic, persistence, matchmaking
+  game/                     game logic, persistence, matchmaking, world data
   screens/                  UI (duel, home shell, tabs)
+  ui/                       shared widgets, painters, the map camera
 packages/mom_engine/        pure-Dart duel engine — no Flutter imports
   lib/src/                  duel resolution, elements, statuses, netcode, AI
   test/                     engine tests
   tool/balance_sim.dart     AI-vs-AI balance simulator
 test/                       app-level widget tests
+docs/                       architecture reviews, map plates
 ```
 
-## Working on it
+⭐ **The engine is deliberately Flutter-free.** It is a pure Dart package so it
+can be tested exhaustively, run headless in the balance simulator, and one day
+run server-side. Never import Flutter into `packages/mom_engine`.
+
+⭐ **There are no image assets anywhere in this project.** Every visual — the
+world map, mage sprites, element glyphs, combat FX — is a `CustomPainter`.
+This is deliberate: it is why the map is seeded and deterministic, and why
+there is no art pipeline. Adding bitmaps is a real decision, not a detail (see
+GAME_DESIGN §5, narrative screens).
+
+---
+
+## 5. Working on it
 
 ```sh
-flutter test                          # app tests
-dart test packages/mom_engine         # engine tests
+flutter test                              # app tests
+dart test packages/mom_engine             # engine tests
+flutter analyze                           # must be clean
 dart run packages/mom_engine/tool/balance_sim.dart
 ```
 
+**Both suites must pass and `flutter analyze` must be clean before a commit.**
+
+### Releasing
+
 ⚠️ **Always `flutter clean` before a release build.** `flutter build web` has
 silently reused stale artifacts and shipped a build with whole features
-missing. Verify a deploy with:
+missing.
 
 ```sh
-curl -s https://mastersofmagic2.web.app/main.dart.js | grep -o "0\.9\.[0-9]*"
+flutter clean && flutter build web --release
+firebase deploy --only hosting --project mastersofmagic2
 ```
 
-Keep the version in `pubspec.yaml` in sync with `lib/game/app_version.dart`.
+⚠️ **Always pass `--project mastersofmagic2`**, so a deploy fails loudly if the
+CLI happens to be authenticated to a different Firebase project.
+
+Verify what actually shipped:
+
+```sh
+curl -s https://mastersofmagic2.web.app/version.json
+```
+
+Keep `pubspec.yaml`'s `version:` in sync with `lib/game/app_version.dart`, and
+bump it every release — otherwise `version.json` cannot tell you which build is
+live.
+
+---
+
+## 6. For AI agents specifically
+
+- **Read [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) §0 first.** It is
+  written for you and encodes conventions that have already cost real time.
+- 🚫 **Do not do UI or browser verification.** Christian drives all visual
+  testing. Write widget/unit tests for logic, then hand over an explicit list
+  of manual steps.
+- 🚫 **Do not guess on a ❓.** Surface it and ask.
+- ⚠️ **Design docs are the source of truth for *intent*; code is the source of
+  truth for *behaviour*.** When they disagree, say so rather than silently
+  picking one — a stale doc and a bug look identical from the outside.
+- ⚠️ **Check the reserved vocabulary in §3** before naming anything.

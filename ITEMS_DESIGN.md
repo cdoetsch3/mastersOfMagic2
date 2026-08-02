@@ -233,21 +233,41 @@ Tier III and IV sets require **all three** of:
 
 ### 3.6 Monetization principle ✅ (the governing rule)
 
-> **Premium currency (Resonance Prisms) only ever buys a shortcut. There must
-> never be anything you *have* to pay RP to do.**
+⚠️ **This rule is about REAL money — i.e. Resonance Prisms (RP), the premium
+currency bought with cash. It is NOT about gold.** (Clarified 2026-08-02; the
+earlier shorthand "money buys time, never access" was ambiguous and read as if
+it constrained gold too.)
 
-- ✅ **Allowed:** skipping/reducing crafting, enchanting and conversion
-  **cooldowns**; "time crystals"; extra potion yield; buying better *odds*
-  (Luck/drop-rate boosts).
-- 🚫 **Never:** substituting for the **rare Tier III/IV components**, for
-  **skill levels**, or for any step of the process itself. Every path must be
-  completable — if slowly — without spending.
+> ### The rule
+> **Nothing purchasable with RP may be unobtainable with gold.**
+>
+> RP may buy **time** (shortcuts) and may even buy **gold** itself. There are
+> **no RP-only functional items.** Cosmetics are the one exception and may be
+> RP-exclusive.
 
-✅ Buying better *odds* at rare components is explicitly fine; buying the
-components is not. The line is **acceleration, not access**.
+✅ **Gold may absolutely buy access.** A rich player can buy Master-tier gear
+at every tier from the Concord Market, and that is intended — gold is *earned
+in-game*, so spending it is a legitimate route to power. The constraint is
+purely on what **cash** can reach that gold cannot.
 
-✅ Rare Tier III/IV components are **Bound** (§6c), which is what keeps a
-Concord Market from quietly reselling what drops were meant to gate.
+- ✅ **Allowed for RP:** skipping/reducing crafting, enchanting and conversion
+  **cooldowns**; Time Crystals; faster node-charge replenishment; extra potion
+  yield; better *odds* (Luck/drop-rate boosts); **buying gold**; cosmetics.
+- 🚫 **Never for RP:** anything gold cannot also buy. In particular, **rare
+  Tier III/IV components**, **skill levels**, or any step of a process. Every
+  path must be completable — if slowly — without spending cash.
+
+⭐ **What actually enforces the ceiling: tradability, not currency.** Since RP
+converts to gold, RP effectively buys anything the *market* sells — so the
+guardrail cannot be the price tag, it has to be **what is sellable at all**.
+Rare Tier III/IV components are **Bound** (§6c) and can never be traded, so no
+amount of cash reaches them. This is the same interlock as §9b.6a's *"the
+market sells the floor, never the ceiling"* — and it is why that rule is
+load-bearing for monetization, not just for loot design.
+
+⚠️ **Therefore: any future decision to make a Bound item tradeable is a
+monetization decision, not an economy decision.** It moves that item from
+"earned" to "purchasable with cash" in one step.
 
 ---
 
@@ -810,7 +830,8 @@ Three tiers, applying to every item and material:
 
 ✅ Putting the **Tier III/IV rare components in "Bound"** closes the loophole
 flagged in §3.5: if those were tradeable, gold could buy what rare drops were
-meant to gate, quietly undoing "money buys time, never access."
+meant to gate, quietly undoing §3.6's rule that nothing bought with RP may be
+unobtainable with gold.
 
 ✅ **Release mechanism: an "unbinding" enchant.** Untradeable items are freed
 by applying a dedicated enchant — putting the mechanism in the **Enchanting
@@ -1262,6 +1283,400 @@ felt a burn is noise, not depth.
 
 ---
 
+## 9b. The crafting model & the Primal quarter (session 2026-08-01)
+
+Rulings from the Primal-quarter design session (Christian + external
+brainstorm, reviewed here). These supersede the older assumption that a
+station is *required* to craft.
+
+### 9b.1 Shops & stations ✅
+
+1. ✅ **Trade is not gated.** Shops work from the first town; no tutorial lock.
+2. ✅ **Every shop's stock is regional** — Aldermere sells Primal-band goods.
+3. ✅ **Aldermere keeps Woodcarving** — the first craftable is a staff/wand.
+4. ✅ **Pennycross becomes the Tailoring town.** The player gathers fibres all
+   quarter and ends it with a crafted robe set + a decent staff. ⚠️ Pending
+   code/doc edits when coding resumes: `world.dart` (`station:` on
+   `pennycross`, currently on `galehaven`) and the WORLD_DESIGN §gazetteer
+   entries for both towns.
+5. ✅ **Galehaven takes Potions & Alchemy** (moved from Vespergate, L50 → L22).
+   Consumables arriving at level 50 was comically late; herbs bank up from
+   level 1, and a port town trading remedies reads naturally. Vespergate goes
+   stationless, which suits a gate/pilgrimage town. ⚠️ Pending code edit:
+   `station:` on `galehaven` and `vespergate` in `world.dart`, plus both
+   WORLD_DESIGN gazetteer entries.
+
+**Final station map:** Aldermere Woodcarving (L1) · Pennycross Tailoring (L8)
+· Forgeholm Metalworking (L15) · Galehaven Potions & Alchemy (L22) · Meridian
+Enchanting (L36) · Rimeholt Jewelry (L45) · Zenith all six (L60). Concordance
+and Vespergate are stationless by design.
+
+### 9b.2 Hand-crafting vs stations ✅ (the load-bearing ruling)
+
+6. ✅ **Most items can be hand-crafted anywhere.** Stations are *required* only
+   for certain high-tier recipes.
+7. ✅ **Stations craft faster.** One-off items are fine by hand; past a fairly
+   low quantity threshold, travelling to the station wins.
+8. ✅ **Stations may craft passively** — leave materials for 10 staves
+   overnight, collect finished goods later. 📝 Recommendation, needs ruling:
+   **passive output caps at Standard quality** (§9b.4); quality rolls
+   (Ornate/Master) require attended crafting. Otherwise overnight bulk +
+   salvage becomes unattended quality-fishing, and the crafting *moment*
+   disappears.
+
+⭐ **This ruling quietly dissolves the station-coverage blocker** that opened
+the session (only Woodcarving existing before L15). Every slot has a maker
+from the moment the player has skill + recipe + materials; the station map is
+now *convenience geography* — where bulk and quality happen — not a gate. The
+region-by-region catalogue can assume all nine slots are craftable in-band.
+
+### 9b.3 Equip requirements ✅
+
+9. ✅ **Every item has a minimum equip level.**
+10. ✅ **Items you cannot yet equip can still be acquired** (drops, trade).
+11. ❓ **Does quality (§9b.4) raise the equip level?** 📝 Recommendation: no —
+    a Master Oak wand stays a level-1 item even though it rivals a Rough Yew.
+    That creates the "fine gear for low levels" market crafters live on, and
+    is a deliberate twink lane, not an accident. Needs ruling.
+
+### 9b.4 Quality tiers 📝 (structure accepted, numbers TBD)
+
+Within a material tier, crafted output rolls a quality:
+**Rough → Standard → Ornate → Master**, with better odds at higher skill.
+The pattern (or an analog) applies to every processing skill.
+
+- ✅ **Salvage** (recommended term — genre-standard; "Unbind"/"Unmake" collide
+  with the Bound tradability vocabulary): break a crafted item back to ~50%
+  of its components to reroll for higher quality. Rerolling costs ~2× the
+  materials per attempt — a healthy sink.
+- ✅ **Anchor: Master of tier N ≈ Rough of tier N+1.** With 4%/level
+  compounding, this fixes the quality step size per band:
+  `step = (1.04 ^ level-gap-to-next-tier) ^ (1/3)` — three steps spanning the
+  gap. Early tiers (9–10 level gaps) need ~12% per quality step; late tiers
+  (5-level gaps) ~7%. The quality ladder is therefore *wider* early, exactly
+  when gear is otherwise transitional.
+- ⚠️ **One term, not two:** the top quality is **Master** everywhere; retire
+  "Masterwork" from earlier drafts.
+- ✅ **Quality never raises the equip level.** A Master Oak wand is still a
+  level-1 item. This is a deliberate twink lane: it creates the "fine gear for
+  a new character" market that crafters live on.
+
+### 9b.4a Gear advantage vs level advantage ⭐ (the governing ratio)
+
+Christian's two concerns — *a well-geared low level must not trivialise a
+high level*, and *a hard-won Master item must not be outclassed minutes
+later* — are the same question, and the anchor answers both.
+
+**Gear advantage caps at roughly one material tier.** Rough→Master spans the
+gap to the next tier by construction, so a fully-Master character sits about
+one tier ahead: **~10 levels early, ~5 levels late.** ⭐ That lands exactly on
+the "gear is worth ten levels" line already in the docs — the quality ladder
+and the gear budget agree without being forced to.
+
+⭐ **Character level is unbounded; gear advantage is not.** At 4%/level
+compounding, level keeps paying forever while gear tops out at one tier. A
+level-20 in full Master gear fights like a level-30's *equipment*, but still
+carries a level-20's base HP and damage. They punch up; they do not dominate.
+
+**Why a Master item stays relevant:** it is matched only by the *next tier's
+Rough*, which by definition needs the next equip level. So a Master item holds
+its slot for the whole tier gap — 10 levels early, 5 late. It is never
+outclassed "minutes later" unless a drop breaks the rule below.
+
+⚠️ **Therefore: aspected monster drops must be SIDEGRADES, not upgrades.** An
+aspected drop of tier N should carry roughly *Standard*-quality raw stats plus
+an element rider. A Master crafted item beats it on raw power; the drop offers
+a different axis. Break this and crafting becomes pointless — the single
+biggest risk to the whole economy. **Boss uniques are the deliberate
+exception**: they are the chase, and they are rare enough to stay exciting.
+
+### 9b.4b The three crafting modes ✅
+
+| Mode | Speed | Quality | Skill XP | Notes |
+|---|---|---|---|---|
+| **Active, at a station** | fastest | best odds; the only route to top quality-roll rates | **bonus** | Some recipes require a station outright |
+| **Active, anywhere** | slower | standard odds — ⭐ **can still reach Master** | standard | Keeps stations *convenience*, not gates (§9b.2) |
+| **Passive, at a station** | overnight | ⚠️ **capped at Standard** | **reduced** | Bulk lane; no quality fishing |
+
+✅ **Salvage follows the same shape**: better component yield at the matching
+station than by hand.
+
+⭐ **Why the passive cap matters:** without it, overnight bulk + salvage
+becomes unattended quality-fishing, and the Ornate/Master roll — the best
+moment in crafting — happens while nobody is watching. The cap keeps the
+exciting roll attended and leaves passive crafting as what it should be:
+volume, not luck.
+
+### 9b.5 Provenance naming grammar 📝
+
+Three name shapes, so an item's origin is readable from its name alone:
+
+| Provenance | Grammar | Example |
+|---|---|---|
+| **Crafted** | `[Quality] [Material] [Form]` | *Ornate Oak Quarterstaff* |
+| **Monster drop** | `[Element aspect] [Material] [Form]` | *Charred Yew Baton* |
+| **Boss drop** | Unique name | *Ebony Spire of the Grave* |
+
+- ⚠️ **Base names must not contain quality-like adjectives.** "Rough Oak
+  Quarterstaff" as a *base* name breaks the grammar ("Master Rough Oak…").
+  Bases are plain: *Oak Quarterstaff*, *Yew Battle-Staff*, *Birch Spire*.
+### 9b.5a Form names are FIXED vocabulary ✅
+
+❓ Christian asked whether the form word should escalate with tier
+(*Quarterstaff → Battle-Staff → Spire → Monolith*) or stay constant.
+
+✅ **Fixed.** Every name component carries exactly one fact:
+
+| Component | Encodes | Example |
+|---|---|---|
+| Quality adjective | the crafting roll | *Ornate* |
+| **Material** | **tier / level** | *Bloodwood* |
+| **Form** | **mechanical role** | *Quarterstaff* |
+| Aspect prefix | element (drops only) | *Charred* |
+
+⭐ **Escalating form words would make rank unreadable.** Is a *Spire* better
+than a *Crozier*? The player would have to memorise an arbitrary order
+*on top of* the material order. With fixed forms, "Bloodwood Quarterstaff
+beats Yew Quarterstaff" needs no lookup — and the material name is already
+doing the escalation work (*Oak* → *Aetherwood* escalates by itself).
+
+⭐ **The lost sense of grandeur is recovered where it belongs:** boss uniques
+have bespoke names (§9b.5), so *Ebony Spire of the Grave* still exists — it is
+just a *unique*, which is exactly what should sound grand.
+
+💡 **Form is free to encode mechanics later.** Since form no longer means
+rank, a second two-hander (say a slower, heavier *Warstaff*) can exist at any
+tier as a genuine build variant rather than a rename.
+
+### 9b.5b The twelve aspect prefixes 📝
+
+Applied to monster drops. Every one avoids the element's own status name and
+existing reserved vocabulary.
+
+| Tier | Element | Aspect | Avoids |
+|---|---|---|---|
+| Primal | Pyro | **Charred** | Ignite |
+| Primal | Aqua | **Tidewashed** | Waterlogged |
+| Primal | Flora | **Overgrown** | Photosynthesis |
+| Kinetic | Electro | **Galvanized** | Static Feedback |
+| Kinetic | Aero | **Windworn** | Tailwind |
+| Kinetic | Geo | **Stoneclad** | Stagger |
+| Celestial | Solar | **Sunbleached** | Blind |
+| Celestial | Lunar | **Moonlit** | ⚠️ *Eclipsed* is taken (Lunar's Blind lock **and** the Eclipsed Citadel) |
+| Celestial | Astral | **Starfallen** | Astral Alignment |
+| Ethereal | Sanctus | **Consecrated** | Absolution, Grace, Hallow |
+| Ethereal | Umbra | **Gloomtouched** | Creeping Dark; its Shadow/Dusk/Midnight tiers |
+| Ethereal | Arcane | **Sigilmarked** | Arcane Knowledge |
+
+⚠️ **"Bound" remains reserved** (tradability, §6c) — no *-bound* aspects.
+✅ *Starfallen* deliberately echoes **Starfall Basin**; both are Astral, so the
+shared word-space is flavour rather than collision.
+- ⚠️ **"Bound" is reserved** (tradability, §6c): rename the level-1 book from
+  *Novice's Bound Primer* to e.g. *Novice's Stitched Primer*.
+- 📝 Aspected drops are effectively **pre-enchanted sidegrades** — keep their
+  element bonuses *weaker* than a real enchant so Enchanting keeps its
+  identity. Boss uniques are the chase tier; crafted is the reliable floor.
+
+### 9b.6 Woodcarving ladder 📝 (Christian's draft, with review flags)
+
+Mechanical identity ✅: **staves** (two-handed) lean heavy — total damage,
+big-spell payoffs; **wand + off-hand** leans fast — per-hit damage, on-hit
+effects. This lands exactly on the existing big-spell vs multi-hit tension
+(§3.1's Emberwright-vs-on-hit note): the weapon choice *is* the build choice.
+
+| Equip lvl | Wood | Gem slots | 🏠 Home zone | Why there |
+|---|---|---|---|---|
+| 1 | **Oak** | 0 | Whispering Woods (1–5, Flora) | The archetypal starter hardwood of a deciduous wood |
+| 10 | **Birch** ⭐ | 0 | Ashfall Vale (10–14, Pyro+Flora) | ⭐ Birch is a **fire-successional pioneer — literally what regrows after a burn.** Tier-2 wood sits exactly where a level-10 player fights |
+| 20 | **Yew** | 0 | Windward Steppe (19–24, Aero) | Yew is the classic windbreak — famously wind-hardy, and a longbow wood |
+| 25 | **Rowan** 💡 NEW | 0–1 | Thunderspire Peaks (23–28, Electro+Aero) | ⭐ Rowan is the **folkloric lightning-ward tree**, and grows at altitude ("mountain ash") |
+| 30 | **Ironwood** | 0–1 | The Kiln Desert (30–34, Solar) | ⭐ Desert ironwood is a **real Sonoran desert tree** — needs no reinterpretation at all |
+| 35 | **Bloodwood** | 1–2 | The Mirrormere (32–37, Lunar) | Deep red heartwood under a blood moon, mirrored in the lake |
+| 40 | **Ebony** | 1–2 | The Sunless Reach (38–42, Solar+Lunar) | ⭐ **The retheme:** black wood grown where the sun does not reach. *Sunless/lightless*, not "void-touched" |
+| 45 | **Spiritwood** | 2–3 | Hallowmarch (45–49, Sanctus) | Hallowed ground, hallowed wood |
+| 50 | **Aetherwood** | 3 | The Collapsed Academy (50–54, Arcane) | Aether is arcane; the Academy is the Arcane zone |
+
+⭐ **Every wood now has a home, and the map does the teaching.** The gathering
+map *is* the world map: you learn where trees grow by playing. With ~5-minute
+travel legs this also makes regional wood a genuine trade lane, and gives
+**Discordant** characters (no market) a concrete reason to revisit old zones.
+
+💡 **Rowan at 25 fills a real hole.** Levels 21–29 previously spanned three
+zones (Frostfell Pass, Thunderspire, Molten Deep) with no new wood.
+
+📝 **On the uneven gaps** (9/10/5/5/5/5/5/5 — early tiers last twice as long in
+*levels*): leave them. XP per level grows linearly (`100 + 50×(level−1)`), so
+early levels pass fast and late ones slowly — in *time*, a 10-level early tier
+and a 5-level late tier are closer than they look. ⚠️ But note this feeds
+§9b.4a: the quality ladder is ~12% per step early and ~7% late.
+
+✅ **Level 40's retheme resolves itself.** "Void-Touched" was a flavour
+adjective, and §9b.5a's grammar removes adjectives from base names entirely —
+the item is simply an **Ebony Quarterstaff**. Sunless/lightless language moves
+to the item description and to that band's boss uniques; void/soul/aether
+vocabulary stays reserved for 45+.
+
+- ✅ **Durability does not exist**, and no item described in this document has
+  it. ⚠️ Equipment *degradation* is intended as a **very late endgame** system;
+  it is undesigned, and nothing here may assume or imply it. Do not let it
+  re-enter via adjectives ("weathered", "lower durability").
+- 💡 Off-hand families (Book / Orb / Scroll / Relic) could carry light
+  mechanical identities (e.g. books → status/utility, orbs → damage) so the
+  off-hand choice is a build decision rather than a skin. And the tank lane
+  (Aegis Sovereign) may eventually want a **ward/shield** off-hand family —
+  maker TBD (Metalworking?).
+
+### 9b.6a What makes a rare drop worth fighting for ⭐ (supersedes the flat "sidegrade" rule)
+
+⚠️ **The problem Christian raised:** once the Concord Market matures, a player
+can simply **buy Master-tier gear at every level**. Crafted Master therefore
+stops being an achievement and becomes *the purchasable floor* — so "aspected
+drops are sidegrades" cannot be the whole story, or drops become pointless to
+anyone with gold.
+
+⭐ **The resolution: quality and rarity are two orthogonal ladders doing
+different jobs.**
+
+| Ladder | Scales | Applies to |
+|---|---|---|
+| **Quality** (Rough→Master) | **raw stat magnitude** | crafted items |
+| **Rarity** (Common→Legendary) | **which kinds of properties can exist at all** (§8) | everything |
+
+Per §8, Common is *flat stats only* and Rare *has a modifier*. So a Master
+crafted Common has **maxed flat stats and structurally cannot carry a
+modifier**. The gap between it and a Rare drop is **categorical, not
+numerical** — which is a far more durable distinction than "slightly bigger
+numbers."
+
+**The power lattice, within one material tier** (📝 numbers provisional):
+
+| Item | Raw stats | Properties |
+|---|---|---|
+| Rough crafted | 1.00 | — |
+| Standard crafted | ~1.12 | — |
+| **Aspected drop** (Uncommon) | ~1.12 | small element rider |
+| Ornate crafted | ~1.25 | — |
+| **Master crafted** | **~1.40** (≈ next tier's Rough) | — |
+| **Rare drop** (mini-boss) | **~1.40** | ⭐ **a modifier** |
+| **Epic drop / craft** (boss) | **~1.50** | ⭐ strong modifier · **enchantable** · set piece |
+
+✅ This matches Christian's instinct exactly — Rare ≈ Master, Epic marginally
+stronger — but now it is *justified* rather than asserted: the rarest drops are
+better because rarity buys **capability**, and only secondarily power.
+
+⭐ **The governing rule: the market sells the FLOOR, never the CEILING.**
+
+- **Master crafted** is the best thing you can **buy**.
+- **Rare / Epic** are the best things you can **earn**.
+
+The existing tradability tiers (§6c) already enforce this and need no change:
+crafted gear is *Untradeable* until freed by an unbinding enchant (skill-gated,
+so a market forms but with friction), while **Tier III/IV rare set components
+are Bound and can never be sold at all**. Gold buys the baseline; it cannot buy
+the top.
+
+⭐ **And crafting is not sidelined at the top** — §3.5's acquisition triangle
+means Epic set pieces are *crafted from Bound rare drops*. Drops supply the
+components, crafting assembles them, Enchanting adds the element axis. The two
+systems are complementary, not competing.
+
+⚠️ **The load-bearing consequence: Rare modifiers must be genuinely good.** If
+a mini-boss Rare carries "+2% crit", it is strictly worse than a Master anyone
+can buy, and the whole mini-boss tier becomes skippable. **The modifier is the
+entire reason to fight the thing** — treat weak modifiers as a balance bug, not
+flavour.
+
+⚠️ **This makes gold powerful early**, since buying a Master at each tier is a
+real shortcut. That is acceptable and even good — it gives gold a purpose and
+makes the wealth achievements meaningful — but it does mean **Discordant
+characters are meaningfully behind on gear**, which is the mode working as
+intended, not a bug to compensate for.
+
+### 9b.7 Gathering nodes — charges & replenishment 📝
+
+✅ **Resource nodes are regional and charge-based.** Christian's model:
+
+- A node holds up to **~6 charges**; gathering spends one.
+- Charges replenish **1 per ~4 hours**, capping at 6.
+- ✅ **Time Crystals accelerate replenishment** — consistent with the
+  monetization rule (§3.6): acceleration, never access.
+
+⭐ **Six charges at four hours is a full refill in 24h**, which is the right
+shape: a player who logs in once a day loses nothing, and one who logs in
+twice gets no *extra* — only earlier. That is engagement without punishment.
+
+✅ **Node charges are PER-CHARACTER, and accrue offline.** A shared world node
+would strip zones bare for later players and turn gathering into a race.
+Offline accrual is derived from a timestamp — the same "never schedule, always
+compute" pattern travel already uses.
+
+✅ **In-game shop stock is also per-character**, with the same reasoning. ⭐
+**The Concord Market is the sole exception — it is truly global**, which is
+precisely what makes it a market rather than a vendor.
+
+✅ **The real purpose of charges is supply control, not engagement.** They exist
+so the market cannot be flooded by bots gathering unbounded resources. Worth
+stating plainly, because it means the right tuning question is *"what supply
+does the economy want?"* rather than *"how often should players log in?"*
+
+✅ **Region materials also drop from that region's enemies**, in smaller
+quantities than a node yields ("or near that region", if a zone's table needs
+flexibility). ⭐ This is what keeps **Discordant** mode viable: a no-market
+character is no longer hard-capped by node throughput, because fighting is a
+second, uncapped supply line. It also means a player who prefers combat to
+gathering can still craft — just more slowly.
+
+### 9b.7a Gathering tools 💡 (Christian, 2026-08-02)
+
+Gathering a node is an **active wait of ~45–90s**, reducible with a better
+tool: craftable **hatchets** (Felling), **rakes** (Foraging), **pickaxes**
+(Mining).
+
+⭐ **This is a genuinely good early loop** — gather by hand, craft a hatchet,
+gather faster — and it gives Woodcarving and Metalworking a *sink that matters
+from level 1*, which the skill tree otherwise lacks before gear does.
+
+📝 Shape, to settle:
+
+- **Tool tiers should track the material ladder** (Oak hatchet → Ironwood
+  hatchet → …), so tools ride the same progression as everything else.
+- ❓ **Do tools occupy a slot?** 📝 Recommend **no** — owning the best tool
+  simply applies its speed. A gear slot spent on a hatchet is a tax, and a
+  "tool slot" is inventory management nobody asked for.
+- ⚠️ **Tools are the classic home for durability**, and §9b.6 rules durability
+  out. If equipment degradation ever ships as the late-game system, *tools are
+  where it should start* — far lower stakes than gear. Until then, tools do
+  not wear out.
+
+⚠️ **Model the total wait before tuning any single lever.** Crafting throughput
+is now gated by node charges **and** gather time **and** skill level **and**
+recipe unlocks **and** ~5-minute travel legs. Each is individually reasonable;
+compounded they can be far longer than any one number suggests.
+
+✅ **A gather harvests the node's charges SIMULTANEOUSLY, not serially.**
+Whether the node holds 1 charge or 6, it is **one wait**. Six charges is one
+timer, not six.
+
+⭐ This is the right call and worth stating why: it removes the perverse
+incentive to visit a node early and often (which would punish the very
+players charges are meant to bring back), and it makes a full node the
+*efficient* play — you are rewarded for letting it fill, which is exactly the
+behaviour the replenishment curve wants.
+
+✅ **Gather time scales with material tier** — short early, longer for harder
+materials. A level-1 player pulling oak waits briefly; Aetherwood is a
+commitment. This also keeps the early game snappy, where a long timer would do
+the most damage to first impressions.
+
+📝 Still worth deciding: whether the timer runs **while the player does
+something else** (travel, a duel) or holds the screen. Given travel already has
+a real clock, a gather that ticks in the background would compose well — but it
+is an interaction decision, not a tuning one.
+
+📝 **Still open:** does a node yield **material by zone** (Ashfall Vale always
+gives birch) or roll a small table? Flat-by-zone is more legible and makes the
+map teach itself (§9b.6); a small roll adds variance cheaply.
+
 ## 10. Open questions
 
 ✅ **Resolved:** power budget · five archetypes · counter-loop · sim criterion
@@ -1300,6 +1715,34 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-02b.** §3.6 monetization rule rewritten for precision: it
+governs **RP (real money) only, never gold** — nothing bought with RP may be
+unobtainable with gold; RP may buy time *and gold*; no RP-only functional
+items, cosmetics excepted. Noted that tradability (Bound), not price, is what
+actually enforces the ceiling once RP converts to gold. Node gathering
+confirmed as one simultaneous harvest with tier-scaled timers.
+
+**Rev — 2026-08-02 (Primal-quarter, session 2).** Galehaven confirmed for
+Potions & Alchemy (station map finalised); form names fixed as vocabulary
+(material carries rank, uniques carry grandeur); twelve element aspect
+prefixes named; wood ladder given a home zone per tier plus Rowan at 25;
+gear-vs-level ratio derived (gear caps at ~1 tier, level unbounded); three
+crafting modes tabled; **quality and rarity separated as orthogonal ladders**,
+resolving how rare drops stay desirable against a market selling Master
+("the market sells the floor, never the ceiling"); per-character nodes and
+shops with a global Concord Market; region materials also drop from enemies
+(unblocking Discordant); craftable gathering tools.
+
+**Rev — 2026-08-01 (Primal-quarter session).** Shops ungated with regional
+stock; Pennycross takes Tailoring (Galehaven identity now ❓, Potions
+proposed); hand-crafting anywhere with stations as speed/bulk/quality layer
+(+ passive overnight crafting 📝); min-equip levels; quality tiers
+Rough/Standard/Ornate/Master with Salvage rerolls and the Master(N)≈Rough(N+1)
+anchor; provenance naming grammar (crafted/aspected/unique); Woodcarving
+material ladder drafted with review flags (Oak→Birch→Yew reorder, celestial
+retheme at 40, durability flagged as undesigned).
+
 
 **Rev 11 (cross-doc review)** — Findings from a four-doc consistency review
 noted in place. Fixed: rarity ladder renamed to Dust→Heart; 5×9=45 builds;

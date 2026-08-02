@@ -292,7 +292,8 @@ one-time rewards on the same moment is what makes it one.
 supplemental, reserved for the ones that deserve to be seen.
 
 ⚠️ **RP as a reward is consistent with the monetization rule** (ITEMS §3.6:
-premium currency buys acceleration, never access). Giving non-payers a taste
+nothing bought with RP may be
+unobtainable with gold — and achievement RP is a *grant*, not a purchase). Giving non-payers a taste
 of the acceleration tier argues *for* the purchase. Amounts stay small enough
 that they cannot substitute for buying.
 
@@ -403,20 +404,23 @@ platforms take.
 Raised by the character/account split (§2). Recorded here so it is not lost;
 these belong in GAME_DESIGN §5 if adopted.
 
-- **Permadeath mode** (name TBD) — the character is gone on death.
-- **No-trading mode** (name TBD) — everything must be found or crafted;
-  no shops, no Concord Market.
-- **Both at once** — the strictest mode.
+- ✅ **Discordant** — no trading, no shops, no Concord Market; everything must
+  be found or crafted.
+- ✅ **Mortal** — one life; defeat ends the character permanently.
+- ✅ **Discordant Mortal** — both at once.
 
 ⭐ **These are the strongest argument for the character/account split.** A
 permadeath character has to be separate from your main, and "separate
 character" only means something if progress and achievements travel with the
 character rather than the account — which §2 already rules.
 
-⚠️ If adopted, achievements need a **mode flag**: an achievement earned in
-no-trading mode is a different accomplishment from the same one earned
-normally, and the two should be distinguishable rather than silently merged.
+⚠️ Achievements need a **mode flag**: the same achievement earned as
+**Discordant** is a different accomplishment from one earned with a market
+behind you, and the two should be distinguishable rather than silently merged.
 Deciding that *after* the achievement schema ships is a migration.
+
+⭐ **Mode names double as titles** (§6.1) — "Corvin the Discordant" needs no
+extra vocabulary, which is a point in favour of the names chosen.
 
 ---
 

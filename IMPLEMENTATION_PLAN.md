@@ -742,6 +742,28 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
 
 ## Deferred / banked — do not build without an explicit ask
 
+- **📝 Alternate character modes — named, not built.** ✅ **Discordant** (no
+  trading/shops/Concord Market — everything found or crafted), ✅ **Mortal**
+  (one life; defeat ends the character), ✅ **Discordant Mortal** (both). Full
+  note with the naming rationale and collision warnings in GAME_DESIGN §5.
+  ⛔ **Blocked on the character-vs-account split** — a permadeath run only
+  means anything as a separate character, and `PlayerProfile` is currently
+  both. ❓ Open ruling needed: does an Endurance proc (ITEMS §5b.2 death save)
+  save a **Mortal** character? Leaning no.
+
+- **📝 Narrative screens — requested, not designed.** Two tiers: **Tier 1**
+  short story beats inside the main game, **Tier 2** discoverable books/tomes
+  with much deeper lore. See GAME_DESIGN §5.
+  ⭐ Tier 1 is half-built already — all 32 locations carry an `arrival`
+  passage written for exactly this, and they are currently dead data with
+  nowhere to display them.
+  ⚠️ **This is the first feature that would add image assets to a project that
+  has none** — there is no `assets/` directory, and every visual (map, sprites,
+  glyphs, FX) is a `CustomPainter`. Introducing an art pipeline is a real
+  decision; a middle path is `CustomPainter` illustration for Tier 1 (the
+  world map proves it can carry real artwork) with bitmaps reserved for Tier 2.
+
+
 - **📝 Achievements + character progress — designed, not built.** See
   `ACHIEVEMENTS_DESIGN.md` (2026-07-28). ~140 achievements: three per zone
   (clear / purge every enemy / collect every drop), 5-tier charge-based

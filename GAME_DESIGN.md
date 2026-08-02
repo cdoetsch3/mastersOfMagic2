@@ -420,14 +420,35 @@ MoM2 adds **spell slots** unlocked via leveling.
   - ✅ Monsters fight by the **exact same rules** as players (elements, charges, spells,
     shields) with an AI brain.
 
-### 📝 Alternate character modes — to consider (2026-07-28)
+### 📝 TODO — Alternate character modes (named 2026-07-28, not built)
 
-Raised while designing achievements; recorded, not designed.
+Christian's RuneScape reference: Ironman (no trading) and Hardcore
+(permadeath). ✅ **Names decided**; the modes themselves are a to-do.
 
-- 💡 **Permadeath mode** (name TBD) — the character is gone on death.
-- 💡 **No-trading mode** (name TBD) — everything must be **found or crafted**;
-  no shops, no Concord Market. A self-sufficiency run.
-- 💡 **Both at once** — the strictest mode.
+| Mode | Rule | Name comes from |
+|---|---|---|
+| ✅ **Discordant** | No trading, no shops, no Concord Market. Everything **found or crafted**. | The antonym of the **Concord** — Concordance is the trade capital and the Concord Market *is* the economy, so opting out is a stance against it, not a generic "solo" tag. |
+| ✅ **Mortal** | One life. Defeat ends the character, permanently. | Plain on purpose: this is the mode where a misunderstanding costs someone hours of play. |
+| ✅ **Discordant Mortal** | Both at once. | Compound, so it reads as exactly what it is. |
+
+⚠️ **"Mortal" implies ordinary characters are immortal, and the lore does not
+currently say that.** Accepted knowingly. One line of world-building settles
+it — and note the engine's own vocabulary is **defeat**, not death
+(`DefeatedEvent` → "X is defeated"), so the honest framing is *"defeat is
+final"* rather than *"you can die."* Worth aligning the lore with that phrasing
+rather than introducing literal death.
+
+⚠️ **Do not rename these to anything Iron-flavoured.** RuneScape players read
+"Iron" as the *no-trade* mode, so an "Ironclad"-style name for **Mortal** would
+mislead exactly the audience most likely to try it. Likewise **Bound** is taken
+(item tradability, ITEMS §6c) and **Sudden Death** is taken (the fatigue
+mechanic, TYPE_EFFECTS §8).
+
+❓ **Open: does an Endurance proc save a Mortal character?** ITEMS §5b.2 plans
+Endurance as a death save. If **yes**, Mortal quietly sells a gear-buyable
+second life and the name is untrue; if **no**, Endurance is dead weight in the
+mode that most wants it. Leaning **no** — the mode is defined by the absence of
+safety nets — but rule on it before either ships.
 
 ⭐ **These force a decision the codebase has not made: character vs account.**
 Today `PlayerProfile` is both — one document at `players/{uid}`. A permadeath
@@ -443,6 +464,57 @@ writing to the profile document; retrofitting means migrating every save.
 ⚠️ No-trading mode also needs a ruling on whether its achievements are
 *distinct* from the normal ones — the same achievement earned without a market
 is a different accomplishment.
+
+### 📝 TODO — Narrative screens (requested 2026-07-28, not designed)
+
+A mechanism for showing **images + text as story** during the game. Two tiers,
+deliberately different in weight:
+
+| Tier | What it is | Where it appears |
+|---|---|---|
+| **1 — Story** | Short, simple, part of the main game. The beats a player cannot miss: arriving somewhere new, clearing a region, meeting a named foe. | Inline, at the moment it happens |
+| **2 — Tomes** | Long-form lore, much deeper. **Discoverable** books found in the world — optional, collectable, for players who want the world rather than the game. | A library/journal the player builds up |
+
+⭐ **Tier 1 already half-exists and should be built on, not beside.** Every
+location carries an `arrival` string — 32 of them, second person, present
+tense, written to be shown on first arrival — plus a `blurb`. That is the
+Tier-1 voice already established; the missing piece is a *screen* worth showing
+it on, not new writing. ⚠️ Whatever gets built must render those existing
+strings, or the world doc's 32 arrival passages quietly become dead data.
+
+⚠️ **This is the first feature that would introduce image assets, and the
+project has none.** There is no `assets/` directory and nothing in
+`pubspec.yaml` declares one — every visual in the game (the world map, mage
+sprites, element glyphs, all combat FX) is a `CustomPainter`. That is a
+deliberate, load-bearing pattern: it is why the whole map is seeded and
+deterministic, and why the build has no art pipeline. Introducing bitmaps is
+a real decision, not a detail:
+
+- ✅ **In favour:** story art is exactly the thing procedural painting is worst
+  at, and hand-drawn scene art would raise the game's perceived production
+  value more than anything else on the roadmap.
+- ⚠️ **Against:** it adds an art pipeline, asset licensing, per-image download
+  weight (the app is already 41 MB, of which 37 MB is canvaskit — see the
+  caching note in IMPLEMENTATION_PLAN), and a second way of drawing things
+  that future contributors must choose between.
+- 💡 **Middle path worth considering:** `CustomPainter` scene *illustrations*
+  in the established style — the world map already proves the codebase can
+  produce real illustration this way — reserving bitmaps for Tier 2 tomes,
+  where the count is small and the player opted in.
+
+❓ **Open questions before building:**
+- Are Tier-2 tomes **items** (inventory, tradable, droppable) or a separate
+  collection? Items make them lootable and Concord-tradable, which interacts
+  with **Discordant** mode; a separate collection avoids that entirely.
+- Do tomes grant anything (XP, an achievement, a title) or are they purely
+  lore? ⭐ Achievements already exist as the right home for "found all N"
+  (ACHIEVEMENTS_DESIGN §5.1's Collector tier is the same shape).
+- Is Tier 1 **skippable**? It must be — a story screen a returning player
+  cannot dismiss becomes the thing they resent about the game.
+- Does story state belong on the **character** or the **account**? Per
+  ACHIEVEMENTS_DESIGN §2 everything else is character-level; re-reading the
+  same intro on every alt is a strong argument for account-level here, and
+  would be the first exception.
 
 ### Adventure loop (push-your-luck)
 - ✅ **HP persists between encounters** within an adventure. After each encounter the
