@@ -698,7 +698,11 @@ class DuelEngine {
       // grind through. Without this a level-60 boss has 683 HP and still hits
       // for level-1 numbers — which is exactly how it shipped once.
       var perHit =
-          (_roll(minPerHit, maxPerHit) * scale * caster.levelScale).round();
+          (_roll(minPerHit, maxPerHit) *
+                  scale *
+                  caster.levelScale *
+                  caster.powerScale)
+              .round();
 
       // Crit (§5.2 step 4/5, per hit). Guarded on chance > 0 so a no-crit
       // build rolls nothing. The bonus is a multiplier atop the damage mods.

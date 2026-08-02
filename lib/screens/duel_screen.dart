@@ -36,6 +36,14 @@ class DuelScreen extends StatefulWidget {
   /// the player won. Lets the caller grant XP/gold. Draws report `false`.
   final void Function(bool playerWon)? onResult;
 
+  /// ⭐ Health carried in from an adventure (GAME_DESIGN adventure loop). Null
+  /// for a standalone duel, which starts at full.
+  final int? playerStartingHp;
+
+  /// Reports the player's remaining health, so the next encounter in a run can
+  /// start where this one ended.
+  final void Function(int remainingHp)? onPlayerHpRemaining;
+
   /// The player's character level — scales their health and damage.
   final int playerLevel;
 
@@ -45,6 +53,8 @@ class DuelScreen extends StatefulWidget {
     required this.driver,
     this.campaign = false,
     this.onResult,
+    this.playerStartingHp,
+    this.onPlayerHpRemaining,
     this.playerLevel = 1,
   });
 
@@ -60,6 +70,7 @@ class _DuelScreenState extends State<DuelScreen>
     loadout: widget.loadout,
     driver: widget.driver,
     playerLevel: widget.playerLevel,
+    playerStartingHp: widget.playerStartingHp,
   );
   bool _resultReported = false;
   late final AnimationController _fx = AnimationController(
@@ -178,6 +189,7 @@ class _DuelScreenState extends State<DuelScreen>
     if (!_resultReported && c.gameOver) {
       _resultReported = true;
       widget.onResult?.call(c.playerWon);
+      widget.onPlayerHpRemaining?.call(c.player.hp);
     }
   }
 

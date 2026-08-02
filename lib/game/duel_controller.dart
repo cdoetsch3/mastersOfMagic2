@@ -92,10 +92,18 @@ class DuelController extends ChangeNotifier {
   /// The player's character level, for health and damage scaling.
   final int playerLevel;
 
+  /// ⭐ Health carried in from an adventure. Null starts at full.
+  ///
+  /// ⚠️ Applied to the *player only* — an encounter's enemy is always fresh,
+  /// because the run's tension is the player's dwindling health, not a chain
+  /// of half-dead monsters.
+  final int? playerStartingHp;
+
   DuelController({
     required this.loadout,
     required this.driver,
     this.playerLevel = 1,
+    this.playerStartingHp,
   }) {
     newDuel();
     driver.watchOpponentSurrender(_onOpponentSurrendered);
@@ -108,7 +116,18 @@ class DuelController extends ChangeNotifier {
     // even-level duel plays exactly as it always did; a level gap is now
     // worth something.
     player = MageState(name: 'You', level: playerLevel);
-    enemy = MageState(name: driver.opponentName, level: driver.opponentLevel);
+    final carried = playerStartingHp;
+    if (carried != null) player.hp = carried.clamp(1, player.maxHp);
+    // ⭐ An enemy is the level baseline TIMES its archetype (ENEMIES §1.1), so
+    // a Glasswing and a Redoubt of the same level are genuinely different
+    // fights rather than the same fight with different names.
+    enemy = MageState(
+      name: driver.opponentName,
+      level: driver.opponentLevel,
+      maxHp:
+          (MageState.scaledMaxHp(driver.opponentLevel) * driver.opponentHpScale)
+              .round(),
+    )..powerScale = driver.opponentPowerScale;
     final host = playerIsHost ? player : enemy;
     final guest = playerIsHost ? enemy : player;
     engine = DuelEngine(host, guest, rng: _rng);

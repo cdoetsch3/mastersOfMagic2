@@ -5,6 +5,9 @@ import '../../game/duel_launcher.dart';
 import '../../game/element_style.dart';
 import '../../game/game_state.dart';
 import '../../game/travel.dart';
+import '../../game/adventure.dart';
+import '../../game/adventure_launcher.dart';
+import '../../game/enemies/bestiary.dart';
 import '../../game/world.dart';
 import '../../ui/app_theme.dart';
 import '../../ui/travel_progress_card.dart';
@@ -99,23 +102,35 @@ class _MapTabState extends State<MapTab> {
         ),
       ],
       if (here.hasAdventure)
-        _ActionTile(
-          icon: Icons.local_fire_department,
-          color: AppColors.ember,
-          title: 'Begin adventure',
-          subtitle:
-              'Fight ${World.opponentNameFor(here)} '
-              '(${here.enemyBandLabel})',
-          onTap: () => launchAiDuel(
-            context,
-            loadout: game.profile.activePreset.toLoadout(),
-            campaign: true,
-            persona: AiRoster.campaignFoe(
-              name: World.opponentNameFor(here),
-              level: (here.minLevel + here.maxLevel) ~/ 2,
+        // ⭐ A real run through the zone's roster, not a single stand-in duel.
+        // ⚠️ Only Whispering Woods has a bestiary; everywhere else still falls
+        // back to the one-off fight until its roster is built.
+        if (Bestiary.forZone(here.id).isNotEmpty)
+          _ActionTile(
+            icon: Icons.local_fire_department,
+            color: AppColors.ember,
+            title: 'Begin adventure',
+            subtitle: _runSubtitle(here),
+            onTap: () => launchAdventure(context, here),
+          )
+        else
+          _ActionTile(
+            icon: Icons.local_fire_department,
+            color: AppColors.ember,
+            title: 'Begin adventure',
+            subtitle:
+                'Fight ${World.opponentNameFor(here)} '
+                '(${here.enemyBandLabel})',
+            onTap: () => launchAiDuel(
+              context,
+              loadout: game.profile.activePreset.toLoadout(),
+              campaign: true,
+              persona: AiRoster.campaignFoe(
+                name: World.opponentNameFor(here),
+                level: (here.minLevel + here.maxLevel) ~/ 2,
+              ),
             ),
           ),
-        ),
     ];
   }
 
@@ -450,4 +465,12 @@ class _MiniTag extends StatelessWidget {
       Text(text, style: TextStyle(color: color, fontSize: 11.5)),
     ],
   );
+}
+
+/// ⭐ Shows the run's length up front (GAME_DESIGN world structure) — the
+/// player should know what they are committing to before they commit.
+String _runSubtitle(GameLocation zone) {
+  final perSection = commonsPerSectionFor(zone.tier);
+  final total = perSection * 3 + 3;
+  return '$total encounters · ${zone.enemyBandLabel}';
 }

@@ -173,6 +173,14 @@ sealed class ItemDef {
   /// ⭐ The "players who care can learn more" channel. Never mechanical.
   final String lore;
 
+  /// A written name, for the kinds that have no naming grammar.
+  ///
+  /// ⚠️ **Equipment must leave this null.** Its name is *composed* from
+  /// aspect + quality + material + form (ITEMS §9b.5a) precisely so the name
+  /// cannot drift from the facts; writing one down here would reintroduce the
+  /// drift that rule exists to prevent. Guarded by a test.
+  final String? properName;
+
   /// Gold. ⚠️ A tuning knob — a candidate for server-side config later, since
   /// nothing the duel resolves depends on it.
   final int value;
@@ -181,6 +189,7 @@ sealed class ItemDef {
     required this.id,
     required this.rarity,
     required this.lore,
+    this.properName,
     this.tradability = Tradability.tradeable,
     this.equipLevel = 1,
     this.value = 0,
@@ -256,6 +265,7 @@ final class ConsumableDef extends ItemDef {
     super.tradability,
     super.equipLevel,
     super.value,
+    super.properName,
   });
 
   @override
@@ -271,6 +281,7 @@ final class BeltableDef extends ItemDef with Beltable {
     super.tradability,
     super.equipLevel,
     super.value,
+    super.properName,
   });
 
   @override
@@ -298,6 +309,7 @@ final class MaterialDef extends ItemDef with Salvageable {
     super.tradability,
     super.equipLevel,
     super.value,
+    super.properName,
   });
 
   @override
@@ -319,6 +331,7 @@ final class MoteDef extends ItemDef {
     super.tradability,
     super.equipLevel,
     super.value,
+    super.properName,
   });
 
   @override
@@ -366,6 +379,7 @@ final class ToolDef extends ItemDef with Salvageable {
     super.tradability,
     super.equipLevel,
     super.value,
+    super.properName,
   });
 
   @override
@@ -386,6 +400,7 @@ final class GemDef extends ItemDef {
     super.tradability,
     super.equipLevel,
     super.value,
+    super.properName,
   });
 
   @override
@@ -408,6 +423,7 @@ final class KeyDef extends ItemDef {
     required super.lore,
     required this.gates,
     super.equipLevel,
+    super.properName,
   }) : super(tradability: Tradability.bound, value: 0);
 
   @override

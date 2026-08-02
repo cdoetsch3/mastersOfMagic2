@@ -275,20 +275,20 @@ void main() {
 
   group('the four containers each have one job', () {
     test('only Beltable things reach combat', () {
-      expect(Carrying.accepts(Container.belt, _tonic), isTrue);
+      expect(Carrying.accepts(ItemContainer.belt, _tonic), isTrue);
       expect(
-        Carrying.accepts(Container.belt, _ration),
+        Carrying.accepts(ItemContainer.belt, _ration),
         isFalse,
         reason: 'a field ration is a between-encounters item',
       );
-      expect(Carrying.accepts(Container.belt, _staff), isFalse);
+      expect(Carrying.accepts(ItemContainer.belt, _staff), isFalse);
     });
 
     test('every other container takes anything — space, not legality', () {
       for (final c in [
-        Container.storeroom,
-        Container.backpack,
-        Container.mount,
+        ItemContainer.storeroom,
+        ItemContainer.backpack,
+        ItemContainer.mount,
       ]) {
         for (final d in <ItemDef>[_staff, _log, _ration, _tonic, _key]) {
           expect(Carrying.accepts(c, d), isTrue, reason: '$c / ${d.id}');

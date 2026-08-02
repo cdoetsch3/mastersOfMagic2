@@ -740,6 +740,40 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
 
 ---
 
+## ✅ The core loop is playable (2026-08-02)
+
+Travel to Whispering Woods → fight a real roster → take loot home → stow it in
+Aldermere's Storeroom. Built end to end:
+
+| Piece | Where |
+|---|---|
+| Slot backpack, per-city Storerooms, belt, instance pool | `lib/game/items/inventory.dart`, `PlayerProfile` |
+| Archetype HP **and damage** on enemies | `MageState.powerScale` (engine), `OpponentDriver.opponentHpScale/PowerScale` |
+| A bestiary entry as a fightable opponent | `lib/game/enemies/enemy_encounter.dart` |
+| The run: 3 sections, 2-of-4 minis, 1-of-2 bosses, HP carried, push-your-luck | `lib/game/adventure.dart` |
+| Drop tables → items → slots | `lib/game/enemies/loot.dart` |
+| Adventure screen, backpack grid, Storeroom | `lib/screens/adventure_screen.dart`, `tabs/inventory_tab.dart` |
+
+⚠️ **Only Whispering Woods has a bestiary.** Every other zone still falls back
+to the single stand-in duel; `map_tab` switches on `Bestiary.forZone(id)` being
+non-empty, so a zone lights up the moment its roster is written.
+
+⭐ **`MageState.powerScale` is the one engine change**, and it is deliberately
+**damage-only** — never shields. A Sentinel is low damage *and* a wall, and
+scaling both would erase the archetype.
+
+⚠️ **Still missing from the loop:**
+- **The belt is data, not a mechanic.** `Belt` persists and the UI can show it,
+  but nothing loads it and no duel turn spends on a consumable.
+- **Nothing equips.** `EquipmentDef` drops and is carried; `ItemModifiers`
+  reaches no `MageState`.
+- **No death timer.** GAME_DESIGN's escalating respawn penalty is unbuilt; a
+  death currently costs only the run's loot.
+- **A run is not persisted** — deliberate, so a losing fight cannot be dodged
+  by force-quitting. ❓ Revisit if players lose runs to a dropped connection.
+
+---
+
 ## Deferred / banked — do not build without an explicit ask
 
 - **⛔ TO DO — the `progress/` subcollection. Two of the three per-zone

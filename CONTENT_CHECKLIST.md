@@ -57,11 +57,25 @@ pipeline, a licensing question, and download weight.
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Whispering Woods** | ✅ 1–5 | ✅ Flora | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Oak | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
+| **Whispering Woods** | ✅ 1–5 | ✅ Flora | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | 🟡 | ⬜ | ✅ Oak | ⬜ | ✅ | ✅ | ✅ | ✅ | 🟡 | 📝 |
 | **Glimmerbrook** | ✅ 3–8 | ✅ Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Cinderpeak Foothills** | ✅ 6–11 | ✅ Pyro | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Thornmire** | ✅ 8–13 | ✅ Flora+Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Ashfall Vale** | ✅ 10–14 | ✅ Pyro+Flora | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Birch | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
+
+⭐ **Whispering Woods is BUILT** — `lib/game/enemies/whispering_woods.dart` and
+`lib/game/items/catalogue/whispering_woods_items.dart`. 11 creatures with their
+own move sets and drop tables, 13 items, guarded by 24 tests in
+`test/whispering_woods_test.dart`. ⚠️ **It is the template for the other 24**,
+so a change to its shape is a change to all of them.
+
+⭐ It also lands the **first real gate item**: both bosses guarantee
+`proof_of_the_woods`, one of Aldermere's *"three ordinary proofs"* — until now
+every gate in the game was a prose string with nothing behind it.
+
+⚠️ Still open for this zone: **BossFX** (what makes each boss more than a big
+statline), **Art** (painter recipes), **Nodes** (gathering placement) and the
+three **achievements**, which need the `progress/` subcollection.
 
 🟡 **Names:** one placeholder existed per zone in `World.opponentNameFor` —
 Thornback Sprite · Brook Naiad · Ashjaw Brute · Mirewalker · Cinderbloom Husk.

@@ -10,7 +10,11 @@ library;
 import 'item_def.dart';
 
 /// The four places an item can be.
-enum Container {
+///
+/// ⚠️ **Named `ItemContainer`, not `Container`.** Flutter's `Container` widget
+/// is one of the most-used names in the framework, and a bare `Container` here
+/// silently shadows it in every UI file that imports this library.
+enum ItemContainer {
   /// Unlimited, and ⚠️ **one per city, not a shared pool** (ITEMS §10.3c).
   /// What you leave in Aldermere is in Aldermere; moving it means carrying it.
   ///
@@ -63,6 +67,6 @@ abstract final class Carrying {
   ///
   /// ⭐ The one rule worth stating in code: **only Beltable things reach
   /// combat.** Everything else is a matter of space, not legality.
-  static bool accepts(Container where, ItemDef def) =>
-      where != Container.belt || def is Beltable;
+  static bool accepts(ItemContainer where, ItemDef def) =>
+      where != ItemContainer.belt || def is Beltable;
 }

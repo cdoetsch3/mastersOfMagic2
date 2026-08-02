@@ -22,20 +22,28 @@ class ElementStyle {
 const Map<MagicElement, ElementStyle> elementStyles = {
   // Tier 1 — Primal
   MagicElement.aqua: ElementStyle(Color(0xFF3D8BD9), Icons.water_drop, 'Aqua'),
-  MagicElement.pyro:
-      ElementStyle(Color(0xFFE25822), Icons.local_fire_department, 'Pyro'),
+  MagicElement.pyro: ElementStyle(
+    Color(0xFFE25822),
+    Icons.local_fire_department,
+    'Pyro',
+  ),
   MagicElement.flora: ElementStyle(Color(0xFF5FB35B), Icons.eco, 'Flora'),
   // Tier 2 — Kinetic
   MagicElement.electro: ElementStyle(Color(0xFFE8C547), Icons.bolt, 'Electro'),
   MagicElement.aero: ElementStyle(Color(0xFF9BB8C4), Icons.air, 'Aero'),
   MagicElement.geo: ElementStyle(Color(0xFF9C7A4B), Icons.landscape, 'Geo'),
   // Tier 3 — Celestial
-  MagicElement.solar:
-      ElementStyle(Color(0xFFF5B23E), Icons.wb_sunny, 'Solar'),
-  MagicElement.lunar:
-      ElementStyle(Color(0xFFAFC3E8), Icons.nightlight_round, 'Lunar'),
-  MagicElement.astral:
-      ElementStyle(Color(0xFF6E7BD6), Icons.star_outline, 'Astral'),
+  MagicElement.solar: ElementStyle(Color(0xFFF5B23E), Icons.wb_sunny, 'Solar'),
+  MagicElement.lunar: ElementStyle(
+    Color(0xFFAFC3E8),
+    Icons.nightlight_round,
+    'Lunar',
+  ),
+  MagicElement.astral: ElementStyle(
+    Color(0xFF6E7BD6),
+    Icons.star_outline,
+    'Astral',
+  ),
   // Tier 4 — Ethereal
   // Sanctus and Umbra deliberately avoid sun/moon glyphs — those belong to
   // Solar and Lunar, and the old light_mode/dark_mode pair read as a second
@@ -44,13 +52,22 @@ const Map<MagicElement, ElementStyle> elementStyles = {
   // Material has no halo and no demon, so these two are drawn (see
   // ui/element_glyphs.dart). The icons named here are fallbacks only.
   MagicElement.sanctus: ElementStyle(
-      Color(0xFFF2E7C9), Icons.workspace_premium, 'Sanctus',
-      glyph: HaloGlyphPainter.new),
+    Color(0xFFF2E7C9),
+    Icons.workspace_premium,
+    'Sanctus',
+    glyph: HaloGlyphPainter.new,
+  ),
   MagicElement.umbra: ElementStyle(
-      Color(0xFF8B5CD6), Icons.dark_mode, 'Umbra',
-      glyph: DemonGlyphPainter.new),
-  MagicElement.arcane:
-      ElementStyle(Color(0xFFD65AB8), Icons.auto_awesome, 'Arcane'),
+    Color(0xFF8B5CD6),
+    Icons.dark_mode,
+    'Umbra',
+    glyph: DemonGlyphPainter.new,
+  ),
+  MagicElement.arcane: ElementStyle(
+    Color(0xFFD65AB8),
+    Icons.auto_awesome,
+    'Arcane',
+  ),
 };
 
 /// Display label for a tier (Spellbook grouping, tooltips).
@@ -68,7 +85,11 @@ extension ElementStyleX on MagicElement {
 /// The element's mark at [size] — its drawn glyph where it has one, otherwise
 /// its Material icon. Use this rather than `Icon(element.style.icon)` so the
 /// hand-drawn elements render everywhere they appear.
-Widget elementGlyph(MagicElement element, {required double size, Color? color}) {
+Widget elementGlyph(
+  MagicElement element, {
+  required double size,
+  Color? color,
+}) {
   final style = element.style;
   final tint = color ?? style.color;
   final glyph = style.glyph;
@@ -78,13 +99,13 @@ Widget elementGlyph(MagicElement element, {required double size, Color? color}) 
 }
 
 String priorityLabel(int priority) => switch (priority) {
-      <= 2 => 'instant',
-      3 => 'shield',
-      4 => 'channel',
-      <= 6 => 'quick',
-      <= 8 => 'aux',
-      _ => 'regular',
-    };
+  <= 2 => 'instant',
+  3 => 'shield',
+  4 => 'channel',
+  <= 6 => 'quick',
+  <= 8 => 'aux',
+  _ => 'regular',
+};
 
 const Map<String, IconData> spellIcons = {
   'flick': Icons.auto_awesome,
@@ -123,7 +144,7 @@ String spellTooltip(Spell spell) {
       :final minAmount,
       :final maxAmount,
       :final hits,
-      :final lifesteal
+      :final lifesteal,
     ) =>
       '${hits > 1 ? '$hits hits of ' : ''}$minAmount-$maxAmount damage'
           '${lifesteal > 0 ? ', heals for ${(lifesteal * 100).round()}% of the health damage' : ''}',
@@ -162,7 +183,8 @@ const Map<String, String> spellDescriptions = {
   'jolt': 'Strikes early and seizes Haste, winning future same-speed ties.',
   'flurry': 'Three rapid strikes; each rolls its own damage.',
   'volley': 'Four bolts in succession — steady chip through a shield.',
-  'barrage': 'Spends ALL your charge as separate bolts — one per point. '
+  'barrage':
+      'Spends ALL your charge as separate bolts — one per point. '
       'Each meets the shield on its own, so it chews through Barriers.',
   'sap': 'Heals you for half the damage that reaches their health.',
   'leech': 'A stronger draught — still half of what reaches their health.',
@@ -172,7 +194,8 @@ const Map<String, String> spellDescriptions = {
   'bulwark': 'A heavy shield in your element.',
   'rampart': 'A towering shield in your element.',
   'sanctuary': 'The greatest shield a mage can weave.',
-  'barrier': 'Stacks up to 3 points; each blocks one hit whole. '
+  'barrier':
+      'Stacks up to 3 points; each blocks one hit whole. '
       'Element-less — a multi-hit spell burns one point per hit.',
   'empower': 'Your next offensive spell deals double damage.',
   'quicken': 'Your next offensive spell strikes before enemy shields.',

@@ -25,7 +25,9 @@ class AuthService extends ChangeNotifier {
   }) async {
     try {
       final cred = await _auth.createUserWithEmailAndPassword(
-          email: email.trim(), password: password);
+        email: email.trim(),
+        password: password,
+      );
       await cred.user?.updateDisplayName(characterName.trim());
       await cred.user?.sendEmailVerification();
       await cred.user?.reload();
@@ -38,11 +40,15 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<String?> signIn(
-      {required String email, required String password}) async {
+  Future<String?> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
       await _auth.signInWithEmailAndPassword(
-          email: email.trim(), password: password);
+        email: email.trim(),
+        password: password,
+      );
       return null;
     } on FirebaseAuthException catch (e) {
       return _message(e);
@@ -67,7 +73,8 @@ class AuthService extends ChangeNotifier {
       await _auth.sendPasswordResetEmail(email: email.trim());
       return null;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') return null; // don't leak account existence
+      if (e.code == 'user-not-found')
+        return null; // don't leak account existence
       return _message(e);
     } catch (e) {
       return 'Something went wrong. Please try again.';
@@ -89,7 +96,8 @@ class AuthService extends ChangeNotifier {
     if (user == null || email == null) return 'You are not signed in.';
     try {
       await user.reauthenticateWithCredential(
-          EmailAuthProvider.credential(email: email, password: currentPassword));
+        EmailAuthProvider.credential(email: email, password: currentPassword),
+      );
       await user.updatePassword(newPassword);
       notifyListeners();
       return null;
@@ -114,19 +122,18 @@ class AuthService extends ChangeNotifier {
   Future<void> signOut() => _auth.signOut();
 
   String _message(FirebaseAuthException e) => switch (e.code) {
-        'email-already-in-use' => 'That email already has an account.',
-        'invalid-email' => 'That email address looks invalid.',
-        'weak-password' => 'Choose a stronger password (6+ characters).',
-        'user-not-found' ||
-        'wrong-password' ||
-        'invalid-credential' =>
-          'Wrong email or password.',
-        'too-many-requests' => 'Too many attempts. Try again later.',
-        'operation-not-allowed' =>
-          'Email sign-in is not enabled for this project yet.',
-        'network-request-failed' => 'Network error. Check your connection.',
-        _ => e.message ?? 'Authentication failed.',
-      };
+    'email-already-in-use' => 'That email already has an account.',
+    'invalid-email' => 'That email address looks invalid.',
+    'weak-password' => 'Choose a stronger password (6+ characters).',
+    'user-not-found' ||
+    'wrong-password' ||
+    'invalid-credential' => 'Wrong email or password.',
+    'too-many-requests' => 'Too many attempts. Try again later.',
+    'operation-not-allowed' =>
+      'Email sign-in is not enabled for this project yet.',
+    'network-request-failed' => 'Network error. Check your connection.',
+    _ => e.message ?? 'Authentication failed.',
+  };
 }
 
 /// Inherited access to the single [AuthService].

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:mom_engine/mom_engine.dart';
 
 import 'ai_personas.dart';
+import 'enemies/enemy_def.dart';
 import 'firestore_rest.dart';
 import 'mage_apparel.dart';
 
@@ -28,6 +29,18 @@ abstract interface class OpponentDriver {
   /// mage rather than a level-1 one with a good brain.
   int get opponentLevel;
   MageApparel get opponentApparel;
+
+  /// Multiplier on the opponent's max HP, off the level baseline.
+  ///
+  /// ⭐ **Where an enemy archetype's `hpScale` enters the duel** (ENEMIES
+  /// §2.1). 1.0 for a mage or another player; 2.20 for a Redoubt.
+  double get opponentHpScale => 1.0;
+
+  /// Multiplier on the opponent's outgoing damage.
+  ///
+  /// ⚠️ Damage only — never shields. A Sentinel is low damage *and* a wall,
+  /// and scaling both would erase the archetype.
+  double get opponentPowerScale => 1.0;
 
   /// Whether the local player is "host" (engine mage1). Remote duels assign
   /// sides; local duels always make the player the host.
@@ -58,13 +71,26 @@ abstract interface class OpponentDriver {
 /// mage states after constructing the engine.
 class LocalAiDriver implements OpponentDriver {
   final AiPersona persona;
+
+  /// The bestiary entry behind this fight, when there is one.
+  ///
+  /// ⭐ Present for a campaign encounter, null for a practice persona — which
+  /// is why the scales default to 1.0 rather than being required.
+  final EnemyDef? enemy;
   final Random rng;
   late final DuelAi _brain = persona.buildBrain();
 
   MageState? _player;
   MageState? _enemy;
 
-  LocalAiDriver({required this.persona, Random? rng}) : rng = rng ?? Random();
+  LocalAiDriver({required this.persona, this.enemy, Random? rng})
+    : rng = rng ?? Random();
+
+  @override
+  double get opponentHpScale => enemy?.archetype.hpScale ?? 1.0;
+
+  @override
+  double get opponentPowerScale => enemy?.archetype.damageScale ?? 1.0;
 
   void bind(MageState player, MageState enemy) {
     _player = player;
@@ -109,6 +135,14 @@ class LocalAiDriver implements OpponentDriver {
 /// An opponent that hasn't committed within [opponentTimeout] forfeits the
 /// move (also how disconnects are handled — they forfeit until they lose).
 class RemoteDuelDriver implements OpponentDriver {
+  /// ⚠️ A human opponent is always the baseline — archetype scales are an
+  /// enemy-design tool and must never touch PvP.
+  @override
+  double get opponentHpScale => 1.0;
+
+  @override
+  double get opponentPowerScale => 1.0;
+
   final String roomId;
   final bool isHost;
   final int masterSeed;

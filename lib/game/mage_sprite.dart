@@ -35,8 +35,9 @@ class MageSprite extends StatefulWidget {
 class _MageSpriteState extends State<MageSprite>
     with SingleTickerProviderStateMixin {
   late final AnimationController _bob = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 2200))
-    ..repeat();
+    vsync: this,
+    duration: const Duration(milliseconds: 2200),
+  )..repeat();
 
   @override
   void dispose() {
@@ -157,8 +158,11 @@ class _MagePainter extends CustomPainter {
     // Charge aura behind the mage: grows and brightens with charge.
     if (charge > 0) {
       paint.color = orbColor.withValues(alpha: 0.06 * charge);
-      canvas.drawCircle(Offset(size.width * 0.42, size.height * 0.62),
-          size.height * (0.26 + 0.04 * charge), paint);
+      canvas.drawCircle(
+        Offset(size.width * 0.42, size.height * 0.62),
+        size.height * (0.26 + 0.04 * charge),
+        paint,
+      );
     }
 
     for (var y = 0; y < rows; y++) {
@@ -204,5 +208,7 @@ class _MagePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_MagePainter old) =>
-      old.apparel != apparel || old.orbColor != orbColor || old.charge != charge;
+      old.apparel != apparel ||
+      old.orbColor != orbColor ||
+      old.charge != charge;
 }

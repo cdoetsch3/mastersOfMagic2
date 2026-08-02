@@ -15,56 +15,57 @@ Future<void> showSpellDetail(BuildContext context, Spell spell) {
 }
 
 ({String label, Color color}) _category(Spell spell) => switch (spell.effect) {
-      DamageEffect() ||
-      BarrageEffect() ||
-      OverloadEffect() =>
-        (label: 'damaging', color: AppColors.ember),
-      ShieldEffect() || BarrierEffect() => (label: 'shield', color: AppColors.sky),
-      DischargeEffect() => (label: 'control', color: AppColors.gem),
-      _ => (label: 'aux', color: AppColors.gold),
-    };
+  DamageEffect() ||
+  BarrageEffect() ||
+  OverloadEffect() => (label: 'damaging', color: AppColors.ember),
+  ShieldEffect() || BarrierEffect() => (label: 'shield', color: AppColors.sky),
+  DischargeEffect() => (label: 'control', color: AppColors.gem),
+  _ => (label: 'aux', color: AppColors.gold),
+};
 
 /// The headline figure — kept short so it never crowds the label beside it.
 String _numbers(Spell spell) => switch (spell.effect) {
-      DamageEffect(:final minAmount, :final maxAmount, :final hits) =>
-        hits > 1 ? '$minAmount–$maxAmount ×$hits' : '$minAmount–$maxAmount',
-      BarrageEffect(:final minPerCharge, :final maxPerCharge) =>
-        '$minPerCharge–$maxPerCharge ×X',
-      OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
-        '$minPerCharge–$maxPerCharge',
-      ShieldEffect(:final minStrength, :final maxStrength) =>
-        '$minStrength–$maxStrength',
-      BarrierEffect() => '+1 pt',
-      EmpowerEffect(:final multiplier) => '×$multiplier',
-      // These headline figures are all short labels, so they all capitalise —
-      // mixing 'Haste' with 'pierce' read as a bug.
-      QuickenEffect() => 'Faster',
-      PhaseEffect() => 'Pierce',
-      HasteEffect() => 'Haste',
-      DischargeEffect() => 'All',
-      HallowEffect() => 'Grace',
-    };
+  DamageEffect(:final minAmount, :final maxAmount, :final hits) =>
+    hits > 1 ? '$minAmount–$maxAmount ×$hits' : '$minAmount–$maxAmount',
+  BarrageEffect(:final minPerCharge, :final maxPerCharge) =>
+    '$minPerCharge–$maxPerCharge ×X',
+  OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
+    '$minPerCharge–$maxPerCharge',
+  ShieldEffect(:final minStrength, :final maxStrength) =>
+    '$minStrength–$maxStrength',
+  BarrierEffect() => '+1 pt',
+  EmpowerEffect(:final multiplier) => '×$multiplier',
+  // These headline figures are all short labels, so they all capitalise —
+  // mixing 'Haste' with 'pierce' read as a bug.
+  QuickenEffect() => 'Faster',
+  PhaseEffect() => 'Pierce',
+  HasteEffect() => 'Haste',
+  DischargeEffect() => 'All',
+  HallowEffect() => 'Grace',
+};
 
 /// The qualifier beside the figure — carries the prose, and is free to wrap.
 String _numbersLabel(Spell spell) => switch (spell.effect) {
-      DamageEffect(:final lifesteal) => lifesteal > 0
-          ? 'damage — heals you for ${(lifesteal * 100).round()}% of what '
+  DamageEffect(:final lifesteal) =>
+    lifesteal > 0
+        ? 'damage — heals you for ${(lifesteal * 100).round()}% of what '
               'reaches their health'
-          : 'damage, rolled on cast',
-      BarrageEffect() => 'damage, one hit per charge spent',
-      OverloadEffect() => "damage per point of the enemy's charge",
-      ShieldEffect() => 'shield in your element',
-      BarrierEffect() => 'of Barrier (max 3) — each point blocks one whole hit',
-      EmpowerEffect() => 'damage on your next offensive spell',
-      QuickenEffect() => 'your next offensive spell resolves sooner',
-      PhaseEffect() => 'your next offensive spell ignores shields',
-      HasteEffect() => 'seized — you win same-speed ties',
-      DischargeEffect() => "of the enemy's charge, wiped",
-      HallowEffect() => 'banked — it blocks the next debuff applied to you',
-    };
+        : 'damage, rolled on cast',
+  BarrageEffect() => 'damage, one hit per charge spent',
+  OverloadEffect() => "damage per point of the enemy's charge",
+  ShieldEffect() => 'shield in your element',
+  BarrierEffect() => 'of Barrier (max 3) — each point blocks one whole hit',
+  EmpowerEffect() => 'damage on your next offensive spell',
+  QuickenEffect() => 'your next offensive spell resolves sooner',
+  PhaseEffect() => 'your next offensive spell ignores shields',
+  HasteEffect() => 'seized — you win same-speed ties',
+  DischargeEffect() => "of the enemy's charge, wiped",
+  HallowEffect() => 'banked — it blocks the next debuff applied to you',
+};
 
 List<String> _systemsRules(Spell spell) {
-  final isDamaging = spell.effect is DamageEffect ||
+  final isDamaging =
+      spell.effect is DamageEffect ||
       spell.effect is BarrageEffect ||
       spell.effect is OverloadEffect;
   final isHarmful = isDamaging || spell.effect is DischargeEffect;
@@ -113,8 +114,7 @@ class _SpellDetailDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: const BoxDecoration(
-                border:
-                    Border(bottom: BorderSide(color: AppColors.borderDim)),
+                border: Border(bottom: BorderSide(color: AppColors.borderDim)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,25 +129,34 @@ class _SpellDetailDialog extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(color: AppColors.border),
                         ),
-                        child: Icon(spellIcons[spell.id] ?? Icons.auto_fix_high,
-                            size: 20, color: AppColors.gold),
+                        child: Icon(
+                          spellIcons[spell.id] ?? Icons.auto_fix_high,
+                          size: 20,
+                          color: AppColors.gold,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(spell.name,
-                                style: const TextStyle(
-                                    color: AppColors.text,
-                                    fontSize: 19,
-                                    fontWeight: FontWeight.w700)),
+                            Text(
+                              spell.name,
+                              style: const TextStyle(
+                                color: AppColors.text,
+                                fontSize: 19,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                             if (flavor != null)
-                              Text(flavor,
-                                  style: const TextStyle(
-                                      color: AppColors.textDim,
-                                      fontSize: 12,
-                                      fontStyle: FontStyle.italic)),
+                              Text(
+                                flavor,
+                                style: const TextStyle(
+                                  color: AppColors.textDim,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -158,14 +167,25 @@ class _SpellDetailDialog extends StatelessWidget {
                     spacing: 6,
                     runSpacing: 6,
                     children: [
-                      _chip(spell.xCost ? 'X charge' : '${spell.chargeCost} charge',
-                          leadColor: AppColors.sky),
-                      _chip('priority ${spell.priority} · '
-                          '${priorityLabel(spell.priority)}'),
-                      _chip(cat.label, borderColor: cat.color, textColor: cat.color),
+                      _chip(
+                        spell.xCost ? 'X charge' : '${spell.chargeCost} charge',
+                        leadColor: AppColors.sky,
+                      ),
+                      _chip(
+                        'priority ${spell.priority} · '
+                        '${priorityLabel(spell.priority)}',
+                      ),
+                      _chip(
+                        cat.label,
+                        borderColor: cat.color,
+                        textColor: cat.color,
+                      ),
                       if (spell.grantsHaste && spell.effect is! HasteEffect)
-                        _chip('seizes Haste',
-                            borderColor: AppColors.teal, textColor: AppColors.teal),
+                        _chip(
+                          'seizes Haste',
+                          borderColor: AppColors.teal,
+                          textColor: AppColors.teal,
+                        ),
                     ],
                   ),
                 ],
@@ -181,25 +201,35 @@ class _SpellDetailDialog extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(_numbers(spell),
-                            style: const TextStyle(
-                                color: AppColors.text,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700)),
+                        Text(
+                          _numbers(spell),
+                          style: const TextStyle(
+                            color: AppColors.text,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                         const SizedBox(width: 8),
                         Flexible(
-                          child: Text(_numbersLabel(spell),
-                              style: const TextStyle(
-                                  color: AppColors.textDim, fontSize: 12.5)),
+                          child: Text(
+                            _numbersLabel(spell),
+                            style: const TextStyle(
+                              color: AppColors.textDim,
+                              fontSize: 12.5,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 14),
-                    const Text('HOW THE SYSTEMS TOUCH IT',
-                        style: TextStyle(
-                            color: AppColors.textFaint,
-                            fontSize: 10.5,
-                            letterSpacing: 1)),
+                    const Text(
+                      'HOW THE SYSTEMS TOUCH IT',
+                      style: TextStyle(
+                        color: AppColors.textFaint,
+                        fontSize: 10.5,
+                        letterSpacing: 1,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     for (final rule in _systemsRules(spell)) _bullet(rule),
                   ],
@@ -224,17 +254,26 @@ class _SpellDetailDialog extends StatelessWidget {
             child: Icon(Icons.circle, size: 5, color: AppColors.gold),
           ),
           Expanded(
-            child: Text(text,
-                style: const TextStyle(
-                    color: AppColors.textDim, fontSize: 12.5, height: 1.4)),
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: AppColors.textDim,
+                fontSize: 12.5,
+                height: 1.4,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _chip(String text,
-      {Color? borderColor, Color? textColor, Color? leadColor}) {
+  Widget _chip(
+    String text, {
+    Color? borderColor,
+    Color? textColor,
+    Color? leadColor,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
       decoration: BoxDecoration(
@@ -242,10 +281,13 @@ class _SpellDetailDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: borderColor ?? AppColors.borderDim),
       ),
-      child: Text(text,
-          style: TextStyle(
-              color: textColor ?? leadColor ?? AppColors.textDim,
-              fontSize: 11.5)),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: textColor ?? leadColor ?? AppColors.textDim,
+          fontSize: 11.5,
+        ),
+      ),
     );
   }
 
@@ -263,12 +305,15 @@ class _SpellDetailDialog extends StatelessWidget {
             backgroundColor: AppColors.gold,
             foregroundColor: AppColors.bg,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(999)),
+              borderRadius: BorderRadius.circular(999),
+            ),
             padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 6),
           ),
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Done',
-              style: TextStyle(fontWeight: FontWeight.w600)),
+          child: const Text(
+            'Done',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
         ),
       ),
     );

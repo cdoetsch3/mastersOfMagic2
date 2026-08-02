@@ -28,7 +28,8 @@ class GameplayGuideScreen extends StatelessWidget {
               children: const [
                 _Section(
                   title: 'The turn',
-                  body: 'Both mages lock in a move at the same time, then the '
+                  body:
+                      'Both mages lock in a move at the same time, then the '
                       'round resolves — so every turn is a mind-game. You '
                       'either charge (+1, up to 5) or cast a spell you can '
                       'afford. Casting spends ALL your charge and ends the '
@@ -39,7 +40,8 @@ class GameplayGuideScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 _Section(
                   title: 'Haste breaks ties',
-                  body: 'When both mages act at the same priority, the Haste '
+                  body:
+                      'When both mages act at the same priority, the Haste '
                       'holder resolves first — so a lethal hit can land before '
                       'the reply. Grab Haste with Jolt or Hasty (or ride an '
                       'Aero Tailwind streak).',
@@ -49,7 +51,8 @@ class GameplayGuideScreen extends StatelessWidget {
                 SizedBox(height: 18),
                 _Section(
                   title: 'When a spell does not go off',
-                  body: 'A spell FIZZLES if your charge is pulled below its '
+                  body:
+                      'A spell FIZZLES if your charge is pulled below its '
                       'cost before it resolves (Discharge, or an Electro '
                       'Static Feedback proc) — nothing is cast and you keep '
                       'the charge you have left. A spell MISSES if you are '
@@ -61,7 +64,8 @@ class GameplayGuideScreen extends StatelessWidget {
                 SizedBox(height: 18),
                 _Section(
                   title: 'Elements carry effects',
-                  body: 'Every element has a side-effect that fires as you '
+                  body:
+                      'Every element has a side-effect that fires as you '
                       'cast it — burns, charge theft, blinding, and more. Each '
                       'also beats one element in its tier: you hit that '
                       'shield for DOUBLE, and only HALF into the element that '
@@ -88,15 +92,23 @@ class _Section extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title,
-            style: const TextStyle(
-                color: AppColors.text,
-                fontSize: 16,
-                fontWeight: FontWeight.w700)),
+        Text(
+          title,
+          style: const TextStyle(
+            color: AppColors.text,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const SizedBox(height: 6),
-        Text(body,
-            style: const TextStyle(
-                color: AppColors.textDim, fontSize: 13.5, height: 1.45)),
+        Text(
+          body,
+          style: const TextStyle(
+            color: AppColors.textDim,
+            fontSize: 13.5,
+            height: 1.45,
+          ),
+        ),
       ],
     );
   }
@@ -107,12 +119,42 @@ class _PriorityLadder extends StatelessWidget {
   const _PriorityLadder();
 
   static const _bands = <({int p, String name, String what, Color color})>[
-    (p: 1, name: 'Instant', what: 'the rare instant strikes', color: AppColors.ember),
-    (p: 3, name: 'Shields', what: 'Ward, Aegis, Barrier — up before the hits', color: AppColors.sky),
-    (p: 4, name: 'Channel', what: 'charging resolves here', color: AppColors.textDim),
-    (p: 5, name: 'Quick', what: 'Flick, Jolt — beat regular attacks', color: AppColors.teal),
-    (p: 7, name: 'Aux / control', what: 'Empower, Quicken, Discharge, Overload', color: AppColors.gem),
-    (p: 9, name: 'Regular', what: 'most attacks — Bolt, Blast, Cataclysm', color: AppColors.gold),
+    (
+      p: 1,
+      name: 'Instant',
+      what: 'the rare instant strikes',
+      color: AppColors.ember,
+    ),
+    (
+      p: 3,
+      name: 'Shields',
+      what: 'Ward, Aegis, Barrier — up before the hits',
+      color: AppColors.sky,
+    ),
+    (
+      p: 4,
+      name: 'Channel',
+      what: 'charging resolves here',
+      color: AppColors.textDim,
+    ),
+    (
+      p: 5,
+      name: 'Quick',
+      what: 'Flick, Jolt — beat regular attacks',
+      color: AppColors.teal,
+    ),
+    (
+      p: 7,
+      name: 'Aux / control',
+      what: 'Empower, Quicken, Discharge, Overload',
+      color: AppColors.gem,
+    ),
+    (
+      p: 9,
+      name: 'Regular',
+      what: 'most attacks — Bolt, Blast, Cataclysm',
+      color: AppColors.gold,
+    ),
   ];
 
   @override
@@ -127,16 +169,21 @@ class _PriorityLadder extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('RESOLUTION ORDER',
-              style: TextStyle(
-                  color: AppColors.textFaint,
-                  fontSize: 11,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.w600)),
+          const Text(
+            'RESOLUTION ORDER',
+            style: TextStyle(
+              color: AppColors.textFaint,
+              fontSize: 11,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 2),
-          const Text('Lower priority acts first. This is why a shield goes up '
-              'before the attack it blocks.',
-              style: TextStyle(color: AppColors.textDim, fontSize: 12.5)),
+          const Text(
+            'Lower priority acts first. This is why a shield goes up '
+            'before the attack it blocks.',
+            style: TextStyle(color: AppColors.textDim, fontSize: 12.5),
+          ),
           const SizedBox(height: 12),
           for (final b in _bands) ...[
             _rung(b.p, b.name, b.what, b.color),
@@ -151,15 +198,23 @@ class _PriorityLadder extends StatelessWidget {
             ),
             child: const Row(
               children: [
-                Icon(Icons.local_fire_department,
-                    size: 15, color: AppColors.ember),
+                Icon(
+                  Icons.local_fire_department,
+                  size: 15,
+                  color: AppColors.ember,
+                ),
                 SizedBox(width: 8),
                 Expanded(
-                  child: Text('End of turn: heals land FIRST, then burns tick '
-                      '— so a Photosynthesis heal resolves before an Ignite '
-                      'burn can finish you.',
-                      style: TextStyle(
-                          color: AppColors.textDim, fontSize: 12, height: 1.35)),
+                  child: Text(
+                    'End of turn: heals land FIRST, then burns tick '
+                    '— so a Photosynthesis heal resolves before an Ignite '
+                    'burn can finish you.',
+                    style: TextStyle(
+                      color: AppColors.textDim,
+                      fontSize: 12,
+                      height: 1.35,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -181,23 +236,35 @@ class _PriorityLadder extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(color: color, width: 1.4),
           ),
-          child: Text('$priority',
-              style: TextStyle(
-                  color: color, fontSize: 13, fontWeight: FontWeight.w700)),
+          child: Text(
+            '$priority',
+            style: TextStyle(
+              color: color,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name,
-                  style: const TextStyle(
-                      color: AppColors.text,
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600)),
-              Text(what,
-                  style: const TextStyle(
-                      color: AppColors.textFaint, fontSize: 11.5)),
+              Text(
+                name,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                what,
+                style: const TextStyle(
+                  color: AppColors.textFaint,
+                  fontSize: 11.5,
+                ),
+              ),
             ],
           ),
         ),
@@ -227,37 +294,48 @@ class _PhaseStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget phase(String name, String detail, Color color) => Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.panel,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderDim),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppColors.panel,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.borderDim),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              name,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name,
-                    style: TextStyle(
-                        color: color,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700)),
-                const SizedBox(height: 4),
-                Text(detail,
-                    style: const TextStyle(
-                        color: AppColors.textDim, fontSize: 11, height: 1.35)),
-              ],
+            const SizedBox(height: 4),
+            Text(
+              detail,
+              style: const TextStyle(
+                color: AppColors.textDim,
+                fontSize: 11,
+                height: 1.35,
+              ),
             ),
-          ),
-        );
+          ],
+        ),
+      ),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('A turn in three beats',
-            style: TextStyle(
-                color: AppColors.text,
-                fontSize: 16,
-                fontWeight: FontWeight.w700)),
+        const Text(
+          'A turn in three beats',
+          style: TextStyle(
+            color: AppColors.text,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const SizedBox(height: 8),
         // IntrinsicHeight bounds the cross axis: a bare `stretch` Row inside
         // the scrolling list would demand infinite height.
@@ -288,11 +366,14 @@ class _StatusList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Every status',
-            style: TextStyle(
-                color: AppColors.text,
-                fontSize: 16,
-                fontWeight: FontWeight.w700)),
+        const Text(
+          'Every status',
+          style: TextStyle(
+            color: AppColors.text,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const SizedBox(height: 4),
         const Text(
           'Conditions you carry show as pips beside your health. Moments are '
@@ -306,12 +387,15 @@ class _StatusList extends StatelessWidget {
         ]) ...[
           Padding(
             padding: const EdgeInsets.only(top: 6, bottom: 6),
-            child: Text(group.$1.toUpperCase(),
-                style: const TextStyle(
-                    color: AppColors.textFaint,
-                    fontSize: 11,
-                    letterSpacing: 1.1,
-                    fontWeight: FontWeight.w600)),
+            child: Text(
+              group.$1.toUpperCase(),
+              style: const TextStyle(
+                color: AppColors.textFaint,
+                fontSize: 11,
+                letterSpacing: 1.1,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           for (final info in group.$2) _StatusRow(info),
         ],
@@ -346,31 +430,44 @@ class _StatusRow extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(info.name,
-                    style: TextStyle(
-                        color: color,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700)),
+                child: Text(
+                  info.name,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
               Text(
                 info.element == null
                     ? kindLabel
                     : '${info.element!.style.label} · $kindLabel',
                 style: const TextStyle(
-                    color: AppColors.textFaint, fontSize: 11),
+                  color: AppColors.textFaint,
+                  fontSize: 11,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 3),
-          Text(info.description,
-              style: const TextStyle(
-                  color: AppColors.textDim, fontSize: 12.5, height: 1.35)),
+          Text(
+            info.description,
+            style: const TextStyle(
+              color: AppColors.textDim,
+              fontSize: 12.5,
+              height: 1.35,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text('How: ${info.trigger}',
-              style: const TextStyle(
-                  color: AppColors.textFaint,
-                  fontSize: 11.5,
-                  fontStyle: FontStyle.italic)),
+          Text(
+            'How: ${info.trigger}',
+            style: const TextStyle(
+              color: AppColors.textFaint,
+              fontSize: 11.5,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
         ],
       ),
     );

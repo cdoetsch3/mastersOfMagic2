@@ -1,5 +1,8 @@
 import 'package:mom_engine/mom_engine.dart';
 
+import 'items/inventory.dart';
+import 'items/item_instance.dart';
+
 import 'loadout.dart';
 import 'progression.dart';
 import 'active_trip.dart';
@@ -158,9 +161,25 @@ class PlayerProfile {
   List<LoadoutPreset> presets;
   int activePresetIndex;
 
-  /// Inventory is intentionally empty in Phase 1 (Phase 2: items + crafting).
-  /// Shaped as id -> quantity so it maps cleanly to a Firestore map.
-  Map<String, int> inventory;
+  /// What this character is carrying. ⭐ **One item per slot** — twenty Oak
+  /// Logs fill it (ITEMS §10.3a).
+  Backpack backpack;
+
+  /// What can be reached during a duel. Loaded from [backpack].
+  Belt belt;
+
+  /// Storerooms, keyed by **town id** (ITEMS §10.3c).
+  ///
+  /// ⚠️ **One per city, never a shared pool.** What you leave in Aldermere is
+  /// in Aldermere; moving it means carrying it there yourself.
+  Map<String, Storeroom> storerooms;
+
+  /// Every non-fungible item this character owns, by instance id.
+  ///
+  /// ⭐ **One pool; containers hold ids.** A staff moved from the backpack to a
+  /// Storeroom must be the *same* staff, so the instance cannot live inside
+  /// whichever container currently names it.
+  Map<String, ItemInstance> itemInstances;
 
   int duelsWon;
   int duelsLost;
@@ -183,14 +202,20 @@ class PlayerProfile {
     Map<String, int>? zoneClears,
     List<LoadoutPreset>? presets,
     this.activePresetIndex = 0,
-    Map<String, int>? inventory,
+    Backpack? backpack,
+    Belt? belt,
+    Map<String, Storeroom>? storerooms,
+    Map<String, ItemInstance>? itemInstances,
     this.duelsWon = 0,
     this.duelsLost = 0,
   }) : locationId = locationId ?? World.startLocationId,
        discoveredLocationIds = discoveredLocationIds ?? {World.startLocationId},
        zoneClears = zoneClears ?? {},
        presets = presets ?? [LoadoutPreset.starter('Loadout I')],
-       inventory = inventory ?? {};
+       backpack = backpack ?? Backpack.empty(),
+       belt = belt ?? const Belt(),
+       storerooms = storerooms ?? {},
+       itemInstances = itemInstances ?? {};
 
   factory PlayerProfile.newPlayer({String name = 'Apprentice'}) =>
       PlayerProfile(name: name);
@@ -243,10 +268,18 @@ class PlayerProfile {
     'zoneClears': zoneClears,
     'presets': presets.map((p) => p.toJson()).toList(),
     'activePresetIndex': activePresetIndex,
-    'inventory': inventory,
+    'backpack': backpack.toJson(),
+    'belt': belt.toJson(),
+    'storerooms': {
+      for (final e in storerooms.entries)
+        if (!e.value.isEmpty) e.key: e.value.toJson(),
+    },
+    'itemInstances': {
+      for (final e in itemInstances.entries) e.key: e.value.toJson(),
+    },
     'duelsWon': duelsWon,
     'duelsLost': duelsLost,
-    'schemaVersion': 1,
+    'schemaVersion': 2,
   };
 
   factory PlayerProfile.fromJson(Map<String, dynamic> json) {
@@ -278,9 +311,22 @@ class PlayerProfile {
           {},
       presets: presets,
       activePresetIndex: (json['activePresetIndex'] as num?)?.toInt() ?? 0,
-      inventory:
-          (json['inventory'] as Map?)?.map(
-            (k, v) => MapEntry(k as String, (v as num).toInt()),
+      backpack: Backpack.fromJson(json['backpack'] as List?),
+      belt: Belt.fromJson(json['belt'] as List?),
+      storerooms:
+          (json['storerooms'] as Map?)?.map(
+            (k, v) => MapEntry(
+              k as String,
+              Storeroom.fromJson(v as Map<String, dynamic>?),
+            ),
+          ) ??
+          {},
+      itemInstances:
+          (json['itemInstances'] as Map?)?.map(
+            (k, v) => MapEntry(
+              k as String,
+              ItemInstance.fromJson(v as Map<String, dynamic>),
+            ),
           ) ??
           {},
       duelsWon: (json['duelsWon'] as num?)?.toInt() ?? 0,

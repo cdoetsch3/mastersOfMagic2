@@ -19,8 +19,9 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  late final TextEditingController _email =
-      TextEditingController(text: widget.initialEmail);
+  late final TextEditingController _email = TextEditingController(
+    text: widget.initialEmail,
+  );
   bool _busy = false;
   bool _sent = false;
   String? _error;
@@ -78,83 +79,94 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _form(AuthService? auth) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Enter the email on your account and we will send you a link to '
-            'set a new password.',
-            style: TextStyle(color: AppColors.textDim, fontSize: 13.5),
-          ),
-          const SizedBox(height: 16),
-          AuthTextField(
-            controller: _email,
-            label: 'Email',
-            icon: Icons.mail_outline,
-            keyboard: TextInputType.emailAddress,
-            onSubmitted: _busy ? null : (_) => _send(auth),
-          ),
-          if (_error != null) ...[
-            const SizedBox(height: 4),
-            Text(_error!,
-                style: const TextStyle(color: AppColors.ember, fontSize: 13)),
-          ],
-          const SizedBox(height: 12),
-          FilledButton(
-            onPressed: _busy ? null : () => _send(auth),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.gold,
-              foregroundColor: AppColors.bg,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-            child: _busy
-                ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: AppColors.bg))
-                : const Text('Send reset link',
-                    style:
-                        TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-          ),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      const Text(
+        'Enter the email on your account and we will send you a link to '
+        'set a new password.',
+        style: TextStyle(color: AppColors.textDim, fontSize: 13.5),
+      ),
+      const SizedBox(height: 16),
+      AuthTextField(
+        controller: _email,
+        label: 'Email',
+        icon: Icons.mail_outline,
+        keyboard: TextInputType.emailAddress,
+        onSubmitted: _busy ? null : (_) => _send(auth),
+      ),
+      if (_error != null) ...[
+        const SizedBox(height: 4),
+        Text(
+          _error!,
+          style: const TextStyle(color: AppColors.ember, fontSize: 13),
+        ),
+      ],
+      const SizedBox(height: 12),
+      FilledButton(
+        onPressed: _busy ? null : () => _send(auth),
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.gold,
+          foregroundColor: AppColors.bg,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+        child: _busy
+            ? const SizedBox(
+                height: 18,
+                width: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.bg,
+                ),
+              )
+            : const Text(
+                'Send reset link',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              ),
+      ),
+    ],
+  );
 
   Widget _confirmation() => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Icon(Icons.mark_email_read, color: AppColors.green, size: 44),
-          const SizedBox(height: 12),
-          const Text('Check your email',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: AppColors.text,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Text(
-            'If an account exists for ${_email.text.trim()}, a reset link is on '
-            'its way. It expires in an hour — check your spam folder if you do '
-            'not see it.',
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textDim, fontSize: 13.5),
-          ),
-          const SizedBox(height: 20),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.gold,
-              foregroundColor: AppColors.bg,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-            child: const Text('Back to sign in',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-          ),
-          TextButton(
-            onPressed: () => setState(() => _sent = false),
-            child: const Text('Use a different email'),
-          ),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      const Icon(Icons.mark_email_read, color: AppColors.green, size: 44),
+      const SizedBox(height: 12),
+      const Text(
+        'Check your email',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: AppColors.text,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        'If an account exists for ${_email.text.trim()}, a reset link is on '
+        'its way. It expires in an hour — check your spam folder if you do '
+        'not see it.',
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: AppColors.textDim, fontSize: 13.5),
+      ),
+      const SizedBox(height: 20),
+      FilledButton(
+        onPressed: () => Navigator.of(context).pop(),
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.gold,
+          foregroundColor: AppColors.bg,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+        child: const Text(
+          'Back to sign in',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+        ),
+      ),
+      TextButton(
+        onPressed: () => setState(() => _sent = false),
+        child: const Text('Use a different email'),
+      ),
+    ],
+  );
 }
 
 /// Changes the password of the signed-in account.
@@ -210,16 +222,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       _error = null;
     });
     final error = await auth.changePassword(
-        currentPassword: _current.text, newPassword: _next.text);
+      currentPassword: _current.text,
+      newPassword: _next.text,
+    );
     if (!mounted) return;
     setState(() {
       _busy = false;
       _error = error;
     });
     if (error == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Password changed.')));
       Navigator.of(context).pop();
     }
   }
@@ -245,7 +259,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   Text(
                     'Signed in as ${auth?.email ?? ''}.',
                     style: const TextStyle(
-                        color: AppColors.textDim, fontSize: 13.5),
+                      color: AppColors.textDim,
+                      fontSize: 13.5,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   AuthTextField(
@@ -269,9 +285,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ),
                   if (_error != null) ...[
                     const SizedBox(height: 4),
-                    Text(_error!,
-                        style: const TextStyle(
-                            color: AppColors.ember, fontSize: 13)),
+                    Text(
+                      _error!,
+                      style: const TextStyle(
+                        color: AppColors.ember,
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
                   const SizedBox(height: 12),
                   FilledButton(
@@ -286,10 +306,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             height: 18,
                             width: 18,
                             child: CircularProgressIndicator(
-                                strokeWidth: 2, color: AppColors.bg))
-                        : const Text('Change password',
+                              strokeWidth: 2,
+                              color: AppColors.bg,
+                            ),
+                          )
+                        : const Text(
+                            'Change password',
                             style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600)),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 ],
               ),

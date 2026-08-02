@@ -53,12 +53,20 @@ class HomeTab extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('You are at ${p.location.name}',
-                              style: const TextStyle(
-                                  color: AppColors.text, fontSize: 14)),
-                          const Text('Open the map to travel or adventure',
-                              style: TextStyle(
-                                  color: AppColors.textDim, fontSize: 12)),
+                          Text(
+                            'You are at ${p.location.name}',
+                            style: const TextStyle(
+                              color: AppColors.text,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const Text(
+                            'Open the map to travel or adventure',
+                            style: TextStyle(
+                              color: AppColors.textDim,
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -77,12 +85,20 @@ class HomeTab extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Active loadout: ${p.activePreset.name}',
-                              style: const TextStyle(
-                                  color: AppColors.text, fontSize: 14)),
-                          const Text('Manage spells and presets',
-                              style: TextStyle(
-                                  color: AppColors.textDim, fontSize: 12)),
+                          Text(
+                            'Active loadout: ${p.activePreset.name}',
+                            style: const TextStyle(
+                              color: AppColors.text,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const Text(
+                            'Manage spells and presets',
+                            style: TextStyle(
+                              color: AppColors.textDim,
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -117,15 +133,19 @@ class _XpCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text('Level ${p.level}',
-                  style: const TextStyle(
-                      color: AppColors.text,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600)),
+              Text(
+                'Level ${p.level}',
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const Spacer(),
-              Text('${p.xpIntoLevel} / ${p.xpForThisLevel} XP',
-                  style: const TextStyle(
-                      color: AppColors.textDim, fontSize: 12)),
+              Text(
+                '${p.xpIntoLevel} / ${p.xpForThisLevel} XP',
+                style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -142,8 +162,10 @@ class _XpCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text('${p.duelsWon}W · ${p.duelsLost}L',
-              style: const TextStyle(color: AppColors.textFaint, fontSize: 11)),
+          Text(
+            '${p.duelsWon}W · ${p.duelsLost}L',
+            style: const TextStyle(color: AppColors.textFaint, fontSize: 11),
+          ),
         ],
       ),
     );
@@ -160,12 +182,15 @@ class _FindDuelButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.ember,
           foregroundColor: AppColors.bg,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
         icon: const WizardHatIcon(size: 22, color: AppColors.bg),
-        label: const Text('Find a duel',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        label: const Text(
+          'Find a duel',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
         onPressed: () => _startPvpDuel(context),
       ),
     );
@@ -209,17 +234,24 @@ class _QuestCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        color: AppColors.text, fontSize: 14)),
-                Text(subtitle,
-                    style: const TextStyle(
-                        color: AppColors.textDim, fontSize: 12)),
+                Text(
+                  title,
+                  style: const TextStyle(color: AppColors.text, fontSize: 14),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: AppColors.textDim,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
-          Text(progress,
-              style: const TextStyle(color: AppColors.textFaint, fontSize: 12)),
+          Text(
+            progress,
+            style: const TextStyle(color: AppColors.textFaint, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -235,7 +267,8 @@ Future<int?> showPresetPicker(BuildContext context) {
     context: context,
     backgroundColor: AppColors.panel,
     shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+    ),
     builder: (context) => SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -243,11 +276,14 @@ Future<int?> showPresetPicker(BuildContext context) {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Choose your loadout',
-                style: TextStyle(
-                    color: AppColors.text,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600)),
+            const Text(
+              'Choose your loadout',
+              style: TextStyle(
+                color: AppColors.text,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 12),
             for (var i = 0; i < p.presets.length; i++)
               Padding(
@@ -259,28 +295,39 @@ Future<int?> showPresetPicker(BuildContext context) {
                       : AppColors.border,
                   child: Row(
                     children: [
-                      const Icon(Icons.menu_book,
-                          color: AppColors.sky, size: 20),
+                      const Icon(
+                        Icons.menu_book,
+                        color: AppColors.sky,
+                        size: 20,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(p.presets[i].name,
-                                style: const TextStyle(
-                                    color: AppColors.text, fontSize: 14)),
                             Text(
-                                '${p.presets[i].elementIds.length} elements · '
-                                '${p.presets[i].spellIds.length} spells',
-                                style: const TextStyle(
-                                    color: AppColors.textDim, fontSize: 12)),
+                              p.presets[i].name,
+                              style: const TextStyle(
+                                color: AppColors.text,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              '${p.presets[i].elementIds.length} elements · '
+                              '${p.presets[i].spellIds.length} spells',
+                              style: const TextStyle(
+                                color: AppColors.textDim,
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                       if (i == p.activePresetIndex)
-                        const Text('active',
-                            style: TextStyle(
-                                color: AppColors.gold, fontSize: 11)),
+                        const Text(
+                          'active',
+                          style: TextStyle(color: AppColors.gold, fontSize: 11),
+                        ),
                     ],
                   ),
                 ),

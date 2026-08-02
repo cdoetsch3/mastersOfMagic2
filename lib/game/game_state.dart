@@ -1,10 +1,19 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
+import 'package:mom_engine/mom_engine.dart';
 
 import 'active_trip.dart';
+import 'adventure.dart';
+import 'enemies/bestiary.dart';
+import 'enemies/loot.dart';
+import 'items/inventory.dart';
+import 'items/item_instance.dart';
 import 'player_profile.dart';
 import 'profile_storage.dart';
 import 'progression.dart';
 import 'travel.dart';
+import 'world.dart';
 
 /// Owns the [PlayerProfile] and mediates every change to it, persisting after
 /// each mutation. Screens read state and call intent methods; they never
@@ -229,6 +238,124 @@ class GameState extends ChangeNotifier {
       pendingLevelUp = after;
       notifyListeners();
     }
+  }
+
+  // ---- Adventures -------------------------------------------------------
+
+  /// The run in progress, if any. ⚠️ Deliberately **not persisted** — a run is
+  /// a single sitting, and resuming one across a reload would let a player
+  /// dodge a losing fight by force-quitting.
+  AdventureRun? run;
+
+  /// Starts a run at [zone].
+  AdventureRun beginAdventure(GameLocation zone, {Random? rng}) {
+    final started = AdventureRun.roll(
+      zone: zone,
+      roster: Bestiary.forZone(zone.id),
+      playerHp: MageState.scaledMaxHp(profile.level),
+      rng: rng ?? Random(),
+    );
+    run = started;
+    notifyListeners();
+    return started;
+  }
+
+  /// Records a won encounter, rolling its drops into the run's pending loot.
+  Future<void> winEncounter({required int remainingHp, Random? rng}) async {
+    final r = run;
+    if (r == null || r.isOver) return;
+    final enemy = r.current!;
+    final loot = rollDrops(enemy.def.drops, rng ?? Random());
+    final wasBoss = r.atBoss;
+    r.recordVictory(
+      loot: loot.slots,
+      instances: loot.instances,
+      remainingHp: remainingHp,
+    );
+    await recordDuelResult(
+      won: true,
+      opponentLevel: enemy.level,
+      bossDefeated: wasBoss,
+      locationId: r.zoneId,
+    );
+    if (r.lootIsBanked) await _bankRunLoot();
+    notifyListeners();
+  }
+
+  /// Records a lost encounter. ⚠️ The run's loot is gone.
+  Future<void> loseEncounter({Random? rng}) async {
+    final r = run;
+    if (r == null || r.isOver) return;
+    final enemy = r.current!;
+    r.recordDefeat();
+    await recordDuelResult(won: false, opponentLevel: enemy.level);
+    notifyListeners();
+  }
+
+  /// Walks out with what has been earned so far.
+  Future<void> leaveAdventure() async {
+    final r = run;
+    if (r == null || r.isOver) return;
+    r.returnToTown();
+    await _bankRunLoot();
+    notifyListeners();
+  }
+
+  /// Moves a finished run's loot into the backpack.
+  ///
+  /// ⚠️ **Overflow is not discarded** — anything that does not fit stays
+  /// reported so the UI can tell the player, rather than vanishing.
+  Future<List<InventorySlot>> _bankRunLoot() async {
+    final r = run;
+    if (r == null || !r.lootIsBanked) return const [];
+    var overflow = <InventorySlot>[];
+    await _mutate(() {
+      final result = profile.backpack.withAll(r.pendingLoot);
+      profile.backpack = result.pack;
+      overflow = result.overflow;
+      // Only keep instances for loot that actually landed.
+      final kept = {
+        for (final s in result.pack.contents)
+          if (s.instanceId != null) s.instanceId!,
+      };
+      r.pendingInstances.forEach((id, inst) {
+        if (kept.contains(id)) profile.itemInstances[id] = inst;
+      });
+    });
+    r.pendingLoot.clear();
+    r.pendingInstances.clear();
+    return overflow;
+  }
+
+  // ---- Storeroom --------------------------------------------------------
+
+  /// Puts the backpack slot at [index] into [townId]'s Storeroom.
+  ///
+  /// ⚠️ **Per city** (ITEMS §10.3c) — this never touches another town's.
+  Future<void> deposit(String townId, int index) => _mutate(() {
+    final slot = profile.backpack.slots[index];
+    if (slot == null) return;
+    final room = profile.storerooms[townId] ?? const Storeroom();
+    profile.storerooms[townId] = room.withDeposited(slot);
+    profile.backpack = profile.backpack.withRemovedAt(index);
+  });
+
+  /// Takes [want] out of [townId]'s Storeroom, if the backpack has room.
+  Future<bool> withdraw(String townId, InventorySlot want) async {
+    if (profile.backpack.isFull) return false;
+    var ok = false;
+    await _mutate(() {
+      final room = profile.storerooms[townId];
+      if (room == null) return;
+      final result = room.withWithdrawn(want);
+      if (result.taken == null) return;
+      final pack = profile.backpack.withAdded(result.taken!);
+      if (pack == null) return;
+      profile.storerooms[townId] = result.room;
+      profile.backpack = pack;
+      ok = true;
+    });
+    return ok;
   }
 
   void acknowledgeLevelUp() {

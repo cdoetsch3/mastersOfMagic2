@@ -29,8 +29,10 @@ class FirestoreRest {
 
   /// Reads a document. Returns its decoded fields, or null if missing.
   static Future<Map<String, dynamic>?> get(String path) async {
-    final res =
-        await http.get(Uri.parse('$_base/$path'), headers: await _headers());
+    final res = await http.get(
+      Uri.parse('$_base/$path'),
+      headers: await _headers(),
+    );
     if (res.statusCode == 404) return null;
     if (res.statusCode != 200) {
       throw FirestoreRestException(res.statusCode, res.body);
@@ -41,8 +43,11 @@ class FirestoreRest {
 
   /// Writes (merges) [data] into a document, creating it if needed. When
   /// [updateOnly] is given, only those field paths are touched.
-  static Future<void> set(String path, Map<String, dynamic> data,
-      {List<String>? updateOnly}) async {
+  static Future<void> set(
+    String path,
+    Map<String, dynamic> data, {
+    List<String>? updateOnly,
+  }) async {
     final mask = (updateOnly ?? data.keys.toList())
         .map((f) => 'updateMask.fieldPaths=${Uri.encodeQueryComponent(f)}')
         .join('&');
@@ -59,10 +64,14 @@ class FirestoreRest {
   /// Creates a document only if it does not already exist. Returns false if it
   /// already existed (precondition failed).
   static Future<bool> createIfAbsent(
-      String collection, String docId, Map<String, dynamic> data) async {
+    String collection,
+    String docId,
+    Map<String, dynamic> data,
+  ) async {
     final res = await http.post(
       Uri.parse(
-          '$_base/$collection?documentId=$docId&currentDocument.exists=false'),
+        '$_base/$collection?documentId=$docId&currentDocument.exists=false',
+      ),
       headers: await _headers(),
       body: jsonEncode({'fields': encodeFields(data)}),
     );
@@ -85,15 +94,15 @@ class FirestoreRest {
   }) async {
     final structured = <String, dynamic>{
       'from': [
-        {'collectionId': collection}
+        {'collectionId': collection},
       ],
       'limit': limit,
       if (orderBy != null)
         'orderBy': [
           {
             'field': {'fieldPath': orderBy},
-            'direction': 'ASCENDING'
-          }
+            'direction': 'ASCENDING',
+          },
         ],
       if (equals != null)
         'where': {
@@ -101,7 +110,7 @@ class FirestoreRest {
             'field': {'fieldPath': equals.field},
             'op': 'EQUAL',
             'value': encodeValue(equals.value),
-          }
+          },
         },
     };
     final res = await http.post(
@@ -139,14 +148,14 @@ class FirestoreRest {
     if (value is String) return {'stringValue': value};
     if (value is List) {
       return {
-        'arrayValue': {'values': value.map(encodeValue).toList()}
+        'arrayValue': {'values': value.map(encodeValue).toList()},
       };
     }
     if (value is Map) {
       return {
         'mapValue': {
-          'fields': value.map((k, v) => MapEntry('$k', encodeValue(v)))
-        }
+          'fields': value.map((k, v) => MapEntry('$k', encodeValue(v))),
+        },
       };
     }
     return {'stringValue': '$value'};
@@ -167,13 +176,15 @@ class FirestoreRest {
     if (value.containsKey('stringValue')) return value['stringValue'];
     if (value.containsKey('timestampValue')) return value['timestampValue'];
     if (value.containsKey('arrayValue')) {
-      final vals = (value['arrayValue'] as Map<String, dynamic>)['values']
+      final vals =
+          (value['arrayValue'] as Map<String, dynamic>)['values']
               as List<dynamic>? ??
           [];
       return vals.map((v) => decodeValue(v as Map<String, dynamic>)).toList();
     }
     if (value.containsKey('mapValue')) {
-      final f = (value['mapValue'] as Map<String, dynamic>)['fields']
+      final f =
+          (value['mapValue'] as Map<String, dynamic>)['fields']
               as Map<String, dynamic>? ??
           {};
       return decodeFields(f);

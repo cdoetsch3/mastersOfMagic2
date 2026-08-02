@@ -11,6 +11,12 @@ import 'package:masters_of_magic_2/game/opponent_driver.dart';
 /// exposes the surrender callback, and can hold an exchange in flight.
 class FakeRemoteDriver implements OpponentDriver {
   @override
+  double get opponentHpScale => 1.0;
+
+  @override
+  double get opponentPowerScale => 1.0;
+
+  @override
   int get opponentLevel => 1;
 
   bool surrenderReported = false;

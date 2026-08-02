@@ -1195,6 +1195,13 @@ that name would be genuinely confusing in the log and the tutorial. Same for
 it would look at home in a bestiary entry written by a nervous field
 naturalist, it is right.
 
+⚠️ **This is a REVIEW rule, not an automated one — deliberately.** A blocklist
+was tried and dropped (2026-08-02): it only ever catches the handful of words
+someone thought to type, while giving false confidence about everything else.
+✅ **What IS enforced in tests** is the narrower correctness rule below — no
+move may be named `Charge`, `Cast`, `Focus`, or after an element, because those
+are ambiguous in the battle log rather than merely derivative.
+
 ✅ **Calibrate the strictness by WHERE in the game it appears.** Some overlap is
 inevitable and fine — there are only so many things a dragon can do.
 

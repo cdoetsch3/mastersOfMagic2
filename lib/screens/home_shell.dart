@@ -131,8 +131,7 @@ class _BottomBar extends StatelessWidget {
           for (var i = 0; i < _tabs.length; i++)
             Expanded(
               child: i == _centerIndex
-                  ? _CenterButton(
-                      active: index == i, onTap: () => onSelect(i))
+                  ? _CenterButton(active: index == i, onTap: () => onSelect(i))
                   : _BarTab(
                       def: _tabs[i],
                       active: index == i,
@@ -149,8 +148,7 @@ class _BarTab extends StatelessWidget {
   final _TabDef def;
   final bool active;
   final VoidCallback onTap;
-  const _BarTab(
-      {required this.def, required this.active, required this.onTap});
+  const _BarTab({required this.def, required this.active, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -200,10 +198,13 @@ class _CenterButton extends StatelessWidget {
           ),
           Transform.translate(
             offset: const Offset(0, -14),
-            child: Text('Home',
-                style: TextStyle(
-                    color: active ? AppColors.gold : AppColors.textDim,
-                    fontSize: 11)),
+            child: Text(
+              'Home',
+              style: TextStyle(
+                color: active ? AppColors.gold : AppColors.textDim,
+                fontSize: 11,
+              ),
+            ),
           ),
         ],
       ),
@@ -248,8 +249,11 @@ class _RailTab extends StatelessWidget {
   final _TabDef def;
   final bool active;
   final VoidCallback onTap;
-  const _RailTab(
-      {required this.def, required this.active, required this.onTap});
+  const _RailTab({
+    required this.def,
+    required this.active,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -296,10 +300,13 @@ class _RailCenter extends StatelessWidget {
             child: const WizardHatIcon(size: 24, color: AppColors.bg),
           ),
           const SizedBox(height: 2),
-          Text('Home',
-              style: TextStyle(
-                  color: active ? AppColors.gold : AppColors.textDim,
-                  fontSize: 9.5)),
+          Text(
+            'Home',
+            style: TextStyle(
+              color: active ? AppColors.gold : AppColors.textDim,
+              fontSize: 9.5,
+            ),
+          ),
         ],
       ),
     );
@@ -323,22 +330,30 @@ class PlayerHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        color: AppColors.text,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600)),
-                Text('${p.name}  ·  Level ${p.level}',
-                    style: const TextStyle(
-                        color: AppColors.textDim, fontSize: 12)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '${p.name}  ·  Level ${p.level}',
+                  style: const TextStyle(
+                    color: AppColors.textDim,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
           _Currency(leading: const CoinIcon(size: 15), value: p.gold),
           const SizedBox(width: 8),
           _Currency(
-              leading: const Icon(Icons.diamond, size: 14, color: AppColors.gem),
-              value: p.resonancePrisms),
+            leading: const Icon(Icons.diamond, size: 14, color: AppColors.gem),
+            value: p.resonancePrisms,
+          ),
         ],
       ),
     );
@@ -364,11 +379,14 @@ class _Currency extends StatelessWidget {
         children: [
           leading,
           const SizedBox(width: 5),
-          Text('$value',
-              style: const TextStyle(
-                  color: AppColors.text,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600)),
+          Text(
+            '$value',
+            style: const TextStyle(
+              color: AppColors.text,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );

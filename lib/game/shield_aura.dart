@@ -70,7 +70,9 @@ class ShieldAuraPainter extends CustomPainter {
     var rx = spriteHeight * 0.49;
     var ry = spriteHeight * 0.56;
 
-    final rings = shieldColor == null ? const <int>[] : shieldRings(shieldRemaining);
+    final rings = shieldColor == null
+        ? const <int>[]
+        : shieldRings(shieldRemaining);
     for (var i = 0; i < rings.length; i++) {
       final stroke = rings[i] * shieldPxPerPoint * scale;
 
@@ -116,8 +118,14 @@ class ShieldAuraPainter extends CustomPainter {
 
   /// A thin white ring with beads set on it — chosen over dashes or hatching
   /// because a bead stays legible when the aura shrinks, where a gap does not.
-  void _beadedRing(Canvas canvas, Offset c, double rx, double ry,
-      double opacity, double scale) {
+  void _beadedRing(
+    Canvas canvas,
+    Offset c,
+    double rx,
+    double ry,
+    double opacity,
+    double scale,
+  ) {
     canvas.drawOval(
       Rect.fromCenter(center: c, width: rx * 2, height: ry * 2),
       Paint()

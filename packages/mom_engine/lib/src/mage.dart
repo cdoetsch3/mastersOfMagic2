@@ -139,6 +139,21 @@ class MageState {
   /// balance figure in the design docs was measured at.
   final int level;
 
+  /// An extra multiplier on **outgoing damage only**, on top of [levelScale].
+  ///
+  /// ⭐ **This is where an enemy archetype's `damageScale` lands** (ENEMIES
+  /// §2.1). A player is always 1.0; a Glasswing is 1.70 and a Sentinel 0.70,
+  /// which is what makes two enemies of the same level feel different rather
+  /// than merely have different health.
+  ///
+  /// ⚠️ **Deliberately NOT applied to shields.** A Sentinel is 0.70 damage
+  /// *and* a wall — scaling its shields down too would erase the archetype it
+  /// exists to be. Damage and defence are separate dials on purpose.
+  ///
+  /// ⚠️ Lockstep: both clients derive this from the same `EnemyDef`, so it
+  /// must never be rolled or read from anywhere but the shared definition.
+  double powerScale = 1.0;
+
   /// Multiplier on max health and outgoing damage, from [level].
   ///
   /// ⭐ **Geometric, not linear** (ruling, 2026-07-28). At 4%/level compounding

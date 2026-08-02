@@ -29,7 +29,9 @@ class Matchmaking {
   static const String _alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
   static String _newCode([int length = 6]) => List.generate(
-      length, (_) => _alphabet[_random.nextInt(_alphabet.length)]).join();
+    length,
+    (_) => _alphabet[_random.nextInt(_alphabet.length)],
+  ).join();
 
   static int _newSeed() => _random.nextInt(0x40000000);
 
@@ -69,22 +71,27 @@ class Matchmaking {
   }) async {
     try {
       // 1. Claim someone already waiting (oldest first).
-      final waiting =
-          await FirestoreRest.query(_queue, orderBy: 'createdAt', limit: 5);
+      final waiting = await FirestoreRest.query(
+        _queue,
+        orderBy: 'createdAt',
+        limit: 5,
+      );
       for (final ticket in waiting) {
         if (ticket.id == uid) continue;
         if (ticket.data['claimedBy'] != null) continue;
-        final ok = await FirestoreRest.set(
-          '$_queue/${ticket.id}',
-          {'claimedBy': uid, 'claimedByName': name},
-        ).then((_) => true).catchError((_) => false);
+        final ok = await FirestoreRest.set('$_queue/${ticket.id}', {
+          'claimedBy': uid,
+          'claimedByName': name,
+        }).then((_) => true).catchError((_) => false);
         if (ok) {
-          return MatchResult.human(RemoteDuelDriver(
-            roomId: ticket.data['roomId'] as String,
-            isHost: false,
-            masterSeed: (ticket.data['masterSeed'] as num).toInt(),
-            opponentName: ticket.data['name'] as String? ?? 'Rival mage',
-          ));
+          return MatchResult.human(
+            RemoteDuelDriver(
+              roomId: ticket.data['roomId'] as String,
+              isHost: false,
+              masterSeed: (ticket.data['masterSeed'] as num).toInt(),
+              opponentName: ticket.data['name'] as String? ?? 'Rival mage',
+            ),
+          );
         }
       }
 
@@ -99,17 +106,15 @@ class Matchmaking {
         'masterSeed': seed,
         'createdAt': _now(),
       });
-      final claimer = await _poll<({String uid, String name})>(
-        '$_queue/$uid',
-        (d) {
-          final by = d?['claimedBy'];
-          if (by is String) {
-            return (uid: by, name: d?['claimedByName'] as String? ?? 'Rival');
-          }
-          return null;
-        },
-        timeout: patience,
-      );
+      final claimer = await _poll<({String uid, String name})>('$_queue/$uid', (
+        d,
+      ) {
+        final by = d?['claimedBy'];
+        if (by is String) {
+          return (uid: by, name: d?['claimedByName'] as String? ?? 'Rival');
+        }
+        return null;
+      }, timeout: patience);
       if (claimer != null) {
         await FirestoreRest.set('$_duels/$code', {
           'status': 'active',
@@ -121,12 +126,14 @@ class Matchmaking {
           'createdAt': _now(),
         });
         await FirestoreRest.delete('$_queue/$uid');
-        return MatchResult.human(RemoteDuelDriver(
-          roomId: code,
-          isHost: true,
-          masterSeed: seed,
-          opponentName: claimer.name,
-        ));
+        return MatchResult.human(
+          RemoteDuelDriver(
+            roomId: code,
+            isHost: true,
+            masterSeed: seed,
+            opponentName: claimer.name,
+          ),
+        );
       }
       await FirestoreRest.delete('$_queue/$uid');
     } catch (_) {

@@ -39,20 +39,22 @@ class _ElementDetailDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: const BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(color: AppColors.borderDim)),
+                border: Border(bottom: BorderSide(color: AppColors.borderDim)),
               ),
               child: Row(
                 children: [
                   _elementAvatar(element, 36),
                   const SizedBox(width: 12),
                   Flexible(
-                    child: Text(style.label,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            color: AppColors.text,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700)),
+                    child: Text(
+                      style.label,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   _tierTag(element.tier),
@@ -69,11 +71,14 @@ class _ElementDetailDialog extends StatelessWidget {
                     _kv('Trigger', lore.trigger),
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
-                      child: Text(lore.description,
-                          style: const TextStyle(
-                              color: AppColors.textDim,
-                              fontSize: 12.5,
-                              height: 1.4)),
+                      child: Text(
+                        lore.description,
+                        style: const TextStyle(
+                          color: AppColors.textDim,
+                          fontSize: 12.5,
+                          height: 1.4,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 14),
                     // IntrinsicHeight bounds the cross axis: a bare `stretch`
@@ -134,17 +139,20 @@ class _ElementDetailDialog extends StatelessWidget {
         children: [
           SizedBox(
             width: 70,
-            child: Text(label,
-                style: const TextStyle(
-                    color: AppColors.textDim, fontSize: 13)),
+            child: Text(
+              label,
+              style: const TextStyle(color: AppColors.textDim, fontSize: 13),
+            ),
           ),
           Expanded(
-            child: Text(value,
-                style: TextStyle(
-                    color: AppColors.text,
-                    fontSize: 13,
-                    fontWeight:
-                        valueStrong ? FontWeight.w700 : FontWeight.w400)),
+            child: Text(
+              value,
+              style: TextStyle(
+                color: AppColors.text,
+                fontSize: 13,
+                fontWeight: valueStrong ? FontWeight.w700 : FontWeight.w400,
+              ),
+            ),
           ),
         ],
       ),
@@ -166,24 +174,30 @@ class _ElementDetailDialog extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(heading,
-              style: TextStyle(
-                  color: headingColor,
-                  fontSize: 10.5,
-                  letterSpacing: 1,
-                  fontWeight: FontWeight.w600)),
+          Text(
+            heading,
+            style: TextStyle(
+              color: headingColor,
+              fontSize: 10.5,
+              letterSpacing: 1,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 6),
           Row(
             children: [
               _elementAvatar(other, 20),
               const SizedBox(width: 7),
               Flexible(
-                child: Text(other.style.label,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: AppColors.text,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600)),
+                child: Text(
+                  other.style.label,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
@@ -191,9 +205,14 @@ class _ElementDetailDialog extends StatelessWidget {
           for (final line in lines)
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Text(line,
-                  style: const TextStyle(
-                      color: AppColors.textDim, fontSize: 11, height: 1.35)),
+              child: Text(
+                line,
+                style: const TextStyle(
+                  color: AppColors.textDim,
+                  fontSize: 11,
+                  height: 1.35,
+                ),
+              ),
             ),
         ],
       ),
@@ -214,13 +233,15 @@ class _ElementDetailDialog extends StatelessWidget {
             backgroundColor: AppColors.gold,
             foregroundColor: AppColors.bg,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(999)),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 22, vertical: 6),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 6),
           ),
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Done',
-              style: TextStyle(fontWeight: FontWeight.w600)),
+          child: const Text(
+            'Done',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
         ),
       ),
     );
@@ -244,8 +265,9 @@ Widget _elementAvatar(MagicElement element, double size) {
 Widget _tierMatchup(MagicTier tier) {
   final beats = tier.beatsTier;
   final beatenBy = tier.beatenByTier;
-  final neutral = MagicTier.values
-      .firstWhere((t) => t != tier && t != beats && t != beatenBy);
+  final neutral = MagicTier.values.firstWhere(
+    (t) => t != tier && t != beats && t != beatenBy,
+  );
   return Container(
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
@@ -255,12 +277,15 @@ Widget _tierMatchup(MagicTier tier) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('ACROSS TIERS',
-            style: TextStyle(
-                color: AppColors.textFaint,
-                fontSize: 10.5,
-                letterSpacing: 1,
-                fontWeight: FontWeight.w600)),
+        Text(
+          'ACROSS TIERS',
+          style: TextStyle(
+            color: AppColors.textFaint,
+            fontSize: 10.5,
+            letterSpacing: 1,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         const SizedBox(height: 5),
         Text(
           'Against ${tierLabels[beats]!} you hit shields 1.5×; against '
@@ -268,7 +293,10 @@ Widget _tierMatchup(MagicTier tier) {
           'This never stacks with the element counters above — same tier uses '
           'those, different tiers use these.',
           style: const TextStyle(
-              color: AppColors.textDim, fontSize: 12, height: 1.4),
+            color: AppColors.textDim,
+            fontSize: 12,
+            height: 1.4,
+          ),
         ),
       ],
     ),
@@ -282,11 +310,14 @@ Widget _tierTag(MagicTier tier) {
       color: AppColors.borderDim,
       borderRadius: BorderRadius.circular(4),
     ),
-    child: Text(tierLabels[tier]!.toUpperCase(),
-        style: const TextStyle(
-            color: AppColors.gold,
-            fontSize: 10.5,
-            letterSpacing: 0.8,
-            fontWeight: FontWeight.w600)),
+    child: Text(
+      tierLabels[tier]!.toUpperCase(),
+      style: const TextStyle(
+        color: AppColors.gold,
+        fontSize: 10.5,
+        letterSpacing: 0.8,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
   );
 }
