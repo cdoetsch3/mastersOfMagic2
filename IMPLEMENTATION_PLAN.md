@@ -742,6 +742,45 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
 
 ## Deferred / banked — do not build without an explicit ask
 
+- **⛔ TO DO — the `progress/` subcollection. Two of the three per-zone
+  achievements cannot exist without it.** ACHIEVEMENTS §2.1 specifies
+  `players/{uid}/characters/{id}/progress/{doc}` and **none of it is built**.
+  ✅ `PlayerProfile.zoneClears` covers **First Clear** only.
+
+  | Doc | Holds | Blocks | Size |
+  |---|---|---|---|
+  | `zones` | `enemiesDefeated` per zone | ⛔ **Purge** — "defeat every enemy type" | 275 creature types |
+  | `zones` | `dropsSeen` per zone | ⛔ **Collector** — "see every possible drop" | unbounded |
+  | `charges` | lifetime charge count per element | Mastery tier (§2.2) | 12 ints |
+  | `kills` | defeat count per enemy type | leaderboards, titles | 275 |
+  | `totals` | lifetime gold, duels, travel time, XP | Wealth/Duelling tiers | small |
+
+  ⭐ **The requirement that shapes the data model, and is easy to miss:**
+  **`dropsSeen` is a permanent log, NOT inventory.** A player who loots a rare
+  item, sells it, and never sees it again **must keep the Collector credit**.
+  ⚠️ Deriving "seen" from what is currently held is wrong and will look correct
+  right up until the first player sells something.
+
+  ⚠️ **Do not put any of these on `PlayerProfile`.** `zoneClears` sits there as
+  a deliberate, argued exception — bounded at 26 and read by the map on every
+  app open (ACHIEVEMENTS §2.3 amendment). ⭐ **The failure mode is someone
+  adding `enemiesDefeated` beside it because that is where clears already
+  live**, then discovering the 1 MiB document ceiling with a full bestiary.
+
+  ⚠️ **Write pattern is prescribed and must be followed:** accumulate in memory
+  during a duel and **flush once at the end**, alongside the existing XP/gold
+  write. Charges happen several times per duel per player; a write each time is
+  both slow and expensive. An abandoned duel losing its charges is acceptable.
+
+  **Also needed:** `firestore.rules` for the subcollection, read/write paths in
+  `firestore_rest.dart`, and a decision on whether the achievements screen reads
+  it lazily (it should — the duel screen never needs the kill tally).
+
+  🚫 **Genuinely blocked on items** for `dropsSeen`: there is no `Item` or
+  `Material` model in the codebase at all, so "every possible drop" has nothing
+  to enumerate against.
+
+
 - **📝 `PlayerProfile.zoneClears` exists but nothing sets it yet.**
   ✅ The field (`Map<String, int>` of zone id → times cleared), persistence,
   `hasCleared()`, `clearCountFor()` and the `bossDefeated:` parameter on

@@ -217,10 +217,19 @@ from a parent element.
 **125 commons, 100 mini-bosses, 50 bosses — 172 distinct names.** Every theme
 was recovered from that zone's own `arrival` passage rather than invented.
 
-⛔ **What is NOT done, and it is the half that decides whether a fight is
-good:** all 150 mini-bosses and bosses are **names and premises with no
-archetype attached**. §2.2–2.3 define seven elevated archetypes and none of the
-150 is mapped to one. Nothing can be built or balance-simmed until they are.
+✅ **Archetypes assigned to all 150 minis and bosses** (ENEMIES §2g, first
+pass). Every zone fields one Champion, Redoubt, Executioner and Hexer, so a
+2-of-4 draw is always a different pair of roles; bosses split
+Juggernaut 17 / Tyrant 17 / Aspect 16.
+
+✅ **Elements resolved (ENEMIES §2h):** pure zones use their element; hybrids
+may assign one of the two per creature or use both; and in the **Celestial and
+Ethereal quarters** a mini or boss may carry a third element sparingly — never
+the counter to the zone's own, which would punish correct preparation.
+
+⛔ **Still missing per creature:** its move set (§3 — creatures get creature
+moves, not spells). Coefficients stay at the archetype defaults until the
+balance sim moves them.
 
 ⚠️ **Other gaps §2f found:** Adept appears in only 10 of 25 zones despite being
 the yardstick every other archetype is felt against; the Siphon is in 12 of 25,

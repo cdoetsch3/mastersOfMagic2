@@ -247,10 +247,10 @@ undead.
 - ⚠️ **Products within a tier are close but not equal.** Bruiser and Juggernaut
   sit high because telegraphing is a real cost the numbers cannot express.
   Verify that in the sim rather than trusting the table.
-- ❓ **Open: does an archetype restrict its spell pool by element tier?** A
-  Primal Bruiser should probably not have Cataclysm at level 8. Simplest rule:
-  an enemy may only bring spells a *player* of its level could
-  (`Progression.spellsAtLevel`), which reuses a curve that already exists.
+- ✅ **Resolved: an enemy may only bring spells a *player* of its level could**
+  (`Progression.spellsAtLevel`), which reuses a curve that already exists. A
+  Primal Bruiser does not get Cataclysm at level 8.
+- ✅ **Which element a creature uses — see §2h.**
 
 ---
 
@@ -886,16 +886,15 @@ creature names, 125 commons, 100 mini-bosses, 50 bosses.**
 - ✅ **No zone repeats an archetype inside its own five commons.** Every zone
   fields five genuinely different fights.
 
-### ⛔ The real gap: minis and bosses have no archetypes
+### ✅ Resolved — minis and bosses now have archetypes
 
-⛔ **Every mini-boss and boss in §2d–2e is a NAME and a premise, with no
-archetype attached.** §2.2 defines four mini archetypes (Champion, Redoubt,
-Executioner, Hexer) and §2.3 three boss archetypes (Juggernaut, Tyrant,
-Aspect), and not one of the 150 elevated encounters is mapped to any of them.
+⛔ **Was:** all 150 elevated encounters were names and premises with nothing
+mechanical attached, so none could be built or balance-simmed.
 
-⚠️ **This is the half that decides whether a fight is any good.** A name and a
-premise tell you what a boss *means*; the archetype tells you what it *does*.
-Until they are assigned, none of these can be built or balance-simmed.
+✅ **Fixed in §2g** (first pass, for refinement). Minis are one of each per zone
+— Champion / Redoubt / Executioner / Hexer, 25 each — so a run's 2-of-4 draw is
+always a different pair of **roles**. Bosses take 2 of 3 by premise:
+Juggernaut 17 · Tyrant 17 · Aspect 16.
 
 ### ⚠️ Archetype distribution is lopsided
 
@@ -963,6 +962,163 @@ that still give the pool a reason to exist:
 would like your name for the record"* — so the first clear takes your name, and
 every clear after that can draw **you**, written in. ✅ `PlayerProfile` now
 carries `zoneClears`, which is what this needs.
+
+---
+
+## 2g. 📝 Archetypes for every mini-boss and boss (first pass)
+
+⚠️ **First pass, explicitly for refinement.** These close the gap §2f flagged —
+150 elevated encounters that had names and premises but nothing mechanical.
+
+### ⭐ The minis assign themselves, and that is the good news
+
+**Four mini archetypes exist and every zone has exactly four minis**, so the
+default is **one of each, per zone**. That is not a convenience — it is the
+best available answer:
+
+⭐ **A run draws 2 of the 4 (GAME_DESIGN §3d), so every visit is a different
+pair of tactical ROLES**, not just different names. Champion + Redoubt is a
+grind; Executioner + Hexer is a scramble. ⭐ **The pool stops being cosmetic
+variety and becomes the reason a zone plays differently on a second run** —
+which is exactly what the Purge achievement (~4.2 clears, ACHIEVEMENTS §2.3)
+asks players to do anyway.
+
+✅ **Distribution is perfectly even by construction: Champion 25, Redoubt 25,
+Executioner 25, Hexer 25.**
+
+⚠️ **Break the one-of-each rule only with a reason.** A zone whose four minis
+are all wardens genuinely wants two Redoubts — but then say so, because the
+cost is a run that can draw two of the same shape.
+
+### Bosses — 2 of 3, chosen by the premise
+
+| Boss archetype | Goes to |
+|---|---|
+| **Aspect** | The one that **is** the place or the element — leans on the passive taken to an extreme |
+| **Juggernaut** | The one that is a **mass or a force** — enormous, predictable, an endurance test |
+| **Tyrant** | The one that is a **mind** — a person, a will, something that decided |
+
+✅ **Resulting spread: Juggernaut 17 · Tyrant 17 · Aspect 16.**
+
+---
+
+### The table
+
+| Zone | Champion | Redoubt | Executioner | Hexer | Boss A | Boss B |
+|---|---|---|---|---|---|---|
+| **Whispering Woods** | Elderroot | Mother Spore | Hollow Stag | The Murmur | Heartwood ⛰️ | The Standing Green ✨ |
+| **Glimmerbrook** | Weirkeeper | The Held Breath | Pale Coil | Frostgleam Naiad | The Cold Below ⛰️ | Stillwater ✨ |
+| **Cinderpeak Foothills** | Slagheart | Vent Warden | Char-Tusk | The Emberqueen | The Breathing Stone ⛰️ | Flintmaw 👑 |
+| **Thornmire** | Old Wallow | The Green Drowning | Wickerdrowned | Fenmother | Mirethroat ⛰️ | The Drinking Grove ✨ |
+| **Ashfall Vale** | The Grey Stag | First Green | Last Ember | Kindleroot | The Blackened Crown 👑 | The Rooting ✨ |
+| **Old Quarry** | Obsidian Golem | Earth Titan | Deadweight | The Overseer | Mountain Heart ⛰️ | The Empty Course 👑 |
+| **Stormcliff Coast** | Brinecharge | The Long Line | Voltgeist | Storm Shaman | Storm Lord 👑 | The Return Stroke ✨ |
+| **Windward Steppe** | Old Lean | Sky Titan | Gale Serpent | Wind Wraith | The Unbroken Blow ⛰️ | Tempest Monarch 👑 |
+| **Frostfell Pass** | The Last Cairn | Hoarking | Coldsnap | The Certain Road | The White Corridor ⛰️ | The Road Under ✨ |
+| **Thunderspire Peaks** | Crown Fire | Anvilhead | Thunder Roc | The Shortening | The Storm That Passes ⛰️ | The Strike That Lands ✨ |
+| **The Molten Deep** | The Floor | Magma Behemoth | Pyroclast | Firstmelt | The Slow Stone ⛰️ | Efreet 👑 |
+| **The Kiln Desert** | Sun Templar | Prism Sentinel | Saltmarch Wraith | The Shadeless Hour | The Cold Shadow 👑 | Solar Deity ✨ |
+| **The Mirrormere** | The Second You | Herald of the Waxing | Stalker of the New Moon | The Waning Wraith | The Moon Below 👑 | Luna Plena ✨ |
+| **Starfall Basin** | The Zodiac Ascendant | Constellation Warden | Rift Walker | Echo of the Between | The Next One ⛰️ | What Landed 👑 |
+| **Tidewrack Shoals** | Tidal Empress | Leviathan | Maelstrom Horror | The Turning | Kraken ⛰️ | The Undertow ✨ |
+| **The Sunless Reach** | Solar Archon | The Crest | Both-Sided Thing | Duskmarch | The Last Light ✨ | The First Dark ✨ |
+| **The Shattered Orrery** | Sidereal Fault | Escapement | Long Division | The Remainder | The Calculation ⛰️ | The Answer 👑 |
+| **The Glass Archive** | The Last Reader | Aperture | Burnt Index | The Marginalia | What Was Written 👑 | What Is Left Of It ✨ |
+| **Hallowmarch** | Milestone | Vestal Warden | Seraph Judicant | The Upkeep | The Keeper of the Road ⛰️ | The Hierophant Eternal 👑 |
+| **The Buried Sky** | Stonefall Herald | Bedrock Colossus | Nadir | The Long Count | The Overburden ⛰️ | The Buried Constellation ✨ |
+| **The Umbral Wastes** | Umbral Knight | The Edge | Void Stalker | Eclipse Weaver | Nightbringer 👑 | What Was Thought About ✨ |
+| **The Sealed Garden** | The Last Gardener | Root Matriarch | Cherub of the Turning Blade | The Kept Vow | Guardian of the World Tree ⛰️ | The Serpent in the Branches 👑 |
+| **The Collapsed Academy** | The Fourth Item | Mana Golem | Arcane Chimera | Spell Weaver | The Archmage 👑 | The Last Three Items ✨ |
+| **The Reliquary Deep** | Antechoir | Reliquary Colossus | The Second Hand | Warm Middle | What Was Consecrated ⛰️ | What Did Not Leave It Alone 👑 |
+| **The Unwritten Library** | The Index | Colophon | Redaction | The Amanuensis | The Record ⛰️ | The Author 👑 |
+
+⛰️ Juggernaut · 👑 Tyrant · ✨ Aspect
+
+### ⭐ Assignments worth keeping through any refinement
+
+- ⭐ **Ashfall Vale — First Green is the Redoubt, Last Ember is the
+  Executioner.** The two sides of the zone's argument are mechanically
+  opposite: regrowth wins by outlasting, fire wins by being faster. ⭐ **The
+  theme is now legible in the statlines**, not just the names.
+- ⭐ **Thunderspire's *The Shortening* is the Hexer.** The zone's premise is
+  intervals getting shorter; a stacking status IS that premise.
+- ⭐ **Starfall's two-scale pool maps exactly** — *What Landed* is compact and
+  clever (Tyrant), *The Next One* is enormous and unavoidable (Juggernaut).
+- ⭐ **The Shattered Orrery** — *The Calculation* grinds forever (Juggernaut),
+  *The Answer* knows (Tyrant). The archetypes ARE the premise.
+- ⭐ **The Sealed Garden's Serpent is the Tyrant, not the Guardian.** The rule
+  is a wall you must get through; the tempter's threat is that it plays well.
+- ⭐ **Cherub of the Turning Blade is the Executioner** — a flaming sword that
+  turns every way is not a wall.
+
+### ⚠️ The deliberate exceptions
+
+- ⚠️ **The Sunless Reach fields TWO Aspects** — the only zone that does. Its
+  premise is identical ground on two sides of a line, so *The Last Light*
+  (Solar) and *The First Dark* (Lunar) being the same archetype of different
+  elements **is the mechanical statement of the theme**. ⭐ Keep it; it is the
+  one place doubling says something.
+- ❓ **The Unwritten Library's repeat-clear third boss, *Your Entry*,** has no
+  archetype here. It is the player's own build written down — arguably not any
+  of the three, and possibly a new one. Needs a ruling.
+- ❓ **The Eclipsed Citadel is absent**, per §2e — the finale needs its own
+  structure, not this template.
+
+### ⚠️ What this pass did NOT do
+
+- ⚠️ **No element assigned per enemy.** A zone's elements are known, but which
+  of a hybrid's two a given creature uses is not decided.
+- ⚠️ **No move sets.** §3 requires creature moves, not spells, for anything
+  that is not a mage.
+- ⚠️ **Coefficients are untouched** — every Champion is 1.70/1.20 until the
+  balance sim says otherwise. ⭐ **That is the point of the archetype layer:**
+  these 150 encounters are now buildable and simmable, which they were not an
+  hour ago.
+
+---
+
+## 2h. ✅ Which element a creature uses (Christian, 2026-08-02)
+
+✅ **Pure zones: the zone's element.** No decision to make — every creature in
+Whispering Woods is Flora.
+
+✅ **Hybrid zones: either way is fine.** Per creature, either assign it **one**
+of the zone's two elements, or let it use **both**. ⭐ Both readings are
+legitimate and the choice can be made creature by creature rather than as a
+blanket rule — a Thirstvine is obviously Flora drinking Aqua, while a
+Both-Sided Thing in The Sunless Reach should plainly be both.
+
+### ⭐ Enemies are NOT locked to their zone's elements
+
+✅ **In the last two quarters — Celestial (30–44) and Ethereal (45–60) — a
+creature may use a third or even fourth element, sparingly.**
+
+⭐ **Why this is scoped to the back half, and why that scoping is the whole
+point.** The player counter-picks a loadout from the zone's advertised
+elements. If enemies can surprise them off-element:
+
+- **Early, that is unfair.** A level-4 player is still learning that elements
+  counter each other at all; an off-element hit reads as the game cheating.
+- ⭐ **Late, it is exactly the tension the endgame needs.** By level 40 a player
+  has twelve elements, five slots and a settled counter-pick habit. A rare
+  off-element move means the safe loadout is not perfectly safe, and the shield
+  plan has to leave a little room. ⭐ **It keeps loadout choice alive long after
+  the counter wheel has been memorised** — which is the thing that otherwise
+  goes stale in the last twenty levels.
+
+📝 **Proposed guardrail — mine, not a ruling. "Sparingly" needs a number or it
+becomes "sometimes anything happens":**
+
+| Rule | Why |
+|---|---|
+| **Minis and bosses only, never commons** | A common is the fight a player learns the zone on; surprises belong on the fights they came for |
+| **At most one off-element move per creature** | Enough to break the assumption, not enough to invalidate a whole loadout |
+| **Celestial and Ethereal only** | Per the ruling above |
+| **Never the zone's own counter** | ⚠️ **The real trap.** A player brings the element that beats the zone; if a boss carries the one thing that beats *that*, the counter-pick is not a choice but a punishment |
+
+⚠️ **That last row is the one to keep.** The others are tunable; a boss that
+specifically punishes correct preparation is the version of this idea that
+makes players stop preparing.
 
 ---
 
