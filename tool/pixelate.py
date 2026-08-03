@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """Turn generated artwork into game-ready creature sprites.
 
-    python3 tool/pixelate.py --zone whispering_woods --element flora
+    python3 tool/pixelate.py --zone whispering_woods --element flora --cutout
 
-Reads every PNG in `art/source/<zone>/`, and writes a small, palette-locked
+Reads every image in `art/source/<zone>/`, and writes a small, palette-locked
 sprite to `assets/creatures/<zone>/`.
+
+⚠️ **Pass `--cutout` for artwork with a background.** Generators usually return
+a scene, not a subject — a forest behind the creature, a floor beneath it. The
+alpha-driven trim and composite below assume the background is already gone, so
+without this the trees get downsampled along with the fawn. Needs `rembg`:
+
+    python3 -m pip install --user rembg onnxruntime
 
 Why each step is the way it is
 ------------------------------
@@ -53,6 +60,23 @@ DEFAULT_SIZE = 64
 # ⚠️ Anything below this alpha becomes fully transparent. Soft edges at this
 # scale read as grime, not as antialiasing.
 ALPHA_CUTOFF = 128
+
+
+def cut_out(img: "Image.Image") -> "Image.Image":
+    """Removes the background, leaving the subject on alpha.
+
+    ⚠️ Optional and lazily imported — `rembg` pulls in onnxruntime and a model
+    download, which is a lot to force on someone whose art already has alpha.
+    """
+    try:
+        from rembg import remove
+    except ImportError:
+        sys.exit(
+            "--cutout needs rembg:\n"
+            "  python3 -m pip install --user rembg onnxruntime\n"
+            "Or remove the background yourself and drop the flag."
+        )
+    return remove(img)
 
 
 # ---- palettes ------------------------------------------------------------
@@ -120,8 +144,12 @@ def to_sprite(
     src: pathlib.Path,
     palette: list[tuple[int, int, int]],
     size: int,
+    cutout: bool = False,
 ) -> Image.Image:
     img = Image.open(src).convert("RGBA")
+
+    if cutout:
+        img = cut_out(img).convert("RGBA")
 
     # ⚠️ Alpha first, and kept out of the colour maths entirely.
     alpha = img.getchannel("A")
@@ -164,6 +192,11 @@ def main() -> None:
     ap.add_argument("--zone", required=True, help="e.g. whispering_woods")
     ap.add_argument("--element", required=True, help="e.g. flora")
     ap.add_argument("--size", type=int, default=DEFAULT_SIZE)
+    ap.add_argument(
+        "--cutout",
+        action="store_true",
+        help="strip the background first (needed for generated scenes)",
+    )
     args = ap.parse_args()
 
     palettes = write_palettes()
@@ -175,7 +208,7 @@ def main() -> None:
     if not src_dir.is_dir():
         sys.exit(
             f"no source art at {src_dir}\n"
-            f"  Put generated PNGs there, named after the creature id "
+            f"  Put generated images there, named after the creature id "
             f"(listening_fawn.png, heartwood.png, ...).\n"
             f"  Prompts: art/prompts/{args.zone}.md"
         )
@@ -183,12 +216,24 @@ def main() -> None:
     out_dir = OUT_DIR / args.zone
     out_dir.mkdir(parents=True, exist_ok=True)
     made = []
-    for src in sorted(src_dir.glob("*.png")):
-        sprite = to_sprite(src, palette, args.size)
-        dst = out_dir / src.name
+    sources = sorted(
+        f
+        for f in src_dir.iterdir()
+        if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}
+    )
+    for src in sources:
+        sprite = to_sprite(src, palette, args.size, cutout=args.cutout)
+        # ⭐ Always .png out, whatever went in — the creature id is the stem.
+        dst = out_dir / f"{src.stem}.png"
         sprite.save(dst)
         made.append(src.stem)
         print(f"  {src.name} -> {dst.relative_to(ROOT)}  ({args.size}x{args.size})")
+
+    if made and not args.cutout:
+        print(
+            "\n⚠️  ran without --cutout. If the source art has a background, "
+            "it has just been pixelated along with the creature."
+        )
 
     # ⭐ A manifest, so the Dart side can assert every creature has art rather
     # than discovering a missing file at runtime.
