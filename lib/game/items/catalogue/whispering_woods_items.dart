@@ -92,6 +92,8 @@ abstract final class WhisperingWoodsItems {
     properName: "Forager's Ration",
     rarity: Rarity.common,
     lore: 'Filling. That is the whole of its reputation.',
+    // ⭐ Between encounters only — eating mid-duel would be a free turn.
+    effect: ItemEffect(healPercent: 25),
     value: 4,
   );
 
@@ -103,6 +105,9 @@ abstract final class WhisperingWoodsItems {
     lore:
         'Tastes like the underside of a leaf. Apprentices carry two and use '
         'neither, which is its own kind of lesson.',
+    // ⚠️ Weaker than a ration on purpose: this one costs a TURN, and the
+    // opponent committed blind, so its value is the timing, not the number.
+    effect: ItemEffect(healPercent: 15),
     value: 12,
   );
 

@@ -292,6 +292,28 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Uses a carried item between encounters.
+  ///
+  /// ⭐ Removes it **only if it was actually spent** — an item that changed
+  /// nothing stays in the pack, because a game that eats your food for no
+  /// benefit is worse than one that refuses.
+  Future<UseOutcome> useItem(String defId) async {
+    final r = run;
+    if (r == null) return const UseOutcome.refused('Not on an adventure.');
+    final outcome = r.use(
+      defId,
+      maxHp: MageState.scaledMaxHp(profile.level),
+      carried: profile.backpack.countOf(defId) > 0,
+    );
+    if (outcome.consumed) {
+      await _mutate(() {
+        profile.backpack = profile.backpack.withRemovedFirst(defId);
+      });
+    }
+    notifyListeners();
+    return outcome;
+  }
+
   /// Walks out with what has been earned so far.
   Future<void> leaveAdventure() async {
     final r = run;

@@ -4,6 +4,7 @@ import '../game/adventure.dart';
 import '../game/enemies/enemy_def.dart';
 import '../game/game_state.dart';
 import '../game/items/item_catalogue.dart';
+import '../game/items/item_def.dart';
 import '../game/opponent_driver.dart';
 import '../game/world.dart';
 import '../ui/app_theme.dart';
@@ -53,6 +54,14 @@ class _AdventureScreenState extends State<AdventureScreen> {
                       onFight: () => _fight(game, run),
                       onLeave: () => _leave(game),
                     ),
+                  if (!run.isOver) ...[
+                    const SizedBox(height: 14),
+                    _Consumables(
+                      game: game,
+                      busy: _busy,
+                      onUse: (id) => _use(game, id),
+                    ),
+                  ],
                   const SizedBox(height: 18),
                   _Haul(run: run),
                 ],
@@ -95,6 +104,21 @@ class _AdventureScreenState extends State<AdventureScreen> {
       await game.loseEncounter();
     }
     if (mounted) setState(() => _busy = false);
+  }
+
+  Future<void> _use(GameState game, String defId) async {
+    final outcome = await game.useItem(defId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.panel,
+        content: Text(
+          outcome.message,
+          style: const TextStyle(color: AppColors.text),
+        ),
+      ),
+    );
+    setState(() {});
   }
 
   Future<void> _leave(GameState game) async {
@@ -348,4 +372,96 @@ class _Haul extends StatelessWidget {
     final def = ItemCatalogue.tryById(defId);
     return def == null ? AppColors.textFaint : rarityColour(def.rarity);
   }
+}
+
+/// Everything carried that can be used right now.
+///
+/// ⭐ **Generic**: it lists anything [Usable] with a real effect and shows what
+/// that effect is, so a new consumable appears here with no UI change at all.
+///
+/// ⚠️ Between encounters only (ITEMS §6b.2). Using something here is free; the
+/// belt is what costs a turn mid-duel.
+class _Consumables extends StatelessWidget {
+  final GameState game;
+  final bool busy;
+  final ValueChanged<String> onUse;
+
+  const _Consumables({
+    required this.game,
+    required this.busy,
+    required this.onUse,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final counts = <String, int>{};
+    for (final slot in game.profile.backpack.contents) {
+      final def = ItemCatalogue.tryById(slot.defId);
+      if (def is Usable && !(def as Usable).effect.isNothing) {
+        counts[slot.defId] = (counts[slot.defId] ?? 0) + 1;
+      }
+    }
+    if (counts.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionLabel('Consumables'),
+        GamePanel(
+          child: Column(
+            children: [
+              for (final e in counts.entries)
+                _ConsumableRow(
+                  def: ItemCatalogue.byId(e.key),
+                  count: e.value,
+                  onUse: busy ? null : () => onUse(e.key),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ConsumableRow extends StatelessWidget {
+  final ItemDef def;
+  final int count;
+  final VoidCallback? onUse;
+
+  const _ConsumableRow({required this.def, required this.count, this.onUse});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 3),
+    child: Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                ItemCatalogue.displayName(def, null),
+                style: const TextStyle(color: AppColors.text, fontSize: 13),
+              ),
+              // ⭐ Built from the effect, so the number and its text cannot
+              // disagree.
+              Text(
+                (def as Usable).effect.describe,
+                style: const TextStyle(
+                  color: AppColors.textFaint,
+                  fontSize: 11.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Text(
+          '×$count',
+          style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+        ),
+        const SizedBox(width: 8),
+        TextButton(onPressed: onUse, child: const Text('Use')),
+      ],
+    ),
+  );
 }

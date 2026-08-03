@@ -8,10 +8,14 @@ library;
 
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:mom_engine/mom_engine.dart';
 
 import 'enemies/enemy_def.dart';
 import 'enemies/enemy_encounter.dart';
+import 'items/item_catalogue.dart';
+import 'items/item_def.dart';
 import 'items/item_instance.dart';
 import 'world.dart';
 
@@ -161,6 +165,40 @@ class AdventureRun {
     outcome = RunOutcome.died;
   }
 
+  /// Uses a carried item.
+  ///
+  /// ⭐ **Generic on purpose.** It asks whether the def is [Usable] and applies
+  /// whatever its [ItemEffect] says — so a new consumable needs no new code
+  /// path here, only an effect.
+  ///
+  /// ⚠️ **Between encounters only** (ITEMS §6b.2). Using something here is
+  /// free; the belt is what costs a turn mid-duel, and collapsing the two
+  /// would make the belt pointless.
+  UseOutcome use(String defId, {required int maxHp, required bool carried}) {
+    if (isOver) return const UseOutcome.refused('Not now.');
+    if (!carried) return const UseOutcome.refused('You are not carrying that.');
+    final def = ItemCatalogue.tryById(defId);
+    if (def is! Usable || (def as Usable).effect.isNothing) {
+      return const UseOutcome.refused('That does nothing.');
+    }
+    final effect = (def as Usable).effect;
+
+    final healed = _heal(effect.healFor(maxHp), maxHp);
+    if (healed == 0) {
+      // ⚠️ Not consumed. Using something that changes nothing must not spend
+      // it — that reads as the game stealing an item.
+      return const UseOutcome.refused('You are already at full health.');
+    }
+    return UseOutcome.used('You recover $healed health.');
+  }
+
+  int _heal(int amount, int maxHp) {
+    if (amount <= 0) return 0;
+    final before = playerHp;
+    playerHp = (playerHp + amount).clamp(0, maxHp);
+    return playerHp - before;
+  }
+
   /// Walking out early with what you have.
   void returnToTown() {
     if (outcome == RunOutcome.running) outcome = RunOutcome.returned;
@@ -169,4 +207,17 @@ class AdventureRun {
   /// Whether the loot survived. ⭐ The single question the whole loop turns on.
   bool get lootIsBanked =>
       outcome == RunOutcome.returned || outcome == RunOutcome.cleared;
+}
+
+/// What using an item did, and whether it was spent doing it.
+@immutable
+class UseOutcome {
+  /// ⚠️ False means the item is **still in the pack**.
+  final bool consumed;
+
+  /// Player-facing, always populated — a silent no-op is the worst outcome.
+  final String message;
+
+  const UseOutcome.used(this.message) : consumed = true;
+  const UseOutcome.refused(this.message) : consumed = false;
 }

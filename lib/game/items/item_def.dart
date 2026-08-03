@@ -252,13 +252,60 @@ final class EquipmentDef extends ItemDef
   bool get isFungible => false;
 }
 
+/// What using an item does.
+///
+/// ⭐ **One vocabulary for every consumable**, whether it is eaten between
+/// fights or drunk off the belt mid-duel. Adding an effect means adding a
+/// field here and a case in [describe] — never a new code path per item.
+///
+/// ⚠️ Deliberately small. Only healing exists because only healing is
+/// designed; a speculative effect vocabulary would be a system nobody has
+/// balanced against spells.
+@immutable
+class ItemEffect {
+  /// Health restored, as a **percentage of max** rather than a flat number, so
+  /// one item does not trivialise level 2 and become worthless by level 20.
+  final int healPercent;
+
+  const ItemEffect({this.healPercent = 0});
+
+  static const none = ItemEffect();
+
+  bool get isNothing => healPercent == 0;
+
+  /// What this restores for a mage with [maxHp]. At least 1 if it heals at
+  /// all — an item that does nothing reads as a bug.
+  int healFor(int maxHp) {
+    if (healPercent == 0) return 0;
+    final amount = (maxHp * healPercent / 100).round();
+    return amount < 1 ? 1 : amount;
+  }
+
+  /// One line for a tooltip, built from the effect rather than written per
+  /// item — ⭐ so a number changed here cannot disagree with its own text.
+  String get describe =>
+      healPercent > 0 ? 'Restores $healPercent% health' : 'No effect';
+}
+
+/// Anything a player can use up.
+///
+/// ⭐ **The interface the UI talks to**, so a "use" button never needs to know
+/// whether it is holding food, a potion, or something not invented yet.
+mixin Usable {
+  ItemEffect get effect;
+}
+
 /// Something used up. Consumed from the **backpack** between encounters.
 ///
 /// ⚠️ A plain [ConsumableDef] cannot be used in combat — that is what
 /// [BeltableDef] is for. Splitting them means "can this be drunk mid-duel" is
 /// a **type**, not a flag someone can forget to check (ITEMS §6b.3).
-final class ConsumableDef extends ItemDef {
+final class ConsumableDef extends ItemDef with Usable {
+  @override
+  final ItemEffect effect;
+
   const ConsumableDef({
+    this.effect = ItemEffect.none,
     required super.id,
     required super.rarity,
     required super.lore,
@@ -273,8 +320,12 @@ final class ConsumableDef extends ItemDef {
 }
 
 /// A consumable that may be loaded onto the belt and used mid-duel.
-final class BeltableDef extends ItemDef with Beltable {
+final class BeltableDef extends ItemDef with Beltable, Usable {
+  @override
+  final ItemEffect effect;
+
   const BeltableDef({
+    this.effect = ItemEffect.none,
     required super.id,
     required super.rarity,
     required super.lore,
