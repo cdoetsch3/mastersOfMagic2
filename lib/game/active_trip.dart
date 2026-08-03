@@ -1,4 +1,5 @@
 import 'travel.dart';
+import 'world.dart';
 
 /// A journey in progress, on a real clock.
 ///
@@ -113,8 +114,12 @@ class ActiveTrip {
   }) {
     final cumulative = <int>[0];
     var total = 0.0;
-    for (final leg in route.legs) {
-      total += leg.minutes * 60 / speedMultiplier;
+    for (var i = 0; i + 1 < route.stops.length; i++) {
+      // ⚠️ [TravelTimes], never `leg.minutes`. The edge still carries the
+      // hand-authored duration kept for tuning, and reading it here is exactly
+      // the drift that having two durations invites.
+      final minutes = TravelTimes.between(route.stops[i], route.stops[i + 1]);
+      total += minutes * 60 / speedMultiplier;
       // Rounded on the running total, not per leg: rounding each leg up would
       // charge a fast mount a whole extra unit on every one of them.
       cumulative.add(total.ceil());

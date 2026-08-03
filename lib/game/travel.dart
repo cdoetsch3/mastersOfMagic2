@@ -18,10 +18,13 @@ class TravelRoute {
   const TravelRoute(this.stops, this.legs);
 
   /// Base minutes on foot, before any mount multiplier.
+  ///
+  /// ⭐ Summed from the **stops**, since [TravelTimes] reads the pair a leg
+  /// joins rather than anything stored on the leg.
   int get minutes {
     var total = 0;
-    for (final leg in legs) {
-      total += leg.minutes;
+    for (var i = 0; i + 1 < stops.length; i++) {
+      total += TravelTimes.between(stops[i], stops[i + 1]);
     }
     return total;
   }
@@ -84,7 +87,9 @@ abstract final class Travel {
     for (final id in ids) {
       table[id]![id] = const _Hop(0, null);
       for (final e in World.byId(id).edges) {
-        table[id]![e.to] = _Hop(e.minutes, e.to);
+        // ⚠️ Cost comes from [TravelTimes], the active policy — NOT from
+        // e.minutes, which holds the authored durations kept for tuning.
+        table[id]![e.to] = _Hop(TravelTimes.between(id, e.to), e.to);
       }
     }
     // Floyd–Warshall: allow each location in turn to be a waypoint.

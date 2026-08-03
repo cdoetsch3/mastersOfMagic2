@@ -4,6 +4,7 @@ import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/game/travel.dart';
+import 'package:masters_of_magic_2/game/world.dart';
 
 class _MemStorage implements ProfileStorage {
   PlayerProfile? stored;
@@ -102,11 +103,11 @@ void main() {
           reason: 'a leg must never become free, however fast the mount',
         );
       }
-      // ⭐ The design's collapse (§4b.1): the ~39-minute climb to Rimeholt is
-      // minutes, not seconds shaved. A whole-minute model could not express
-      // this — every leg would round up to a minute of its own.
-      expect(onFoot.totalMinutes, 39);
-      expect(mounted.totalMinutes, 4);
+      // ⭐ The design's collapse (§4b.1): the climb to Rimeholt is minutes
+      // saved, not seconds. A whole-minute model could not express this —
+      // every leg would round up to a minute of its own.
+      expect(onFoot.totalMinutes, route.legs.length * TravelTimes.perLeg);
+      expect(mounted.totalMinutes, 3);
     });
 
     test('a trip survives a save and reload', () {

@@ -58,7 +58,16 @@ class AiPersona {
   /// compose. The same loadout at intelligence 3 and at 9 is two genuinely
   /// different opponents, and the same rating can be dropped on any monster
   /// without borrowing anything else from a persona.
-  DuelAi buildBrain() => LadderAi(intelligence, spells: loadout.spells);
+  /// ⚠️ **Elements matter as much as spells here.** In this game the element
+  /// of a cast comes from what the mage *charged*, not from the spell — so a
+  /// brain given every element charges at random and a Flora creature's own
+  /// move lands as Astral. That shipped: a Listening Fawn cast Astral and
+  /// Aqua, and a Thornback Sprite cast Aero and Sanctus.
+  DuelAi buildBrain() => LadderAi(
+    intelligence,
+    spells: loadout.spells,
+    elements: loadout.elements,
+  );
 }
 
 /// Chance an enemy of the given [intelligence] throws away its turn.

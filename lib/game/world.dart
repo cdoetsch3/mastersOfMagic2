@@ -65,7 +65,14 @@ class TravelEdge {
   /// The location id this road leads to.
   final String to;
 
-  /// Base minutes on foot, before any mount multiplier.
+  /// The **authored** duration for this road, in minutes on foot.
+  ///
+  /// ⚠️ **Not what travel currently costs.** [TravelTimes] is the active
+  /// policy and presently ignores this, charging a flat 1 minute a leg (3
+  /// between towns). These numbers are kept because they carry design work a
+  /// rule cannot: the starting valley has shorter legs, the high country
+  /// longer ones, and the sea and Veil crossings cost more than any road.
+  /// ⭐ Deleting them would lose that and it could not be recovered.
   final int minutes;
 
   final TravelEdgeKind kind;
@@ -84,6 +91,31 @@ class TravelEdge {
 
   @override
   String toString() => 'TravelEdge($to, ${minutes}m, ${kind.name})';
+}
+
+/// What a leg of travel actually costs — the **active policy**.
+///
+/// 📝 **Flat 3 minutes a leg, for now** (Christian, 2026-08-02). An earlier
+/// pass tried 1 minute a leg with 3 between towns; ⚠️ **it did not survive
+/// contact with the graph** — two ordinary legs undercut one town leg, so
+/// cutting through a zone beat the direct road and the town cost almost never
+/// applied. Parked rather than patched.
+///
+/// ⚠️ **[TravelEdge.minutes] is deliberately NOT consulted here.** It holds the
+/// hand-authored per-road durations — the starting valley shorter, the high
+/// country longer, the sea and Veil crossings longer still — which are kept
+/// for when tuning resumes. ⭐ Two durations exist on purpose; this one wins,
+/// and `travel_test.dart` asserts which.
+abstract final class TravelTimes {
+  /// Every leg, regardless of what it joins.
+  static const int perLeg = 3;
+
+  /// The cost of the leg joining [fromId] and [toId].
+  ///
+  /// Takes both endpoints even though it currently ignores them — ⭐ every
+  /// rule worth trying next (by destination kind, by tier, by edge kind) needs
+  /// them, and threading them later would touch the solver again.
+  static int between(String fromId, String toId) => perLeg;
 }
 
 class GameLocation {

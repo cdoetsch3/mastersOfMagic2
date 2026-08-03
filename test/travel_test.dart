@@ -83,12 +83,21 @@ void main() {
       expect(r.stops, ['aldermere']);
     });
 
-    test('a neighbour costs exactly its edge', () {
-      final edge = World.byId('aldermere').edgeTo('pennycross')!;
-      final r = Travel.route('aldermere', 'pennycross')!;
-      expect(r.minutes, edge.minutes);
+    test('a leg costs what the policy says, not what the edge says', () {
+      // ⚠️ Two durations exist on purpose: TravelEdge.minutes holds the
+      // hand-authored value kept for tuning, and TravelTimes is what travel
+      // actually charges. This pins which one wins.
+      final edge = World.byId('pennycross').edgeTo('forgeholm')!;
+      final r = Travel.route('pennycross', 'forgeholm')!;
+      expect(r.minutes, TravelTimes.perLeg);
+      expect(
+        World.locations.expand((l) => l.edges).map((e) => e.minutes).toSet(),
+        isNot(hasLength(1)),
+        reason:
+            'the authored durations vary; the policy does not — that is '
+            'the whole point of keeping them apart',
+      );
       expect(r.legs, [edge]);
-      expect(r.stops, ['aldermere', 'pennycross']);
     });
 
     test('stops and legs line up', () {
@@ -101,7 +110,11 @@ void main() {
           reason: 'leg $i does not join its stops',
         );
       }
-      expect(r.minutes, r.legs.fold<int>(0, (a, l) => a + l.minutes));
+      expect(
+        r.minutes,
+        r.legs.length * TravelTimes.perLeg,
+        reason: 'cost comes from TravelTimes, not from leg.minutes',
+      );
     });
 
     test('the route is the QUICKEST, not the one with fewest stops', () {
@@ -116,7 +129,7 @@ void main() {
           if (seen.contains(e.to)) continue;
           final rest = bruteForce(e.to, to, {...seen, e.to}, depth - 1);
           if (rest == null) continue;
-          final total = rest + e.minutes;
+          final total = rest + TravelTimes.between(from, e.to);
           if (best == null || total < best) best = total;
         }
         return best;
@@ -189,21 +202,31 @@ void main() {
   });
 
   group('the shape of the world, in minutes', () {
-    // ⚠️ These pin what the current graph actually costs, so a change to any
-    // edge shows up as a changed *journey* rather than a changed number in a
-    // file nobody reads. WORLD_DESIGN §4b.1's worked example predicted ~30
-    // minutes for Aldermere -> Rimeholt; the real chain is 8 legs, not the ~6
-    // the example assumed, so it is 39 at the design's own 5-minute baseline.
-    test('the long climb costs what the design intends per leg', () {
-      final r = Travel.route('aldermere', 'rimeholt')!;
-      expect(r.legs.length, 8);
-      expect(r.minutes, 39);
-      expect(r.minutes / r.legs.length, closeTo(5, 1));
+    // 📝 Flat 3 a leg for now. ⚠️ A "1 a leg, 3 between towns" rule was tried
+    // and parked: two ordinary legs undercut one town leg, so cutting through
+    // a zone beat the direct road and the town cost almost never applied.
+    test('every leg costs the same', () {
+      for (final l in World.locations) {
+        for (final e in l.edges) {
+          expect(TravelTimes.between(l.id, e.to), TravelTimes.perLeg);
+        }
+      }
     });
 
-    test('the first town hop is short, the campaign traverse is not', () {
-      expect(Travel.minutesBetween('aldermere', 'pennycross'), 3);
-      expect(Travel.minutesBetween('aldermere', 'zenith'), greaterThan(60));
+    test('a route costs its length', () {
+      for (final pair in [
+        ['aldermere', 'whispering_woods'],
+        ['aldermere', 'pennycross'],
+        ['aldermere', 'rimeholt'],
+      ]) {
+        final r = Travel.route(pair[0], pair[1])!;
+        expect(r.minutes, r.legs.length * TravelTimes.perLeg);
+      }
+    });
+
+    test('the traverse still feels like a journey', () {
+      expect(Travel.minutesBetween('aldermere', 'whispering_woods'), 3);
+      expect(Travel.minutesBetween('aldermere', 'zenith'), greaterThan(30));
     });
   });
 }
