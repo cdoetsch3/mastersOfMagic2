@@ -2,9 +2,19 @@
 """Turn generated artwork into game-ready creature sprites.
 
     python3 tool/pixelate.py --zone whispering_woods --element flora --cutout
+    python3 tool/pixelate.py --zone whispering_woods --mode background
 
-Reads every image in `art/source/<zone>/`, and writes a small, palette-locked
-sprite to `assets/creatures/<zone>/`.
+**Creature mode** (default) reads `art/source/<zone>/`, and writes a small,
+palette-locked sprite per creature to `assets/creatures/<zone>/`.
+
+**Background mode** reads `art/source/backgrounds/<zone>.*` and writes one wide
+arena backdrop to `assets/backgrounds/`.
+
+⭐ **A background must LOSE to the sprites.** It is most of the screen, so the
+temptation is to make it beautiful — but creature legibility is what the fight
+depends on. Background mode therefore darkens and desaturates deliberately, and
+uses a wider palette than a creature (a scene posterises into bands at 16
+colours) without locking to one element hue.
 
 ⚠️ **Pass `--cutout` for artwork with a background.** Generators usually return
 a scene, not a subject — a forest behind the creature, a floor beneath it. The
@@ -51,11 +61,24 @@ STYLE = ROOT / "lib" / "game" / "element_style.dart"
 PALETTE_DIR = ROOT / "art" / "palettes"
 SOURCE_DIR = ROOT / "art" / "source"
 OUT_DIR = ROOT / "assets" / "creatures"
+BG_OUT = ROOT / "assets" / "backgrounds"
 
 # ⭐ Small enough that the art reads as deliberate pixel art rather than a
 # blurry photo, large enough to keep a silhouette. 64 is the sweet spot for a
 # ~160px display height.
 DEFAULT_SIZE = 64
+
+# ⭐ Wide, and small enough to still read as pixel art when scaled up behind
+# the arena. 16:9 so it fits the duel screen without cropping.
+BACKGROUND_SIZE = (384, 216)
+
+# A scene needs more than a creature's 16 — fewer and skies band badly.
+BACKGROUND_COLOURS = 28
+
+# ⚠️ How far a background is pushed back. Both deliberate: without them a good
+# backdrop makes the creature standing on it unreadable.
+BACKGROUND_DARKEN = 0.42
+BACKGROUND_DESATURATE = 0.45
 
 # ⚠️ Anything below this alpha becomes fully transparent. Soft edges at this
 # scale read as grime, not as antialiasing.
@@ -187,10 +210,68 @@ def to_sprite(
     return canvas
 
 
+def to_background(src: pathlib.Path, size: tuple[int, int]) -> Image.Image:
+    """A wide, dimmed, quantised arena backdrop.
+
+    ⚠️ No element remap. A scene is many hues; forcing it through one ramp
+    turns a forest into a green smear.
+    """
+    img = Image.open(src).convert("RGB")
+
+    # Cover-fit, then centre-crop — letterboxing a backdrop looks like a bug.
+    tw, th = size
+    scale = max(tw / img.width, th / img.height)
+    img = img.resize(
+        (max(1, round(img.width * scale)), max(1, round(img.height * scale))),
+        Image.BOX,
+    )
+    left = (img.width - tw) // 2
+    top = (img.height - th) // 2
+    img = img.crop((left, top, left + tw, top + th))
+
+    # ⭐ Push it back BEFORE quantising, so the palette is chosen from the
+    # colours that will actually be shown rather than the bright originals.
+    px = np.asarray(img).astype(np.float32)
+    grey = px.mean(axis=2, keepdims=True)
+    px = px + (grey - px) * BACKGROUND_DESATURATE
+    px = px * (1.0 - BACKGROUND_DARKEN)
+    img = Image.fromarray(px.clip(0, 255).astype(np.uint8), "RGB")
+
+    return img.quantize(
+        colors=BACKGROUND_COLOURS,
+        method=Image.Quantize.MEDIANCUT,
+        dither=Image.Dither.NONE,
+    ).convert("RGB")
+
+
+def run_backgrounds(zone: str) -> None:
+    src_dir = SOURCE_DIR / "backgrounds"
+    matches = [
+        f
+        for f in sorted(src_dir.glob(f"{zone}.*"))
+        if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}
+    ] if src_dir.is_dir() else []
+    if not matches:
+        sys.exit(
+            f"no backdrop at {src_dir}/{zone}.png\n"
+            f"  Prompts: art/prompts/backgrounds.md"
+        )
+    BG_OUT.mkdir(parents=True, exist_ok=True)
+    dst = BG_OUT / f"{zone}.png"
+    to_background(matches[0], BACKGROUND_SIZE).save(dst)
+    w, h = BACKGROUND_SIZE
+    print(f"  {matches[0].name} -> {dst.relative_to(ROOT)}  ({w}x{h})")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--zone", required=True, help="e.g. whispering_woods")
-    ap.add_argument("--element", required=True, help="e.g. flora")
+    ap.add_argument(
+        "--mode",
+        choices=["creature", "background"],
+        default="creature",
+    )
+    ap.add_argument("--element", help="e.g. flora — creature mode only")
     ap.add_argument("--size", type=int, default=DEFAULT_SIZE)
     ap.add_argument(
         "--cutout",
@@ -198,6 +279,13 @@ def main() -> None:
         help="strip the background first (needed for generated scenes)",
     )
     args = ap.parse_args()
+
+    if args.mode == "background":
+        run_backgrounds(args.zone)
+        return
+
+    if not args.element:
+        sys.exit("creature mode needs --element (the palette to lock to)")
 
     palettes = write_palettes()
     if args.element not in palettes:

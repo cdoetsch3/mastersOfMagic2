@@ -80,7 +80,7 @@ surface it and ask; do not decide it in code.
 | ⭐ **The Buried Sky** — the late Geo+Astral zone | [WORLD_DESIGN.md](docs/WORLD_DESIGN.md) **§4c.1b** |
 | ⭐ **What content each zone still needs** — the tracking grid | [CONTENT_CHECKLIST.md](docs/CONTENT_CHECKLIST.md) |
 | 🎨 **What each creature looks like** — the descriptions | [BESTIARY_ART.md](docs/BESTIARY_ART.md) |
-| 🎨 **Paste-ready image prompts**, and how to name the files | [art/prompts/](art/prompts/) |
+| 🎨 **Paste-ready image prompts**, and the art pipeline | [art/README.md](art/README.md) |
 | Boss/mini-boss names per element, zone structure | [GAME_DESIGN.md](docs/GAME_DESIGN.md) §5, §3d |
 
 ### "I want to know what to work on"
