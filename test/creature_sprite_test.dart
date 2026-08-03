@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/creature_sprite.dart';
 import 'package:masters_of_magic_2/game/enemies/bestiary.dart';
 import 'package:masters_of_magic_2/game/enemies/whispering_woods_art.dart';
+import 'package:masters_of_magic_2/ui/creature_art.dart';
 import 'package:mom_engine/mom_engine.dart';
 
 void main() {
@@ -83,6 +86,37 @@ void main() {
 
     test('an unknown character draws nothing rather than throwing', () {
       expect(SpritePalette.forElement(MagicElement.flora).resolve('?'), isNull);
+    });
+  });
+
+  group('asset paths', () {
+    test('a creature resolves to its zone and id', () {
+      final fawn = Bestiary.byId('listening_fawn')!;
+      expect(
+        creatureAssetFor(fawn),
+        'assets/creatures/whispering_woods/listening_fawn.png',
+      );
+    });
+
+    test('⚠️ every declared asset directory exists in pubspec', () {
+      // A directory declared in pubspec must exist or the build fails, and
+      // one that exists but is NOT declared silently ships nothing.
+      final pubspec = File('pubspec.yaml').readAsStringSync();
+      for (final e in Bestiary.all) {
+        expect(
+          pubspec,
+          contains('assets/creatures/${e.zoneId}/'),
+          reason: '${e.zoneId} art would not be bundled',
+        );
+      }
+      expect(pubspec, contains('assets/backgrounds/'));
+    });
+
+    test('a zone backdrop resolves to its id', () {
+      expect(
+        backdropFor('whispering_woods'),
+        'assets/backgrounds/whispering_woods.png',
+      );
     });
   });
 }

@@ -148,11 +148,19 @@ assets/creatures/           pixelated sprites, per zone
 can be tested exhaustively, run headless in the balance simulator, and one day
 run server-side. Never import Flutter into `packages/mom_engine`.
 
-⭐ **There are no image assets anywhere in this project.** Every visual — the
-world map, mage sprites, element glyphs, combat FX — is a `CustomPainter`.
-This is deliberate: it is why the map is seeded and deterministic, and why
-there is no art pipeline. Adding bitmaps is a real decision, not a detail (see
-GAME_DESIGN §5, narrative screens).
+⭐ **Almost everything is a `CustomPainter`** — the world map, the mage sprite,
+element glyphs, every combat effect. That is why the map is seeded and
+deterministic, and it stays true.
+
+⚠️ **Amended 2026-08-02: creature art is the one exception.** A bestiary of 275
+creatures is not something hand-placed pixels can carry — a full pass at
+pixel-grid sprites produced nine interchangeable green lumps out of eleven
+(IMPLEMENTATION_PLAN). Creatures and arena backdrops are therefore **generated
+images**, pixelated through `tool/pixelate.py`; see [art/README.md](art/README.md).
+
+⚠️ **The exception is bounded.** Anything else wanting a bitmap is still a real
+decision, not a detail. And `CreatureView` **falls back** to the pixel grid, so
+a zone without art renders rather than breaking.
 
 ---
 

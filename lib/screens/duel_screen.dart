@@ -16,7 +16,9 @@ import '../game/status_fx.dart';
 import '../game/opponent_driver.dart';
 import '../game/progression.dart';
 import '../game/items/item_catalogue.dart';
+import '../game/enemies/enemy_def.dart';
 import '../ui/app_theme.dart';
+import '../ui/creature_art.dart';
 import 'tabs/inventory_tab.dart' show rarityColour;
 import '../ui/element_text.dart';
 import 'home_shell.dart';
@@ -192,6 +194,13 @@ class _DuelScreenState extends State<DuelScreen>
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+  }
+
+  /// The bestiary entry behind this fight. Null for a PvP duel or a practice
+  /// persona, where the opponent really is a mage.
+  EnemyDef? get _enemyDef {
+    final d = widget.driver;
+    return d is LocalAiDriver ? d.enemy : null;
   }
 
   /// Loot from this encounter, once [DuelScreen.onSettle] has resolved.
@@ -660,6 +669,10 @@ class _DuelScreenState extends State<DuelScreen>
                 },
                 child: Stack(
                   children: [
+                    // ⭐ Behind everything, and it loses to everything. Absent
+                    // until a zone has a backdrop, which is most of them.
+                    if (_enemyDef != null)
+                      ArenaBackdrop(zoneId: _enemyDef!.zoneId),
                     Positioned(
                       left: 0,
                       right: 0,
@@ -771,18 +784,31 @@ class _DuelScreenState extends State<DuelScreen>
         child: Stack(
           alignment: Alignment.center,
           children: [
-            MageSprite(
-              apparel: isEnemy
-                  ? widget.driver.opponentApparel
-                  : MageApparel.apprenticeBlue,
-              element: isEnemy
-                  ? c.revealedEnemyElement
-                  : (c.shownPlayerElement ?? c.pendingElement),
-              charge: isEnemy ? c.shownEnemyCharge : c.shownPlayerCharge,
-              facingRight: !isEnemy,
-              defeated: isEnemy ? c.enemyDefeated : c.playerDefeated,
-              height: height,
-            ),
+            // ⭐ The player is a mage; the opponent usually is not. A
+            // Listening Fawn is a deer grown from roots, and it spent this
+            // whole project fighting in a green cloak and a pointed hat
+            // because personas wear MageApparel.
+            if (isEnemy && _enemyDef != null)
+              CreatureView(
+                def: _enemyDef!,
+                charge: c.shownEnemyCharge,
+                facingRight: false,
+                defeated: c.enemyDefeated,
+                height: height,
+              )
+            else
+              MageSprite(
+                apparel: isEnemy
+                    ? widget.driver.opponentApparel
+                    : MageApparel.apprenticeBlue,
+                element: isEnemy
+                    ? c.revealedEnemyElement
+                    : (c.shownPlayerElement ?? c.pendingElement),
+                charge: isEnemy ? c.shownEnemyCharge : c.shownPlayerCharge,
+                facingRight: !isEnemy,
+                defeated: isEnemy ? c.enemyDefeated : c.playerDefeated,
+                height: height,
+              ),
             // Shield + Barrier are one painter: the shield is one ring per
             // 100 points with its stroke scaled to what's LEFT (so it visibly
             // thins as it fails), and each Barrier point is a thin beaded white

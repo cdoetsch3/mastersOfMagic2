@@ -25,3 +25,14 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # ⚠️ The first image assets in the project. Everything else is a
+  # CustomPainter (README §4) and stays that way — the map, the mage, every
+  # combat effect. A bestiary of 275 creatures is what hand-placed pixels
+  # could not carry.
+  #
+  # ⚠️ Declared per directory, and a declared directory must EXIST — hence the
+  # .gitkeep files. Not recursive: a new zone needs a line here.
+  assets:
+    - assets/creatures/whispering_woods/
+    - assets/backgrounds/
