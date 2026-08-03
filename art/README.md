@@ -21,6 +21,15 @@ Descriptions come from [../docs/BESTIARY_ART.md](../docs/BESTIARY_ART.md).
 python3 tool/pixelate.py --zone whispering_woods --element flora --cutout
 ```
 
+⭐ **128×128 by default.** 64 was the first guess and it lost the Listening
+Fawn's root legs and lowered head entirely. `--size` overrides it.
+
+⭐ **Every palette carries a neutral ramp as well as its element ramp.** A
+single-hue palette destroys material contrast — the Fawn is birch-white bark
+under green moss, and against a Flora-only ramp both collapsed into the same
+green. The neutral ramp is what lets bark, bone, stone and ash survive while
+the element hue still says which zone you are in.
+
 ⚠️ **`--cutout` unless the art already has a transparent background.** A
 generator returns a scene; the pipeline's trim and composite assume the
 background is gone, so without it the scenery gets pixelated too.

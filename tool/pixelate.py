@@ -63,10 +63,12 @@ SOURCE_DIR = ROOT / "art" / "source"
 OUT_DIR = ROOT / "assets" / "creatures"
 BG_OUT = ROOT / "assets" / "backgrounds"
 
-# ⭐ Small enough that the art reads as deliberate pixel art rather than a
-# blurry photo, large enough to keep a silhouette. 64 is the sweet spot for a
-# ~160px display height.
-DEFAULT_SIZE = 64
+# ⚠️ **128, not 64.** 64 was the first guess and it was too small — measured on
+# the Listening Fawn, the root legs and the lowered head both dissolved. 128
+# keeps them and still reads as deliberate pixel art rather than a blurry
+# photo. Costs about 11 KB a sprite, so ~3 MB for the whole 275-creature
+# bestiary, which is nothing next to the 37 MB of canvaskit.
+DEFAULT_SIZE = 128
 
 # ⭐ Wide, and small enough to still read as pixel art when scaled up behind
 # the arena. 16:9 so it fits the duel screen without cropping.
@@ -124,15 +126,17 @@ def element_colours() -> dict[str, tuple[int, int, int]]:
     return out
 
 
-def build_ramp(rgb: tuple[int, int, int], steps: int = 10) -> list[tuple[int, int, int]]:
-    """A dark-to-light ramp through an element's colour.
+def build_ramp(
+    rgb: tuple[int, int, int],
+    steps: int,
+    shadow: tuple[int, int, int] = (18, 14, 26),
+    light: tuple[int, int, int] = (255, 250, 240),
+) -> list[tuple[int, int, int]]:
+    """A dark-to-light ramp through one colour.
 
-    ⭐ Not a rainbow. A creature palette is one hue's tonal range plus a near
-    black and a near white — that is what makes a limited palette read as
-    lighting rather than as posterisation.
+    ⭐ Not a rainbow. A ramp is one hue's tonal range — that is what makes a
+    limited palette read as lighting rather than as posterisation.
     """
-    shadow = (18, 14, 26)  # the game's own background, so sprites sit in it
-    light = (255, 250, 240)
     ramp: list[tuple[int, int, int]] = []
     half = steps // 2
     for i in range(half):  # shadow -> colour
@@ -144,15 +148,26 @@ def build_ramp(rgb: tuple[int, int, int], steps: int = 10) -> list[tuple[int, in
     return ramp
 
 
-def write_palettes(size: int = 16) -> dict[str, list[tuple[int, int, int]]]:
-    """Writes one palette PNG per element and returns them."""
+def write_palettes(size: int = 24) -> dict[str, list[tuple[int, int, int]]]:
+    """One palette per element: an element ramp PLUS a neutral ramp.
+
+    ⚠️ **A single-hue palette destroys material contrast**, and that was not
+    obvious until real art went through it. The Listening Fawn is birch-white
+    bark under green moss; against a Flora-only ramp both collapsed into the
+    same green and the creature read as one flat colour.
+
+    ⭐ The neutral ramp is what lets bark, bone, stone, ash and snow survive
+    while the element hue still says which zone you are in.
+    """
     PALETTE_DIR.mkdir(parents=True, exist_ok=True)
+    # A warm-grey ramp: bark and bone, never a pure neutral, so it sits with
+    # the element rather than looking like a different image.
+    NEUTRAL = (168, 158, 148)
     palettes = {}
     for name, rgb in element_colours().items():
-        ramp = build_ramp(rgb, steps=size - 2)
-        # ⭐ A true black and a near-white on every palette: outlines and
-        # specular highlights are what stop a sprite reading as a flat blob.
-        full = [(10, 8, 14)] + ramp + [(255, 255, 255)]
+        hue = build_ramp(rgb, steps=size - 8)
+        neutral = build_ramp(NEUTRAL, steps=6, shadow=(24, 22, 28))
+        full = [(10, 8, 14)] + hue + neutral + [(255, 255, 255)]
         img = Image.new("RGB", (len(full), 1))
         img.putdata(full)
         img.save(PALETTE_DIR / f"{name}.png")
