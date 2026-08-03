@@ -19,15 +19,15 @@ disagree, **they win on rules and this wins on place.**
 Status legend: ✅ decided · 📝 draft · 💡 idea bank · ❓ open · ⚠️ risk
 
 Companion plates are checked in as self-contained HTML under
-[docs/plates/](docs/plates/) — open any of them directly in a browser.
+[docs/plates/](plates/) — open any of them directly in a browser.
 
 | Plate | Shows | Verdict |
 |---|---|---|
-| [**I**](docs/plates/plate-1-known-world.html) | plan view, climate causation | superseded by I-a/I-b |
-| [**II**](docs/plates/plate-2-wheel.html) | concentric wheel — rings and marches | ❌ not adopted; two ideas salvaged (§5) |
-| [**III**](docs/plates/plate-3-long-ascent.html) | elevation section, places numbered by height | ❌ not adopted; ⚠️ its altitudes are **no longer canon** |
-| [**I-a**](docs/plates/plate-1a-the-climb.html) | plan view + ascent — the finale becomes a climb | superseded by I-b |
-| ✅ [**I-b**](docs/plates/plate-1b-one-crossing.html) | **the settled map** — one world, one crossing | **canonical** |
+| [**I**](plates/plate-1-known-world.html) | plan view, climate causation | superseded by I-a/I-b |
+| [**II**](plates/plate-2-wheel.html) | concentric wheel — rings and marches | ❌ not adopted; two ideas salvaged (§5) |
+| [**III**](plates/plate-3-long-ascent.html) | elevation section, places numbered by height | ❌ not adopted; ⚠️ its altitudes are **no longer canon** |
+| [**I-a**](plates/plate-1a-the-climb.html) | plan view + ascent — the finale becomes a climb | superseded by I-b |
+| ✅ [**I-b**](plates/plate-1b-one-crossing.html) | **the settled map** — one world, one crossing | **canonical** |
 
 ---
 

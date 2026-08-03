@@ -29,7 +29,7 @@ enum WorldPlane {
 /// A place on the world map. The graph of [connections] is what travel walks;
 /// there is no simulated terrain (design decision — menu-based travel only).
 ///
-/// Source of truth: **[WORLD_DESIGN.md](../../WORLD_DESIGN.md) and Plate I-b**
+/// Source of truth: **[WORLD_DESIGN.md](../../docs/WORLD_DESIGN.md) and Plate I-b**
 /// (`docs/plates/plate-1b-one-crossing.html`). Coordinates are not stored —
 /// the plate holds the geometry, this holds the graph and the text.
 /// How a road is travelled, which is not the same as how long it takes.

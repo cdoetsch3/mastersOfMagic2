@@ -7,9 +7,10 @@ Both players lock in a move each turn, then the round resolves together —
 prediction and mind-games are the point. The duel engine is pure Dart,
 deterministic, and runs lockstep with commit-reveal netcode.
 
-> **This file is the index.** It exists so a human or an AI arriving cold can
-> find the right document in one hop instead of grepping. If you add a design
-> doc, add a row here.
+> **This file is the index, and the only Markdown at the repo root.** Every
+> design doc lives in [docs/](docs/); this exists so a human or an AI arriving
+> cold can find the right one in one hop instead of grepping. If you add a
+> design doc, put it in `docs/` and add a row here.
 
 ---
 
@@ -37,19 +38,19 @@ surface it and ask; do not decide it in code.
 
 | Question | Doc |
 |---|---|
-| How does a turn resolve? Priority, Haste, charge? | [GAME_DESIGN.md](GAME_DESIGN.md) §1 |
-| What do the twelve elements *do*? | [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) |
-| Exact resolution order / precedence pipeline | [TYPE_EFFECTS_DESIGN.md](TYPE_EFFECTS_DESIGN.md) §5.1–5.2 |
-| Spell list, costs, priorities | [GAME_DESIGN.md](GAME_DESIGN.md) §3 |
-| Levels, XP, unlock schedules | [PROGRESSION_DESIGN.md](PROGRESSION_DESIGN.md) |
-| Game modes (PvP, campaign, Discordant, Mortal) | [GAME_DESIGN.md](GAME_DESIGN.md) §5 |
+| How does a turn resolve? Priority, Haste, charge? | [GAME_DESIGN.md](docs/GAME_DESIGN.md) §1 |
+| What do the twelve elements *do*? | [TYPE_EFFECTS_DESIGN.md](docs/TYPE_EFFECTS_DESIGN.md) |
+| Exact resolution order / precedence pipeline | [TYPE_EFFECTS_DESIGN.md](docs/TYPE_EFFECTS_DESIGN.md) §5.1–5.2 |
+| Spell list, costs, priorities | [GAME_DESIGN.md](docs/GAME_DESIGN.md) §3 |
+| Levels, XP, unlock schedules | [PROGRESSION_DESIGN.md](docs/PROGRESSION_DESIGN.md) |
+| Game modes (PvP, campaign, Discordant, Mortal) | [GAME_DESIGN.md](docs/GAME_DESIGN.md) §5 |
 
 ### "I want to change the world or the map"
 
 | Question | Doc |
 |---|---|
-| Which places exist, how they connect, what is in them | [WORLD_DESIGN.md](WORLD_DESIGN.md) |
-| Travel times, mounts, trade, the Concord Market | [WORLD_DESIGN.md](WORLD_DESIGN.md) §4b |
+| Which places exist, how they connect, what is in them | [WORLD_DESIGN.md](docs/WORLD_DESIGN.md) |
+| Travel times, mounts, trade, the Concord Market | [WORLD_DESIGN.md](docs/WORLD_DESIGN.md) §4b |
 | 🗺️ **The current world map, rendered and labelled** | [docs/plates/world-map.html](docs/plates/world-map.html) |
 | How the map is *drawn* (and the bugs that shaped it) | [docs/reviews/](docs/reviews/) |
 | Visual plates / map artwork history | [docs/plates/](docs/plates/) |
@@ -58,32 +59,32 @@ surface it and ask; do not decide it in code.
 
 | Question | Doc |
 |---|---|
-| Equipment slots, sets, rarity, modifiers | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §1–4, §8 |
-| Motes and the crafting currency ladder | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §6 |
-| Skills — gathering and processing | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §6a |
-| ⭐ **Crafting model, quality tiers, stations, gathering nodes, the wood ladder, naming grammar** | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) **§9b** — the newest and most concrete section |
-| What can be traded, and what can never be | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) §6c |
-| 🚫 **Monetization — read before touching anything purchasable** | [ITEMS_DESIGN.md](ITEMS_DESIGN.md) **§3.6** |
-| Achievements and character progress | [ACHIEVEMENTS_DESIGN.md](ACHIEVEMENTS_DESIGN.md) |
+| Equipment slots, sets, rarity, modifiers | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) §1–4, §8 |
+| Motes and the crafting currency ladder | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) §6 |
+| Skills — gathering and processing | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) §6a |
+| ⭐ **Crafting model, quality tiers, stations, gathering nodes, the wood ladder, naming grammar** | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) **§9b** — the newest and most concrete section |
+| What can be traded, and what can never be | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) §6c |
+| 🚫 **Monetization — read before touching anything purchasable** | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) **§3.6** |
+| Achievements and character progress | [ACHIEVEMENTS_DESIGN.md](docs/ACHIEVEMENTS_DESIGN.md) |
 
 ### "I want to work on enemies or zone content"
 
 | Question | Doc |
 |---|---|
-| ⭐ **The 16 enemy archetypes, and how an enemy is built** | [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) §1–2 |
-| ⭐ **Why a creature's fiction picks its archetype** — the rule everything else follows | [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) **§2b** |
-| ⭐ **Primal-quarter zone themes and full rosters** (commons, minis, bosses) | [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) **§2d** |
-| ⭐ **The Primal quarter's story arc** — what the five themes add up to | [GAME_DESIGN.md](GAME_DESIGN.md) §5 |
-| Element coverage across the world, and the late-zone proposal | [WORLD_DESIGN.md](WORLD_DESIGN.md) §4c |
-| ⭐ **The Sealed Garden** — the late Flora+Sanctus zone, and why Eden matters to the endgame | [WORLD_DESIGN.md](WORLD_DESIGN.md) **§4c.1a** |
-| ⭐ **The Buried Sky** — the late Geo+Astral zone | [WORLD_DESIGN.md](WORLD_DESIGN.md) **§4c.1b** |
-| ⭐ **What content each zone still needs** — the tracking grid | [CONTENT_CHECKLIST.md](CONTENT_CHECKLIST.md) |
-| 🎨 **What each creature looks like** — image-generation briefs | [BESTIARY_ART.md](BESTIARY_ART.md) |
-| Boss/mini-boss names per element, zone structure | [GAME_DESIGN.md](GAME_DESIGN.md) §5, §3d |
+| ⭐ **The 16 enemy archetypes, and how an enemy is built** | [ENEMIES_DESIGN.md](docs/ENEMIES_DESIGN.md) §1–2 |
+| ⭐ **Why a creature's fiction picks its archetype** — the rule everything else follows | [ENEMIES_DESIGN.md](docs/ENEMIES_DESIGN.md) **§2b** |
+| ⭐ **Primal-quarter zone themes and full rosters** (commons, minis, bosses) | [ENEMIES_DESIGN.md](docs/ENEMIES_DESIGN.md) **§2d** |
+| ⭐ **The Primal quarter's story arc** — what the five themes add up to | [GAME_DESIGN.md](docs/GAME_DESIGN.md) §5 |
+| Element coverage across the world, and the late-zone proposal | [WORLD_DESIGN.md](docs/WORLD_DESIGN.md) §4c |
+| ⭐ **The Sealed Garden** — the late Flora+Sanctus zone, and why Eden matters to the endgame | [WORLD_DESIGN.md](docs/WORLD_DESIGN.md) **§4c.1a** |
+| ⭐ **The Buried Sky** — the late Geo+Astral zone | [WORLD_DESIGN.md](docs/WORLD_DESIGN.md) **§4c.1b** |
+| ⭐ **What content each zone still needs** — the tracking grid | [CONTENT_CHECKLIST.md](docs/CONTENT_CHECKLIST.md) |
+| 🎨 **What each creature looks like** — image-generation briefs | [BESTIARY_ART.md](docs/BESTIARY_ART.md) |
+| Boss/mini-boss names per element, zone structure | [GAME_DESIGN.md](docs/GAME_DESIGN.md) §5, §3d |
 
 ### "I want to know what to work on"
 
-⭐ **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the work queue.** It
+⭐ **[IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) is the work queue.** It
 holds the phase order, dependency gates, what is done, what is blocked and why,
 and a *Deferred / banked* list of things deliberately **not** being built yet.
 Read its §0 "Rules of engagement" before writing code — those are conventions
@@ -134,7 +135,12 @@ packages/mom_engine/        pure-Dart duel engine — no Flutter imports
   test/                     engine tests
   tool/balance_sim.dart     AI-vs-AI balance simulator
 test/                       app-level widget tests
-docs/                       architecture reviews, map plates
+docs/                       ⭐ every design doc lives here
+  plates/                   map artwork, generated + historical
+  reviews/                  architecture reviews
+art/                        source art and per-element palettes
+  prompts/                  image-generation prompts, per zone
+assets/creatures/           pixelated sprites, per zone
 ```
 
 ⭐ **The engine is deliberately Flutter-free.** It is a pure Dart package so it
@@ -202,7 +208,7 @@ live.
 
 ## 6. For AI agents specifically
 
-- **Read [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) §0 first.** It is
+- **Read [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) §0 first.** It is
   written for you and encodes conventions that have already cost real time.
 - 🚫 **Do not do UI or browser verification.** Christian drives all visual
   testing. Write widget/unit tests for logic, then hand over an explicit list

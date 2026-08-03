@@ -682,7 +682,7 @@ fault of the player. So:
   §7 ruling that Stagger lingers until consumed).
 - ⚠️ **Naming:** the working name for this was "Ward," which **collides with
   the shipped `Ward` spell** (1-charge shield, priority 3,
-  [spellbook.dart](packages/mom_engine/lib/src/spellbook.dart)). **Grace** is
+  [spellbook.dart](../packages/mom_engine/lib/src/spellbook.dart)). **Grace** is
   the name; alternates considered and free: Benediction, Reprieve, Sanctity.
 - ✅ Grace does **not** block Fatigue, for the same reason Absolution can't
   purge it.

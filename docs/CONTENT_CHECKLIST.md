@@ -176,7 +176,7 @@ and Magma Behemoth; Tidewrack Shoals took Kraken and Leviathan.
 `test/world_test.dart` asserts the 3–4 range (not just a floor) and that no
 element tops out below band 28.
 
-🗺️ **[docs/plates/world-map.html](docs/plates/world-map.html) is the current
+🗺️ **[docs/plates/world-map.html](plates/world-map.html) is the current
 map.** Regenerate it after any change to positions, roads or bands with
 `flutter test tool/render_map_test.dart`.
 
