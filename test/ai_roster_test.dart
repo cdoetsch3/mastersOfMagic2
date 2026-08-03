@@ -20,12 +20,18 @@ void main() {
     final levels = AiRoster.all.map((p) => p.level).toList();
 
     expect(levels, [1, 15, 28, 40, 50, 60], reason: 'evenly spread 1..50, +60');
-    expect(levels, orderedEquals(List.of(levels)..sort()),
-        reason: 'AiRoster.all must stay weakest-to-strongest');
+    expect(
+      levels,
+      orderedEquals(List.of(levels)..sort()),
+      reason: 'AiRoster.all must stay weakest-to-strongest',
+    );
 
     final aboveCap = AiRoster.all.where((p) => p.level > 50).toList();
-    expect(aboveCap.map((p) => p.name), ['Procarius'],
-        reason: 'only the Eclipsed sits above the player level cap');
+    expect(
+      aboveCap.map((p) => p.name),
+      ['Procarius'],
+      reason: 'only the Eclipsed sits above the player level cap',
+    );
   });
 
   test('intelligence stays on the 1-10 ladder and rises with level', () {
@@ -46,14 +52,22 @@ void main() {
     for (final p in AiRoster.all) {
       for (final element in p.loadout.elements) {
         final needs = tierUnlockLevel[element.tier]!;
-        expect(p.level, greaterThanOrEqualTo(needs),
-            reason: '${p.name} (L${p.level}) carries ${element.name}, but '
-                '${element.tier.name} unlocks at L$needs');
+        expect(
+          p.level,
+          greaterThanOrEqualTo(needs),
+          reason:
+              '${p.name} (L${p.level}) carries ${element.name}, but '
+              '${element.tier.name} unlocks at L$needs',
+        );
       }
       for (final spell in p.loadout.spells) {
-        expect(p.level, greaterThanOrEqualTo(Progression.unlockLevelOf(spell)),
-            reason: '${p.name} (L${p.level}) carries ${spell.id}, which '
-                'unlocks at L${Progression.unlockLevelOf(spell)}');
+        expect(
+          p.level,
+          greaterThanOrEqualTo(Progression.unlockLevelOf(spell)),
+          reason:
+              '${p.name} (L${p.level}) carries ${spell.id}, which '
+              'unlocks at L${Progression.unlockLevelOf(spell)}',
+        );
       }
     }
   });
@@ -66,37 +80,56 @@ void main() {
   // force.
   test('every persona fits what a player of its level may field', () {
     for (final p in AiRoster.all) {
-      expect(p.loadout.elements.length,
-          lessThanOrEqualTo(Progression.usableElementsAtLevel(p.level)),
-          reason: '${p.name} holds ${p.loadout.elements.length} elements');
-      expect(p.loadout.spells.length,
-          lessThanOrEqualTo(Progression.usableSpellsAtLevel(p.level)),
-          reason: '${p.name} holds ${p.loadout.spells.length} spells');
+      expect(
+        p.loadout.elements.length,
+        lessThanOrEqualTo(Progression.usableElementsAtLevel(p.level)),
+        reason: '${p.name} holds ${p.loadout.elements.length} elements',
+      );
+      expect(
+        p.loadout.spells.length,
+        lessThanOrEqualTo(Progression.usableSpellsAtLevel(p.level)),
+        reason: '${p.name} holds ${p.loadout.spells.length} spells',
+      );
     }
   });
 
   test('loadouts respect the per-pool caps and hold no duplicates', () {
     for (final p in AiRoster.all) {
-      expect(p.loadout.elements.length,
-          inInclusiveRange(1, Loadout.maxElementSlots),
-          reason: p.name);
-      expect(p.loadout.spells.length,
-          inInclusiveRange(1, Loadout.maxSpellSlots),
-          reason: p.name);
-      expect(p.loadout.elements.toSet().length, p.loadout.elements.length,
-          reason: '${p.name} lists a duplicate element');
-      expect(p.loadout.spells.map((s) => s.id).toSet().length,
-          p.loadout.spells.length,
-          reason: '${p.name} lists a duplicate spell');
+      expect(
+        p.loadout.elements.length,
+        inInclusiveRange(1, Loadout.maxElementSlots),
+        reason: p.name,
+      );
+      expect(
+        p.loadout.spells.length,
+        inInclusiveRange(1, Loadout.maxSpellSlots),
+        reason: p.name,
+      );
+      expect(
+        p.loadout.elements.toSet().length,
+        p.loadout.elements.length,
+        reason: '${p.name} lists a duplicate element',
+      );
+      expect(
+        p.loadout.spells.map((s) => s.id).toSet().length,
+        p.loadout.spells.length,
+        reason: '${p.name} lists a duplicate spell',
+      );
     }
 
     // A level-50 opponent should bring what a level-50 player brings: both
     // pools full — 5 elements and 10 spells.
     for (final p in AiRoster.all.where((p) => p.level >= 50)) {
-      expect(p.loadout.elements.length, Loadout.maxElementSlots,
-          reason: '${p.name} is under-equipped on elements for its level');
-      expect(p.loadout.spells.length, Loadout.maxSpellSlots,
-          reason: '${p.name} is under-equipped on spells for its level');
+      expect(
+        p.loadout.elements.length,
+        Loadout.maxElementSlots,
+        reason: '${p.name} is under-equipped on elements for its level',
+      );
+      expect(
+        p.loadout.spells.length,
+        Loadout.maxSpellSlots,
+        reason: '${p.name} is under-equipped on spells for its level',
+      );
     }
   });
 
@@ -108,13 +141,20 @@ void main() {
       if (previous != null) expect(rate, lessThan(previous));
       previous = rate;
     }
-    expect(previous, 0.0, reason: 'intelligence 10 is as optimal as we can make it');
+    expect(
+      previous,
+      0.0,
+      reason: 'intelligence 10 is as optimal as we can make it',
+    );
   });
 
   test('each persona reports the blunder rate its rating implies', () {
     for (final p in AiRoster.all) {
-      expect(p.mistakeChance, blunderChanceForIntelligence(p.intelligence),
-          reason: p.name);
+      expect(
+        p.mistakeChance,
+        blunderChanceForIntelligence(p.intelligence),
+        reason: p.name,
+      );
     }
   });
 
@@ -137,15 +177,23 @@ void main() {
       final foe = AiRoster.campaignFoe(name: 'Wild', level: level);
       for (final element in foe.loadout.elements) {
         final needs = tierUnlockLevel[element.tier]!;
-        expect(level, greaterThanOrEqualTo(needs),
-            reason: 'a L$level campaign foe borrowed ${element.name} '
-                '(${element.tier.name}, unlocks L$needs) from '
-                '${AiRoster.strongestAtOrBelow(level).name}');
+        expect(
+          level,
+          greaterThanOrEqualTo(needs),
+          reason:
+              'a L$level campaign foe borrowed ${element.name} '
+              '(${element.tier.name}, unlocks L$needs) from '
+              '${AiRoster.strongestAtOrBelow(level).name}',
+        );
       }
       for (final spell in foe.loadout.spells) {
-        expect(level, greaterThanOrEqualTo(Progression.unlockLevelOf(spell)),
-            reason: 'a L$level campaign foe borrowed ${spell.id} '
-                '(unlocks L${Progression.unlockLevelOf(spell)})');
+        expect(
+          level,
+          greaterThanOrEqualTo(Progression.unlockLevelOf(spell)),
+          reason:
+              'a L$level campaign foe borrowed ${spell.id} '
+              '(unlocks L${Progression.unlockLevelOf(spell)})',
+        );
       }
     }
   });

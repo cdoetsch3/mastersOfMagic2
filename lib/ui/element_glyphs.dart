@@ -103,9 +103,17 @@ class DemonGlyphPainter extends CustomPainter {
       final x = w * 0.5;
       path.moveTo(x + dir * w * 0.26, h * 0.30);
       path.quadraticBezierTo(
-          x + dir * w * 0.50, h * 0.16, x + dir * w * 0.44, h * 0.02);
+        x + dir * w * 0.50,
+        h * 0.16,
+        x + dir * w * 0.44,
+        h * 0.02,
+      );
       path.quadraticBezierTo(
-          x + dir * w * 0.30, h * 0.14, x + dir * w * 0.13, h * 0.22);
+        x + dir * w * 0.30,
+        h * 0.14,
+        x + dir * w * 0.13,
+        h * 0.22,
+      );
       path.close();
     }
 
@@ -147,8 +155,8 @@ class PaintedGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: size,
-        height: size,
-        child: CustomPaint(painter: painter(color)),
-      );
+    width: size,
+    height: size,
+    child: CustomPaint(painter: painter(color)),
+  );
 }

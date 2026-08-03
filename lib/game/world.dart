@@ -107,15 +107,40 @@ class TravelEdge {
 /// for when tuning resumes. ⭐ Two durations exist on purpose; this one wins,
 /// and `travel_test.dart` asserts which.
 abstract final class TravelTimes {
-  /// Every leg, regardless of what it joins.
-  static const int perLeg = 3;
+  /// ⭐ **The one knob.** Every leg of every journey costs this.
+  ///
+  /// 📝 **10 seconds while testing** — a real playthrough wants minutes, but
+  /// waiting three of them to check a change is not a workflow. ⚠️ Put this
+  /// back to `3 * 60` before anyone plays for real.
+  static const int perLegSeconds = 10;
 
-  /// The cost of the leg joining [fromId] and [toId].
+  /// The cost of the leg joining [fromId] and [toId], in seconds.
   ///
   /// Takes both endpoints even though it currently ignores them — ⭐ every
   /// rule worth trying next (by destination kind, by tier, by edge kind) needs
   /// them, and threading them later would touch the solver again.
-  static int between(String fromId, String toId) => perLeg;
+  static int secondsBetween(String fromId, String toId) => perLegSeconds;
+
+  /// Whole minutes, rounded up, for anything that still counts in minutes.
+  ///
+  /// ⚠️ Never 0 — a leg that reads as free is worse than one that reads as
+  /// slow.
+  static int between(String fromId, String toId) {
+    final secs = secondsBetween(fromId, toId);
+    return secs == 0 ? 0 : ((secs / 60).ceil()).clamp(1, 1 << 30);
+  }
+
+  /// A human label for [seconds] — "10s", "3 min", "1h 05m".
+  ///
+  /// ⭐ One formatter, so a 10-second test build does not display "0 min"
+  /// everywhere and look broken.
+  static String label(int seconds) {
+    if (seconds < 60) return '${seconds}s';
+    if (seconds < 3600) return '${(seconds / 60).round()} min';
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    return '${h}h ${m.toString().padLeft(2, '0')}m';
+  }
 }
 
 class GameLocation {

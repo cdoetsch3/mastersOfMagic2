@@ -26,17 +26,25 @@ void main() {
     });
   }
 
-  testWidgets('the reset form carries the email over from sign-in',
-      (tester) async {
-    await pumpAt(tester, const ForgotPasswordScreen(initialEmail: 'a@b.com'),
-        const Size(360, 720));
+  testWidgets('the reset form carries the email over from sign-in', (
+    tester,
+  ) async {
+    await pumpAt(
+      tester,
+      const ForgotPasswordScreen(initialEmail: 'a@b.com'),
+      const Size(360, 720),
+    );
     expect(find.text('a@b.com'), findsOneWidget);
   });
 
-  testWidgets('an invalid email is rejected before any request goes out',
-      (tester) async {
-    await pumpAt(tester, const ForgotPasswordScreen(initialEmail: 'nope'),
-        const Size(360, 720));
+  testWidgets('an invalid email is rejected before any request goes out', (
+    tester,
+  ) async {
+    await pumpAt(
+      tester,
+      const ForgotPasswordScreen(initialEmail: 'nope'),
+      const Size(360, 720),
+    );
     await tester.tap(find.text('Send reset link'));
     await tester.pump();
     expect(find.text('Enter a valid email address.'), findsOneWidget);

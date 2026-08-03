@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
+import 'package:masters_of_magic_2/game/travel.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:masters_of_magic_2/screens/tabs/map_tab.dart';
 
@@ -45,7 +46,14 @@ void main() {
   ) async {
     await pumpTab(tester);
     // Aldermere's neighbours are 3-minute walks.
-    expect(find.textContaining('3 min'), findsWidgets);
+    // ⭐ Whatever a leg currently costs, the trip must state it — the point is
+    // that the price is visible, not that it is any particular number.
+    expect(
+      find.textContaining(
+        TravelTimes.label(Travel.secondsBetween('aldermere', 'pennycross')!),
+      ),
+      findsWidgets,
+    );
   });
 
   testWidgets('a journey in progress is shown, and can be stopped', (
@@ -76,14 +84,21 @@ void main() {
     final game = await pumpTab(tester);
     await game.beginTravel('whispering_woods');
     await tester.pump();
-    expect(find.text('3:00'), findsOneWidget);
 
-    clock = noon.add(const Duration(seconds: 61));
+    // ⭐ Expressed against the trip, not a fixed 3:00 — the per-leg duration
+    // is a knob (TravelTimes.perLegSeconds) and a pinned clock face would
+    // fail every time it is tuned.
+    final total = game.profile.trip!.totalSeconds;
+    String face(int secs) =>
+        '${secs ~/ 60}:${(secs % 60).toString().padLeft(2, '0')}';
+    expect(find.text(face(total)), findsOneWidget);
+
+    clock = noon.add(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
-    expect(find.text('1:59'), findsOneWidget);
+    expect(find.text(face(total - 1)), findsOneWidget);
 
     // Let the ticker settle the arrival on its own.
-    clock = noon.add(const Duration(minutes: 4));
+    clock = noon.add(Duration(seconds: total + 60));
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
     expect(game.profile.locationId, 'whispering_woods');

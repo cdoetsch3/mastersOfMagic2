@@ -9,20 +9,28 @@ void main() {
   group('presence buckets', () {
     test('active within the window is online', () {
       expect(presenceFor(now, now: now), Presence.online);
-      expect(presenceFor(ago(const Duration(minutes: 4)), now: now),
-          Presence.online);
+      expect(
+        presenceFor(ago(const Duration(minutes: 4)), now: now),
+        Presence.online,
+      );
     });
 
     test('past the window is no longer online', () {
-      expect(presenceFor(ago(const Duration(minutes: 6)), now: now),
-          Presence.recent);
-      expect(presenceFor(ago(const Duration(hours: 5)), now: now),
-          Presence.recent);
+      expect(
+        presenceFor(ago(const Duration(minutes: 6)), now: now),
+        Presence.recent,
+      );
+      expect(
+        presenceFor(ago(const Duration(hours: 5)), now: now),
+        Presence.recent,
+      );
     });
 
     test('over a day is away', () {
-      expect(presenceFor(ago(const Duration(days: 3)), now: now),
-          Presence.away);
+      expect(
+        presenceFor(ago(const Duration(days: 3)), now: now),
+        Presence.away,
+      );
     });
 
     test('never recorded is unknown, which is not the same as offline', () {
@@ -31,8 +39,10 @@ void main() {
 
     test('a clock-skewed future timestamp reads as online, not unknown', () {
       // Devices disagree about the time; that should not blank the dot.
-      expect(presenceFor(now.add(const Duration(minutes: 3)), now: now),
-          Presence.online);
+      expect(
+        presenceFor(now.add(const Duration(minutes: 3)), now: now),
+        Presence.online,
+      );
     });
 
     test('only online shows the dot', () {
@@ -46,12 +56,16 @@ void main() {
   group('presence labels', () {
     test('read the way a person would say it', () {
       expect(presenceLabel(now, now: now), 'Online');
-      expect(presenceLabel(ago(const Duration(minutes: 40)), now: now),
-          '40m ago');
+      expect(
+        presenceLabel(ago(const Duration(minutes: 40)), now: now),
+        '40m ago',
+      );
       expect(presenceLabel(ago(const Duration(hours: 6)), now: now), '6h ago');
       expect(presenceLabel(ago(const Duration(days: 6)), now: now), '6d ago');
-      expect(presenceLabel(ago(const Duration(days: 90)), now: now),
-          'Over a month ago');
+      expect(
+        presenceLabel(ago(const Duration(days: 90)), now: now),
+        'Over a month ago',
+      );
       expect(presenceLabel(null, now: now), 'Never seen');
     });
   });

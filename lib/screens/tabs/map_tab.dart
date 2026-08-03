@@ -71,7 +71,7 @@ class _MapTabState extends State<MapTab> {
                   // ⚠️ One journey at a time. While travelling the cards stay
                   // visible but inert, so the map still reads as a map rather
                   // than emptying out mid-trip.
-                  minutes: Travel.minutesBetween(here.id, id),
+                  travelLabel: Travel.labelBetween(here.id, id),
                   enabled: !game.isTravelling,
                   onTravel: () => game.travelTo(id),
                 ),
@@ -337,12 +337,12 @@ class _TravelCard extends StatelessWidget {
 
   /// How long the walk takes, shown so the cost of a trip is visible before
   /// committing to it rather than discovered afterwards.
-  final int? minutes;
+  final String? travelLabel;
   final bool enabled;
   const _TravelCard({
     required this.location,
     required this.onTravel,
-    this.minutes,
+    this.travelLabel,
     this.enabled = true,
   });
 
@@ -422,7 +422,7 @@ class _TravelCard extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    minutes == null ? 'Travel' : '$minutes min',
+                    travelLabel ?? 'Travel',
                     style: const TextStyle(color: AppColors.teal, fontSize: 12),
                   ),
                   const SizedBox(width: 2),

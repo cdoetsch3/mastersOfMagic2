@@ -9,16 +9,22 @@ void main() {
     for (final element in MagicElement.values) {
       testWidgets('${element.name} draws at icon sizes', (tester) async {
         for (final size in [14.0, 18.0, 40.0]) {
-          await tester.pumpWidget(Center(
-            child: MediaQuery(
-              data: const MediaQueryData(),
-              child: Directionality(
-                textDirection: TextDirection.ltr,
-                child: elementGlyph(element, size: size),
+          await tester.pumpWidget(
+            Center(
+              child: MediaQuery(
+                data: const MediaQueryData(),
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: elementGlyph(element, size: size),
+                ),
               ),
             ),
-          ));
-          expect(tester.takeException(), isNull, reason: '${element.name} @$size');
+          );
+          expect(
+            tester.takeException(),
+            isNull,
+            reason: '${element.name} @$size',
+          );
         }
       });
     }
@@ -39,14 +45,27 @@ void main() {
       }
     });
 
-    testWidgets('both painters repaint when their colour changes',
-        (tester) async {
-      expect(const HaloGlyphPainter(Colors.red)
-          .shouldRepaint(const HaloGlyphPainter(Colors.blue)), isTrue);
-      expect(const HaloGlyphPainter(Colors.red)
-          .shouldRepaint(const HaloGlyphPainter(Colors.red)), isFalse);
-      expect(const DemonGlyphPainter(Colors.red)
-          .shouldRepaint(const DemonGlyphPainter(Colors.blue)), isTrue);
+    testWidgets('both painters repaint when their colour changes', (
+      tester,
+    ) async {
+      expect(
+        const HaloGlyphPainter(
+          Colors.red,
+        ).shouldRepaint(const HaloGlyphPainter(Colors.blue)),
+        isTrue,
+      );
+      expect(
+        const HaloGlyphPainter(
+          Colors.red,
+        ).shouldRepaint(const HaloGlyphPainter(Colors.red)),
+        isFalse,
+      );
+      expect(
+        const DemonGlyphPainter(
+          Colors.red,
+        ).shouldRepaint(const DemonGlyphPainter(Colors.blue)),
+        isTrue,
+      );
     });
   });
 }

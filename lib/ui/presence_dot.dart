@@ -16,7 +16,12 @@ class PresenceDot extends StatelessWidget {
   /// Overridable so tests are not wall-clock dependent.
   final DateTime? now;
 
-  const PresenceDot({super.key, required this.lastSeen, this.size = 9, this.now});
+  const PresenceDot({
+    super.key,
+    required this.lastSeen,
+    this.size = 9,
+    this.now,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,9 @@ class PresenceDot extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-                color: AppColors.green.withValues(alpha: 0.55), blurRadius: 5),
+              color: AppColors.green.withValues(alpha: 0.55),
+              blurRadius: 5,
+            ),
           ],
         ),
       ),

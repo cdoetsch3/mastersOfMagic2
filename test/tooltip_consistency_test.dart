@@ -11,17 +11,26 @@ void main() {
   group('every spell is described', () {
     test('has flavour text', () {
       for (final spell in Spellbook.all) {
-        expect(spellDescriptions[spell.id], isNotNull,
-            reason: '${spell.name} has no description');
-        expect(spellDescriptions[spell.id]!.length, greaterThan(15),
-            reason: '${spell.name} description is a stub');
+        expect(
+          spellDescriptions[spell.id],
+          isNotNull,
+          reason: '${spell.name} has no description',
+        );
+        expect(
+          spellDescriptions[spell.id]!.length,
+          greaterThan(15),
+          reason: '${spell.name} description is a stub',
+        );
       }
     });
 
     test('has an icon', () {
       for (final spell in Spellbook.all) {
-        expect(spellIcons[spell.id], isNotNull,
-            reason: '${spell.name} has no icon');
+        expect(
+          spellIcons[spell.id],
+          isNotNull,
+          reason: '${spell.name} has no icon',
+        );
       }
     });
 
@@ -36,9 +45,15 @@ void main() {
       for (final spell in Spellbook.all) {
         final tip = spellTooltip(spell);
         expect(tip, contains(spell.name));
-        if (spell.effect case DamageEffect(:final minAmount, :final maxAmount)) {
-          expect(tip, contains('$minAmount-$maxAmount'),
-              reason: '${spell.name} tooltip must show its real damage');
+        if (spell.effect case DamageEffect(
+          :final minAmount,
+          :final maxAmount,
+        )) {
+          expect(
+            tip,
+            contains('$minAmount-$maxAmount'),
+            reason: '${spell.name} tooltip must show its real damage',
+          );
         }
       }
     });
@@ -47,11 +62,15 @@ void main() {
   group('lifesteal text matches the actual rate', () {
     test('the tooltip states the true percentage', () {
       for (final spell in Spellbook.all) {
-        if (spell.effect case DamageEffect(:final lifesteal)
-            when lifesteal > 0) {
+        if (spell.effect case DamageEffect(
+          :final lifesteal,
+        ) when lifesteal > 0) {
           final percent = (lifesteal * 100).round();
-          expect(spellTooltip(spell), contains('$percent%'),
-              reason: '${spell.name} must say it heals $percent%');
+          expect(
+            spellTooltip(spell),
+            contains('$percent%'),
+            reason: '${spell.name} must say it heals $percent%',
+          );
         }
       }
     });
@@ -59,13 +78,20 @@ void main() {
     test('no lifesteal blurb still claims a full steal', () {
       // The old copy said "equal to health damage dealt" / "wholesale".
       for (final spell in Spellbook.all) {
-        if (spell.effect case DamageEffect(:final lifesteal)
-            when lifesteal > 0 && lifesteal < 1) {
+        if (spell.effect case DamageEffect(
+          :final lifesteal,
+        ) when lifesteal > 0 && lifesteal < 1) {
           final blurb = spellDescriptions[spell.id]!.toLowerCase();
-          expect(blurb, isNot(contains('equal to')),
-              reason: '${spell.name} implies a 1:1 steal');
-          expect(blurb, isNot(contains('wholesale')),
-              reason: '${spell.name} implies a full steal');
+          expect(
+            blurb,
+            isNot(contains('equal to')),
+            reason: '${spell.name} implies a 1:1 steal',
+          );
+          expect(
+            blurb,
+            isNot(contains('wholesale')),
+            reason: '${spell.name} implies a full steal',
+          );
         }
       }
     });
@@ -97,9 +123,13 @@ void main() {
       pairs.forEach((element, statusId) {
         final info = StatusCatalog.byId(statusId)!;
         final loreName = elementLore[element]!.effectName.toLowerCase();
-        expect(loreName, info.name.toLowerCase(),
-            reason: '${element.name}: lore calls it "$loreName", the '
-                'catalogue calls it "${info.name}"');
+        expect(
+          loreName,
+          info.name.toLowerCase(),
+          reason:
+              '${element.name}: lore calls it "$loreName", the '
+              'catalogue calls it "${info.name}"',
+        );
       });
     });
   });
@@ -145,9 +175,7 @@ void main() {
       MagicElement.electro: {
         'proc chance': ElementTuning.staticFeedbackPercent,
       },
-      MagicElement.aero: {
-        'streak length': ElementTuning.tailwindStreak,
-      },
+      MagicElement.aero: {'streak length': ElementTuning.tailwindStreak},
       MagicElement.geo: {
         'cast cadence': ElementTuning.staggerEveryNthCast,
         'damage share': ElementTuning.staggerDamagePercent,
@@ -181,37 +209,52 @@ void main() {
     };
 
     test('all twelve elements are covered', () {
-      expect(claims.keys.toSet(), MagicElement.values.toSet(),
-          reason: 'a new element needs its numbers guarded too');
+      expect(
+        claims.keys.toSet(),
+        MagicElement.values.toSet(),
+        reason: 'a new element needs its numbers guarded too',
+      );
     });
 
     for (final entry in claims.entries) {
       test('${entry.key.name} states its real numbers', () {
         final sheet = sheetFor(entry.key);
         entry.value.forEach((label, value) {
-          expect(quotes(sheet, value), isTrue,
-              reason: '${entry.key.name}: the sheet never mentions $value '
-                  '($label). Either the engine changed or the text is stale.\n'
-                  'Sheet: $sheet');
+          expect(
+            quotes(sheet, value),
+            isTrue,
+            reason:
+                '${entry.key.name}: the sheet never mentions $value '
+                '($label). Either the engine changed or the text is stale.\n'
+                'Sheet: $sheet',
+          );
         });
       });
     }
 
     test('Photosynthesis text no longer talks about stacks', () {
       // The specific regression that started all this.
-      final text = '${sheetFor(MagicElement.flora)} '
-              '${StatusCatalog.byId('photosynthesis')!.description}'
-          .toLowerCase();
-      expect(text, isNot(contains('stack')),
-          reason: 'Photosynthesis has no stacks — it is active or it is not');
+      final text =
+          '${sheetFor(MagicElement.flora)} '
+                  '${StatusCatalog.byId('photosynthesis')!.description}'
+              .toLowerCase();
+      expect(
+        text,
+        isNot(contains('stack')),
+        reason: 'Photosynthesis has no stacks — it is active or it is not',
+      );
     });
 
     test('the Flora interactions on Pyro and Aqua match the new mechanic', () {
-      expect(elementLore[MagicElement.pyro]!.beatsEffect.toLowerCase(),
-          contains('streak'),
-          reason: 'Ignite breaks the streak now, not stacks');
-      expect(elementLore[MagicElement.aqua]!.weakEffect.toLowerCase(),
-          isNot(contains('stack')));
+      expect(
+        elementLore[MagicElement.pyro]!.beatsEffect.toLowerCase(),
+        contains('streak'),
+        reason: 'Ignite breaks the streak now, not stacks',
+      );
+      expect(
+        elementLore[MagicElement.aqua]!.weakEffect.toLowerCase(),
+        isNot(contains('stack')),
+      );
     });
   });
 
@@ -223,20 +266,27 @@ void main() {
       for (final entry in spellDescriptions.entries) {
         final text = entry.value.toLowerCase();
         for (final word in gone) {
-          expect(text, isNot(contains(word)),
-              reason: "'${entry.key}' mentions removed concept '$word'");
+          expect(
+            text,
+            isNot(contains(word)),
+            reason: "'${entry.key}' mentions removed concept '$word'",
+          );
         }
       }
     });
 
     test('element lore is clean', () {
       for (final entry in elementLore.entries) {
-        final text = '${entry.value.description} ${entry.value.trigger} '
-                '${entry.value.beatsEffect} ${entry.value.weakEffect}'
-            .toLowerCase();
+        final text =
+            '${entry.value.description} ${entry.value.trigger} '
+                    '${entry.value.beatsEffect} ${entry.value.weakEffect}'
+                .toLowerCase();
         for (final word in gone) {
-          expect(text, isNot(contains(word)),
-              reason: "${entry.key.name} lore mentions '$word'");
+          expect(
+            text,
+            isNot(contains(word)),
+            reason: "${entry.key.name} lore mentions '$word'",
+          );
         }
       }
     });
@@ -245,8 +295,11 @@ void main() {
       for (final info in StatusCatalog.all) {
         final text = '${info.description} ${info.trigger}'.toLowerCase();
         for (final word in gone) {
-          expect(text, isNot(contains(word)),
-              reason: "'${info.id}' mentions '$word'");
+          expect(
+            text,
+            isNot(contains(word)),
+            reason: "'${info.id}' mentions '$word'",
+          );
         }
       }
     });

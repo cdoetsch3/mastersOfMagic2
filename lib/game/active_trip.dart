@@ -118,8 +118,11 @@ class ActiveTrip {
       // ⚠️ [TravelTimes], never `leg.minutes`. The edge still carries the
       // hand-authored duration kept for tuning, and reading it here is exactly
       // the drift that having two durations invites.
-      final minutes = TravelTimes.between(route.stops[i], route.stops[i + 1]);
-      total += minutes * 60 / speedMultiplier;
+      final secs = TravelTimes.secondsBetween(
+        route.stops[i],
+        route.stops[i + 1],
+      );
+      total += secs / speedMultiplier;
       // Rounded on the running total, not per leg: rounding each leg up would
       // charge a fast mount a whole extra unit on every one of them.
       cumulative.add(total.ceil());

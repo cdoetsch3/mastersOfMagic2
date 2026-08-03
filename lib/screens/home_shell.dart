@@ -76,36 +76,42 @@ class _HomeShellState extends State<HomeShell> {
       const SocialTab(),
     ];
     // Phone-first content: on wide screens (desktop / landscape tablets),
-    // center the tab content in a phone-ish column instead of letting cards
-    // and grids balloon to fill the width.
-    final body = Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 720),
-        child: IndexedStack(index: _index, children: tabs),
-      ),
-    );
+    // centre the shell in a phone-ish column instead of letting cards and
+    // grids balloon to fill the width.
+    //
+    // ⚠️ The constraint wraps the **whole shell**, not just the content —
+    // see below. Constraining only the content left the nav bar wider than
+    // the thing it navigates.
+    final body = IndexedStack(index: _index, children: tabs);
 
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final landscape = constraints.maxWidth > constraints.maxHeight;
-            if (landscape) {
-              return Row(
-                children: [
-                  _NavRail(index: _index, onSelect: _select),
-                  Expanded(child: body),
-                ],
-              );
-            }
-            return Column(
-              children: [
-                Expanded(child: body),
-                _BottomBar(index: _index, onSelect: _select),
-              ],
-            );
-          },
+        // ⭐ One column for content AND chrome, so the bar can never drift
+        // wider than what it navigates.
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: MaxWidth.shellWidth),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final landscape = constraints.maxWidth > constraints.maxHeight;
+                if (landscape) {
+                  return Row(
+                    children: [
+                      _NavRail(index: _index, onSelect: _select),
+                      Expanded(child: body),
+                    ],
+                  );
+                }
+                return Column(
+                  children: [
+                    Expanded(child: body),
+                    _BottomBar(index: _index, onSelect: _select),
+                  ],
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

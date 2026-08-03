@@ -78,6 +78,9 @@ void main() {
   group('routes', () {
     test('going nowhere costs nothing', () {
       final r = Travel.route('aldermere', 'aldermere')!;
+      // ⚠️ Zero, not the one-minute floor. A short leg must never read as
+      // free; a trip you do not take genuinely is.
+      expect(r.seconds, 0);
       expect(r.minutes, 0);
       expect(r.isTrivial, isTrue);
       expect(r.stops, ['aldermere']);
@@ -89,7 +92,7 @@ void main() {
       // actually charges. This pins which one wins.
       final edge = World.byId('pennycross').edgeTo('forgeholm')!;
       final r = Travel.route('pennycross', 'forgeholm')!;
-      expect(r.minutes, TravelTimes.perLeg);
+      expect(r.seconds, TravelTimes.perLegSeconds);
       expect(
         World.locations.expand((l) => l.edges).map((e) => e.minutes).toSet(),
         isNot(hasLength(1)),
@@ -111,8 +114,8 @@ void main() {
         );
       }
       expect(
-        r.minutes,
-        r.legs.length * TravelTimes.perLeg,
+        r.seconds,
+        r.legs.length * TravelTimes.perLegSeconds,
         reason: 'cost comes from TravelTimes, not from leg.minutes',
       );
     });
@@ -129,7 +132,7 @@ void main() {
           if (seen.contains(e.to)) continue;
           final rest = bruteForce(e.to, to, {...seen, e.to}, depth - 1);
           if (rest == null) continue;
-          final total = rest + TravelTimes.between(from, e.to);
+          final total = rest + TravelTimes.secondsBetween(from, e.to);
           if (best == null || total < best) best = total;
         }
         return best;
@@ -144,7 +147,7 @@ void main() {
         final route = Travel.route(pair[0], pair[1])!;
         final truth = bruteForce(pair[0], pair[1], {pair[0]}, 9);
         expect(
-          route.minutes,
+          route.seconds,
           truth,
           reason: '${pair[0]} -> ${pair[1]} is not the quickest route',
         );
@@ -202,13 +205,17 @@ void main() {
   });
 
   group('the shape of the world, in minutes', () {
-    // 📝 Flat 3 a leg for now. ⚠️ A "1 a leg, 3 between towns" rule was tried
-    // and parked: two ordinary legs undercut one town leg, so cutting through
-    // a zone beat the direct road and the town cost almost never applied.
+    // 📝 **One knob**: TravelTimes.perLegSeconds, currently 10 for testing.
+    // ⚠️ A "1 minute a leg, 3 between towns" rule was tried and parked — two
+    // ordinary legs undercut one town leg, so cutting through a zone beat the
+    // direct road and the town cost almost never applied.
     test('every leg costs the same', () {
       for (final l in World.locations) {
         for (final e in l.edges) {
-          expect(TravelTimes.between(l.id, e.to), TravelTimes.perLeg);
+          expect(
+            TravelTimes.secondsBetween(l.id, e.to),
+            TravelTimes.perLegSeconds,
+          );
         }
       }
     });
@@ -220,13 +227,24 @@ void main() {
         ['aldermere', 'rimeholt'],
       ]) {
         final r = Travel.route(pair[0], pair[1])!;
-        expect(r.minutes, r.legs.length * TravelTimes.perLeg);
+        expect(r.seconds, r.legs.length * TravelTimes.perLegSeconds);
       }
     });
 
-    test('the traverse still feels like a journey', () {
-      expect(Travel.minutesBetween('aldermere', 'whispering_woods'), 3);
-      expect(Travel.minutesBetween('aldermere', 'zenith'), greaterThan(30));
+    test('the longest journey is still the longest', () {
+      // ⚠️ Relative, not absolute — the duration is a test-build value and
+      // pinning a number here would fail the moment it is tuned.
+      final short = Travel.secondsBetween('aldermere', 'whispering_woods')!;
+      final long = Travel.secondsBetween('aldermere', 'zenith')!;
+      expect(long, greaterThan(short * 5));
+    });
+
+    test('⚠️ a leg never reads as free, however short', () {
+      // A 10-second leg must not display "0 min".
+      expect(TravelTimes.label(10), '10s');
+      expect(TravelTimes.label(180), '3 min');
+      expect(TravelTimes.label(3900), '1h 05m');
+      expect(TravelTimes.between('a', 'b'), greaterThanOrEqualTo(1));
     });
   });
 }

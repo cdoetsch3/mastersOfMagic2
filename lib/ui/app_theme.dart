@@ -31,7 +31,17 @@ abstract final class AppColors {
 class MaxWidth extends StatelessWidget {
   /// Wide enough for a two-column inventory grid, narrow enough that a line of
   /// body text stays comfortable.
+  ///
+  /// ⚠️ Pushed routes only. The home shell uses [shellWidth], which is
+  /// narrower — see there for why.
   static const double maxWidth = 900;
+
+  /// The phone-ish column the tab shell lives in.
+  ///
+  /// ⭐ **Narrower than [maxWidth] on purpose**, and it must wrap the nav bar
+  /// as well as the content — otherwise the bar is wider than what it
+  /// navigates, which is what shipped.
+  static const double shellWidth = 720;
 
   final Widget child;
 

@@ -27,7 +27,8 @@ void main() {
           expect(
             def.elements,
             contains(element),
-            reason: '${def.name} used ${element.name}, but it is '
+            reason:
+                '${def.name} used ${element.name}, but it is '
                 '${def.elements.map((e) => e.name).join("/")}',
           );
         }

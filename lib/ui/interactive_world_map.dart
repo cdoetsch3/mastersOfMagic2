@@ -541,7 +541,8 @@ class PlaceSheet extends StatelessWidget {
                       ? 'No road from here'
                       : minutes == null
                       ? 'Travel to ${location.name}'
-                      : 'Travel to ${location.name} — $minutes min',
+                      : 'Travel to ${location.name} — '
+                            '${TravelTimes.label(minutes! * 60)}',
                 ),
               ),
             ),

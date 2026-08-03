@@ -39,11 +39,11 @@ void main() {
       final trip = tripTo('rimeholt');
       expect(trip.stops.length, trip.secondsAtStop.length);
       expect(trip.secondsAtStop.first, 0);
+      // ⭐ Seconds are the source of truth; minutes are a rounded-up view of
+      // them. Asserting minutes*60 would break the moment a leg is shorter
+      // than a minute, which it is while testing.
+      expect(trip.totalSeconds, Travel.secondsBetween('aldermere', 'rimeholt'));
       expect(trip.totalMinutes, Travel.minutesBetween('aldermere', 'rimeholt'));
-      expect(
-        trip.totalSeconds,
-        Travel.minutesBetween('aldermere', 'rimeholt')! * 60,
-      );
       for (var i = 1; i < trip.secondsAtStop.length; i++) {
         expect(trip.secondsAtStop[i], greaterThan(trip.secondsAtStop[i - 1]));
       }
@@ -52,8 +52,12 @@ void main() {
     test('you are where the elapsed time says you are', () {
       final trip = tripTo('rimeholt');
       expect(trip.stopReachedAt(noon), 'aldermere');
+      // ⚠️ Just short of the first leg, not a fixed minute — a leg can be
+      // seconds long while testing.
       expect(
-        trip.stopReachedAt(noon.add(const Duration(minutes: 1))),
+        trip.stopReachedAt(
+          noon.add(Duration(seconds: trip.secondsAtStop[1] - 1)),
+        ),
         'aldermere',
       );
 
@@ -106,8 +110,15 @@ void main() {
       // ⭐ The design's collapse (§4b.1): the climb to Rimeholt is minutes
       // saved, not seconds. A whole-minute model could not express this —
       // every leg would round up to a minute of its own.
-      expect(onFoot.totalMinutes, route.legs.length * TravelTimes.perLeg);
-      expect(mounted.totalMinutes, 3);
+      expect(
+        onFoot.totalSeconds,
+        route.legs.length * TravelTimes.perLegSeconds,
+      );
+      expect(
+        mounted.totalSeconds,
+        lessThan(onFoot.totalSeconds),
+        reason: 'a mount must actually help',
+      );
     });
 
     test('a trip survives a save and reload', () {
@@ -219,7 +230,11 @@ void main() {
       () async {
         final game = fresh();
         await game.beginTravel('rimeholt');
-        clock = noon.add(const Duration(seconds: 30));
+        // ⚠️ Just short of the first stop, expressed against the trip rather
+        // than a fixed 30 seconds — a leg can be shorter than that.
+        clock = noon.add(
+          Duration(seconds: game.profile.trip!.secondsAtStop[1] - 1),
+        );
         await game.cancelTravel();
         expect(game.profile.locationId, 'aldermere');
       },

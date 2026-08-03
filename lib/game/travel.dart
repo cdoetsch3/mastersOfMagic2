@@ -17,17 +17,29 @@ class TravelRoute {
 
   const TravelRoute(this.stops, this.legs);
 
-  /// Base minutes on foot, before any mount multiplier.
+  /// Base seconds on foot, before any mount multiplier.
   ///
   /// ⭐ Summed from the **stops**, since [TravelTimes] reads the pair a leg
-  /// joins rather than anything stored on the leg.
-  int get minutes {
+  /// joins rather than anything stored on the leg. ⭐ Seconds rather than
+  /// minutes so a short test-build duration is expressible at all.
+  int get seconds {
     var total = 0;
     for (var i = 0; i + 1 < stops.length; i++) {
-      total += TravelTimes.between(stops[i], stops[i + 1]);
+      total += TravelTimes.secondsBetween(stops[i], stops[i + 1]);
     }
     return total;
   }
+
+  /// Whole minutes, rounded up. ⚠️ Prefer [label] for anything a player reads.
+  ///
+  /// ⚠️ **Zero stays zero.** The floor of 1 exists so a short leg never reads
+  /// as free — but a trip to where you already are genuinely costs nothing,
+  /// and rounding that up to a minute is a lie.
+  int get minutes =>
+      seconds == 0 ? 0 : ((seconds / 60).ceil()).clamp(1, 1 << 30);
+
+  /// What to show the player — "10s", "4 min".
+  String get label => TravelTimes.label(seconds);
 
   String get from => stops.first;
   String get to => stops.last;
@@ -89,7 +101,7 @@ abstract final class Travel {
       for (final e in World.byId(id).edges) {
         // ⚠️ Cost comes from [TravelTimes], the active policy — NOT from
         // e.minutes, which holds the authored durations kept for tuning.
-        table[id]![e.to] = _Hop(TravelTimes.between(id, e.to), e.to);
+        table[id]![e.to] = _Hop(TravelTimes.secondsBetween(id, e.to), e.to);
       }
     }
     // Floyd–Warshall: allow each location in turn to be a waypoint.
@@ -133,9 +145,23 @@ abstract final class Travel {
   }
 
   /// Minutes on foot between two locations, or null if unreachable.
-  static int? minutesBetween(String fromId, String toId) {
+  /// Seconds between two places, or null if unreachable.
+  static int? secondsBetween(String fromId, String toId) {
     if (!World.exists(fromId) || !World.exists(toId)) return null;
     return _solved[fromId]![toId]?.minutes;
+  }
+
+  /// Whole minutes, rounded up. ⚠️ Prefer [labelBetween] for display.
+  static int? minutesBetween(String fromId, String toId) {
+    final s = secondsBetween(fromId, toId);
+    if (s == null) return null;
+    return s == 0 ? 0 : ((s / 60).ceil()).clamp(1, 1 << 30);
+  }
+
+  /// What to show the player for a trip — "10s", "4 min".
+  static String? labelBetween(String fromId, String toId) {
+    final s = secondsBetween(fromId, toId);
+    return s == null ? null : TravelTimes.label(s);
   }
 
   /// Every location reachable from [fromId], with the cost of getting there.

@@ -16,7 +16,9 @@ void main() {
   });
 
   test('a loss is flat, whoever beat you', () {
-    expect(Progression.xpForDuel(won: false, opponentLevel: 1),
-        Progression.xpForDuel(won: false, opponentLevel: 60));
+    expect(
+      Progression.xpForDuel(won: false, opponentLevel: 1),
+      Progression.xpForDuel(won: false, opponentLevel: 60),
+    );
   });
 }

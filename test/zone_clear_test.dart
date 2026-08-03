@@ -6,14 +6,17 @@ import 'package:masters_of_magic_2/game/world.dart';
 
 void main() {
   group('a character remembers which zones it has cleared', () {
-    test('a new character has cleared nothing, but has discovered its start', () {
-      final p = PlayerProfile.newPlayer();
-      expect(p.zoneClears, isEmpty);
-      expect(p.zonesCleared, 0);
-      expect(p.hasCleared(World.startLocationId), isFalse);
-      // ⚠️ Discovery is not clearing. Conflating them is the likely bug.
-      expect(p.discoveredLocationIds, contains(World.startLocationId));
-    });
+    test(
+      'a new character has cleared nothing, but has discovered its start',
+      () {
+        final p = PlayerProfile.newPlayer();
+        expect(p.zoneClears, isEmpty);
+        expect(p.zonesCleared, 0);
+        expect(p.hasCleared(World.startLocationId), isFalse);
+        // ⚠️ Discovery is not clearing. Conflating them is the likely bug.
+        expect(p.discoveredLocationIds, contains(World.startLocationId));
+      },
+    );
 
     test('clears survive a save/load round trip', () {
       final p = PlayerProfile.newPlayer()

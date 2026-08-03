@@ -21,24 +21,28 @@ void main() {
     // Tear the previous tree down first: a dialog left open from the last
     // iteration would swallow the tap that opens the next one.
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpWidget(MaterialApp(
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: Center(
-            child: ElevatedButton(
-              onPressed: () => open(context),
-              child: const Text('open'),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: ElevatedButton(
+                onPressed: () => open(context),
+                child: const Text('open'),
+              ),
             ),
           ),
         ),
       ),
-    ));
+    );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull, reason: reason);
   }
 
-  testWidgets('element dialog lays out for every element in the roster', (tester) async {
+  testWidgets('element dialog lays out for every element in the roster', (
+    tester,
+  ) async {
     for (final element in MagicElement.values) {
       await expectOpensCleanly(
         tester,
@@ -49,8 +53,9 @@ void main() {
     }
   });
 
-  testWidgets('spell dialog lays out for every spell in the book',
-      (tester) async {
+  testWidgets('spell dialog lays out for every spell in the book', (
+    tester,
+  ) async {
     for (final spell in Spellbook.all) {
       await expectOpensCleanly(
         tester,
@@ -71,8 +76,9 @@ void main() {
     expect(find.text('RESOLUTION ORDER'), findsOneWidget);
   });
 
-  testWidgets('the gameplay guide also lays out on a narrow screen',
-      (tester) async {
+  testWidgets('the gameplay guide also lays out on a narrow screen', (
+    tester,
+  ) async {
     // The phase strip is the tightest row — check it survives a small phone.
     await tester.binding.setSurfaceSize(const Size(320, 640));
     addTearDown(() => tester.binding.setSurfaceSize(null));
