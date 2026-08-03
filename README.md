@@ -78,6 +78,7 @@ surface it and ask; do not decide it in code.
 | ⭐ **The Sealed Garden** — the late Flora+Sanctus zone, and why Eden matters to the endgame | [WORLD_DESIGN.md](WORLD_DESIGN.md) **§4c.1a** |
 | ⭐ **The Buried Sky** — the late Geo+Astral zone | [WORLD_DESIGN.md](WORLD_DESIGN.md) **§4c.1b** |
 | ⭐ **What content each zone still needs** — the tracking grid | [CONTENT_CHECKLIST.md](CONTENT_CHECKLIST.md) |
+| 🎨 **What each creature looks like** — image-generation briefs | [BESTIARY_ART.md](BESTIARY_ART.md) |
 | Boss/mini-boss names per element, zone structure | [GAME_DESIGN.md](GAME_DESIGN.md) §5, §3d |
 
 ### "I want to know what to work on"

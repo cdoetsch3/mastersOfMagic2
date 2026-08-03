@@ -776,6 +776,15 @@ scaling both would erase the archetype.
 
 ## Deferred / banked — do not build without an explicit ask
 
+- **⚠️ Every enemy renders as a MAGE.** `EnemyEncounter.toPersona()` builds an
+  `AiPersona`, personas wear `MageApparel`, and the duel screen draws a robed
+  wizard — so a Listening Fawn (a deer grown from roots) fights the player in a
+  green cloak and a pointed hat. ⭐ **Almost nothing in the bestiary is a
+  mage.** Physical descriptions for the Primal quarter's 55 creatures are in
+  BESTIARY_ART.md; the painter side is unbuilt. ⚠️ Whatever replaces it must
+  stay a `CustomPainter` — the project has no bitmaps, deliberately (README §4).
+
+
 - **⛔ TO DO — the `progress/` subcollection. Two of the three per-zone
   achievements cannot exist without it.** ACHIEVEMENTS §2.1 specifies
   `players/{uid}/characters/{id}/progress/{doc}` and **none of it is built**.
