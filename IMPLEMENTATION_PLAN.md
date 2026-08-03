@@ -776,6 +776,30 @@ scaling both would erase the archetype.
 
 ## Deferred / banked — do not build without an explicit ask
 
+- **📝 Creature sprites: the system works, the ART does not.** Built
+  2026-08-02: `creature_sprite.dart` draws a creature from an indexed pixel
+  grid (strings, one per row) with an element-derived palette, per-sprite
+  dimensions, and the same bob/charge/defeat behaviour as the mage sprite.
+  Eleven Whispering Woods grids exist, guarded by tests, and render via
+  `flutter test tool/render_creatures_test.dart`.
+
+  ⚠️ **They are not good.** Nine of eleven read as interchangeable green
+  lumps; only Heartwood and The Standing Green work, and both work for the
+  same reason — a distinctive **outer silhouette with negative space**, not
+  internal detail. A second pass that raised palette contrast and added an
+  outline slot helped marginally and made the Listening Fawn actively worse.
+
+  ⭐ **The binding constraint is authoring, not the format.** Hand-placing
+  pixels blind, 275 times, will produce 275 lumps. Options, in order of
+  likely quality: **(a) bitmaps** from `BESTIARY_ART.md` descriptions —
+  highest ceiling, costs an asset pipeline and per-zone lazy loading;
+  **(b) generate an image, then downsample and quantise it into a grid** —
+  keeps the no-assets property and is automatable, but needs the image
+  pipeline anyway; **(c) a human pixel artist**.
+
+  ✅ Keep the system regardless: it is a clean fallback, it costs nothing to
+  leave in, and it is what proves the point.
+
 - **⚠️ Every enemy renders as a MAGE.** `EnemyEncounter.toPersona()` builds an
   `AiPersona`, personas wear `MageApparel`, and the duel screen draws a robed
   wizard — so a Listening Fawn (a deer grown from roots) fights the player in a
