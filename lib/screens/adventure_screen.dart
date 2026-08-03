@@ -9,6 +9,7 @@ import '../game/opponent_driver.dart';
 import '../game/world.dart';
 import '../ui/app_theme.dart';
 import 'duel_screen.dart';
+import 'level_up_screen.dart';
 import 'tabs/inventory_tab.dart' show rarityColour;
 
 /// One run through a zone: what is in front of you, how far in you are, and
@@ -75,11 +76,6 @@ class _AdventureScreenState extends State<AdventureScreen> {
     if (encounter == null || _busy) return;
     setState(() => _busy = true);
 
-    // ⭐ HP carries between encounters — that is the whole tension of pushing
-    // on. Charge and shields reset, per GAME_DESIGN's adventure loop.
-    var survivingHp = run.playerHp;
-    var won = false;
-
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => DuelScreen(
@@ -90,20 +86,40 @@ class _AdventureScreenState extends State<AdventureScreen> {
           ),
           campaign: true,
           playerLevel: game.profile.level,
+          // ⭐ HP carries between encounters — that is the whole tension of
+          // pushing on. Charge and shields reset; only health persists.
           playerStartingHp: run.playerHp,
-          onResult: (playerWon) => won = playerWon,
-          onPlayerHpRemaining: (hp) => survivingHp = hp,
+          // ⚠️ Settled here, awaited by the end screen, so the loot exists
+          // before it is drawn.
+          onSettle: (won, remainingHp) async {
+            if (!won) {
+              await game.loseEncounter();
+              return const [];
+            }
+            return game.winEncounter(remainingHp: remainingHp);
+          },
         ),
       ),
     );
 
     if (!mounted) return;
-    if (won) {
-      await game.winEncounter(remainingHp: survivingHp);
-    } else {
-      await game.loseEncounter();
-    }
+    // ⚠️ This path pushes DuelScreen directly rather than going through
+    // launchDuel, so the level-up has to be surfaced here too — otherwise
+    // levelling mid-run is silent, which is the most likely place to level.
+    await _showLevelUpIfAny(game);
     if (mounted) setState(() => _busy = false);
+  }
+
+  Future<void> _showLevelUpIfAny(GameState game) async {
+    final level = game.pendingLevelUp;
+    final from = game.pendingLevelUpFrom;
+    if (level == null || !mounted) return;
+    game.acknowledgeLevelUp();
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LevelUpScreen(from: from ?? level - 1, to: level),
+      ),
+    );
   }
 
   Future<void> _use(GameState game, String defId) async {

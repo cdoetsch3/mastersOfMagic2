@@ -31,6 +31,13 @@ class GameState extends ChangeNotifier {
   /// Set when a level-up happens so the UI can celebrate it once.
   int? pendingLevelUp;
 
+  /// The level held *before* the pending level-up, so the screen can report
+  /// what changed rather than only where you ended up.
+  ///
+  /// ⚠️ Needed because a single fight can cross more than one level, and
+  /// "level 4 → 6" gains everything from both.
+  int? pendingLevelUpFrom;
+
   /// The clock. Injectable so tests can move time instead of waiting five real
   /// minutes for a journey — without this the whole travel feature is
   /// untestable.
@@ -236,6 +243,7 @@ class GameState extends ChangeNotifier {
     final after = profile.level;
     if (after > before) {
       pendingLevelUp = after;
+      pendingLevelUpFrom = before;
       notifyListeners();
     }
   }
@@ -261,9 +269,16 @@ class GameState extends ChangeNotifier {
   }
 
   /// Records a won encounter, rolling its drops into the run's pending loot.
-  Future<void> winEncounter({required int remainingHp, Random? rng}) async {
+  ///
+  /// ⭐ Returns the def ids that dropped, so the end screen can show them
+  /// **before** it renders. Rolling after the duel screen popped would leave
+  /// nothing to display.
+  Future<List<String>> winEncounter({
+    required int remainingHp,
+    Random? rng,
+  }) async {
     final r = run;
-    if (r == null || r.isOver) return;
+    if (r == null || r.isOver) return const [];
     final enemy = r.current!;
     final loot = rollDrops(enemy.def.drops, rng ?? Random());
     final wasBoss = r.atBoss;
@@ -280,6 +295,7 @@ class GameState extends ChangeNotifier {
     );
     if (r.lootIsBanked) await _bankRunLoot();
     notifyListeners();
+    return [for (final slot in loot.slots) slot.defId];
   }
 
   /// Records a lost encounter. ⚠️ The run's loot is gone.
@@ -382,6 +398,7 @@ class GameState extends ChangeNotifier {
 
   void acknowledgeLevelUp() {
     pendingLevelUp = null;
+    pendingLevelUpFrom = null;
     notifyListeners();
   }
 

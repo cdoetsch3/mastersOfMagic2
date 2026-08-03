@@ -15,7 +15,9 @@ import '../game/shield_aura.dart';
 import '../game/status_fx.dart';
 import '../game/opponent_driver.dart';
 import '../game/progression.dart';
+import '../game/items/item_catalogue.dart';
 import '../ui/app_theme.dart';
+import 'tabs/inventory_tab.dart' show rarityColour;
 import '../ui/element_text.dart';
 import 'home_shell.dart';
 
@@ -44,6 +46,13 @@ class DuelScreen extends StatefulWidget {
   /// start where this one ended.
   final void Function(int remainingHp)? onPlayerHpRemaining;
 
+  /// Settles a campaign encounter and hands back what dropped.
+  ///
+  /// ⭐ **Awaited before the end screen renders**, which is the whole reason it
+  /// exists: loot is rolled by `GameState`, and if that happened after this
+  /// screen popped there would be nothing to show. Null for a PvP duel.
+  final Future<List<String>> Function(bool won, int remainingHp)? onSettle;
+
   /// The player's character level — scales their health and damage.
   final int playerLevel;
 
@@ -55,6 +64,7 @@ class DuelScreen extends StatefulWidget {
     this.onResult,
     this.playerStartingHp,
     this.onPlayerHpRemaining,
+    this.onSettle,
     this.playerLevel = 1,
   });
 
@@ -184,13 +194,27 @@ class _DuelScreenState extends State<DuelScreen>
     ]);
   }
 
+  /// Loot from this encounter, once [DuelScreen.onSettle] has resolved.
+  ///
+  /// ⚠️ Null while settling — the end screen shows a placeholder rather than
+  /// an empty haul, because "you got nothing" and "we have not looked yet"
+  /// must not look the same.
+  List<String>? _loot;
+
   // Reports the outcome exactly once per duel (win/loss/draw/forfeit).
   void _checkResult() {
-    if (!_resultReported && c.gameOver) {
-      _resultReported = true;
-      widget.onResult?.call(c.playerWon);
-      widget.onPlayerHpRemaining?.call(c.player.hp);
+    if (_resultReported || !c.gameOver) return;
+    _resultReported = true;
+    widget.onResult?.call(c.playerWon);
+    widget.onPlayerHpRemaining?.call(c.player.hp);
+    final settle = widget.onSettle;
+    if (settle == null) {
+      _loot = const [];
+      return;
     }
+    settle(c.playerWon, c.player.hp).then((loot) {
+      if (mounted) setState(() => _loot = loot);
+    });
   }
 
   @override
@@ -1276,7 +1300,13 @@ class _DuelScreenState extends State<DuelScreen>
     final title = c.isDraw ? 'Draw' : (won ? 'Victory!' : 'Defeat');
     final accent = won ? const Color(0xFFE8C547) : const Color(0xFFD85A30);
     final goldEarned = won ? Progression.winGold : Progression.lossGold;
-    final xpEarned = won ? Progression.winXp : Progression.lossXp;
+    // ⚠️ The *actual* award, not the flat base. XP scales with who you beat
+    // (Progression.xpForDuel), so showing `winXp` told the player 60 while
+    // GameState banked 60 + 10 per opponent level.
+    final xpEarned = Progression.xpForDuel(
+      won: won,
+      opponentLevel: widget.driver.opponentLevel,
+    );
 
     return Positioned.fill(
       child: Container(
@@ -1336,17 +1366,26 @@ class _DuelScreenState extends State<DuelScreen>
                   label: 'Experience',
                   value: xpEarned > 0 ? '+$xpEarned XP' : '—',
                 ),
-                const SizedBox(height: 8),
-                _rewardRow(
-                  leading: const Icon(
-                    Icons.military_tech,
-                    color: Color(0xFF6E6A7A),
-                    size: 22,
+                // ⚠️ Ranking is a PvP concept. A campaign fight has no
+                // ladder, and showing "coming soon" there is noise about a
+                // feature that will never apply to it.
+                if (!widget.campaign) ...[
+                  const SizedBox(height: 8),
+                  _rewardRow(
+                    leading: const Icon(
+                      Icons.military_tech,
+                      color: Color(0xFF6E6A7A),
+                      size: 22,
+                    ),
+                    label: 'Ranking',
+                    value: 'coming soon',
+                    muted: true,
                   ),
-                  label: 'Ranking',
-                  value: 'coming soon',
-                  muted: true,
-                ),
+                ],
+                if (widget.campaign && won) ...[
+                  const SizedBox(height: 10),
+                  _LootStrip(loot: _loot),
+                ],
                 const SizedBox(height: 10),
                 TextButton.icon(
                   onPressed: () => _showLog(context),
@@ -2193,4 +2232,117 @@ class _FxPainter extends CustomPainter {
   @override
   bool shouldRepaint(_FxPainter old) =>
       old.t != t || old.kind != kind || old.color != color;
+}
+
+/// What dropped, as a row of icons.
+///
+/// ⭐ Icons rather than a list because a haul is glanced at, not read — and
+/// because it is the one part of a campaign end screen that a PvP one has no
+/// equivalent of.
+class _LootStrip extends StatelessWidget {
+  /// Null while the drop is still being settled. ⚠️ Distinct from empty:
+  /// "nothing dropped" and "we have not looked yet" must not look the same.
+  final List<String>? loot;
+
+  const _LootStrip({required this.loot});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = loot;
+    if (items == null) {
+      return const SizedBox(
+        height: 44,
+        child: Center(
+          child: SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Color(0xFF9C93C4),
+            ),
+          ),
+        ),
+      );
+    }
+    if (items.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 10),
+        child: Text(
+          'It carried nothing.',
+          style: TextStyle(color: Color(0xFF6E6A7A), fontSize: 12.5),
+        ),
+      );
+    }
+
+    final counts = <String, int>{};
+    for (final id in items) {
+      counts[id] = (counts[id] ?? 0) + 1;
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'RECOVERED',
+          style: TextStyle(
+            color: Color(0xFF9C93C4),
+            fontSize: 11,
+            letterSpacing: 1.1,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final e in counts.entries)
+              _LootChip(defId: e.key, count: e.value),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _LootChip extends StatelessWidget {
+  final String defId;
+  final int count;
+
+  const _LootChip({required this.defId, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    final def = ItemCatalogue.tryById(defId);
+    final colour = def == null
+        ? const Color(0xFF6E6A7A)
+        : rarityColour(def.rarity);
+    final name = def == null ? defId : ItemCatalogue.displayName(def, null);
+    return Tooltip(
+      message: def == null ? defId : '$name\n${def.lore}',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        decoration: BoxDecoration(
+          color: const Color(0xFF141021),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: colour, width: 1.2),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 8, height: 8, color: colour),
+            const SizedBox(width: 6),
+            Text(name, style: TextStyle(color: colour, fontSize: 11.5)),
+            if (count > 1)
+              Text(
+                '  ×$count',
+                style: const TextStyle(
+                  color: Color(0xFF9C93C4),
+                  fontSize: 11.5,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }

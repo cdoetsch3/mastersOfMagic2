@@ -34,6 +34,9 @@ class InventoryTab extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
             children: [
+              const SectionLabel('Equipped'),
+              _PaperDoll(game: game),
+              const SizedBox(height: 16),
               SectionLabel(
                 'Backpack — ${game.profile.backpack.used}'
                 '/${Carrying.backpackSlots}',
@@ -62,6 +65,186 @@ class InventoryTab extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// The ten equipment slots, plus what the belt can currently hold.
+///
+/// ⭐ **Empty slots are shown, not hidden.** Most of the value of this panel
+/// early on is telling the player what they do not have yet — a paper doll
+/// that only lists worn items looks like a bug when you own nothing.
+///
+/// 📝 Nothing equips yet: items drop and are carried, but `ItemModifiers`
+/// reaches no `MageState`. The slots are real; the wiring is not.
+class _PaperDoll extends StatelessWidget {
+  final GameState game;
+
+  const _PaperDoll({required this.game});
+
+  static const _labels = {
+    EquipSlot.hat: 'Hat',
+    EquipSlot.robeTop: 'Robe top',
+    EquipSlot.robeBottom: 'Robe bottom',
+    EquipSlot.gloves: 'Gloves',
+    EquipSlot.boots: 'Boots',
+    EquipSlot.neck: 'Neck',
+    EquipSlot.ring: 'Ring',
+    EquipSlot.mainHand: 'Main hand',
+    EquipSlot.offHand: 'Off hand',
+    EquipSlot.belt: 'Belt',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final beltCapacity = Carrying.beltSlotsFor();
+    return GamePanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final slot in EquipSlot.values)
+                _EquipSlotChip(
+                  label: _labels[slot] ?? slot.name,
+                  instanceId: game.profile.equipped[slot],
+                  game: game,
+                  // ⭐ The five armour slots are the set slots (ITEMS §3.2);
+                  // marking them is what makes "3+2" legible later.
+                  carriesSet: slot.carriesSet,
+                ),
+            ],
+          ),
+          const Divider(color: AppColors.borderDim, height: 22),
+          Row(
+            children: [
+              const Icon(Icons.science, color: AppColors.teal, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Belt — ${game.profile.belt.used}/$beltCapacity',
+                  style: const TextStyle(color: AppColors.text, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            // ⚠️ The rule that makes the belt a decision rather than a tax.
+            'What you can reach mid-duel. Using one spends your turn.',
+            style: TextStyle(color: AppColors.textFaint, fontSize: 11.5),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              for (var i = 0; i < beltCapacity; i++) ...[
+                _BeltSlot(
+                  defId: i < game.profile.belt.loaded.length
+                      ? game.profile.belt.loaded[i]
+                      : null,
+                ),
+                const SizedBox(width: 6),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EquipSlotChip extends StatelessWidget {
+  final String label;
+  final String? instanceId;
+  final GameState game;
+  final bool carriesSet;
+
+  const _EquipSlotChip({
+    required this.label,
+    required this.instanceId,
+    required this.game,
+    required this.carriesSet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final inst = instanceId == null
+        ? null
+        : game.profile.itemInstances[instanceId];
+    final def = inst == null ? null : ItemCatalogue.tryById(inst.defId);
+    final filled = def != null;
+    final colour = filled ? rarityColour(def.rarity) : AppColors.borderDim;
+    return Container(
+      width: 104,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: colour, width: filled ? 1.5 : 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label.toUpperCase(),
+                  style: const TextStyle(
+                    color: AppColors.textFaint,
+                    fontSize: 9,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ),
+              if (carriesSet)
+                const Icon(Icons.link, size: 10, color: AppColors.textFaint),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            filled ? ItemCatalogue.displayName(def, inst) : 'Empty',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: filled ? colour : AppColors.textFaint,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BeltSlot extends StatelessWidget {
+  final String? defId;
+
+  const _BeltSlot({required this.defId});
+
+  @override
+  Widget build(BuildContext context) {
+    final def = defId == null ? null : ItemCatalogue.tryById(defId!);
+    return Container(
+      width: 34,
+      height: 34,
+      decoration: BoxDecoration(
+        color: AppColors.bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: def == null ? AppColors.borderDim : rarityColour(def.rarity),
+        ),
+      ),
+      child: def == null
+          ? null
+          : Center(
+              child: Text(
+                ItemCatalogue.displayName(def, null).substring(0, 1),
+                style: TextStyle(color: rarityColour(def.rarity), fontSize: 13),
+              ),
+            ),
     );
   }
 }

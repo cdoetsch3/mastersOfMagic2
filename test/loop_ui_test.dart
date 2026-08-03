@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
+import 'package:masters_of_magic_2/game/items/carrying.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
@@ -61,6 +62,29 @@ void main() {
     game.profile.locationId = 'whispering_woods';
     await _pump(tester, game);
     expect(find.textContaining('Storeroom is in town'), findsOneWidget);
+  });
+
+  testWidgets('all ten equipment slots are shown, empty included', (
+    tester,
+  ) async {
+    // ⭐ A paper doll that only lists worn items looks like a bug when you own
+    // nothing, which is exactly the state a new character is in.
+    final game = GameState(_Mem(), PlayerProfile.newPlayer());
+    await _pump(tester, game);
+    expect(find.text('Empty'), findsNWidgets(EquipSlot.values.length));
+    expect(find.text('HAT'), findsOneWidget);
+    expect(find.text('BELT'), findsOneWidget);
+  });
+
+  testWidgets('the belt shows its capacity and what it costs', (tester) async {
+    final game = GameState(_Mem(), PlayerProfile.newPlayer());
+    await _pump(tester, game);
+    expect(
+      find.textContaining('Belt — 0/${Carrying.baseBeltSlots}'),
+      findsOneWidget,
+    );
+    // ⚠️ The rule that makes the belt a decision rather than a tax.
+    expect(find.textContaining('spends your turn'), findsOneWidget);
   });
 
   test('every item in the catalogue renders a name that is not its id', () {

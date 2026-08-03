@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../screens/duel_screen.dart';
-import '../ui/app_theme.dart';
+import '../screens/level_up_screen.dart';
 import 'ai_personas.dart';
 import 'game_state.dart';
 import 'loadout.dart';
@@ -18,7 +18,6 @@ Future<void> launchDuel(
   required bool campaign,
 }) async {
   final game = GameStateScope.read(context);
-  final messenger = ScaffoldMessenger.of(context);
 
   await Navigator.of(context).push(
     MaterialPageRoute<void>(
@@ -43,15 +42,15 @@ Future<void> launchDuel(
   );
 
   final level = game.pendingLevelUp;
-  if (level != null) {
+  final from = game.pendingLevelUpFrom;
+  if (level != null && context.mounted) {
+    // ⭐ A screen, not a snackbar. A level-up that flashes past in three
+    // seconds is the same as no level-up, and this is one of the few moments
+    // the game has to say "you are now better at this".
     game.acknowledgeLevelUp();
-    messenger.showSnackBar(
-      SnackBar(
-        backgroundColor: AppColors.panel,
-        content: Text(
-          'Level up! You are now level $level.',
-          style: const TextStyle(color: AppColors.gold),
-        ),
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LevelUpScreen(from: from ?? level - 1, to: level),
       ),
     );
   }

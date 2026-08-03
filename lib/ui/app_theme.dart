@@ -19,6 +19,36 @@ abstract final class AppColors {
 }
 
 /// A rounded surface panel used across the menus.
+/// Keeps the app a readable column on a laptop or tablet.
+///
+/// ⚠️ **The layout is phone-first** — tabs, a header, single-column lists — and
+/// stretched to 2000px it reads as a broken website rather than a game. This
+/// caps it and centres it, letting the background fill the rest.
+///
+/// ⭐ Applied once in `MaterialApp.builder`, **above the Navigator**, so every
+/// pushed route (duel, adventure, account) inherits it. Doing it per-screen
+/// would mean every new screen has to remember.
+class MaxWidth extends StatelessWidget {
+  /// Wide enough for a two-column inventory grid, narrow enough that a line of
+  /// body text stays comfortable.
+  static const double maxWidth = 900;
+
+  final Widget child;
+
+  const MaxWidth({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) => ColoredBox(
+    color: AppColors.bg,
+    child: Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: maxWidth),
+        child: child,
+      ),
+    ),
+  );
+}
+
 class GamePanel extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -126,7 +156,10 @@ class _WizardHatPainter extends CustomPainter {
     // Brim.
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(11 * k, 17.2 * k), width: 17 * k, height: 4.4 * k),
+        center: Offset(11 * k, 17.2 * k),
+        width: 17 * k,
+        height: 4.4 * k,
+      ),
       paint,
     );
     // Sparkle star, upper right.
@@ -153,12 +186,15 @@ class SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 8, top: 4),
-        child: Text(text.toUpperCase(),
-            style: const TextStyle(
-                color: AppColors.textDim,
-                fontSize: 11,
-                letterSpacing: 1.1,
-                fontWeight: FontWeight.w600)),
-      );
+    padding: const EdgeInsets.only(bottom: 8, top: 4),
+    child: Text(
+      text.toUpperCase(),
+      style: const TextStyle(
+        color: AppColors.textDim,
+        fontSize: 11,
+        letterSpacing: 1.1,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  );
 }

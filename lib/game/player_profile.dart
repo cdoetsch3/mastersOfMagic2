@@ -1,6 +1,7 @@
 import 'package:mom_engine/mom_engine.dart';
 
 import 'items/inventory.dart';
+import 'items/item_def.dart';
 import 'items/item_instance.dart';
 
 import 'loadout.dart';
@@ -168,6 +169,14 @@ class PlayerProfile {
   /// What can be reached during a duel. Loaded from [backpack].
   Belt belt;
 
+  /// What is worn, by slot. ⚠️ Values are **instance ids** — equipment is
+  /// never fungible, so the specific item matters (ITEMS §10.3a).
+  ///
+  /// 📝 Nothing writes this yet: items drop and are carried, but
+  /// `ItemModifiers` still reaches no `MageState`. The slots exist so the
+  /// paper doll can show what is empty, which is most of the value early on.
+  Map<EquipSlot, String> equipped;
+
   /// Storerooms, keyed by **town id** (ITEMS §10.3c).
   ///
   /// ⚠️ **One per city, never a shared pool.** What you leave in Aldermere is
@@ -206,6 +215,7 @@ class PlayerProfile {
     Belt? belt,
     Map<String, Storeroom>? storerooms,
     Map<String, ItemInstance>? itemInstances,
+    Map<EquipSlot, String>? equipped,
     this.duelsWon = 0,
     this.duelsLost = 0,
   }) : locationId = locationId ?? World.startLocationId,
@@ -215,7 +225,8 @@ class PlayerProfile {
        backpack = backpack ?? Backpack.empty(),
        belt = belt ?? const Belt(),
        storerooms = storerooms ?? {},
-       itemInstances = itemInstances ?? {};
+       itemInstances = itemInstances ?? {},
+       equipped = equipped ?? {};
 
   factory PlayerProfile.newPlayer({String name = 'Apprentice'}) =>
       PlayerProfile(name: name);
@@ -277,6 +288,7 @@ class PlayerProfile {
     'itemInstances': {
       for (final e in itemInstances.entries) e.key: e.value.toJson(),
     },
+    'equipped': {for (final e in equipped.entries) e.key.name: e.value},
     'duelsWon': duelsWon,
     'duelsLost': duelsLost,
     'schemaVersion': 2,
@@ -329,8 +341,28 @@ class PlayerProfile {
             ),
           ) ??
           {},
+      equipped: _equippedFrom(json['equipped'] as Map?),
       duelsWon: (json['duelsWon'] as num?)?.toInt() ?? 0,
       duelsLost: (json['duelsLost'] as num?)?.toInt() ?? 0,
     );
   }
+}
+
+/// ⚠️ An unknown slot name is dropped rather than throwing — a save written by
+/// a newer build must not brick an older one.
+Map<EquipSlot, String> _equippedFrom(Map? json) {
+  final out = <EquipSlot, String>{};
+  if (json == null) return out;
+  for (final e in json.entries) {
+    final slot = _slotByName(e.key as String);
+    if (slot != null) out[slot] = e.value as String;
+  }
+  return out;
+}
+
+EquipSlot? _slotByName(String name) {
+  for (final s in EquipSlot.values) {
+    if (s.name == name) return s;
+  }
+  return null;
 }

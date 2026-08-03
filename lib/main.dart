@@ -12,7 +12,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
     debugPrint('Firebase init failed (running without accounts): $e');
   }
@@ -28,8 +29,9 @@ class MastersOfMagicApp extends StatefulWidget {
 
 class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
   late final Future<GameState> _future = GameState.boot(LocalProfileStorage());
-  late final AuthService? _auth =
-      Firebase.apps.isNotEmpty ? AuthService() : null;
+  late final AuthService? _auth = Firebase.apps.isNotEmpty
+      ? AuthService()
+      : null;
   GameState? _gameState;
 
   @override
@@ -78,11 +80,16 @@ class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
               return const ColoredBox(
                 color: AppColors.bg,
                 child: Center(
-                    child: CircularProgressIndicator(color: AppColors.gold)),
+                  child: CircularProgressIndicator(color: AppColors.gold),
+                ),
               );
             }
-            Widget scoped =
-                GameStateScope(state: snapshot.data!, child: child!);
+            Widget scoped = GameStateScope(
+              state: snapshot.data!,
+              // ⚠️ Above the Navigator, so every pushed route is constrained
+              // too — not just the tabs.
+              child: MaxWidth(child: child!),
+            );
             final auth = _auth;
             if (auth != null) {
               scoped = AuthScope(service: auth, child: scoped);
