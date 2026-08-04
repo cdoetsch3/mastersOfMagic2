@@ -87,11 +87,35 @@ BACKGROUND_DESATURATE = 0.45
 ALPHA_CUTOFF = 128
 
 
+# ⭐ Chroma key. Nothing in a natural bestiary is magenta, so it can never be
+# confused with the subject — including a birch-WHITE creature, which a white
+# background would eat.
+KEY_COLOUR = (255, 0, 255)
+KEY_TOLERANCE = 60
+
+
+def key_out(img: "Image.Image", tol: int = KEY_TOLERANCE) -> "Image.Image":
+    """Removes an exact background colour.
+
+    ⭐ **Lossless on the subject, and it keeps thin structures.** `rembg` is a
+    segmentation model and it guesses: it ate the Hollow Stag's antlers whole,
+    because branching shapes against a low-contrast background read as
+    background. A colour key cannot make that mistake.
+    """
+    px = np.asarray(img.convert("RGBA")).astype(np.int16)
+    dist = np.abs(px[:, :, :3] - np.array(KEY_COLOUR, dtype=np.int16)).sum(axis=2)
+    px[:, :, 3] = np.where(dist <= tol, 0, px[:, :, 3])
+    return Image.fromarray(px.astype(np.uint8), "RGBA")
+
+
 def cut_out(img: "Image.Image") -> "Image.Image":
     """Removes the background, leaving the subject on alpha.
 
-    ⚠️ Optional and lazily imported — `rembg` pulls in onnxruntime and a model
-    download, which is a lot to force on someone whose art already has alpha.
+    ⚠️ **Prefer `--key`.** This is a segmentation model and it guesses; on the
+    Hollow Stag it removed the antlers entirely. Use it only for art that was
+    generated without a keyable background.
+
+    ⚠️ Lazily imported — `rembg` pulls in onnxruntime and a 176 MB model.
     """
     try:
         from rembg import remove
@@ -129,7 +153,11 @@ def element_colours() -> dict[str, tuple[int, int, int]]:
 def build_ramp(
     rgb: tuple[int, int, int],
     steps: int,
-    shadow: tuple[int, int, int] = (18, 14, 26),
+    # ⚠️ **Not near-black.** A ramp bottoming out at the panel colour crushes
+    # any creature that is mostly mid-tone — The Standing Green is green from
+    # head to foot, and the dark half of the Flora ramp swallowed its interior
+    # entirely. A lifted floor keeps detail inside the silhouette.
+    shadow: tuple[int, int, int] = (46, 42, 58),
     light: tuple[int, int, int] = (255, 250, 240),
 ) -> list[tuple[int, int, int]]:
     """A dark-to-light ramp through one colour.
@@ -183,10 +211,13 @@ def to_sprite(
     palette: list[tuple[int, int, int]],
     size: int,
     cutout: bool = False,
+    key: bool = False,
 ) -> Image.Image:
     img = Image.open(src).convert("RGBA")
 
-    if cutout:
+    if key:
+        img = key_out(img)
+    elif cutout:
         img = cut_out(img).convert("RGBA")
 
     # ⚠️ Alpha first, and kept out of the colour maths entirely.
@@ -208,6 +239,12 @@ def to_sprite(
 
     # Harden the edge before quantising, or the palette learns the halo.
     alpha = alpha.point(lambda a: 255 if a >= ALPHA_CUTOFF else 0)
+
+    # ⭐ Stretch the subject's own range to fill the ramp, measured over the
+    # OPAQUE pixels only. A flatly-lit generation uses a narrow band of values,
+    # and quantising that directly throws away most of the palette — which is
+    # what "the pixelate process removed details" actually was.
+    img = _stretch(img, alpha)
 
     # Remap colour onto the element palette. ⚠️ dither=NONE.
     pal_img = Image.new("P", (1, 1))
@@ -278,6 +315,20 @@ def run_backgrounds(zone: str) -> None:
     print(f"  {matches[0].name} -> {dst.relative_to(ROOT)}  ({w}x{h})")
 
 
+def _stretch(img: "Image.Image", alpha: "Image.Image") -> "Image.Image":
+    """Linear contrast stretch over the subject, ignoring transparency."""
+    rgb = np.asarray(img.convert("RGB")).astype(np.float32)
+    mask = np.asarray(alpha) >= ALPHA_CUTOFF
+    if mask.sum() < 16:
+        return img
+    lum = rgb @ np.array([0.299, 0.587, 0.114], dtype=np.float32)
+    lo, hi = np.percentile(lum[mask], (2, 98))
+    if hi - lo < 8:
+        return img  # already flat; stretching would only amplify noise
+    scaled = (rgb - lo) * (255.0 / (hi - lo))
+    return Image.fromarray(scaled.clip(0, 255).astype(np.uint8), "RGB")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--zone", required=True, help="e.g. whispering_woods")
@@ -289,9 +340,16 @@ def main() -> None:
     ap.add_argument("--element", help="e.g. flora — creature mode only")
     ap.add_argument("--size", type=int, default=DEFAULT_SIZE)
     ap.add_argument(
+        "--key",
+        action="store_true",
+        help="remove a flat magenta background (preferred — exact, keeps "
+        "thin structures like antlers)",
+    )
+    ap.add_argument(
         "--cutout",
         action="store_true",
-        help="strip the background first (needed for generated scenes)",
+        help="strip the background with rembg (guesses; use only when the art "
+        "has no keyable background)",
     )
     args = ap.parse_args()
 
@@ -325,14 +383,16 @@ def main() -> None:
         if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}
     )
     for src in sources:
-        sprite = to_sprite(src, palette, args.size, cutout=args.cutout)
+        sprite = to_sprite(
+            src, palette, args.size, cutout=args.cutout, key=args.key
+        )
         # ⭐ Always .png out, whatever went in — the creature id is the stem.
         dst = out_dir / f"{src.stem}.png"
         sprite.save(dst)
         made.append(src.stem)
         print(f"  {src.name} -> {dst.relative_to(ROOT)}  ({args.size}x{args.size})")
 
-    if made and not args.cutout:
+    if made and not (args.cutout or args.key):
         print(
             "\n⚠️  ran without --cutout. If the source art has a background, "
             "it has just been pixelated along with the creature."
