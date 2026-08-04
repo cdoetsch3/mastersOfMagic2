@@ -30,18 +30,9 @@ under green moss, and against a Flora-only ramp both collapsed into the same
 green. The neutral ramp is what lets bark, bone, stone and ash survive while
 the element hue still says which zone you are in.
 
-⚠️ **Generate on flat magenta and use `--key`.** It is an exact colour match,
-so it is lossless on the subject and thin structures survive.
-
-⚠️ **`--cutout` is the fallback and it GUESSES.** `rembg` is a segmentation
-model; against the low-contrast grey background an earlier prompt asked for, it
-removed the Hollow Stag's antlers entirely and nothing downstream could recover
-them. Use it only for art with no keyable background.
-
-⭐ **The pipeline also stretches each subject's own tonal range** before
-quantising, measured over opaque pixels only. A flatly-lit generation occupies
-a narrow band of values, and quantising that directly throws away most of the
-palette — which is what "the pixelate process removed details" actually was.
+⚠️ **`--cutout` unless the art already has a transparent background.** A
+generator returns a scene; the pipeline's trim and composite assume the
+background is gone, so without it the scenery gets pixelated too.
 
 ## Backgrounds
 
