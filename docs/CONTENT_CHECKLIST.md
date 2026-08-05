@@ -28,13 +28,15 @@ Design lives elsewhere — this file only tracks *state*:
 | 6 | **Minis** | Pool of **4** mini-bosses, coherent with the region (ENEMIES §4) | Roster |
 | 7 | **Boss** | Pool of **2** bosses, coherent with the region (ENEMIES §4) | Roster |
 | 8 | **BossFX** | What makes each boss more than a big statline | Boss |
-| 9 | **Art** | A `CustomPainter` recipe per enemy — ⚠️ **not bitmaps**, this project has no image assets | Roster |
+| 9 | **Art** | ⭐ A **generated sprite per creature**, run through `tool/pixelate.py`. Prompts in `art/prompts/<zone>.md` | Names |
+| 9b | **Backdrop** | The zone's arena scene, `--mode background`. One per zone, not per encounter | Lore |
 | 10 | **Mats** | Which raw materials this zone yields | ITEMS §9b.6 |
 | 11 | **Nodes** | Resource nodes placed — which skill, which material, per section | Mats |
 | 12 | **Motes** | Which element motes drop, at which tiers | Elem |
 | 13 | **Drop-C** | Drop table for common enemies | Mats, ITEMS §9b.6a |
 | 14 | **Drop-M** | Drop table for mini-bosses | Minis |
 | 15 | **Drop-B** | Drop table for bosses — incl. Bound set components | Boss |
+| 15b | **Icons** | ⭐ An image per **item** the zone yields, same pipeline as creatures | Mats, Drop-* |
 | 16 | **Ach** | The 3 achievements (Clear / Purge / Collect) | Roster, Drop-* |
 | | | ⭐ **Clear** is unblocked — `PlayerProfile.zoneClears` exists. **Purge** needs a per-enemy defeat log (~4.2 clears per zone, since the pool shows 2 of 4 minis and 1 of 2 bosses). **Collect** needs items *and* a permanent seen-log separate from inventory. ACHIEVEMENTS §2.3 | |
 | 17 | **Story** | Tier-1 narrative beat, if this zone gets one | GAME_DESIGN §5 |
@@ -44,24 +46,32 @@ columns free, and the `arrival` passages are strong direction for everything
 downstream. Column 12 derives from column 2 and should never be authored
 by hand.
 
-⚠️ **Column 9 is the one to be careful about.** "Images for the enemies" was
-the original phrasing, but there are **no image assets anywhere in this
-project** — every visual is a `CustomPainter`. Treat this column as "painter
-recipe + palette", parameterised by archetype with the element supplying
-colour, and it stays cheap. Treat it as bitmaps and it becomes an art
-pipeline, a licensing question, and download weight.
+⚠️ **Columns 9, 9b and 15b were re-scoped 2026-08-05.** They used to say
+"`CustomPainter` recipe, **not bitmaps**". ⭐ **That was tried and abandoned:**
+a full pass of hand-authored pixel grids for Whispering Woods produced nine
+interchangeable green lumps out of eleven. Creatures, backdrops and item icons
+are now **generated images pixelated through `tool/pixelate.py`**
+(see [../art/README.md](../art/README.md)); everything else in the game is
+still a painter.
+
+⭐ **These three columns are cheap per item and expensive in aggregate.** One
+sprite is ~8 KB and a few minutes; the bestiary is 275 of them. Budget them as
+a per-zone batch, not a per-creature task.
+
+⚠️ **Icons (15b) has no pipeline mode yet.** Creatures and backdrops do;
+`--mode icon` (small, square, probably 48px on a transparent field) is unbuilt.
 
 ---
 
 ## 2. The grid — Primal quarter (levels 1–14)
 
-| Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Whispering Woods** | ✅ 1–5 | ✅ Flora | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | 🟡 | ⬜ | ✅ Oak | ⬜ | ✅ | ✅ | ✅ | ✅ | 🟡 | 📝 |
-| **Glimmerbrook** | ✅ 3–8 | ✅ Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
-| **Cinderpeak Foothills** | ✅ 6–11 | ✅ Pyro | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
-| **Thornmire** | ✅ 8–13 | ✅ Flora+Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
-| **Ashfall Vale** | ✅ 10–14 | ✅ Pyro+Flora | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Birch | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
+| Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Backdrop | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Icons | Ach | Story |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Whispering Woods** | ✅ 1–5 | ✅ Flora | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | 🟡 | ✅ 11 | ⬜ | ✅ Oak | ⬜ | ✅ | ✅ | ✅ | ✅ | ⬜ | 🟡 | 📝 |
+| **Glimmerbrook** | ✅ 3–8 | ✅ Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
+| **Cinderpeak Foothills** | ✅ 6–11 | ✅ Pyro | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
+| **Thornmire** | ✅ 8–13 | ✅ Flora+Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
+| **Ashfall Vale** | ✅ 10–14 | ✅ Pyro+Flora | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Birch | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 
 ⭐ **Whispering Woods is BUILT** — `lib/game/enemies/whispering_woods.dart` and
 `lib/game/items/catalogue/whispering_woods_items.dart`. 11 creatures with their
@@ -73,8 +83,14 @@ so a change to its shape is a change to all of them.
 `proof_of_the_woods`, one of Aldermere's *"three ordinary proofs"* — until now
 every gate in the game was a prose string with nothing behind it.
 
+✅ **Art is done for this zone** — 11 generated sprites in
+`assets/creatures/whispering_woods/`, and `CreatureView` draws them in the
+duel. ⚠️ Two need re-cutting: the Hollow Stag lost its antlers and The
+Standing Green lost detail, both to `rembg` during background removal rather
+than to anything in the palette.
+
 ⚠️ Still open for this zone: **BossFX** (what makes each boss more than a big
-statline), **Art** (painter recipes), **Nodes** (gathering placement) and the
+statline), **Backdrop**, **Nodes** (gathering placement), **Icons**, and the
 three **achievements**, which need the `progress/` subcollection.
 
 🟡 **Names:** one placeholder existed per zone in `World.opponentNameFor` —
@@ -106,43 +122,69 @@ Thornmire have no materials assigned yet.
 
 ---
 
+## 2a. ⭐ What to do next, in order
+
+Measured off the grid above, not from memory.
+
+| # | Work | Why it is first |
+|---|---|---|
+| **1** | ⭐ **Build the other four Primal zones** — enemies, moves, items, drop tables | Whispering Woods proved the shape and is the template. Four zones × 11 creatures = the rest of the quarter playable. Everything downstream (icons, nodes, achievements) needs these to exist first |
+| **2** | **Gathering nodes** (col 11) | The only ⬜ that blocks a whole *skill*. Materials exist and drop from kills; nothing can be gathered from the world yet, so Woodcarving has no input that is not a corpse |
+| **3** | **Icons** (col 15b) | New column. Needs `--mode icon` in the pipeline first — small, square, transparent field |
+| **4** | **Backdrops** (col 9b) | 26 prompts already written from the `arrival` text; the pipeline mode exists. Cheapest visual win per hour on the board |
+| **5** | **BossFX** (col 8) | The only design work left in the quarter. What makes Heartwood more than a big statline |
+| **6** | ⛔ **Achievements** (col 16) | Blocked on the `progress/` subcollection, which is logged in IMPLEMENTATION_PLAN and unbuilt |
+| **7** | **Story** (col 17) | 26 zone-clear passages. Arrival poses the question; the clear answers it (GAME_DESIGN §5) |
+
+⚠️ **Two things are NOT on this list and should be**, because they block
+shipping rather than content:
+
+- ⛔ **The login content-version gate.** The moment item *stats* exist, two
+  clients on different builds disagree about what a staff does and the lockstep
+  duel diverges — presenting as a netcode bug rather than a data bug.
+- ⚠️ **Nothing equips.** `EquipmentDef` drops and is carried, but
+  `ItemModifiers` reaches no `MageState`. The paper doll is display-only, so
+  every piece of gear in the quarter is currently decorative.
+
+---
+
 ## 3. The grid — remaining zones
 
 ### Kinetic (15–29)
 
-| Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Old Quarry** | ✅ 15–19 | ✅ Geo | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Stormcliff Coast** | ✅ 17–22 | ✅ Electro | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Windward Steppe** | ✅ 19–24 | ✅ Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Yew | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Frostfell Pass** | ✅ 21–26 | ✅ Aqua+Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Thunderspire Peaks** | ✅ 23–28 | ✅ Electro+Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Rowan | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Molten Deep** 🏰 | ✅ 25–29 | ✅ Pyro+Geo | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Backdrop | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Icons | Ach | Story |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Old Quarry** | ✅ 15–19 | ✅ Geo | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Stormcliff Coast** | ✅ 17–22 | ✅ Electro | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Windward Steppe** | ✅ 19–24 | ✅ Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Yew | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Frostfell Pass** | ✅ 21–26 | ✅ Aqua+Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Thunderspire Peaks** | ✅ 23–28 | ✅ Electro+Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Rowan | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Molten Deep** 🏰 | ✅ 25–29 | ✅ Pyro+Geo | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 ### Celestial (30–44)
 
-| Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **The Kiln Desert** | ✅ 30–34 | ✅ Solar | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Ironwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Mirrormere** | ✅ 32–37 | ✅ Lunar | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Bloodwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Starfall Basin** | ✅ 34–39 | ✅ Astral | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **Tidewrack Shoals** | ✅ 36–40 | ✅ Lunar+Aqua | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Sunless Reach** | ✅ 38–42 | ✅ Solar+Lunar | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Ebony | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Shattered Orrery** 🏰 | ✅ 40–44 | ✅ Astral+Electro | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Glass Archive** 🏰 | ✅ 43–47 | ✅ Solar+Arcane | ✅ | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Backdrop | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Icons | Ach | Story |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **The Kiln Desert** | ✅ 30–34 | ✅ Solar | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Ironwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Mirrormere** | ✅ 32–37 | ✅ Lunar | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Bloodwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Starfall Basin** | ✅ 34–39 | ✅ Astral | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **Tidewrack Shoals** | ✅ 36–40 | ✅ Lunar+Aqua | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Sunless Reach** | ✅ 38–42 | ✅ Solar+Lunar | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Ebony | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Shattered Orrery** 🏰 | ✅ 40–44 | ✅ Astral+Electro | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Glass Archive** 🏰 | ✅ 43–47 | ✅ Solar+Arcane | ✅ | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 ### Ethereal (45–60)
 
-| Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Ach | Story |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Hallowmarch** | ✅ 45–49 | ✅ Sanctus | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Spiritwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Umbral Wastes** | ✅ 47–51 | ✅ Umbra | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Collapsed Academy** 🏰 | ✅ 50–54 | ✅ Arcane | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | 🟡 Aetherwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Reliquary Deep** 🏰 | ✅ 52–56 | ✅ Sanctus+Umbra | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Unwritten Library** 🏰 | ✅ 54–58 | ✅ Umbra+Arcane | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Buried Sky** 🏰 | ✅ 46–50 | ✅ Geo+Astral | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Sealed Garden** | ✅ 49–53 | ✅ Flora+Sanctus | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **The Eclipsed Citadel** 🏰 | ✅ 58–60 | ✅ all | 🟡 | ❓ | 🟡 1 | ⬜ | ❓ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Backdrop | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Icons | Ach | Story |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Hallowmarch** | ✅ 45–49 | ✅ Sanctus | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Spiritwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Umbral Wastes** | ✅ 47–51 | ✅ Umbra | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Collapsed Academy** 🏰 | ✅ 50–54 | ✅ Arcane | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Aetherwood | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Reliquary Deep** 🏰 | ✅ 52–56 | ✅ Sanctus+Umbra | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Unwritten Library** 🏰 | ✅ 54–58 | ✅ Umbra+Arcane | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Buried Sky** 🏰 | ✅ 46–50 | ✅ Geo+Astral | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Sealed Garden** | ✅ 49–53 | ✅ Flora+Sanctus | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| **The Eclipsed Citadel** 🏰 | ✅ 58–60 | ✅ all | 🟡 | ❓ | 🟡 1 | ⬜ | ❓ | 🟡 1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 🏰 = dungeon rather than route.
 
