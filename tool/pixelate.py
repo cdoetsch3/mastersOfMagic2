@@ -82,6 +82,11 @@ BACKGROUND_COLOURS = 28
 BACKGROUND_DARKEN = 0.42
 BACKGROUND_DESATURATE = 0.45
 
+# ⚠️ How hard the element hue is pushed. Above 1.0 = more saturated than the
+# element's own UI colour — deliberate, because the hue ramp is competing with
+# neutrals for the same mid-tones and loses at 1.0.
+ELEMENT_SATURATION = 1.6
+
 # ⚠️ Anything below this alpha becomes fully transparent. Soft edges at this
 # scale read as grime, not as antialiasing.
 ALPHA_CUTOFF = 128
@@ -126,6 +131,18 @@ def element_colours() -> dict[str, tuple[int, int, int]]:
     return out
 
 
+def _saturate(rgb: tuple[int, int, int], amount: float) -> tuple[int, int, int]:
+    """Pushes a colour away from its own grey.
+
+    ⭐ Around the colour's own luminance, so it gets more colourful without
+    getting lighter or darker — which would shift where it lands in the ramp.
+    """
+    lum = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]
+    return tuple(
+        int(max(0, min(255, round(lum + (c - lum) * amount)))) for c in rgb
+    )
+
+
 def build_ramp(
     rgb: tuple[int, int, int],
     steps: int,
@@ -162,10 +179,18 @@ def write_palettes(size: int = 24) -> dict[str, list[tuple[int, int, int]]]:
     PALETTE_DIR.mkdir(parents=True, exist_ok=True)
     # A warm-grey ramp: bark and bone, never a pure neutral, so it sits with
     # the element rather than looking like a different image.
+    #
+    # ⚠️ **Do NOT tint this toward the element.** Tried at 35% and it made the
+    # zone read as LESS green, not more: once the bark is greenish too, the
+    # moss has nothing to contrast against and the element stops registering.
+    # The contrast between neutral and hue is what makes the hue visible.
     NEUTRAL = (168, 158, 148)
     palettes = {}
     for name, rgb in element_colours().items():
-        hue = build_ramp(rgb, steps=size - 8)
+        # ⭐ Saturate the element ramp instead. The source art is mostly
+        # desaturated bark and bone, so an unboosted hue ramp gets out-competed
+        # by the neutrals during quantisation and the greens go quiet.
+        hue = build_ramp(_saturate(rgb, ELEMENT_SATURATION), steps=size - 8)
         neutral = build_ramp(NEUTRAL, steps=6, shadow=(24, 22, 28))
         full = [(10, 8, 14)] + hue + neutral + [(255, 255, 255)]
         img = Image.new("RGB", (len(full), 1))
