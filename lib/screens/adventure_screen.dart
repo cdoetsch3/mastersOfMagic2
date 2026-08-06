@@ -46,8 +46,14 @@ class _AdventureScreenState extends State<AdventureScreen> {
                 children: [
                   _Progress(run: run),
                   const SizedBox(height: 14),
+                  if (!run.isOver && run.atSectionStart)
+                    _Beat(zone: widget.zone, section: run.section),
                   if (run.isOver)
-                    _Ending(run: run, onLeave: () => Navigator.pop(context))
+                    _Ending(
+                      run: run,
+                      zone: widget.zone,
+                      onLeave: () => Navigator.pop(context),
+                    )
                   else
                     _NextFight(
                       run: run,
@@ -275,16 +281,19 @@ class _NextFight extends StatelessWidget {
 
 class _Ending extends StatelessWidget {
   final AdventureRun run;
+  final GameLocation zone;
   final VoidCallback onLeave;
 
-  const _Ending({required this.run, required this.onLeave});
+  const _Ending({required this.run, required this.zone, required this.onLeave});
 
   @override
   Widget build(BuildContext context) {
     final (title, body, colour) = switch (run.outcome) {
       RunOutcome.cleared => (
         'The zone is cleared',
-        'You beat what was waiting at the end of it.',
+        // ⭐ Arrival poses the question; the epilogue answers it. Falls back
+        // rather than showing a blank — most zones have no epilogue yet.
+        zone.epilogue ?? 'You beat what was waiting at the end of it.',
         AppColors.gold,
       ),
       RunOutcome.returned => (
@@ -480,4 +489,47 @@ class _ConsumableRow extends StatelessWidget {
       ],
     ),
   );
+}
+
+/// The narrative beat for the section the player has just entered.
+///
+/// ⭐ **Paced, not front-loaded.** Whispering Woods' story is slowly realising
+/// something is wrong; delivering that in one arrival paragraph would give the
+/// answer before the player had the question.
+///
+/// ⚠️ Renders nothing when a zone has no beat for this section — most zones
+/// have none yet, and a run must not stall waiting for text.
+class _Beat extends StatelessWidget {
+  final GameLocation zone;
+  final int section;
+
+  const _Beat({required this.zone, required this.section});
+
+  @override
+  Widget build(BuildContext context) {
+    if (section >= zone.beats.length) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: GamePanel(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.forest, color: AppColors.teal, size: 18),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                zone.beats[section],
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 13,
+                  height: 1.45,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

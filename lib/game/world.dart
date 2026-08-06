@@ -156,6 +156,30 @@ class GameLocation {
   /// game systems. First-draft copy — see WORLD_DESIGN §6.
   final String arrival;
 
+  /// Shown when the zone's boss falls.
+  ///
+  /// ⭐ **Arrival poses the question; the epilogue answers it** (GAME_DESIGN
+  /// §5). [arrival] deliberately resolves nothing; this delivers the thing the
+  /// zone was there to teach. Same voice — second person, present tense, no
+  /// exposition about game systems.
+  ///
+  /// ⚠️ **Must not close the zone off.** Zones are re-run for materials and
+  /// for Purge, so an epilogue that kills the place for good contradicts the
+  /// next visit.
+  final String? epilogue;
+
+  /// One line per section of a run, shown as the player crosses into it.
+  ///
+  /// ⭐ **This is how a zone tells a story at the pace it is played.** A run is
+  /// three sections (GAME_DESIGN §3d), so a realisation can *dawn* — pleasant,
+  /// then off, then undeniable — instead of arriving all at once in the
+  /// epilogue. Whispering Woods is the case that demanded it: the beat is
+  /// slowly noticing something is wrong, and that cannot be one paragraph.
+  ///
+  /// ⚠️ Up to three, matching the section count. Shorter than [arrival] —
+  /// these interrupt a run, so they are a sentence, not a passage.
+  final List<String> beats;
+
   /// Elemental flavour of the monsters found here (empty for towns). One
   /// element for a pure zone, two for a hybrid, all twelve for the Citadel.
   final List<MagicElement> elements;
@@ -210,6 +234,8 @@ class GameLocation {
     required this.kind,
     required this.blurb,
     required this.arrival,
+    this.epilogue,
+    this.beats = const [],
     required this.edges,
     this.plane = WorldPlane.world,
     this.elements = const [],
@@ -303,10 +329,31 @@ abstract final class World {
       minLevel: 1,
       maxLevel: 5,
       blurb: 'Sun-dappled woods that murmur when nothing is moving them.',
+      // ⚠️ **Opens pleasant on purpose.** The zone's beat is slowly realising
+      // something is wrong, so the first impression must be a nice wood with
+      // exactly one thing off — not a warning.
       arrival:
-          'The murmur is not wind. It comes from the ground, from the '
-          'roots crossing under the path, and it stops the moment you stand '
-          'still to listen.',
+          'Sun comes down through the leaves in pieces and moves when they '
+          'move. It is a good path, well walked, and the air smells of warm '
+          'bark. Somewhere under it all, something is murmuring.',
+      // ⭐ Paced across the run's three sections: pleasant, off, undeniable.
+      beats: [
+        'The murmur stops the moment you stand still to listen. When you '
+            'walk on, it starts again.',
+        'You have passed this bend before. The path has not looped — you '
+            'have been watching for that. The trees have moved.',
+        'It is not coming from the trees. It is coming from underneath '
+            'them, from the roots crossing beneath the path, and it is all one '
+            'sound. You have been walking on it this whole time.',
+      ],
+      // ⭐ The quarter's first lesson, paid off: an element can be AWARE.
+      // ⚠️ Nothing dies here — the network moves. The wood is still the wood
+      // when you come back for oak.
+      epilogue:
+          'The murmur does not stop when the heartwood comes down. It moves '
+          '— under the path, out toward the edges, somewhere you cannot walk '
+          'to — and settles there. You did not kill anything. You '
+          'interrupted something, and it noticed you doing it.',
       edges: [
         TravelEdge('aldermere', 3),
         TravelEdge('thornmire', 3),

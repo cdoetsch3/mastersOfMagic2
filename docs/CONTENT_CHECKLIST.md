@@ -39,7 +39,7 @@ Design lives elsewhere — this file only tracks *state*:
 | 15b | **Icons** | ⭐ An image per **item** the zone yields, same pipeline as creatures | Mats, Drop-* |
 | 16 | **Ach** | The 3 achievements (Clear / Purge / Collect) | Roster, Drop-* |
 | | | ⭐ **Clear** is unblocked — `PlayerProfile.zoneClears` exists. **Purge** needs a per-enemy defeat log (~4.2 clears per zone, since the pool shows 2 of 4 minis and 1 of 2 bosses). **Collect** needs items *and* a permanent seen-log separate from inventory. ACHIEVEMENTS §2.3 | |
-| 17 | **Story** | Tier-1 narrative beat, if this zone gets one | GAME_DESIGN §5 |
+| 17 | **Story** | ⭐ Three things now, not one: the `arrival` (poses), up to **3 section beats** (paced through the run), and the `epilogue` (answers) | Lore, Roster |
 
 ⭐ **Columns 1–3 are already mostly done for every zone** — that is 3 of 17
 columns free, and the `arrival` passages are strong direction for everything
@@ -67,7 +67,7 @@ a per-zone batch, not a per-creature task.
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Backdrop | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Icons | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Whispering Woods** | ✅ 1–5 | ✅ Flora | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | 🟡 | ✅ 11 | ⬜ | ✅ Oak | ⬜ | ✅ | ✅ | ✅ | ✅ | ⬜ | 🟡 | 📝 |
+| **Whispering Woods** | ✅ 1–5 | ✅ Flora | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | 🟡 | ✅ 11 | ⬜ | ✅ Oak | ⬜ | ✅ | ✅ | ✅ | ✅ | ⬜ | 🟡 | ✅ |
 | **Glimmerbrook** | ✅ 3–8 | ✅ Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Cinderpeak Foothills** | ✅ 6–11 | ✅ Pyro | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Thornmire** | ✅ 8–13 | ✅ Flora+Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |

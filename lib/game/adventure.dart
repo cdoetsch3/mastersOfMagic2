@@ -129,6 +129,26 @@ class AdventureRun {
     );
   }
 
+  /// Which section (0-2) the encounter at [index] belongs to.
+  ///
+  /// ⭐ Derived from the roster shape rather than stored: a section ENDS on a
+  /// mini or a boss, so the count of elevated enemies already passed is the
+  /// section number.
+  int sectionAt(int i) {
+    var section = 0;
+    for (var n = 0; n < i && n < encounters.length; n++) {
+      if (encounters[n].def.rank != EnemyRank.common) section++;
+    }
+    return section;
+  }
+
+  /// The section the player is in now.
+  int get section => sectionAt(index);
+
+  /// True when [index] is the first encounter of its section — ⭐ the moment a
+  /// narrative beat fires.
+  bool get atSectionStart => index == 0 || sectionAt(index - 1) != section;
+
   bool get isOver => outcome != RunOutcome.running;
   bool get isFinished => index >= encounters.length;
 
