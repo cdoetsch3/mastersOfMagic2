@@ -128,99 +128,197 @@ game has no thesis. The difference is not power. It is consent.
 
 ## 4b. ✅ Why the player goes anywhere
 
-⭐ **Three kinds of reason, and two of them already exist in `world.dart`.**
+⚠️ **The first pass through the world is not a Crown hunt.** ⭐ A level-1 mage
+in Aldermere is not assembling a Concordant Crown — they have no idea it is
+possible, and saying so out loud would make the next sixty levels a fetch
+list. The Crown is the *last act*, not the premise (§4c).
 
-### 4b.1 The twelve pure zones ARE the Crown
+⭐⭐ **So the first pass needs its own reason, and it has one: you are trying
+to reach a sealed city, and the only road to it goes up through four
+quarters.** Each quarter has a local problem that gets solved locally and
+hands the player, on its way out, one more piece of why the door is shut.
 
-⭐⭐ **Twelve elements. Twelve pure zones. Twelve gems.** The map already has
-exactly one pure zone per element — `world_test.dart` asserts it — so the
-critical path is the right length without inventing anything.
+### 4b.1 One subplot per quarter, each handing off to the next
 
-⭐ **A pure zone is the only place its element exists undiluted**, which is why
-it is the only place you can ask that element for agreement. Everywhere else it
-is already arguing with something.
+**Q1 · Primal · 1–14 — *"This is not local."***
+You start doing errands. Something in the woods, something in the water,
+something in the fire — three ordinary nuisances for three ordinary people,
+and the player thinks they are three ordinary jobs. ⭐ **They are one job.**
+The three proofs the north road wants turn out to be three faces of the same
+wrongness, and it is coming from upriver.
+**Handoff:** ⭐ **your mother recognises it.** She saw this exact symptom
+fifteen years ago, in the weeks before she was sent here. *The thing you have
+been fighting all quarter is the thing that took your father.*
 
-⚠️ **The player does not start knowing this.** The mother knows a Crown is
-twelve elements; she does not know where any of them are, or that "earning
-agreement" now means going and asking. Discovery is the first act.
+**Q2 · Kinetic · 15–29 — *"This is recent."***
+📝 *This was the quarter with no story. It has one now.* Concordance's
+three-part ward has failed and the roads are unusable, so the Kinetic quarter
+is not a place you pass through — it is a place that needs the ward put back.
+While repairing it you talk to people who **remember when it was not like
+this**, and they all date it to the same year.
+**Handoff:** the discord and the sealing of Zenith are **one event**. Nobody at
+ground level knows what happened at the summit, because everyone who does is
+behind the door.
 
-### 4b.2 The five gates are the intermediate waypoints
+**Q3 · Celestial · 30–44 — *"This has happened before."***
+Above the shelf you find the leavings of previous Crowns — the Buried Sky's
+*"this has all happened before"* stops being atmosphere. The sky keeps a
+record of every Crown ever assembled. ⭐ **And there is a gap in it.** The
+most recent entry has been struck out; the holder's name is gone.
+**Handoff:** ⭐⭐ **someone censored the record — which means an uncensored one
+exists, and there is exactly one place that keeps those.** *This is the pull
+that makes the Unwritten Library a destination rather than a room on the way.*
 
-⚠️ **These are already written and have never been given a reason to exist.**
+**Q4 · Ethereal · 45–60 — *"It was made to happen."***
+You collect three key fragments across the quarter without knowing what they
+open. The Library tells you: Procarius, the binding, the sealing, and the
+three council members who split the key — ⭐ **one of them your father.**
+**Handoff:** the fragments open the Citadel. Procarius is standing in it. He
+has been waiting fifteen years for someone who can do what he cannot.
 
-| Gate | At | Wants |
-|---|---|---|
-| Three ordinary proofs | Aldermere → the north road | 1 per Primal zone, incl. `proof_of_the_woods` ✅ **built** |
-| The Kinetic Sigil, in three parts | Concordance (30) | The Kinetic quarter |
-| A Celestial Totem — Solar, Lunar, Astral essences | above Rimeholt (45) | The three Celestial pure zones |
-| Three Ethereal key fragments | The Eclipsed Citadel | The Ethereal quarter |
-| **The Concordant Crown** | Zenith (60) | All twelve |
+⭐ **Every handoff is the same shape** — you solve a local problem and the
+solution turns out to be evidence about the door. That is what keeps a
+sixty-level climb feeling like one story instead of four.
 
-⭐ **The reason: the gates are how Zenith's descendants control the climb.**
-Each was set by crown-holding families to stop anyone reaching the summit
-unprepared — and after Procarius, *unprepared* was redefined as *untested*.
-⚠️ **Every gate is the aristocracy vetting you**, which is why they escalate
-and why the last one is the Crown itself.
+### 4b.2 The five gates, and why each one is there
 
-⭐ That gives the whole climb a shape the player can feel: four checkpoints,
-each demanding you prove you have been somewhere, before the fifth demands you
-prove you have been everywhere.
+⚠️ **"The aristocracy is vetting you" was too thin.** ⭐ **Not one of these is
+a permission slip.** Each is a thing somebody built for a concrete reason, and
+the player's business with it is different every time.
 
-### 4b.3 The thirteen hybrids are optional, and they are the story
+**1 · Three ordinary proofs** — Aldermere → the north road
+⭐ **Your mother set this rule.** Fifteen years ago she asked the road warden
+to let no unproven mage past, and she meant one specific child. She cannot
+stop you leaving; she arranged for the road to ask you for proof first.
+⚠️ **She can tell you so when you bring the third one** — which turns the
+tutorial gate into the first real scene between them, rather than a
+forty-level-late reveal. ✅ `proof_of_the_woods` already exists.
+
+**2 · The Kinetic Sigil, in three parts** — Concordance, 30
+⭐ **It is a containment ward, not a gate, and it has failed in three places.**
+Concordance ringed itself when the Kinetic elements turned violent within
+living memory. You are not assembling the Sigil to be let in; you are
+assembling it because the city is open to the roads and someone has to close
+it. ⭐⭐ **The Sigil is a Crown in miniature** — three elements, three parts,
+one object that makes them hold together. The player builds the small version
+thirty levels before anyone says the word *Crown*, and it teaches the
+mechanic by hand.
+
+**3 · A Celestial Totem, charged with Solar, Lunar and Astral** — Rimeholt, 45
+⭐ **It is equipment. Nobody is checking it.** Above the barrier there is no
+ground, and the three things the sky is made of are the three things that let
+you stand on it. ⚠️ Arrive without one and the mountain simply does not hold
+you. The three essences are not a toll — they are the reason you survive the
+next fifteen levels. (Meridian is already placed *below* the barrier for
+exactly this grind.)
+
+**4 · Three Ethereal key fragments** — the Eclipsed Citadel
+⭐⭐ **This lock was built to keep Procarius out, and you are about to open
+it.** Zenith's council sealed the Citadel from the inside and split the key
+three ways into the Ethereal quarter so no single person could ever reopen
+it. ⚠️ **The last gate before the villain is a thing your father helped
+build.** And it is why Procarius has waited fifteen years without leaving:
+**he is not guarding a door. He is waiting for a locksmith.**
+
+**5 · The Concordant Crown** — Zenith, 60
+⭐ **Not a rule anyone set. The doors answer to an accord and nothing else.**
+That is why the city is hereditary, why the sealing worked at all, and why the
+last act of the game is filling a circlet (§4c).
+
+### 4b.3 The hybrids are where the discord is legible
 
 ⭐ **The Crown is made from agreement; the story is found in disagreement.** A
-hybrid zone is where two elements meet and contend — so it is where the discord
-is *visible*, and where its cause can be learned.
+hybrid zone is where two elements meet and contend, so it is where the discord
+is *visible* and its cause can be learned.
 
-⭐⭐ **A player who skips every hybrid finishes the game exactly the way
-Procarius did: with the power and none of the understanding.** That is the
-reason hybrids can be optional and still matter. They are not side content —
-they are the difference between winning and knowing what you won.
+⭐⭐ **A player who does the minimum finishes the game the way Procarius did:
+with the power and none of the understanding.** They are not side content —
+they are the difference between winning and knowing what you won. They already
+carry the Tier III/IV Bound set components (ITEMS §3.5); the narrative half is
+that each one explains a piece of what happened.
 
-⚠️ **So they must be highly valuable without being required.** They already
-hold the Tier III/IV Bound set components (ITEMS §3.5), which is the mechanical
-half. The narrative half is that each one explains a piece of what happened.
+⚠️ **One hybrid is required, and the map already made it so.** The Eclipsed
+Citadel has exactly two edges — the Unwritten Library and Zenith — so **the
+Library is the only approach to the endgame.** It does not need to be made
+mandatory. It needs the Q3 handoff above to give the player a reason to want
+what is in it before they arrive.
 
-### 4b.4 ⭐ The chain that ends the game
-
-**The Unwritten Library → the Citadel → Zenith.**
-
-📝 **The Library is where you learn what Procarius actually did.** Something
-there is writing, by nobody, and *"it would like your name for the record"* —
-⭐ **it has the record.** Every Crown, every holder, every sealing. It is the
-last optional zone in the game and it holds the deepest answer, which is the
-right place for it.
-
-⚠️ **It is a hybrid, so it is skippable** — deliberately. You can walk into the
-Citadel having never learned why Procarius is standing there.
+📝 **The Library holds the uncensored record.** *"Something is taking dictation
+and it would like your name for the record"* — ⭐ it has the record: every
+Crown, every holder, every sealing, including the entry the sky no longer has.
 
 ---
 
-## 5. How each quarter carries it
+## 4c. ⭐⭐ The last act: filling the Crown
 
-| Quarter | What the player learns | Where |
+⚠️ **This is a distinct phase and it changes the shape of the endgame.**
+
+**The empty frame belongs to Procarius.** He has had it for fifteen years,
+standing at a door that will not open for an unfilled Crown — ⭐⭐ **unable to
+fill it, because the elements will not answer the man who once coerced them.**
+That is why he never left. It is also, finally, an explanation for a villain
+who has done nothing for fifteen years except stand somewhere.
+
+**The sequence:**
+
+1. **The Citadel.** You beat him and the frame is yours. ⚠️ **He is not
+   finished** — see below.
+2. **Twelve trials.** You return to each of the twelve pure zones and *ask*.
+   ⭐ **This is the only point in the game where the word "agreement" is
+   literal**, and it is the payoff for §4 — sixty levels of method, cashed in
+   twelve times.
+3. **Zenith's door**, with a filled Crown, where he is waiting. ⭐ **He cannot
+   fill a Crown, so he waited for someone who could.** The final fight is at
+   the door he has been locked out of, over the thing he has wanted the whole
+   time.
+
+⭐ **A pure zone is the only place its element exists undiluted**, which is why
+it is the only place the question can be asked. Everywhere else the element is
+already mid-argument.
+
+⚠️ **The trials cannot be the ordinary zones at their ordinary level.** The
+twelve pure zones span bands 1–60; walking a level-60 mage back into Whispering
+Woods is not a climax. ⭐ **Asking is not clearing.** The element answers at
+full strength — a level-60 run of a zone the player first saw at level 3.
+
+⭐⭐ **This is the "re-clear the first quarter, amplified" idea from earlier,
+arriving where it actually belongs.** It was unconvincing as a mid-game event
+because nothing motivated it. As the final act it is motivated by the only
+thing left to do, and it reuses all twelve zones as endgame content.
+
+❓ **Open: how the player crosses the world twelve times.** Twelve trips down
+from the Empyrean and back is a lot of travel. The obvious lever is Zenith's
+one-way teleport net; the more interesting one is that **the frame itself
+pulls toward its gems**. Unresolved.
+
+---
+
+## 5. What each quarter teaches
+
+| Quarter | Subplot (§4b.1) | What the player learns |
 |---|---|---|
-| **Primal** 1–14 | ⭐ Elements are **parties**, not forces. They want things, and where they meet they contend | The five zone themes, GAME_DESIGN §5 |
-| **Kinetic** 15–29 | The discord is **recent and worsening** — old people remember when it was not like this | 📝 Needs writing |
-| **Celestial** 30–44 | It has **happened before**, many times, and someone has always fixed it | The Buried Sky; the Crown as an office |
-| **Ethereal** 45–60 | ⭐ It was **made** to happen. The Garden is what accord looked like; the Archive is the door Arcane left by; the Citadel is the man who did it | Sealed Garden, Glass Archive, Citadel |
+| **Primal** 1–14 | Three errands, one cause | ⭐ Elements are **parties**, not forces — they want things, and where they meet they contend |
+| **Kinetic** 15–29 | Rebuilding Concordance's failed ward | The discord is **recent**, and it is dated to the year Zenith closed |
+| **Celestial** 30–44 | The sky's record of every Crown | It has **happened before** — and the last entry was struck out |
+| **Ethereal** 45–60 | Three key fragments, and the Library | ⭐ It was **made** to happen, by a man still standing at the door |
 
-⭐ **The Primal quarter gains a reason it did not have.** It teaches that
-elements have wills; forty levels later you learn someone tried to override
-those wills. The lesson and its payoff are separated by the whole game.
-
-📝 **The Kinetic quarter is the thin one** — it currently carries no story beat
-at all, and it is the natural home for "this is recent." Six zones with nothing
-to say is the biggest narrative gap in the game.
+⭐ **The Primal quarter's lesson is paid off forty levels later.** It teaches
+that elements have wills; the Ethereal quarter reveals that someone overrode
+those wills. The setup and the payoff are separated by the whole game, which is
+the strongest thing this structure does.
 
 ---
 
 ## 6. The ending
 
-You reach the Citadel with a finished Crown. Procarius wants it — not to rule,
-but because it is the only thing that opens the door he has been locked out of
-for fifteen years. ⚠️ **He is a warning, not a monster:** he is what happens to
-someone who does exactly what you are doing and then cannot stop.
+Procarius wants the Crown — not to rule, but because it is the only thing that
+opens the door he has been locked out of for fifteen years. ⚠️ **He is a
+warning, not a monster:** he is what happens to someone who does exactly what
+you are doing and then cannot stop.
+
+⭐ **You and he differ in one respect only.** Twelve elements agreed to you.
+That is the whole margin, and the ending should not pretend it is anything
+larger.
 
 Beyond him is Zenith, and your father, and the answer to whether he was trapped
 or chose to stay.
@@ -249,14 +347,19 @@ the player can see rather than a cutscene claim. Unspecified for now.
 ## 8. ❓ Still open
 
 - **What Zenith is actually like inside**, and whether the player stays.
-- **The Kinetic quarter's beat** — six zones, nothing to say yet.
+- ⭐ ~~The Kinetic quarter's beat~~ — ✅ resolved: the failed ward (§4b.1).
+- **What the twelve trials actually are** (§4c.2) — a run mode, a single fight,
+  or something that is not a fight at all. Nothing is built.
+- **How the player crosses the world twelve times** in the last act (§4c).
 - **Whether the mother is a recurring voice** or only a prologue.
 - **How the player learns any of this.** Tier-1 narrative screens are designed
   but unbuilt (GAME_DESIGN §5), and this story currently has nowhere to appear.
 - ⛔ **Four of the five gates are prose with no items behind them.** Only
   `proof_of_the_woods` exists. The Kinetic Sigil, the Celestial Totem, the
   Ethereal fragments and the Crown are all still just strings — and §4b.2 now
-  makes them the backbone of the climb.
+  makes each of them a subplot's payload, not a checkpoint.
+- ⛔ **Nothing enforces a gate.** `GameLocation.gate` is prose; `opensAtLevel`
+  is the only real lock in the code.
 - **What each hybrid explains.** Thirteen zones, thirteen pieces of the story,
   none written.
 - **Whether the world visibly heals** at the end (§6).
