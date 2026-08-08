@@ -65,6 +65,7 @@ surface it and ask; do not decide it in code.
 | Skills — gathering and processing | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) §6a |
 | ⭐ **Crafting model, quality tiers, stations, gathering nodes, the wood ladder, naming grammar** | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) **§9b** — the newest and most concrete section |
 | What can be traded, and what can never be | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) §6c |
+| ⭐ **How content is documented for the wiki** — code canonical, JSON export, integrity guard | [CONTENT_EXPORT.md](docs/CONTENT_EXPORT.md) |
 | 🚫 **Monetization — read before touching anything purchasable** | [ITEMS_DESIGN.md](docs/ITEMS_DESIGN.md) **§3.6** |
 | Achievements and character progress | [ACHIEVEMENTS_DESIGN.md](docs/ACHIEVEMENTS_DESIGN.md) |
 

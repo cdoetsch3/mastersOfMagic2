@@ -1,0 +1,2880 @@
+{
+  "schemaVersion": 1,
+  "counts": {
+    "zones": 26,
+    "towns": 9,
+    "creatures": 11,
+    "items": 13,
+    "recipes": 0
+  },
+  "zones": [
+    {
+      "id": "hearthwood",
+      "name": "Hearthwood",
+      "kind": "town",
+      "plane": "world",
+      "tier": "primal",
+      "elements": [],
+      "minLevel": 0,
+      "maxLevel": 0,
+      "opensAtLevel": 1,
+      "station": "Woodcarving",
+      "gate": "Three ordinary proofs, shown to the guard on the north road",
+      "blurb": "A wooded river valley where every mage begins.",
+      "arrival": "Alders lean over the water, and the whole valley smells of wet bark and woodsmoke. Someone is sharpening something. Nobody looks up when you pass, which is its own kind of welcome.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "whispering_woods",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "glimmerbrook",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "thornmire",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "cinderpeak_foothills",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "pennycross",
+          "minutes": 3,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "whispering_woods",
+      "name": "Whispering Woods",
+      "kind": "route",
+      "plane": "world",
+      "tier": "primal",
+      "elements": [
+        "flora"
+      ],
+      "minLevel": 1,
+      "maxLevel": 5,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "Sun-dappled woods that murmur when nothing is moving them.",
+      "arrival": "Sun comes down through the leaves in pieces and moves when they move. It is a good path, well walked, and the air smells of warm bark. Somewhere under it all, something is murmuring.",
+      "beats": [
+        "The murmur stops the moment you stand still to listen. When you walk on, it starts again.",
+        "You have passed this bend before. The path has not looped — you have been watching for that. The trees have moved.",
+        "It is not coming from the trees. It is coming from underneath them, from the roots crossing beneath the path, and it is all one sound. You have been walking on it this whole time."
+      ],
+      "epilogue": "The murmur does not stop when the heartwood comes down. It moves — under the path, out toward the edges, somewhere you cannot walk to — and settles there. You did not kill anything. You interrupted something, and it noticed you doing it.",
+      "edges": [
+        {
+          "to": "hearthwood",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "thornmire",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "ashfall_vale",
+          "minutes": 3,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "glimmerbrook",
+      "name": "Glimmerbrook",
+      "kind": "route",
+      "plane": "world",
+      "tier": "primal",
+      "elements": [
+        "aqua"
+      ],
+      "minLevel": 3,
+      "maxLevel": 8,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "Springs and shallows east of Hearthwood, bright enough to hurt.",
+      "arrival": "The brook runs over pale stones and throws the light back at you in pieces. Fish hang in the current without swimming. The water is colder than the season should allow.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "hearthwood",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "thornmire",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "pennycross",
+          "minutes": 3,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "cinderpeak_foothills",
+      "name": "Cinderpeak Foothills",
+      "kind": "route",
+      "plane": "world",
+      "tier": "primal",
+      "elements": [
+        "pyro"
+      ],
+      "minLevel": 6,
+      "maxLevel": 11,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "The first rise north, where the ground is warm through your boots.",
+      "arrival": "The grass gives out and the slope turns to grey grit that shifts under you. Somewhere above, the mountain is breathing. The air tastes of struck flint.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "hearthwood",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "ashfall_vale",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "the_molten_deep",
+          "minutes": 5,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "thornmire",
+      "name": "Thornmire",
+      "kind": "route",
+      "plane": "world",
+      "tier": "primal",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "minLevel": 8,
+      "maxLevel": 13,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "Where the woods drown in the brook's outflow.",
+      "arrival": "The path becomes a suggestion, then a rumour, then water. Trees stand in it up to their knees and have made peace with that. Everything green here is winning.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "hearthwood",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "whispering_woods",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "glimmerbrook",
+          "minutes": 3,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "ashfall_vale",
+      "name": "Ashfall Vale",
+      "kind": "route",
+      "plane": "world",
+      "tier": "primal",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "minLevel": 10,
+      "maxLevel": 14,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "Downwind of the cone: the burn scar where ash falls on forest.",
+      "arrival": "Grey settles on every leaf until the whole valley looks like a charcoal drawing of itself. New shoots are already pushing up through it. Fire came through here, and something is arguing about whether it won.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "whispering_woods",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "cinderpeak_foothills",
+          "minutes": 3,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "pennycross",
+      "name": "Pennycross",
+      "kind": "town",
+      "plane": "world",
+      "tier": "primal",
+      "elements": [],
+      "minLevel": 0,
+      "maxLevel": 0,
+      "opensAtLevel": 8,
+      "station": "Tailoring",
+      "gate": null,
+      "blurb": "The first market, where the river road crosses the mountain road.",
+      "arrival": "Two roads meet and a town happened. Stalls have grown into buildings, and the buildings still look like stalls. Everyone is halfway through a transaction.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "hearthwood",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "glimmerbrook",
+          "minutes": 3,
+          "kind": "road"
+        },
+        {
+          "to": "old_quarry",
+          "minutes": 4,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "forgeholm",
+      "name": "Forgeholm",
+      "kind": "town",
+      "plane": "world",
+      "tier": "kinetic",
+      "elements": [],
+      "minLevel": 0,
+      "maxLevel": 0,
+      "opensAtLevel": 15,
+      "station": "Metalworking",
+      "gate": null,
+      "blurb": "A city with a mountain for a roof, cut into the Ironspine.",
+      "arrival": "You arrive at a door. The road ends at a gate in the rock and everything past it was cut rather than built — halls stacked over halls, stairs where a street would be, and a red glow a long way down that never goes out. Ore does not leave here until it has a name. It is never quiet and never cold.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "old_quarry",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "thunderspire_peaks",
+          "minutes": 5,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "old_quarry",
+      "name": "Old Quarry",
+      "kind": "route",
+      "plane": "world",
+      "tier": "kinetic",
+      "elements": [
+        "geo"
+      ],
+      "minLevel": 15,
+      "maxLevel": 19,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "Cut into the range's southern flank, and cut too deep.",
+      "arrival": "The road stops being a road and becomes the floor of something somebody dug. Terraces step down into shadow, each one squarer than anything nature makes, and the tool marks are old. Whatever was quarried out of here left a shape, and the shape has started to move.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "pennycross",
+          "minutes": 4,
+          "kind": "road"
+        },
+        {
+          "to": "forgeholm",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "the_molten_deep",
+          "minutes": 5,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "stormcliff_coast",
+      "name": "Stormcliff Coast",
+      "kind": "route",
+      "plane": "world",
+      "tier": "kinetic",
+      "elements": [
+        "electro"
+      ],
+      "minLevel": 17,
+      "maxLevel": 22,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "Where the western ocean's weather hits a wall and has nowhere to go.",
+      "arrival": "The cliffs take the whole weight of it. Spray comes up further than it should and your hair lifts before you hear the crack. The rock is scorched in long vertical lines.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "thunderspire_peaks",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "galehaven",
+          "minutes": 5,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "galehaven",
+      "name": "Galehaven",
+      "kind": "town",
+      "plane": "world",
+      "tier": "kinetic",
+      "elements": [],
+      "minLevel": 0,
+      "maxLevel": 0,
+      "opensAtLevel": 22,
+      "station": "Potions and Alchemy",
+      "gate": null,
+      "blurb": "The one notch in a hundred miles of cliff.",
+      "arrival": "The harbour is impossibly calm for what is happening outside it. Cloth and dye come off the boats in bales; nothing here is made locally except the ships.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "stormcliff_coast",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "frostfell_pass",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "tidewrack_shoals",
+          "minutes": 12,
+          "kind": "sea"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "windward_steppe",
+      "name": "Windward Steppe",
+      "kind": "route",
+      "plane": "world",
+      "tier": "kinetic",
+      "elements": [
+        "aero"
+      ],
+      "minLevel": 19,
+      "maxLevel": 24,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "A high tableland east of the crest, scoured flat.",
+      "arrival": "Nothing here is taller than your knee, and everything leans the same way. The wind does not gust; it simply blows, and has been blowing since before there was anyone to notice.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "thunderspire_peaks",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "frostfell_pass",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "concordance",
+          "minutes": 5,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "frostfell_pass",
+      "name": "Frostfell Pass",
+      "kind": "route",
+      "plane": "world",
+      "tier": "kinetic",
+      "elements": [
+        "aqua",
+        "aero"
+      ],
+      "minLevel": 21,
+      "maxLevel": 26,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "The way through. Sea air lifted over the crest and frozen there.",
+      "arrival": "The pass is a white corridor between two black walls. Your breath goes up and does not come down. The road is under here somewhere, and other people have been sure of that too.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "thunderspire_peaks",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "windward_steppe",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "galehaven",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "concordance",
+          "minutes": 5,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "thunderspire_peaks",
+      "name": "Thunderspire Peaks",
+      "kind": "route",
+      "plane": "world",
+      "tier": "kinetic",
+      "elements": [
+        "electro",
+        "aero"
+      ],
+      "minLevel": 23,
+      "maxLevel": 28,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "The summit line where coastal storm meets steppe wind.",
+      "arrival": "You are inside the weather rather than under it. The cloud is lit from within at intervals, and the intervals are getting shorter. Metal hums.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "forgeholm",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "stormcliff_coast",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "windward_steppe",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "frostfell_pass",
+          "minutes": 5,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_molten_deep",
+      "name": "The Molten Deep",
+      "kind": "dungeon",
+      "plane": "world",
+      "tier": "kinetic",
+      "elements": [
+        "pyro",
+        "geo"
+      ],
+      "minLevel": 25,
+      "maxLevel": 29,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "Under the quarry, under the mountain, under the sea's level.",
+      "arrival": "The quarry's deepest gallery keeps going after the tool marks stop. The rock gets warm, then hot, then lit from below. There is a floor down here that moves like water because it is not water.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "old_quarry",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "cinderpeak_foothills",
+          "minutes": 5,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "concordance",
+      "name": "Concordance",
+      "kind": "town",
+      "plane": "world",
+      "tier": "celestial",
+      "elements": [],
+      "minLevel": 0,
+      "maxLevel": 0,
+      "opensAtLevel": 30,
+      "station": null,
+      "gate": "The Kinetic Sigil, in three parts, shown at the gate",
+      "blurb": "The trade capital, at the head of navigation on the River Concord.",
+      "arrival": "Everything that moves by water or road in this world passes through here, and the city has arranged itself around that fact. You show your Sigil at the gate. Nobody fights you; someone writes your name down.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "frostfell_pass",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "windward_steppe",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "the_kiln_desert",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "the_mirrormere",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "meridian",
+          "minutes": 5,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_kiln_desert",
+      "name": "The Kiln Desert",
+      "kind": "route",
+      "plane": "world",
+      "tier": "celestial",
+      "elements": [
+        "solar"
+      ],
+      "minLevel": 30,
+      "maxLevel": 34,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "A cold high desert in the range's rain shadow, and the sunniest ground in the world.",
+      "arrival": "The air is too thin to hold heat, so the sun burns while the wind bites. There is no shade anywhere and no water for a day's walk. Your shadow is the hardest-edged thing you have ever seen.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "concordance",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "meridian",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "the_sunless_reach",
+          "minutes": 6,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_mirrormere",
+      "name": "The Mirrormere",
+      "kind": "route",
+      "plane": "world",
+      "tier": "celestial",
+      "elements": [
+        "lunar"
+      ],
+      "minLevel": 32,
+      "maxLevel": 37,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "A high still lake that holds the moon better than the sky does.",
+      "arrival": "Not a ripple. The surface gives you back the mountains, the stars, and the moon at a size the moon has no right to be. Walking the shore, you are careful not to look down for too long.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "concordance",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "meridian",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "tidewrack_shoals",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_sunless_reach",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "rimeholt",
+          "minutes": 6,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "starfall_basin",
+      "name": "Starfall Basin",
+      "kind": "route",
+      "plane": "world",
+      "tier": "celestial",
+      "elements": [
+        "astral"
+      ],
+      "minLevel": 34,
+      "maxLevel": 39,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "A crater field, preserved because nothing grows to cover it.",
+      "arrival": "Bowl after bowl in the pale ground, each with something at the bottom that is not from here. Nothing has grown over them because nothing grows. At night the sky is so clear it looks like a threat.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "meridian",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_shattered_orrery",
+          "minutes": 6,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "meridian",
+      "name": "Meridian",
+      "kind": "town",
+      "plane": "world",
+      "tier": "celestial",
+      "elements": [],
+      "minLevel": 0,
+      "maxLevel": 0,
+      "opensAtLevel": 36,
+      "station": "Enchanting",
+      "gate": null,
+      "blurb": "An observatory on the crest of the Scarp: the highest dark-sky ground there is.",
+      "arrival": "A town of long roofs that open. Everyone keeps different hours and nobody explains. From the crest you can see the desert on one side and, on the other, a valley with no light in it at all.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "concordance",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "the_kiln_desert",
+          "minutes": 5,
+          "kind": "road"
+        },
+        {
+          "to": "the_mirrormere",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "starfall_basin",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_sunless_reach",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "rimeholt",
+          "minutes": 6,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "tidewrack_shoals",
+      "name": "Tidewrack Shoals",
+      "kind": "route",
+      "plane": "world",
+      "tier": "celestial",
+      "elements": [
+        "lunar",
+        "aqua"
+      ],
+      "minLevel": 36,
+      "maxLevel": 40,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "Tides that obey the moon exactly, on the northern shore.",
+      "arrival": "The water goes out further than seems survivable and comes back faster. What it uncovers has been down there a long time. Everything is timed to something overhead.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "galehaven",
+          "minutes": 12,
+          "kind": "sea"
+        },
+        {
+          "to": "the_mirrormere",
+          "minutes": 6,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_sunless_reach",
+      "name": "The Sunless Reach",
+      "kind": "route",
+      "plane": "world",
+      "tier": "celestial",
+      "elements": [
+        "solar",
+        "lunar"
+      ],
+      "minLevel": 38,
+      "maxLevel": 42,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "The Scarp's north face. Direct sun never reaches the floor.",
+      "arrival": "You come over the crest out of glare into a valley that has never been lit. The rock is the same rock. The desert is a thousand feet away and on the other side of the world.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "meridian",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_kiln_desert",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_mirrormere",
+          "minutes": 6,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_shattered_orrery",
+      "name": "The Shattered Orrery",
+      "kind": "dungeon",
+      "plane": "world",
+      "tier": "celestial",
+      "elements": [
+        "astral",
+        "electro"
+      ],
+      "minLevel": 40,
+      "maxLevel": 44,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "A broken model of the heavens, still trying to run.",
+      "arrival": "Rings the size of bridges, half of them fallen, and the fallen half still turning. The arcing is not weather; it is the mechanism. Something is being calculated and has been for a very long time.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "starfall_basin",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_glass_archive",
+          "minutes": 7,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "rimeholt",
+      "name": "Rimeholt",
+      "kind": "town",
+      "plane": "world",
+      "tier": "ethereal",
+      "elements": [],
+      "minLevel": 0,
+      "maxLevel": 0,
+      "opensAtLevel": 45,
+      "station": "Jewelry",
+      "gate": "A Celestial Totem charged with the Solar, Lunar and Astral essences, to pass the barrier above the town",
+      "blurb": "Basecamp. The last mortal outpost, above the tree line.",
+      "arrival": "There is no wood here, so nothing is built of it. The town is stone and rope and hide, dug in against a slope that goes up out of sight. Everyone you meet is either arriving or leaving; nobody is from here.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "meridian",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_mirrormere",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "hallowmarch",
+          "minutes": 6,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "hallowmarch",
+      "name": "Hallowmarch",
+      "kind": "route",
+      "plane": "world",
+      "tier": "ethereal",
+      "elements": [
+        "sanctus"
+      ],
+      "minLevel": 45,
+      "maxLevel": 49,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "The Vault's south flank: a consecrated causeway up the only side that thaws.",
+      "arrival": "A raised road, and someone built it. The sun reaches this face for a few hours and the meltwater runs beside you the whole way. Every mile or so there is a marker, and every marker has been maintained.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "rimeholt",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_reliquary_deep",
+          "minutes": 8,
+          "kind": "road"
+        },
+        {
+          "to": "vespergate",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_sealed_garden",
+          "minutes": 6,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_umbral_wastes",
+      "name": "The Umbral Wastes",
+      "kind": "route",
+      "plane": "world",
+      "tier": "ethereal",
+      "elements": [
+        "umbra"
+      ],
+      "minLevel": 47,
+      "maxLevel": 51,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "The Vault's north face. No direct sun at any hour of any day.",
+      "arrival": "You round the shoulder and the light stops. Not dusk — an absence with an edge to it. The ice here has never melted and holds its shape like something that has been thought about.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "the_reliquary_deep",
+          "minutes": 8,
+          "kind": "road"
+        },
+        {
+          "to": "vespergate",
+          "minutes": 8,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_reliquary_deep",
+      "name": "The Reliquary Deep",
+      "kind": "dungeon",
+      "plane": "world",
+      "tier": "ethereal",
+      "elements": [
+        "sanctus",
+        "umbra"
+      ],
+      "minLevel": 52,
+      "maxLevel": 56,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "A vault bored through the mountain from the lit side to the dark.",
+      "arrival": "The door is on the warm flank and the far end opens onto the ice. In between, a corridor that someone consecrated and someone else did not leave alone. It is warmer in the middle than at either end.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "hallowmarch",
+          "minutes": 8,
+          "kind": "road"
+        },
+        {
+          "to": "the_umbral_wastes",
+          "minutes": 8,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "vespergate",
+      "name": "Vespergate",
+      "kind": "town",
+      "plane": "world",
+      "tier": "ethereal",
+      "elements": [],
+      "minLevel": 0,
+      "maxLevel": 0,
+      "opensAtLevel": 50,
+      "station": null,
+      "gate": null,
+      "blurb": "Where the ground runs out. The last place with a supply line.",
+      "arrival": "A fortress at the top of the world, facing the wrong way — not outward at an enemy but upward, at nothing. Above it the rock goes vertical and stops being a route. They have been brewing their own everything for a long time.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "hallowmarch",
+          "minutes": 6,
+          "kind": "road"
+        },
+        {
+          "to": "the_umbral_wastes",
+          "minutes": 8,
+          "kind": "road"
+        },
+        {
+          "to": "the_buried_sky",
+          "minutes": 8,
+          "kind": "road"
+        },
+        {
+          "to": "the_collapsed_academy",
+          "minutes": 12,
+          "kind": "veil"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_sealed_garden",
+      "name": "The Sealed Garden",
+      "kind": "route",
+      "plane": "world",
+      "tier": "ethereal",
+      "elements": [
+        "flora",
+        "sanctus"
+      ],
+      "minLevel": 49,
+      "maxLevel": 53,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "A garden nobody has been let into for a very long time.",
+      "arrival": "The wall is low enough to see over and that is the whole cruelty of it. Inside, everything is in leaf and in season at once. The gate is shut, the guard is still at the gate, and the faith that posted him has been gone for centuries.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "hallowmarch",
+          "minutes": 6,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_glass_archive",
+      "name": "The Glass Archive",
+      "kind": "dungeon",
+      "plane": "world",
+      "tier": "celestial",
+      "elements": [
+        "solar",
+        "arcane"
+      ],
+      "minLevel": 43,
+      "maxLevel": 47,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "They wrote it in light, and light does not keep.",
+      "arrival": "Lenses on every roof, and all of them still aimed. Around midday the hillside fills with writing you can almost read, and by the time your eyes adjust it has moved on. Whatever they recorded here, they recorded onto the one thing that will not hold still.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "the_shattered_orrery",
+          "minutes": 7,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_buried_sky",
+      "name": "The Buried Sky",
+      "kind": "dungeon",
+      "plane": "world",
+      "tier": "ethereal",
+      "elements": [
+        "geo",
+        "astral"
+      ],
+      "minLevel": 46,
+      "maxLevel": 50,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "The oldest rock in the world, and it is full of stars.",
+      "arrival": "You climb to the top of everything in order to go down. The shaft cuts through band after band of stone, and every band holds a scatter of light in it. None of the patterns match the sky you walked in under.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "vespergate",
+          "minutes": 8,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_collapsed_academy",
+      "name": "The Collapsed Academy",
+      "kind": "dungeon",
+      "plane": "empyrean",
+      "tier": "ethereal",
+      "elements": [
+        "arcane"
+      ],
+      "minLevel": 50,
+      "maxLevel": 54,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "A school that read too far, and left.",
+      "arrival": "It is not ruined so much as unfinished in the wrong direction. Staircases arrive at rooms that were never built. The syllabus is still on the wall and the last three items on it are not in any language you have.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "vespergate",
+          "minutes": 12,
+          "kind": "veil"
+        },
+        {
+          "to": "the_unwritten_library",
+          "minutes": 8,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_unwritten_library",
+      "name": "The Unwritten Library",
+      "kind": "dungeon",
+      "plane": "empyrean",
+      "tier": "ethereal",
+      "elements": [
+        "umbra",
+        "arcane"
+      ],
+      "minLevel": 54,
+      "maxLevel": 58,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": null,
+      "blurb": "Knowledge that eats its keeper. The shelves are still filling.",
+      "arrival": "Every book here is being written right now, by nobody. The shelves go up past where a ceiling would be. Something is taking dictation and it would like your name for the record.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "the_collapsed_academy",
+          "minutes": 8,
+          "kind": "road"
+        },
+        {
+          "to": "the_eclipsed_citadel",
+          "minutes": 8,
+          "kind": "road"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "the_eclipsed_citadel",
+      "name": "The Eclipsed Citadel",
+      "kind": "dungeon",
+      "plane": "empyrean",
+      "tier": "ethereal",
+      "elements": [
+        "aqua",
+        "pyro",
+        "flora",
+        "electro",
+        "aero",
+        "geo",
+        "solar",
+        "lunar",
+        "astral",
+        "sanctus",
+        "umbra",
+        "arcane"
+      ],
+      "minLevel": 58,
+      "maxLevel": 60,
+      "opensAtLevel": null,
+      "station": null,
+      "gate": "Three Ethereal key fragments",
+      "blurb": "The door back into the world, and the thing standing in it.",
+      "arrival": "Below it, through a gap in nothing, is the summit of the mountain you could not climb. The Citadel is between you and it. That is what the name has always meant.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "the_unwritten_library",
+          "minutes": 8,
+          "kind": "road"
+        },
+        {
+          "to": "zenith",
+          "minutes": 12,
+          "kind": "veil"
+        }
+      ],
+      "teleportsTo": []
+    },
+    {
+      "id": "zenith",
+      "name": "Zenith",
+      "kind": "town",
+      "plane": "world",
+      "tier": "ethereal",
+      "elements": [],
+      "minLevel": 0,
+      "maxLevel": 0,
+      "opensAtLevel": 60,
+      "station": "Every station — the only town with all six",
+      "gate": "The Concordant Crown: twelve elemental gems and twelve Cores, bound with a purchased binding spell",
+      "blurb": "The summit. Visible from everywhere below, and shut.",
+      "arrival": "The doors were never locked from the inside. From up here the whole world is one thing, and every city you have ever walked into is a mark on it you could put a finger over.",
+      "beats": [],
+      "epilogue": null,
+      "edges": [
+        {
+          "to": "the_eclipsed_citadel",
+          "minutes": 12,
+          "kind": "veil"
+        }
+      ],
+      "teleportsTo": [
+        "hearthwood",
+        "pennycross",
+        "forgeholm",
+        "galehaven",
+        "concordance",
+        "meridian",
+        "rimeholt",
+        "vespergate"
+      ]
+    }
+  ],
+  "creatures": [
+    {
+      "id": "listening_fawn",
+      "name": "Listening Fawn",
+      "zoneId": "whispering_woods",
+      "rank": "common",
+      "archetype": "Drudge",
+      "elements": [
+        "flora"
+      ],
+      "lore": "It does not flee and it does not approach. Twice I have looked up to find it closer without having seen it move, and both times it was facing the ground rather than me.",
+      "moves": [
+        {
+          "id": "ww_startle",
+          "name": "Startle",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "fawnhide",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "foragers_ration",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "thornback_sprite",
+      "name": "Thornback Sprite",
+      "zoneId": "whispering_woods",
+      "rank": "common",
+      "archetype": "Skirmisher",
+      "elements": [
+        "flora"
+      ],
+      "lore": "Small, and gone before the swing finishes. The thorns are not for defence — it plants them, and comes back for them later.",
+      "moves": [
+        {
+          "id": "ww_prick",
+          "name": "Prick",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_nettle",
+          "name": "Nettle",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "bindweed_fibre",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "sporecap_shambler",
+      "name": "Sporecap Shambler",
+      "zoneId": "whispering_woods",
+      "rank": "common",
+      "archetype": "Blighter",
+      "elements": [
+        "flora"
+      ],
+      "lore": "The cap is the animal and the body is scaffolding. Cut the body and the cap simply builds another, more slowly and slightly wrong.",
+      "moves": [
+        {
+          "id": "ww_puffburst",
+          "name": "Puffburst",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_settle",
+          "name": "Settle",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "bindweed_fibre",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "sapwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "bindweed_creeper",
+      "name": "Bindweed Creeper",
+      "zoneId": "whispering_woods",
+      "rank": "common",
+      "archetype": "Siphon",
+      "elements": [
+        "flora"
+      ],
+      "lore": "It drinks. Everything in this wood that stands still long enough is eventually part of the same drink, and it is patient about it.",
+      "moves": [
+        {
+          "id": "ww_bind",
+          "name": "Bind",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_throttle",
+          "name": "Throttle",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "bindweed_fibre",
+            "min": 2,
+            "max": 3,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": [
+          {
+            "itemId": "bindweed_belt",
+            "min": 1,
+            "max": 1,
+            "chance": 0.01
+          }
+        ]
+      }
+    },
+    {
+      "id": "rootknuckle",
+      "name": "Rootknuckle",
+      "zoneId": "whispering_woods",
+      "rank": "common",
+      "archetype": "Bruiser",
+      "elements": [
+        "flora"
+      ],
+      "lore": "A knot of root that comes up through the path where the path is thinnest. It is not hunting. You are simply standing on it.",
+      "moves": [
+        {
+          "id": "ww_knuckle",
+          "name": "Knuckle",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_upheave",
+          "name": "Upheave",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "oak_log",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": [
+          {
+            "itemId": "oak_circlet",
+            "min": 1,
+            "max": 1,
+            "chance": 0.02
+          }
+        ]
+      }
+    },
+    {
+      "id": "elderroot",
+      "name": "Elderroot",
+      "zoneId": "whispering_woods",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "flora"
+      ],
+      "lore": "Older than the path, and the path was surveyed twice. It has been doing this longer than anything else here and it shows.",
+      "moves": [
+        {
+          "id": "ww_grasp",
+          "name": "Grasp",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_sunder",
+          "name": "Sunder",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_barkover",
+          "name": "Bark Over",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "oak_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "bindweed_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "sapwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "sporecap_mantle",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "mother_spore",
+      "name": "Mother Spore",
+      "zoneId": "whispering_woods",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "flora"
+      ],
+      "lore": "Every shambler in the wood is hers, and she does not appear to care about any of them individually.",
+      "moves": [
+        {
+          "id": "ww_choke",
+          "name": "Choke",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_encyst",
+          "name": "Encyst",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "ww_flourish",
+          "name": "Flourish",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "oak_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "bindweed_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "sapwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "sporecap_mantle",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "hollow_stag",
+      "name": "Hollow Stag",
+      "zoneId": "whispering_woods",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "flora"
+      ],
+      "lore": "What is left of a Listening Fawn that listened for long enough. It is still facing the ground.",
+      "moves": [
+        {
+          "id": "ww_gore",
+          "name": "Gore",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_runthrough",
+          "name": "Run Through",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "oak_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "bindweed_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "sapwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "sporecap_mantle",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_murmur",
+      "name": "The Murmur",
+      "zoneId": "whispering_woods",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "flora"
+      ],
+      "lore": "The sound the whole wood makes, standing in one place for once. It knows the shape of what you were about to do.",
+      "moves": [
+        {
+          "id": "ww_undertone",
+          "name": "Undertone",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_sayyourname",
+          "name": "Say Your Name",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_closein",
+          "name": "Close In",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "HasteEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "oak_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "bindweed_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "sapwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "sporecap_mantle",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "heartwood",
+      "name": "Heartwood",
+      "zoneId": "whispering_woods",
+      "rank": "boss",
+      "archetype": "Juggernaut",
+      "elements": [
+        "flora"
+      ],
+      "lore": "Everything under the path runs back to here. Standing at its base, the murmur is not a sound any more; it is a pressure.",
+      "moves": [
+        {
+          "id": "ww_heave",
+          "name": "Heave",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_rootwall",
+          "name": "Rootwall",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "ww_deepen",
+          "name": "Deepen",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 3,
+            "max": 6,
+            "chance": 1.0
+          },
+          {
+            "itemId": "proof_of_the_woods",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "oak_log",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "bindweed_belt",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "sporecap_mantle",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "heartwood_stave",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_standing_green",
+      "name": "The Standing Green",
+      "zoneId": "whispering_woods",
+      "rank": "boss",
+      "archetype": "Aspect",
+      "elements": [
+        "flora"
+      ],
+      "lore": "The wood grew this in the shape of a person, and got the proportions nearly right. It is the \"nearly\" that stays with you.",
+      "moves": [
+        {
+          "id": "ww_reach",
+          "name": "Reach",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_standcloser",
+          "name": "Stand Closer",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 6,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ww_greenover",
+          "name": "Green Over",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 3,
+            "max": 6,
+            "chance": 1.0
+          },
+          {
+            "itemId": "proof_of_the_woods",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "oak_log",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "bindweed_belt",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "sporecap_mantle",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "heartwood_stave",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "oak_log",
+      "name": "Oak Log",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Cut green, it weeps for a week. Hearthwood seasons it in the open because the smoke gets into anything dried indoors.",
+      "skill": "woodcarving",
+      "tier": 1,
+      "salvage": []
+    },
+    {
+      "id": "bindweed_fibre",
+      "name": "Bindweed Fibre",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Strong out of all proportion to its thickness. The trick is cutting it before it notices.",
+      "skill": "tailoring",
+      "tier": 1,
+      "salvage": []
+    },
+    {
+      "id": "fawnhide",
+      "name": "Fawnhide",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Thin, and it takes a dye better than anything else at this depth of the wood. Nobody in Hearthwood will say where they get it.",
+      "skill": "tailoring",
+      "tier": 1,
+      "salvage": []
+    },
+    {
+      "id": "flora_dust",
+      "name": "Flora Dust",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "What a growing thing leaves when it is unmade faster than it grew.",
+      "element": "flora",
+      "moteTier": "dust"
+    },
+    {
+      "id": "flora_shard",
+      "name": "Flora Shard",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Dust that settled somewhere it was not disturbed.",
+      "element": "flora",
+      "moteTier": "shard"
+    },
+    {
+      "id": "flora_crystal",
+      "name": "Flora Crystal",
+      "kind": "mote",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "It is warm, and it does not stop being warm.",
+      "element": "flora",
+      "moteTier": "crystal"
+    },
+    {
+      "id": "foragers_ration",
+      "name": "Forager's Ration",
+      "kind": "consumable",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 4,
+      "fungible": true,
+      "lore": "Filling. That is the whole of its reputation.",
+      "effect": {
+        "healPercent": 25
+      }
+    },
+    {
+      "id": "sapwort_draught",
+      "name": "Sapwort Draught",
+      "kind": "beltable",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 12,
+      "fungible": true,
+      "lore": "Tastes like the underside of a leaf. Apprentices carry two and use neither, which is its own kind of lesson.",
+      "effect": {
+        "healPercent": 15
+      }
+    },
+    {
+      "id": "oak_circlet",
+      "name": "Oak Circlet",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 20,
+      "fungible": false,
+      "lore": "A band of green wood, bent and pinned. It tightens as it dries.",
+      "slot": "hat",
+      "form": "Circlet",
+      "material": "Oak",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 1
+      },
+      "salvage": [
+        {
+          "itemId": "oak_log",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "bindweed_belt",
+      "name": "Bindweed Belt",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 30,
+      "fungible": false,
+      "lore": "Woven wet and left to shrink. It will hold a bottle and not much dignity.",
+      "slot": "belt",
+      "form": "Belt",
+      "material": "Bindweed",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "beltSlots": 1
+      },
+      "salvage": [
+        {
+          "itemId": "bindweed_fibre",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "sporecap_mantle",
+      "name": "Sporecap Mantle",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 4,
+      "value": 180,
+      "fungible": false,
+      "lore": "Still shedding. Field note: the spores settle on whatever is nearest and the wearer is rarely nearest.",
+      "slot": "robeTop",
+      "form": "Mantle",
+      "material": "Sporecap",
+      "socketCount": 1,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "dodge": 3,
+        "deflectChance": 4
+      },
+      "salvage": [
+        {
+          "itemId": "bindweed_fibre",
+          "min": 2,
+          "max": 4
+        }
+      ]
+    },
+    {
+      "id": "heartwood_stave",
+      "name": "Heartwood Quarterstaff",
+      "kind": "equipment",
+      "rarity": "epic",
+      "tradability": "untradeable",
+      "equipLevel": 5,
+      "value": 600,
+      "fungible": false,
+      "lore": "Cut from the centre, which is why it is warm. It is still growing, very slowly, in whichever direction it is pointed.",
+      "slot": "mainHand",
+      "form": "Quarterstaff",
+      "material": "Heartwood",
+      "socketCount": 2,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 2,
+        "critChance": 5,
+        "critDamage": 10
+      },
+      "salvage": [
+        {
+          "itemId": "oak_log",
+          "min": 3,
+          "max": 5
+        }
+      ]
+    },
+    {
+      "id": "proof_of_the_woods",
+      "name": "Proof of the Woods",
+      "kind": "key",
+      "rarity": "rare",
+      "tradability": "bound",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "A knot of root that kept growing after it was cut. The guard on the north road has seen a hundred and still turns each one over twice.",
+      "gates": "hearthwood"
+    }
+  ],
+  "recipes": [],
+  "index": {
+    "itemSources": {
+      "bindweed_belt": [
+        {
+          "type": "drop",
+          "from": "bindweed_creeper",
+          "zoneId": "whispering_woods",
+          "bucket": "bonus",
+          "chance": 0.01
+        },
+        {
+          "type": "drop",
+          "from": "heartwood",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_standing_green",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        }
+      ],
+      "bindweed_fibre": [
+        {
+          "type": "drop",
+          "from": "thornback_sprite",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "sporecap_shambler",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "bindweed_creeper",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "elderroot",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "mother_spore",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "hollow_stag",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_murmur",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "salvage",
+          "from": "bindweed_belt"
+        },
+        {
+          "type": "salvage",
+          "from": "sporecap_mantle"
+        }
+      ],
+      "fawnhide": [
+        {
+          "type": "drop",
+          "from": "listening_fawn",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.45
+        }
+      ],
+      "flora_crystal": [
+        {
+          "type": "drop",
+          "from": "elderroot",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "mother_spore",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "hollow_stag",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_murmur",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "heartwood",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_standing_green",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "flora_dust": [
+        {
+          "type": "drop",
+          "from": "listening_fawn",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "thornback_sprite",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "sporecap_shambler",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "bindweed_creeper",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "rootknuckle",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 0.75
+        }
+      ],
+      "flora_shard": [
+        {
+          "type": "drop",
+          "from": "thornback_sprite",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "sporecap_shambler",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "bindweed_creeper",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "rootknuckle",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "elderroot",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "mother_spore",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "hollow_stag",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_murmur",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "heartwood",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_standing_green",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "foragers_ration": [
+        {
+          "type": "drop",
+          "from": "listening_fawn",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.15
+        }
+      ],
+      "heartwood_stave": [
+        {
+          "type": "drop",
+          "from": "heartwood",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "the_standing_green",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.1
+        }
+      ],
+      "oak_circlet": [
+        {
+          "type": "drop",
+          "from": "rootknuckle",
+          "zoneId": "whispering_woods",
+          "bucket": "bonus",
+          "chance": 0.02
+        }
+      ],
+      "oak_log": [
+        {
+          "type": "drop",
+          "from": "rootknuckle",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "elderroot",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "mother_spore",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "hollow_stag",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_murmur",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "heartwood",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "the_standing_green",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "salvage",
+          "from": "oak_circlet"
+        },
+        {
+          "type": "salvage",
+          "from": "heartwood_stave"
+        }
+      ],
+      "proof_of_the_woods": [
+        {
+          "type": "drop",
+          "from": "heartwood",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_standing_green",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "sapwort_draught": [
+        {
+          "type": "drop",
+          "from": "sporecap_shambler",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "elderroot",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "mother_spore",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "hollow_stag",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_murmur",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        }
+      ],
+      "sporecap_mantle": [
+        {
+          "type": "drop",
+          "from": "elderroot",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "mother_spore",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "hollow_stag",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_murmur",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "heartwood",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_standing_green",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.2
+        }
+      ]
+    },
+    "itemUses": {
+      "bindweed_belt": [
+        {
+          "type": "salvageInto",
+          "itemId": "bindweed_fibre"
+        }
+      ],
+      "heartwood_stave": [
+        {
+          "type": "salvageInto",
+          "itemId": "oak_log"
+        }
+      ],
+      "oak_circlet": [
+        {
+          "type": "salvageInto",
+          "itemId": "oak_log"
+        }
+      ],
+      "sporecap_mantle": [
+        {
+          "type": "salvageInto",
+          "itemId": "bindweed_fibre"
+        }
+      ]
+    }
+  }
+}
