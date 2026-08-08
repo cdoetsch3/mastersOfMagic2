@@ -1,12 +1,11 @@
 # Content checklist — combat zones
 
 **Single source of truth for what content each combat zone still needs.**
-**28 combat zones, all built.** ⚠️ **The region list re-opened once and closed
-again** — The Bellows Gap and The Charring Yards went in on 2026-08-08 to make
-the Pennycross → Forgeholm road more than a single hop. All 28 exist in
-`world.dart`, on the map, and in the routing table.
-⛔ **Nothing can be added now without changing a rule:** `world_test.dart` holds
-every element to 3–4 zones and Pyro, Geo, Electro and Aero are all at 4. Towns are tracked
+**26 combat zones, all built.** ⚠️ **The region list re-opened on 2026-08-08 and
+was closed again the same day** — two north-road zones went in and came back
+out; the road from Pennycross to Forgeholm now runs through the **Old Quarry**,
+which already existed. ⭐ **The zone list is the one that was locked.** All 26
+exist in `world.dart`, on the map, and in the routing table. Towns are tracked
 separately (§4) because they need entirely different things.
 
 Design lives elsewhere — this file only tracks *state*:
@@ -75,7 +74,6 @@ a per-zone batch, not a per-creature task.
 | **Cinderpeak Foothills** | ✅ 6–11 | ✅ Pyro | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Thornmire** | ✅ 8–13 | ✅ Flora+Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Ashfall Vale** | ✅ 10–14 | ✅ Pyro+Flora | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Birch | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
-| **The Bellows Gap** ⭐new | ✅ 11–15 | ✅ Geo+Aero | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 
 ⭐ **Whispering Woods is BUILT** — `lib/game/enemies/whispering_woods.dart` and
 `lib/game/items/catalogue/whispering_woods_items.dart`. 11 creatures with their
@@ -83,12 +81,10 @@ own move sets and drop tables, 13 items, guarded by 24 tests in
 `test/whispering_woods_test.dart`. ⚠️ **It is the template for the other 26**,
 so a change to its shape is a change to all of them.
 
-⛔ **The two north-road zones have nothing but a name, a band and a pair of
-elements** (added 2026-08-08). They are the newest and emptiest rows in this
-document: no theme paragraph, no roster, no creatures. ⭐ **The Charring Yards
-is load-bearing for the story** — NARRATIVE §4b.1 makes it where the player
-first sees Forgeholm's ward failing — so it cannot stay a stub as long as the
-rest of the Kinetic quarter.
+⭐ **The Old Quarry became load-bearing for the story on 2026-08-08.** It is now
+the only road into the range, the place the player first sees Forgeholm's ward
+failing, and the source of the Sigil's Geo essence (NARRATIVE §4b.1). Its roster
+already exists; what it needs is a theme that carries all three jobs.
 
 ⭐ It also lands the **first real gate item**: both bosses guarantee
 `proof_of_the_woods`, one of Hearthwood's *"three ordinary proofs"* — until now
@@ -165,7 +161,6 @@ shipping rather than content:
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Backdrop | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Icons | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **The Charring Yards** ⭐new | ✅ 13–17 | ✅ Pyro+Electro | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Old Quarry** | ✅ 15–19 | ✅ Geo | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **Stormcliff Coast** | ✅ 17–22 | ✅ Electro | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **Windward Steppe** | ✅ 19–24 | ✅ Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Yew | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |

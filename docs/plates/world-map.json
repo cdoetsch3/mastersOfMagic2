@@ -218,23 +218,6 @@
       ]
     },
     {
-      "id": "the_bellows_gap",
-      "name": "The Bellows Gap",
-      "kind": "route",
-      "x": 470.0,
-      "y": 1004.0,
-      "band": "Lv 11-15",
-      "tier": "primal",
-      "colors": [
-        "#9c7a4b",
-        "#9bb8c4"
-      ],
-      "elements": [
-        "Geo",
-        "Aero"
-      ]
-    },
-    {
       "id": "pennycross",
       "name": "Pennycross",
       "kind": "town",
@@ -246,28 +229,11 @@
       "elements": []
     },
     {
-      "id": "the_charring_yards",
-      "name": "The Charring Yards",
-      "kind": "route",
-      "x": 392.0,
-      "y": 876.0,
-      "band": "Lv 13-17",
-      "tier": "kinetic",
-      "colors": [
-        "#e25822",
-        "#e8c547"
-      ],
-      "elements": [
-        "Pyro",
-        "Electro"
-      ]
-    },
-    {
       "id": "forgeholm",
       "name": "Forgeholm",
       "kind": "town",
-      "x": 346.0,
-      "y": 748.0,
+      "x": 392.0,
+      "y": 876.0,
       "band": "",
       "tier": "kinetic",
       "colors": [],
@@ -277,8 +243,8 @@
       "id": "old_quarry",
       "name": "Old Quarry",
       "kind": "route",
-      "x": 462.0,
-      "y": 846.0,
+      "x": 496.0,
+      "y": 986.0,
       "band": "Lv 15-19",
       "tier": "kinetic",
       "colors": [

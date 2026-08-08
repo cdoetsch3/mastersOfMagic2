@@ -597,29 +597,32 @@ one edge.
 
 ## 4c. ⭐ Element coverage across the world — audit + the late-zone question
 
-**Measured from `world.dart`, 2026-08-02**; ✅ **amended 2026-08-08** for the
-north road. 24 element-bearing zones; the Eclipsed Citadel is excluded (it
-carries all twelve).
+✅ **Re-measured from `world.dart`, 2026-08-08.** 25 element-bearing zones; the
+Eclipsed Citadel is excluded (it carries all twelve).
 
-⛔ **The world is now at the ceiling.** `world_test.dart` holds every element to
-3–4 zones, and Pyro, Geo, Electro and Aero all sit at 4 as of The Bellows Gap
-and The Charring Yards. **No further zone can use any of them** without raising
-the rule first.
+⭐ **Every element now sits at 3 or 4 zones, and nothing is at the ceiling.**
+`world_test.dart` holds each to 3–4, and only Aqua and Flora are at 4 — so the
+world has room for new zones again, as long as they avoid those two.
+
+⚠️ **The table below was five days stale.** It predated the three late zones
+(Sealed Garden, Glass Archive, Buried Sky), which is why it showed Solar,
+Astral, Sanctus and Arcane at 2. It is regenerated here, and Geo's highest band
+is 50, not the 29 previously printed.
 
 | Element | Zones | Highest band | Where it appears |
 |---|---|---|---|
 | **Aqua** | 4 | 40 | Glimmerbrook 3–8 · Thornmire 8–13 · Frostfell Pass 21–26 · Tidewrack Shoals 36–40 |
-| **Flora** | 3 | ⚠️ **14** | Whispering Woods 1–5 · Thornmire 8–13 · Ashfall Vale 10–14 |
-| **Pyro** | 4 | 29 | Cinderpeak 6–11 · Ashfall Vale 10–14 · The Charring Yards 13–17 · The Molten Deep 25–29 |
-| **Electro** | 4 | 44 | The Charring Yards 13–17 · Stormcliff 17–22 · Thunderspire 23–28 · Shattered Orrery 40–44 |
-| **Aero** | 4 | 28 | The Bellows Gap 11–15 · Windward Steppe 19–24 · Frostfell Pass 21–26 · Thunderspire 23–28 |
-| **Lunar** | 3 | 42 | Mirrormere 32–37 · Tidewrack 36–40 · Sunless Reach 38–42 |
-| **Umbra** | 3 | 58 | Umbral Wastes 47–51 · Reliquary Deep 52–56 · Unwritten Library 54–58 |
-| **Geo** | 4 | 29 | The Bellows Gap 11–15 · Old Quarry 15–19 · The Molten Deep 25–29 · The Buried Sky 46–50 |
-| **Solar** | ⚠️ 2 | 42 | Kiln Desert 30–34 · Sunless Reach 38–42 |
-| **Astral** | ⚠️ 2 | 44 | Starfall Basin 34–39 · Shattered Orrery 40–44 |
-| **Sanctus** | ⚠️ 2 | 56 | Hallowmarch 45–49 · Reliquary Deep 52–56 |
-| **Arcane** | ⚠️ 2 | 58 | Collapsed Academy 50–54 · Unwritten Library 54–58 |
+| **Flora** | 4 | 53 | Whispering Woods 1–5 · Thornmire 8–13 · Ashfall Vale 10–14 · The Sealed Garden 49–53 |
+| **Pyro** | 3 | 29 | Cinderpeak Foothills 6–11 · Ashfall Vale 10–14 · The Molten Deep 25–29 |
+| **Electro** | 3 | 44 | Stormcliff Coast 17–22 · Thunderspire Peaks 23–28 · The Shattered Orrery 40–44 |
+| **Aero** | 3 | 28 | Windward Steppe 19–24 · Frostfell Pass 21–26 · Thunderspire Peaks 23–28 |
+| **Geo** | 3 | 50 | Old Quarry 15–19 · The Molten Deep 25–29 · The Buried Sky 46–50 |
+| **Solar** | 3 | 47 | The Kiln Desert 30–34 · The Sunless Reach 38–42 · The Glass Archive 43–47 |
+| **Lunar** | 3 | 42 | The Mirrormere 32–37 · Tidewrack Shoals 36–40 · The Sunless Reach 38–42 |
+| **Astral** | 3 | 50 | Starfall Basin 34–39 · The Shattered Orrery 40–44 · The Buried Sky 46–50 |
+| **Sanctus** | 3 | 56 | Hallowmarch 45–49 · The Sealed Garden 49–53 · The Reliquary Deep 52–56 |
+| **Umbra** | 3 | 58 | The Umbral Wastes 47–51 · The Reliquary Deep 52–56 · The Unwritten Library 54–58 |
+| **Arcane** | 3 | 58 | The Glass Archive 43–47 · The Collapsed Academy 50–54 · The Unwritten Library 54–58 |
 
 ⭐ **The headline: count was never really the problem — spread is.** The target
 of 3–4 zones per element is already nearly met; the range is 2–4, and no
@@ -1030,18 +1033,6 @@ not locked.
 > **Here** — Pyro **and** Flora motes. Ashwood, which only grows back burnt.
 > ⭐ The proving ground for the Pyro ▸ Flora matchup.
 
-#### The Bellows Gap · hybrid · Geo + Aero *(Geo ▸ Aero)* · Lv 11–15
-> **Blurb** — The notch the mountain road goes through, and what owns it.
->
-> **Arrival** — The road narrows until it is the only flat thing for a mile,
-> and the wind comes through the gap in long slow pulls — in, out, in, out.
-> Loose stone travels downhill all day with nobody touching it. The carters do
-> not stop here, and they do not say why.
->
-> **Here** — ⭐ **The last Primal-band zone, and nothing in it is Primal.** Both
-> its elements are Kinetic: the quarter boundary is a place you walk through
-> rather than a level you reach.
-
 #### ⛲ Pennycross · town
 > **Blurb** — The first market, where the river road crosses the mountain road.
 >
@@ -1056,17 +1047,21 @@ not locked.
 
 ### 6.2 Kinetic — the range · Lv 15–29
 
-#### The Charring Yards · hybrid · Pyro + Electro *(Pyro ▸ Electro)* · Lv 13–17
-> **Blurb** — Where Forgeholm burns wood down into something worth carrying.
+#### Old Quarry · pure · Geo · Lv 15–19
+> **Blurb** — Cut into the range's southern flank, and cut too deep.
 >
-> **Arrival** — Stacks the size of houses, turfed over and smouldering a week
-> at a time — this is what the forge eats. Half of them have been opened early.
-> Something keeps coming down out of the cloud and setting them off, and the
-> yardmen have stopped rebuilding the ones nearest the road.
+> **Arrival** — The road stops being a road and becomes the floor of something
+> somebody dug. Terraces step down into shadow, each one squarer than anything
+> nature makes, and the tool marks are old. Whatever was quarried out of here left
+> a shape, and the shape has started to move.
 >
-> **Here** — ⭐ **The first place the player sees the ward's failure without
-> being told about it** (NARRATIVE §4b.1). Charcoal, and the industry of a town
-> that is losing an argument with its own sky.
+> **Here** — Best Geo motes. Mining. The upper entrance to The Molten Deep.
+>
+> ⭐ **The way into the mountains, and the only one.** The road north from
+> Pennycross runs through the quarry and Forgeholm is on the far side of it, so
+> the first Kinetic zone is the door to the quarter. ⚠️ **The player walks
+> through it before the city asks for its Geo essence** (NARRATIVE §4b.1) —
+> they have already met the thing they will be sent back for.
 
 #### ⛏️ Forgeholm · town · **unlocks Kinetic (L15)**
 > **Blurb** — A city with a mountain for a roof, cut into the Ironspine.
@@ -1080,15 +1075,6 @@ not locked.
 > **Here** — Metalworking. Mining. ⭐ **It is inside the range, not below it** —
 > its pin sits on the `ironspine` polyline in `world_map_geometry.dart`, and
 > that is a content constraint rather than a drawing preference.
-
-#### Old Quarry · pure · Geo · Lv 15–19
-> **Blurb** — Cut into the range's southern flank, and cut too deep.
->
-> **Arrival** — Terraces step down into shadow, each one squarer than anything
-> nature makes. The tool marks are old. Whatever was quarried out of here left
-> a shape, and the shape has started to move.
->
-> **Here** — Best Geo motes. Mining. The upper entrance to The Molten Deep.
 
 #### Stormcliff Coast · pure · Electro · Lv 17–22
 > **Blurb** — Where the western ocean's weather hits a wall and has nowhere to go.

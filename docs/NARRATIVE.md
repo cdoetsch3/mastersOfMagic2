@@ -186,13 +186,14 @@ made, quietly and for fifteen years, into the person who goes after him.*
 ⭐ **Forgeholm is under siege and does not call it that.** The city is cut into
 the Ironspine, and the three-part ward that has kept the mountain out of its
 halls has failed. Things come down into the upper levels now. ⚠️ **You see it
-before anyone tells you** — The Charring Yards, on the road in, where the
-charcoal stacks have been opened early and the yardmen have stopped rebuilding
-the ones nearest the road.
+before anyone tells you** — the Old Quarry, the one road in, where *"whatever
+was quarried out of here left a shape, and the shape has started to move."*
 
 **So you take the fight out to it.** ⭐⭐ **The three parts of the Sigil are
 three essences from the three Kinetic pure zones the map already has** — Geo at
-the Old Quarry, Electro at Stormcliff Coast, Aero on the Windward Steppe. Bring
+the Old Quarry, Electro at Stormcliff Coast, Aero on the Windward Steppe.
+⭐ **The first of the three is the road you came in on**, so the quarter opens
+and closes in the same place. Bring
 them back, the ward goes up, Forgeholm holds.
 
 ⭐ **That is why Concordance wants the Sigil at its gate.** Concordance is a
@@ -407,8 +408,6 @@ the player can see rather than a cutscene claim. Unspecified for now.
   toward recurring: she is the examiner for all three proofs.
 - ⛔ **The character-creation screen does not exist.** The data model does
   (`PlayerGender`, `Pronouns`); nothing asks the question.
-- ⛔ **The Charring Yards has no roster** and NARRATIVE §4b.1 now makes it the
-  place the player first sees the siege.
 - **How the player learns any of this.** Tier-1 narrative screens are designed
   but unbuilt (GAME_DESIGN §5), and this story currently has nowhere to appear.
 - ⛔ **Four of the five gates are prose with no items behind them.** Only

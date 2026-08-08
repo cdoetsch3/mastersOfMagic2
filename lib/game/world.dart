@@ -393,9 +393,9 @@ abstract final class World {
           'The grass gives out and the slope turns to grey grit that '
           'shifts under you. Somewhere above, the mountain is breathing. The '
           'air tastes of struck flint.',
-      // ⚠️ **No shortcut to Forgeholm from here.** This edge used to exist and
-      // it let a level-11 player skip the whole north road; the tier boundary
-      // is a place now (The Bellows Gap, The Charring Yards), not a number.
+      // ⚠️ **No shortcut to Forgeholm from here.** This edge used to exist
+      // and it let a level-11 player skip the climb; the way into the range
+      // is the Old Quarry, and there is no second way.
       edges: [
         TravelEdge('hearthwood', 3),
         TravelEdge('ashfall_vale', 3),
@@ -443,25 +443,6 @@ abstract final class World {
       ],
     ),
     GameLocation(
-      id: 'the_bellows_gap',
-      name: 'The Bellows Gap',
-      kind: LocationKind.route,
-      tier: MagicTier.primal,
-      // Geo ▸ Aero — the notch the mountain road takes, and the wind in it.
-      // ⚠️ Both elements are Kinetic. That is the point: this is the last
-      // Primal-band zone and nothing in it is Primal.
-      elements: [MagicElement.geo, MagicElement.aero],
-      minLevel: 11,
-      maxLevel: 15,
-      blurb: 'The notch the mountain road goes through, and what owns it.',
-      arrival:
-          'The road narrows until it is the only flat thing for a mile, and '
-          'the wind comes through the gap in long slow pulls — in, out, in, '
-          'out. Loose stone travels downhill all day with nobody touching it. '
-          'The carters do not stop here, and they do not say why.',
-      edges: [TravelEdge('pennycross', 4), TravelEdge('the_charring_yards', 4)],
-    ),
-    GameLocation(
       id: 'pennycross',
       name: 'Pennycross',
       kind: LocationKind.town,
@@ -477,31 +458,13 @@ abstract final class World {
       edges: [
         TravelEdge('hearthwood', 3),
         TravelEdge('glimmerbrook', 3),
-        TravelEdge('the_bellows_gap', 4),
+        TravelEdge('old_quarry', 4),
       ],
     ),
 
     // ---------------------------------------------------------------
     // Kinetic — the range · Lv 15-29 · -400-2 500 m
     // ---------------------------------------------------------------
-    GameLocation(
-      id: 'the_charring_yards',
-      name: 'The Charring Yards',
-      kind: LocationKind.route,
-      tier: MagicTier.kinetic,
-      // Pyro ▸ Electro — slow fire under a sky that keeps interrupting it.
-      elements: [MagicElement.pyro, MagicElement.electro],
-      minLevel: 13,
-      maxLevel: 17,
-      blurb: "Where Forgeholm burns wood down into something worth carrying.",
-      arrival:
-          'Stacks the size of houses, turfed over and smouldering a week at a '
-          'time — this is what the forge eats. Half of them have been opened '
-          'early. Something keeps coming down out of the cloud and setting '
-          'them off, and the yardmen have stopped rebuilding the ones nearest '
-          'the road.',
-      edges: [TravelEdge('the_bellows_gap', 4), TravelEdge('forgeholm', 5)],
-    ),
     GameLocation(
       id: 'forgeholm',
       name: 'Forgeholm',
@@ -516,9 +479,13 @@ abstract final class World {
           'halls, stairs where a street would be, and a red glow a long way '
           'down that never goes out. Ore does not leave here until it has a '
           'name. It is never quiet and never cold.',
-      // ⭐ **One road in from the south, and it is three days long.** Arriving
-      // here is supposed to feel like having left home.
-      edges: [TravelEdge('the_charring_yards', 5), TravelEdge('old_quarry', 5)],
+      // ⭐ **One road in from the south, through the quarry.** Everything
+      // deeper in the range hangs off the city, so Forgeholm is passed
+      // THROUGH rather than visited — which is what makes it a gate.
+      edges: [
+        TravelEdge('old_quarry', 5),
+        TravelEdge('thunderspire_peaks', 5),
+      ],
     ),
     GameLocation(
       id: 'old_quarry',
@@ -530,13 +497,18 @@ abstract final class World {
       maxLevel: 19,
       blurb: "Cut into the range's southern flank, and cut too deep.",
       arrival:
-          'Terraces step down into shadow, each one squarer than anything '
-          'nature makes. The tool marks are old. Whatever was quarried out of '
-          'here left a shape, and the shape has started to move.',
+          'The road stops being a road and becomes the floor of something '
+          'somebody dug. Terraces step down into shadow, each one squarer '
+          'than anything nature makes, and the tool marks are old. Whatever '
+          'was quarried out of here left a shape, and the shape has started '
+          'to move.',
+      // ⭐ **The way into the mountains, and the only one.** The road north
+      // from Pennycross runs through the quarry, and Forgeholm is on the far
+      // side of it — so the first Kinetic zone is the door to the quarter.
       edges: [
+        TravelEdge('pennycross', 4),
         TravelEdge('forgeholm', 5),
         TravelEdge('the_molten_deep', 5),
-        TravelEdge('thunderspire_peaks', 5),
       ],
     ),
     GameLocation(
@@ -630,7 +602,7 @@ abstract final class World {
           'lit from within at intervals, and the intervals are getting '
           'shorter. Metal hums.',
       edges: [
-        TravelEdge('old_quarry', 5),
+        TravelEdge('forgeholm', 5),
         TravelEdge('stormcliff_coast', 5),
         TravelEdge('windward_steppe', 5),
         TravelEdge('frostfell_pass', 5),
@@ -1124,9 +1096,7 @@ abstract final class World {
       'cinderpeak_foothills': 'Ashjaw Brute',
       'thornmire': 'Mirewalker',
       'ashfall_vale': 'Cinderbloom Husk',
-      'the_bellows_gap': 'The Long Draw',
       // Kinetic
-      'the_charring_yards': 'Stackfall Cinderwake',
       'old_quarry': 'Quarry Golem',
       'stormcliff_coast': 'Stormcliff Tidecaller',
       'windward_steppe': 'Steppe Harrier',

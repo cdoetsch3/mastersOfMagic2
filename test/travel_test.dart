@@ -91,9 +91,9 @@ void main() {
       // hand-authored value kept for tuning, and TravelTimes is what travel
       // actually charges. This pins which one wins.
       // ⚠️ Must be an ADJACENT pair. This used to be pennycross→forgeholm and
-      // broke the day the north road went in between them.
-      final edge = World.byId('pennycross').edgeTo('the_bellows_gap')!;
-      final r = Travel.route('pennycross', 'the_bellows_gap')!;
+      // broke the day the Old Quarry went in between them.
+      final edge = World.byId('pennycross').edgeTo('old_quarry')!;
+      final r = Travel.route('pennycross', 'old_quarry')!;
       expect(r.seconds, TravelTimes.perLegSeconds);
       expect(
         World.locations.expand((l) => l.edges).map((e) => e.minutes).toSet(),

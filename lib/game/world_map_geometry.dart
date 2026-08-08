@@ -129,16 +129,13 @@ abstract final class WorldMapGeometry {
     'cinderpeak_foothills': Offset(690, 1104),
     'ashfall_vale': Offset(762, 1014),
     'pennycross': Offset(598, 1096),
-    // ⭐ **The north road climbs the range's southern toe and goes IN.**
-    // Pennycross used to be one hop from the Kinetic quarter.
-    'the_bellows_gap': Offset(470, 1004),
-    'the_charring_yards': Offset(392, 876),
-    // ⚠️ **Forgeholm sits ON `ironspine`, at roughly its middle** — the town
-    // is cut into the mountain, not parked at its foot, and `world_map_test`
-    // asserts the first half of that. The whole Kinetic block was moved up
-    // around it; it used to sit at the range's southern tip.
-    'forgeholm': Offset(346, 748),
-    'old_quarry': Offset(462, 846),
+    // ⭐ **The north road climbs the range's southern toe and goes IN**, and
+    // the Old Quarry is the doorway. Pennycross used to be one hop from the
+    // Kinetic quarter; now the quarry is between them.
+    'old_quarry': Offset(496, 986),
+    // ⚠️ **Forgeholm sits ON `ironspine`** — the city is cut into the
+    // mountain, not parked at its foot, and `world_map_test` asserts it.
+    'forgeholm': Offset(392, 876),
     'stormcliff_coast': Offset(206, 810),
     'galehaven': Offset(186, 700),
     'windward_steppe': Offset(470, 700),
