@@ -541,6 +541,13 @@ first quarter whose whole lesson is *"the elements disagree"* makes that goal
 mean something. Without it the crown is a collection checklist; with it, it is
 the answer to a problem the player met at level 1.
 
+⭐ **And it now has a cause it did not have when it was written.** The elements
+contend because someone tried to make them stop — see
+[NARRATIVE.md](NARRATIVE.md) §2.2. The Primal quarter teaches that elements
+have wills; forty levels later the player learns those wills were overridden.
+⚠️ **The lesson and its payoff are deliberately separated by the whole game**,
+so nothing here should hint at the cause.
+
 📝 **Glimmerbrook is the mystery seed, and it should stay quiet.** Water
 refusing to move is the only theme in the quarter that is a *symptom* rather
 than a nature — the others are elements being intensely themselves. It is the

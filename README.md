@@ -44,6 +44,7 @@ surface it and ask; do not decide it in code.
 | Spell list, costs, priorities | [GAME_DESIGN.md](docs/GAME_DESIGN.md) §3 |
 | Levels, XP, unlock schedules | [PROGRESSION_DESIGN.md](docs/PROGRESSION_DESIGN.md) |
 | Game modes (PvP, campaign, Discordant, Mortal) | [GAME_DESIGN.md](docs/GAME_DESIGN.md) §5 |
+| ⭐ **The overarching story** — Procarius, the Crown, the sealed summit | [NARRATIVE.md](docs/NARRATIVE.md) |
 
 ### "I want to change the world or the map"
 
