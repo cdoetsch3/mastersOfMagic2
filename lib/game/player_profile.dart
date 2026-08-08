@@ -6,6 +6,7 @@ import 'items/item_instance.dart';
 
 import 'loadout.dart';
 import 'progression.dart';
+import 'pronouns.dart';
 import 'active_trip.dart';
 import 'world.dart';
 
@@ -179,8 +180,8 @@ class PlayerProfile {
 
   /// Storerooms, keyed by **town id** (ITEMS §10.3c).
   ///
-  /// ⚠️ **One per city, never a shared pool.** What you leave in Aldermere is
-  /// in Aldermere; moving it means carrying it there yourself.
+  /// ⚠️ **One per city, never a shared pool.** What you leave in Hearthwood is
+  /// in Hearthwood; moving it means carrying it there yourself.
   Map<String, Storeroom> storerooms;
 
   /// Every non-fungible item this character owns, by instance id.
@@ -189,6 +190,11 @@ class PlayerProfile {
   /// Storeroom must be the *same* staff, so the instance cannot live inside
   /// whichever container currently names it.
   Map<String, ItemInstance> itemInstances;
+
+  /// ⭐ **Chosen at character creation and used by every line of story text
+  /// that refers to the player** — the mother's "my son"/"my daughter" most of
+  /// all. Read [pronouns] rather than switching on this.
+  PlayerGender gender;
 
   int duelsWon;
   int duelsLost;
@@ -216,6 +222,7 @@ class PlayerProfile {
     Map<String, Storeroom>? storerooms,
     Map<String, ItemInstance>? itemInstances,
     Map<EquipSlot, String>? equipped,
+    this.gender = PlayerGender.unspecified,
     this.duelsWon = 0,
     this.duelsLost = 0,
   }) : locationId = locationId ?? World.startLocationId,
@@ -228,10 +235,16 @@ class PlayerProfile {
        itemInstances = itemInstances ?? {},
        equipped = equipped ?? {};
 
-  factory PlayerProfile.newPlayer({String name = 'Apprentice'}) =>
-      PlayerProfile(name: name);
+  factory PlayerProfile.newPlayer({
+    String name = 'Apprentice',
+    PlayerGender gender = PlayerGender.unspecified,
+  }) => PlayerProfile(name: name, gender: gender);
 
   // ---- Derived ---------------------------------------------------------
+
+  /// How to talk about this character. ⭐ Never switch on [gender] at a call
+  /// site — ask for the word you need, so adding a fourth set stays one edit.
+  Pronouns get pronouns => gender.pronouns;
 
   /// Whether this character has beaten [locationId]'s boss at least once.
   ///
@@ -289,6 +302,7 @@ class PlayerProfile {
       for (final e in itemInstances.entries) e.key: e.value.toJson(),
     },
     'equipped': {for (final e in equipped.entries) e.key.name: e.value},
+    'gender': gender.name,
     'duelsWon': duelsWon,
     'duelsLost': duelsLost,
     'schemaVersion': 2,
@@ -342,6 +356,9 @@ class PlayerProfile {
           ) ??
           {},
       equipped: _equippedFrom(json['equipped'] as Map?),
+      // Absent on saves from before the field existed — PlayerGender.byName
+      // reads that as unspecified, which is they/them.
+      gender: PlayerGender.byName(json['gender'] as String?),
       duelsWon: (json['duelsWon'] as num?)?.toInt() ?? 0,
       duelsLost: (json['duelsLost'] as num?)?.toInt() ?? 0,
     );

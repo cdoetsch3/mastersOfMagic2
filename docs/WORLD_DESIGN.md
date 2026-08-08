@@ -329,7 +329,7 @@ multiply it. Deliberately the simplest thing that works.
 ✅ **Time crystals expedite travel**, the same way they skip crafting and
 research timers (GAME_DESIGN idea bank #8/#9).
 
-📝 **Worked example — the thing to tune against.** Aldermere → Rimeholt is a
+📝 **Worked example — the thing to tune against.** Hearthwood → Rimeholt is a
 long chain of legs. At ~5 minutes each on foot that is **~30 minutes**; the same
 trip is **~3 minutes** on a Giant Eagle and **~90 seconds** on a Veilcourser.
 That collapse *is* the mount ladder's appeal, and it is why the top tiers can be
@@ -597,19 +597,25 @@ one edge.
 
 ## 4c. ⭐ Element coverage across the world — audit + the late-zone question
 
-**Measured from `world.dart`, 2026-08-02.** 22 element-bearing zones; the
-Eclipsed Citadel is excluded (it carries all twelve).
+**Measured from `world.dart`, 2026-08-02**; ✅ **amended 2026-08-08** for the
+north road. 24 element-bearing zones; the Eclipsed Citadel is excluded (it
+carries all twelve).
+
+⛔ **The world is now at the ceiling.** `world_test.dart` holds every element to
+3–4 zones, and Pyro, Geo, Electro and Aero all sit at 4 as of The Bellows Gap
+and The Charring Yards. **No further zone can use any of them** without raising
+the rule first.
 
 | Element | Zones | Highest band | Where it appears |
 |---|---|---|---|
 | **Aqua** | 4 | 40 | Glimmerbrook 3–8 · Thornmire 8–13 · Frostfell Pass 21–26 · Tidewrack Shoals 36–40 |
 | **Flora** | 3 | ⚠️ **14** | Whispering Woods 1–5 · Thornmire 8–13 · Ashfall Vale 10–14 |
-| **Pyro** | 3 | 29 | Cinderpeak 6–11 · Ashfall Vale 10–14 · The Molten Deep 25–29 |
-| **Electro** | 3 | 44 | Stormcliff 17–22 · Thunderspire 23–28 · Shattered Orrery 40–44 |
-| **Aero** | 3 | 28 | Windward Steppe 19–24 · Frostfell Pass 21–26 · Thunderspire 23–28 |
+| **Pyro** | 4 | 29 | Cinderpeak 6–11 · Ashfall Vale 10–14 · The Charring Yards 13–17 · The Molten Deep 25–29 |
+| **Electro** | 4 | 44 | The Charring Yards 13–17 · Stormcliff 17–22 · Thunderspire 23–28 · Shattered Orrery 40–44 |
+| **Aero** | 4 | 28 | The Bellows Gap 11–15 · Windward Steppe 19–24 · Frostfell Pass 21–26 · Thunderspire 23–28 |
 | **Lunar** | 3 | 42 | Mirrormere 32–37 · Tidewrack 36–40 · Sunless Reach 38–42 |
 | **Umbra** | 3 | 58 | Umbral Wastes 47–51 · Reliquary Deep 52–56 · Unwritten Library 54–58 |
-| **Geo** | ⚠️ 2 | 29 | Old Quarry 15–19 · The Molten Deep 25–29 |
+| **Geo** | 4 | 29 | The Bellows Gap 11–15 · Old Quarry 15–19 · The Molten Deep 25–29 · The Buried Sky 46–50 |
 | **Solar** | ⚠️ 2 | 42 | Kiln Desert 30–34 · Sunless Reach 38–42 |
 | **Astral** | ⚠️ 2 | 44 | Starfall Basin 34–39 · Shattered Orrery 40–44 |
 | **Sanctus** | ⚠️ 2 | 56 | Hallowmarch 45–49 · Reliquary Deep 52–56 |
@@ -967,7 +973,7 @@ not locked.
 
 ### 6.1 Primal — the basin · Lv 1–14
 
-#### 🏠 Aldermere · town
+#### 🏠 Hearthwood · town
 > **Blurb** — A wooded river valley where every mage begins.
 >
 > **Arrival** — Alders lean over the water, and the whole valley smells of wet
@@ -987,7 +993,7 @@ not locked.
 > **Here** — The best Flora motes in the world. Felling. First-clear reward.
 
 #### Glimmerbrook · pure · Aqua · Lv 3–8
-> **Blurb** — Springs and shallows east of Aldermere, bright enough to hurt.
+> **Blurb** — Springs and shallows east of Hearthwood, bright enough to hurt.
 >
 > **Arrival** — The brook runs over pale stones and throws the light back at
 > you in pieces. Fish hang in the current without swimming. The water is colder
@@ -1024,6 +1030,18 @@ not locked.
 > **Here** — Pyro **and** Flora motes. Ashwood, which only grows back burnt.
 > ⭐ The proving ground for the Pyro ▸ Flora matchup.
 
+#### The Bellows Gap · hybrid · Geo + Aero *(Geo ▸ Aero)* · Lv 11–15
+> **Blurb** — The notch the mountain road goes through, and what owns it.
+>
+> **Arrival** — The road narrows until it is the only flat thing for a mile,
+> and the wind comes through the gap in long slow pulls — in, out, in, out.
+> Loose stone travels downhill all day with nobody touching it. The carters do
+> not stop here, and they do not say why.
+>
+> **Here** — ⭐ **The last Primal-band zone, and nothing in it is Primal.** Both
+> its elements are Kinetic: the quarter boundary is a place you walk through
+> rather than a level you reach.
+
 #### ⛲ Pennycross · town
 > **Blurb** — The first market, where the river road crosses the mountain road.
 >
@@ -1038,14 +1056,30 @@ not locked.
 
 ### 6.2 Kinetic — the range · Lv 15–29
 
+#### The Charring Yards · hybrid · Pyro + Electro *(Pyro ▸ Electro)* · Lv 13–17
+> **Blurb** — Where Forgeholm burns wood down into something worth carrying.
+>
+> **Arrival** — Stacks the size of houses, turfed over and smouldering a week
+> at a time — this is what the forge eats. Half of them have been opened early.
+> Something keeps coming down out of the cloud and setting them off, and the
+> yardmen have stopped rebuilding the ones nearest the road.
+>
+> **Here** — ⭐ **The first place the player sees the ward's failure without
+> being told about it** (NARRATIVE §4b.1). Charcoal, and the industry of a town
+> that is losing an argument with its own sky.
+
 #### ⛏️ Forgeholm · town · **unlocks Kinetic (L15)**
-> **Blurb** — The last flat ground before the Ironspine.
+> **Blurb** — A city with a mountain for a roof, cut into the Ironspine.
 >
-> **Arrival** — The town is built into the hill rather than on it. Ore goes in
-> one end and comes out the other as something with a name. It is never quiet
-> and never cold.
+> **Arrival** — You arrive at a door. The road ends at a gate in the rock and
+> everything past it was cut rather than built — halls stacked over halls,
+> stairs where a street would be, and a red glow a long way down that never
+> goes out. Ore does not leave here until it has a name. It is never quiet and
+> never cold.
 >
-> **Here** — Metalworking. Mining. The road into the range.
+> **Here** — Metalworking. Mining. ⭐ **It is inside the range, not below it** —
+> its pin sits on the `ironspine` polyline in `world_map_geometry.dart`, and
+> that is a content constraint rather than a drawing preference.
 
 #### Old Quarry · pure · Geo · Lv 15–19
 > **Blurb** — Cut into the range's southern flank, and cut too deep.
@@ -1330,7 +1364,7 @@ not locked.
 | ❓ Thin Air magnitude; flat or altitude-scaled; how acclimatisation is bought | Celestial tuning | this doc §4.1 |
 | ❓ Does Astral get a compensating quirk in the Empyrean, or is no-moon one-sided? | Empyrean rules | this doc §4.2 |
 | ❓ Does the Mirrormere's *reflected* phase differ from the real one? | a Lunar mechanic | TYPE_EFFECTS |
-| ❓ What the three Primal proofs actually are | Aldermere's gate | GAME_DESIGN §3 |
+| ❓ What the three Primal proofs actually are | Hearthwood's gate | GAME_DESIGN §3 |
 | ❓ Are assembled gate objects consumed or kept? (The Totem wants to be keepable) | gate items | GAME_DESIGN §3 |
 | ❓ Core drop rate, sized against *twelve* for the crown | endgame pacing | ITEMS §6.0 |
 | ❓ Concordance's hour-long buffs — needs the real-time buff machinery | capital content | ITEMS §6b.1 |

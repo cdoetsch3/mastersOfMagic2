@@ -16,7 +16,7 @@ import 'item_def.dart';
 /// silently shadows it in every UI file that imports this library.
 enum ItemContainer {
   /// Unlimited, and ⚠️ **one per city, not a shared pool** (ITEMS §10.3c).
-  /// What you leave in Aldermere is in Aldermere; moving it means carrying it.
+  /// What you leave in Hearthwood is in Hearthwood; moving it means carrying it.
   ///
   /// ⭐ This is what makes mount cargo, Journey's cargo risk and the
   /// decentralised crafting stations structural rather than flavour.

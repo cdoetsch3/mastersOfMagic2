@@ -515,7 +515,7 @@ minutes: ~5 min per leg.
 📝 **Two tuning facts the built graph produced**, both worth a decision before
 the travel UI ships:
 
-- **Aldermere → Rimeholt costs 39 minutes, not the ~30** in WORLD_DESIGN
+- **Hearthwood → Rimeholt costs 39 minutes, not the ~30** in WORLD_DESIGN
   §4b.1's worked example. The 5-minute baseline is honoured exactly — the real
   chain is **8 legs**, not the ~6 the example assumed. Either correct the
   example to 39 or shorten some legs; `test/travel_test.dart` pins 39 so the
@@ -743,7 +743,7 @@ Per ITEMS §5b. Each is independent; ordered by ascending risk.
 ## ✅ The core loop is playable (2026-08-02)
 
 Travel to Whispering Woods → fight a real roster → take loot home → stow it in
-Aldermere's Storeroom. Built end to end:
+Hearthwood's Storeroom. Built end to end:
 
 | Piece | Where |
 |---|---|

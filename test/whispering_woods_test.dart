@@ -256,7 +256,7 @@ void main() {
     });
 
     test('both bosses hand over the gate item', () {
-      // ⭐ Aldermere's north road wants "three ordinary proofs" — this is one.
+      // ⭐ Hearthwood's north road wants "three ordinary proofs" — this is one.
       // ⚠️ On the main table it would be luck; it has to be guaranteed, or
       // progression is gated behind a dice roll.
       for (final b in WhisperingWoodsBestiary.bosses) {
@@ -272,8 +272,8 @@ void main() {
       final proof = ItemCatalogue.byId('proof_of_the_woods');
       expect(proof, isA<KeyDef>());
       expect(proof.tradability, Tradability.bound);
-      expect((proof as KeyDef).gates, 'aldermere');
-      expect(World.byId('aldermere').gate, isNotNull);
+      expect((proof as KeyDef).gates, 'hearthwood');
+      expect(World.byId('hearthwood').gate, isNotNull);
     });
 
     test('every item in the zone catalogue is actually obtainable', () {

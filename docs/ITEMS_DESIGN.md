@@ -1297,8 +1297,8 @@ station is *required* to craft.
 ### 9b.1 Shops & stations ✅
 
 1. ✅ **Trade is not gated.** Shops work from the first town; no tutorial lock.
-2. ✅ **Every shop's stock is regional** — Aldermere sells Primal-band goods.
-3. ✅ **Aldermere keeps Woodcarving** — the first craftable is a staff/wand.
+2. ✅ **Every shop's stock is regional** — Hearthwood sells Primal-band goods.
+3. ✅ **Hearthwood keeps Woodcarving** — the first craftable is a staff/wand.
 4. ✅ **Pennycross becomes the Tailoring town.** The player gathers fibres all
    quarter and ends it with a crafted robe set + a decent staff. ⚠️ Pending
    code/doc edits when coding resumes: `world.dart` (`station:` on
@@ -1311,7 +1311,7 @@ station is *required* to craft.
    `station:` on `galehaven` and `vespergate` in `world.dart`, plus both
    WORLD_DESIGN gazetteer entries.
 
-**Final station map:** Aldermere Woodcarving (L1) · Pennycross Tailoring (L8)
+**Final station map:** Hearthwood Woodcarving (L1) · Pennycross Tailoring (L8)
 · Forgeholm Metalworking (L15) · Galehaven Potions & Alchemy (L22) · Meridian
 Enchanting (L36) · Rimeholt Jewelry (L45) · Zenith all six (L60). Concordance
 and Vespergate are stationless by design.
@@ -2050,7 +2050,7 @@ equipment bonuses (§6b.2's `+1 slot` modifier axis, now `beltSlots`).
 
 ✅ **Named the Storeroom.** ✅ **Every city has its own, bought or unlocked
 separately.**
-⚠️ **They are not a shared pool.** What you leave in Aldermere is in Aldermere.
+⚠️ **They are not a shared pool.** What you leave in Hearthwood is in Hearthwood.
 Moving it means **carrying it there yourself**.
 
 ⭐ **This is the decision that makes the rest of the world's systems load
@@ -2060,7 +2060,7 @@ bearing**, and it is worth being explicit about how much it changes:
 |---|---|---|
 | **Mount cargo** (+35 → +100, WORLD_DESIGN §4b.3) | A trade convenience | ⭐ The reason mounts exist. Relocating a hoard is a *logistics* problem |
 | **Journey risking cargo** (§4b.2) | A gamble on loot | ⭐ A gamble on **everything you own that is in transit** |
-| **Decentralised crafting stations** (§9b.1) | Flavour — one skill per town | ⭐ Genuinely structural: your wood is in Aldermere and your cloth is in Pennycross |
+| **Decentralised crafting stations** (§9b.1) | Flavour — one skill per town | ⭐ Genuinely structural: your wood is in Hearthwood and your cloth is in Pennycross |
 | **Concordance, the trade capital** | A market | ⭐ The natural hub, because it is where routes meet |
 
 ⚠️ **The friction risk, stated plainly.** Per-city storage *plus* decentralised

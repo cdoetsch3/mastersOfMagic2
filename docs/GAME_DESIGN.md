@@ -720,12 +720,12 @@ not better at everything.
 #### 2. Towns — and the capital
 
 ✅ **Nine towns — two per tier, plus a post-campaign ninth (§3b).** Six exist
-in the current draft (Aldermere, Forgeholm, Galehaven, Rimeholt, Meridian,
+in the current draft (Hearthwood, Forgeholm, Galehaven, Rimeholt, Meridian,
 Vespergate); **Pennycross**, **Concordance** and **Zenith** are new.
 
 | Tier | Towns | When |
 |---|---|---|
-| **Primal** | 🏠 **Aldermere** *(home village)* · ⛲ **Pennycross** *(the first market)* | L1 · ~L8 |
+| **Primal** | 🏠 **Hearthwood** *(home village)* · ⛲ **Pennycross** *(the first market)* | L1 · ~L8 |
 | **Kinetic** | ⛏️ **Forgeholm** *(mining)* · ⚓ **Galehaven** *(port)* | ~L15 · ~L22 |
 | **Celestial** | 🏛️ **Concordance** *(capital · gateway to Celestial)* · 🔭 **Meridian** *(observatory)* | ~L30 · ~L36 |
 | **Ethereal** | 🏔️ **Rimeholt** *(the last mortal outpost, above the tree line)* · 🚪 **Vespergate** *(threshold fortress)* | ~L45 · ~L50 |
@@ -738,7 +738,7 @@ the campaign and the moment the world stops being provincial.
 - Celestial spokes off it, so it becomes your base for the back half rather
   than a place you pass through. Difficulty still scales with distance from
   home — the capital simply *becomes* home.
-- Aldermere stays a humble village, which it should: opening in the capital
+- Hearthwood stays a humble village, which it should: opening in the capital
   would spend the game's biggest location on a player who cannot appreciate
   it.
 
@@ -938,7 +938,7 @@ towns, leaving two deliberately civic:
 
 | Town | Tier | Station | Why there |
 |---|---|---|---|
-| 🏠 **Aldermere** | Primal | **Woodcarving** | The woods are its whole geography, and a stave is the first weapon a new mage cuts |
+| 🏠 **Hearthwood** | Primal | **Woodcarving** | The woods are its whole geography, and a stave is the first weapon a new mage cuts |
 | ⛲ **Pennycross** | Primal | — *(first market)* | Teaches buying and selling before Concordance turns trade into a system |
 | ⛏️ **Forgeholm** | Kinetic | **Metalworking** | It is the mining town; ore is refined where it comes out of the ground |
 | ⚓ **Galehaven** | Kinetic | **Tailoring** | A port is where cloth and dye arrive from elsewhere — robes are a trade good, not a local one |
@@ -961,7 +961,7 @@ towns, leaving two deliberately civic:
    the crafting tree unfolds at the same pace as the world — no town ever
    offers a skill the player has no use for yet.
 
-📝 Gathering skills sit alongside naturally: **Felling** around Aldermere,
+📝 Gathering skills sit alongside naturally: **Felling** around Hearthwood,
 **Mining** around Forgeholm and Rimeholt, **Foraging** around Galehaven and
 Vespergate.
 
@@ -977,7 +977,7 @@ and you *make things* out in the world.
 > visible and clearly labelled — *"Adamant Vein · requires Mining 40"*.
 
 ⭐ Sharpen it: put the node for a **later tier's material next to an earlier
-tier's town**. You walk past the Adamant Vein outside Aldermere at level 6 and
+tier's town**. You walk past the Adamant Vein outside Hearthwood at level 6 and
 finally crack it at level 40 — which drags you back to the starting village at
 the endgame. That single trick makes every town permanently relevant and costs
 nothing but placement.
@@ -1331,7 +1331,7 @@ within-tier counter edge.
 
 | Region | Type | Elements | Lv |
 |---|---|---|---|
-| **Aldermere** | 🏠 home town | — | — |
+| **Hearthwood** | 🏠 home town | — | — |
 | **Whispering Woods** | pure | Flora | 1–5 |
 | **Glimmerbrook** | pure | Aqua | 3–8 |
 | **Cinderpeak Foothills** | pure | Pyro | 6–11 |
@@ -1433,14 +1433,14 @@ where the counter game has to be second nature.
 
 | Ring | Region | Type | Elements | Lv |
 |---|---|---|---|---|
-| 0 | **Aldermere** | home town | — | — |
+| 0 | **Hearthwood** | home town | — | — |
 | 1 | Whispering Woods | route | Earth, Air | 1–5 |
 | 1 | Glimmerbrook | route | Water, Light | 2–6 |
 | 1 | Old Quarry | offshoot of Whispering Woods | Earth | 4–8 |
 | 2 | **Forgeholm** | mining town | — | — |
-| 2 | Cinderpeak Foothills | route (Aldermere→Forgeholm) | Fire, Earth | 8–14 |
+| 2 | Cinderpeak Foothills | route (Hearthwood→Forgeholm) | Fire, Earth | 8–14 |
 | 2 | **Galehaven** | port town | — | — |
-| 2 | Stormcliff Coast | route (Aldermere→Galehaven) | Water, Electric | 8–14 |
+| 2 | Stormcliff Coast | route (Hearthwood→Galehaven) | Water, Electric | 8–14 |
 | 3 | The Caldera | offshoot of Forgeholm | Fire | 15–22 |
 | 3 | Crystal Caverns | offshoot of Forgeholm | Earth, Light | 16–24 |
 | 3 | Frostfell Pass | route (Forgeholm→Rimeholt) | Ice, Air | 18–26 |

@@ -47,11 +47,11 @@ void main() {
     tester,
   ) async {
     final game = GameState(_Mem(), PlayerProfile.newPlayer());
-    game.profile.storerooms['aldermere'] = const Storeroom(
+    game.profile.storerooms['hearthwood'] = const Storeroom(
       stacks: {'oak_log': 4},
     );
     await _pump(tester, game);
-    expect(find.textContaining('ALDERMERE STOREROOM'), findsOneWidget);
+    expect(find.textContaining('HEARTHWOOD STOREROOM'), findsOneWidget);
     expect(find.text('×4'), findsOneWidget);
     // ⚠️ The per-city rule, stated where a player will actually read it.
     expect(find.textContaining('per city'), findsOneWidget);

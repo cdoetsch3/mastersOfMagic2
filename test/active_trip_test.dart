@@ -33,7 +33,7 @@ void main() {
 
   group('a trip is a function of the clock', () {
     ActiveTrip tripTo(String to) =>
-        ActiveTrip.fromRoute(Travel.route('aldermere', to)!, noon);
+        ActiveTrip.fromRoute(Travel.route('hearthwood', to)!, noon);
 
     test('cumulative times line up with the route', () {
       final trip = tripTo('rimeholt');
@@ -42,8 +42,8 @@ void main() {
       // ⭐ Seconds are the source of truth; minutes are a rounded-up view of
       // them. Asserting minutes*60 would break the moment a leg is shorter
       // than a minute, which it is while testing.
-      expect(trip.totalSeconds, Travel.secondsBetween('aldermere', 'rimeholt'));
-      expect(trip.totalMinutes, Travel.minutesBetween('aldermere', 'rimeholt'));
+      expect(trip.totalSeconds, Travel.secondsBetween('hearthwood', 'rimeholt'));
+      expect(trip.totalMinutes, Travel.minutesBetween('hearthwood', 'rimeholt'));
       for (var i = 1; i < trip.secondsAtStop.length; i++) {
         expect(trip.secondsAtStop[i], greaterThan(trip.secondsAtStop[i - 1]));
       }
@@ -51,14 +51,14 @@ void main() {
 
     test('you are where the elapsed time says you are', () {
       final trip = tripTo('rimeholt');
-      expect(trip.stopReachedAt(noon), 'aldermere');
+      expect(trip.stopReachedAt(noon), 'hearthwood');
       // ⚠️ Just short of the first leg, not a fixed minute — a leg can be
       // seconds long while testing.
       expect(
         trip.stopReachedAt(
           noon.add(Duration(seconds: trip.secondsAtStop[1] - 1)),
         ),
-        'aldermere',
+        'hearthwood',
       );
 
       // Exactly at the second stop's time, you have reached it.
@@ -90,7 +90,7 @@ void main() {
     });
 
     test('a mount shortens every leg, and never to nothing', () {
-      final route = Travel.route('aldermere', 'rimeholt')!;
+      final route = Travel.route('hearthwood', 'rimeholt')!;
       final onFoot = ActiveTrip.fromRoute(route, noon);
       final mounted = ActiveTrip.fromRoute(
         route,
@@ -150,8 +150,8 @@ void main() {
       final game = fresh();
       expect(await game.beginTravel('whispering_woods'), isTrue);
       expect(game.isTravelling, isTrue);
-      expect(game.profile.locationId, 'aldermere');
-      expect(game.currentLocationId, 'aldermere');
+      expect(game.profile.locationId, 'hearthwood');
+      expect(game.currentLocationId, 'hearthwood');
     });
 
     test('you arrive when the clock says so, not before', () async {
@@ -161,7 +161,7 @@ void main() {
 
       clock = noon.add(Duration(seconds: total - 1));
       expect(game.isTravelling, isTrue);
-      expect(game.profile.locationId, 'aldermere');
+      expect(game.profile.locationId, 'hearthwood');
 
       clock = noon.add(Duration(seconds: total));
       expect(game.isTravelling, isFalse);
@@ -191,7 +191,7 @@ void main() {
 
     test('you cannot travel to where you already are', () async {
       final game = fresh();
-      expect(await game.beginTravel('aldermere'), isFalse);
+      expect(await game.beginTravel('hearthwood'), isFalse);
       expect(await game.beginTravel('atlantis'), isFalse);
       expect(game.isTravelling, isFalse);
     });
@@ -202,7 +202,7 @@ void main() {
       final trip = game.profile.trip!;
       expect(trip.stops.length, greaterThan(2));
       expect(trip.toId, 'rimeholt');
-      expect(trip.totalMinutes, Travel.minutesBetween('aldermere', 'rimeholt'));
+      expect(trip.totalMinutes, Travel.minutesBetween('hearthwood', 'rimeholt'));
     });
   });
 
@@ -236,7 +236,7 @@ void main() {
           Duration(seconds: game.profile.trip!.secondsAtStop[1] - 1),
         );
         await game.cancelTravel();
-        expect(game.profile.locationId, 'aldermere');
+        expect(game.profile.locationId, 'hearthwood');
       },
     );
 
@@ -259,7 +259,7 @@ void main() {
     test('cancelling when not travelling does nothing', () async {
       final game = fresh();
       await game.cancelTravel();
-      expect(game.profile.locationId, 'aldermere');
+      expect(game.profile.locationId, 'hearthwood');
     });
   });
 

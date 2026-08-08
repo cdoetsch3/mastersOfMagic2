@@ -46,7 +46,7 @@ void main() {
       }
     });
 
-    test('every location is reachable on foot from Aldermere', () {
+    test('every location is reachable on foot from Hearthwood', () {
       final seen = <String>{World.startLocationId};
       final queue = <String>[World.startLocationId];
       while (queue.isNotEmpty) {
@@ -382,7 +382,7 @@ void main() {
       // ⭐ Which town teaches what, per ITEMS §9b. Each skill is learnable in
       // exactly ONE place until Zenith, so moving one is a real design change
       // and should fail here rather than pass quietly.
-      expect(byId['aldermere']!.station, 'Woodcarving');
+      expect(byId['hearthwood']!.station, 'Woodcarving');
       expect(byId['pennycross']!.station, 'Tailoring');
       expect(byId['forgeholm']!.station, 'Metalworking');
       expect(byId['galehaven']!.station, 'Potions and Alchemy');
@@ -399,7 +399,7 @@ void main() {
 
     test('each tier gate is recorded on the place that enforces it', () {
       for (final id in [
-        'aldermere',
+        'hearthwood',
         'concordance',
         'rimeholt',
         'the_eclipsed_citadel',

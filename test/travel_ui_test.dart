@@ -45,12 +45,12 @@ void main() {
     tester,
   ) async {
     await pumpTab(tester);
-    // Aldermere's neighbours are 3-minute walks.
+    // Hearthwood's neighbours are 3-minute walks.
     // ⭐ Whatever a leg currently costs, the trip must state it — the point is
     // that the price is visible, not that it is any particular number.
     expect(
       find.textContaining(
-        TravelTimes.label(Travel.secondsBetween('aldermere', 'pennycross')!),
+        TravelTimes.label(Travel.secondsBetween('hearthwood', 'pennycross')!),
       ),
       findsWidgets,
     );
@@ -71,12 +71,12 @@ void main() {
 
     // ⭐ The button names where you end up, because cancelling drops you at
     // the last place reached rather than back at the start.
-    expect(find.textContaining('Stop at Aldermere'), findsOneWidget);
+    expect(find.textContaining('Stop at Hearthwood'), findsOneWidget);
 
-    await tester.tap(find.textContaining('Stop at Aldermere'));
+    await tester.tap(find.textContaining('Stop at Hearthwood'));
     await tester.pumpAndSettle();
     expect(game.isTravelling, isFalse);
-    expect(game.profile.locationId, 'aldermere');
+    expect(game.profile.locationId, 'hearthwood');
     expect(find.textContaining('Travelling to'), findsNothing);
   });
 
@@ -132,7 +132,7 @@ void main() {
     final trip = game.profile.trip!;
     expect(trip.stops.length, greaterThan(2));
 
-    expect(find.textContaining('On the road from Aldermere'), findsOneWidget);
+    expect(find.textContaining('On the road from Hearthwood'), findsOneWidget);
 
     clock = noon.add(Duration(seconds: trip.secondsAtStop[1] + 5));
     await tester.pump(const Duration(seconds: 1));

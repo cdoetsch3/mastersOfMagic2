@@ -456,7 +456,7 @@ abstract final class WhisperingWoodsBestiary {
     always: [
       DropEntry('flora_crystal', min: 1, max: 2),
       DropEntry('flora_shard', min: 3, max: 6),
-      // ⭐ The gate item. One of Aldermere's "three ordinary proofs".
+      // ⭐ The gate item. One of Hearthwood's "three ordinary proofs".
       DropEntry('proof_of_the_woods'),
     ],
     main: [

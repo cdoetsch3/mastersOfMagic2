@@ -64,6 +64,32 @@ void main() {
         );
       }
     });
+
+    test('⭐ Forgeholm is IN the Ironspine, not beside it', () {
+      // The town is cut into the mountain — "halls stacked over halls, stairs
+      // where a street would be". ⚠️ Its pin drifted 110 units off the range
+      // once while making room for the north road, which quietly turned a
+      // mountain hall into a foothill village.
+      final spine = WorldMapGeometry.ironspine;
+      var nearest = double.infinity;
+      final at = WorldMapGeometry.positions['forgeholm']!;
+      for (var i = 0; i < spine.length - 1; i++) {
+        final a = spine[i];
+        final seg = spine[i + 1] - a;
+        final t = (((at - a).dx * seg.dx + (at - a).dy * seg.dy) /
+                seg.distanceSquared)
+            .clamp(0.0, 1.0);
+        final d = (at - (a + seg * t)).distance;
+        if (d < nearest) nearest = d;
+      }
+      expect(
+        nearest,
+        lessThan(15),
+        reason:
+            'Forgeholm is ${nearest.toStringAsFixed(0)} from the Ironspine. '
+            'It is supposed to be inside it.',
+      );
+    });
   });
 
   group('the two planes are drawn apart', () {
@@ -178,7 +204,7 @@ void main() {
     test('every PLACE name is ALL CAPS on the map', () {
       // ⚠️ The miss that survived four rounds of review. Place pins and named
       // geography are drawn by different code paths, and only the geography
-      // was being capitalised — so towns still read "Aldermere" next to
+      // was being capitalised — so towns still read "Hearthwood" next to
       // "THE VERDANT BASIN". Both paths now go through [mapLabelFor].
       for (final loc in World.locations) {
         final drawn = mapLabelFor(loc.name);
@@ -194,7 +220,7 @@ void main() {
         );
       }
       expect(mapLabelFor('The Eclipsed Citadel'), 'ECLIPSED CITADEL');
-      expect(mapLabelFor('Aldermere'), 'ALDERMERE');
+      expect(mapLabelFor('Hearthwood'), 'HEARTHWOOD');
     });
 
     test('every feature label is ALL CAPS', () {
@@ -327,25 +353,25 @@ void main() {
 
   group('the painter repaints when it must', () {
     test('moving, selecting or hiding pins all trigger a repaint', () {
-      final base = WorldMapPainter(currentId: 'aldermere');
+      final base = WorldMapPainter(currentId: 'hearthwood');
       expect(
         base.shouldRepaint(WorldMapPainter(currentId: 'pennycross')),
         isTrue,
       );
       expect(
         base.shouldRepaint(
-          WorldMapPainter(currentId: 'aldermere', selectedId: 'x'),
+          WorldMapPainter(currentId: 'hearthwood', selectedId: 'x'),
         ),
         isTrue,
       );
       expect(
         base.shouldRepaint(
-          WorldMapPainter(currentId: 'aldermere', showPins: false),
+          WorldMapPainter(currentId: 'hearthwood', showPins: false),
         ),
         isTrue,
       );
       expect(
-        base.shouldRepaint(WorldMapPainter(currentId: 'aldermere')),
+        base.shouldRepaint(WorldMapPainter(currentId: 'hearthwood')),
         isFalse,
       );
     });
@@ -354,11 +380,11 @@ void main() {
       // ⚠️ The old check compared `.length`. Swapping one known place for
       // another — a quest reveal, a scrying spell, a multiplayer sighting —
       // left the count identical, so the map silently kept the stale dimming.
-      final before = WorldMapPainter(seen: {'aldermere', 'thornmire'});
-      final after = WorldMapPainter(seen: {'aldermere', 'pennycross'});
+      final before = WorldMapPainter(seen: {'hearthwood', 'thornmire'});
+      final after = WorldMapPainter(seen: {'hearthwood', 'pennycross'});
       expect(before.shouldRepaint(after), isTrue);
       expect(
-        before.shouldRepaint(WorldMapPainter(seen: {'thornmire', 'aldermere'})),
+        before.shouldRepaint(WorldMapPainter(seen: {'thornmire', 'hearthwood'})),
         isFalse,
         reason: 'set equality, not order',
       );
@@ -368,7 +394,7 @@ void main() {
       // ⚠️ The real shape of the bug: the screen handed over
       // profile.discoveredLocationIds itself, so old and new painters held one
       // instance and every comparison was an object against itself.
-      final live = <String>{'aldermere'};
+      final live = <String>{'hearthwood'};
       final before = WorldMapPainter(seen: live);
       live.add('thornmire');
       final after = WorldMapPainter(seen: live);
@@ -377,7 +403,7 @@ void main() {
         isTrue,
         reason: 'the painter must have snapshotted, not aliased',
       );
-      expect(before.seen, {'aldermere'});
+      expect(before.seen, {'hearthwood'});
       expect(() => before.seen.add('x'), throwsUnsupportedError);
     });
   });
@@ -390,9 +416,9 @@ void main() {
           height: 600,
           child: CustomPaint(
             painter: WorldMapPainter(
-              currentId: 'aldermere',
-              reachable: World.byId('aldermere').connections.toSet(),
-              seen: const {'aldermere'},
+              currentId: 'hearthwood',
+              reachable: World.byId('hearthwood').connections.toSet(),
+              seen: const {'hearthwood'},
             ),
           ),
         ),
@@ -411,7 +437,7 @@ void main() {
     // neither. Nothing compared rendered pixels to the camera until this.
     Future<void> checkFit(WidgetTester tester, Size size) async {
       final recorder = ui.PictureRecorder();
-      WorldMapPainter(currentId: 'aldermere').paint(Canvas(recorder), size);
+      WorldMapPainter(currentId: 'hearthwood').paint(Canvas(recorder), size);
       final picture = recorder.endRecording();
 
       await tester.runAsync(() async {

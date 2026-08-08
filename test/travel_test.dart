@@ -77,21 +77,23 @@ void main() {
 
   group('routes', () {
     test('going nowhere costs nothing', () {
-      final r = Travel.route('aldermere', 'aldermere')!;
+      final r = Travel.route('hearthwood', 'hearthwood')!;
       // ⚠️ Zero, not the one-minute floor. A short leg must never read as
       // free; a trip you do not take genuinely is.
       expect(r.seconds, 0);
       expect(r.minutes, 0);
       expect(r.isTrivial, isTrue);
-      expect(r.stops, ['aldermere']);
+      expect(r.stops, ['hearthwood']);
     });
 
     test('a leg costs what the policy says, not what the edge says', () {
       // ⚠️ Two durations exist on purpose: TravelEdge.minutes holds the
       // hand-authored value kept for tuning, and TravelTimes is what travel
       // actually charges. This pins which one wins.
-      final edge = World.byId('pennycross').edgeTo('forgeholm')!;
-      final r = Travel.route('pennycross', 'forgeholm')!;
+      // ⚠️ Must be an ADJACENT pair. This used to be pennycross→forgeholm and
+      // broke the day the north road went in between them.
+      final edge = World.byId('pennycross').edgeTo('the_bellows_gap')!;
+      final r = Travel.route('pennycross', 'the_bellows_gap')!;
       expect(r.seconds, TravelTimes.perLegSeconds);
       expect(
         World.locations.expand((l) => l.edges).map((e) => e.minutes).toSet(),
@@ -104,7 +106,7 @@ void main() {
     });
 
     test('stops and legs line up', () {
-      final r = Travel.route('aldermere', 'rimeholt')!;
+      final r = Travel.route('hearthwood', 'rimeholt')!;
       expect(r.legs.length, r.stops.length - 1);
       for (var i = 0; i < r.legs.length; i++) {
         expect(
@@ -139,7 +141,7 @@ void main() {
       }
 
       for (final pair in [
-        ['aldermere', 'concordance'],
+        ['hearthwood', 'concordance'],
         ['galehaven', 'meridian'],
         ['pennycross', 'thunderspire_peaks'],
         ['forgeholm', 'the_kiln_desert'],
@@ -169,7 +171,7 @@ void main() {
     test('every place can be reached from the starting town', () {
       for (final loc in World.locations) {
         expect(
-          Travel.route('aldermere', loc.id),
+          Travel.route('hearthwood', loc.id),
           isNotNull,
           reason: '${loc.id} is stranded',
         );
@@ -179,28 +181,28 @@ void main() {
     test('a Journey up the world stops at towns to heal', () {
       // §4b.2: Journey stops at each town on the way, which is what breaks a
       // long road into survivable stages.
-      final r = Travel.route('aldermere', 'rimeholt')!;
+      final r = Travel.route('hearthwood', 'rimeholt')!;
       expect(r.townStops, isNotEmpty);
       for (final id in r.townStops) {
         expect(World.byId(id).isTown, isTrue);
       }
-      expect(r.townStops, isNot(contains('aldermere')));
+      expect(r.townStops, isNot(contains('hearthwood')));
     });
 
     test('reaching Zenith needs passage the road cannot give', () {
-      final r = Travel.route('aldermere', 'zenith')!;
+      final r = Travel.route('hearthwood', 'zenith')!;
       expect(
         r.needsPassage,
         isTrue,
         reason: 'the route crosses the Veil, which is not a road',
       );
-      final overland = Travel.route('aldermere', 'concordance')!;
+      final overland = Travel.route('hearthwood', 'concordance')!;
       expect(overland.needsPassage, isFalse);
     });
 
     test('nowhere is not a place', () {
-      expect(Travel.route('aldermere', 'atlantis'), isNull);
-      expect(Travel.route('atlantis', 'aldermere'), isNull);
+      expect(Travel.route('hearthwood', 'atlantis'), isNull);
+      expect(Travel.route('atlantis', 'hearthwood'), isNull);
     });
   });
 
@@ -222,9 +224,9 @@ void main() {
 
     test('a route costs its length', () {
       for (final pair in [
-        ['aldermere', 'whispering_woods'],
-        ['aldermere', 'pennycross'],
-        ['aldermere', 'rimeholt'],
+        ['hearthwood', 'whispering_woods'],
+        ['hearthwood', 'pennycross'],
+        ['hearthwood', 'rimeholt'],
       ]) {
         final r = Travel.route(pair[0], pair[1])!;
         expect(r.seconds, r.legs.length * TravelTimes.perLegSeconds);
@@ -234,8 +236,8 @@ void main() {
     test('the longest journey is still the longest', () {
       // ⚠️ Relative, not absolute — the duration is a test-build value and
       // pinning a number here would fail the moment it is tuned.
-      final short = Travel.secondsBetween('aldermere', 'whispering_woods')!;
-      final long = Travel.secondsBetween('aldermere', 'zenith')!;
+      final short = Travel.secondsBetween('hearthwood', 'whispering_woods')!;
+      final long = Travel.secondsBetween('hearthwood', 'zenith')!;
       expect(long, greaterThan(short * 5));
     });
 

@@ -195,7 +195,7 @@ void main() {
   });
 
   group('the whole loop, end to end', () {
-    test('fight, loot, walk out, stow it in Aldermere', () async {
+    test('fight, loot, walk out, stow it in Hearthwood', () async {
       final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
       game.beginAdventure(_woods, rng: Random(3));
 
@@ -208,11 +208,11 @@ void main() {
       await game.leaveAdventure();
       expect(game.profile.backpack.used, greaterThan(0));
 
-      // Stow the first slot in Aldermere's Storeroom.
+      // Stow the first slot in Hearthwood's Storeroom.
       final carried = game.profile.backpack.used;
-      await game.deposit('aldermere', 0);
+      await game.deposit('hearthwood', 0);
       expect(game.profile.backpack.used, carried - 1);
-      expect(game.profile.storerooms['aldermere']!.itemCount, 1);
+      expect(game.profile.storerooms['hearthwood']!.itemCount, 1);
       expect(
         game.profile.storerooms['forgeholm'],
         isNull,
@@ -220,8 +220,8 @@ void main() {
       );
 
       // And take it back out.
-      final want = game.profile.storerooms['aldermere']!.stacks.keys.first;
-      final ok = await game.withdraw('aldermere', InventorySlot(defId: want));
+      final want = game.profile.storerooms['hearthwood']!.stacks.keys.first;
+      final ok = await game.withdraw('hearthwood', InventorySlot(defId: want));
       expect(ok, isTrue);
       expect(game.profile.backpack.used, carried);
     });

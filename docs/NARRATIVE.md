@@ -91,9 +91,9 @@ is deliberately unresolved**, and the game should not answer it until the
 player is through the door. It is the reason the ending is *about* something
 rather than merely won.
 
-### 3.2 ✅ The mother — fifteen years in Aldermere
+### 3.2 ✅ The mother — fifteen years in Hearthwood
 
-⭐ **The quiet place he chose is Aldermere**, *"a wooded river valley where
+⭐ **The quiet place he chose is Hearthwood**, *"a wooded river valley where
 every mage begins."* The starting town is not arbitrary. It is a refuge, picked
 because nothing happens there, and you were raised in it without being told
 why.
@@ -106,6 +106,34 @@ voice:** she is authoritative about the past and unreliable about the present,
 so she can explain the rules without solving the game.
 
 She has been waiting the whole time.
+
+### 3.3 ⭐⭐ The opening scene
+
+**Character creation asks for a name and whether you are a boy or a girl.**
+⚠️ **It asks because the mother's first line depends on the answer** — *my
+son*, *my daughter* — and that line is the game's first sentence.
+✅ `PlayerGender` and `Pronouns` are built (`lib/game/pronouns.dart`); the
+picker is not.
+
+**Then you are in Hearthwood, and your mother has been teaching you magic your
+whole life.** ⭐ **You think that is normal.** Every parent teaches a child
+something; yours taught you charging, and shielding, and which element answers
+which. It has never occurred to you to ask why she knows.
+
+She sends you out to train. That is the whole of the first instruction the game
+gives: *go and practise, and bring me back something to show for it.* Three
+ordinary errands in three ordinary places.
+
+⭐⭐ **And at the third proof she tells you what the lessons were for.** She has
+not been keeping a child busy for fifteen years. She has been building the one
+person who could go and get him — and now that you can pass the road warden's
+test, you can also do the thing she has been waiting to ask.
+
+⚠️ **The player and the character learn this at the same moment**, which is the
+only reason it lands. Nothing before the third proof may hint that the training
+is aimed at anything. ⭐ **The rule on the north road is hers** (§4b.2): she set
+it fifteen years ago so the road would stop you until you were ready, and she
+is also the one who decides you are.
 
 ---
 
@@ -129,7 +157,7 @@ game has no thesis. The difference is not power. It is consent.
 ## 4b. ✅ Why the player goes anywhere
 
 ⚠️ **The first pass through the world is not a Crown hunt.** ⭐ A level-1 mage
-in Aldermere is not assembling a Concordant Crown — they have no idea it is
+in Hearthwood is not assembling a Concordant Crown — they have no idea it is
 possible, and saying so out loud would make the next sixty levels a fetch
 list. The Crown is the *last act*, not the premise (§4c).
 
@@ -140,25 +168,43 @@ hands the player, on its way out, one more piece of why the door is shut.
 
 ### 4b.1 One subplot per quarter, each handing off to the next
 
-**Q1 · Primal · 1–14 — *"This is not local."***
-You start doing errands. Something in the woods, something in the water,
-something in the fire — three ordinary nuisances for three ordinary people,
-and the player thinks they are three ordinary jobs. ⭐ **They are one job.**
-The three proofs the north road wants turn out to be three faces of the same
-wrongness, and it is coming from upriver.
-**Handoff:** ⭐ **your mother recognises it.** She saw this exact symptom
-fifteen years ago, in the weeks before she was sent here. *The thing you have
-been fighting all quarter is the thing that took your father.*
+**Q1 · Primal · 1–14 — *"This is not local, and neither are you."***
+Your mother sends you out to train (§3.3). Something in the woods, something in
+the water, something in the fire — three ordinary nuisances in three ordinary
+places, and both the player and the character believe they are homework.
+⭐ **They are one job.** The three proofs the north road wants turn out to be
+three faces of the same wrongness, and it comes from upriver.
+**Handoff — two revelations in one scene:** ⭐ **she recognises it**, because
+she saw this exact symptom fifteen years ago in the weeks before she was sent
+here. And ⭐⭐ **the training was never general.** *The thing you have been
+fighting all quarter is the thing that took your father, and you have been
+made, quietly and for fifteen years, into the person who goes after him.*
 
-**Q2 · Kinetic · 15–29 — *"This is recent."***
-📝 *This was the quarter with no story. It has one now.* Concordance's
-three-part ward has failed and the roads are unusable, so the Kinetic quarter
-is not a place you pass through — it is a place that needs the ward put back.
-While repairing it you talk to people who **remember when it was not like
-this**, and they all date it to the same year.
-**Handoff:** the discord and the sealing of Zenith are **one event**. Nobody at
-ground level knows what happened at the summit, because everyone who does is
-behind the door.
+**Q2 · Kinetic · 15–29 — *"This is recent, and it is winning."***
+📝 *This was the quarter with no story.*
+
+⭐ **Forgeholm is under siege and does not call it that.** The city is cut into
+the Ironspine, and the three-part ward that has kept the mountain out of its
+halls has failed. Things come down into the upper levels now. ⚠️ **You see it
+before anyone tells you** — The Charring Yards, on the road in, where the
+charcoal stacks have been opened early and the yardmen have stopped rebuilding
+the ones nearest the road.
+
+**So you take the fight out to it.** ⭐⭐ **The three parts of the Sigil are
+three essences from the three Kinetic pure zones the map already has** — Geo at
+the Old Quarry, Electro at Stormcliff Coast, Aero on the Windward Steppe. Bring
+them back, the ward goes up, Forgeholm holds.
+
+⭐ **That is why Concordance wants the Sigil at its gate.** Concordance is a
+trade capital at the head of navigation and every road north runs through
+Forgeholm; it is not asking for a magic token, it is asking whether the road is
+open. ⚠️ Which is exactly what its arrival text already says: *"Nobody fights
+you; someone writes your name down."* **That is a clerk, not a warden.**
+
+**Handoff:** the people you meet rebuilding the ward **remember when it was not
+like this**, and they all date it to the same year Zenith closed. The discord
+and the sealing are **one event** — and nobody at ground level knows what
+happened at the summit, because everyone who does is behind the door.
 
 **Q3 · Celestial · 30–44 — *"This has happened before."***
 Above the shelf you find the leavings of previous Crowns — the Buried Sky's
@@ -186,7 +232,7 @@ sixty-level climb feeling like one story instead of four.
 a permission slip.** Each is a thing somebody built for a concrete reason, and
 the player's business with it is different every time.
 
-**1 · Three ordinary proofs** — Aldermere → the north road
+**1 · Three ordinary proofs** — Hearthwood → the north road
 ⭐ **Your mother set this rule.** Fifteen years ago she asked the road warden
 to let no unproven mage past, and she meant one specific child. She cannot
 stop you leaving; she arranged for the road to ask you for proof first.
@@ -194,14 +240,15 @@ stop you leaving; she arranged for the road to ask you for proof first.
 tutorial gate into the first real scene between them, rather than a
 forty-level-late reveal. ✅ `proof_of_the_woods` already exists.
 
-**2 · The Kinetic Sigil, in three parts** — Concordance, 30
-⭐ **It is a containment ward, not a gate, and it has failed in three places.**
-Concordance ringed itself when the Kinetic elements turned violent within
-living memory. You are not assembling the Sigil to be let in; you are
-assembling it because the city is open to the roads and someone has to close
-it. ⭐⭐ **The Sigil is a Crown in miniature** — three elements, three parts,
-one object that makes them hold together. The player builds the small version
-thirty levels before anyone says the word *Crown*, and it teaches the
+**2 · The Kinetic Sigil, in three parts** — shown at Concordance, 30
+⭐ **It is Forgeholm's containment ward, and it has failed.** You do not
+assemble it to be let into Concordance; you assemble it because the mountain is
+getting into Forgeholm's halls and someone has to shut it out (§4b.1).
+⭐ **Concordance asks to see it because Concordance is a trade city** — every
+road north runs through Forgeholm, and the gate's real question is whether the
+road is open. ⭐⭐ **The Sigil is a Crown in miniature:** three elements, three
+parts, one object that makes them hold together. The player builds the small
+version thirty levels before anyone says the word *Crown*, and it teaches the
 mechanic by hand.
 
 **3 · A Celestial Totem, charged with Solar, Lunar and Astral** — Rimeholt, 45
@@ -298,7 +345,7 @@ pulls toward its gems**. Unresolved.
 | Quarter | Subplot (§4b.1) | What the player learns |
 |---|---|---|
 | **Primal** 1–14 | Three errands, one cause | ⭐ Elements are **parties**, not forces — they want things, and where they meet they contend |
-| **Kinetic** 15–29 | Rebuilding Concordance's failed ward | The discord is **recent**, and it is dated to the year Zenith closed |
+| **Kinetic** 15–29 | Forgeholm under siege; rebuilding its failed ward | The discord is **recent**, and it is dated to the year Zenith closed |
 | **Celestial** 30–44 | The sky's record of every Crown | It has **happened before** — and the last entry was struck out |
 | **Ethereal** 45–60 | Three key fragments, and the Library | ⭐ It was **made** to happen, by a man still standing at the door |
 
@@ -340,7 +387,12 @@ the player can see rather than a cutscene claim. Unspecified for now.
 - ⚠️ **Tier-1 narrative must be skippable.** A returning player who cannot
   dismiss a story screen comes to resent it (GAME_DESIGN §5).
 - ⭐ **Everything above is assembled from committed text.** Changing Zenith's
-  gate, the Citadel's blurb, or Aldermere's arrival changes the story.
+  gate, the Citadel's blurb, or Hearthwood's arrival changes the story.
+- ⚠️ **The player has a gender and it is one of three answers.** Any line that
+  refers to the player must go through `Pronouns.apply` — never a hand-written
+  "he" or "his", and never a hand-written verb next to one. `{They} {are} her
+  {child}` is the shape. they/them takes a plural verb, which is the case that
+  gets shipped broken.
 
 ---
 
@@ -351,7 +403,12 @@ the player can see rather than a cutscene claim. Unspecified for now.
 - **What the twelve trials actually are** (§4c.2) — a run mode, a single fight,
   or something that is not a fight at all. Nothing is built.
 - **How the player crosses the world twelve times** in the last act (§4c).
-- **Whether the mother is a recurring voice** or only a prologue.
+- **Whether the mother is a recurring voice** or only a prologue. §3.3 leans
+  toward recurring: she is the examiner for all three proofs.
+- ⛔ **The character-creation screen does not exist.** The data model does
+  (`PlayerGender`, `Pronouns`); nothing asks the question.
+- ⛔ **The Charring Yards has no roster** and NARRATIVE §4b.1 now makes it the
+  place the player first sees the siege.
 - **How the player learns any of this.** Tier-1 narrative screens are designed
   but unbuilt (GAME_DESIGN §5), and this story currently has nowhere to appear.
 - ⛔ **Four of the five gates are prose with no items behind them.** Only

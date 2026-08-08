@@ -50,10 +50,10 @@ void main() {
   });
 
   group('a Storeroom belongs to one city', () {
-    test('depositing in Aldermere does not put it in Forgeholm', () {
+    test('depositing in Hearthwood does not put it in Forgeholm', () {
       final p = PlayerProfile.newPlayer();
-      p.storerooms['aldermere'] = const Storeroom().withDeposited(_log);
-      expect(p.storerooms['aldermere']!.itemCount, 1);
+      p.storerooms['hearthwood'] = const Storeroom().withDeposited(_log);
+      expect(p.storerooms['hearthwood']!.itemCount, 1);
       expect(
         p.storerooms['forgeholm'],
         isNull,
@@ -95,10 +95,10 @@ void main() {
     test('backpack and storerooms survive save and load', () {
       final p = PlayerProfile.newPlayer()
         ..backpack = Backpack.empty().withAdded(_log)!
-        ..storerooms['aldermere'] = const Storeroom(stacks: {'oak_log': 9});
+        ..storerooms['hearthwood'] = const Storeroom(stacks: {'oak_log': 9});
       final back = PlayerProfile.fromJson(p.toJson());
       expect(back.backpack.countOf('oak_log'), 1);
-      expect(back.storerooms['aldermere']!.stacks['oak_log'], 9);
+      expect(back.storerooms['hearthwood']!.stacks['oak_log'], 9);
     });
 
     test('a fresh character carries and stores nothing', () {
@@ -125,10 +125,10 @@ void main() {
 
       // ... carry it to town and stow it
       p.backpack = p.backpack.withRemovedFirst('oak_quarterstaff');
-      p.storerooms['aldermere'] = const Storeroom().withDeposited(slot);
+      p.storerooms['hearthwood'] = const Storeroom().withDeposited(slot);
 
       final back = PlayerProfile.fromJson(p.toJson());
-      expect(back.storerooms['aldermere']!.instanceIds, ['uuid-1']);
+      expect(back.storerooms['hearthwood']!.instanceIds, ['uuid-1']);
       expect(
         back.itemInstances['uuid-1']!.quality,
         Quality.ornate,
@@ -146,7 +146,7 @@ void main() {
       p.backpack = p.backpack.withAdded(
         const InventorySlot(defId: 'oak_quarterstaff', instanceId: 'uuid-1'),
       )!;
-      p.storerooms['aldermere'] = const Storeroom(instanceIds: ['uuid-1']);
+      p.storerooms['hearthwood'] = const Storeroom(instanceIds: ['uuid-1']);
 
       final referenced = <String>{
         for (final s in p.backpack.contents)

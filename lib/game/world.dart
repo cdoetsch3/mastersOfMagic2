@@ -279,12 +279,12 @@ class GameLocation {
 /// Vespergate, crosses the **Empyrean**, and re-enters at the summit through
 /// the Eclipsed Citadel — ⭐ **the summit is never climbed.**
 abstract final class World {
-  static const String startLocationId = 'aldermere';
+  static const String startLocationId = 'hearthwood';
 
   /// Every town, in the order the campaign meets them. Zenith's teleport net
   /// is built from this.
   static const List<String> townIds = [
-    'aldermere',
+    'hearthwood',
     'pennycross',
     'forgeholm',
     'galehaven',
@@ -300,8 +300,8 @@ abstract final class World {
     // Primal — the basin · Lv 1-14 · 0-1 000 m
     // ---------------------------------------------------------------
     GameLocation(
-      id: 'aldermere',
-      name: 'Aldermere',
+      id: 'hearthwood',
+      name: 'Hearthwood',
       kind: LocationKind.town,
       tier: MagicTier.primal,
       opensAtLevel: 1,
@@ -355,7 +355,7 @@ abstract final class World {
           'to — and settles there. You did not kill anything. You '
           'interrupted something, and it noticed you doing it.',
       edges: [
-        TravelEdge('aldermere', 3),
+        TravelEdge('hearthwood', 3),
         TravelEdge('thornmire', 3),
         TravelEdge('ashfall_vale', 3),
       ],
@@ -368,13 +368,13 @@ abstract final class World {
       elements: [MagicElement.aqua],
       minLevel: 3,
       maxLevel: 8,
-      blurb: 'Springs and shallows east of Aldermere, bright enough to hurt.',
+      blurb: 'Springs and shallows east of Hearthwood, bright enough to hurt.',
       arrival:
           'The brook runs over pale stones and throws the light back at '
           'you in pieces. Fish hang in the current without swimming. The water '
           'is colder than the season should allow.',
       edges: [
-        TravelEdge('aldermere', 3),
+        TravelEdge('hearthwood', 3),
         TravelEdge('thornmire', 3),
         TravelEdge('pennycross', 3),
       ],
@@ -393,10 +393,12 @@ abstract final class World {
           'The grass gives out and the slope turns to grey grit that '
           'shifts under you. Somewhere above, the mountain is breathing. The '
           'air tastes of struck flint.',
+      // ⚠️ **No shortcut to Forgeholm from here.** This edge used to exist and
+      // it let a level-11 player skip the whole north road; the tier boundary
+      // is a place now (The Bellows Gap, The Charring Yards), not a number.
       edges: [
-        TravelEdge('aldermere', 3),
+        TravelEdge('hearthwood', 3),
         TravelEdge('ashfall_vale', 3),
-        TravelEdge('forgeholm', 5),
         TravelEdge('the_molten_deep', 5),
       ],
     ),
@@ -415,7 +417,7 @@ abstract final class World {
           'Trees stand in it up to their knees and have made peace with that. '
           'Everything green here is winning.',
       edges: [
-        TravelEdge('aldermere', 3),
+        TravelEdge('hearthwood', 3),
         TravelEdge('whispering_woods', 3),
         TravelEdge('glimmerbrook', 3),
       ],
@@ -441,6 +443,25 @@ abstract final class World {
       ],
     ),
     GameLocation(
+      id: 'the_bellows_gap',
+      name: 'The Bellows Gap',
+      kind: LocationKind.route,
+      tier: MagicTier.primal,
+      // Geo ▸ Aero — the notch the mountain road takes, and the wind in it.
+      // ⚠️ Both elements are Kinetic. That is the point: this is the last
+      // Primal-band zone and nothing in it is Primal.
+      elements: [MagicElement.geo, MagicElement.aero],
+      minLevel: 11,
+      maxLevel: 15,
+      blurb: 'The notch the mountain road goes through, and what owns it.',
+      arrival:
+          'The road narrows until it is the only flat thing for a mile, and '
+          'the wind comes through the gap in long slow pulls — in, out, in, '
+          'out. Loose stone travels downhill all day with nobody touching it. '
+          'The carters do not stop here, and they do not say why.',
+      edges: [TravelEdge('pennycross', 4), TravelEdge('the_charring_yards', 4)],
+    ),
+    GameLocation(
       id: 'pennycross',
       name: 'Pennycross',
       kind: LocationKind.town,
@@ -454,9 +475,9 @@ abstract final class World {
           'buildings, and the buildings still look like stalls. Everyone is '
           'halfway through a transaction.',
       edges: [
-        TravelEdge('aldermere', 3),
+        TravelEdge('hearthwood', 3),
         TravelEdge('glimmerbrook', 3),
-        TravelEdge('forgeholm', 5),
+        TravelEdge('the_bellows_gap', 4),
       ],
     ),
 
@@ -464,22 +485,40 @@ abstract final class World {
     // Kinetic — the range · Lv 15-29 · -400-2 500 m
     // ---------------------------------------------------------------
     GameLocation(
+      id: 'the_charring_yards',
+      name: 'The Charring Yards',
+      kind: LocationKind.route,
+      tier: MagicTier.kinetic,
+      // Pyro ▸ Electro — slow fire under a sky that keeps interrupting it.
+      elements: [MagicElement.pyro, MagicElement.electro],
+      minLevel: 13,
+      maxLevel: 17,
+      blurb: "Where Forgeholm burns wood down into something worth carrying.",
+      arrival:
+          'Stacks the size of houses, turfed over and smouldering a week at a '
+          'time — this is what the forge eats. Half of them have been opened '
+          'early. Something keeps coming down out of the cloud and setting '
+          'them off, and the yardmen have stopped rebuilding the ones nearest '
+          'the road.',
+      edges: [TravelEdge('the_bellows_gap', 4), TravelEdge('forgeholm', 5)],
+    ),
+    GameLocation(
       id: 'forgeholm',
       name: 'Forgeholm',
       kind: LocationKind.town,
       tier: MagicTier.kinetic,
       opensAtLevel: 15,
       station: 'Metalworking',
-      blurb: 'The last flat ground before the Ironspine.',
+      blurb: 'A city with a mountain for a roof, cut into the Ironspine.',
       arrival:
-          'The town is built into the hill rather than on it. Ore goes in '
-          'one end and comes out the other as something with a name. It is '
-          'never quiet and never cold.',
-      edges: [
-        TravelEdge('cinderpeak_foothills', 5),
-        TravelEdge('pennycross', 5),
-        TravelEdge('old_quarry', 5),
-      ],
+          'You arrive at a door. The road ends at a gate in the rock and '
+          'everything past it was cut rather than built — halls stacked over '
+          'halls, stairs where a street would be, and a red glow a long way '
+          'down that never goes out. Ore does not leave here until it has a '
+          'name. It is never quiet and never cold.',
+      // ⭐ **One road in from the south, and it is three days long.** Arriving
+      // here is supposed to feel like having left home.
+      edges: [TravelEdge('the_charring_yards', 5), TravelEdge('old_quarry', 5)],
     ),
     GameLocation(
       id: 'old_quarry',
@@ -1042,7 +1081,7 @@ abstract final class World {
       // ⭐ Line of sight to everywhere is why the teleport net exists at all.
       // One-way for now: the return trip needs a Crown check that is unbuilt.
       teleportsTo: [
-        'aldermere',
+        'hearthwood',
         'pennycross',
         'forgeholm',
         'galehaven',
@@ -1085,7 +1124,9 @@ abstract final class World {
       'cinderpeak_foothills': 'Ashjaw Brute',
       'thornmire': 'Mirewalker',
       'ashfall_vale': 'Cinderbloom Husk',
+      'the_bellows_gap': 'The Long Draw',
       // Kinetic
+      'the_charring_yards': 'Stackfall Cinderwake',
       'old_quarry': 'Quarry Golem',
       'stormcliff_coast': 'Stormcliff Tidecaller',
       'windward_steppe': 'Steppe Harrier',

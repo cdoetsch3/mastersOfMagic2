@@ -44,7 +44,7 @@ Wide cinematic landscape illustration, painterly, environment only. Muted and de
 `glimmerbrook.png` — *Lv 3–8*
 
 ```
-Wide cinematic landscape illustration, painterly, environment only. Muted and desaturated, low contrast, dark overall value so that figures placed in front of it remain clearly readable. Deep shadow in the foreground, light held in the middle distance. NO creatures, NO people, NO characters, NO text, NO borders, NO UI. Empty scene. Springs and shallows east of Aldermere, bright enough to hurt. The brook runs over pale stones and throws the light back at you in pieces. Fish hang in the current without swimming. The water is colder than the season should allow.
+Wide cinematic landscape illustration, painterly, environment only. Muted and desaturated, low contrast, dark overall value so that figures placed in front of it remain clearly readable. Deep shadow in the foreground, light held in the middle distance. NO creatures, NO people, NO characters, NO text, NO borders, NO UI. Empty scene. Springs and shallows east of Hearthwood, bright enough to hurt. The brook runs over pale stones and throws the light back at you in pieces. Fish hang in the current without swimming. The water is colder than the season should allow.
 ```
 
 ## Cinderpeak Foothills

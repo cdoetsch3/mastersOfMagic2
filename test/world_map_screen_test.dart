@@ -91,7 +91,7 @@ void main() {
   testWidgets('tapping a pin at FIT scale opens its sheet', (tester) async {
     await pumpMap(tester, const Size(400, 800));
 
-    await tester.tapAt(screenPositionOf(tester, 'aldermere'));
+    await tester.tapAt(screenPositionOf(tester, 'hearthwood'));
     await tester.pumpAndSettle();
     expect(
       find.text('You are already here'),
@@ -113,7 +113,7 @@ void main() {
     await tester.pumpAndSettle();
     // ⭐ Travel takes time now: tapping departs, it does not teleport.
     expect(game.isTravelling, isTrue);
-    expect(game.profile.locationId, 'aldermere');
+    expect(game.profile.locationId, 'hearthwood');
 
     await arrive(tester, game);
     expect(game.profile.locationId, 'whispering_woods');
@@ -132,7 +132,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.my_location));
     await tester.pumpAndSettle();
 
-    await tester.tapAt(screenPositionOf(tester, 'aldermere'));
+    await tester.tapAt(screenPositionOf(tester, 'hearthwood'));
     await tester.pumpAndSettle();
     expect(
       find.text('You are already here'),
@@ -151,7 +151,7 @@ void main() {
     final game = await pumpMap(tester, const Size(1200, 800));
 
     // Walk south to Thornmire's neighbourhood so it is reachable.
-    // aldermere -> thornmire are directly connected.
+    // hearthwood -> thornmire are directly connected.
     await tester.tapAt(screenPositionOf(tester, 'thornmire'));
     await tester.pumpAndSettle();
     expect(
@@ -167,7 +167,7 @@ void main() {
     expect(find.textContaining('Travel to Glimmerbrook'), findsOneWidget);
     expect(
       game.profile.locationId,
-      'aldermere',
+      'hearthwood',
       reason: 'opening a sheet is not travelling',
     );
   });
@@ -200,7 +200,7 @@ void main() {
     // moves the player without going through the sheet (a travel timer
     // completing, a cloud sync, a cutscene) rendered nothing.
     final game = await pumpMap(tester, const Size(400, 800));
-    expect(find.text('Aldermere'), findsWidgets);
+    expect(find.text('Hearthwood'), findsWidgets);
 
     await game.travelTo('thornmire');
     await arrive(tester, game);
@@ -210,7 +210,7 @@ void main() {
       findsWidgets,
       reason: 'the screen must observe GameState, not snapshot it',
     );
-    expect(find.text('Aldermere'), findsNothing);
+    expect(find.text('Hearthwood'), findsNothing);
   });
 
   testWidgets('tap targets stay a constant size on screen', (tester) async {
@@ -332,7 +332,7 @@ void main() {
       reason: 'and it is centred, not pinned to the left edge',
     );
 
-    for (final id in ['thornmire', 'aldermere', 'the_eclipsed_citadel']) {
+    for (final id in ['thornmire', 'hearthwood', 'the_eclipsed_citadel']) {
       expect(viewer.contains(screenPositionOf(tester, id)), isTrue, reason: id);
     }
   });
@@ -393,7 +393,7 @@ void main() {
       final game = await pumpCard(tester);
 
       // It opens framed on the player, so their own pin is under the middle.
-      await tester.tapAt(screenPositionOf(tester, 'aldermere'));
+      await tester.tapAt(screenPositionOf(tester, 'hearthwood'));
       await tester.pumpAndSettle();
       expect(find.text('You are already here'), findsOneWidget);
       await dismissSheet(tester);

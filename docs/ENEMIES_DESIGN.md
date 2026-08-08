@@ -401,6 +401,20 @@ lesson Thornmire exists to teach, but if the player has no burst option at
 level 8–13 it becomes a wall rather than a lesson. **Verify against the actual
 level-8 spell pool before committing.**
 
+### ⛔ The north road · unwritten
+
+⭐ **Two zones went in on 2026-08-08 and neither has a roster.**
+
+| Zone | Band | Elements | Theme to write to |
+|---|---|---|---|
+| **The Bellows Gap** | 11–15 | Geo + Aero | *"The carters do not stop here, and they do not say why."* ⭐ The last Primal-band zone, and **nothing in it is Primal** — the quarter boundary is a place, not a number. Stone that travels downhill on its own, and wind that sounds like breathing |
+| **The Charring Yards** | 13–17 | Pyro + Electro | ⭐ **Where the player first sees Forgeholm's ward failing, before anyone says so** (NARRATIVE §4b.1). Slow fire being interrupted by something coming down out of the cloud. Charcoal stacks opened early |
+
+⚠️ **The Charring Yards is the load-bearing one.** Its roster has to make a
+reader believe a city is losing, without a line of dialogue.
+
+---
+
 ### Ashfall Vale · 10–14 · Pyro + Flora ⭐ hybrid
 
 > ⭐ **Theme: an argument between fire and regrowth, still unresolved.**
@@ -477,7 +491,9 @@ hybrid theme yet.
 
 ---
 
-## 2e. ✅ The rest of the world — themes and rosters (all 26 zones)
+## 2e. ✅ The rest of the world — themes and rosters (26 of 28 zones)
+
+⚠️ The two north-road zones are NOT in this section — see "The north road" above.
 
 📝 **Every theme below was recovered from that zone's `arrival` passage**, the
 same method as §2d. None were invented alongside. ⭐ **The passages carry a
@@ -1011,6 +1027,8 @@ cost is a run that can draw two of the same shape.
 | **Cinderpeak Foothills** | Slagheart | Vent Warden | Char-Tusk | The Emberqueen | The Breathing Stone ⛰️ | Flintmaw 👑 |
 | **Thornmire** | Old Wallow | The Green Drowning | Wickerdrowned | Fenmother | Mirethroat ⛰️ | The Drinking Grove ✨ |
 | **Ashfall Vale** | The Grey Stag | First Green | Last Ember | Kindleroot | The Blackened Crown 👑 | The Rooting ✨ |
+| **The Bellows Gap** ⛔ | — | — | — | — | The Long Draw | — |
+| **The Charring Yards** ⛔ | — | — | — | — | Stackfall Cinderwake | — |
 | **Old Quarry** | Obsidian Golem | Earth Titan | Deadweight | The Overseer | Mountain Heart ⛰️ | The Empty Course 👑 |
 | **Stormcliff Coast** | Brinecharge | The Long Line | Voltgeist | Storm Shaman | Storm Lord 👑 | The Return Stroke ✨ |
 | **Windward Steppe** | Old Lean | Sky Titan | Gale Serpent | Wind Wraith | The Unbroken Blow ⛰️ | Tempest Monarch 👑 |

@@ -55,8 +55,8 @@
     },
     {
       "text": "THE IRONSPINE",
-      "x": 300.0,
-      "y": 700.0,
+      "x": 292.0,
+      "y": 1096.0,
       "size": 24.0,
       "tracking": 7.0,
       "rot": 0.0,
@@ -128,8 +128,8 @@
   ],
   "places": [
     {
-      "id": "aldermere",
-      "name": "Aldermere",
+      "id": "hearthwood",
+      "name": "Hearthwood",
       "kind": "town",
       "x": 424.0,
       "y": 1274.0,
@@ -218,6 +218,23 @@
       ]
     },
     {
+      "id": "the_bellows_gap",
+      "name": "The Bellows Gap",
+      "kind": "route",
+      "x": 470.0,
+      "y": 1004.0,
+      "band": "Lv 11-15",
+      "tier": "primal",
+      "colors": [
+        "#9c7a4b",
+        "#9bb8c4"
+      ],
+      "elements": [
+        "Geo",
+        "Aero"
+      ]
+    },
+    {
       "id": "pennycross",
       "name": "Pennycross",
       "kind": "town",
@@ -229,11 +246,28 @@
       "elements": []
     },
     {
+      "id": "the_charring_yards",
+      "name": "The Charring Yards",
+      "kind": "route",
+      "x": 392.0,
+      "y": 876.0,
+      "band": "Lv 13-17",
+      "tier": "kinetic",
+      "colors": [
+        "#e25822",
+        "#e8c547"
+      ],
+      "elements": [
+        "Pyro",
+        "Electro"
+      ]
+    },
+    {
       "id": "forgeholm",
       "name": "Forgeholm",
       "kind": "town",
-      "x": 404.0,
-      "y": 1000.0,
+      "x": 346.0,
+      "y": 748.0,
       "band": "",
       "tier": "kinetic",
       "colors": [],
@@ -243,8 +277,8 @@
       "id": "old_quarry",
       "name": "Old Quarry",
       "kind": "route",
-      "x": 410.0,
-      "y": 906.0,
+      "x": 462.0,
+      "y": 846.0,
       "band": "Lv 15-19",
       "tier": "kinetic",
       "colors": [
@@ -258,8 +292,8 @@
       "id": "stormcliff_coast",
       "name": "Stormcliff Coast",
       "kind": "route",
-      "x": 212.0,
-      "y": 892.0,
+      "x": 206.0,
+      "y": 810.0,
       "band": "Lv 17-22",
       "tier": "kinetic",
       "colors": [
@@ -273,8 +307,8 @@
       "id": "galehaven",
       "name": "Galehaven",
       "kind": "town",
-      "x": 198.0,
-      "y": 806.0,
+      "x": 186.0,
+      "y": 700.0,
       "band": "",
       "tier": "kinetic",
       "colors": [],
@@ -284,8 +318,8 @@
       "id": "windward_steppe",
       "name": "Windward Steppe",
       "kind": "route",
-      "x": 506.0,
-      "y": 820.0,
+      "x": 470.0,
+      "y": 700.0,
       "band": "Lv 19-24",
       "tier": "kinetic",
       "colors": [
@@ -299,8 +333,8 @@
       "id": "frostfell_pass",
       "name": "Frostfell Pass",
       "kind": "route",
-      "x": 306.0,
-      "y": 770.0,
+      "x": 330.0,
+      "y": 570.0,
       "band": "Lv 21-26",
       "tier": "kinetic",
       "colors": [
@@ -316,8 +350,8 @@
       "id": "thunderspire_peaks",
       "name": "Thunderspire Peaks",
       "kind": "route",
-      "x": 348.0,
-      "y": 862.0,
+      "x": 300.0,
+      "y": 650.0,
       "band": "Lv 23-28",
       "tier": "kinetic",
       "colors": [

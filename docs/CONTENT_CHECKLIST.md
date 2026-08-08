@@ -1,9 +1,12 @@
 # Content checklist — combat zones
 
 **Single source of truth for what content each combat zone still needs.**
-**26 combat zones, all built.** ✅ The region list is CLOSED — The Sealed
-Garden, The Buried Sky and The Glass Archive were the last three, and all now
-exist in `world.dart`, on the map, and in the routing table. Towns are tracked
+**28 combat zones, all built.** ⚠️ **The region list re-opened once and closed
+again** — The Bellows Gap and The Charring Yards went in on 2026-08-08 to make
+the Pennycross → Forgeholm road more than a single hop. All 28 exist in
+`world.dart`, on the map, and in the routing table.
+⛔ **Nothing can be added now without changing a rule:** `world_test.dart` holds
+every element to 3–4 zones and Pyro, Geo, Electro and Aero are all at 4. Towns are tracked
 separately (§4) because they need entirely different things.
 
 Design lives elsewhere — this file only tracks *state*:
@@ -72,15 +75,23 @@ a per-zone batch, not a per-creature task.
 | **Cinderpeak Foothills** | ✅ 6–11 | ✅ Pyro | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Thornmire** | ✅ 8–13 | ✅ Flora+Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Ashfall Vale** | ✅ 10–14 | ✅ Pyro+Flora | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Birch | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
+| **The Bellows Gap** ⭐new | ✅ 11–15 | ✅ Geo+Aero | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 
 ⭐ **Whispering Woods is BUILT** — `lib/game/enemies/whispering_woods.dart` and
 `lib/game/items/catalogue/whispering_woods_items.dart`. 11 creatures with their
 own move sets and drop tables, 13 items, guarded by 24 tests in
-`test/whispering_woods_test.dart`. ⚠️ **It is the template for the other 24**,
+`test/whispering_woods_test.dart`. ⚠️ **It is the template for the other 26**,
 so a change to its shape is a change to all of them.
 
+⛔ **The two north-road zones have nothing but a name, a band and a pair of
+elements** (added 2026-08-08). They are the newest and emptiest rows in this
+document: no theme paragraph, no roster, no creatures. ⭐ **The Charring Yards
+is load-bearing for the story** — NARRATIVE §4b.1 makes it where the player
+first sees Forgeholm's ward failing — so it cannot stay a stub as long as the
+rest of the Kinetic quarter.
+
 ⭐ It also lands the **first real gate item**: both bosses guarantee
-`proof_of_the_woods`, one of Aldermere's *"three ordinary proofs"* — until now
+`proof_of_the_woods`, one of Hearthwood's *"three ordinary proofs"* — until now
 every gate in the game was a prose string with nothing behind it.
 
 ✅ **Art is done for this zone** — 11 generated sprites in
@@ -154,6 +165,7 @@ shipping rather than content:
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Backdrop | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Icons | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **The Charring Yards** ⭐new | ✅ 13–17 | ✅ Pyro+Electro | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Old Quarry** | ✅ 15–19 | ✅ Geo | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **Stormcliff Coast** | ✅ 17–22 | ✅ Electro | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **Windward Steppe** | ✅ 19–24 | ✅ Aero | 🟡 | 📝 | 🟡 1 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | 🟡 Yew | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
@@ -197,7 +209,7 @@ and costs almost nothing in new content. Needs a ruling.
 ✅ **The Sealed Garden and The Buried Sky are built** — locations, map pins,
 roads, themed opponents, `blurb` and `arrival` text. Routing is derived from
 edges, so Floyd–Warshall picked them up with no change to `travel.dart`;
-verified reachable from Aldermere in both directions with zero unreachable
+verified reachable from Hearthwood in both directions with zero unreachable
 same-plane pairs. Design in WORLD_DESIGN §4c.1a–1b.
 
 ⭐ **Both are the only zones whose Lore is ✅ rather than 🟡** — their `arrival`
@@ -231,7 +243,7 @@ station recipes, prices, and the per-character daily stock (ITEMS §9b.7).
 
 | Town | Opens | Station | Shop stock | Recipes | Prices |
 |---|---|---|---|---|---|
-| **Aldermere** | 1 | ✅ Woodcarving | ⬜ | ⬜ | ⬜ |
+| **Hearthwood** | 1 | ✅ Woodcarving | ⬜ | ⬜ | ⬜ |
 | **Pennycross** | 8 | ✅ Tailoring | ⬜ | ⬜ | ⬜ |
 | **Forgeholm** | 15 | ✅ Metalworking | ⬜ | ⬜ | ⬜ |
 | **Galehaven** | 22 | ✅ Potions & Alchemy | ⬜ | ⬜ | ⬜ |

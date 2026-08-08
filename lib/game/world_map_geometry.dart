@@ -73,7 +73,9 @@ abstract final class WorldMapGeometry {
       tracking: 5,
     ),
     MapLabel('THE KILN DESERT', Offset(792, 792), MapLabelTone.dry),
-    MapLabel('THE IRONSPINE', Offset(300, 700), MapLabelTone.land, size: 24),
+    // ⚠️ Moved south when the Kinetic block moved up — at y 700 it sat on
+    // Forgeholm, Galehaven and Windward Steppe at once.
+    MapLabel('THE IRONSPINE', Offset(292, 1096), MapLabelTone.land, size: 24),
     MapLabel('THE VERDANT BASIN', Offset(352, 1306), MapLabelTone.land),
     MapLabel('CINDERLANDS', Offset(760, 940), MapLabelTone.warm),
     MapLabel(
@@ -120,20 +122,28 @@ abstract final class WorldMapGeometry {
 
   /// Map position of every place, campaign order.
   static const Map<String, Offset> positions = {
-    'aldermere': Offset(424, 1274),
+    'hearthwood': Offset(424, 1274),
     'whispering_woods': Offset(296, 1212),
     'glimmerbrook': Offset(556, 1256),
     'thornmire': Offset(326, 1376),
     'cinderpeak_foothills': Offset(690, 1104),
     'ashfall_vale': Offset(762, 1014),
     'pennycross': Offset(598, 1096),
-    'forgeholm': Offset(404, 1000),
-    'old_quarry': Offset(410, 906),
-    'stormcliff_coast': Offset(212, 892),
-    'galehaven': Offset(198, 806),
-    'windward_steppe': Offset(506, 820),
-    'frostfell_pass': Offset(306, 770),
-    'thunderspire_peaks': Offset(348, 862),
+    // ⭐ **The north road climbs the range's southern toe and goes IN.**
+    // Pennycross used to be one hop from the Kinetic quarter.
+    'the_bellows_gap': Offset(470, 1004),
+    'the_charring_yards': Offset(392, 876),
+    // ⚠️ **Forgeholm sits ON `ironspine`, at roughly its middle** — the town
+    // is cut into the mountain, not parked at its foot, and `world_map_test`
+    // asserts the first half of that. The whole Kinetic block was moved up
+    // around it; it used to sit at the range's southern tip.
+    'forgeholm': Offset(346, 748),
+    'old_quarry': Offset(462, 846),
+    'stormcliff_coast': Offset(206, 810),
+    'galehaven': Offset(186, 700),
+    'windward_steppe': Offset(470, 700),
+    'frostfell_pass': Offset(330, 570),
+    'thunderspire_peaks': Offset(300, 650),
     'the_molten_deep': Offset(826, 912),
     'concordance': Offset(556, 712),
     'the_kiln_desert': Offset(766, 672),

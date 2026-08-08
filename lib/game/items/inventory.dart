@@ -99,8 +99,8 @@ class Backpack {
 
 /// One city's Storeroom (ITEMS §10.3c).
 ///
-/// ⚠️ **Per city, never a shared pool.** What you leave in Aldermere is in
-/// Aldermere; moving it means carrying it. ⭐ That is what makes mount cargo,
+/// ⚠️ **Per city, never a shared pool.** What you leave in Hearthwood is in
+/// Hearthwood; moving it means carrying it. ⭐ That is what makes mount cargo,
 /// Journey's cargo risk and the decentralised crafting stations structural
 /// rather than flavour.
 @immutable

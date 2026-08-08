@@ -46,7 +46,7 @@ Verified empirically (widget test, 400×800 viewport):
 
 | Tap position | Sheet opens? |
 |---|---|
-| Correctly computed screen position of Aldermere | ❌ no |
+| Correctly computed screen position of Hearthwood | ❌ no |
 | Position transformed by **M²** (the double-inverse's fixed point) | ✅ yes |
 
 Consequences by zoom:

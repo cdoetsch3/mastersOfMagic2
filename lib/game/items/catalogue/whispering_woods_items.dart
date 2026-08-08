@@ -20,7 +20,7 @@ abstract final class WhisperingWoodsItems {
     properName: 'Oak Log',
     rarity: Rarity.common,
     lore:
-        'Cut green, it weeps for a week. Aldermere seasons it in the open '
+        'Cut green, it weeps for a week. Hearthwood seasons it in the open '
         'because the smoke gets into anything dried indoors.',
     skill: CraftSkill.woodcarving,
     tier: 1,
@@ -47,7 +47,7 @@ abstract final class WhisperingWoodsItems {
     rarity: Rarity.common,
     lore:
         'Thin, and it takes a dye better than anything else at this depth of '
-        'the wood. Nobody in Aldermere will say where they get it.',
+        'the wood. Nobody in Hearthwood will say where they get it.',
     skill: CraftSkill.tailoring,
     tier: 1,
   );
@@ -181,7 +181,7 @@ abstract final class WhisperingWoodsItems {
 
   // ---- the gate ------------------------------------------------------
 
-  /// ⭐ **The first real gate item.** Aldermere's north road asks for *"three
+  /// ⭐ **The first real gate item.** Hearthwood's north road asks for *"three
   /// ordinary proofs"* (`world.dart`) — one from each Primal pure zone. Until
   /// now every gate in the game was a prose string with nothing behind it.
   static const proofOfTheWoods = KeyDef(
@@ -191,7 +191,7 @@ abstract final class WhisperingWoodsItems {
     lore:
         'A knot of root that kept growing after it was cut. The guard on the '
         'north road has seen a hundred and still turns each one over twice.',
-    gates: 'aldermere',
+    gates: 'hearthwood',
   );
 
   static const all = <ItemDef>[
