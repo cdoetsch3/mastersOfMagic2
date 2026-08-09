@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../game/ai_personas.dart';
 import '../game/auth_service.dart';
@@ -18,7 +19,17 @@ import 'account_screen.dart';
 class MatchmakingScreen extends StatefulWidget {
   final Loadout loadout;
 
-  const MatchmakingScreen({super.key, required this.loadout});
+  /// A room code arriving from a scanned QR link (main.dart's ?join=
+  /// handling). Prefilled AND submitted — the person scanning has already
+  /// expressed the intent; asking them to press Join again is a step nobody
+  /// wants.
+  final String? initialJoinCode;
+
+  const MatchmakingScreen({
+    super.key,
+    required this.loadout,
+    this.initialJoinCode,
+  });
 
   @override
   State<MatchmakingScreen> createState() => _MatchmakingScreenState();
@@ -31,6 +42,16 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
   String? _roomCode;
   String? _error;
   final _codeField = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final code = widget.initialJoinCode;
+    if (code != null && code.isNotEmpty) {
+      _codeField.text = code.toUpperCase();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _joinRoom());
+    }
+  }
 
   @override
   void dispose() {
@@ -109,7 +130,12 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       _error = null;
     });
     try {
-      final room = await Matchmaking.createRoom(uid: id.uid, name: id.name);
+      final game = GameStateScope.read(context);
+      final room = await Matchmaking.createRoom(
+        uid: id.uid,
+        name: id.name,
+        level: game.profile.level,
+      );
       if (!mounted) return;
       setState(() => _roomCode = room.code);
       final driver = await Matchmaking.waitForGuest(
@@ -160,6 +186,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         code: code,
         uid: id.uid,
         name: id.name,
+        level: GameStateScope.read(context).profile.level,
       );
       if (!mounted) return;
       setState(() => _busy = _Busy.none);
@@ -276,6 +303,30 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
               ),
             ),
           ),
+        ),
+        const SizedBox(height: 16),
+        // ⭐ Scannable with the phone's own camera — the QR is just a join
+        // URL, so the friend needs no in-app scanner: scan, tap, the app
+        // opens and auto-joins (main.dart reads ?join= at boot).
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: QrImageView(
+            data: 'https://mastersofmagic2.web.app/?join=${_roomCode!}',
+            version: QrVersions.auto,
+            size: 150,
+            // ⚠️ Solid white quiet zone + black modules — QR contrast is not
+            // the place for the app palette.
+            backgroundColor: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'or scan to join',
+          style: TextStyle(color: AppColors.textDim, fontSize: 12),
         ),
         const SizedBox(height: 16),
         const SizedBox(

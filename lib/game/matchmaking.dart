@@ -60,9 +60,66 @@ class Matchmaking {
 
   // ---- Quick match ------------------------------------------------------
 
+  /// Whether [their] ticket strictly precedes [mine] in claim order.
+  ///
+  /// ⭐ **The rendezvous rule**: while waiting to be claimed, each searcher
+  /// re-scans the queue and may claim only tickets that precede their own —
+  /// by createdAt (ISO strings sort chronologically), uid as the tiebreak.
+  /// Strict precedence means two simultaneous searchers can never claim each
+  /// other: exactly one of them precedes, and only the OTHER may act.
+  /// Public and pure for the test.
+  static bool ticketPrecedes({
+    required String theirUid,
+    required String theirCreatedAt,
+    required String myUid,
+    required String myCreatedAt,
+  }) {
+    final byTime = theirCreatedAt.compareTo(myCreatedAt);
+    if (byTime != 0) return byTime < 0;
+    return theirUid.compareTo(myUid) < 0;
+  }
+
+  /// Tries to claim [ticket] for [uid]. True only if OUR claim stuck.
+  ///
+  /// ⚠️ Firestore REST has no transactions here, so the claim is
+  /// write-then-verify: last write wins the doc, and the read-back tells the
+  /// loser to walk away instead of both joining the same room.
+  static Future<bool> _claim(
+    ({String id, Map<String, dynamic> data}) ticket, {
+    required String uid,
+    required String name,
+    required int level,
+  }) async {
+    try {
+      await FirestoreRest.set('$_queue/${ticket.id}', {
+        'claimedBy': uid,
+        'claimedByName': name,
+        // ⭐ The claimer's level rides the claim, so the ticket owner can
+        // build the SAME two-level duel we do (the desync fix).
+        'claimedByLevel': level,
+      });
+      final check = await FirestoreRest.get('$_queue/${ticket.id}');
+      return check?['claimedBy'] == uid;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static RemoteDuelDriver _joinTicket(Map<String, dynamic> ticket) =>
+      RemoteDuelDriver(
+        roomId: ticket['roomId'] as String,
+        isHost: false,
+        masterSeed: (ticket['masterSeed'] as num).toInt(),
+        opponentName: ticket['name'] as String? ?? 'Rival mage',
+        opponentLevel: (ticket['level'] as num?)?.toInt() ?? 1,
+      );
+
   /// Searches the queue for a waiting player. Joins them if found; otherwise
-  /// posts a ticket and waits [patience] to be claimed. If nobody shows up,
-  /// falls back to the AI persona nearest [level].
+  /// posts a ticket and waits [patience] to be claimed — ⭐ **while also
+  /// re-scanning the queue**, because two players who press the button at
+  /// the same moment both see it empty, both post, and would otherwise both
+  /// sit out the timeout and get an AI (the exact reported bug). If nobody
+  /// shows up, falls back to the AI persona nearest [level].
   static Future<MatchResult> quickMatch({
     required String uid,
     required String name,
@@ -79,61 +136,79 @@ class Matchmaking {
       for (final ticket in waiting) {
         if (ticket.id == uid) continue;
         if (ticket.data['claimedBy'] != null) continue;
-        final ok = await FirestoreRest.set('$_queue/${ticket.id}', {
-          'claimedBy': uid,
-          'claimedByName': name,
-        }).then((_) => true).catchError((_) => false);
-        if (ok) {
-          return MatchResult.human(
-            RemoteDuelDriver(
-              roomId: ticket.data['roomId'] as String,
-              isHost: false,
-              masterSeed: (ticket.data['masterSeed'] as num).toInt(),
-              opponentName: ticket.data['name'] as String? ?? 'Rival mage',
-            ),
-          );
+        if (await _claim(ticket, uid: uid, name: name, level: level)) {
+          return MatchResult.human(_joinTicket(ticket.data));
         }
       }
 
-      // 2. Post a ticket and wait to be claimed.
+      // 2. Post a ticket, then alternate between "was I claimed?" and
+      // "did someone else post before me?" until the patience runs out.
       final code = _newCode();
       final seed = _newSeed();
+      final createdAt = _now();
       await FirestoreRest.set('$_queue/$uid', {
         'uid': uid,
         'name': name,
         'level': level,
         'roomId': code,
         'masterSeed': seed,
-        'createdAt': _now(),
+        'createdAt': createdAt,
       });
-      final claimer = await _poll<({String uid, String name})>('$_queue/$uid', (
-        d,
-      ) {
-        final by = d?['claimedBy'];
+      final deadline = DateTime.now().add(patience);
+      while (DateTime.now().isBefore(deadline)) {
+        // a. Someone claimed my ticket — I host.
+        final mine = await FirestoreRest.get('$_queue/$uid');
+        final by = mine?['claimedBy'];
         if (by is String) {
-          return (uid: by, name: d?['claimedByName'] as String? ?? 'Rival');
+          await FirestoreRest.set('$_duels/$code', {
+            'status': 'active',
+            'hostUid': uid,
+            'hostName': name,
+            'hostLevel': level,
+            'guestUid': by,
+            'guestName': mine?['claimedByName'] as String? ?? 'Rival',
+            'guestLevel': (mine?['claimedByLevel'] as num?)?.toInt() ?? 1,
+            'masterSeed': seed,
+            'createdAt': _now(),
+          });
+          await FirestoreRest.delete('$_queue/$uid');
+          return MatchResult.human(
+            RemoteDuelDriver(
+              roomId: code,
+              isHost: true,
+              masterSeed: seed,
+              opponentName: mine?['claimedByName'] as String? ?? 'Rival',
+              opponentLevel: (mine?['claimedByLevel'] as num?)?.toInt() ?? 1,
+            ),
+          );
         }
-        return null;
-      }, timeout: patience);
-      if (claimer != null) {
-        await FirestoreRest.set('$_duels/$code', {
-          'status': 'active',
-          'hostUid': uid,
-          'hostName': name,
-          'guestUid': claimer.uid,
-          'guestName': claimer.name,
-          'masterSeed': seed,
-          'createdAt': _now(),
-        });
-        await FirestoreRest.delete('$_queue/$uid');
-        return MatchResult.human(
-          RemoteDuelDriver(
-            roomId: code,
-            isHost: true,
-            masterSeed: seed,
-            opponentName: claimer.name,
-          ),
+
+        // b. A ticket that precedes mine — I claim it and I am the guest.
+        // ⚠️ Strict precedence only (ticketPrecedes), or two simultaneous
+        // searchers would claim each other and open two half-empty rooms.
+        final others = await FirestoreRest.query(
+          _queue,
+          orderBy: 'createdAt',
+          limit: 5,
         );
+        for (final ticket in others) {
+          if (ticket.id == uid) continue;
+          if (ticket.data['claimedBy'] != null) continue;
+          if (!ticketPrecedes(
+            theirUid: ticket.id,
+            theirCreatedAt: ticket.data['createdAt'] as String? ?? '',
+            myUid: uid,
+            myCreatedAt: createdAt,
+          )) {
+            continue;
+          }
+          if (await _claim(ticket, uid: uid, name: name, level: level)) {
+            await FirestoreRest.delete('$_queue/$uid');
+            return MatchResult.human(_joinTicket(ticket.data));
+          }
+        }
+
+        await Future<void>.delayed(const Duration(milliseconds: 900));
       }
       await FirestoreRest.delete('$_queue/$uid');
     } catch (_) {
@@ -149,6 +224,7 @@ class Matchmaking {
   static Future<({String code, int seed})> createRoom({
     required String uid,
     required String name,
+    required int level,
   }) async {
     final code = _newCode();
     final seed = _newSeed();
@@ -156,6 +232,9 @@ class Matchmaking {
       'status': 'waiting',
       'hostUid': uid,
       'hostName': name,
+      // ⭐ Levels cross the wire in BOTH directions, or the two clients
+      // simulate two different duels (the desync of 2026-08-09).
+      'hostLevel': level,
       'masterSeed': seed,
       'createdAt': _now(),
     });
@@ -168,19 +247,23 @@ class Matchmaking {
     required int seed,
     Duration patience = const Duration(minutes: 5),
   }) async {
-    final name = await _poll<String>(
+    final guest = await _poll<({String name, int level})>(
       '$_duels/$code',
       (d) => d?['guestUid'] != null
-          ? (d?['guestName'] as String? ?? 'Rival mage')
+          ? (
+              name: d?['guestName'] as String? ?? 'Rival mage',
+              level: (d?['guestLevel'] as num?)?.toInt() ?? 1,
+            )
           : null,
       timeout: patience,
     );
-    if (name == null) return null;
+    if (guest == null) return null;
     return RemoteDuelDriver(
       roomId: code,
       isHost: true,
       masterSeed: seed,
-      opponentName: name,
+      opponentName: guest.name,
+      opponentLevel: guest.level,
     );
   }
 
@@ -189,6 +272,7 @@ class Matchmaking {
     required String code,
     required String uid,
     required String name,
+    required int level,
   }) async {
     final roomCode = code.toUpperCase().trim();
     final data = await FirestoreRest.get('$_duels/$roomCode');
@@ -198,6 +282,7 @@ class Matchmaking {
     await FirestoreRest.set('$_duels/$roomCode', {
       'guestUid': uid,
       'guestName': name,
+      'guestLevel': level,
       'status': 'active',
     });
     return RemoteDuelDriver(
@@ -205,6 +290,7 @@ class Matchmaking {
       isHost: false,
       masterSeed: (data['masterSeed'] as num).toInt(),
       opponentName: data['hostName'] as String? ?? 'Rival mage',
+      opponentLevel: (data['hostLevel'] as num?)?.toInt() ?? 1,
     );
   }
 

@@ -164,7 +164,11 @@ class RemoteDuelDriver implements OpponentDriver {
     required this.isHost,
     required this.masterSeed,
     required this.opponentName,
-    this.opponentLevel = 1,
+    // ⚠️ Required, not defaulted. A defaulted 1 is how every PvP duel
+    // silently simulated the opponent at level 1 — two clients running two
+    // different fights (HP pools AND damage scaling), which is a lockstep
+    // desync, not a display bug.
+    required this.opponentLevel,
   });
 
   String get _roomPath => 'duels/$roomId';
