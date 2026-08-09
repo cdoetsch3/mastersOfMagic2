@@ -56,9 +56,14 @@ void main() {
     }
   });
 
-  test('recipe ids are unique', () {
+  test('recipe ids are unique, and no recipe is a faucet', () {
     final ids = RecipeBook.all.map((r) => r.id).toList();
     expect(ids.toSet().length, ids.length);
+    // ⚠️ This check lives here rather than in a RecipeDef assert because
+    // list length is not const-evaluable in Dart.
+    for (final r in RecipeBook.all) {
+      expect(r.inputs, isNotEmpty, reason: '${r.id} consumes nothing');
+    }
   });
 
   test('the derived index answers "where does oak_log come from"', () {

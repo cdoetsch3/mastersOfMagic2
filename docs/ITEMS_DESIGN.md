@@ -1682,6 +1682,63 @@ is an interaction decision, not a tuning one.
 gives birch) or roll a small table? Flat-by-zone is more legible and makes the
 map teach itself (§9b.6); a small roll adds variance cheaply.
 
+## 9b.8 The Q1 catalogue rulings ✅ (session 2026-08-09)
+
+The first quarter's items, recipes and stats are **in code** — catalogue files
+per zone, `recipes/primal_recipes.dart`, exported to `docs/wiki/content.json`
+(CONTENT_EXPORT). ⚠️ **Per that framework, this section records the rules and
+none of the numbers.**
+
+### The rulings
+
+1. ✅ **Base hit chance is 80%.** Accuracy gear closes the gap; it applies to
+   enemies symmetrically. ⭐ Accuracy is the stat Q1 teaches — the hood, the
+   knot and both staves all move it. 📝 One playtest before it is final.
+2. ✅ **The weapon lanes are two stats.** The quarterstaff adds damage **per
+   charge the spell cost** (§5b.3a's definition) — it pays for commitment.
+   The wand adds damage **per cast** — tempo. Crossover at 2 charges, and the
+   staff out-accurates wand + knot combined, on purpose.
+3. ✅ **The Woodcarving off-hand is the Knot** — 📝 a naming reservation for
+   the first two tiers; may be revisited at tier 3.
+4. ✅ **Crit is defined**: a crit deals **150%** damage; each crit-damage
+   point adds 1 to the 50. ⚠️ **Standard stats are 0% crit chance** — crits
+   exist only through gear. In Q1: exactly one ring (Cinder Loop) and one
+   boss unique (Heartwood Staff).
+5. ✅ **Q2's mechanics stay in Q2**: dodge, deflection, crit-as-a-lane, the
+   Antidote, and offensive potions are all deliberately absent from Q1 so
+   each quarter introduces something.
+6. ✅ **The potion grammar**: `{Ingredient} {Form}` where **form = mechanic,
+   ingredient = magnitude** — §9b.5a's philosophy applied to consumables.
+   **Draught** is always a flat heal; **Tonic** is always over-time (in-duel
+   it ticks; between encounters it applies in full). Q1 has exactly two:
+   Sapwort Draught and Brookmint Tonic. Rations are not usable in a fight.
+7. ✅ **Materials: 2 per pure zone, 3 per hybrid** — the hybrid bonus is the
+   reason to go. ⭐ Every hybrid extra is a ⏳ **banking material** —
+   gatherable now, spendable next quarter: Copper + Charcoal → Metalworking
+   (L15), Fenroot → the Antidote (Q2), Amber → Jewelry (much later). Each
+   quarter seeding a future skill is now the pattern.
+8. ✅ **Belts:** two in Q1 — Fawnhide (L4) and Tuskhide (L11). Fibres are
+   recipe inputs only; the woven Bindweed Belt was removed.
+9. ✅ **Jewelry is drop-only all quarter** (no maker until Rimeholt): two
+   necks, two rings. Rares from mini pools — Brookstone Pendant (Frostgleam
+   Naiad), Cinder Loop (The Emberqueen), Wickerbound Ring (Fenmother) — and
+   one epic from a boss: **The Charlock**, off The Rooting, the quarter's
+   only Epic. 📝 The Overseer's Seal waits for Q2, dropped by its namesake in
+   the Old Quarry.
+10. ✅ **Named equipment may carry a `properName`** (boss uniques + the
+    drop-only jewelry); crafted commons never do — the grammar composes their
+    names. "Heartwood Stave" is now displayed **Heartwood Staff**.
+
+### ⚠️ What this bought that is not yet wired
+
+- `ItemModifiers` gained maxHp, damage-per-cast, damage-per-charge, shield
+  strength %, healing received %, and regrow — **none reach a `MageState`
+  yet** (the standing "nothing equips" blocker, now load-bearing).
+- The 80% accuracy base, the crit roll, the Tonic's in-duel tick and the
+  Charlock's regrow are engine work, logged as tasks.
+
+---
+
 ## 10. Open questions
 
 ✅ **Resolved:** power budget · five archetypes · counter-loop · sim criterion
@@ -1720,6 +1777,13 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-09.** §9b.8 added: the Q1 catalogue rulings (80% base
+accuracy, the two weapon lanes, crit defined, potion grammar, 2/3 materials
+with banking, drop-only jewelry, belts at L4/L11). Sporecap Mantle restatted
+(+12 HP / +2 acc, socket removed); Heartwood Staff keeps crit and gains
++3-per-charge / +7 acc; Bindweed Belt removed; Sapwort Draught 20%. All Q1
+items and 20 recipes are in code and in the export.
 
 **Rev — 2026-08-02b.** §3.6 monetization rule rewritten for precision: it
 governs **RP (real money) only, never gold** — nothing bought with RP may be

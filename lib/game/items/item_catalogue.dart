@@ -6,6 +6,10 @@
 /// those strings resolves.
 library;
 
+import 'catalogue/ashfall_vale_items.dart';
+import 'catalogue/cinderpeak_items.dart';
+import 'catalogue/glimmerbrook_items.dart';
+import 'catalogue/thornmire_items.dart';
 import 'catalogue/whispering_woods_items.dart';
 import 'item_def.dart';
 import 'item_instance.dart';
@@ -15,7 +19,13 @@ abstract final class ItemCatalogue {
   /// ⚠️ **Every zone catalogue must be listed here.** An unlisted one compiles
   /// fine and simply never resolves, which is exactly the silent failure the
   /// id test exists to catch.
-  static const List<ItemDef> all = <ItemDef>[...WhisperingWoodsItems.all];
+  static const List<ItemDef> all = <ItemDef>[
+    ...WhisperingWoodsItems.all,
+    ...GlimmerbrookItems.all,
+    ...CinderpeakItems.all,
+    ...ThornmireItems.all,
+    ...AshfallValeItems.all,
+  ];
 
   static final Map<String, ItemDef> _byId = {for (final d in all) d.id: d};
 
@@ -31,6 +41,9 @@ abstract final class ItemCatalogue {
   /// against.
   static String displayName(ItemDef def, [ItemInstance? instance]) {
     if (def is! EquipmentDef) return def.properName ?? def.id;
+    // ⭐ Named equipment — boss uniques and the drop-only jewelry — keeps its
+    // bespoke name (§9b.5): "Heartwood Staff", never "Heartwood Quarterstaff".
+    if (def.properName != null) return def.properName!;
     return composeItemName(
       aspectPrefix: instance?.aspect == null
           ? null

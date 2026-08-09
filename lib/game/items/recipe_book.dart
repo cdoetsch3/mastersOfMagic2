@@ -8,13 +8,10 @@ library;
 
 import 'item_def.dart';
 import 'recipe_def.dart';
+import 'recipes/primal_recipes.dart';
 
 abstract final class RecipeBook {
-  /// 📝 Empty until the Primal recipe set is ruled on (ITEMS §9b) — the four
-  /// open rulings are Q1 ore, metal-free Oak/Birch, drop-only jewelry, and
-  /// the tier-2 material names. The shape ships first so the export contract
-  /// and the wiki can build against it.
-  static const List<RecipeDef> all = <RecipeDef>[];
+  static const List<RecipeDef> all = <RecipeDef>[...PrimalRecipes.all];
 
   static final Map<String, RecipeDef> _byId = {for (final r in all) r.id: r};
 

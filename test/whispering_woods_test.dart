@@ -2,7 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/enemies/enemy_archetype.dart';
 import 'package:masters_of_magic_2/game/enemies/enemy_def.dart';
 import 'package:masters_of_magic_2/game/enemies/whispering_woods.dart';
+import 'package:masters_of_magic_2/game/items/catalogue/whispering_woods_items.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
+import 'package:masters_of_magic_2/game/items/recipe_book.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:mom_engine/mom_engine.dart';
@@ -278,15 +280,17 @@ void main() {
 
     test('every item in the zone catalogue is actually obtainable', () {
       // ⚠️ An item nothing drops and nothing crafts is dead content, and the
-      // Collector achievement would be uncompletable.
-      const craftedOnly = {'oak_circlet', 'bindweed_belt', 'foragers_ration'};
+      // Collector achievement would be uncompletable. ⭐ The crafted set is
+      // DERIVED from RecipeBook, so a recipe removed without a drop added
+      // fails here rather than going quietly dead.
+      final crafted = RecipeBook.all.map((r) => r.outputId).toSet();
       final dropped = WhisperingWoodsBestiary.allDrops;
-      for (final d in ItemCatalogue.all) {
-        if (craftedOnly.contains(d.id)) continue;
+      for (final d in WhisperingWoodsItems.all) {
+        if (crafted.contains(d.id)) continue;
         expect(
           dropped.contains(d.id),
           isTrue,
-          reason: '${d.id} is defined but nothing drops it',
+          reason: '${d.id} is defined but nothing drops or crafts it',
         );
       }
     });

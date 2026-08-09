@@ -57,7 +57,7 @@ abstract final class WhisperingWoodsBestiary {
       always: _commonAlways,
       main: [
         DropEntry.nothing(weight: 40),
-        DropEntry('fawnhide', weight: 45),
+        DropEntry('bindweed_fibre', weight: 45),
         DropEntry('foragers_ration', weight: 15),
       ],
     ),
@@ -134,7 +134,7 @@ abstract final class WhisperingWoodsBestiary {
         DropEntry.nothing(weight: 30),
         DropEntry('bindweed_fibre', weight: 40),
         DropEntry('flora_shard', weight: 25, min: 1, max: 2),
-        DropEntry('sapwort_draught', weight: 5),
+        DropEntry('foragers_ration', weight: 5),
       ],
     ),
   );
@@ -173,7 +173,6 @@ abstract final class WhisperingWoodsBestiary {
         DropEntry('bindweed_fibre', weight: 50, min: 2, max: 3),
         DropEntry('flora_shard', weight: 20),
       ],
-      bonus: [DropEntry('bindweed_belt', chance: 0.01)],
     ),
   );
 
@@ -447,7 +446,7 @@ abstract final class WhisperingWoodsBestiary {
     main: [
       DropEntry('oak_log', weight: 40, min: 2, max: 4),
       DropEntry('bindweed_fibre', weight: 30, min: 2, max: 4),
-      DropEntry('sapwort_draught', weight: 25),
+      DropEntry('foragers_ration', weight: 25),
       DropEntry('sporecap_mantle', weight: 5),
     ],
   );
@@ -461,7 +460,7 @@ abstract final class WhisperingWoodsBestiary {
     ],
     main: [
       DropEntry('oak_log', weight: 45, min: 4, max: 8),
-      DropEntry('bindweed_belt', weight: 25),
+      DropEntry('bindweed_fibre', weight: 25, min: 3, max: 6),
       DropEntry('sporecap_mantle', weight: 20),
       DropEntry('heartwood_stave', weight: 10),
     ],

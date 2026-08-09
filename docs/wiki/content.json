@@ -4,8 +4,8 @@
     "zones": 26,
     "towns": 9,
     "creatures": 11,
-    "items": 13,
-    "recipes": 0
+    "items": 44,
+    "recipes": 20
   },
   "zones": [
     {
@@ -1329,7 +1329,7 @@
             "chance": 0.4
           },
           {
-            "itemId": "fawnhide",
+            "itemId": "bindweed_fibre",
             "min": 1,
             "max": 1,
             "weight": 45,
@@ -1477,7 +1477,7 @@
             "chance": 0.25
           },
           {
-            "itemId": "sapwort_draught",
+            "itemId": "foragers_ration",
             "min": 1,
             "max": 1,
             "weight": 5,
@@ -1551,14 +1551,7 @@
             "chance": 0.2
           }
         ],
-        "bonus": [
-          {
-            "itemId": "bindweed_belt",
-            "min": 1,
-            "max": 1,
-            "chance": 0.01
-          }
-        ]
+        "bonus": []
       }
     },
     {
@@ -1708,7 +1701,7 @@
             "chance": 0.3
           },
           {
-            "itemId": "sapwort_draught",
+            "itemId": "foragers_ration",
             "min": 1,
             "max": 1,
             "weight": 25,
@@ -1798,7 +1791,7 @@
             "chance": 0.3
           },
           {
-            "itemId": "sapwort_draught",
+            "itemId": "foragers_ration",
             "min": 1,
             "max": 1,
             "weight": 25,
@@ -1878,7 +1871,7 @@
             "chance": 0.3
           },
           {
-            "itemId": "sapwort_draught",
+            "itemId": "foragers_ration",
             "min": 1,
             "max": 1,
             "weight": 25,
@@ -1968,7 +1961,7 @@
             "chance": 0.3
           },
           {
-            "itemId": "sapwort_draught",
+            "itemId": "foragers_ration",
             "min": 1,
             "max": 1,
             "weight": 25,
@@ -2057,9 +2050,9 @@
             "chance": 0.45
           },
           {
-            "itemId": "bindweed_belt",
-            "min": 1,
-            "max": 1,
+            "itemId": "bindweed_fibre",
+            "min": 3,
+            "max": 6,
             "weight": 25,
             "chance": 0.25
           },
@@ -2153,9 +2146,9 @@
             "chance": 0.45
           },
           {
-            "itemId": "bindweed_belt",
-            "min": 1,
-            "max": 1,
+            "itemId": "bindweed_fibre",
+            "min": 3,
+            "max": 6,
             "weight": 25,
             "chance": 0.25
           },
@@ -2203,20 +2196,6 @@
       "value": 0,
       "fungible": true,
       "lore": "Strong out of all proportion to its thickness. The trick is cutting it before it notices.",
-      "skill": "tailoring",
-      "tier": 1,
-      "salvage": []
-    },
-    {
-      "id": "fawnhide",
-      "name": "Fawnhide",
-      "kind": "material",
-      "rarity": "common",
-      "tradability": "tradeable",
-      "equipLevel": 1,
-      "value": 0,
-      "fungible": true,
-      "lore": "Thin, and it takes a dye better than anything else at this depth of the wood. Nobody in Hearthwood will say where they get it.",
       "skill": "tailoring",
       "tier": 1,
       "salvage": []
@@ -2275,20 +2254,6 @@
       }
     },
     {
-      "id": "sapwort_draught",
-      "name": "Sapwort Draught",
-      "kind": "beltable",
-      "rarity": "common",
-      "tradability": "tradeable",
-      "equipLevel": 1,
-      "value": 12,
-      "fungible": true,
-      "lore": "Tastes like the underside of a leaf. Apprentices carry two and use neither, which is its own kind of lesson.",
-      "effect": {
-        "healPercent": 15
-      }
-    },
-    {
       "id": "oak_circlet",
       "name": "Oak Circlet",
       "kind": "equipment",
@@ -2316,29 +2281,208 @@
       ]
     },
     {
-      "id": "bindweed_belt",
-      "name": "Bindweed Belt",
+      "id": "oak_quarterstaff",
+      "name": "Oak Quarterstaff",
       "kind": "equipment",
       "rarity": "common",
       "tradability": "tradeable",
       "equipLevel": 1,
       "value": 30,
       "fungible": false,
-      "lore": "Woven wet and left to shrink. It will hold a bottle and not much dignity.",
-      "slot": "belt",
-      "form": "Belt",
+      "lore": "Season it a year and it stops arguing. Nobody seasons it a year.",
+      "slot": "mainHand",
+      "form": "Quarterstaff",
+      "material": "Oak",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 5
+      },
+      "salvage": [
+        {
+          "itemId": "oak_log",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "oak_wand",
+      "name": "Oak Wand",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 25,
+      "fungible": false,
+      "lore": "Light enough to forget, which is the point of it.",
+      "slot": "mainHand",
+      "form": "Wand",
+      "material": "Oak",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": [
+        {
+          "itemId": "oak_log",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "oak_knot",
+      "name": "Oak Knot",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 20,
+      "fungible": false,
+      "lore": "A burl worked smooth, kept in the off hand. Carvers say the tangle remembers which way it grew, and pointing it settles the question.",
+      "slot": "offHand",
+      "form": "Knot",
+      "material": "Oak",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 3
+      },
+      "salvage": [
+        {
+          "itemId": "oak_log",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "bindweed_hood",
+      "name": "Bindweed Hood",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 18,
+      "fungible": false,
+      "lore": "It keeps the sun off, and the wood does the rest.",
+      "slot": "hat",
+      "form": "Hood",
       "material": "Bindweed",
       "socketCount": 0,
       "setId": null,
       "setTier": null,
       "modifiers": {
-        "beltSlots": 1
+        "accuracyBonus": 1
       },
       "salvage": [
         {
           "itemId": "bindweed_fibre",
           "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "bindweed_robe",
+      "name": "Bindweed Robe",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 30,
+      "fungible": false,
+      "lore": "Woven wet and left to shrink. It fits by the third day.",
+      "slot": "robeTop",
+      "form": "Robe",
+      "material": "Bindweed",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": [
+        {
+          "itemId": "bindweed_fibre",
+          "min": 2,
+          "max": 3
+        }
+      ]
+    },
+    {
+      "id": "bindweed_leggings",
+      "name": "Bindweed Leggings",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 24,
+      "fungible": false,
+      "lore": "They whistle faintly in a wind. No one has explained it.",
+      "slot": "robeBottom",
+      "form": "Leggings",
+      "material": "Bindweed",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": [
+        {
+          "itemId": "bindweed_fibre",
+          "min": 1,
           "max": 2
+        }
+      ]
+    },
+    {
+      "id": "bindweed_boots",
+      "name": "Bindweed Boots",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 15,
+      "fungible": false,
+      "lore": "Quiet on leaf litter, which in this wood cuts both ways.",
+      "slot": "boots",
+      "form": "Boots",
+      "material": "Bindweed",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": [
+        {
+          "itemId": "bindweed_fibre",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "bindweed_gloves",
+      "name": "Bindweed Gloves",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 15,
+      "fungible": false,
+      "lore": "The weave tightens when you grip. Let go slowly.",
+      "slot": "gloves",
+      "form": "Gloves",
+      "material": "Bindweed",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": [
+        {
+          "itemId": "bindweed_fibre",
+          "min": 1,
+          "max": 1
         }
       ]
     },
@@ -2355,12 +2499,11 @@
       "slot": "robeTop",
       "form": "Mantle",
       "material": "Sporecap",
-      "socketCount": 1,
+      "socketCount": 0,
       "setId": null,
       "setTier": null,
       "modifiers": {
-        "dodge": 3,
-        "deflectChance": 4
+        "accuracyBonus": 2
       },
       "salvage": [
         {
@@ -2372,7 +2515,7 @@
     },
     {
       "id": "heartwood_stave",
-      "name": "Heartwood Quarterstaff",
+      "name": "Heartwood Staff",
       "kind": "equipment",
       "rarity": "epic",
       "tradability": "untradeable",
@@ -2387,7 +2530,7 @@
       "setId": null,
       "setTier": null,
       "modifiers": {
-        "accuracyBonus": 2,
+        "accuracyBonus": 7,
         "critChance": 5,
         "critDamage": 10
       },
@@ -2410,35 +2553,823 @@
       "fungible": true,
       "lore": "A knot of root that kept growing after it was cut. The guard on the north road has seen a hundred and still turns each one over twice.",
       "gates": "hearthwood"
+    },
+    {
+      "id": "fawnhide",
+      "name": "Fawnhide",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Thin, and it takes a dye better than anything else this close to the water. Nobody in Hearthwood will say where they get it.",
+      "skill": "tailoring",
+      "tier": 1,
+      "salvage": []
+    },
+    {
+      "id": "sapwort",
+      "name": "Sapwort",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Grows with its feet in the brook and its head in the sun, and tastes of neither.",
+      "skill": "potionsAndAlchemy",
+      "tier": 1,
+      "salvage": []
+    },
+    {
+      "id": "sapwort_draught",
+      "name": "Sapwort Draught",
+      "kind": "beltable",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 12,
+      "fungible": true,
+      "lore": "Tastes like the underside of a leaf. Apprentices carry two and use neither, which is its own kind of lesson.",
+      "effect": {
+        "healPercent": 20
+      }
+    },
+    {
+      "id": "fawnhide_belt",
+      "name": "Fawnhide Belt",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 4,
+      "value": 40,
+      "fungible": false,
+      "lore": "Soft enough to sleep in. It will hold a bottle where you can reach it, which is worth more than it sounds.",
+      "slot": "belt",
+      "form": "Belt",
+      "material": "Fawnhide",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "beltSlots": 1
+      },
+      "salvage": [
+        {
+          "itemId": "fawnhide",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "brookstone_pendant",
+      "name": "Brookstone Pendant",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 6,
+      "value": 200,
+      "fungible": false,
+      "lore": "A river pebble with a hole worn through it, strung on gut. Looking through the hole shows the same world, calmer.",
+      "slot": "neck",
+      "form": "Pendant",
+      "material": "Brookstone",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": []
+    },
+    {
+      "id": "copper_ore",
+      "name": "Copper Ore",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "The hills here rust green. Forgeholm pays for it by the sack and does not say what the hurry is.",
+      "skill": "metalworking",
+      "tier": 2,
+      "salvage": []
+    },
+    {
+      "id": "tuskhide",
+      "name": "Tuskhide",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Scarred, singed, and thicker than a door. Whatever wears it walks through embers on purpose.",
+      "skill": "tailoring",
+      "tier": 2,
+      "salvage": []
+    },
+    {
+      "id": "tuskhide_belt",
+      "name": "Tuskhide Belt",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 11,
+      "value": 110,
+      "fungible": false,
+      "lore": "Two bottles and room for a third. The buckle outweighs the knife.",
+      "slot": "belt",
+      "form": "Belt",
+      "material": "Tuskhide",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "beltSlots": 2
+      },
+      "salvage": [
+        {
+          "itemId": "tuskhide",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "cinder_loop",
+      "name": "Cinder Loop",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 9,
+      "value": 220,
+      "fungible": false,
+      "lore": "A ring of char that never quite goes out. Wearing it feels like the moment before a pot boils over.",
+      "slot": "ring",
+      "form": "Ring",
+      "material": "Cinder",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "critChance": 5,
+        "critDamage": 5
+      },
+      "salvage": []
+    },
+    {
+      "id": "bogflax_fibre",
+      "name": "Bogflax Fibre",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Retted in the mire by the mire. Cloth of it never fully dries, and never quite burns either.",
+      "skill": "tailoring",
+      "tier": 2,
+      "salvage": []
+    },
+    {
+      "id": "fenroot",
+      "name": "Fenroot",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Bitter enough to make your eyes water at arm's length. The herbalists of Galehaven buy every scrap and boil it with the windows open.",
+      "skill": "potionsAndAlchemy",
+      "tier": 2,
+      "salvage": []
+    },
+    {
+      "id": "amber",
+      "name": "Amber",
+      "kind": "material",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Light that went into a tree and never came back out. Sometimes there is a wing in it.",
+      "skill": "jewelry",
+      "tier": 2,
+      "salvage": []
+    },
+    {
+      "id": "bogflax_hood",
+      "name": "Bogflax Hood",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 10,
+      "value": 55,
+      "fungible": false,
+      "lore": "Keeps the rain out. The mire finds another way in.",
+      "slot": "hat",
+      "form": "Hood",
+      "material": "Bogflax",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 2
+      },
+      "salvage": [
+        {
+          "itemId": "bogflax_fibre",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "bogflax_robe",
+      "name": "Bogflax Robe",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 10,
+      "value": 85,
+      "fungible": false,
+      "lore": "Heavy when wet, and it is always wet. You stop noticing.",
+      "slot": "robeTop",
+      "form": "Robe",
+      "material": "Bogflax",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": [
+        {
+          "itemId": "bogflax_fibre",
+          "min": 2,
+          "max": 4
+        }
+      ]
+    },
+    {
+      "id": "bogflax_leggings",
+      "name": "Bogflax Leggings",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 10,
+      "value": 70,
+      "fungible": false,
+      "lore": "Mud to the knee is the local dye lot.",
+      "slot": "robeBottom",
+      "form": "Leggings",
+      "material": "Bogflax",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": [
+        {
+          "itemId": "bogflax_fibre",
+          "min": 1,
+          "max": 3
+        }
+      ]
+    },
+    {
+      "id": "bogflax_boots",
+      "name": "Bogflax Boots",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 10,
+      "value": 45,
+      "fungible": false,
+      "lore": "The mire keeps boots. These are the kind it gives back.",
+      "slot": "boots",
+      "form": "Boots",
+      "material": "Bogflax",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": [
+        {
+          "itemId": "bogflax_fibre",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "bogflax_gloves",
+      "name": "Bogflax Gloves",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 10,
+      "value": 45,
+      "fungible": false,
+      "lore": "Waxed against the wet. Grip first, apologise later.",
+      "slot": "gloves",
+      "form": "Gloves",
+      "material": "Bogflax",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": [
+        {
+          "itemId": "bogflax_fibre",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "wickerbound_ring",
+      "name": "Wickerbound Ring",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 12,
+      "value": 240,
+      "fungible": false,
+      "lore": "Willow withies in a knot that took someone a whole winter. Cut it and it grows closed by morning.",
+      "slot": "ring",
+      "form": "Ring",
+      "material": "Wicker",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": []
+    },
+    {
+      "id": "birch_log",
+      "name": "Birch Log",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "First back after the burn, straight as a rule and pale as paper. The vale is a plantation nobody planted.",
+      "skill": "woodcarving",
+      "tier": 2,
+      "salvage": []
+    },
+    {
+      "id": "brookmint",
+      "name": "Brookmint",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Cold on the tongue even in this valley. It grows where the streams cut through the ash, greener than anything around it.",
+      "skill": "potionsAndAlchemy",
+      "tier": 2,
+      "salvage": []
+    },
+    {
+      "id": "charcoal",
+      "name": "Charcoal",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "The vale makes its own. Gathering it is not burning anything that was not already burned.",
+      "skill": "metalworking",
+      "tier": 2,
+      "salvage": []
+    },
+    {
+      "id": "brookmint_tonic",
+      "name": "Brookmint Tonic",
+      "kind": "beltable",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 25,
+      "fungible": true,
+      "lore": "Drink it and count. The cold goes down, turns around, and comes back up as warmth over the next little while.",
+      "effect": {}
+    },
+    {
+      "id": "birch_quarterstaff",
+      "name": "Birch Quarterstaff",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 10,
+      "value": 90,
+      "fungible": false,
+      "lore": "Springy where oak is stubborn. It gives, then gives back.",
+      "slot": "mainHand",
+      "form": "Quarterstaff",
+      "material": "Birch",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 6
+      },
+      "salvage": [
+        {
+          "itemId": "birch_log",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "birch_wand",
+      "name": "Birch Wand",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 10,
+      "value": 75,
+      "fungible": false,
+      "lore": "Peels itself a little more each week, like it is in a hurry.",
+      "slot": "mainHand",
+      "form": "Wand",
+      "material": "Birch",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 1
+      },
+      "salvage": [
+        {
+          "itemId": "birch_log",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "birch_knot",
+      "name": "Birch Knot",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 10,
+      "value": 60,
+      "fungible": false,
+      "lore": "A pale whorl with a dark centre. It warms in the hand it likes.",
+      "slot": "offHand",
+      "form": "Knot",
+      "material": "Birch",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 4
+      },
+      "salvage": [
+        {
+          "itemId": "birch_log",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "the_charlock",
+      "name": "The Charlock",
+      "kind": "equipment",
+      "rarity": "epic",
+      "tradability": "untradeable",
+      "equipLevel": 14,
+      "value": 700,
+      "fungible": false,
+      "lore": "A seed case of black glass on a charred stem. Every morning it has flowered again, and every evening the flower is ash.",
+      "slot": "neck",
+      "form": "Locket",
+      "material": "Charlock",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {},
+      "salvage": []
     }
   ],
-  "recipes": [],
+  "recipes": [
+    {
+      "id": "craft_oak_quarterstaff",
+      "outputId": "oak_quarterstaff",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "oak_log",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "id": "craft_oak_wand",
+      "outputId": "oak_wand",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "oak_log",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_oak_knot",
+      "outputId": "oak_knot",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "oak_log",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_birch_quarterstaff",
+      "outputId": "birch_quarterstaff",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "birch_log",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "id": "craft_birch_wand",
+      "outputId": "birch_wand",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "birch_log",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_birch_knot",
+      "outputId": "birch_knot",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "birch_log",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_bindweed_hood",
+      "outputId": "bindweed_hood",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bindweed_fibre",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_bindweed_robe",
+      "outputId": "bindweed_robe",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bindweed_fibre",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "id": "craft_bindweed_leggings",
+      "outputId": "bindweed_leggings",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bindweed_fibre",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "id": "craft_bindweed_boots",
+      "outputId": "bindweed_boots",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bindweed_fibre",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_bindweed_gloves",
+      "outputId": "bindweed_gloves",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bindweed_fibre",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_fawnhide_belt",
+      "outputId": "fawnhide_belt",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 4,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "fawnhide",
+          "count": 2
+        },
+        {
+          "itemId": "bindweed_fibre",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_tuskhide_belt",
+      "outputId": "tuskhide_belt",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 11,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "tuskhide",
+          "count": 2
+        },
+        {
+          "itemId": "bogflax_fibre",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_bogflax_hood",
+      "outputId": "bogflax_hood",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bogflax_fibre",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_bogflax_robe",
+      "outputId": "bogflax_robe",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bogflax_fibre",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "id": "craft_bogflax_leggings",
+      "outputId": "bogflax_leggings",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bogflax_fibre",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "id": "craft_bogflax_boots",
+      "outputId": "bogflax_boots",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bogflax_fibre",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_bogflax_gloves",
+      "outputId": "bogflax_gloves",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "bogflax_fibre",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_sapwort_draught",
+      "outputId": "sapwort_draught",
+      "outputCount": 1,
+      "skill": "potionsAndAlchemy",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "sapwort",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_brookmint_tonic",
+      "outputId": "brookmint_tonic",
+      "outputCount": 1,
+      "skill": "potionsAndAlchemy",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "brookmint",
+          "count": 2
+        }
+      ]
+    }
+  ],
   "index": {
     "itemSources": {
-      "bindweed_belt": [
+      "bindweed_boots": [
         {
-          "type": "drop",
-          "from": "bindweed_creeper",
-          "zoneId": "whispering_woods",
-          "bucket": "bonus",
-          "chance": 0.01
-        },
-        {
-          "type": "drop",
-          "from": "heartwood",
-          "zoneId": "whispering_woods",
-          "bucket": "main",
-          "chance": 0.25
-        },
-        {
-          "type": "drop",
-          "from": "the_standing_green",
-          "zoneId": "whispering_woods",
-          "bucket": "main",
-          "chance": 0.25
+          "type": "craft",
+          "recipeId": "craft_bindweed_boots",
+          "skill": "tailoring",
+          "skillLevel": 1
         }
       ],
       "bindweed_fibre": [
+        {
+          "type": "drop",
+          "from": "listening_fawn",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.45
+        },
         {
           "type": "drop",
           "from": "thornback_sprite",
@@ -2489,21 +3420,196 @@
           "chance": 0.3
         },
         {
+          "type": "drop",
+          "from": "heartwood",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_standing_green",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
           "type": "salvage",
-          "from": "bindweed_belt"
+          "from": "bindweed_hood"
+        },
+        {
+          "type": "salvage",
+          "from": "bindweed_robe"
+        },
+        {
+          "type": "salvage",
+          "from": "bindweed_leggings"
+        },
+        {
+          "type": "salvage",
+          "from": "bindweed_boots"
+        },
+        {
+          "type": "salvage",
+          "from": "bindweed_gloves"
         },
         {
           "type": "salvage",
           "from": "sporecap_mantle"
         }
       ],
+      "bindweed_gloves": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bindweed_gloves",
+          "skill": "tailoring",
+          "skillLevel": 1
+        }
+      ],
+      "bindweed_hood": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bindweed_hood",
+          "skill": "tailoring",
+          "skillLevel": 1
+        }
+      ],
+      "bindweed_leggings": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bindweed_leggings",
+          "skill": "tailoring",
+          "skillLevel": 1
+        }
+      ],
+      "bindweed_robe": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bindweed_robe",
+          "skill": "tailoring",
+          "skillLevel": 1
+        }
+      ],
+      "birch_knot": [
+        {
+          "type": "craft",
+          "recipeId": "craft_birch_knot",
+          "skill": "woodcarving",
+          "skillLevel": 10
+        }
+      ],
+      "birch_log": [
+        {
+          "type": "salvage",
+          "from": "birch_quarterstaff"
+        },
+        {
+          "type": "salvage",
+          "from": "birch_wand"
+        },
+        {
+          "type": "salvage",
+          "from": "birch_knot"
+        }
+      ],
+      "birch_quarterstaff": [
+        {
+          "type": "craft",
+          "recipeId": "craft_birch_quarterstaff",
+          "skill": "woodcarving",
+          "skillLevel": 10
+        }
+      ],
+      "birch_wand": [
+        {
+          "type": "craft",
+          "recipeId": "craft_birch_wand",
+          "skill": "woodcarving",
+          "skillLevel": 10
+        }
+      ],
+      "bogflax_boots": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bogflax_boots",
+          "skill": "tailoring",
+          "skillLevel": 10
+        }
+      ],
+      "bogflax_fibre": [
+        {
+          "type": "salvage",
+          "from": "bogflax_hood"
+        },
+        {
+          "type": "salvage",
+          "from": "bogflax_robe"
+        },
+        {
+          "type": "salvage",
+          "from": "bogflax_leggings"
+        },
+        {
+          "type": "salvage",
+          "from": "bogflax_boots"
+        },
+        {
+          "type": "salvage",
+          "from": "bogflax_gloves"
+        }
+      ],
+      "bogflax_gloves": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bogflax_gloves",
+          "skill": "tailoring",
+          "skillLevel": 10
+        }
+      ],
+      "bogflax_hood": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bogflax_hood",
+          "skill": "tailoring",
+          "skillLevel": 10
+        }
+      ],
+      "bogflax_leggings": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bogflax_leggings",
+          "skill": "tailoring",
+          "skillLevel": 10
+        }
+      ],
+      "bogflax_robe": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bogflax_robe",
+          "skill": "tailoring",
+          "skillLevel": 10
+        }
+      ],
+      "brookmint_tonic": [
+        {
+          "type": "craft",
+          "recipeId": "craft_brookmint_tonic",
+          "skill": "potionsAndAlchemy",
+          "skillLevel": 10
+        }
+      ],
       "fawnhide": [
         {
-          "type": "drop",
-          "from": "listening_fawn",
-          "zoneId": "whispering_woods",
-          "bucket": "main",
-          "chance": 0.45
+          "type": "salvage",
+          "from": "fawnhide_belt"
+        }
+      ],
+      "fawnhide_belt": [
+        {
+          "type": "craft",
+          "recipeId": "craft_fawnhide_belt",
+          "skill": "tailoring",
+          "skillLevel": 4
         }
       ],
       "flora_crystal": [
@@ -2666,6 +3772,41 @@
           "zoneId": "whispering_woods",
           "bucket": "main",
           "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "sporecap_shambler",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "elderroot",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "mother_spore",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "hollow_stag",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_murmur",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.25
         }
       ],
       "heartwood_stave": [
@@ -2691,6 +3832,14 @@
           "zoneId": "whispering_woods",
           "bucket": "bonus",
           "chance": 0.02
+        }
+      ],
+      "oak_knot": [
+        {
+          "type": "craft",
+          "recipeId": "craft_oak_knot",
+          "skill": "woodcarving",
+          "skillLevel": 1
         }
       ],
       "oak_log": [
@@ -2749,7 +3898,35 @@
         },
         {
           "type": "salvage",
+          "from": "oak_quarterstaff"
+        },
+        {
+          "type": "salvage",
+          "from": "oak_wand"
+        },
+        {
+          "type": "salvage",
+          "from": "oak_knot"
+        },
+        {
+          "type": "salvage",
           "from": "heartwood_stave"
+        }
+      ],
+      "oak_quarterstaff": [
+        {
+          "type": "craft",
+          "recipeId": "craft_oak_quarterstaff",
+          "skill": "woodcarving",
+          "skillLevel": 1
+        }
+      ],
+      "oak_wand": [
+        {
+          "type": "craft",
+          "recipeId": "craft_oak_wand",
+          "skill": "woodcarving",
+          "skillLevel": 1
         }
       ],
       "proof_of_the_woods": [
@@ -2770,39 +3947,10 @@
       ],
       "sapwort_draught": [
         {
-          "type": "drop",
-          "from": "sporecap_shambler",
-          "zoneId": "whispering_woods",
-          "bucket": "main",
-          "chance": 0.05
-        },
-        {
-          "type": "drop",
-          "from": "elderroot",
-          "zoneId": "whispering_woods",
-          "bucket": "main",
-          "chance": 0.25
-        },
-        {
-          "type": "drop",
-          "from": "mother_spore",
-          "zoneId": "whispering_woods",
-          "bucket": "main",
-          "chance": 0.25
-        },
-        {
-          "type": "drop",
-          "from": "hollow_stag",
-          "zoneId": "whispering_woods",
-          "bucket": "main",
-          "chance": 0.25
-        },
-        {
-          "type": "drop",
-          "from": "the_murmur",
-          "zoneId": "whispering_woods",
-          "bucket": "main",
-          "chance": 0.25
+          "type": "craft",
+          "recipeId": "craft_sapwort_draught",
+          "skill": "potionsAndAlchemy",
+          "skillLevel": 1
         }
       ],
       "sporecap_mantle": [
@@ -2848,13 +3996,200 @@
           "bucket": "main",
           "chance": 0.2
         }
+      ],
+      "tuskhide": [
+        {
+          "type": "salvage",
+          "from": "tuskhide_belt"
+        }
+      ],
+      "tuskhide_belt": [
+        {
+          "type": "craft",
+          "recipeId": "craft_tuskhide_belt",
+          "skill": "tailoring",
+          "skillLevel": 11
+        }
       ]
     },
     "itemUses": {
-      "bindweed_belt": [
+      "bindweed_boots": [
         {
           "type": "salvageInto",
           "itemId": "bindweed_fibre"
+        }
+      ],
+      "bindweed_fibre": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bindweed_hood",
+          "outputId": "bindweed_hood"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bindweed_robe",
+          "outputId": "bindweed_robe"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bindweed_leggings",
+          "outputId": "bindweed_leggings"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bindweed_boots",
+          "outputId": "bindweed_boots"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bindweed_gloves",
+          "outputId": "bindweed_gloves"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_fawnhide_belt",
+          "outputId": "fawnhide_belt"
+        }
+      ],
+      "bindweed_gloves": [
+        {
+          "type": "salvageInto",
+          "itemId": "bindweed_fibre"
+        }
+      ],
+      "bindweed_hood": [
+        {
+          "type": "salvageInto",
+          "itemId": "bindweed_fibre"
+        }
+      ],
+      "bindweed_leggings": [
+        {
+          "type": "salvageInto",
+          "itemId": "bindweed_fibre"
+        }
+      ],
+      "bindweed_robe": [
+        {
+          "type": "salvageInto",
+          "itemId": "bindweed_fibre"
+        }
+      ],
+      "birch_knot": [
+        {
+          "type": "salvageInto",
+          "itemId": "birch_log"
+        }
+      ],
+      "birch_log": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_birch_quarterstaff",
+          "outputId": "birch_quarterstaff"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_birch_wand",
+          "outputId": "birch_wand"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_birch_knot",
+          "outputId": "birch_knot"
+        }
+      ],
+      "birch_quarterstaff": [
+        {
+          "type": "salvageInto",
+          "itemId": "birch_log"
+        }
+      ],
+      "birch_wand": [
+        {
+          "type": "salvageInto",
+          "itemId": "birch_log"
+        }
+      ],
+      "bogflax_boots": [
+        {
+          "type": "salvageInto",
+          "itemId": "bogflax_fibre"
+        }
+      ],
+      "bogflax_fibre": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_tuskhide_belt",
+          "outputId": "tuskhide_belt"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bogflax_hood",
+          "outputId": "bogflax_hood"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bogflax_robe",
+          "outputId": "bogflax_robe"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bogflax_leggings",
+          "outputId": "bogflax_leggings"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bogflax_boots",
+          "outputId": "bogflax_boots"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bogflax_gloves",
+          "outputId": "bogflax_gloves"
+        }
+      ],
+      "bogflax_gloves": [
+        {
+          "type": "salvageInto",
+          "itemId": "bogflax_fibre"
+        }
+      ],
+      "bogflax_hood": [
+        {
+          "type": "salvageInto",
+          "itemId": "bogflax_fibre"
+        }
+      ],
+      "bogflax_leggings": [
+        {
+          "type": "salvageInto",
+          "itemId": "bogflax_fibre"
+        }
+      ],
+      "bogflax_robe": [
+        {
+          "type": "salvageInto",
+          "itemId": "bogflax_fibre"
+        }
+      ],
+      "brookmint": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_brookmint_tonic",
+          "outputId": "brookmint_tonic"
+        }
+      ],
+      "fawnhide": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_fawnhide_belt",
+          "outputId": "fawnhide_belt"
+        }
+      ],
+      "fawnhide_belt": [
+        {
+          "type": "salvageInto",
+          "itemId": "fawnhide"
         }
       ],
       "heartwood_stave": [
@@ -2869,10 +4204,65 @@
           "itemId": "oak_log"
         }
       ],
+      "oak_knot": [
+        {
+          "type": "salvageInto",
+          "itemId": "oak_log"
+        }
+      ],
+      "oak_log": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_oak_quarterstaff",
+          "outputId": "oak_quarterstaff"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_oak_wand",
+          "outputId": "oak_wand"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_oak_knot",
+          "outputId": "oak_knot"
+        }
+      ],
+      "oak_quarterstaff": [
+        {
+          "type": "salvageInto",
+          "itemId": "oak_log"
+        }
+      ],
+      "oak_wand": [
+        {
+          "type": "salvageInto",
+          "itemId": "oak_log"
+        }
+      ],
+      "sapwort": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_sapwort_draught",
+          "outputId": "sapwort_draught"
+        }
+      ],
       "sporecap_mantle": [
         {
           "type": "salvageInto",
           "itemId": "bindweed_fibre"
+        }
+      ],
+      "tuskhide": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_tuskhide_belt",
+          "outputId": "tuskhide_belt"
+        }
+      ],
+      "tuskhide_belt": [
+        {
+          "type": "salvageInto",
+          "itemId": "tuskhide"
         }
       ]
     }

@@ -67,6 +67,8 @@ class RecipeDef {
     required this.inputs,
     this.outputCount = 1,
     this.stationRequired = false,
-  }) : assert(inputs.length > 0, 'a recipe with no inputs is a faucet'),
-       assert(outputCount > 0);
+    // ⚠️ No `inputs.length` assert — list members are not const-evaluable.
+    // "A recipe with no inputs is a faucet" is enforced by
+    // `content_export_test` instead, where it can name the offender.
+  }) : assert(outputCount > 0);
 }

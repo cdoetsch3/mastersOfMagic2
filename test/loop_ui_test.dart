@@ -97,16 +97,20 @@ void main() {
     }
   });
 
-  test('⚠️ equipment must never carry a written name', () {
+  test('⚠️ crafted equipment must never carry a written name', () {
     // Its name is composed from aspect + quality + material + form so it
-    // cannot drift from the facts (ITEMS §9b.5a).
+    // cannot drift from the facts (ITEMS §9b.5a). ⭐ The exception is NAMED
+    // drops — boss uniques and the drop-only jewelry — whose bespoke name is
+    // the point (§9b.5). Commons are always crafted-grammar items.
     for (final def in ItemCatalogue.all) {
       if (def is EquipmentDef) {
-        expect(
-          def.properName,
-          isNull,
-          reason: '${def.id} would let its name drift from its facts',
-        );
+        if (def.rarity == Rarity.common) {
+          expect(
+            def.properName,
+            isNull,
+            reason: '${def.id} would let its name drift from its facts',
+          );
+        }
       } else {
         expect(def.properName, isNotNull, reason: '${def.id} needs a name');
       }

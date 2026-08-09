@@ -121,12 +121,41 @@ mixin Beltable {}
 /// layer that can silently drift.
 @immutable
 class ItemModifiers {
+  /// Added to the 80% base hit chance (ITEMS §9b.8). ⭐ The stat Q1 teaches.
   final int accuracyBonus;
+
   final int dodge;
+
+  /// Chance (%) that a hit crits. ⚠️ **Standard stats are 0** — crits exist
+  /// only through gear, and in Q1 only through one ring (§9b.8).
   final int critChance;
+
+  /// A crit deals 150% damage; each point here adds 1 to the 50 (§9b.8).
   final int critDamage;
+
   final int deflectChance;
   final int deflectAmount;
+
+  /// Flat max-HP — §4.1's baseline stat, carried by the Tailoring set.
+  final int maxHpBonus;
+
+  /// ⭐ The wand lane: flat damage added once per cast, so cheap spells get
+  /// proportionally more (§9b.8).
+  final int damagePerCast;
+
+  /// ⭐ The quarterstaff lane: flat damage per charge the spell COST — pays
+  /// only on commitment. "Charge spent" is §5b.3a's engine-wide definition.
+  final int damagePerCharge;
+
+  /// Shields you cast are this % stronger (§4.1 safe list).
+  final int shieldStrengthPercent;
+
+  /// Healing you receive is this % larger — potions included.
+  final int healingReceivedPercent;
+
+  /// ⭐ Regrow this % of max HP at the end of every turn. The Charlock's
+  /// stat; ⚠️ must route through `TurnStatus` when wired (§4.2).
+  final int regrowPercent;
 
   /// ⭐ A non-combat-power axis (ITEMS §6b.2) — build value that does not
   /// inflate damage or HP, which is what a system worried about power creep
@@ -140,6 +169,12 @@ class ItemModifiers {
     this.critDamage = 0,
     this.deflectChance = 0,
     this.deflectAmount = 0,
+    this.maxHpBonus = 0,
+    this.damagePerCast = 0,
+    this.damagePerCharge = 0,
+    this.shieldStrengthPercent = 0,
+    this.healingReceivedPercent = 0,
+    this.regrowPercent = 0,
     this.beltSlots = 0,
   });
 
@@ -152,6 +187,12 @@ class ItemModifiers {
       critDamage == 0 &&
       deflectChance == 0 &&
       deflectAmount == 0 &&
+      maxHpBonus == 0 &&
+      damagePerCast == 0 &&
+      damagePerCharge == 0 &&
+      shieldStrengthPercent == 0 &&
+      healingReceivedPercent == 0 &&
+      regrowPercent == 0 &&
       beltSlots == 0;
 }
 
@@ -246,6 +287,10 @@ final class EquipmentDef extends ItemDef
     super.tradability,
     super.equipLevel,
     super.value,
+    // ⭐ Only for NAMED equipment — boss uniques and drop-only jewelry
+    // (§9b.5). Crafted gear must leave this null so the material+form
+    // grammar composes the name.
+    super.properName,
   });
 
   @override
@@ -267,24 +312,45 @@ class ItemEffect {
   /// one item does not trivialise level 2 and become worthless by level 20.
   final int healPercent;
 
-  const ItemEffect({this.healPercent = 0});
+  /// The Tonic shape (ITEMS §9b.8): heal [healPerTurnPercent] at the end of
+  /// each of the next [healTurns] turns. ⚠️ **In a duel only.** Outside
+  /// combat the whole amount applies at once — [healFor] already includes it,
+  /// so callers between encounters need no special case.
+  final int healPerTurnPercent;
+  final int healTurns;
+
+  const ItemEffect({
+    this.healPercent = 0,
+    this.healPerTurnPercent = 0,
+    this.healTurns = 0,
+  }) : assert(
+         (healPerTurnPercent == 0) == (healTurns == 0),
+         'over-time needs both a rate and a duration',
+       );
 
   static const none = ItemEffect();
 
-  bool get isNothing => healPercent == 0;
+  bool get isNothing => healPercent == 0 && healPerTurnPercent == 0;
 
-  /// What this restores for a mage with [maxHp]. At least 1 if it heals at
-  /// all — an item that does nothing reads as a bug.
+  /// The total this restores for a mage with [maxHp] — flat plus the full
+  /// over-time amount, which is what out-of-combat use applies. At least 1 if
+  /// it heals at all: an item that does nothing reads as a bug.
   int healFor(int maxHp) {
-    if (healPercent == 0) return 0;
-    final amount = (maxHp * healPercent / 100).round();
+    final percent = healPercent + healPerTurnPercent * healTurns;
+    if (percent == 0) return 0;
+    final amount = (maxHp * percent / 100).round();
     return amount < 1 ? 1 : amount;
   }
 
   /// One line for a tooltip, built from the effect rather than written per
   /// item — ⭐ so a number changed here cannot disagree with its own text.
-  String get describe =>
-      healPercent > 0 ? 'Restores $healPercent% health' : 'No effect';
+  String get describe {
+    if (healPerTurnPercent > 0) {
+      return 'Restores $healPerTurnPercent% health per turn for '
+          '$healTurns turns';
+    }
+    return healPercent > 0 ? 'Restores $healPercent% health' : 'No effect';
+  }
 }
 
 /// Anything a player can use up.
