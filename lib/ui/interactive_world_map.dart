@@ -216,7 +216,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
         // ⚠️ One journey at a time. Offering Travel mid-trip would silently do
         // nothing, which reads as a broken button.
         isTravelling: travelling,
-        minutes: Travel.minutesBetween(_here.id, loc.id),
+        travelLabel: Travel.labelBetween(_here.id, loc.id),
         onTravel: () {
           Navigator.of(ctx).pop();
           _travel(loc);
@@ -422,7 +422,11 @@ class PlaceSheet extends StatelessWidget {
   final bool isTravelling;
 
   /// The walk from here, shown so the cost is visible before committing.
-  final int? minutes;
+  ///
+  /// ⭐ A preformatted label ("10s", "3 min"), NOT a minute count — rounding
+  /// seconds to whole minutes for display turned a 10s test leg into "1 min"
+  /// (TravelTimes.label already handles sub-minute durations).
+  final String? travelLabel;
 
   const PlaceSheet({
     super.key,
@@ -431,7 +435,7 @@ class PlaceSheet extends StatelessWidget {
     required this.canTravel,
     required this.onTravel,
     this.isTravelling = false,
-    this.minutes,
+    this.travelLabel,
   });
 
   @override
@@ -539,10 +543,9 @@ class PlaceSheet extends StatelessWidget {
                       ? 'Already travelling'
                       : !canTravel
                       ? 'No road from here'
-                      : minutes == null
+                      : travelLabel == null
                       ? 'Travel to ${location.name}'
-                      : 'Travel to ${location.name} — '
-                            '${TravelTimes.label(minutes! * 60)}',
+                      : 'Travel to ${location.name} — $travelLabel',
                 ),
               ),
             ),
