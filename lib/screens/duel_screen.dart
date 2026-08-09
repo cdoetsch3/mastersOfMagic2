@@ -530,10 +530,10 @@ class _DuelScreenState extends State<DuelScreen>
           color: const Color(0xFFE8C547),
           ms: 450,
         );
-      case SpellMissedEvent(:final caster, :final spell):
+      case SpellMissedEvent(:final caster, :final spell, :final blinded):
         await _showMessage(
           '${caster == c.enemy ? c.enemy.name : 'You'}: '
-          '${spell.name} missed — blinded',
+          '${spell.name} missed${blinded ? ' — blinded' : ''}',
           const Color(0xFFF2E7C9),
         );
         await _runFx(

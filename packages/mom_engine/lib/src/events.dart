@@ -193,16 +193,24 @@ class SpellFizzledEvent extends DuelEvent {
       'charge at resolution)';
 }
 
-/// A committed offensive spell that missed (Blind). Charge is spent; the spell
-/// has no effect. Does not advance the cast streak.
+/// A committed offensive spell that missed. Charge is spent; the spell has no
+/// effect. Does not advance the cast streak.
+///
+/// ⭐ [blinded] distinguishes the two ways to miss: Blind (the caster's own
+/// eyes) vs a plain accuracy roll against the base miss chance or the
+/// target's dodge (ITEMS §9b.8). The UI must not blame Blind for an ordinary
+/// whiff.
 class SpellMissedEvent extends DuelEvent {
   final MageState caster;
   final Spell spell;
+  final bool blinded;
 
-  const SpellMissedEvent(this.caster, this.spell);
+  const SpellMissedEvent(this.caster, this.spell, {this.blinded = false});
 
   @override
-  String toString() => '${caster.name} is blinded — ${spell.name} misses';
+  String toString() => blinded
+      ? '${caster.name} is blinded — ${spell.name} misses'
+      : '${caster.name}: ${spell.name} misses';
 }
 
 /// Damage dealt by a status effect during a start/end phase (a DoT tick like

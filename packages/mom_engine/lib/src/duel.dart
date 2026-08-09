@@ -522,7 +522,9 @@ class DuelEngine {
           blindPenalty;
       final missPercent = 100 - hitChance;
       if (missPercent > 0 && rng.nextDouble() * 100 < missPercent) {
-        events.add(SpellMissedEvent(caster, spell));
+        // ⭐ Tag the cause: only a real Blind window says "blinded" (§9b.8).
+        // A whiff against the base miss or dodge is just a miss.
+        events.add(SpellMissedEvent(caster, spell, blinded: caster.missChance > 0));
         return;
       }
     }

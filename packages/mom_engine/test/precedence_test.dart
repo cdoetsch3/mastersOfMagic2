@@ -1,5 +1,18 @@
+import 'dart:math';
+
 import 'package:mom_engine/mom_engine.dart';
 import 'package:test/test.dart';
+
+/// Rolls a guaranteed miss: `nextDouble` returns 0, so any positive miss
+/// chance fires. `nextInt` 0 keeps damage rolls at their minimum.
+class _AlwaysMiss implements Random {
+  @override
+  double nextDouble() => 0;
+  @override
+  int nextInt(int max) => 0;
+  @override
+  bool nextBool() => false;
+}
 
 /// A test-double blinder: makes the holder's harmful spells miss with a fixed
 /// chance for [turnsLeft] turns. (Phase 4 built the real Blind on the
@@ -118,10 +131,25 @@ void main() {
       alice.statuses.add(_Blind(1.0, 3)); // 100% miss
       final r = duel.resolveTurn(
           CastAction(Spellbook.blast), const ForfeitAction());
-      expect(r.events.whereType<SpellMissedEvent>(), hasLength(1));
+      final miss = r.events.whereType<SpellMissedEvent>().single;
       expect(bruno.hp, 100, reason: 'Blast missed');
       expect(alice.charge, 0, reason: 'charge is still spent on a miss');
       expect(alice.streakCount, 0, reason: 'a miss advances no streak');
+      // ⭐ This miss IS from Blind, so the event says so — the UI shows
+      // "— blinded" only here.
+      expect(miss.blinded, isTrue);
+    });
+
+    test('a plain accuracy miss is NOT tagged blinded', () {
+      // No Blind status; the base miss chance alone whiffs the cast. The UI
+      // must say "missed", never "blinded" (ITEMS §9b.8).
+      charge(alice, MagicElement.geo, 2);
+      final unlucky = DuelEngine(alice, bruno,
+          rng: _AlwaysMiss(), baseMissPercent: 20);
+      final r = unlucky.resolveTurn(
+          CastAction(Spellbook.blast), const ForfeitAction());
+      final miss = r.events.whereType<SpellMissedEvent>().single;
+      expect(miss.blinded, isFalse, reason: 'no Blind, so no "blinded" blame');
     });
 
     test('a guaranteed miss also nullifies Discharge (harmful, non-damaging)',
