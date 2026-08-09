@@ -165,6 +165,47 @@ void main() {
     });
   });
 
+  group('deposit all (backpack only, never equipped)', () {
+    test('empties the whole pack into the Storeroom and reports the count',
+        () async {
+      final profile = PlayerProfile.newPlayer()
+        ..backpack = Backpack.of(const [
+          InventorySlot(defId: 'oak_log'),
+          InventorySlot(defId: 'oak_log'),
+          InventorySlot(defId: 'bindweed_fibre'),
+        ]);
+      final game = GameState(_MemStorage(), profile);
+
+      expect(await game.depositAll('hearthwood'), 3);
+      expect(game.profile.backpack.used, 0);
+      final room = game.profile.storerooms['hearthwood']!;
+      expect(room.stacks['oak_log'], 2, reason: 'fungibles collapse to counts');
+      expect(room.stacks['bindweed_fibre'], 1);
+    });
+
+    test('⚠️ never touches equipped gear — the whole ruling', () async {
+      final game = _gameCarrying('oak_wand');
+      await game.equipFromBackpack(0); // the wand is now WORN, not in the pack
+      game.profile.backpack = Backpack.of(const [
+        InventorySlot(defId: 'oak_log'),
+      ]);
+
+      final moved = await game.depositAll('hearthwood');
+
+      expect(moved, 1, reason: 'only the loose log moves');
+      expect(game.profile.equipped[EquipSlot.mainHand], 'i1',
+          reason: 'the worn wand must still be equipped');
+      expect(game.profile.storerooms['hearthwood']?.instanceIds ?? const [],
+          isNot(contains('i1')),
+          reason: 'equipped gear must never reach the Storeroom');
+    });
+
+    test('an empty pack is a no-op that moves nothing', () async {
+      final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
+      expect(await game.depositAll('hearthwood'), 0);
+    });
+  });
+
   group('the belt sizes itself off gear', () {
     test('a worn Tuskhide Belt adds its two slots', () {
       final totals = Equipping.totals(

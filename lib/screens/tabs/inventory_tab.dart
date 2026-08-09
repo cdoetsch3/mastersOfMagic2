@@ -40,11 +40,44 @@ class InventoryTab extends StatelessWidget {
               const SizedBox(height: 10),
               _GearTotals(game: game),
               const SizedBox(height: 16),
-              SectionLabel(
-                'Backpack — ${game.profile.backpack.used}'
-                '/${Carrying.backpackSlots}',
+              Row(
+                children: [
+                  Expanded(
+                    child: SectionLabel(
+                      'Backpack — ${game.profile.backpack.used}'
+                      '/${Carrying.backpackSlots}',
+                    ),
+                  ),
+                  // ⭐ In town only, and only when there is something to move.
+                  // Deposits the whole pack; equipped gear is never touched.
+                  if (inTown && game.profile.backpack.used > 0)
+                    TextButton.icon(
+                      onPressed: () async {
+                        final moved = await game.depositAll(here.id);
+                        if (context.mounted && moved > 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Stowed $moved item'
+                                  '${moved == 1 ? '' : 's'} in '
+                                  '${here.name}.'),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.arrow_downward, size: 16),
+                      label: const Text('Deposit all'),
+                    ),
+                ],
               ),
               _BackpackGrid(game: game, town: inTown ? here.id : null),
+              if (inTown)
+                const Padding(
+                  padding: EdgeInsets.only(top: 2, left: 4),
+                  child: Text(
+                    'Tap to stow · hold for options.',
+                    style: TextStyle(color: AppColors.textFaint, fontSize: 11),
+                  ),
+                ),
               const SizedBox(height: 16),
               if (inTown) ...[
                 SectionLabel('${here.name} Storeroom — ${room.itemCount}'),
@@ -409,33 +442,38 @@ class _BackpackGrid extends StatelessWidget {
               ? null
               : game.profile.itemInstances[slot.instanceId];
           final def = ItemCatalogue.tryById(slot.defId);
+          if (def == null) {
+            return _ItemSlot(slot: slot, instance: instance);
+          }
+          // The full menu, reached by long-press (Option A) — or by tap when
+          // out of town, where there is nowhere to deposit.
+          void openMenu() => showItemActions(
+            context,
+            def: def,
+            instance: instance,
+            actions: [
+              // ⭐ Wearing beats stowing in the ordering — the rarer, more
+              // deliberate act.
+              if (def is EquipmentDef)
+                (label: 'Equip', run: () => game.equipFromBackpack(i)),
+              if (town != null)
+                (
+                  label: 'Stow',
+                  run: () async {
+                    await game.deposit(town!, i);
+                    return null;
+                  },
+                ),
+            ],
+          );
           return _ItemSlot(
             slot: slot,
             instance: instance,
-            onTap: def == null
-                ? null
-                : () => showItemActions(
-                    context,
-                    def: def,
-                    instance: instance,
-                    actions: [
-                      // ⭐ Wearing beats stowing in the ordering — it is the
-                      // rarer, more deliberate act.
-                      if (def is EquipmentDef)
-                        (
-                          label: 'Equip',
-                          run: () => game.equipFromBackpack(i),
-                        ),
-                      if (town != null)
-                        (
-                          label: 'Stow',
-                          run: () async {
-                            await game.deposit(town!, i);
-                            return null;
-                          },
-                        ),
-                    ],
-                  ),
+            // ⭐ Option A: in town a single tap stows instantly; out of town
+            // there is nowhere to stow, so tap opens the menu instead. The
+            // menu is always one long-press away.
+            onTap: town == null ? openMenu : () => game.deposit(town!, i),
+            onLongPress: openMenu,
           );
         },
       ),
@@ -462,7 +500,16 @@ class _ItemSlot extends StatelessWidget {
   final ItemInstance? instance;
   final VoidCallback? onTap;
 
-  const _ItemSlot({required this.slot, this.instance, this.onTap});
+  /// ⭐ Option A: tap moves the item, press-and-hold opens the full menu
+  /// (Equip / Use / details). Right-click maps to the same on desktop.
+  final VoidCallback? onLongPress;
+
+  const _ItemSlot({
+    required this.slot,
+    this.instance,
+    this.onTap,
+    this.onLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -475,6 +522,8 @@ class _ItemSlot extends StatelessWidget {
       message: def == null ? slot.defId : '$name\n${def.lore}',
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
+        onSecondaryTap: onLongPress,
         borderRadius: BorderRadius.circular(6),
         child: DecoratedBox(
           decoration: BoxDecoration(
@@ -613,7 +662,13 @@ class _StoredRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) => InkWell(
+    // ⭐ Option A: tapping the row takes one back — the mirror of tapping a
+    // pack tile to stow. The explicit buttons stay for discoverability and
+    // because Wear is a second, distinct action.
+    onTap: onTake,
+    borderRadius: BorderRadius.circular(6),
+    child: Padding(
     padding: const EdgeInsets.symmetric(vertical: 3),
     child: Row(
       children: [
@@ -634,6 +689,7 @@ class _StoredRow extends StatelessWidget {
           TextButton(onPressed: onWear, child: const Text('Wear')),
         TextButton(onPressed: onTake, child: const Text('Take')),
       ],
+    ),
     ),
   );
 }

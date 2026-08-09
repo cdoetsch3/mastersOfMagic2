@@ -484,6 +484,31 @@ class GameState extends ChangeNotifier {
     profile.backpack = profile.backpack.withRemovedAt(index);
   });
 
+  /// Empties the whole backpack into [townId]'s Storeroom in one action.
+  ///
+  /// ⭐ **Backpack only — equipped gear is never touched** (ruling
+  /// 2026-08-09). Worn items live in `profile.equipped`, not the backpack, so
+  /// this is safe by construction: iterating the pack cannot reach them. What
+  /// you are wearing when you tap this is exactly what you are still wearing
+  /// after.
+  ///
+  /// Returns how many items moved, so the UI can say so — a bulk action that
+  /// reports nothing reads as having done nothing.
+  Future<int> depositAll(String townId) async {
+    if (profile.backpack.used == 0) return 0;
+    var moved = 0;
+    await _mutate(() {
+      var room = profile.storerooms[townId] ?? const Storeroom();
+      for (final slot in profile.backpack.contents) {
+        room = room.withDeposited(slot);
+        moved++;
+      }
+      profile.storerooms[townId] = room;
+      profile.backpack = Backpack.empty();
+    });
+    return moved;
+  }
+
   /// Takes [want] out of [townId]'s Storeroom, if the backpack has room.
   Future<bool> withdraw(String townId, InventorySlot want) async {
     if (profile.backpack.isFull) return false;
