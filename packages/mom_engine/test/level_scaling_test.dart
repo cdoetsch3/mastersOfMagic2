@@ -22,7 +22,7 @@ void main() {
       a
         ..charge = 1
         ..element = MagicElement.pyro;
-      DuelEngine(a, b, rng: Random(seed), elementEffects: false)
+      DuelEngine(a, b, rng: Random(seed), elementEffects: false, baseMissPercent: 0)
           .resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
       total += 100000 - b.hp;
     }
@@ -74,7 +74,7 @@ void main() {
       a
         ..charge = 2
         ..element = MagicElement.aqua;
-      DuelEngine(a, b, rng: Random(4), elementEffects: false)
+      DuelEngine(a, b, rng: Random(4), elementEffects: false, baseMissPercent: 0)
           .resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
       return a.shield!.remaining;
     }
@@ -94,7 +94,7 @@ void main() {
     // very next Flora cast, so Ignite would counter nothing.
     final a = MageState(name: 'A');
     final b = MageState(name: 'B');
-    final duel = DuelEngine(a, b, rng: Random(3));
+    final duel = DuelEngine(a, b, rng: Random(3), baseMissPercent: 0);
 
     for (var i = 0; i < 3; i++) {
       a

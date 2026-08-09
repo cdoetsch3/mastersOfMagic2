@@ -194,7 +194,12 @@ class AdventureRun {
   /// ⚠️ **Between encounters only** (ITEMS §6b.2). Using something here is
   /// free; the belt is what costs a turn mid-duel, and collapsing the two
   /// would make the belt pointless.
-  UseOutcome use(String defId, {required int maxHp, required bool carried}) {
+  UseOutcome use(
+    String defId, {
+    required int maxHp,
+    required bool carried,
+    int healingReceivedPercent = 0,
+  }) {
     if (isOver) return const UseOutcome.refused('Not now.');
     if (!carried) return const UseOutcome.refused('You are not carrying that.');
     final def = ItemCatalogue.tryById(defId);
@@ -203,7 +208,14 @@ class AdventureRun {
     }
     final effect = (def as Usable).effect;
 
-    final healed = _heal(effect.healFor(maxHp), maxHp);
+    // ⭐ The Wickerbound Ring's promise (ITEMS §9b.8): healing received
+    // multiplies potions too, in and out of combat — same rounding as the
+    // engine's one door, MageState.heal.
+    var amount = effect.healFor(maxHp);
+    if (amount > 0 && healingReceivedPercent != 0) {
+      amount = (amount * (100 + healingReceivedPercent) / 100).round();
+    }
+    final healed = _heal(amount, maxHp);
     if (healed == 0) {
       // ⚠️ Not consumed. Using something that changes nothing must not spend
       // it — that reads as the game stealing an item.

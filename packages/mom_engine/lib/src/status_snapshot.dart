@@ -1,5 +1,6 @@
 import 'element.dart';
 import 'element_status.dart';
+import 'item_status.dart';
 import 'mage.dart';
 
 /// One status/buff on a mage, frozen at a moment in time.
@@ -82,6 +83,13 @@ class StatusSnapshot {
               id: 'ignite', turnsLeft: turnsLeft, magnitude: perTick));
         case BlindStatus(:final turnsLeft):
           out.add(StatusView(id: 'blind', turnsLeft: turnsLeft));
+        case RegrowStatus(:final percentPerTurn):
+          out.add(StatusView(id: 'regrow', magnitude: percentPerTurn));
+        case HealOverTimeStatus(:final percentPerTurn, :final turnsLeft):
+          out.add(StatusView(
+              id: 'healOverTime',
+              turnsLeft: turnsLeft,
+              magnitude: percentPerTurn));
       }
     }
 

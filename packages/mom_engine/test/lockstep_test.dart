@@ -15,8 +15,8 @@ void main() {
     final a2 = MageState(name: 'Guest');
     final b1 = MageState(name: 'Host');
     final b2 = MageState(name: 'Guest');
-    final engineA = DuelEngine(a1, a2, rng: rngA);
-    final engineB = DuelEngine(b1, b2, rng: rngB);
+    final engineA = DuelEngine(a1, a2, rng: rngA, baseMissPercent: 0);
+    final engineB = DuelEngine(b1, b2, rng: rngB, baseMissPercent: 0);
 
     // Scripted decision-making driven by a third RNG (simulating players).
     final script = Random(42);
@@ -66,7 +66,7 @@ void main() {
       for (var i = 0; i < 50; i++) {
         final m1 = MageState(name: 'A');
         final m2 = MageState(name: 'B');
-        final duel = DuelEngine(m1, m2, rng: rng);
+        final duel = DuelEngine(m1, m2, rng: rng, baseMissPercent: 0);
         final novice = TunableAi(mistakeChance: 0.6, aggression: 0.5);
         final vet = TunableAi(mistakeChance: 0.0);
         while (!duel.isOver && duel.turnNumber < 200) {
@@ -84,7 +84,7 @@ void main() {
       for (var i = 0; i < 300; i++) {
         final sharp = MageState(name: 'Sharp');
         final sloppy = MageState(name: 'Sloppy');
-        final duel = DuelEngine(sharp, sloppy, rng: rng);
+        final duel = DuelEngine(sharp, sloppy, rng: rng, baseMissPercent: 0);
         final sharpAi = TunableAi(mistakeChance: 0.02);
         final sloppyAi = TunableAi(mistakeChance: 0.6);
         while (!duel.isOver && duel.turnNumber < 200) {

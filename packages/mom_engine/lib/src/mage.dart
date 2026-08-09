@@ -125,6 +125,15 @@ class MageState {
   /// X-cost spell actually paid. Also applied once, on the first hit.
   int damagePerCharge = 0;
 
+  /// Shields this mage casts are this % stronger (ITEMS §9b.8). Elemental
+  /// shields only — Barrier is point-based and has no strength to scale.
+  int shieldStrengthPercent = 0;
+
+  /// Healing this mage receives is this % larger (ITEMS §9b.8). Applied
+  /// inside [heal], so potions, lifesteal, Photosynthesis and Regrow all
+  /// route through it without knowing it exists.
+  int healingReceivedPercent = 0;
+
   /// Reduces an attacker's hit chance against this mage. Percent points.
   int dodge = 0;
 
@@ -218,6 +227,12 @@ class MageState {
   }
 
   void heal(int amount) {
+    // ⭐ The one door all healing walks through (ITEMS §9b.8) — callers that
+    // want the actual amount applied measure hp before and after, which is
+    // also what keeps their events truthful.
+    if (amount > 0 && healingReceivedPercent != 0) {
+      amount = (amount * (100 + healingReceivedPercent) / 100).round();
+    }
     hp = (hp + amount).clamp(0, maxHp);
   }
 

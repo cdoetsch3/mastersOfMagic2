@@ -14,6 +14,7 @@ export 'src/mage.dart';
 export 'src/netcode.dart';
 export 'src/element_status.dart';
 export 'src/element_tuning.dart';
+export 'src/item_status.dart';
 export 'src/spell.dart';
 export 'src/spellbook.dart';
 export 'src/status.dart';

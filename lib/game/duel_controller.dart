@@ -138,7 +138,15 @@ class DuelController extends ChangeNotifier {
       ..deflectChance = playerGear.deflectChance
       ..deflectAmount = playerGear.deflectAmount
       ..damagePerCast = playerGear.damagePerCast
-      ..damagePerCharge = playerGear.damagePerCharge;
+      ..damagePerCharge = playerGear.damagePerCharge
+      ..shieldStrengthPercent = playerGear.shieldStrengthPercent
+      ..healingReceivedPercent = playerGear.healingReceivedPercent;
+    // ⭐ Regrow rides the status machinery (item_status.dart), so the lane
+    // sort and the HUD pip come for free. Permanent: gear is not taken off
+    // mid-duel.
+    if (playerGear.regrowPercent > 0) {
+      player.statuses.add(RegrowStatus(playerGear.regrowPercent));
+    }
     final carried = playerStartingHp;
     if (carried != null) player.hp = carried.clamp(1, player.maxHp);
     // ⭐ An enemy is the level baseline TIMES its archetype (ENEMIES §1.1), so

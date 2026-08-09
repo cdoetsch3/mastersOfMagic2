@@ -319,10 +319,14 @@ class GameState extends ChangeNotifier {
   Future<UseOutcome> useItem(String defId) async {
     final r = run;
     if (r == null) return const UseOutcome.refused('Not on an adventure.');
+    final gear = equipmentTotals;
     final outcome = r.use(
       defId,
-      maxHp: MageState.scaledMaxHp(profile.level),
+      // ⭐ Gear reaches the road too: worn HP raises the pool a potion heals
+      // against, and healing received % multiplies what it restores.
+      maxHp: MageState.scaledMaxHp(profile.level) + gear.maxHpBonus,
       carried: profile.backpack.countOf(defId) > 0,
+      healingReceivedPercent: gear.healingReceivedPercent,
     );
     if (outcome.consumed) {
       await _mutate(() {

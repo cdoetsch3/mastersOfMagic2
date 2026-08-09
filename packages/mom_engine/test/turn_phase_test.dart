@@ -78,7 +78,7 @@ void main() {
   setUp(() {
     alice = MageState(name: 'Alice');
     bruno = MageState(name: 'Bruno');
-    duel = DuelEngine(alice, bruno, elementEffects: false);
+    duel = DuelEngine(alice, bruno, elementEffects: false, baseMissPercent: 0);
   });
 
   // A quiet turn: neither mage acts in the main phase, isolating phase effects.
@@ -233,7 +233,7 @@ void main() {
         b.statuses
           ..add(_Regen(2))
           ..add(_Burn(4, 5, bypass: true));
-        final d = DuelEngine(a, b, elementEffects: false);
+        final d = DuelEngine(a, b, elementEffects: false, baseMissPercent: 0);
         final log = <String>[];
         for (var i = 0; i < 4; i++) {
           log.addAll(d

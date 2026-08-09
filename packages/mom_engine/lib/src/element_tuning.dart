@@ -16,6 +16,13 @@ import 'element.dart';
 /// Specification: TYPE_EFFECTS_DESIGN.md §2 and §4.
 
 abstract final class ElementTuning {
+  /// ⭐ **The base miss chance every harmful cast carries** (ITEMS §9b.8,
+  /// ruled 2026-08-09): base hit chance is 80%, and accuracy gear closes the
+  /// gap. Symmetric — enemies whiff at the same rate. 📝 Flagged for one
+  /// playtest before it is final; set to 0 to restore the old always-hit
+  /// baseline.
+  static const int baseMissPercent = 20;
+
   // ---- Tier 1 — Primal ------------------------------------------------
 
   /// Ignite (Pyro): chance to proc on a damaging hit, even a fully shielded

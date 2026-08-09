@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 /// Bulwark ... You cast Overload ... 48 to shield", off a bar that was gone.
 void main() {
   DuelEngine duel(MageState a, MageState b, {int seed = 1}) =>
-      DuelEngine(a, b, rng: Random(seed), elementEffects: false);
+      DuelEngine(a, b, rng: Random(seed), elementEffects: false, baseMissPercent: 0);
 
   void charged(MageState m, MagicElement e, int n) {
     m

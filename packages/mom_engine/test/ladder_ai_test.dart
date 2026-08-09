@@ -37,7 +37,7 @@ void main() {
     for (var i = 0; i < duels; i++) {
       final m1 = MageState(name: 'A');
       final m2 = MageState(name: 'B');
-      final duel = DuelEngine(m1, m2, rng: rng);
+      final duel = DuelEngine(m1, m2, rng: rng, baseMissPercent: 0);
       final k1 = drawKit(rng);
       final k2 = drawKit(rng);
       final ai1 = LadderAi(a, spells: k1.$2, elements: k1.$1);

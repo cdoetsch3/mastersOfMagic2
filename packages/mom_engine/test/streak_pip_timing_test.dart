@@ -22,7 +22,7 @@ void main() {
   int streakIn(StatusSnapshot s) => s['streak']?.stacks ?? 0;
 
   test('the streak is visible in the same turn the cast lands', () {
-    final duel = DuelEngine(alice, bruno, rng: Random(7));
+    final duel = DuelEngine(alice, bruno, rng: Random(7), baseMissPercent: 0);
 
     // Turn 1 — Aero Flick. Streak becomes 1.
     alice.element = MagicElement.aero;
@@ -44,7 +44,7 @@ void main() {
 
   test('the new count is carried by the cast event itself, not a later one',
       () {
-    final duel = DuelEngine(alice, bruno, rng: Random(7));
+    final duel = DuelEngine(alice, bruno, rng: Random(7), baseMissPercent: 0);
     alice.element = MagicElement.aero;
     final r = duel.resolveTurn(
         CastAction(Spellbook.flick, MagicElement.aero), const ForfeitAction());
@@ -56,7 +56,7 @@ void main() {
   });
 
   test('a fizzle or miss still leaves the streak alone', () {
-    final duel = DuelEngine(alice, bruno, rng: Random(7));
+    final duel = DuelEngine(alice, bruno, rng: Random(7), baseMissPercent: 0);
     alice.element = MagicElement.aero;
     var r = duel.resolveTurn(
         CastAction(Spellbook.flick, MagicElement.aero), const ForfeitAction());

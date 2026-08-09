@@ -34,7 +34,7 @@ void main() {
     final you = mage('You', MagicElement.electro, 3);
     final wick = mage('Wick', MagicElement.umbra, 2);
 
-    final r = DuelEngine(you, wick, rng: _AlwaysProc())
+    final r = DuelEngine(you, wick, rng: _AlwaysProc(), baseMissPercent: 0)
         .resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.bolt));
 
     expect(r.events.whereType<ChargeDrainedEvent>(), hasLength(1),
@@ -47,7 +47,7 @@ void main() {
     final you = mage('You', MagicElement.electro, 3);
     final wick = mage('Wick', MagicElement.umbra, 1);
 
-    final r = DuelEngine(you, wick, rng: _AlwaysProc())
+    final r = DuelEngine(you, wick, rng: _AlwaysProc(), baseMissPercent: 0)
         .resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.bolt));
 
     expect(r.events.whereType<SpellFizzledEvent>(), hasLength(1),
@@ -64,7 +64,7 @@ void main() {
     final you = mage('You', MagicElement.electro, 3);
     final wick = mage('Wick', MagicElement.umbra, 2);
 
-    final r = DuelEngine(you, wick, rng: _AlwaysProc())
+    final r = DuelEngine(you, wick, rng: _AlwaysProc(), baseMissPercent: 0)
         .resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.bolt));
 
     expect(r.events.whereType<SpellFizzledEvent>(), isEmpty);
@@ -77,7 +77,7 @@ void main() {
     final wick = mage('Wick', MagicElement.umbra, 4);
 
     // Discharge is priority 7; give Wick a priority-7 cast so they collide.
-    final r = DuelEngine(you, wick, rng: Random(1))
+    final r = DuelEngine(you, wick, rng: Random(1), baseMissPercent: 0)
         .resolveTurn(CastAction(Spellbook.discharge),
             CastAction(Spellbook.hasty, MagicElement.umbra));
 
@@ -94,7 +94,7 @@ void main() {
     final wick = mage('Wick', MagicElement.umbra, 3);
 
     // Wick's Flick is priority 5 and resolves before the Electro Leech at 9.
-    final r = DuelEngine(you, wick, rng: _AlwaysProc()).resolveTurn(
+    final r = DuelEngine(you, wick, rng: _AlwaysProc(), baseMissPercent: 0).resolveTurn(
         CastAction(Spellbook.leech), CastAction(Spellbook.flick));
 
     expect(r.events.whereType<SpellFizzledEvent>(), isEmpty,

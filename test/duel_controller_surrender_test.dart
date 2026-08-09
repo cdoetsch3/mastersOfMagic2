@@ -83,6 +83,9 @@ void main() {
           critChance: 5,
           critDamage: 5,
           damagePerCharge: 1,
+          shieldStrengthPercent: 10,
+          healingReceivedPercent: 10,
+          regrowPercent: 2,
         ),
       );
       expect(geared.player.maxHp, 112,
@@ -92,8 +95,14 @@ void main() {
       // ⭐ The ruling: crit = 150% base + points. Engine base is 50, so the
       // Cinder Loop's 5 points must read 55, never 5.
       expect(geared.player.critDamage, 55);
+      expect(geared.player.shieldStrengthPercent, 10);
+      expect(geared.player.healingReceivedPercent, 10);
+      // ⭐ Regrow arrives as a status, so the HUD pip and the heal-lane
+      // ordering come for free.
+      expect(geared.player.statuses.whereType<RegrowStatus>(), isNotEmpty);
       expect(geared.enemy.accuracyBonus, 0,
           reason: 'enemies get archetypes, never the player\'s wardrobe');
+      expect(geared.enemy.statuses.whereType<RegrowStatus>(), isEmpty);
     });
 
     test('an unequipped player is byte-identical to the old baseline', () {

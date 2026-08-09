@@ -37,7 +37,7 @@ void main() {
   group('Ignite (Pyro §2.2)', () {
     test('a proc burns 10% of raw damage for 3 end-of-turn ticks', () {
       final duel =
-          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)));
+          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)), baseMissPercent: 0);
       charge(alice, MagicElement.pyro, 1);
       final r1 = duel.resolveTurn(
           CastAction(Spellbook.bolt), const ForfeitAction());
@@ -61,7 +61,7 @@ void main() {
 
     test('no proc, no burn', () {
       final duel =
-          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: false)));
+          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: false)), baseMissPercent: 0);
       charge(alice, MagicElement.pyro, 1);
       final r = duel.resolveTurn(
           CastAction(Spellbook.bolt), const ForfeitAction());
@@ -71,7 +71,7 @@ void main() {
 
     test('a shielded hit can still ignite (proc is on-attack raw damage)', () {
       final duel =
-          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)));
+          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)), baseMissPercent: 0);
       bruno.shield = ActiveShield.elemental(MagicElement.geo, 999);
       charge(alice, MagicElement.pyro, 1);
       duel.resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
@@ -83,7 +83,7 @@ void main() {
         () {
       bruno.statuses.add(IgniteStatus(5));
       bruno.shield = ActiveShield.elemental(MagicElement.geo, 30);
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       expect(bruno.hp, 100);
       // The burn carries Pyro's element — the same identity that gives it 2×
@@ -96,7 +96,7 @@ void main() {
     test('the burn counters a Flora shield (pyro burns flora, 2x)', () {
       bruno.statuses.add(IgniteStatus(5));
       bruno.shield = ActiveShield.elemental(MagicElement.flora, 30);
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       expect(bruno.shield!.remaining, 20, reason: '5 doubled to 10');
     });
@@ -125,7 +125,7 @@ void main() {
     }
 
     test('the first four Flora casts do nothing at all', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       alice.hp = 50;
       floraCast(duel, alice, 4);
       expect(alice.statuses.whereType<PhotosynthesisStatus>(), isEmpty,
@@ -134,14 +134,14 @@ void main() {
     });
 
     test('the fifth consecutive Flora cast activates it', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       floraCast(duel, alice, 5);
       expect(alice.streakCount, greaterThanOrEqualTo(5));
       expect(alice.statuses.whereType<PhotosynthesisStatus>(), hasLength(1));
     });
 
     test('heals 1% of max HP per turn while active', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       floraCast(duel, alice, 5);
       alice.hp = 50;
       duel.resolveTurn(
@@ -151,7 +151,7 @@ void main() {
     });
 
     test('breaking the streak switches it off', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       floraCast(duel, alice, 5);
       expect(alice.statuses.whereType<PhotosynthesisStatus>(), hasLength(1));
 
@@ -165,7 +165,7 @@ void main() {
     test('Ignite breaks the STREAK, not merely the status', () {
       // ⚠️ Stripping the status alone would let it return on the very next
       // Flora cast, and Ignite would counter nothing.
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       floraCast(duel, alice, 5);
       expect(alice.streakCount, greaterThanOrEqualTo(5));
 
@@ -178,7 +178,7 @@ void main() {
     });
 
     test('an active Photosynthesis blocks Waterlogged; four casts does not', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       floraCast(duel, alice, 5);
       expect(PhotosynthesisStatus.activeFor(alice), isTrue);
       expect(alice.statuses.whereType<PhotosynthesisStatus>(), hasLength(1));
@@ -186,7 +186,7 @@ void main() {
 
     test('the heal lands before same-turn burn damage (survivability first)',
         () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       floraCast(duel, alice, 5);
       alice.hp = 2;
       // ⚠️ Ward built the streak, so Alice is standing behind a Flora shield.
@@ -202,7 +202,7 @@ void main() {
 
   group('Waterlogged (Aqua §2.1)', () {
     test('every 3rd consecutive Aqua cast slows the opponent by +10', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       for (var i = 0; i < 2; i++) {
         charge(alice, MagicElement.aqua, 1);
         duel.resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
@@ -214,7 +214,7 @@ void main() {
     });
 
     test('the 6th consecutive cast triggers again', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       for (var i = 0; i < 6; i++) {
         bruno.priorityPenalty = 0; // consume between (simulates action taken)
         charge(alice, MagicElement.aqua, 1);
@@ -231,7 +231,7 @@ void main() {
         ..streakElement = MagicElement.flora
         ..streakCount = 5
         ..statuses.add(PhotosynthesisStatus());
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       for (var i = 0; i < 3; i++) {
         charge(alice, MagicElement.aqua, 1);
         duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
@@ -243,7 +243,7 @@ void main() {
   group('cleanse web (§2 table)', () {
     test('Ignite breaks an active Photosynthesis (Pyro burns Flora)', () {
       final duel =
-          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)));
+          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)), baseMissPercent: 0);
       bruno
         ..streakElement = MagicElement.flora
         ..streakCount = 5
@@ -258,7 +258,7 @@ void main() {
 
     test('casting an Aqua shield clears Ignite (Aqua douses Pyro)', () {
       alice.statuses.add(IgniteStatus(5));
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       charge(alice, MagicElement.aqua, 1);
       final r = duel.resolveTurn(
           CastAction(Spellbook.ward), const ForfeitAction());
@@ -269,7 +269,7 @@ void main() {
 
     test('an Aqua ATTACK does not clear Ignite (only shields douse)', () {
       alice.statuses.add(IgniteStatus(5));
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       charge(alice, MagicElement.aqua, 1);
       duel.resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
       expect(alice.statuses.whereType<IgniteStatus>(), hasLength(1));
@@ -278,7 +278,7 @@ void main() {
 
   group('Fatigue sudden death (§8)', () {
     test('no fatigue at or below the threshold', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       for (var i = 0; i < DuelEngine.fatigueThreshold; i++) {
         final r =
             duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
@@ -290,7 +290,7 @@ void main() {
     });
 
     test('escalating unblockable damage after the threshold', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       alice.shield = ActiveShield.elemental(MagicElement.geo, 999);
       for (var i = 0; i < DuelEngine.fatigueThreshold; i++) {
         duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
@@ -311,7 +311,7 @@ void main() {
           ..streakCount = 5
           ..statuses.add(PhotosynthesisStatus());
       }
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       var turns = 0;
       while (!duel.isOver && turns < 100) {
         duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
@@ -321,7 +321,7 @@ void main() {
     });
 
     test('symmetric fatigue kills produce a winner, never a draw', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1));
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       var turns = 0;
       while (!duel.isOver && turns < 100) {
         duel.resolveTurn(const ForfeitAction(), const ForfeitAction());

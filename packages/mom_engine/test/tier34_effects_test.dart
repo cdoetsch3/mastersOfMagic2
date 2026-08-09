@@ -61,7 +61,7 @@ void main() {
 
     test('only the Full Moon matters — it strengthens a Lunar attack by 20%',
         () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       // Advance to turn 3 (Full).
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
@@ -73,7 +73,7 @@ void main() {
 
     test('the other phases do nothing (simplified design)', () {
       // Turn 1 is New — under the trimmed design that is now neutral.
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       charge(alice, MagicElement.lunar, 0);
       duel.resolveTurn(
           CastAction(dmg(20), MagicElement.lunar), const ForfeitAction());
@@ -81,7 +81,7 @@ void main() {
     });
 
     test('Full Moon touches only Lunar spells, never other elements', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       charge(alice, MagicElement.pyro, 0);
@@ -91,7 +91,7 @@ void main() {
     });
 
     test('the public moonPhase getter reports the *upcoming* turn', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       expect(duel.moonPhase, MoonPhase.newMoon, reason: 'turn 1 is next');
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // turn 1
       expect(duel.moonPhase, MoonPhase.waxing, reason: 'turn 2 is next');
@@ -104,7 +104,7 @@ void main() {
   // ======================================================================
   group('Solar → Lunar — the eclipse denies the Full Moon', () {
     test('an eclipsed Lunar mage gets no Full-Moon bonus', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       bruno.statuses.add(BlindStatus());
       // Reach turn 3 (Full globally). Bruno's blind is active from turn 2 on.
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // 1
@@ -118,7 +118,7 @@ void main() {
     });
 
     test('the eclipse is per-mage — an unblinded caster still gets Full', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       bruno.statuses.add(BlindStatus()); // Bruno eclipsed, but Alice casts
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // 1
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction()); // 2
@@ -130,7 +130,7 @@ void main() {
 
     test('the application turn is not yet eclipsed (matches the miss window)',
         () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       // Reach turn 3 (Full) first, THEN blind Bruno this same turn so his
       // Blind is fresh (missChance 0 on the application turn) — his moon is
       // still the global Full, exactly as his attacks still land this turn.
@@ -149,7 +149,7 @@ void main() {
   // ======================================================================
   group('Astral — Astral Alignment', () {
     test('stacks grow by CHARGE SPENT, not per cast', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       charge(alice, MagicElement.astral, 4);
       duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
       expect(statusOf<AstralAlignmentStatus>(alice)!.stacks, 4,
@@ -157,7 +157,7 @@ void main() {
     });
 
     test('a 0-charge cast grants nothing — spending is the commitment', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       charge(alice, MagicElement.astral, 0);
       duel.resolveTurn(
           CastAction(Spellbook.flick, MagicElement.astral), const ForfeitAction());
@@ -165,7 +165,7 @@ void main() {
     });
 
     test('decays by 1 per turn without Astral activity', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       charge(alice, MagicElement.astral, 3);
       duel.resolveTurn(CastAction(Spellbook.surge), const ForfeitAction());
       expect(statusOf<AstralAlignmentStatus>(alice)!.stacks, 3);
@@ -182,7 +182,7 @@ void main() {
     });
 
     test('the split routes 1%/stack past the shield to health at 100%', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       alice.statuses.add(AstralAlignmentStatus(20)); // 20% pierce
       // Solar shield is neutral to a Pyro attacker (opposite tiers) → 100%, so
       // the shield chip is un-multiplied and the arithmetic is clean.
@@ -195,7 +195,7 @@ void main() {
     });
 
     test('it pierces a Barrier too — and the Barrier still pops', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       alice.statuses.add(AstralAlignmentStatus(20)); // 20%
       bruno.barrierPoints = 1;
       charge(alice, MagicElement.pyro, 0);
@@ -207,7 +207,7 @@ void main() {
 
     test('does nothing against an unshielded target (all damage was health)',
         () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       alice.statuses.add(AstralAlignmentStatus(20));
       charge(alice, MagicElement.pyro, 0);
       duel.resolveTurn(
@@ -217,7 +217,7 @@ void main() {
 
     // Note 13 — the pierce lands on health, so lifesteal must heal for it.
     test('lifesteal heals pro-rata for the pierced portion', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       alice
         ..hp = 50
         ..statuses.add(AstralAlignmentStatus(20)); // 20% pierce
@@ -239,7 +239,7 @@ void main() {
   // ======================================================================
   group('Lunar → Astral — a Lunar attack strips Alignment', () {
     test('a normal Lunar attack strips one stack', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       bruno.statuses.add(AstralAlignmentStatus(3));
       charge(alice, MagicElement.lunar, 0); // turn 1 New — still an attack
       // Bruno charges Astral so its Alignment doesn't also take its -1 decay
@@ -250,7 +250,7 @@ void main() {
     });
 
     test('a Full-Moon Lunar attack strips them all', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       bruno.statuses.add(AstralAlignmentStatus(4));
       // Reach turn 3 (Full).
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
@@ -267,7 +267,7 @@ void main() {
   // ======================================================================
   group('Sanctus — Absolution', () {
     test('fires on the 3rd consecutive Sanctus cast, purging one debuff', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       alice.statuses.add(IgniteStatus(5)); // a debuff to purge
       alice
         ..streakElement = MagicElement.sanctus
@@ -280,7 +280,7 @@ void main() {
     });
 
     test('with no debuff to purge, it banks Grace instead', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       alice
         ..streakElement = MagicElement.sanctus
         ..streakCount = 2;
@@ -291,7 +291,7 @@ void main() {
     });
 
     test('the purge pool includes field-debuffs (Waterlogged, Stagger)', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       alice.priorityPenalty = 10; // Waterlogged — a field, not a status
       alice
         ..streakElement = MagicElement.sanctus
@@ -303,7 +303,7 @@ void main() {
     });
 
     test('a non-3rd Sanctus cast does nothing', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       alice.statuses.add(IgniteStatus(5));
       charge(alice, MagicElement.sanctus, 0); // 1st cast, no streak yet
       duel.resolveTurn(
@@ -313,7 +313,7 @@ void main() {
     });
 
     test('casting a different element resets the Sanctus streak', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       alice
         ..streakElement = MagicElement.sanctus
         ..streakCount = 2;
@@ -331,7 +331,7 @@ void main() {
   // ======================================================================
   group('Sanctus → Umbra — Absolution strips 5 Creeping Dark', () {
     test('the opponent loses 5 stacks when Absolution fires', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       bruno.statuses.add(CreepingDarkStatus(12));
       alice
         ..streakElement = MagicElement.sanctus
@@ -349,7 +349,7 @@ void main() {
   // ======================================================================
   group('Grace and Hallow', () {
     test('Hallow banks Grace', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       charge(alice, MagicElement.pyro, 2);
       duel.resolveTurn(CastAction(Spellbook.hallow), const ForfeitAction());
       expect(alice.hasGrace, isTrue);
@@ -357,7 +357,7 @@ void main() {
     });
 
     test('Grace blocks the next debuff (a Blind), then is spent', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]));
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]), baseMissPercent: 0);
       bruno.hasGrace = true;
       charge(alice, MagicElement.solar, 4); // 40% blind, 0.0 procs
       duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
@@ -367,7 +367,7 @@ void main() {
     });
 
     test('Grace blocks Waterlogged', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       bruno.hasGrace = true;
       alice
         ..streakElement = MagicElement.aqua
@@ -380,7 +380,7 @@ void main() {
     });
 
     test('Grace does not stack past one', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       charge(alice, MagicElement.pyro, 2);
       duel.resolveTurn(CastAction(Spellbook.hallow), const ForfeitAction());
       charge(alice, MagicElement.pyro, 2);
@@ -394,7 +394,7 @@ void main() {
   // ======================================================================
   group('Arcane → Sanctus — an Arcane attack unravels the rite', () {
     test('a landed Arcane attack resets the target Sanctus streak to 0', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       bruno
         ..streakElement = MagicElement.sanctus
         ..streakCount = 2;
@@ -406,7 +406,7 @@ void main() {
     });
 
     test('a fully-shielded Arcane attack does NOT reset it (§5.4)', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       bruno
         ..streakElement = MagicElement.sanctus
         ..streakCount = 2;

@@ -16,7 +16,7 @@ void main() {
   });
 
   test('there is exactly one frame per event', () {
-    final duel = DuelEngine(alice, bruno, rng: Random(1));
+    final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
     alice
       ..charge = 2
       ..element = MagicElement.pyro;
@@ -27,7 +27,7 @@ void main() {
 
   test('a status is absent before its event and present after', () {
     // Force an Ignite: Pyro attack with a proc roll of 0.0.
-    final duel = DuelEngine(alice, bruno, rng: _Scripted([0.0]));
+    final duel = DuelEngine(alice, bruno, rng: _Scripted([0.0]), baseMissPercent: 0);
     alice
       ..charge = 2
       ..element = MagicElement.pyro;
@@ -47,7 +47,7 @@ void main() {
   });
 
   test('the final frame matches live state', () {
-    final duel = DuelEngine(alice, bruno, rng: _Scripted([0.0]));
+    final duel = DuelEngine(alice, bruno, rng: _Scripted([0.0]), baseMissPercent: 0);
     alice
       ..charge = 2
       ..element = MagicElement.pyro;
@@ -59,7 +59,7 @@ void main() {
   });
 
   test('snapshots carry field-backed buffs too, not just TurnStatuses', () {
-    final duel = DuelEngine(alice, bruno, rng: Random(1));
+    final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
     alice
       ..charge = 3
       ..element = MagicElement.pyro;

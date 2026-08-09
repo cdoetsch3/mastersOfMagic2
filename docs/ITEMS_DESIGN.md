@@ -1740,10 +1740,25 @@ engine gained the two flat-damage lanes (per cast, per charge spent, applied
 ONCE per cast, to the first hit). Crit lands exactly as ruled: engine base 50
 + item points, so the Cinder Loop reads 155%.
 
-### ⚠️ Still engine work (task #2)
+### ✅ The engine side is in too (task #2, same day)
 
-The 80% base accuracy (spells default 100 today), shield strength %, healing
-received %, the Tonic's in-duel tick, and the Charlock's regrow.
+- **The 80% base is live**: every harmful cast rolls against
+  `ElementTuning.baseMissPercent` (20), symmetric for enemies, and accuracy
+  gear closes the gap. ⚠️ **Astral pays the base too** — it slips dodge and
+  Blind (§4b), not the world; exempting it would have made Astral 25% more
+  accurate than everything for free. `DuelEngine` takes the base as a
+  parameter so mechanics tests opt out; real duels never override it.
+  📝 Still flagged for one playtest.
+- **Shield strength %** scales elemental shields at cast (Barrier is points
+  and is untouched). **Healing received %** lives inside `MageState.heal` —
+  the one door — so lifesteal, Photosynthesis, Regrow and potions all route
+  through it without knowing it exists; it also applies to potions used
+  between encounters.
+- **Regrow and heal-over-time are statuses** (`item_status.dart`), riding
+  the same lane machinery as the element statuses. The Charlock adds
+  `RegrowStatus` at duel start. ⚠️ `HealOverTimeStatus` (the Tonic's tick)
+  is a tested primitive with **no in-duel trigger yet** — using a belt item
+  as a turn action is unbuilt, and that is the belt combat feature's job.
 
 ---
 

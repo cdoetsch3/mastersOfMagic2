@@ -28,7 +28,7 @@ void main() {
   setUp(() {
     alice = MageState(name: 'Alice');
     bruno = MageState(name: 'Bruno');
-    duel = DuelEngine(alice, bruno, elementEffects: false);
+    duel = DuelEngine(alice, bruno, elementEffects: false, baseMissPercent: 0);
   });
 
   void charge(MageState m, MagicElement e, int to) {

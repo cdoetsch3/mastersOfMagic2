@@ -134,7 +134,16 @@ class DuelEngine {
   /// wins the turn's initiative scramble.
   MageState? _tailwindGrab;
 
-  DuelEngine(this.mage1, this.mage2, {Random? rng, this.elementEffects = true})
+  /// The universal miss floor every harmful cast rolls against (ITEMS
+  /// §9b.8). Defaults to the tuned value; ⚠️ **tests of OTHER mechanics pass
+  /// 0** so their scripted RNG sequences stay about what they test. Real
+  /// duels never override it — both lockstep clients must agree.
+  final int baseMissPercent;
+
+  DuelEngine(this.mage1, this.mage2,
+      {Random? rng,
+      this.elementEffects = true,
+      this.baseMissPercent = ElementTuning.baseMissPercent})
       : rng = rng ?? Random();
 
   int _roll(int min, int max) =>
@@ -493,16 +502,24 @@ class DuelEngine {
     }
 
     // Precedence step 3 — Hit roll: a single unified accuracy check (§5.2).
-    //   hitChance = spellAccuracy + gearAccuracy − targetDodge − blind
-    // Blind is folded in as a flat −50 (no separate miss system); Astral is
-    // exempt (Astral slips Solar, §4b). Only harmful spells roll, and only
-    // when the hit chance is actually below 100 — so a default-stat cast (100
-    // accuracy, 0 dodge, unblinded) consumes no RNG, leaving the sim unmoved.
+    //   hitChance = spellAccuracy − baseMiss + gearAccuracy − targetDodge − blind
+    // ⭐ Every harmful cast now carries ElementTuning.baseMissPercent (ITEMS
+    // §9b.8: base hit is 80%, gear closes the gap) — so accuracy gear does
+    // something against everyone, not only dodge builds. Blind is folded in
+    // as a flat −50. ⚠️ Astral slips Solar (§4b): exempt from dodge and
+    // Blind, but NOT from the base — "slips evasion" must not silently
+    // become "25% more accurate than every other element".
     // Miss ⇒ no effect, charge still spent (post-resolution sweep), no streak.
-    if (spell.isHarmful && cast.element != MagicElement.astral) {
-      final blindPenalty = (caster.missChance * 100).round(); // 50 if blinded
-      final hitChance =
-          spell.accuracy + caster.accuracyBonus - cast.target.dodge - blindPenalty;
+    if (spell.isHarmful) {
+      final slips = cast.element == MagicElement.astral;
+      final blindPenalty =
+          slips ? 0 : (caster.missChance * 100).round(); // 50 if blinded
+      final dodge = slips ? 0 : cast.target.dodge;
+      final hitChance = spell.accuracy -
+          baseMissPercent +
+          caster.accuracyBonus -
+          dodge -
+          blindPenalty;
       final missPercent = 100 - hitChance;
       if (missPercent > 0 && rng.nextDouble() * 100 < missPercent) {
         events.add(SpellMissedEvent(caster, spell));
@@ -602,8 +619,12 @@ class DuelEngine {
         // damage. Without it a level-60's shield soaks a level-60's hit for
         // one tenth as long as a level-1's does against a level-1 — defence
         // would quietly stop being a strategy as the game went on.
-        final strength =
-            (_roll(minStrength, maxStrength) * caster.levelScale).round();
+        // ⭐ Gear's shield strength % (ITEMS §9b.8) rides the same line as
+        // the level scale. Elemental shields only — Barrier is points.
+        final strength = (_roll(minStrength, maxStrength) *
+                caster.levelScale *
+                (1 + caster.shieldStrengthPercent / 100))
+            .round();
         caster.shield = ActiveShield.elemental(cast.element, strength);
         events.add(ShieldRaisedEvent(caster,
             element: cast.element, isBarrier: false, strength: strength));
@@ -749,9 +770,11 @@ class DuelEngine {
           deflected: deflected));
     }
     if (lifesteal > 0 && totalToHp > 0) {
-      final healed = (totalToHp * lifesteal).round();
-      cast.caster.heal(healed);
-      events.add(HealedEvent(cast.caster, healed));
+      // Before/after, because heal() may scale the amount (healing received
+      // %) — the event must report what actually happened.
+      final before = cast.caster.hp;
+      cast.caster.heal((totalToHp * lifesteal).round());
+      events.add(HealedEvent(cast.caster, cast.caster.hp - before));
     }
     _lastAttackToHp = totalToHp;
     return totalRaw;

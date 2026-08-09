@@ -9,7 +9,7 @@ void main() {
   setUp(() {
     attacker = MageState(name: 'Attacker');
     defender = MageState(name: 'Defender');
-    duel = DuelEngine(attacker, defender, elementEffects: false);
+    duel = DuelEngine(attacker, defender, elementEffects: false, baseMissPercent: 0);
   });
 
   /// Charges [mage] up to [target] charge in [element] while the other mage
