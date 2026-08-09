@@ -636,6 +636,47 @@ in this document.
 
 ---
 
+### 5b.5 The Long Rite 📝 (instant-death ritual — Christian, 2026-08-09)
+
+**The idea:** an instant-death win condition that requires an uninterrupted
+"ritual" of roughly **15 turns** to execute.
+
+⭐ **Read correctly, this is an anti-turtle mechanism, not a rush tool.** Most
+duels are decided well before turn 15, so the Rite only ever completes
+against an opponent who refuses to engage — it is a doom clock that
+*punishes total passivity*, which is a hole no other mechanic currently
+covers. That framing should drive every tuning decision.
+
+**Proposed shape (all 📝, nothing ruled):**
+
+- **Progressing the Rite costs the turn** — a Channel-like action, so the
+  ritualist is fully committal: fifteen turns of not attacking, not
+  shielding, not healing. The opponent is being handed fifteen free turns;
+  the Rite is only frightening because of what happens if they waste them.
+- **Any damage to health interrupts it** — back to zero, not paused.
+  Shields raised *before* the Rite began are its only armor, which makes
+  "crack the shell" the counterplay and gives shield-strength gear a
+  second identity.
+- ⚠️ **The count must be visible to both players** — a pip that climbs.
+  A hidden instant win is a bad-faith mechanic. ❓ Interaction with Umbra's
+  Midnight (which hides exactly this kind of information) needs a ruling:
+  recommend the Rite pip is *exempt* from concealment, always.
+- ❓ **Where it lives**: an Ethereal-tier spell (45+) keeps it out of the
+  early game; Sanctus (oaths, rites) is the thematic home, though an
+  Umbra framing (the death that walks slowly) also reads. Could also be a
+  boss unique's granted ability rather than a spell.
+- ⚠️ **Mortal mode**: a Rite kill deletes a character like any other death.
+  That is either the most dramatic moment the game can produce or a griefing
+  tool — probably both. Flag for the §7 balance pass.
+- ⚠️ **PvP timeouts**: 15 turns × the 25s move timeout is over six minutes
+  of ceiling. Fine for a mechanic this rare, but the stall-detection ideas
+  in §7 should treat "opponent is mid-Rite" as activity, not stalling.
+
+❓ Open: exact turn count (15 is a feel guess), whether partial progress
+persists between duels (no — surely no), and the name.
+
+---
+
 ## 6. Elemental motes & the crafting economy 📝
 
 Christian's Skyrim-soul-gem model, adopted.
@@ -1800,6 +1841,10 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-09b.** §5b.5 added: The Long Rite, a proposed 15-turn
+uninterrupted-ritual instant-death mechanic, framed as an anti-turtle doom
+clock. Nothing built.
 
 **Rev — 2026-08-09.** §9b.8 added: the Q1 catalogue rulings (80% base
 accuracy, the two weapon lanes, crit defined, potion grammar, 2/3 materials
