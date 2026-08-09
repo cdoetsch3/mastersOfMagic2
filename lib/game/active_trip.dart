@@ -147,7 +147,13 @@ class ActiveTrip {
   /// travelling.
   static ActiveTrip? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
-    final stops = (json['stops'] as List?)?.cast<String>();
+    // ⭐ Canonicalise every stop — a trip in flight when a zone was renamed
+    // would otherwise carry a dead id straight past the profile migration
+    // (World.renamedIds).
+    final stops = (json['stops'] as List?)
+        ?.cast<String>()
+        .map(World.canonicalId)
+        .toList();
     final seconds = (json['secondsAtStop'] as List?)
         ?.map((m) => (m as num).toInt())
         .toList();

@@ -322,17 +322,24 @@ class PlayerProfile {
       xp: (json['xp'] as num?)?.toInt() ?? 0,
       gold: (json['gold'] as num?)?.toInt() ?? 0,
       resonancePrisms: (json['resonancePrisms'] as num?)?.toInt() ?? 0,
-      locationId: json['locationId'] as String?,
+      // ⭐ Every stored location id is canonicalised on load (World.renamedIds)
+      // so a rename never strands a save. Six fields hold one: this, the trip,
+      // the discovered set, and the keys of zoneClears + storerooms.
+      locationId: json['locationId'] == null
+          ? null
+          : World.canonicalId(json['locationId'] as String),
       trip: ActiveTrip.fromJson(json['trip'] as Map<String, dynamic>?),
       discoveredLocationIds: (json['discoveredLocationIds'] as List?)
           ?.cast<String>()
+          .map(World.canonicalId)
           .toSet(),
       // Absent on saves from before clears were tracked — an old character
       // reads as "has cleared nothing", which is the safe direction: it can
       // only withhold repeat-clear content, never grant it early.
       zoneClears:
           (json['zoneClears'] as Map?)?.map(
-            (k, v) => MapEntry(k as String, (v as num).toInt()),
+            (k, v) =>
+                MapEntry(World.canonicalId(k as String), (v as num).toInt()),
           ) ??
           {},
       presets: presets,
@@ -342,7 +349,7 @@ class PlayerProfile {
       storerooms:
           (json['storerooms'] as Map?)?.map(
             (k, v) => MapEntry(
-              k as String,
+              World.canonicalId(k as String),
               Storeroom.fromJson(v as Map<String, dynamic>?),
             ),
           ) ??

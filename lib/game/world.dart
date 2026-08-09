@@ -1069,6 +1069,20 @@ abstract final class World {
     for (final l in locations) l.id: l,
   };
 
+  /// ⚠️ **Ids renamed after saves already existed.** A stored id is mapped
+  /// through this on load ([canonicalId]) so a rename never strands a
+  /// character on an id the routing graph no longer knows — which is exactly
+  /// what happened when Aldermere became Hearthwood: `byId` fell back to the
+  /// start location so the *place* looked right, but `Travel.route` keyed on
+  /// the dead string and returned null, silently breaking travel.
+  ///
+  /// ⭐ Append-only. Removing an entry re-breaks every save that still holds
+  /// the old id.
+  static const Map<String, String> renamedIds = {'aldermere': 'hearthwood'};
+
+  /// The id a stored value should be read as, after any rename.
+  static String canonicalId(String id) => renamedIds[id] ?? id;
+
   /// ⚠️ Falls back to the start location for an unknown id rather than
   /// throwing — a bad id must never crash the app on load.
   static GameLocation byId(String id) => _byId[id] ?? locations.first;
