@@ -678,6 +678,14 @@ class DuelEngine {
     required bool ignoresShields,
     required List<DuelEvent> events,
   }) {
+    // ⭐ Gear's flat damage (ITEMS §9b.8): per-cast plus per-charge-spent,
+    // added ONCE — to the first hit — after the level scale, before crit and
+    // deflection meet it. Per-hit gear was deliberately not built; the wand
+    // ruling is per CAST precisely to avoid multi-hit optimisation this early.
+    final flatBonus =
+        cast.caster.damagePerCast +
+        cast.caster.damagePerCharge *
+            (cast.spell!.xCost ? cast.chargeAtCast : cast.spell!.chargeCost);
     final target = cast.target;
     final spell = cast.spell!;
     // Astral Alignment: this fraction of each hit bypasses the shield to
@@ -703,6 +711,7 @@ class DuelEngine {
                   caster.levelScale *
                   caster.powerScale)
               .round();
+      if (h == 0 && flatBonus > 0) perHit += flatBonus;
 
       // Crit (§5.2 step 4/5, per hit). Guarded on chance > 0 so a no-crit
       // build rolls nothing. The bonus is a multiplier atop the damage mods.

@@ -180,6 +180,23 @@ class ItemModifiers {
 
   static const none = ItemModifiers();
 
+  /// Field-wise sum — what wearing two things means.
+  ItemModifiers operator +(ItemModifiers o) => ItemModifiers(
+    accuracyBonus: accuracyBonus + o.accuracyBonus,
+    dodge: dodge + o.dodge,
+    critChance: critChance + o.critChance,
+    critDamage: critDamage + o.critDamage,
+    deflectChance: deflectChance + o.deflectChance,
+    deflectAmount: deflectAmount + o.deflectAmount,
+    maxHpBonus: maxHpBonus + o.maxHpBonus,
+    damagePerCast: damagePerCast + o.damagePerCast,
+    damagePerCharge: damagePerCharge + o.damagePerCharge,
+    shieldStrengthPercent: shieldStrengthPercent + o.shieldStrengthPercent,
+    healingReceivedPercent: healingReceivedPercent + o.healingReceivedPercent,
+    regrowPercent: regrowPercent + o.regrowPercent,
+    beltSlots: beltSlots + o.beltSlots,
+  );
+
   bool get isEmpty =>
       accuracyBonus == 0 &&
       dodge == 0 &&

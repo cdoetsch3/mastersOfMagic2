@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:mom_engine/mom_engine.dart';
 
+import 'items/item_def.dart';
 import 'loadout.dart';
 import 'opponent_driver.dart';
 
@@ -99,11 +100,17 @@ class DuelController extends ChangeNotifier {
   /// of half-dead monsters.
   final int? playerStartingHp;
 
+  /// What the player's gear adds up to (Equipping.totals). ⭐ **Applied to
+  /// the player's MageState only** — enemies get their numbers from their
+  /// archetype, never from items.
+  final ItemModifiers playerGear;
+
   DuelController({
     required this.loadout,
     required this.driver,
     this.playerLevel = 1,
     this.playerStartingHp,
+    this.playerGear = ItemModifiers.none,
   }) {
     newDuel();
     driver.watchOpponentSurrender(_onOpponentSurrendered);
@@ -115,7 +122,23 @@ class DuelController extends ChangeNotifier {
     // ⭐ Level scales health and damage on both sides (4%/level). An
     // even-level duel plays exactly as it always did; a level gap is now
     // worth something.
-    player = MageState(name: 'You', level: playerLevel);
+    // ⭐ Gear reaches the duel HERE, and only here (ITEMS §9b.8): flat HP on
+    // the constructor, everything else onto the MageState fields the engine
+    // already rolls. critDamage ADDS to the engine's 50 base, so Cinder
+    // Loop's 5 points read 155%, exactly as ruled.
+    player = MageState(
+      name: 'You',
+      level: playerLevel,
+      maxHp: MageState.scaledMaxHp(playerLevel) + playerGear.maxHpBonus,
+    )
+      ..accuracyBonus = playerGear.accuracyBonus
+      ..dodge = playerGear.dodge
+      ..critChance = playerGear.critChance
+      ..critDamage = 50 + playerGear.critDamage
+      ..deflectChance = playerGear.deflectChance
+      ..deflectAmount = playerGear.deflectAmount
+      ..damagePerCast = playerGear.damagePerCast
+      ..damagePerCharge = playerGear.damagePerCharge;
     final carried = playerStartingHp;
     if (carried != null) player.hp = carried.clamp(1, player.maxHp);
     // ⭐ An enemy is the level baseline TIMES its archetype (ENEMIES §1.1), so

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../game/game_state.dart';
 import '../../game/items/carrying.dart';
+import '../../game/items/equipping.dart';
 import '../../game/items/inventory.dart';
 import '../../game/items/item_catalogue.dart';
 import '../../game/items/item_def.dart';
@@ -36,6 +37,8 @@ class InventoryTab extends StatelessWidget {
             children: [
               const SectionLabel('Equipped'),
               _PaperDoll(game: game),
+              const SizedBox(height: 10),
+              _GearTotals(game: game),
               const SizedBox(height: 16),
               SectionLabel(
                 'Backpack — ${game.profile.backpack.used}'
@@ -75,8 +78,8 @@ class InventoryTab extends StatelessWidget {
 /// early on is telling the player what they do not have yet — a paper doll
 /// that only lists worn items looks like a bug when you own nothing.
 ///
-/// 📝 Nothing equips yet: items drop and are carried, but `ItemModifiers`
-/// reaches no `MageState`. The slots are real; the wiring is not.
+/// ⭐ Tap a worn item to see its stats or take it off; tap a backpack item
+/// to wear it. Since 2026-08-09 the totals genuinely reach the duel.
 class _PaperDoll extends StatelessWidget {
   final GameState game;
 
@@ -97,7 +100,8 @@ class _PaperDoll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final beltCapacity = Carrying.beltSlotsFor();
+    final beltCapacity =
+        Carrying.beltSlotsFor(fromGear: game.equipmentTotals.beltSlots);
     return GamePanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,7 +180,7 @@ class _EquipSlotChip extends StatelessWidget {
     final def = inst == null ? null : ItemCatalogue.tryById(inst.defId);
     final filled = def != null;
     final colour = filled ? rarityColour(def.rarity) : AppColors.borderDim;
-    return Container(
+    final chip = Container(
       width: 104,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
@@ -216,7 +220,133 @@ class _EquipSlotChip extends StatelessWidget {
         ],
       ),
     );
+    if (def is! EquipmentDef) return chip;
+    final slot = def.slot;
+    return InkWell(
+      borderRadius: BorderRadius.circular(6),
+      onTap: () => showItemActions(
+        context,
+        def: def,
+        instance: inst,
+        actions: [
+          (
+            label: 'Unequip',
+            run: () => GameStateScope.read(context).unequip(slot),
+          ),
+        ],
+      ),
+      child: chip,
+    );
   }
+}
+
+/// The gear sum, printed by the same writer every stats panel uses
+/// (Equipping.describe) — ⭐ so this panel cannot disagree with the duel.
+class _GearTotals extends StatelessWidget {
+  final GameState game;
+
+  const _GearTotals({required this.game});
+
+  @override
+  Widget build(BuildContext context) {
+    final lines = Equipping.describe(game.equipmentTotals);
+    return GamePanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'FROM EQUIPMENT',
+            style: TextStyle(
+              color: AppColors.textFaint,
+              fontSize: 10,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 4),
+          if (lines.isEmpty)
+            const Text(
+              'Nothing you are wearing changes your stats yet.',
+              style: TextStyle(color: AppColors.textDim, fontSize: 12),
+            )
+          else
+            for (final line in lines)
+              Text(
+                line,
+                style: const TextStyle(color: AppColors.teal, fontSize: 12.5),
+              ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One dialog for every item interaction — what it is, what it does, and
+/// what you can do with it here. [actions] whose `run` returns a refusal
+/// string surface it; null means done.
+Future<void> showItemActions(
+  BuildContext context, {
+  required ItemDef def,
+  ItemInstance? instance,
+  List<({String label, Future<String?> Function() run})> actions = const [],
+}) async {
+  final lines = def is EquipmentDef
+      ? Equipping.describe(def.modifiers)
+      : (def is Usable ? [(def as Usable).effect.describe] : const <String>[]);
+  final messenger = ScaffoldMessenger.of(context);
+  await showDialog<void>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      backgroundColor: AppColors.panel,
+      title: Text(
+        ItemCatalogue.displayName(def, instance),
+        style: TextStyle(color: rarityColour(def.rarity), fontSize: 16),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (def is EquipmentDef)
+            Text(
+              'Level ${def.equipLevel}',
+              style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+            ),
+          for (final line in lines)
+            Text(
+              line,
+              style: const TextStyle(color: AppColors.teal, fontSize: 13),
+            ),
+          const SizedBox(height: 8),
+          Text(
+            def.lore,
+            style: const TextStyle(
+              color: AppColors.textDim,
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        for (final a in actions)
+          TextButton(
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              final no = await a.run();
+              // ⚠️ A refusal the player never sees is a button that looks
+              // broken. Every rule speaks here.
+              if (no != null) {
+                messenger.showSnackBar(SnackBar(content: Text(no)));
+              }
+            },
+            child: Text(a.label),
+          ),
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
 }
 
 class _BeltSlot extends StatelessWidget {
@@ -275,12 +405,37 @@ class _BackpackGrid extends StatelessWidget {
         itemBuilder: (context, i) {
           final slot = slots[i];
           if (slot == null) return const _EmptySlot();
+          final instance = slot.instanceId == null
+              ? null
+              : game.profile.itemInstances[slot.instanceId];
+          final def = ItemCatalogue.tryById(slot.defId);
           return _ItemSlot(
             slot: slot,
-            instance: slot.instanceId == null
+            instance: instance,
+            onTap: def == null
                 ? null
-                : game.profile.itemInstances[slot.instanceId],
-            onTap: town == null ? null : () => game.deposit(town!, i),
+                : () => showItemActions(
+                    context,
+                    def: def,
+                    instance: instance,
+                    actions: [
+                      // ⭐ Wearing beats stowing in the ordering — it is the
+                      // rarer, more deliberate act.
+                      if (def is EquipmentDef)
+                        (
+                          label: 'Equip',
+                          run: () => game.equipFromBackpack(i),
+                        ),
+                      if (town != null)
+                        (
+                          label: 'Stow',
+                          run: () async {
+                            await game.deposit(town!, i);
+                            return null;
+                          },
+                        ),
+                    ],
+                  ),
           );
         },
       ),
@@ -394,6 +549,22 @@ class _StoreroomList extends StatelessWidget {
                         instanceId: id,
                       ),
                     ),
+              // ⭐ The Storeroom-as-wardrobe move: dress straight from
+              // storage, displaced gear stows itself in exchange.
+              onWear:
+                  ItemCatalogue.tryById(
+                        game.profile.itemInstances[id]?.defId ?? '',
+                      )
+                      is EquipmentDef
+                  ? () async {
+                      final no = await game.equipFromStoreroom(id);
+                      if (no != null && context.mounted) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(no)));
+                      }
+                    }
+                  : null,
             ),
           if (full)
             const Padding(
@@ -431,12 +602,14 @@ class _StoredRow extends StatelessWidget {
   final int count;
   final Color colour;
   final VoidCallback? onTake;
+  final VoidCallback? onWear;
 
   const _StoredRow({
     required this.label,
     required this.count,
     required this.colour,
     this.onTake,
+    this.onWear,
   });
 
   @override
@@ -457,6 +630,8 @@ class _StoredRow extends StatelessWidget {
           style: const TextStyle(color: AppColors.textDim, fontSize: 12),
         ),
         const SizedBox(width: 8),
+        if (onWear != null)
+          TextButton(onPressed: onWear, child: const Text('Wear')),
         TextButton(onPressed: onTake, child: const Text('Take')),
       ],
     ),

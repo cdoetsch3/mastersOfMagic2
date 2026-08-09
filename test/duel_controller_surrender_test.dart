@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mom_engine/mom_engine.dart';
 import 'package:masters_of_magic_2/game/duel_controller.dart';
+import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/loadout.dart';
 import 'package:masters_of_magic_2/game/mage_apparel.dart';
 import 'package:masters_of_magic_2/game/opponent_driver.dart';
@@ -68,6 +69,43 @@ void main() {
   setUp(() {
     driver = FakeRemoteDriver();
     controller = DuelController(loadout: Loadout.starter, driver: driver);
+  });
+
+  group('gear reaches the duel (ITEMS §9b.8)', () {
+    test('the totals land on the player MageState, and only the player', () {
+      final geared = DuelController(
+        loadout: Loadout.starter,
+        driver: FakeRemoteDriver(),
+        playerLevel: 1,
+        playerGear: const ItemModifiers(
+          maxHpBonus: 12,
+          accuracyBonus: 5,
+          critChance: 5,
+          critDamage: 5,
+          damagePerCharge: 1,
+        ),
+      );
+      expect(geared.player.maxHp, 112,
+          reason: 'flat HP must reach the constructor, not be added after');
+      expect(geared.player.accuracyBonus, 5);
+      expect(geared.player.damagePerCharge, 1);
+      // ⭐ The ruling: crit = 150% base + points. Engine base is 50, so the
+      // Cinder Loop's 5 points must read 55, never 5.
+      expect(geared.player.critDamage, 55);
+      expect(geared.enemy.accuracyBonus, 0,
+          reason: 'enemies get archetypes, never the player\'s wardrobe');
+    });
+
+    test('an unequipped player is byte-identical to the old baseline', () {
+      final bare = DuelController(
+        loadout: Loadout.starter,
+        driver: FakeRemoteDriver(),
+      );
+      expect(bare.player.maxHp, 100);
+      expect(bare.player.critChance, 0);
+      expect(bare.player.critDamage, 50,
+          reason: 'the engine default, untouched by empty gear');
+    });
   });
 
   test('surrendering tells the driver so the remote peer finds out', () {

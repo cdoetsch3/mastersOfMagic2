@@ -92,6 +92,7 @@ class _AdventureScreenState extends State<AdventureScreen> {
           ),
           campaign: true,
           playerLevel: game.profile.level,
+          playerGear: game.equipmentTotals,
           // ⭐ HP carries between encounters — that is the whole tension of
           // pushing on. Charge and shields reset; only health persists.
           playerStartingHp: run.playerHp,

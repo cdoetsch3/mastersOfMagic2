@@ -7,7 +7,10 @@ import 'active_trip.dart';
 import 'adventure.dart';
 import 'enemies/bestiary.dart';
 import 'enemies/loot.dart';
+import 'items/equipping.dart';
 import 'items/inventory.dart';
+import 'items/item_catalogue.dart';
+import 'items/item_def.dart';
 import 'items/item_instance.dart';
 import 'player_profile.dart';
 import 'profile_storage.dart';
@@ -370,6 +373,105 @@ class GameState extends ChangeNotifier {
   /// Puts the backpack slot at [index] into [townId]'s Storeroom.
   ///
   /// ⚠️ **Per city** (ITEMS §10.3c) — this never touches another town's.
+  /// The sum of everything worn. ⭐ The single number the duel, the belt and
+  /// the Inventory screen all read (Equipping.totals).
+  ItemModifiers get equipmentTotals => Equipping.totals(
+    equipped: profile.equipped,
+    instances: profile.itemInstances,
+  );
+
+  /// Equips the item in backpack slot [index].
+  ///
+  /// Returns a player-facing refusal, or null on success. ⭐ **A swap, not a
+  /// move**: whatever was worn in that slot lands in the vacated backpack
+  /// slot, so equipping can never fail for space.
+  Future<String?> equipFromBackpack(int index) async {
+    final slot = profile.backpack.slots[index];
+    final inst = slot?.instanceId == null
+        ? null
+        : profile.itemInstances[slot!.instanceId];
+    final def = ItemCatalogue.tryById(inst?.defId ?? '');
+    final no = Equipping.refusal(def, playerLevel: profile.level);
+    if (no != null) return no;
+    final equipSlot = (def! as EquipmentDef).slot;
+    await _mutate(() {
+      final wasWorn = profile.equipped[equipSlot];
+      var pack = profile.backpack.withRemovedAt(index);
+      if (wasWorn != null) {
+        final wornDef = profile.itemInstances[wasWorn]?.defId;
+        if (wornDef != null) {
+          pack =
+              pack.withAdded(
+                InventorySlot(defId: wornDef, instanceId: wasWorn),
+              ) ??
+              pack;
+        }
+      }
+      profile.backpack = pack;
+      profile.equipped[equipSlot] = slot!.instanceId!;
+    });
+    return null;
+  }
+
+  /// Takes off whatever is in [slot], into the backpack.
+  Future<String?> unequip(EquipSlot slot) async {
+    final worn = profile.equipped[slot];
+    if (worn == null) return 'Nothing is equipped there.';
+    final defId = profile.itemInstances[worn]?.defId;
+    if (defId == null) return 'Nothing is equipped there.';
+    // ⚠️ Unequip is the one direction that needs space — there is no slot
+    // being vacated to reuse.
+    if (profile.backpack.isFull) return 'Your pack is full.';
+    await _mutate(() {
+      profile.equipped.remove(slot);
+      profile.backpack =
+          profile.backpack.withAdded(
+            InventorySlot(defId: defId, instanceId: worn),
+          ) ??
+          profile.backpack;
+    });
+    return null;
+  }
+
+  /// Equips a stored instance directly from the current town's Storeroom —
+  /// the displaced item is stowed there in exchange.
+  ///
+  /// ⭐ The Storeroom-as-wardrobe move (ITEMS §10.3c): in a city you can dress
+  /// from storage without a backpack shuffle. ⚠️ Town-only by nature — the
+  /// Storeroom is per city, and you are not in one on the road.
+  Future<String?> equipFromStoreroom(String instanceId) async {
+    final here = profile.locationId;
+    if (!profile.location.isTown) return 'Storerooms are in town.';
+    final room = profile.storerooms[here];
+    if (room == null || !room.instanceIds.contains(instanceId)) {
+      return 'That is not stored here.';
+    }
+    final def = ItemCatalogue.tryById(
+      profile.itemInstances[instanceId]?.defId ?? '',
+    );
+    final no = Equipping.refusal(def, playerLevel: profile.level);
+    if (no != null) return no;
+    final equipSlot = (def! as EquipmentDef).slot;
+    await _mutate(() {
+      final taken = room.withWithdrawn(
+        InventorySlot(defId: def.id, instanceId: instanceId),
+      );
+      var nextRoom = taken.room;
+      final wasWorn = profile.equipped[equipSlot];
+      if (wasWorn != null) {
+        final wornDef = profile.itemInstances[wasWorn]?.defId;
+        if (wornDef != null) {
+          nextRoom = nextRoom.withDeposited(
+            InventorySlot(defId: wornDef, instanceId: wasWorn),
+          );
+        }
+      }
+      profile.storerooms[here] = nextRoom;
+      profile.equipped[equipSlot] = instanceId;
+    });
+    return null;
+  }
+
   Future<void> deposit(String townId, int index) => _mutate(() {
     final slot = profile.backpack.slots[index];
     if (slot == null) return;

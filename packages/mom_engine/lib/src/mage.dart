@@ -116,6 +116,15 @@ class MageState {
   /// Flat accuracy bonus (from gear), added to a spell's own accuracy. Percent.
   int accuracyBonus = 0;
 
+  /// Flat damage added ONCE per offensive cast (the wand lane, ITEMS §9b.8).
+  /// Applied to the first hit, so multi-hit spells gain it once, not per hit.
+  int damagePerCast = 0;
+
+  /// Flat damage per charge the spell COST (the quarterstaff lane, §9b.8).
+  /// "Charge spent" is §5b.3a's definition: the spell's cost, or what an
+  /// X-cost spell actually paid. Also applied once, on the first hit.
+  int damagePerCharge = 0;
+
   /// Reduces an attacker's hit chance against this mage. Percent points.
   int dodge = 0;
 

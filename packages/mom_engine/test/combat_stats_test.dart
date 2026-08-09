@@ -194,4 +194,43 @@ void main() {
     cast(duel, dmg(20), MagicElement.pyro);
     expect(bruno.hp, 85, reason: '20 ×1.5 = 30, then −50% = 15 lands');
   });
+
+  // ======================================================================
+  // Gear's flat damage — per cast and per charge spent (ITEMS §9b.8)
+  // ======================================================================
+  group('flat damage from gear', () {
+    test('damagePerCast adds once to a single hit', () {
+      alice.damagePerCast = 2; // the wand lane
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      cast(duel, dmg(20), MagicElement.flora);
+      expect(bruno.hp, 78, reason: '20 + 2, once');
+    });
+
+    test('damagePerCast adds once to a multi-hit spell, not per hit', () {
+      alice.damagePerCast = 2;
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      cast(duel, dmg(5, hits: 4), MagicElement.flora);
+      // ⚠️ Kills the per-hit implementation: 4×(5+2) would be 28.
+      expect(bruno.hp, 100 - (5 * 4 + 2), reason: '20 + 2, ONCE');
+    });
+
+    test('damagePerCharge scales with the charge the spell cost', () {
+      alice.damagePerCharge = 1; // the quarterstaff lane
+      final threeCharge = Spell(
+          id: 'big', name: 'Big', chargeCost: 3, priority: 9,
+          effect: const DamageEffect(20, 20));
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      cast(duel, threeCharge, MagicElement.flora);
+      // ⚠️ Kills the flat-constant implementation (21) and the per-cast
+      // confusion (20 + 0): the staff pays for COMMITMENT.
+      expect(bruno.hp, 100 - 23, reason: '20 + 1×3 charges');
+    });
+
+    test('a zero-cost spell pays the staff nothing', () {
+      alice.damagePerCharge = 1;
+      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom());
+      cast(duel, dmg(20), MagicElement.flora); // chargeCost 0
+      expect(bruno.hp, 80, reason: 'no charge spent, no staff bonus');
+    });
+  });
 }

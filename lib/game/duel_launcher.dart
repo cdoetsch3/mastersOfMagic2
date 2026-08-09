@@ -29,6 +29,9 @@ Future<void> launchDuel(
         // Without this the duel screen defaults to level 1 and everyone
         // fights at 100 HP regardless of their real level.
         playerLevel: game.profile.level,
+        // ⭐ Gear reaches every duel the player actually fights. Tests that
+        // build DuelScreen directly stay at the unequipped baseline.
+        playerGear: game.equipmentTotals,
         // ⚠️ Both levels cross this seam. The player's scales their health
         // and damage; the opponent's scales the XP the win is worth. This is
         // the only path a real player takes, so a level dropped here is

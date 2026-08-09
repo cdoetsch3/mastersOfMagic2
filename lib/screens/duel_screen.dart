@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mom_engine/mom_engine.dart';
 
+import '../game/items/item_def.dart';
 import '../game/duel_controller.dart';
 import '../game/duel_status_badges.dart';
 import '../game/element_style.dart';
@@ -44,6 +45,10 @@ class DuelScreen extends StatefulWidget {
   /// for a standalone duel, which starts at full.
   final int? playerStartingHp;
 
+  /// The player's summed gear (GameState.equipmentTotals). Defaults to none
+  /// so tests that build the screen directly stay at the baseline.
+  final ItemModifiers playerGear;
+
   /// Reports the player's remaining health, so the next encounter in a run can
   /// start where this one ended.
   final void Function(int remainingHp)? onPlayerHpRemaining;
@@ -65,6 +70,7 @@ class DuelScreen extends StatefulWidget {
     this.campaign = false,
     this.onResult,
     this.playerStartingHp,
+    this.playerGear = ItemModifiers.none,
     this.onPlayerHpRemaining,
     this.onSettle,
     this.playerLevel = 1,
@@ -83,6 +89,7 @@ class _DuelScreenState extends State<DuelScreen>
     driver: widget.driver,
     playerLevel: widget.playerLevel,
     playerStartingHp: widget.playerStartingHp,
+    playerGear: widget.playerGear,
   );
   bool _resultReported = false;
   late final AnimationController _fx = AnimationController(

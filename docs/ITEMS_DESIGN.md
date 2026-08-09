@@ -1729,13 +1729,21 @@ none of the numbers.**
     drop-only jewelry); crafted commons never do — the grammar composes their
     names. "Heartwood Stave" is now displayed **Heartwood Staff**.
 
-### ⚠️ What this bought that is not yet wired
+### ✅ Equipping is wired (2026-08-09, same day)
 
-- `ItemModifiers` gained maxHp, damage-per-cast, damage-per-charge, shield
-  strength %, healing received %, and regrow — **none reach a `MageState`
-  yet** (the standing "nothing equips" blocker, now load-bearing).
-- The 80% accuracy base, the crit roll, the Tonic's in-duel tick and the
-  Charlock's regrow are engine work, logged as tasks.
+The "nothing equips" blocker is closed. `Equipping.totals` sums the worn
+items; `GameState` owns equip / unequip / equip-from-Storeroom (a wardrobe
+swap — the displaced piece stows itself); `DuelController` puts the totals on
+the player's `MageState` and nowhere else. ⭐ The engine already rolled
+accuracy, crit, dodge and deflection — gear now feeds those rolls, and the
+engine gained the two flat-damage lanes (per cast, per charge spent, applied
+ONCE per cast, to the first hit). Crit lands exactly as ruled: engine base 50
++ item points, so the Cinder Loop reads 155%.
+
+### ⚠️ Still engine work (task #2)
+
+The 80% base accuracy (spells default 100 today), shield strength %, healing
+received %, the Tonic's in-duel tick, and the Charlock's regrow.
 
 ---
 
