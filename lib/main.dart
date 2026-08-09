@@ -29,6 +29,16 @@ class MastersOfMagicApp extends StatefulWidget {
 
 class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
   late final Future<GameState> _future = GameState.boot(LocalProfileStorage());
+
+  /// A room code from a scanned QR link (?join=CODE). Read once at boot —
+  /// ⭐ the friend scans the host's QR with their phone camera, the browser
+  /// opens this URL, and HomeShell walks them straight into the duel.
+  final String? _pendingJoinCode = () {
+    final code = Uri.base.queryParameters['join'];
+    return (code == null || code.trim().isEmpty)
+        ? null
+        : code.trim().toUpperCase();
+  }();
   late final AuthService? _auth = Firebase.apps.isNotEmpty
       ? AuthService()
       : null;
@@ -98,7 +108,7 @@ class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
           },
         );
       },
-      home: const HomeShell(),
+      home: HomeShell(pendingJoinCode: _pendingJoinCode),
     );
   }
 }

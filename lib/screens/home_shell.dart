@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/game_state.dart';
 import '../ui/app_theme.dart';
+import 'matchmaking_screen.dart';
 import 'tabs/home_tab.dart';
 import 'tabs/inventory_tab.dart';
 import 'tabs/map_tab.dart';
@@ -28,7 +29,11 @@ const int _centerIndex = 2;
 /// Landscape: a left nav rail (also with an emphasized center) so a player can
 /// stay in landscape through menus and combat without flipping the phone.
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key});
+  /// A room code from a scanned QR link — pushed straight to the
+  /// matchmaking screen on first frame (main.dart reads ?join= at boot).
+  final String? pendingJoinCode;
+
+  const HomeShell({super.key, this.pendingJoinCode});
 
   /// Cross-route tab requests (routes pushed above the shell can't reach its
   /// state through context). Setting a tab index here switches the shell to
@@ -50,6 +55,21 @@ class _HomeShellState extends State<HomeShell> {
   void initState() {
     super.initState();
     HomeShell.tabRequest.addListener(_onTabRequest);
+    final code = widget.pendingJoinCode;
+    if (code != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final game = GameStateScope.read(context);
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => MatchmakingScreen(
+              loadout: game.profile.activePreset.toLoadout(),
+              initialJoinCode: code,
+            ),
+          ),
+        );
+      });
+    }
   }
 
   void _onTabRequest() {

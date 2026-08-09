@@ -18,6 +18,8 @@ dependencies:
   firebase_core: ^4.12.1
   firebase_auth: ^6.5.6
   http: ^1.6.0
+  # QR for room-code join — renders locally, no network fetch.
+  qr_flutter: ^4.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
