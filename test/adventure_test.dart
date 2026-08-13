@@ -302,8 +302,15 @@ void main() {
       await game.winEncounter(remainingHp: 65, rng: Random(4));
       expect(game.run!.pendingLoot, isNotEmpty);
 
-      // Walk out — the loot becomes yours.
+      // Walk out, then take the haul home. ⚠️ Two steps now: walking out ends
+      // the run, and the take-home choice is what makes the loot yours.
       await game.leaveAdventure();
+      expect(
+        game.profile.backpack.used,
+        0,
+        reason: 'walking out that banks on its own skips the choice entirely',
+      );
+      await game.takeRunLoot(game.defaultLootChoice);
       expect(game.profile.backpack.used, greaterThan(0));
 
       // Stow the first slot in Hearthwood's Storeroom.
@@ -344,8 +351,12 @@ void main() {
     });
 
     test(
-      '⚠️ a full backpack reports overflow rather than eating loot',
+      '⚠️ a full backpack costs the haul out loud, never silently',
       () async {
+        // The old behaviour dropped the overflow inside the bank and told
+        // nobody. Now the run ends holding everything, the picker offers zero
+        // free slots, and what is lost is reported. See loot_picker_test.dart
+        // for the choosing itself.
         final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
         // Fill the pack first.
         var pack = game.profile.backpack;
@@ -356,11 +367,28 @@ void main() {
 
         await game.beginAdventure(_woods, rng: Random(11));
         await game.winEncounter(remainingHp: 90, rng: Random(11));
+        final haul = game.run!.pendingLoot.length;
+        expect(haul, greaterThan(0), reason: 'the fixture needs a drop');
+
         await game.leaveAdventure();
+        expect(
+          game.defaultLootChoice,
+          isEmpty,
+          reason:
+              'a default selection that ignores free slots promises a '
+              'slot that is not there',
+        );
+        final result = await game.takeRunLoot(game.defaultLootChoice);
+        expect(
+          result.left,
+          hasLength(haul),
+          reason: 'loot that fits nowhere still has to be reported as lost',
+        );
         expect(game.profile.backpack.isFull, isTrue);
         expect(
           game.profile.backpack.countOf('oak_log'),
           Carrying.backpackSlots,
+          reason: 'a full pack must not be rewritten by the take-home step',
         );
       },
     );

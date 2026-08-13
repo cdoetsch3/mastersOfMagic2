@@ -5,6 +5,7 @@ import '../game/enemies/enemy_def.dart';
 import '../game/game_state.dart';
 import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
+import '../game/items/item_instance.dart';
 import '../game/opponent_driver.dart';
 import '../game/world.dart';
 import '../ui/app_theme.dart';
@@ -25,6 +26,14 @@ class AdventureScreen extends StatefulWidget {
 
 class _AdventureScreenState extends State<AdventureScreen> {
   bool _busy = false;
+
+  /// What the take-home step actually moved, once it has been answered.
+  ///
+  /// ⚠️ Screen-local on purpose: the run drops its pending loot the moment it
+  /// is claimed (it has to — see `GameState.takeRunLoot`), so this is the only
+  /// place the "here is what you walked away with" summary can come from.
+  List<InventorySlot>? _tookHome;
+  List<InventorySlot> _leftBehind = const [];
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +61,13 @@ class _AdventureScreenState extends State<AdventureScreen> {
                     _Ending(
                       run: run,
                       zone: widget.zone,
-                      onLeave: () => Navigator.pop(context),
+                      // ⚠️ The way out is closed until the haul has been
+                      // answered for — leaving with loot still pending is how
+                      // the run gets reopened later holding items the player
+                      // thought they had already taken.
+                      onLeave: run.awaitingLootChoice
+                          ? null
+                          : () => Navigator.pop(context),
                     )
                   else
                     _NextFight(
@@ -63,14 +78,26 @@ class _AdventureScreenState extends State<AdventureScreen> {
                     ),
                   if (!run.isOver) ...[
                     const SizedBox(height: 14),
-                    _Consumables(
+                    _Supplies(
                       game: game,
+                      run: run,
                       busy: _busy,
                       onUse: (id) => _use(game, id),
                     ),
                   ],
                   const SizedBox(height: 18),
-                  _Haul(run: run),
+                  if (!run.isOver)
+                    _Haul(run: run)
+                  else if (run.awaitingLootChoice)
+                    _TakeHome(
+                      run: run,
+                      free: game.profile.backpack.free,
+                      initial: game.defaultLootChoice.toSet(),
+                      busy: _busy,
+                      onTake: (chosen) => _takeHome(game, chosen),
+                    )
+                  else if (_tookHome != null)
+                    _BroughtHome(taken: _tookHome!, left: _leftBehind),
                 ],
               ),
             ),
@@ -132,22 +159,44 @@ class _AdventureScreenState extends State<AdventureScreen> {
   Future<void> _use(GameState game, String defId) async {
     final outcome = await game.useItem(defId);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: AppColors.panel,
-        content: Text(
-          outcome.message,
-          style: const TextStyle(color: AppColors.text),
-        ),
-      ),
-    );
+    // ⚠️ Refusals are shown too — "You are already at full health." must be
+    // seen, because a silent no-op reads as the button being broken.
+    _say(outcome.message);
     setState(() {});
   }
 
   Future<void> _leave(GameState game) async {
+    // ⭐ Ends the run only. The loot picker is what hands anything over, and it
+    // renders in place of the fight panel on the next build.
     await game.leaveAdventure();
     if (mounted) setState(() {});
   }
+
+  Future<void> _takeHome(GameState game, Set<int> chosen) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final result = await game.takeRunLoot(chosen);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _tookHome = result.taken;
+      _leftBehind = result.left;
+    });
+    // ⚠️ The abandoned count is said out loud. Losing things quietly is the
+    // whole bug this step replaced.
+    final left = result.left.length;
+    _say(
+      '${result.taken.length} came home with you'
+      '${left == 0 ? '.' : ' — $left left behind for good.'}',
+    );
+  }
+
+  void _say(String message) => ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      backgroundColor: AppColors.panel,
+      content: Text(message, style: const TextStyle(color: AppColors.text)),
+    ),
+  );
 }
 
 class _Progress extends StatelessWidget {
@@ -283,7 +332,10 @@ class _NextFight extends StatelessWidget {
 class _Ending extends StatelessWidget {
   final AdventureRun run;
   final GameLocation zone;
-  final VoidCallback onLeave;
+
+  /// ⚠️ Null while the take-home step is still open — the door out is not
+  /// offered until the haul has been answered for.
+  final VoidCallback? onLeave;
 
   const _Ending({required this.run, required this.zone, required this.onLeave});
 
@@ -299,7 +351,12 @@ class _Ending extends StatelessWidget {
       ),
       RunOutcome.returned => (
         'You walk out',
-        'Everything you found comes with you.',
+        // ⚠️ No longer promises "everything" — what comes home is the choice
+        // below, and a line that says otherwise makes the picker read as a
+        // bug.
+        run.awaitingLootChoice
+            ? 'Decide what comes home with you.'
+            : 'You walk out with what you chose.',
         AppColors.teal,
       ),
       RunOutcome.died => (
@@ -330,8 +387,12 @@ class _Ending extends StatelessWidget {
   }
 }
 
-/// What the run has produced so far. ⚠️ Labelled as *not yours yet* while the
-/// run is live, because that is the entire push-your-luck decision.
+/// What the run has produced so far. ⚠️ Labelled as *not yours yet*, because
+/// that is the entire push-your-luck decision.
+///
+/// ⭐ Mid-run only. Once the run ends the same list is shown by [_TakeHome] as
+/// something to choose from, and by [_BroughtHome] as something that happened —
+/// three panels because the player is being asked three different questions.
 class _Haul extends StatelessWidget {
   final AdventureRun run;
 
@@ -339,7 +400,6 @@ class _Haul extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (run.outcome == RunOutcome.died) return const SizedBox.shrink();
     final counts = <String, int>{};
     for (final s in run.pendingLoot) {
       counts[s.defId] = (counts[s.defId] ?? 0) + 1;
@@ -347,9 +407,7 @@ class _Haul extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionLabel(
-          run.lootIsBanked ? 'Brought home' : 'Carried so far (not yet yours)',
-        ),
+        const SectionLabel('Carried so far (not yet yours)'),
         GamePanel(
           child: counts.isEmpty
               ? const Text(
@@ -389,15 +447,223 @@ class _Haul extends StatelessWidget {
     );
   }
 
-  String _name(String defId) {
-    final def = ItemCatalogue.tryById(defId);
-    return def == null ? defId : ItemCatalogue.displayName(def, null);
-  }
+  String _name(String defId) => _lootName(InventorySlot(defId: defId), null);
 
-  Color _colour(String defId) {
-    final def = ItemCatalogue.tryById(defId);
-    return def == null ? AppColors.textFaint : rarityColour(def.rarity);
+  Color _colour(String defId) => _lootColour(defId);
+}
+
+/// The name to print for a dropped slot.
+///
+/// ⭐ Takes the [instance] so a rolled staff reads "Ornate Heartwood
+/// Quarterstaff" rather than the bare form — the picker is where the player
+/// decides whether that roll is worth a slot, so it has to say what the roll
+/// was. ⚠️ Falls back to the raw id for an item the catalogue no longer knows,
+/// rather than crashing on a save the content patched out from under.
+String _lootName(InventorySlot slot, ItemInstance? instance) {
+  final def = ItemCatalogue.tryById(slot.defId);
+  return def == null ? slot.defId : ItemCatalogue.displayName(def, instance);
+}
+
+Color _lootColour(String defId) {
+  final def = ItemCatalogue.tryById(defId);
+  return def == null ? AppColors.textFaint : rarityColour(def.rarity);
+}
+
+/// The take-home step: what the run yielded, and which of it fits.
+///
+/// ⭐ **Shown at every ending that kept its loot** — walking out and clearing
+/// the boss alike (designer's ruling). One ritual, so the player always sees
+/// the haul and always chooses; a picker that only appeared when the pack was
+/// full would be a surprise exactly when it hurt most.
+///
+/// ⚠️ **Everything left here is gone for good.** That is stated on the panel,
+/// not just in the confirmation, because the old behaviour — silently dropping
+/// the overflow — cost a playtester a rare they never knew they had.
+class _TakeHome extends StatefulWidget {
+  final AdventureRun run;
+  final int free;
+
+  /// Rarity-first and pre-trimmed by `GameState.defaultLootChoice`, so tapping
+  /// straight through never spends the last slot on a log.
+  final Set<int> initial;
+  final bool busy;
+  final ValueChanged<Set<int>> onTake;
+
+  const _TakeHome({
+    required this.run,
+    required this.free,
+    required this.initial,
+    required this.busy,
+    required this.onTake,
+  });
+
+  @override
+  State<_TakeHome> createState() => _TakeHomeState();
+}
+
+class _TakeHomeState extends State<_TakeHome> {
+  late final Set<int> _picked = {...widget.initial};
+
+  @override
+  Widget build(BuildContext context) {
+    final loot = widget.run.pendingLoot;
+    final atCapacity = _picked.length >= widget.free;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionLabel('Take home'),
+        GamePanel(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ⭐ Live, because "why is that one greyed out" has to answer
+              // itself.
+              Text(
+                'Taking ${_picked.length} of ${loot.length} — '
+                '${widget.free} ${widget.free == 1 ? 'slot' : 'slots'} free',
+                style: const TextStyle(color: AppColors.text, fontSize: 13),
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                'Whatever you leave is abandoned for good.',
+                style: TextStyle(color: AppColors.textFaint, fontSize: 11.5),
+              ),
+              const SizedBox(height: 8),
+              for (var i = 0; i < loot.length; i++)
+                _LootChoiceRow(
+                  slot: loot[i],
+                  instance:
+                      widget.run.pendingInstances[loot[i].instanceId ?? ''],
+                  picked: _picked.contains(i),
+                  // ⚠️ A full selection blocks *adding*, never removing —
+                  // locking the rows outright would trap the player in a
+                  // selection they cannot change.
+                  onTap: widget.busy || (atCapacity && !_picked.contains(i))
+                      ? null
+                      : () => setState(
+                          () => _picked.contains(i)
+                              ? _picked.remove(i)
+                              : _picked.add(i),
+                        ),
+                ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: widget.busy ? null : () => widget.onTake(_picked),
+                  child: Text(
+                    _picked.isEmpty
+                        ? 'Leave it all behind'
+                        : 'Take ${_picked.length} home',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
+}
+
+class _LootChoiceRow extends StatelessWidget {
+  final InventorySlot slot;
+  final ItemInstance? instance;
+  final bool picked;
+  final VoidCallback? onTap;
+
+  const _LootChoiceRow({
+    required this.slot,
+    required this.instance,
+    required this.picked,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dimmed = onTap == null && !picked;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(
+          children: [
+            Icon(
+              picked ? Icons.check_box : Icons.check_box_outline_blank,
+              size: 18,
+              color: picked ? AppColors.teal : AppColors.borderDim,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                _lootName(slot, instance),
+                style: TextStyle(
+                  // ⭐ Rarity on sight (ITEMS §8) — the one cue that makes the
+                  // choice quick.
+                  color: dimmed ? AppColors.textFaint : _lootColour(slot.defId),
+                  fontSize: 13,
+                ),
+              ),
+            ),
+            if (dimmed)
+              const Text(
+                'no room',
+                style: TextStyle(color: AppColors.textFaint, fontSize: 11),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The receipt: what actually came home, and what it cost to leave.
+class _BroughtHome extends StatelessWidget {
+  final List<InventorySlot> taken;
+  final List<InventorySlot> left;
+
+  const _BroughtHome({required this.taken, required this.left});
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const SectionLabel('Brought home'),
+      GamePanel(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (taken.isEmpty)
+              const Text(
+                'Nothing came home.',
+                style: TextStyle(color: AppColors.textDim, fontSize: 12),
+              ),
+            for (final s in taken)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(
+                  _lootName(s, null),
+                  style: TextStyle(color: _lootColour(s.defId), fontSize: 13),
+                ),
+              ),
+            // ⚠️ Named, not merely counted. An abandoned item the player never
+            // sees again should at least be seen once.
+            if (left.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Left behind: ${left.map((s) => _lootName(s, null)).join(', ')}',
+                style: const TextStyle(
+                  color: AppColors.textFaint,
+                  fontSize: 11.5,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
 /// Everything carried that can be used right now.
@@ -405,15 +671,22 @@ class _Haul extends StatelessWidget {
 /// ⭐ **Generic**: it lists anything [Usable] with a real effect and shows what
 /// that effect is, so a new consumable appears here with no UI change at all.
 ///
+/// ⭐ **It states the health it is healing against.** "Restores 25% health" is
+/// only half an answer; a player at 118/120 needs to see the 118 to understand
+/// why the ration will be refused (`GameState.maxHp` is the same pool the use
+/// actually heals, so the two cannot disagree).
+///
 /// ⚠️ Between encounters only (ITEMS §6b.2). Using something here is free; the
 /// belt is what costs a turn mid-duel.
-class _Consumables extends StatelessWidget {
+class _Supplies extends StatelessWidget {
   final GameState game;
+  final AdventureRun run;
   final bool busy;
   final ValueChanged<String> onUse;
 
-  const _Consumables({
+  const _Supplies({
     required this.game,
+    required this.run,
     required this.busy,
     required this.onUse,
   });
@@ -428,13 +701,21 @@ class _Consumables extends StatelessWidget {
       }
     }
     if (counts.isEmpty) return const SizedBox.shrink();
+    final max = game.maxHp;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionLabel('Consumables'),
+        const SectionLabel('Supplies'),
         GamePanel(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Health ${run.playerHp} / $max'
+                '${run.playerHp >= max ? ' — nothing to heal' : ''}',
+                style: const TextStyle(color: AppColors.text, fontSize: 13),
+              ),
+              const SizedBox(height: 4),
               for (final e in counts.entries)
                 _ConsumableRow(
                   def: ItemCatalogue.byId(e.key),

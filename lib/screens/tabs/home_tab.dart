@@ -22,8 +22,15 @@ class HomeTab extends StatelessWidget {
     // ⭐ Only a run still standing. A finished one lingers on the profile until
     // the next adventure overwrites it, and offering to "resume" a corpse is
     // worse than offering nothing.
+    //
+    // ⚠️ **Except a run still holding its haul.** Closing the app on the
+    // take-home step leaves a finished run with loot nobody has claimed, and
+    // without this door back in, that haul would be lost exactly the way the
+    // picker exists to prevent.
     final run = game.run;
-    final resumable = run != null && !run.isOver && !run.isFinished
+    final resumable =
+        run != null &&
+            ((!run.isOver && !run.isFinished) || run.awaitingLootChoice)
         ? run
         : null;
 
@@ -144,24 +151,35 @@ class _ResumeAdventureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final zone = World.byId(run.zoneId);
+    // ⚠️ A finished run has no "encounter 10 of 9" to report, and offering to
+    // "resume" one would promise a fight that is not there.
+    final waiting = run.awaitingLootChoice;
     return GamePanel(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => AdventureScreen(zone: zone)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.flag, color: AppColors.ember),
+          Icon(
+            waiting ? Icons.card_giftcard : Icons.flag,
+            color: waiting ? AppColors.gold : AppColors.ember,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Resume adventure — ${zone.name}',
+                  waiting
+                      ? 'Claim your haul — ${zone.name}'
+                      : 'Resume adventure — ${zone.name}',
                   style: const TextStyle(color: AppColors.text, fontSize: 14),
                 ),
                 Text(
-                  'Encounter ${run.encounterNumber} of ${run.encounterCount}',
+                  waiting
+                      ? '${run.pendingLoot.length} waiting to be taken home'
+                      : 'Encounter ${run.encounterNumber} of '
+                            '${run.encounterCount}',
                   style: const TextStyle(
                     color: AppColors.textDim,
                     fontSize: 12,

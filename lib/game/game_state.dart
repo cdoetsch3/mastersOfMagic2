@@ -268,6 +268,14 @@ class GameState extends ChangeNotifier {
   /// ⚠️ Async now that the run is saved — the rolled line **is** the run, and
   /// a crash before the first fight must not leave a zone half-entered.
   Future<AdventureRun> beginAdventure(GameLocation zone, {Random? rng}) async {
+    // ⚠️ **An unclaimed haul must not die to an overwrite.** The picker can be
+    // dodged — force-quit on the end screen, then enter another zone from the
+    // map — and this line is where that path would silently destroy the loot.
+    // Claiming the rarity-first default instead means dodging the picker
+    // costs the choice, never the rare (validator guard, 2026-08-10).
+    if (run?.awaitingLootChoice == true) {
+      await takeRunLoot(defaultLootChoice);
+    }
     final started = AdventureRun.roll(
       zone: zone,
       roster: Bestiary.forZone(zone.id),
@@ -305,7 +313,10 @@ class GameState extends ChangeNotifier {
       bossDefeated: wasBoss,
       locationId: r.zoneId,
     );
-    if (r.lootIsBanked) await _bankRunLoot();
+    // ⚠️ **A cleared run does NOT hand its loot over here.** Dropping the boss
+    // ends the run, and the take-home step ([takeRunLoot]) is what moves loot
+    // into the pack — one ritual for both endings, so the boss path and the
+    // walk-out path cannot drift apart.
     notifyListeners();
     return [for (final slot in loot.slots) slot.defId];
   }
@@ -329,14 +340,13 @@ class GameState extends ChangeNotifier {
   Future<UseOutcome> useItem(String defId) async {
     final r = run;
     if (r == null) return const UseOutcome.refused('Not on an adventure.');
-    final gear = equipmentTotals;
     final outcome = r.use(
       defId,
       // ⭐ Gear reaches the road too: worn HP raises the pool a potion heals
       // against, and healing received % multiplies what it restores.
-      maxHp: MageState.scaledMaxHp(profile.level) + gear.maxHpBonus,
+      maxHp: maxHp,
       carried: profile.backpack.countOf(defId) > 0,
-      healingReceivedPercent: gear.healingReceivedPercent,
+      healingReceivedPercent: equipmentTotals.healingReceivedPercent,
     );
     if (outcome.consumed) {
       // ⚠️ One write for both halves — the item leaving the pack and the HP it
@@ -349,43 +359,121 @@ class GameState extends ChangeNotifier {
     return outcome;
   }
 
-  /// Walks out with what has been earned so far.
+  /// Walks out early.
+  ///
+  /// ⭐ **Ends the run and nothing else.** The loot stays pending, because what
+  /// comes home is now the player's choice and the picker has not been answered
+  /// yet — see [takeRunLoot]. ⚠️ That leaves a legal in-between state on disk
+  /// (a finished run still holding loot), which is why `AdventureRun`
+  /// advertises it as [AdventureRun.awaitingLootChoice] and the Home tab offers
+  /// the way back to it.
   Future<void> leaveAdventure() async {
     final r = run;
     if (r == null || r.isOver) return;
-    r.returnToTown();
-    await _bankRunLoot();
-    notifyListeners();
+    await _mutate(r.returnToTown);
   }
 
-  /// Moves a finished run's loot into the backpack.
+  /// The selection the take-home picker opens with: indices into
+  /// `run.pendingLoot`, best first, already trimmed to what will fit.
   ///
-  /// ⚠️ **Overflow is not discarded** — anything that does not fit stays
-  /// reported so the UI can tell the player, rather than vanishing.
-  Future<List<InventorySlot>> _bankRunLoot() async {
+  /// ⭐ **Rarity descending.** A playtester lost a rare to the old silent
+  /// overflow, which abandoned whatever happened to be last in the list — so
+  /// the default now spends the last free slot on the best thing found, and a
+  /// player who just taps confirm never loses the item they were excited about.
+  List<int> get defaultLootChoice {
     final r = run;
-    if (r == null || !r.lootIsBanked) return const [];
-    var overflow = <InventorySlot>[];
+    if (r == null) return const [];
+    return _bestFirst(r.pendingLoot).take(profile.backpack.free).toList();
+  }
+
+  /// Takes the chosen part of a finished run's loot home; abandons the rest.
+  ///
+  /// [chosen] holds indices into `run.pendingLoot`. ⭐ **Everything not chosen
+  /// is gone for good**, and that is the point: the player decides what a full
+  /// pack costs them, where before `_bankRunLoot` silently dropped whatever
+  /// overflowed.
+  ///
+  /// ⚠️ **Clamped, never refused.** A selection bigger than the free slots
+  /// keeps its [_bestFirst] prefix and abandons the remainder — a confirm
+  /// button that silently does nothing reads as a broken game, and refusing
+  /// would strand the run in its unclaimed state forever.
+  ///
+  /// Returns what landed and what was left, so the screen can report both
+  /// halves; a loss the player is not told about is the bug this replaced.
+  Future<({List<InventorySlot> taken, List<InventorySlot> left})> takeRunLoot(
+    Iterable<int> chosen,
+  ) async {
+    final r = run;
+    if (r == null || !r.lootIsBanked) {
+      return (taken: const <InventorySlot>[], left: const <InventorySlot>[]);
+    }
+    final taken = <InventorySlot>[];
+    final left = <InventorySlot>[];
     await _mutate(() {
-      final result = profile.backpack.withAll(r.pendingLoot);
-      profile.backpack = result.pack;
-      overflow = result.overflow;
-      // Only keep instances for loot that actually landed.
-      final kept = {
-        for (final s in result.pack.contents)
-          if (s.instanceId != null) s.instanceId!,
-      };
-      r.pendingInstances.forEach((id, inst) {
-        if (kept.contains(id)) profile.itemInstances[id] = inst;
-      });
-      // ⚠️ Emptied **inside** the write. Clearing after it would save a run
-      // still holding loot that is already in the backpack, and reopening the
-      // app would hand it over a second time.
+      final wanted = _bestFirst(
+        r.pendingLoot,
+        // ⚠️ Filtered for range here rather than trusted: these indices come
+        // from a screen, and a stale one must not read off the end.
+        only: {
+          for (final i in chosen)
+            if (i >= 0 && i < r.pendingLoot.length) i,
+        },
+      ).take(profile.backpack.free).toSet();
+
+      var pack = profile.backpack;
+      for (var i = 0; i < r.pendingLoot.length; i++) {
+        final slot = r.pendingLoot[i];
+        // ⚠️ The pack is still asked even though `wanted` is already clamped —
+        // it is the only authority on whether it has room, and belt-and-braces
+        // here is what stops loot vanishing rather than overflowing.
+        final next = wanted.contains(i) ? pack.withAdded(slot) : null;
+        if (next == null) {
+          left.add(slot);
+          continue;
+        }
+        pack = next;
+        taken.add(slot);
+        // ⭐ Only an instance whose slot came home enters the pool. An
+        // abandoned staff's rolls must not outlive the staff: a dangling
+        // instance is a save that grows forever and a name for an item nobody
+        // owns (ITEMS §10.3a, and `PlayerProfile` guards the other direction).
+        final id = slot.instanceId;
+        final inst = id == null ? null : r.pendingInstances[id];
+        if (inst != null) profile.itemInstances[id!] = inst;
+      }
+      profile.backpack = pack;
+      // ⚠️ Emptied **inside** the write, taken and abandoned alike. Clearing
+      // after it would save a run still holding loot that is already in the
+      // backpack, and reopening the app would hand it over a second time.
       r.pendingLoot.clear();
       r.pendingInstances.clear();
     });
-    return overflow;
+    return (taken: taken, left: left);
   }
+
+  /// Indices into [loot] (optionally only those in [only]), rarest first.
+  ///
+  /// ⚠️ **One ordering for both the default selection and the clamp.** If they
+  /// disagreed, confirming the default could abandon a different item than the
+  /// one the picker showed as taken. Ties break on drop order, explicitly,
+  /// because Dart's sort is not stable.
+  List<int> _bestFirst(List<InventorySlot> loot, {Set<int>? only}) {
+    final order = [
+      for (var i = 0; i < loot.length; i++)
+        if (only == null || only.contains(i)) i,
+    ];
+    order.sort((a, b) {
+      final byRarity = _rarityRank(loot[b].defId) - _rarityRank(loot[a].defId);
+      return byRarity != 0 ? byRarity : a - b;
+    });
+    return order;
+  }
+
+  /// ⚠️ An id no catalogue entry claims sorts below common rather than
+  /// throwing — a save written before a content patch removed an item must
+  /// still be able to walk out of the woods.
+  static int _rarityRank(String defId) =>
+      ItemCatalogue.tryById(defId)?.rarity.index ?? -1;
 
   // ---- Storeroom --------------------------------------------------------
 
@@ -398,6 +486,16 @@ class GameState extends ChangeNotifier {
     equipped: profile.equipped,
     instances: profile.itemInstances,
   );
+
+  /// The health pool the player actually fights with: the level curve plus
+  /// whatever the worn gear adds.
+  ///
+  /// ⭐ **One definition, read by both [useItem] and the Supplies panel**, so
+  /// the "61 / 120" on screen is the same 120 a ration heals against. Two call
+  /// sites computing this apart is how "the potion did nothing" gets reported
+  /// as a bug when the player was simply already full.
+  int get maxHp =>
+      MageState.scaledMaxHp(profile.level) + equipmentTotals.maxHpBonus;
 
   /// Equips the item in backpack slot [index].
   ///

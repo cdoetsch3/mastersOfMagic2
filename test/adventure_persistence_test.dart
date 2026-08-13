@@ -261,6 +261,10 @@ void main() {
       }
       final haul = game.run!.pendingLoot.length;
       await game.leaveAdventure();
+      // ⚠️ Walking out only ends the run; the take-home choice is what hands
+      // anything over (loot_picker_test.dart owns that story). Here the pack
+      // is empty, so the default takes the lot.
+      await game.takeRunLoot(game.defaultLootChoice);
 
       final reloaded = (await storage.load())!;
       expect(reloaded.backpack.used, haul, reason: 'the loot became real');

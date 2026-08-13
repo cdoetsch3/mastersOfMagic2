@@ -244,6 +244,16 @@ class AdventureRun {
   bool get lootIsBanked =>
       outcome == RunOutcome.returned || outcome == RunOutcome.cleared;
 
+  /// A run that is over, kept its loot, and has not been asked what to take.
+  ///
+  /// ⭐ **The take-home step is a real state, not a screen transition.** Both
+  /// endings — walking out and dropping the boss — land here holding loot, and
+  /// the picker is what empties it (`GameState.takeRunLoot`). ⚠️ It therefore
+  /// survives a force-quit, so the Home tab must offer the way back to it;
+  /// otherwise closing the app on the end screen silently costs the whole haul,
+  /// which is the exact failure the picker exists to end.
+  bool get awaitingLootChoice => lootIsBanked && pendingLoot.isNotEmpty;
+
   // ---- Serialization -----------------------------------------------------
 
   /// ⭐ **Ids and the rolled level, never the creature itself.** Definitions
