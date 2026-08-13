@@ -389,4 +389,90 @@ void main() {
     expect(defender.hp, 90);
     expect(defender.shield!.remaining, 999);
   });
+
+  // ======================================================================
+  // "It hit through my shield" — the report, not the rule
+  // ======================================================================
+  //
+  // ⭐ The Murmur's **Say Your Name** is priority 2 *and* `ignoresShields`, so
+  // it beats a same-turn shield to the board AND walks past a standing one.
+  // Both are deliberate — it is the mini-boss that punishes answering
+  // everything with a wall. What was not deliberate is that the board says
+  // nothing about it: the shield bar does not move, nothing shatters, and the
+  // health bar takes the full hit, which reads exactly like a shield that
+  // silently failed. These pin the *reporting*, since the maths is correct.
+  group('a shield-ignoring hit announces itself', () {
+    /// The Murmur's shape (`lib/game/enemies/whispering_woods.dart`).
+    const sayYourName = Spell(
+        id: 'ww_sayyourname', name: 'Say Your Name', chargeCost: 3,
+        priority: 2, effect: DamageEffect(14, 18, ignoresShields: true));
+
+    test('a shield raised a PREVIOUS turn is bypassed, and the log says so',
+        () {
+      // ⚠️ The scenario the playtester actually hit. The shield is old news by
+      // the time the spell lands, so priority has nothing to do with it — this
+      // is `ignoresShields` doing exactly what it is flagged to do.
+      attacker
+        ..charge = 3
+        ..element = MagicElement.flora;
+      defender.shield = ActiveShield.elemental(MagicElement.geo, 200);
+
+      final result = duel.resolveTurn(
+          CastAction(sayYourName), ChargeAction(MagicElement.aero));
+      final hit = result.events.whereType<DamageEvent>().single;
+
+      expect(hit.toShield, 0, reason: 'the shield must not soak any of it');
+      expect(defender.shield!.remaining, 200,
+          reason: 'a bypassed shield is untouched, not chipped');
+      expect(hit.bypassedShield, isTrue,
+          reason: 'nothing else in this event distinguishes "your shield did '
+              'not apply" from "your shield did nothing" — the flag is the '
+              'only channel the log and the HUD have');
+      expect('$hit', contains('ignores shields'),
+          reason: 'the battle log line must name the reason the wall did not '
+              'help; a bare "Defender takes Say Your Name: 16 damage" beside '
+              'a full shield bar reads as a bug');
+    });
+
+    test('the flag stays off when there was no defence to bypass', () {
+      // ⚠️ Otherwise every Phase-buffed poke at a naked target shouts about a
+      // shield that was never there, and the tag stops meaning anything.
+      attacker
+        ..charge = 3
+        ..element = MagicElement.flora;
+      final result = duel.resolveTurn(
+          CastAction(sayYourName), ChargeAction(MagicElement.aero));
+      final hit = result.events.whereType<DamageEvent>().single;
+      expect(hit.bypassedShield, isFalse);
+      expect('$hit', isNot(contains('ignores shields')));
+    });
+
+    test('a same-turn shield goes up AFTER it, and the events say that too',
+        () {
+      // Priority 2 beats the shield lane's 3, so a shield cast in answer to it
+      // is simply too late — correct, and legible only because the events are
+      // in resolution order: the hit, then the wall.
+      attacker
+        ..charge = 3
+        ..element = MagicElement.flora;
+      defender
+        ..charge = 1
+        ..element = MagicElement.geo;
+
+      final result =
+          duel.resolveTurn(CastAction(sayYourName), CastAction(Spellbook.ward));
+      final kinds = result.events
+          .where((e) => e is DamageEvent || e is ShieldRaisedEvent)
+          .map((e) => e.runtimeType.toString())
+          .toList();
+
+      expect(kinds.first, 'DamageEvent',
+          reason: 'a priority-2 attack must resolve before a priority-3 '
+              'shield; the log is replayed in this order, so getting it wrong '
+              'would tell the player the wall was up first');
+      expect(kinds.last, 'ShieldRaisedEvent');
+      expect(defender.shield!.remaining, greaterThan(0),
+          reason: 'the shield still goes up — it just missed this hit');
+    });
+  });
 }

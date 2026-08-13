@@ -377,6 +377,7 @@ class _DuelScreenState extends State<DuelScreen>
         :final toHp,
         :final shieldMultiplierPercent,
         :final shieldBroken,
+        :final bypassedShield,
       ):
         final isEnemy = target == c.enemy;
         final color = _castElement?.style.color ?? Colors.white;
@@ -407,6 +408,10 @@ class _DuelScreenState extends State<DuelScreen>
           if (toHp == 0 && toShield > 0) 'blocked',
           if (shieldMultiplierTag(shieldMultiplierPercent) case final t?)
             '$t vs shield',
+          // ⚠️ Says it at the moment it happens. The shield bar does not move
+          // for a shield-ignoring hit, so without this the wall looks like it
+          // simply failed — the "it hit through my shield" complaint.
+          if (bypassedShield) 'ignores shields',
           if (shieldBroken) 'shield shattered',
         ].join('  ');
         await _runFx(
@@ -1454,7 +1459,13 @@ class _DuelScreenState extends State<DuelScreen>
                         label: Text(widget.campaign ? 'Leave' : 'Home'),
                       ),
                     ),
-                    if (widget.driver.supportsRematch) ...[
+                    // ⚠️ Never on a campaign fight. The encounter's result is
+                    // already banked into the adventure run (XP, loot, the
+                    // player's carried health) the moment it ends, so a
+                    // rematch would re-roll a decision that has been paid
+                    // out — a second helping of both. Practice personas keep
+                    // it; a remote room refuses it on the driver instead.
+                    if (!widget.campaign && widget.driver.supportsRematch) ...[
                       const SizedBox(width: 10),
                       Expanded(
                         child: ElevatedButton.icon(

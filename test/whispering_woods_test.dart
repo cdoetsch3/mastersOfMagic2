@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/enemies/enemy_archetype.dart';
 import 'package:masters_of_magic_2/game/enemies/enemy_def.dart';
+import 'package:masters_of_magic_2/game/enemies/enemy_encounter.dart';
 import 'package:masters_of_magic_2/game/enemies/whispering_woods.dart';
 import 'package:masters_of_magic_2/game/items/catalogue/whispering_woods_items.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
@@ -129,6 +132,51 @@ void main() {
           e.moves.map((m) => m.chargeCost).reduce((a, b) => a < b ? a : b),
           lessThanOrEqualTo(5),
           reason: '${e.id} cannot reach any of its own moves',
+        );
+      }
+    });
+
+    test('no creature in the zone can talk itself into forfeiting', () {
+      // ⚠️ **The Sporecap Shambler bug, fought end to end.** Its brain rated
+      // every one of its moves worthless against a standing Barrier — Barrier
+      // points only come off when something hits them, so the standoff it was
+      // waiting out could not end — charged to full, and then forfeited every
+      // turn until `DuelController.forfeitLimit` read three in a row as a
+      // disconnected opponent and conceded the fight *for* it. The player was
+      // handed a win, and in a campaign run the XP and loot that go with it.
+      //
+      // ⭐ Run across the whole bestiary, not just the Shambler: the trap is
+      // the archetype's intelligence rung meeting an all-damage move set, and
+      // half this zone is built that way. `LadderAi`'s own guard lives in
+      // `packages/mom_engine/test/ladder_ai_test.dart`; this is the seam
+      // where the real defs, the real rungs and the real engine meet.
+      for (final e in all) {
+        final brain = EnemyEncounter(def: e, level: 3).toPersona().buildBrain();
+        final foe = MageState(name: e.name, level: 3);
+        final dummy = MageState(name: 'You', level: 3, maxHp: 4000);
+        final duel = DuelEngine(foe, dummy, rng: Random(4), baseMissPercent: 0);
+        final rng = Random(99);
+        var forfeits = 0;
+        for (var turn = 0; turn < 20; turn++) {
+          // The player answers with a Barrier and keeps it up — the exact
+          // board the Shambler could not solve, and deliberately a Barrier
+          // *without* an elemental shield behind it, which is the case the
+          // brain scored at zero. Charging counts as acting; forfeiting does
+          // not.
+          if (dummy.barrierPoints == 0) {
+            dummy.barrierPoints = MageState.maxBarrierPoints;
+          }
+          final action = brain.chooseAction(foe, dummy, rng);
+          if (action is ForfeitAction) forfeits++;
+          duel.resolveTurn(action, const ForfeitAction());
+        }
+        expect(
+          forfeits,
+          0,
+          reason:
+              '${e.name} (intelligence ${e.archetype.intelligence}) forfeited '
+              '$forfeits of 20 turns against a walled target while its own '
+              'moves were affordable — three in a row surrenders the fight',
         );
       }
     });

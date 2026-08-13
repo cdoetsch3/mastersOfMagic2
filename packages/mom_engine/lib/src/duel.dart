@@ -715,11 +715,15 @@ class DuelEngine {
     // health at 100%, splitting the attack rather than shrinking it (§4b.4).
     // Only matters when there's a shield to pierce and the hit isn't already
     // going straight to health (Phase wins that turn).
-    final piercePct =
-        (!ignoresShields &&
-                (target.shield != null || target.barrierPoints > 0))
-            ? (_statusOf<AstralAlignmentStatus>(cast.caster)?.piercePercent ?? 0)
-            : 0;
+    final defended = target.shield != null || target.barrierPoints > 0;
+    final piercePct = (!ignoresShields && defended)
+        ? (_statusOf<AstralAlignmentStatus>(cast.caster)?.piercePercent ?? 0)
+        : 0;
+    // ⭐ Purely for the log and the HUD: a shield-ignoring hit leaves the
+    // shield standing and untouched, so nothing else in the event says the
+    // defence was even there. Safe to read once, before the loop — ignoring a
+    // shield never consumes it, so no hit in this cast can change the answer.
+    final bypassedShield = ignoresShields && defended;
     final caster = cast.caster;
     var totalToHp = 0;
     var totalRaw = 0;
@@ -769,7 +773,8 @@ class DuelEngine {
           shieldBroken: r.broken,
           barrierPopped: r.barrierPopped,
           crit: crit,
-          deflected: deflected));
+          deflected: deflected,
+          bypassedShield: bypassedShield));
     }
     if (lifesteal > 0 && totalToHp > 0) {
       // Before/after, because heal() may scale the amount (healing received

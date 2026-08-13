@@ -341,6 +341,16 @@ class LadderAi implements DuelAi {
       if (canCharge) return ChargeAction(elementArg());
       final any = affordable.where((s) => !s.isOffensive).toList();
       if (any.isNotEmpty) return CastAction(any.last, elementArg());
+      // ⚠️ **ForfeitAction means "no legal move exists", never "no move looks
+      // good."** Sitting at full charge with an affordable attack that merely
+      // *scored* zero is a judgement, and forfeiting on a judgement is a
+      // catastrophe rather than a mistake: `DuelController.forfeitLimit`
+      // reads three forfeits in a row as a disconnected opponent and ends the
+      // duel by surrender. A brain that dislikes all of its options must
+      // still take the least bad one, so the streak can never start.
+      final leastBad = affordable.toList()
+        ..sort((a, b) => _rawDamage(b, self).compareTo(_rawDamage(a, self)));
+      if (leastBad.isNotEmpty) return CastAction(leastBad.first, elementArg());
       return const ForfeitAction();
     }
 
@@ -395,14 +405,27 @@ class LadderAi implements DuelAi {
   /// progress, and a brain that only counts through-damage will stand there
   /// charging while the opponent re-shields forever. Counter-aware rungs
   /// therefore give shield depletion partial credit.
+  ///
+  /// ⚠️ **A Barrier counts as a wall too, and it is the dangerous one.** An
+  /// elemental shield is a pool that other things (a DoT, the opponent's own
+  /// casts) can drain, so scoring it zero merely wasted turns. Barrier points
+  /// come off **only when something hits them** — so a brain that reads "no
+  /// damage gets through" as "not worth casting" enters a standoff it has
+  /// personally guaranteed will never end: it charges to full, runs out of
+  /// moves it rates, and forfeits every turn until `forfeitLimit` surrenders
+  /// the duel for it. That is the Sporecap Shambler bug, and it can bite any
+  /// intelligence-5+ creature whose whole kit is damage.
   int _score(Spell sp, MageState self, MageState enemy) {
     final through = estimateDamage(sp, self, enemy);
     if (through > 0) return through;
-    final wall = enemy.shield;
-    if (wall == null || !sp.isOffensive) return 0;
+    final walled = enemy.shield != null || enemy.barrierPoints > 0;
+    if (!walled || !sp.isOffensive) return 0;
     // Worth about a third of face value: it buys the *next* hit, not this one.
-    final raw = _rawDamage(sp, self);
-    return raw ~/ 3;
+    // ⚠️ Floored at 1. Removing a defence is progress even when the hit is
+    // tiny, and a wall of zeroes is exactly what stalls the brain — a Barrier
+    // eats a hit whole regardless of size, so face value is the wrong
+    // yardstick against one in the first place.
+    return max(1, _rawDamage(sp, self) ~/ 3);
   }
 
   int _rawDamage(Spell sp, MageState self) {

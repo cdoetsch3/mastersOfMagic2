@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/duel_controller.dart';
+import 'package:mom_engine/mom_engine.dart';
 
 /// The engine writes third-person log lines from each mage's name. The local
 /// player is named "You", so those templates need person agreement fixed.
@@ -62,5 +63,25 @@ void main() {
     test('a name merely starting with "You" is not mangled', () {
       expect(fix('Young Wick casts pyro Bolt'), 'Young Wick casts pyro Bolt');
     });
+  });
+
+  test('a shield-ignoring hit reads as one, in the second person', () {
+    // ⭐ The Murmur's Say Your Name walks past a standing shield by design.
+    // The whole complaint ("it hit through my shield") was that the log said
+    // nothing about it — full damage, an untouched shield bar, and a line
+    // indistinguishable from an ordinary hit on a defenceless mage.
+    final you = MageState(name: 'You')
+      ..shield = ActiveShield.elemental(MagicElement.geo, 40);
+    const sayYourName = Spell(
+        id: 'ww_sayyourname', name: 'Say Your Name', chargeCost: 3,
+        priority: 2, effect: DamageEffect(14, 18, ignoresShields: true));
+    final line = fix(
+        DamageEvent(you, sayYourName, toShield: 0, toHp: 16,
+                bypassedShield: true)
+            .toString());
+    expect(line, 'You take Say Your Name: 16 damage, ignores shields',
+        reason: 'without the tag this line is "You take Say Your Name: 16 '
+            'damage" next to a full shield bar, which reads as the shield '
+            'having failed rather than having been bypassed');
   });
 }

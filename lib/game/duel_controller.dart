@@ -84,6 +84,19 @@ class DuelController extends ChangeNotifier {
   /// Forfeiting this many turns in a row is treated as surrendering — it is
   /// how a player who closed their tab (forfeiting every turn via timeout)
   /// is handed their loss instead of dragging the duel out forever.
+  ///
+  /// ⚠️ **Deliberately NOT exempted for local AI**, even though a local brain
+  /// cannot disconnect and so can only forfeit through a bug. A Sporecap
+  /// Shambler once charged to full, decided every one of its moves was
+  /// worthless against a standing Barrier, and forfeited its way into
+  /// conceding the fight (fixed in `LadderAi._score`). Two reasons to leave
+  /// the rule alone: the brain now treats [ForfeitAction] as "no legal move
+  /// exists" rather than "no move looks good", so the streak is unreachable
+  /// for any creature with a move it can afford from zero — which every
+  /// creature is required to have; and the rule is the only thing that
+  /// guarantees a duel terminates if that invariant is ever broken again. An
+  /// AI-only branch here would be dead code that makes the *next* stalemate
+  /// hang forever instead of ending loudly.
   static const int forfeitLimit = 3;
   int _myForfeitStreak = 0;
   int _theirForfeitStreak = 0;

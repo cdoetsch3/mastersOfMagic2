@@ -84,6 +84,19 @@ class DamageEvent extends DuelEvent {
   /// (Phase 3b). 0 when nothing deflected.
   final int deflected;
 
+  /// This hit went **straight past a defence the target actually had** —
+  /// a shield-ignoring spell (The Murmur's Say Your Name) or a Phase buff,
+  /// landing while the shield or Barrier stayed standing.
+  ///
+  /// ⭐ Reported rather than inferred because the board *looks unchanged*:
+  /// the shield bar does not move, no `shieldBroken`, no `barrierPopped`, and
+  /// full damage on the health bar. From the player's chair that reads as a
+  /// shield that failed, which is the single most alarming thing a duel can
+  /// do silently. Presentation is the only consumer — the engine's own maths
+  /// is unaffected — so the flag is set exactly when there was a defence *to*
+  /// bypass, never on a naked target where "ignores shields" says nothing.
+  final bool bypassedShield;
+
   const DamageEvent(
     this.target,
     this.spell, {
@@ -94,6 +107,7 @@ class DamageEvent extends DuelEvent {
     this.barrierPopped = false,
     this.crit = false,
     this.deflected = 0,
+    this.bypassedShield = false,
   });
 
   @override
@@ -104,6 +118,7 @@ class DamageEvent extends DuelEvent {
       if (toShield > 0) '$toShield to shield${tag == null ? '' : ' ($tag)'}',
       if (toHp > 0) '$toHp damage',
       if (toShield == 0 && toHp == 0) 'no effect',
+      if (bypassedShield) 'ignores shields',
       if (deflected > 0) '$deflected deflected',
       if (barrierPopped) 'barrier shattered',
       if (shieldBroken) 'shield shattered',

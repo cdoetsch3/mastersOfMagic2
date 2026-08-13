@@ -406,6 +406,167 @@ void main() {
     });
   });
 
+  // ======================================================================
+  // Forfeiting is not a tactic (the Sporecap Shambler bug)
+  // ======================================================================
+  //
+  // ⭐ [ForfeitAction] means **"no legal move exists"**, never "nothing looks
+  // good". The distinction is not academic: `DuelController.forfeitLimit`
+  // reads three forfeits in a row as a disconnected opponent and concedes the
+  // duel for that side. A brain that forfeits out of taste therefore does not
+  // play badly — it *quits*, and in a campaign fight it hands the player a
+  // free win plus the loot that goes with it.
+  group('a wall is never a reason to forfeit', () {
+    /// The Sporecap Shambler's real kit — *nothing but damage*, no shield and
+    /// no aux, so there is nothing to fall back on when its attacks are rated
+    /// worthless. (`test/whispering_woods_test.dart` fights the actual
+    /// bestiary entry; this is the engine-side shape of it.)
+    final moves = [
+      Spell(
+          id: 'ww_puffburst',
+          name: 'Puffburst',
+          chargeCost: 1,
+          priority: 8,
+          effect: DamageEffect(3, 5, hits: 2)),
+      Spell(
+          id: 'ww_settle',
+          name: 'Settle',
+          chargeCost: 2,
+          priority: 8,
+          effect: DamageEffect(4, 6, hits: 3)),
+    ];
+
+    /// Intelligence 5 is the Blighter archetype's rung — and 5 is where the
+    /// bug lives, because counter-awareness is the competence that scores a
+    /// blocked hit at all.
+    LadderAi brainAt(int rung) =>
+        LadderAi(rung, spells: moves, elements: const [MagicElement.flora]);
+
+    test('a standing Barrier does not stall the brain into surrendering', () {
+      // ⚠️ Barrier is the trap, and specifically Barrier *without* an
+      // elemental shield behind it: points come off only when something hits
+      // them, so a brain that refuses to hit them has guaranteed the standoff
+      // it is waiting out. It charged to 5, ran out of moves it valued, and
+      // forfeited every turn from there.
+      final foe = MageState(name: 'Shambler');
+      final dummy = MageState(name: 'You', maxHp: 600);
+      final duel = DuelEngine(foe, dummy, rng: Random(7), baseMissPercent: 0);
+      final ai = brainAt(5);
+      final rng = Random(1234);
+
+      var forfeits = 0, longestStreak = 0, streak = 0, barriersBroken = 0;
+      for (var turn = 0; turn < 20; turn++) {
+        // The player keeps a Barrier up — exactly the board that produced the
+        // bug, held for the whole fight rather than for one turn.
+        if (dummy.barrierPoints == 0) {
+          dummy.barrierPoints = MageState.maxBarrierPoints;
+          if (turn > 0) barriersBroken++;
+        }
+        final action = ai.chooseAction(foe, dummy, rng);
+        if (action is ForfeitAction) {
+          forfeits++;
+          streak++;
+          longestStreak = max(longestStreak, streak);
+        } else {
+          streak = 0;
+        }
+        duel.resolveTurn(action, const ForfeitAction());
+      }
+      expect(forfeits, 0,
+          reason: 'forfeited $forfeits/20 turns while holding an affordable '
+              'attack — the brain is scoring a blocked hit as worthless and '
+              'quitting instead of chipping the wall down');
+      expect(longestStreak, lessThan(3),
+          reason: 'a streak this long is what DuelController.forfeitLimit '
+              'converts into a surrender');
+      expect(barriersBroken, greaterThan(0),
+          reason: 'it never actually attacked the Barrier — charging forever '
+              'is the same stalemate wearing a different action');
+    });
+
+    test('a Barrier does not change how willing the brain is to swing', () {
+      // ⭐ The root cause, isolated from the forfeit it eventually caused: the
+      // scorer counted only damage that reaches the health bar, so every move
+      // was worth *zero* against a Barrier and the counter-aware filter threw
+      // the whole attack list away. Same board, same charge — only the wall
+      // differs, and a wall that is only removed by being hit must not make
+      // the brain less willing to hit it.
+      int swings({required bool barrier}) {
+        var n = 0;
+        for (var i = 0; i < 300; i++) {
+          final me = MageState(name: 'AI')
+            ..charge = 2
+            ..element = MagicElement.flora;
+          final you = MageState(name: 'You');
+          if (barrier) you.barrierPoints = MageState.maxBarrierPoints;
+          if (brainAt(5).chooseAction(me, you, Random(i)) is CastAction) n++;
+        }
+        return n;
+      }
+
+      final walled = swings(barrier: true);
+      final open = swings(barrier: false);
+      expect(walled, greaterThan(open * 3 ~/ 4),
+          reason: 'attacked only $walled/300 times through a Barrier versus '
+              '$open/300 against a naked target — a blocked hit is being '
+              'scored as worthless rather than as one barrier point removed');
+    });
+
+    test('every rung, at full charge, casts rather than quits', () {
+      // The structural version of the same invariant, across the whole ladder
+      // and both walls: at max charge there is no charging left to do, so a
+      // brain with an affordable spell and no way to charge must cast one.
+      for (var rung = 1; rung <= 10; rung++) {
+        for (final wall in ['barrier', 'shield', 'none']) {
+          final foe = MageState(name: 'AI')
+            ..charge = MageState.maxCharge
+            ..element = MagicElement.flora;
+          final dummy = MageState(name: 'You');
+          if (wall == 'barrier') {
+            dummy.barrierPoints = MageState.maxBarrierPoints;
+          }
+          if (wall == 'shield') {
+            dummy.shield = ActiveShield.elemental(MagicElement.geo, 500);
+          }
+          final ai = brainAt(rung);
+          for (var i = 0; i < 40; i++) {
+            expect(ai.chooseAction(foe, dummy, Random(i)),
+                isNot(isA<ForfeitAction>()),
+                reason: 'rung $rung forfeited at full charge against a $wall '
+                    'while Puffburst and Settle were both affordable — '
+                    'ForfeitAction must mean "no legal move", not "no good '
+                    'move"');
+          }
+        }
+      }
+    });
+
+    test('a spell worth nothing this turn is still cast before quitting', () {
+      // Overload scales off the ENEMY's charge, so against an empty bar it is
+      // honestly worth zero — no wall involved, nothing for the wall credit
+      // above to catch. Full charge, one move, nothing to charge toward: the
+      // brain has to spend it. This is the last remaining route to a forfeit
+      // streak, and the fallback in `chooseAction` is what closes it.
+      final overload = Spell(
+          id: 'overload',
+          name: 'Overload',
+          chargeCost: 2,
+          priority: 9,
+          effect: const OverloadEffect(6, 9));
+      final ai = LadderAi(9,
+          spells: [overload], elements: const [MagicElement.electro]);
+      for (var i = 0; i < 40; i++) {
+        final me = MageState(name: 'AI')
+          ..charge = MageState.maxCharge
+          ..element = MagicElement.electro;
+        expect(ai.chooseAction(me, MageState(name: 'You'), Random(i)),
+            isNot(isA<ForfeitAction>()),
+            reason: 'forfeited with an affordable spell in hand because it '
+                'scored zero — three of these in a row is a surrender');
+      }
+    });
+  });
+
   test('intelligence is clamped to 1-10', () {
     expect(LadderAi(0).intelligence, 1);
     expect(LadderAi(99).intelligence, 10);
