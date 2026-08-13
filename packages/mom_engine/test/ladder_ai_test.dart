@@ -416,6 +416,70 @@ void main() {
   // duel for that side. A brain that forfeits out of taste therefore does not
   // play badly — it *quits*, and in a campaign fight it hands the player a
   // free win plus the loot that goes with it.
+  group('the right tool against a Barrier', () {
+    // ⭐ A Barrier eats exactly ONE hit, whole — so the pick against one is
+    // the cheapest pop or a multi-hit whose later hits land, never the
+    // biggest number (playtest ruling, 2026-08-10).
+    const cheap = Spell(
+        id: 'flick',
+        name: 'Flick',
+        chargeCost: 1,
+        priority: 9,
+        effect: DamageEffect(6, 8));
+    const big = Spell(
+        id: 'slam',
+        name: 'Slam',
+        chargeCost: 5,
+        priority: 9,
+        effect: DamageEffect(40, 50));
+    const volley = Spell(
+        id: 'volley',
+        name: 'Volley',
+        chargeCost: 3,
+        priority: 9,
+        effect: DamageEffect(4, 6, hits: 3));
+
+    MageState walled() => MageState(name: 'You')
+      ..barrierPoints = MageState.maxBarrierPoints;
+
+    MageState full() => MageState(name: 'Foe')
+      ..charge = MageState.maxCharge
+      ..element = MagicElement.flora;
+
+    test('a small spell outranks a large one against a Barrier', () {
+      final ai = LadderAi(5,
+          spells: const [cheap, big], elements: const [MagicElement.flora]);
+      final action = ai.chooseAction(full(), walled(), Random(3));
+      expect(action, isA<CastAction>());
+      expect((action as CastAction).spell.id, 'flick',
+          reason: 'a raw-damage sort spends a Slam where a Flick does the '
+              'identical job — the barrier eats one hit whole either way');
+    });
+
+    test('a multi-hit spell outranks the cheap pop — its later hits land', () {
+      final ai = LadderAi(5,
+          spells: const [cheap, big, volley],
+          elements: const [MagicElement.flora]);
+      final action = ai.chooseAction(full(), walled(), Random(3));
+      expect(action, isA<CastAction>());
+      expect((action as CastAction).spell.id, 'volley',
+          reason: 'hits after the first get past the popped point — real '
+              'damage this turn, which no single hit can offer');
+    });
+
+    test('⚠️ the asymmetry: against an elemental shield, big still wins', () {
+      final ai = LadderAi(5,
+          spells: const [cheap, big], elements: const [MagicElement.flora]);
+      final shielded = MageState(name: 'You')
+        ..shield = ActiveShield.elemental(MagicElement.geo, 500);
+      final action = ai.chooseAction(full(), shielded, Random(3));
+      expect(action, isA<CastAction>());
+      expect((action as CastAction).spell.id, 'slam',
+          reason: 'a shield is a POOL — chipping scales with the hit, so the '
+              'barrier rule must not leak onto elemental shields');
+    });
+  });
+
   group('a wall is never a reason to forfeit', () {
     /// The Sporecap Shambler's real kit — *nothing but damage*, no shield and
     /// no aux, so there is nothing to fall back on when its attacks are rated

@@ -418,14 +418,43 @@ class LadderAi implements DuelAi {
   int _score(Spell sp, MageState self, MageState enemy) {
     final through = estimateDamage(sp, self, enemy);
     if (through > 0) return through;
-    final walled = enemy.shield != null || enemy.barrierPoints > 0;
-    if (!walled || !sp.isOffensive) return 0;
-    // Worth about a third of face value: it buys the *next* hit, not this one.
+    if (!sp.isOffensive) return 0;
+
+    if (enemy.barrierPoints > 0) {
+      // ⭐ **A Barrier eats exactly ONE hit, whole — so size is waste.** The
+      // right tool is the cheapest hit that pops the point, or a multi-hit
+      // spell whose later hits land this same turn past the popped point.
+      // Rating by raw damage here is exactly backwards: it spends a
+      // Cataclysm where a Flick does the identical job (playtest ruling,
+      // 2026-08-10).
+      final hits = _hitCount(sp, self);
+      if (hits > 1) {
+        // Hits after the first get through — real damage, approximated as
+        // (hits-1) average hits. ⚠️ Ignores an elemental shield stacked
+        // BEHIND the barrier; close enough for a picker, wrong place for a
+        // simulator.
+        final perHit = _rawDamage(sp, self) ~/ hits;
+        return max(1, perHit * (hits - 1));
+      }
+      // Single hits rank by cheapness: pop the point, keep the charge.
+      final cost = sp.xCost ? max(1, self.charge) : sp.chargeCost;
+      return max(1, 6 - 2 * cost);
+    }
+
+    if (enemy.shield == null) return 0;
+    // An elemental shield is a pool, so chipping scales with the hit — worth
+    // about a third of face value: it buys the *next* hit, not this one.
     // ⚠️ Floored at 1. Removing a defence is progress even when the hit is
-    // tiny, and a wall of zeroes is exactly what stalls the brain — a Barrier
-    // eats a hit whole regardless of size, so face value is the wrong
-    // yardstick against one in the first place.
+    // tiny, and a wall of zeroes is exactly what stalled the brain here once.
     return max(1, _rawDamage(sp, self) ~/ 3);
+  }
+
+  /// How many separate hits [sp] lands — barrier arithmetic needs it.
+  int _hitCount(Spell sp, MageState self) {
+    final e = sp.effect;
+    if (e is DamageEffect) return e.hits;
+    if (e is BarrageEffect) return self.charge;
+    return 1;
   }
 
   int _rawDamage(Spell sp, MageState self) {
