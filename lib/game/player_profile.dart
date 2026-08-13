@@ -4,6 +4,7 @@ import 'items/inventory.dart';
 import 'items/item_def.dart';
 import 'items/item_instance.dart';
 
+import 'adventure.dart';
 import 'loadout.dart';
 import 'progression.dart';
 import 'pronouns.dart';
@@ -133,6 +134,25 @@ class PlayerProfile {
   /// depends on the clock, so it cannot be a stored field.
   ActiveTrip? trip;
 
+  /// The adventure in progress, if any.
+  ///
+  /// ⭐ **A run survives the app closing.** It used to live in `GameState`
+  /// memory only, so force-quitting at encounter 4 of 9 came back to nothing —
+  /// and a nine-fight run is longer than a bus ride. The earlier worry, that
+  /// persisting it lets a player dodge a losing fight by force-quitting, is
+  /// answered by *where* it resumes rather than by throwing the run away.
+  ///
+  /// ⚠️ **RULING (playtest, 2026-08): closing mid-FIGHT resumes at the START
+  /// of the current encounter.** [AdventureRun.playerHp] only moves on
+  /// `recordVictory`, so it is by construction the health the player walked
+  /// *into* the current fight with — no mid-duel state is serialized, and none
+  /// should be. Quitting a duel therefore costs that duel's progress and
+  /// nothing else: no free escape from a fight going badly, no lost evening
+  /// either. The banked loot from earlier encounters rides along in
+  /// [AdventureRun.pendingLoot] and is still not the player's until they walk
+  /// out.
+  AdventureRun? run;
+
   /// Locations the player has visited (unlocks fast context; travel itself is
   /// still gated by the connection graph).
   Set<String> discoveredLocationIds;
@@ -213,6 +233,7 @@ class PlayerProfile {
     this.resonancePrisms = 0,
     String? locationId,
     this.trip,
+    this.run,
     Set<String>? discoveredLocationIds,
     Map<String, int>? zoneClears,
     List<LoadoutPreset>? presets,
@@ -288,6 +309,7 @@ class PlayerProfile {
     'resonancePrisms': resonancePrisms,
     'locationId': locationId,
     'trip': trip?.toJson(),
+    'run': run?.toJson(),
     'discoveredLocationIds': discoveredLocationIds.toList(),
     'zoneClears': zoneClears,
     'presets': presets.map((p) => p.toJson()).toList(),
@@ -329,6 +351,10 @@ class PlayerProfile {
           ? null
           : World.canonicalId(json['locationId'] as String),
       trip: ActiveTrip.fromJson(json['trip'] as Map<String, dynamic>?),
+      // Absent on saves from before runs were persisted — and absent, on a
+      // run whose zone or creatures no longer resolve, is exactly right: the
+      // player is simply not on an adventure. See AdventureRun.fromJson.
+      run: AdventureRun.fromJson(json['run'] as Map<String, dynamic>?),
       discoveredLocationIds: (json['discoveredLocationIds'] as List?)
           ?.cast<String>()
           .map(World.canonicalId)

@@ -253,21 +253,28 @@ class GameState extends ChangeNotifier {
 
   // ---- Adventures -------------------------------------------------------
 
-  /// The run in progress, if any. ⚠️ Deliberately **not persisted** — a run is
-  /// a single sitting, and resuming one across a reload would let a player
-  /// dodge a losing fight by force-quitting.
-  AdventureRun? run;
+  /// The run in progress, if any.
+  ///
+  /// ⭐ **Stored on the profile, not here**, so every existing [_mutate] write
+  /// carries it to disk for free — see the resume ruling on
+  /// [PlayerProfile.run]. This pair stays because a run is *asked for* as
+  /// `game.run` from a dozen call sites, and routing them through the profile
+  /// would say nothing extra.
+  AdventureRun? get run => profile.run;
+  set run(AdventureRun? value) => profile.run = value;
 
   /// Starts a run at [zone].
-  AdventureRun beginAdventure(GameLocation zone, {Random? rng}) {
+  ///
+  /// ⚠️ Async now that the run is saved — the rolled line **is** the run, and
+  /// a crash before the first fight must not leave a zone half-entered.
+  Future<AdventureRun> beginAdventure(GameLocation zone, {Random? rng}) async {
     final started = AdventureRun.roll(
       zone: zone,
       roster: Bestiary.forZone(zone.id),
       playerHp: MageState.scaledMaxHp(profile.level),
       rng: rng ?? Random(),
     );
-    run = started;
-    notifyListeners();
+    await _mutate(() => profile.run = started);
     return started;
   }
 
@@ -290,6 +297,8 @@ class GameState extends ChangeNotifier {
       instances: loot.instances,
       remainingHp: remainingHp,
     );
+    // ⭐ No explicit save: the run lives on the profile, so the write inside
+    // recordDuelResult below banks the new index and HP along with the XP.
     await recordDuelResult(
       won: true,
       opponentLevel: enemy.level,
@@ -307,6 +316,7 @@ class GameState extends ChangeNotifier {
     if (r == null || r.isOver) return;
     final enemy = r.current!;
     r.recordDefeat();
+    // The defeat rides to disk on recordDuelResult's write, same as a win.
     await recordDuelResult(won: false, opponentLevel: enemy.level);
     notifyListeners();
   }
@@ -329,6 +339,8 @@ class GameState extends ChangeNotifier {
       healingReceivedPercent: gear.healingReceivedPercent,
     );
     if (outcome.consumed) {
+      // ⚠️ One write for both halves — the item leaving the pack and the HP it
+      // bought must never land on disk separately.
       await _mutate(() {
         profile.backpack = profile.backpack.withRemovedFirst(defId);
       });
@@ -366,9 +378,12 @@ class GameState extends ChangeNotifier {
       r.pendingInstances.forEach((id, inst) {
         if (kept.contains(id)) profile.itemInstances[id] = inst;
       });
+      // ⚠️ Emptied **inside** the write. Clearing after it would save a run
+      // still holding loot that is already in the backpack, and reopening the
+      // app would hand it over a second time.
+      r.pendingLoot.clear();
+      r.pendingInstances.clear();
     });
-    r.pendingLoot.clear();
-    r.pendingInstances.clear();
     return overflow;
   }
 

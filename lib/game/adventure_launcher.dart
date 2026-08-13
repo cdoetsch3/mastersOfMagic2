@@ -11,7 +11,8 @@ import 'world.dart';
 /// goes (GAME_DESIGN world structure).
 Future<void> launchAdventure(BuildContext context, GameLocation zone) async {
   final game = GameStateScope.read(context);
-  game.beginAdventure(zone);
+  await game.beginAdventure(zone);
+  if (!context.mounted) return;
   await Navigator.of(
     context,
   ).push(MaterialPageRoute<void>(builder: (_) => AdventureScreen(zone: zone)));

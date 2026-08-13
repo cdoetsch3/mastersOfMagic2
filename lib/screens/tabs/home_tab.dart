@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../game/adventure.dart';
 import '../../game/game_state.dart';
 import '../../game/player_profile.dart';
+import '../../game/world.dart';
 import '../../ui/app_theme.dart';
+import '../adventure_screen.dart';
 import '../home_shell.dart';
 import '../matchmaking_screen.dart';
 
@@ -16,6 +19,13 @@ class HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final game = GameStateScope.of(context);
     final p = game.profile;
+    // ⭐ Only a run still standing. A finished one lingers on the profile until
+    // the next adventure overwrites it, and offering to "resume" a corpse is
+    // worse than offering nothing.
+    final run = game.run;
+    final resumable = run != null && !run.isOver && !run.isFinished
+        ? run
+        : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,6 +53,10 @@ class HomeTab extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               const SectionLabel('Continue'),
+              if (resumable != null) ...[
+                _ResumeAdventureCard(run: resumable),
+                const SizedBox(height: 8),
+              ],
               GamePanel(
                 onTap: () => onSelectTab(0),
                 child: Row(
@@ -114,6 +128,51 @@ class HomeTab extends StatelessWidget {
           child: _FindDuelButton(),
         ),
       ],
+    );
+  }
+}
+
+/// The way back into a run left half-finished.
+///
+/// ⚠️ Pushes the **existing** [AdventureScreen], which reads `game.run` for
+/// itself — there is no second path into an adventure, and adding one is how
+/// the two would drift. 📝 Deliberately plain; a human restyles this later.
+class _ResumeAdventureCard extends StatelessWidget {
+  final AdventureRun run;
+  const _ResumeAdventureCard({required this.run});
+
+  @override
+  Widget build(BuildContext context) {
+    final zone = World.byId(run.zoneId);
+    return GamePanel(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => AdventureScreen(zone: zone)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.flag, color: AppColors.ember),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Resume adventure — ${zone.name}',
+                  style: const TextStyle(color: AppColors.text, fontSize: 14),
+                ),
+                Text(
+                  'Encounter ${run.encounterNumber} of ${run.encounterCount}',
+                  style: const TextStyle(
+                    color: AppColors.textDim,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right, color: AppColors.textFaint),
+        ],
+      ),
     );
   }
 }

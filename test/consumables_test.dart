@@ -10,9 +10,9 @@ import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 
-GameState _game() {
+Future<GameState> _game() async {
   final g = GameState(_Mem(), PlayerProfile.newPlayer());
-  g.beginAdventure(World.byId('whispering_woods'), rng: Random(1));
+  await g.beginAdventure(World.byId('whispering_woods'), rng: Random(1));
   g.profile.backpack = g.profile.backpack.withAdded(
     const InventorySlot(defId: 'foragers_ration'),
   )!;
@@ -52,7 +52,7 @@ void main() {
 
   group('using it between encounters', () {
     test('a wounded player is healed and the item is spent', () async {
-      final g = _game();
+      final g = await _game();
       g.run!.playerHp = 40;
       final before = g.profile.backpack.countOf('foragers_ration');
       final outcome = await g.useItem('foragers_ration');
@@ -62,7 +62,7 @@ void main() {
     });
 
     test('⚠️ at full health it is refused, NOT eaten', () async {
-      final g = _game();
+      final g = await _game();
       final outcome = await g.useItem('foragers_ration');
       expect(outcome.consumed, isFalse);
       expect(
@@ -76,21 +76,21 @@ void main() {
     });
 
     test('healing never overshoots max', () async {
-      final g = _game();
+      final g = await _game();
       g.run!.playerHp = 99;
       await g.useItem('foragers_ration');
       expect(g.run!.playerHp, 100);
     });
 
     test('what you are not carrying cannot be used', () async {
-      final g = _game();
+      final g = await _game();
       final outcome = await g.useItem('sapwort_draught');
       expect(outcome.consumed, isFalse);
       expect(outcome.message, contains('not carrying'));
     });
 
     test('a material is not usable', () async {
-      final g = _game();
+      final g = await _game();
       g.profile.backpack = g.profile.backpack.withAdded(
         const InventorySlot(defId: 'oak_log'),
       )!;
@@ -100,7 +100,7 @@ void main() {
     });
 
     test('⚠️ nothing can be used once the run is over', () async {
-      final g = _game();
+      final g = await _game();
       g.run!.playerHp = 10;
       await g.loseEncounter();
       final outcome = await g.useItem('foragers_ration');

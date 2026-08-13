@@ -64,23 +64,121 @@ void main() {
       expect(seenBosses, hasLength(2));
     });
 
-    test(
-      'elevated ranks fight at the top of the band, commons at the middle',
-      () {
-        final run = _run();
-        for (final e in run.encounters) {
-          if (e.def.rank == EnemyRank.common) {
-            expect(e.level, ((_woods.minLevel + _woods.maxLevel) / 2).round());
-          } else {
-            expect(
-              e.level,
-              _woods.maxLevel,
-              reason: 'a boss must not be a common with more health',
-            );
-          }
+    test('elevated ranks fight at the top of the band', () {
+      final run = _run();
+      for (final e in run.encounters) {
+        if (e.def.rank != EnemyRank.common) {
+          expect(
+            e.level,
+            _woods.maxLevel,
+            reason: 'a boss must not be a common with more health',
+          );
         }
-      },
-    );
+      }
+    });
+  });
+
+  group('the band is a ramp, not a midpoint', () {
+    test('the first fight of the game is at the bottom of the band', () {
+      // ⚠️ The playtest bug: Whispering Woods advertises 1-5 and opened on a
+      // level-3 creature, because commons all fought at ((min+max)/2).
+      for (var seed = 0; seed < 20; seed++) {
+        final run = _run(seed);
+        expect(
+          run.encounters.first.level,
+          _woods.minLevel,
+          reason: 'seed $seed opened above minLevel — the midpoint is back',
+        );
+      }
+    });
+
+    test('the last encounter is at the top of the band', () {
+      final run = _run();
+      expect(
+        run.encounters.last.level,
+        _woods.maxLevel,
+        reason: 'the boss ends the climb, so the band must be fully walked',
+      );
+    });
+
+    test('commons only ever climb, never fall back', () {
+      // ⭐ Measured over the commons alone: minis and the boss sit at maxLevel
+      // by design, so the full line dips back down after every milestone.
+      for (var seed = 0; seed < 20; seed++) {
+        final levels = _run(seed).encounters
+            .where((e) => e.def.rank == EnemyRank.common)
+            .map((e) => e.level)
+            .toList();
+        for (var i = 1; i < levels.length; i++) {
+          expect(
+            levels[i],
+            greaterThanOrEqualTo(levels[i - 1]),
+            reason:
+                'seed $seed went $levels — a ramp indexed per section, or off '
+                'the commons rather than the whole line, does this',
+          );
+        }
+        expect(
+          levels.last,
+          greaterThan(levels.first),
+          reason: 'seed $seed never climbed at all — that is a flat band',
+        );
+        for (final level in levels) {
+          expect(level, inInclusiveRange(_woods.minLevel, _woods.maxLevel));
+        }
+      }
+    });
+  });
+
+  group('no creature twice in a row', () {
+    test('consecutive encounters never share a defId', () {
+      // ⚠️ The playtest bug: uniform draws gave 3 of the first 5 fights to the
+      // same creature. Legal, and it read as the generator being broken.
+      for (var seed = 0; seed < 200; seed++) {
+        final ids = _run(seed).encounters.map((e) => e.def.id).toList();
+        for (var i = 1; i < ids.length; i++) {
+          expect(
+            ids[i],
+            isNot(ids[i - 1]),
+            reason: 'seed $seed drew ${ids[i]} back to back at $i: $ids',
+          );
+        }
+      }
+    });
+
+    test('the bag deals every common before any of them repeats', () {
+      final pool = Bestiary.forZone(
+        'whispering_woods',
+      ).where((e) => e.rank == EnemyRank.common).length;
+      // 3 sections × the tier's commons per section (§3d).
+      final slots = commonsPerSectionFor(_woods.tier) * 3;
+      final cap = (slots / pool).ceil() + 1;
+      for (var seed = 0; seed < 200; seed++) {
+        final counts = <String, int>{};
+        for (final e in _run(seed).encounters) {
+          if (e.def.rank != EnemyRank.common) continue;
+          counts[e.def.id] = (counts[e.def.id] ?? 0) + 1;
+        }
+        for (final entry in counts.entries) {
+          expect(
+            entry.value,
+            lessThanOrEqualTo(cap),
+            reason:
+                'seed $seed used ${entry.key} ${entry.value}x — a bag that is '
+                'refilled early, or a die dressed up as one, clusters like '
+                'this',
+          );
+        }
+      }
+    });
+
+    test('the same seed rolls the same line, every time', () {
+      // ⭐ The bag must not reach for a global Random — lockstep and every
+      // seeded test above depend on the injected one being the only source.
+      final a = _run(42).encounters.map((e) => '${e.def.id}@${e.level}');
+      final b = _run(42).encounters.map((e) => '${e.def.id}@${e.level}');
+      expect(a, orderedEquals(b.toList()));
+    });
   });
 
   group('push your luck', () {
@@ -197,7 +295,7 @@ void main() {
   group('the whole loop, end to end', () {
     test('fight, loot, walk out, stow it in Hearthwood', () async {
       final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
-      game.beginAdventure(_woods, rng: Random(3));
+      await game.beginAdventure(_woods, rng: Random(3));
 
       // Clear the first two fights.
       await game.winEncounter(remainingHp: 80, rng: Random(3));
@@ -228,7 +326,7 @@ void main() {
 
     test('dying banks nothing', () async {
       final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
-      game.beginAdventure(_woods, rng: Random(5));
+      await game.beginAdventure(_woods, rng: Random(5));
       await game.winEncounter(remainingHp: 40, rng: Random(5));
       await game.loseEncounter();
       expect(game.profile.backpack.used, 0);
@@ -237,7 +335,7 @@ void main() {
 
     test('clearing the zone marks it cleared', () async {
       final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
-      game.beginAdventure(_woods, rng: Random(7));
+      await game.beginAdventure(_woods, rng: Random(7));
       while (!game.run!.isFinished) {
         await game.winEncounter(remainingHp: 70, rng: Random(7));
       }
@@ -256,7 +354,7 @@ void main() {
         }
         game.profile.backpack = pack;
 
-        game.beginAdventure(_woods, rng: Random(11));
+        await game.beginAdventure(_woods, rng: Random(11));
         await game.winEncounter(remainingHp: 90, rng: Random(11));
         await game.leaveAdventure();
         expect(game.profile.backpack.isFull, isTrue);
