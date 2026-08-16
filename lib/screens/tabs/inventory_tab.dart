@@ -9,6 +9,8 @@ import '../../game/items/item_def.dart';
 import '../../game/items/item_instance.dart';
 import '../../game/world.dart';
 import '../../ui/app_theme.dart';
+import '../../ui/item_display.dart';
+import '../craft_screen.dart';
 import '../home_shell.dart';
 
 /// The backpack, and — when the player is standing in a town — that town's
@@ -47,6 +49,15 @@ class InventoryTab extends StatelessWidget {
                       'Backpack — ${game.profile.backpack.used}'
                       '/${Carrying.backpackSlots}',
                     ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const CraftScreen(),
+                      ),
+                    ),
+                    icon: const Icon(Icons.handyman, size: 16),
+                    label: const Text('Craft'),
                   ),
                   // ⭐ In town only, and only when there is something to move.
                   // Deposits the whole pack; equipped gear is never touched.
@@ -257,7 +268,7 @@ class _EquipSlotChip extends StatelessWidget {
     final slot = def.slot;
     return InkWell(
       borderRadius: BorderRadius.circular(6),
-      onTap: () => showItemActions(
+      onTap: () => showItemDialog(
         context,
         def: def,
         instance: inst,
@@ -311,75 +322,6 @@ class _GearTotals extends StatelessWidget {
       ),
     );
   }
-}
-
-/// One dialog for every item interaction — what it is, what it does, and
-/// what you can do with it here. [actions] whose `run` returns a refusal
-/// string surface it; null means done.
-Future<void> showItemActions(
-  BuildContext context, {
-  required ItemDef def,
-  ItemInstance? instance,
-  List<({String label, Future<String?> Function() run})> actions = const [],
-}) async {
-  final lines = def is EquipmentDef
-      ? Equipping.describe(def.modifiers)
-      : (def is Usable ? [(def as Usable).effect.describe] : const <String>[]);
-  final messenger = ScaffoldMessenger.of(context);
-  await showDialog<void>(
-    context: context,
-    builder: (dialogContext) => AlertDialog(
-      backgroundColor: AppColors.panel,
-      title: Text(
-        ItemCatalogue.displayName(def, instance),
-        style: TextStyle(color: rarityColour(def.rarity), fontSize: 16),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (def is EquipmentDef)
-            Text(
-              'Level ${def.equipLevel}',
-              style: const TextStyle(color: AppColors.textDim, fontSize: 12),
-            ),
-          for (final line in lines)
-            Text(
-              line,
-              style: const TextStyle(color: AppColors.teal, fontSize: 13),
-            ),
-          const SizedBox(height: 8),
-          Text(
-            def.lore,
-            style: const TextStyle(
-              color: AppColors.textDim,
-              fontSize: 12,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        for (final a in actions)
-          TextButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              final no = await a.run();
-              // ⚠️ A refusal the player never sees is a button that looks
-              // broken. Every rule speaks here.
-              if (no != null) {
-                messenger.showSnackBar(SnackBar(content: Text(no)));
-              }
-            },
-            child: Text(a.label),
-          ),
-        TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(),
-          child: const Text('Close'),
-        ),
-      ],
-    ),
-  );
 }
 
 class _BeltSlot extends StatelessWidget {
@@ -447,7 +389,7 @@ class _BackpackGrid extends StatelessWidget {
           }
           // The full menu, reached by long-press (Option A) — or by tap when
           // out of town, where there is nowhere to deposit.
-          void openMenu() => showItemActions(
+          void openMenu() => showItemDialog(
             context,
             def: def,
             instance: instance,
@@ -693,15 +635,3 @@ class _StoredRow extends StatelessWidget {
     ),
   );
 }
-
-/// ⭐ The standard ARPG ladder (ITEMS §8), so players read rank on sight.
-/// ⚠️ Legendary wants a gradient treatment, not a flat colour — it degrades to
-/// gold here until that widget exists.
-Color rarityColour(Rarity r) => switch (r) {
-  Rarity.common => const Color(0xFFCFD8DC),
-  Rarity.uncommon => const Color(0xFF6BBF59),
-  Rarity.rare => const Color(0xFF4A90D9),
-  Rarity.epic => const Color(0xFFA96BD8),
-  Rarity.mythic => const Color(0xFFE08A3C),
-  Rarity.legendary => const Color(0xFFE8C547),
-};

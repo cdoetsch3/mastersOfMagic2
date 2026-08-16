@@ -7,6 +7,7 @@ import 'items/item_instance.dart';
 import 'adventure.dart';
 import 'loadout.dart';
 import 'progression.dart';
+import 'skills.dart';
 import 'pronouns.dart';
 import 'active_trip.dart';
 import 'world.dart';
@@ -180,6 +181,12 @@ class PlayerProfile {
   /// amendment.
   Map<String, int> zoneClears;
 
+  /// Total XP per skill, keyed by `CraftSkill.name` / `GatherSkill.name`
+  /// (Skills.allKeys). ⭐ **XP is the stored fact; level is derived**
+  /// (Skills.levelForXp) — storing both would let them disagree, the same
+  /// reasoning as character [xp]/[level]. Absent key = never practised = 0.
+  Map<String, int> skillXp;
+
   List<LoadoutPreset> presets;
   int activePresetIndex;
 
@@ -236,6 +243,7 @@ class PlayerProfile {
     this.run,
     Set<String>? discoveredLocationIds,
     Map<String, int>? zoneClears,
+    Map<String, int>? skillXp,
     List<LoadoutPreset>? presets,
     this.activePresetIndex = 0,
     Backpack? backpack,
@@ -249,6 +257,7 @@ class PlayerProfile {
   }) : locationId = locationId ?? World.startLocationId,
        discoveredLocationIds = discoveredLocationIds ?? {World.startLocationId},
        zoneClears = zoneClears ?? {},
+       skillXp = skillXp ?? {},
        presets = presets ?? [LoadoutPreset.starter('Loadout I')],
        backpack = backpack ?? Backpack.empty(),
        belt = belt ?? const Belt(),
@@ -283,6 +292,9 @@ class PlayerProfile {
   /// How many distinct combat zones this character has finished.
   int get zonesCleared => zoneClears.length;
 
+  /// The skill ledger, read side: level for a Skills.allKeys key.
+  int skillLevel(String key) => Skills.levelForXp(skillXp[key] ?? 0);
+
   int get level => Progression.levelForXp(xp);
   int get xpIntoLevel => Progression.xpIntoLevel(xp);
   int get xpForThisLevel => Progression.xpToNext(level);
@@ -312,6 +324,7 @@ class PlayerProfile {
     'run': run?.toJson(),
     'discoveredLocationIds': discoveredLocationIds.toList(),
     'zoneClears': zoneClears,
+    if (skillXp.isNotEmpty) 'skillXp': skillXp,
     'presets': presets.map((p) => p.toJson()).toList(),
     'activePresetIndex': activePresetIndex,
     'backpack': backpack.toJson(),
@@ -366,6 +379,11 @@ class PlayerProfile {
           (json['zoneClears'] as Map?)?.map(
             (k, v) =>
                 MapEntry(World.canonicalId(k as String), (v as num).toInt()),
+          ) ??
+          {},
+      skillXp:
+          (json['skillXp'] as Map?)?.map(
+            (k, v) => MapEntry(k as String, (v as num).toInt()),
           ) ??
           {},
       presets: presets,

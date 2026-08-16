@@ -20,7 +20,7 @@ import '../game/items/item_catalogue.dart';
 import '../game/enemies/enemy_def.dart';
 import '../ui/app_theme.dart';
 import '../ui/creature_art.dart';
-import 'tabs/inventory_tab.dart' show rarityColour;
+import '../ui/item_display.dart' show rarityColour;
 import '../ui/element_text.dart';
 import 'home_shell.dart';
 

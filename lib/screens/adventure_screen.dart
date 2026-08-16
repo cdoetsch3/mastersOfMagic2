@@ -11,7 +11,7 @@ import '../game/world.dart';
 import '../ui/app_theme.dart';
 import 'duel_screen.dart';
 import 'level_up_screen.dart';
-import 'tabs/inventory_tab.dart' show rarityColour;
+import '../ui/item_display.dart' show rarityColour;
 
 /// One run through a zone: what is in front of you, how far in you are, and
 /// the only question that matters — press on, or walk out with what you have.

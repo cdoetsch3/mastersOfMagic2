@@ -1803,6 +1803,47 @@ ONCE per cast, to the first hit). Crit lands exactly as ruled: engine base 50
 
 ---
 
+## 9b.9 Skills XP & the crafting surfaces ✅ (session 2026-08-10)
+
+The skill framework is **in code**: `lib/game/skills.dart` (the ladder and the
+Ledger's views), `PlayerProfile.skillXp` (XP stored, level derived — same
+reasoning as character xp/level), `GameState.craft` (gate → consume → mint →
+XP), and two screens (the Ledger, the Workbench).
+
+### Rulings
+
+1. ✅ **The UI never says where a material grows.** No "Birch grows in
+   Ashfall Vale" lines anywhere — the world teaches organically, and a second
+   source of truth would rot the moment a zone's yields moved.
+2. ✅ **The Ledger scales by showing less**: a collapsed row is a glance
+   (icon, level, bar); expanded shows *Recently unlocked* (≤5, newest first)
+   and the single next gate; the complete catalogue lives behind "View
+   everything", a scrollable sheet needing no curation at skill 40.
+3. ✅ **One item dialog everywhere** (`lib/ui/item_display.dart`): name,
+   stats, equip level, lore — the Ledger, Workbench, backpack, paper doll
+   and loot picker all open the same one. 📝 Grows an item sprite when icons
+   exist (CONTENT_CHECKLIST 15b).
+4. ✅ **Crafting works anywhere** (§9b.2 upheld); the Workbench sorts
+   craftable → missing materials → skill-locked, so what you CAN do is never
+   buried.
+5. 📝 **Numbers are first-pass and tunable**: skill xpToNext = 20 + 5·(n−1);
+   craft XP = 10 + 5·recipeGate. ~2 dozen tier-1 crafts reach the tier-2
+   gate (~10).
+
+### 📝 The crafting minigame (direction agreed, not built)
+
+The craft button is a placeholder for a **crafting act**: each recipe carries
+gesture steps (shave/turn/fit; thread/stitch; pour/stir), simple at tier 1,
+more steps and tighter windows later. ⭐ **Execution quality becomes the
+quality roll** — this unifies with §9b.4b instead of fighting it: attended
+crafting at a station gets wider timing windows (its "best odds"), attended
+anywhere gets standard windows, passive crafting never plays and stays
+capped at Standard. Skill level still sets the quality *ceiling*; the hands
+earn where you land under it. `GameState.craft(performance:)` is the seam it
+plugs into.
+
+---
+
 ## 10. Open questions
 
 ✅ **Resolved:** power budget · five archetypes · counter-loop · sim criterion
@@ -1841,6 +1882,13 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-10.** §9b.9: the skill framework shipped — skillXp on the
+profile, the ladder in skills.dart, GameState.craft, the Ledger and
+Workbench screens, the standardized item dialog. Rulings: no
+material-location hints in UI; Ledger shows recent + next with a
+view-everything sheet; minigame direction (execution → quality) recorded
+with its performance seam.
 
 **Rev — 2026-08-09b.** §5b.5 added: The Long Rite, a proposed 15-turn
 uninterrupted-ritual instant-death mechanic, framed as an anti-turtle doom

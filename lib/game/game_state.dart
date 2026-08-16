@@ -12,6 +12,8 @@ import 'items/inventory.dart';
 import 'items/item_catalogue.dart';
 import 'items/item_def.dart';
 import 'items/item_instance.dart';
+import 'items/recipe_def.dart';
+import 'skills.dart';
 import 'player_profile.dart';
 import 'profile_storage.dart';
 import 'progression.dart';
@@ -250,6 +252,104 @@ class GameState extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // ---- Crafting ---------------------------------------------------------
+
+  /// Makes [recipe]'s output from backpack materials: checks the gate,
+  /// consumes the inputs, mints the item, pays skill XP.
+  ///
+  /// ⭐ **Works anywhere** (ITEMS §9b.2 — stations are convenience, never a
+  /// gate). Inputs come from the backpack only for now; 📝 pulling from the
+  /// local Storeroom in town is a later nicety.
+  ///
+  /// ⚠️ **Space is safe by arithmetic**: every recipe consumes ≥1 slot of
+  /// fungible inputs and yields exactly 1 slot, so a craft never overflows a
+  /// pack that could afford its inputs. The assert guards the recipe that
+  /// would break the theorem.
+  ///
+  /// 📝 **The performance seam**: when the crafting minigame lands, its
+  /// execution score arrives through [performance] (0–1) and becomes the
+  /// quality roll (§9b.4). Until quality moves stats, output is minted plain
+  /// and the score is accepted but unused — the seam exists so the minigame
+  /// bolts on without rewiring this method.
+  Future<CraftOutcome> craft(RecipeDef recipe, {double performance = 1}) async {
+    final skillKey = recipe.skill.name;
+    final have = profile.skillLevel(skillKey);
+    if (have < recipe.skillLevel) {
+      return CraftOutcome.refused(
+        'Needs ${Skills.displayName(skillKey)} ${recipe.skillLevel} — '
+        'you are $have.',
+      );
+    }
+    for (final input in recipe.inputs) {
+      final short = input.count - profile.backpack.countOf(input.defId);
+      if (short > 0) {
+        final def = ItemCatalogue.tryById(input.defId);
+        final name = def == null
+            ? input.defId
+            : ItemCatalogue.displayName(def);
+        return CraftOutcome.refused('Needs $short more $name.');
+      }
+    }
+    final outputDef = ItemCatalogue.tryById(recipe.outputId);
+    if (outputDef == null) {
+      // A recipe pointing at nothing is a content bug, not a player problem.
+      return CraftOutcome.refused('That cannot be made.');
+    }
+    assert(
+      recipe.inputs.fold<int>(0, (a, i) => a + i.count) >=
+          recipe.outputCount,
+      'a recipe that nets slots would make craft() able to overflow the pack',
+    );
+
+    final levelBefore = profile.skillLevel(skillKey);
+    final gained = Skills.xpForRecipe(recipe);
+    ItemInstance? minted;
+    await _mutate(() {
+      var pack = profile.backpack;
+      for (final input in recipe.inputs) {
+        for (var n = 0; n < input.count; n++) {
+          pack = pack.withRemovedFirst(input.defId);
+        }
+      }
+      for (var n = 0; n < recipe.outputCount; n++) {
+        InventorySlot slot;
+        if (outputDef.isFungible) {
+          slot = InventorySlot(defId: outputDef.id);
+        } else {
+          // ⭐ Minted plain — no quality until quality changes stats (ruling
+          // 2026-08-09); the [performance] seam is where it will come from.
+          minted = ItemInstance(
+            instanceId: _mintCraftId(),
+            defId: outputDef.id,
+          );
+          profile.itemInstances[minted!.instanceId] = minted!;
+          slot = InventorySlot(
+            defId: outputDef.id,
+            instanceId: minted!.instanceId,
+          );
+        }
+        pack = pack.withAdded(slot) ?? pack;
+      }
+      profile.backpack = pack;
+      profile.skillXp[skillKey] = (profile.skillXp[skillKey] ?? 0) + gained;
+    });
+    final levelAfter = profile.skillLevel(skillKey);
+    return CraftOutcome.made(
+      defId: outputDef.id,
+      xp: gained,
+      skillKey: skillKey,
+      leveledTo: levelAfter > levelBefore ? levelAfter : null,
+    );
+  }
+
+  static int _craftMintCounter = 0;
+
+  /// Instance ids for crafted goods — same shape as drop minting (loot.dart),
+  /// distinct prefix so provenance is readable in a raw save.
+  String _mintCraftId() =>
+      'c${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}'
+      '${(_craftMintCounter++).toRadixString(36)}';
 
   // ---- Adventures -------------------------------------------------------
 
@@ -711,4 +811,33 @@ class GameStateScope extends InheritedNotifier<GameState> {
             as GameStateScope?;
     return scope!.notifier!;
   }
+}
+
+/// What a craft attempt produced.
+class CraftOutcome {
+  /// Player-facing reason nothing happened, or null on success.
+  final String? refusal;
+
+  final String? defId;
+  final int xp;
+  final String? skillKey;
+
+  /// Non-null when this craft crossed a skill level — the UI's cue to
+  /// celebrate, mirroring the character pendingLevelUp shape.
+  final int? leveledTo;
+
+  const CraftOutcome.refused(this.refusal)
+    : defId = null,
+      xp = 0,
+      skillKey = null,
+      leveledTo = null;
+
+  const CraftOutcome.made({
+    required this.defId,
+    required this.xp,
+    required this.skillKey,
+    this.leveledTo,
+  }) : refusal = null;
+
+  bool get succeeded => refusal == null;
 }

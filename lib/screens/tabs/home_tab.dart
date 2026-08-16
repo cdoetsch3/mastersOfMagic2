@@ -6,6 +6,7 @@ import '../../game/player_profile.dart';
 import '../../game/world.dart';
 import '../../ui/app_theme.dart';
 import '../adventure_screen.dart';
+import '../skills_screen.dart';
 import '../home_shell.dart';
 import '../matchmaking_screen.dart';
 
@@ -60,6 +61,36 @@ class HomeTab extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               const SectionLabel('Continue'),
+              GamePanel(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const SkillsScreen(),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.handyman, color: AppColors.teal),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Text(
+                        'Skills',
+                        style: TextStyle(color: AppColors.text, fontSize: 14),
+                      ),
+                    ),
+                    Text(
+                      // The two the player levels first — a glance without
+                      // opening the ledger.
+                      'Wc ${p.skillLevel('woodcarving')} · '
+                      'Ta ${p.skillLevel('tailoring')}',
+                      style: const TextStyle(
+                        color: AppColors.textDim,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
               if (resumable != null) ...[
                 _ResumeAdventureCard(run: resumable),
                 const SizedBox(height: 8),
