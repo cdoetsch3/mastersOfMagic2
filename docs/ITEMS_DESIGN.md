@@ -1832,15 +1832,71 @@ XP), and two screens (the Ledger, the Workbench).
 
 ### 📝 The crafting minigame (direction agreed, not built)
 
-The craft button is a placeholder for a **crafting act**: each recipe carries
-gesture steps (shave/turn/fit; thread/stitch; pour/stir), simple at tier 1,
-more steps and tighter windows later. ⭐ **Execution quality becomes the
-quality roll** — this unifies with §9b.4b instead of fighting it: attended
-crafting at a station gets wider timing windows (its "best odds"), attended
-anywhere gets standard windows, passive crafting never plays and stays
-capped at Standard. Skill level still sets the quality *ceiling*; the hands
-earn where you land under it. `GameState.craft(performance:)` is the seam it
-plugs into.
+The craft button is a placeholder for a **crafting act**. ⭐ **Execution
+quality becomes the quality roll** — unifying with §9b.4b instead of
+fighting it: attended crafting at a station gets wider timing windows (its
+"best odds"), attended anywhere gets standard windows, passive crafting
+never plays and stays capped at Standard. Skill level still sets the quality
+*ceiling*; the hands earn where you land under it.
+`GameState.craft(performance:)` is the seam it plugs into.
+
+#### 9b.9a The gesture catalogue 💡 (Christian, 2026-08-10 — ideas, not commitments)
+
+⭐ **Three categories, and the category mix is the design tool** (Christian's
+framing): a good recipe chains 2–4 steps across categories so it never
+repeats a feel; the same mechanic reskins across disciplines so input code
+is shared while the fantasy stays distinct.
+
+| # | Mechanic | Category | Fantasy |
+|---|---|---|---|
+| 1 | Chopping — hold, release at the meter's peak | timing | splitting logs, rough shaping |
+| 2 | Carving — drag along a highlighted outline | precision | staff detail, runes, wax models |
+| 3 | Sawing — back-and-forth at steady rhythm; too fast binds | regulation | planks, precise cuts |
+| 4 | Sanding — small circles over rough patches until smooth | regulation | wood finishing, metal polish |
+| 5 | Hammering — timed clicks in a passing sweet spot | timing | forging; misses warp the piece |
+| 6 | Quenching — plunge at the right colour cue | timing | hardness |
+| 7 | Bellows — alternation keeps a drifting needle in band | regulation | forge, glasswork |
+| 8 | Wire drawing — slow steady drag; too fast snaps | regulation | settings, chains, filigree |
+| 9 | Gem setting — click when the wobble centres | precision | jewelry |
+| 10 | Faceting — spin, cut when guides align, per facet | precision | cut quality = alignment |
+| 11 | Swirling — circles at target speed, vortex indicator | regulation | mixing, dissolving |
+| 12 | Pouring — hold to tilt, fill to the line, no overshoot | precision | potions, molten casts |
+| 13 | Grinding — short circles to particle-size target; over-grinding ruins volatiles | regulation | powdered reagents |
+| 14 | Simmering — hold/release to keep a line in a scrolling band | regulation | potions, tempering |
+| 15 | Rune tracing — follow the sigil without leaving bounds | precision | enchanting; longer paths = harder |
+| 16 | Mana channeling — hold through surges, release in a calm | timing | imbuing; surge release = backlash |
+| 17 | Binding/knotting — node sequence, pattern-lock style | precision | seals, grips, hilts |
+| 18 | Distilling — click only the pure drops as they fall | timing | high-tier essence extraction |
+
+#### 9b.9b How it composes 📝 (review of the catalogue)
+
+- ⭐ **~6 input engines carry all 18**: a release-timing meter (1, 6, 16), a
+  passing-sweet-spot rhythm (5, 18), a trace surface (2, 15, 17), a
+  rate-regulated drag (3, 4, 8, 11, 13), a band-keeper (7, 14), and an
+  align-and-commit (9, 10, 12). Build the engines once; skins are cheap.
+- ⭐ **Each discipline gets a signature blend**: Woodcarving is the tutorial —
+  chop/carve/sand is one step from each category, teaching the vocabulary at
+  tier 1. Metalworking leans timing (hammer, quench), Jewelry precision
+  (facet, set, wire), Potions regulation (swirl, simmer) with distilling as
+  its timing capstone, Enchanting precision-plus-instability (trace,
+  channel). The blend IS the skill's feel.
+- ✅ **Cumulative accuracy, never pass/fail** (Christian's note, adopted as
+  the direction): each step emits 0–1, `performance` is their weighted mean,
+  and the floor is a Rough item — a botched swirl makes a weaker potion,
+  never wasted materials. ❓ One open question: #13/#16 imply true loss
+  (ruined volatiles, backlash). If loss ever exists it is a flagged property
+  of rare late-game VOLATILE ingredients, never the default — the default
+  economy rule stays "materials are never eaten by failure".
+- ⭐ **Gathering reuses the engines**: Felling = the chop meter, Mining = the
+  hammer rhythm, Foraging = the careful trace. The three gathering skills
+  get their act from the same six engines for free.
+- ⚠️ **Crafting is client-local** — no lockstep, so #16's random surges may
+  use unseeded randomness safely. Nothing here touches the duel engine.
+- ⚠️ **Bulk lane stays**: quick-craft (no minigame, capped Standard) mirrors
+  the passive-station cap so twenty draughts is never twenty minigames.
+- Complexity curve: tier 1 = one step, +1 step per tier or two, windows
+  tighten with recipe gate; a Master-band recipe is a 4-step chain crossing
+  all three categories.
 
 ---
 
@@ -1882,6 +1938,13 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-10b.** §9b.9a/b: Christian's 18-mechanic gesture catalogue
+recorded with its timing/precision/regulation taxonomy; review maps them to
+~6 shared input engines, gives each discipline a signature category blend
+(Woodcarving as the tutorial skill), adopts cumulative-accuracy-never-
+pass/fail with a materials-are-never-eaten default, and notes gathering
+reuses the same engines.
 
 **Rev — 2026-08-10.** §9b.9: the skill framework shipped — skillXp on the
 profile, the ladder in skills.dart, GameState.craft, the Ledger and
