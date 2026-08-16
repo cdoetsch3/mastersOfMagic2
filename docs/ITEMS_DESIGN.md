@@ -1867,13 +1867,51 @@ is shared while the fantasy stays distinct.
 | 16 | Mana channeling — hold through surges, release in a calm | timing | imbuing; surge release = backlash |
 | 17 | Binding/knotting — node sequence, pattern-lock style | precision | seals, grips, hilts |
 | 18 | Distilling — click only the pure drops as they fall | timing | high-tier essence extraction |
+| 19 | Threading/weaving — over-under through moving gaps; a miss is a visible flaw | precision+timing | leather, grips, cord, bowstrings |
+| 20 | Folding — drag fold + timed press, repeated; each fold raises quality, cooling metal risks a crack | chained | pattern-welded blades |
+| 21 | Acid etching — hold over a stencil, release before burn-through; longer = bolder + riskier | timing | engraving metal, jewelry |
+| 22 | Blowing — breathing-paced press/release to inflate glass evenly | regulation | flasks, enchanting orbs |
+| 23 | Balancing — micro-corrections keep a wobbling cursor centred while a scale settles | regulation | weighing volatiles, pommel balance |
+| 24 | Crystallization seeding — click seed spots; SPACING decides pure growth vs crust | precision (judgment) | alchemy, gem growing |
+| 25 | Tuning — dial to match a tone, audio + waveform | precision | attuning to a ley frequency |
+| 26 | Feeding the flame — drag reagents in the order the fire asks, shrinking windows | timing+memory | rituals, forge blessings |
+| 27 | Peeling — slow drag along a seam with a depth/pressure axis | precision | bark, herb prep, skinning |
+| 28 | Sigil stamping — rotate, position, press for the right duration | chained | seals, maker's marks |
 
 #### 9b.9b How it composes 📝 (review of the catalogue)
 
-- ⭐ **~6 input engines carry all 18**: a release-timing meter (1, 6, 16), a
-  passing-sweet-spot rhythm (5, 18), a trace surface (2, 15, 17), a
-  rate-regulated drag (3, 4, 8, 11, 13), a band-keeper (7, 14), and an
-  align-and-commit (9, 10, 12). Build the engines once; skins are cheap.
+- ⭐ **~9 input engines carry all 28**: a release-timing meter (1, 6, 16, 21),
+  a passing-sweet-spot rhythm (5, 18, 19), a trace surface (2, 15, 17, 27),
+  a rate-regulated drag (3, 4, 8, 11, 13), a band-keeper (7, 14, 22), an
+  align-and-commit (9, 10, 12, 25), and — new with the second batch — a
+  **stabilizer** (23, continuous micro-correction), a **placement** engine
+  (24, judgment of spacing rather than motor accuracy), and a
+  **call-and-response** (26, sequence memory under time pressure). Build the
+  engines once; skins are cheap.
+- ⭐ **The second batch also adds three CHASSIS ideas** — orthogonal to the
+  engines: *cross-step state* (20's cooling metal: a resource that decays
+  across repeats, so later steps are harder), *push-your-luck
+  parameterization* (21: deeper hold = better result + closer to ruin), and
+  *a second continuous axis on a trace* (27's depth). Each upgrades an
+  existing engine rather than adding one.
+- ⭐ **Not every mechanic tests hands** — 24 (seed spacing) and 26 (sequence
+  memory) are judgment and memory. A Master-band chain that mixes one
+  judgment step among motor steps respects players whose strength is not
+  dexterity.
+- ⭐ **Sensory channels** (Christian): tuning is audio, blowing is breath
+  rhythm, balancing is proprioceptive — variation that keeps long sessions
+  from feeling like one timing bar. ⚠️ **Audio is always dual-coded with a
+  visual** (muted phones, deaf players); an audio-only state must never be
+  the only route to quality.
+- ⭐ **Mastery inversion** (Christian): at high skill the guides can come off
+  (no waveform, no pressure indicator) for a quality bonus — crafting by
+  feel. 📝 Refinement adopted: inversion is **opt-in per craft**, a toggle,
+  never forced — removing guides automatically would punish levelling.
+  Possible top-end use: the last quality point at the highest tiers is only
+  reachable guideless.
+- ⚠️ **No new skills implied**: glasswork (22) and bardic strings (25) are
+  SKINS attached to existing disciplines when their items exist, not new
+  ledger rows. The nine skills are the nine skills.
 - ⭐ **Each discipline gets a signature blend**: Woodcarving is the tutorial —
   chop/carve/sand is one step from each category, teaching the vocabulary at
   tier 1. Metalworking leans timing (hammer, quench), Jewelry precision
@@ -1938,6 +1976,14 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-10c.** §9b.9a/b extended: mechanics 19–28 (weaving, folding,
+etching, blowing, balancing, seeding, tuning, flame-feeding, peeling,
+stamping); three new engines (stabilizer, placement, call-and-response) and
+three chassis ideas (cross-step state, push-your-luck, second trace axis);
+sensory-channel variation with the audio-dual-coding rule; mastery
+inversion adopted as opt-in per craft; ruled that glasswork/bardic
+fantasies are skins, never new skills.
 
 **Rev — 2026-08-10b.** §9b.9a/b: Christian's 18-mechanic gesture catalogue
 recorded with its timing/precision/regulation taxonomy; review maps them to
