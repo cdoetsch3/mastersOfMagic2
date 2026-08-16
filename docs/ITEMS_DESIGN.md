@@ -1878,6 +1878,68 @@ is shared while the fantasy stays distinct.
 | 27 | Peeling — slow drag along a seam with a depth/pressure axis | precision | bark, herb prep, skinning |
 | 28 | Sigil stamping — rotate, position, press for the right duration | chained | seals, maker's marks |
 
+#### 9b.9c The difficulty model ✅ (Christian's six levers, 2026-08-10)
+
+⭐ **Simple at the start, like everything else in the game**: fewer mechanics
+known, forgiving execution, 2–3 steps per low-level recipe. The levers:
+
+1. **Exposure** — how many mechanics the player has met. Complex ones
+   (tuning's audio, call-and-response) are reserved for higher tiers.
+2. **Chain length** — steps per recipe: 2–3 early, more later.
+3. **Duration** — higher-tier mechanics run longer: more taps, longer
+   traces, more folds.
+4. **Complexity** — the pattern itself (a simple outline vs a twisty sigil).
+5. **Sensitivity** — thresholds; some mechanics become *failable* when
+   executed badly enough.
+6. **Tempo** — no time pressure while learning; real timing demands later.
+
+4–6 are collectively **"difficulty"**.
+
+⭐⭐ **The margin rule** (the load-bearing addition): a skill-50 crafter
+making a level-20 recipe has a much easier time than a skill-20 crafter —
+practice is part of it, but the SYSTEM also relaxes. Formalized:
+
+    margin M = playerSkillLevel − recipeGate + benchBonus + toolBonus
+
+**Difficulty (levers 4–6) scales off M through one curve**: M = 0 is
+at-level difficulty, each point of margin widens windows / slows tempo /
+softens thresholds, flattening toward (never reaching) trivial. ⭐ This is
+the §9b.4a shape again — relative level, not absolute — and it converges
+with the twink lane on purpose: a high-skill crafter easily Mastering Oak
+wands IS the "fine gear for new characters" market crafters live on
+(§9b.4), and mastery inversion (9b.9b) is what keeps those crafts engaging
+for them.
+
+**Implementation factorization** — the levers split into two kinds:
+- **Authored per recipe** (levers 1–3): the gesture script — which steps,
+  how many, base lengths. Content data, like the recipe's inputs.
+- **Computed at craft time** (levers 4–6): parameterizations of the engines,
+  scaled by ONE difficulty scalar derived from M. No per-recipe difficulty
+  authoring beyond the script.
+
+**Benches and tools live on the same axis**: a workbench grants +N margin
+for its skill (this is §9b.4b's "best odds at the station", now with a
+number); an upgradable tool (hatchet, pickaxe — `ToolDef` already exists in
+the item model with tier and quality) grants margin and/or shortens
+duration for its skill. One axis, three sources: level, bench, tool.
+
+📝 **No hidden per-recipe practice counters** — the "practice" half of the
+easing is real human learning; the margin rule is the mechanical half.
+Tracking crafts-per-recipe to scale difficulty would be invisible state the
+player cannot reason about.
+
+⚠️ **Lever 5 vs the economy rule** (9b.9b: materials are never eaten):
+"failable" is adopted as **fail = the attempt aborts — materials returned,
+time and the crafting moment lost, no XP**. Rough-floor for completed-but-
+sloppy work, abort-with-refund for outright failure, true material loss
+only for flagged volatile ingredients. Three distinct outcomes, worst one
+still gentle.
+
+📝 **Lever 1's schedule falls out of the wood ladder**: tier 1 teaches the
+three pilot engines (chop/carve/sand — one per category), and each band
+introduces roughly one new engine, so by the Ethereal tier the full roster
+is in play without any single moment dumping nine mechanics on the player.
+
 #### 9b.9b How it composes 📝 (review of the catalogue)
 
 - ⭐ **~9 input engines carry all 28**: a release-timing meter (1, 6, 16, 21),
@@ -1976,6 +2038,13 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-10d.** §9b.9c: the difficulty model — Christian's six
+levers (exposure, chain length, duration, complexity, sensitivity, tempo),
+the margin rule M = skill − gate + bench + tool with one difficulty curve,
+authored-vs-computed factorization, benches and tools as margin sources,
+fail = abort-with-refund, no hidden practice counters, engine exposure
+scheduled by the material ladder.
 
 **Rev — 2026-08-10c.** §9b.9a/b extended: mechanics 19–28 (weaving, folding,
 etching, blowing, balancing, seeding, tuning, flame-feeding, peeling,
