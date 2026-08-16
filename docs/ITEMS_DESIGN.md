@@ -1833,11 +1833,11 @@ XP), and two screens (the Ledger, the Workbench).
 ### 📝 The crafting minigame (direction agreed, not built)
 
 The craft button is a placeholder for a **crafting act**. ⭐ **Execution
-quality becomes the quality roll** — unifying with §9b.4b instead of
-fighting it: attended crafting at a station gets wider timing windows (its
-"best odds"), attended anywhere gets standard windows, passive crafting
-never plays and stays capped at Standard. Skill level still sets the quality
-*ceiling*; the hands earn where you land under it.
+sets the CEILING of the quality roll — it never replaces it** (ruled
+2026-08-10, superseding this section's earlier "execution becomes the
+roll" phrasing; see 9b.9d). Stations unify with §9b.4b: wider timing
+windows at a bench (its "best odds"), standard windows anywhere, passive
+crafting never plays and stays capped at Standard.
 `GameState.craft(performance:)` is the seam it plugs into.
 
 #### 9b.9a The gesture catalogue 💡 (Christian, 2026-08-10 — ideas, not commitments)
@@ -1877,6 +1877,35 @@ is shared while the fantasy stays distinct.
 | 26 | Feeding the flame — drag reagents in the order the fire asks, shrinking windows | timing+memory | rituals, forge blessings |
 | 27 | Peeling — slow drag along a seam with a depth/pressure axis | precision | bark, herb prep, skinning |
 | 28 | Sigil stamping — rotate, position, press for the right duration | chained | seals, maker's marks |
+
+#### 9b.9d Quality resolution: the grade is a ceiling, never a guarantee ✅
+
+⭐⭐ **Nailing the craft does NOT guarantee Master** (Christian, 2026-08-10).
+A perfect execution earns the best possible *odds* — the outcome still
+rolls. The pipeline:
+
+1. **Grade** — cumulative step accuracy (9b.9b) → 0–1.
+2. **Execution ceiling** — the grade maps to the highest quality this
+   attempt can yield (thresholds 📝 to be tuned).
+3. **Skill ceiling** — clamped by the earlier rule that skill level caps
+   quality for the recipe's tier. The attempt's true ceiling is the lower
+   of the two: hands cannot exceed what the level allows, and the level
+   cannot exceed what the hands earned today.
+4. **The roll** — quality lands at or below the ceiling, weighted; ⭐ this
+   is where §9b.4's "better odds at higher skill" and the bench bonus
+   live, as weight-shaping rather than window-widening.
+
+⭐ **Why this is right**: it keeps the crafting moment a *moment* — §9b.4b
+protected the attended roll precisely because the reveal is the best beat
+in crafting, and a deterministic grade would delete the reveal. It also
+keeps Master genuinely scarce: a skilled player prints better ODDS, never
+guaranteed output, so the §9b.4a market maths hold.
+
+📝 **Proposed, needs ruling: the grade should raise the floor too.** A
+nailed craft that rolls Rough is a feel-bad strong enough to undo the whole
+system — recommend a perfect grade carries a floor of (say) Ornate, so the
+roll is always "how good?", never "was it wasted?". Threshold numbers for
+both ceiling and floor are tuning work for when quality affects stats.
 
 #### 9b.9c The difficulty model ✅ (Christian's six levers, 2026-08-10)
 
@@ -2038,6 +2067,13 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-10e.** §9b.9d: quality resolution ruled — execution grade
+sets the ceiling (clamped by the skill ceiling), the outcome still rolls
+beneath it with skill/bench shaping the weights; perfect execution earns
+odds, never a guaranteed Master. Proposed floor-raising (a nailed craft
+never rolls Rough) awaits ruling. Supersedes the earlier "execution
+becomes the roll" phrasing.
 
 **Rev — 2026-08-10d.** §9b.9c: the difficulty model — Christian's six
 levers (exposure, chain length, duration, complexity, sensitivity, tempo),
