@@ -1901,11 +1901,16 @@ in crafting, and a deterministic grade would delete the reveal. It also
 keeps Master genuinely scarce: a skilled player prints better ODDS, never
 guaranteed output, so the §9b.4a market maths hold.
 
-📝 **Proposed, needs ruling: the grade should raise the floor too.** A
-nailed craft that rolls Rough is a feel-bad strong enough to undo the whole
-system — recommend a perfect grade carries a floor of (say) Ornate, so the
-roll is always "how good?", never "was it wasted?". Threshold numbers for
-both ceiling and floor are tuning work for when quality affects stats.
+✅ **Ruled: the grade raises the floor too — but the floor scales with
+MARGIN, not grade alone** (Christian, 2026-08-10). At-level (M ≈ 0), even a
+perfect grade can still roll Rough — a level-20 crafter nailing a level-20
+recipe is working at the edge of their ability, and the material can still
+fight back. By roughly **M ≥ 5**, a perfect grade no longer yields Rough at
+all, and the floor keeps climbing with margin from there. ⭐ This puts the
+floor on the same single axis as everything else in 9b.9c — level, bench
+and tool margin all lift it, which is one more quiet reason to walk to the
+bench. Exact floor/ceiling thresholds 📝 are tuning work for when quality
+affects stats.
 
 #### 9b.9c The difficulty model ✅ (Christian's six levers, 2026-08-10)
 
@@ -2067,6 +2072,11 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-10f.** §9b.9d floor ruling: the grade raises the floor,
+scaled by margin — at-level a perfect craft can still roll Rough; from
+about five levels of margin a perfect grade escapes Rough entirely, and
+the floor climbs with margin from there (bench and tool margin included).
 
 **Rev — 2026-08-10e.** §9b.9d: quality resolution ruled — execution grade
 sets the ceiling (clamped by the skill ceiling), the outcome still rolls
