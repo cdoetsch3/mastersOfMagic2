@@ -49,8 +49,170 @@
 
   <title>Masters of Magic 2</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Paints the browser chrome (Android/PWA) the game's background so the
+       splash below doesn't sit in a white frame. -->
+  <meta name="theme-color" content="#141021">
+
+  <!--
+    ⭐ **Boot splash.** A Flutter web app is a blank page until main.dart.js
+    (~3 MB) downloads, parses, and boots the engine — nothing written in Dart
+    can render during that window, which on a cold cellular load is several
+    seconds of white nothing. So the splash is plain HTML/CSS, inline: no
+    images, no webfonts, no network fetch of any kind, so it paints on the
+    first frame the browser draws.
+    ⚠️ Colours are copied from `lib/ui/app_theme.dart` (AppColors.bg /
+    .gold / .gem). They cannot import it — keep them in sync by hand.
+  -->
+  <style>
+    :root { color-scheme: dark; }
+
+    /* Also the anti-flash: even before the splash element is parsed the page
+       is already the game's background, not the browser's white. */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #141021;
+    }
+
+    #boot-splash {
+      position: fixed;
+      inset: 0;
+      /* Above anything the Flutter engine appends to <body>. */
+      z-index: 2147483647;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+      box-sizing: border-box;
+      padding: 24px;
+      background: #141021;
+      background-image:
+        radial-gradient(circle at 50% 42%, #241C40 0%, #141021 62%);
+      color: #E8C547;
+      /* System stack only — a webfont would be a network round trip, which is
+         the exact thing the splash exists to paper over. */
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+      text-align: center;
+      transition: opacity 300ms ease-out;
+    }
+
+    /* The fade-out. `pointer-events: none` lands with the class, so the live
+       app is clickable for the whole 300ms rather than only after it. */
+    #boot-splash.is-done {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #boot-splash .sigil {
+      position: relative;
+      width: 68px;
+      height: 68px;
+    }
+
+    #boot-splash .ring {
+      position: absolute;
+      inset: 0;
+      border: 3px solid rgba(232, 197, 71, 0.16);
+      border-top-color: #E8C547;
+      border-radius: 50%;
+      animation: boot-spin 1.1s linear infinite;
+    }
+
+    #boot-splash .ring--inner {
+      inset: 13px;
+      border-width: 2px;
+      border-top-color: transparent;
+      border-bottom-color: #8B5CD6;
+      animation-duration: 1.8s;
+      animation-direction: reverse;
+    }
+
+    #boot-splash .core {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      margin: -5px 0 0 -5px;
+      border-radius: 50%;
+      background: #E8C547;
+      box-shadow: 0 0 14px 3px rgba(232, 197, 71, 0.5);
+      animation: boot-pulse 1.7s ease-in-out infinite;
+    }
+
+    #boot-splash .title {
+      margin: 0;
+      font-size: clamp(22px, 6.5vw, 34px);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 22px rgba(232, 197, 71, 0.28);
+    }
+
+    #boot-splash .sub {
+      margin: -14px 0 0;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #9C93C4;
+    }
+
+    /* Hidden until the boot has visibly overrun (see the script below), so a
+       normal load never shows it.
+       ⚠️ Absolutely positioned on purpose: in the flex column an invisible
+       paragraph still takes height, which pushes the sigil and title off the
+       optical centre for the 99% of loads that never show this. */
+    #boot-splash .hint {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 28px;
+      margin: 0 auto;
+      max-width: 30em;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #6E6A7A;
+      opacity: 0;
+      transition: opacity 400ms ease-in;
+    }
+    #boot-splash.is-slow .hint { opacity: 1; }
+
+    @keyframes boot-spin { to { transform: rotate(360deg); } }
+    @keyframes boot-pulse {
+      0%, 100% { transform: scale(1);   opacity: 1;   }
+      50%      { transform: scale(0.6); opacity: 0.45; }
+    }
+
+    /* Motion-sensitive users still get a "something is happening" signal —
+       just a breathing sigil instead of two spinning rings. */
+    @media (prefers-reduced-motion: reduce) {
+      #boot-splash .ring,
+      #boot-splash .ring--inner {
+        animation: boot-pulse 2s ease-in-out infinite;
+        border-top-color: #E8C547;
+      }
+      #boot-splash .core { animation-duration: 2.6s; }
+    }
+  </style>
 </head>
 <body>
+  <div id="boot-splash" role="status" aria-live="polite">
+    <div class="sigil" aria-hidden="true">
+      <span class="ring"></span>
+      <span class="ring ring--inner"></span>
+      <span class="core"></span>
+    </div>
+    <h1 class="title">Masters of Magic 2</h1>
+    <p class="sub">Summoning…</p>
+    <p class="hint">
+      Still loading. The first visit downloads the whole game — later ones are
+      much quicker. If this stays up, check your connection and reload.
+    </p>
+  </div>
+
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
@@ -99,6 +261,40 @@
           }
         });
       }
+    })();
+  </script>
+  <!--
+    ⭐ Takes the boot splash down the moment the app is actually on screen.
+    ⚠️ The trigger is the engine's own `flutter-first-frame` window event —
+    dispatched once, after the first Flutter frame has been rasterised. Do NOT
+    swap this for a timer: a splash torn down early shows the user a blank
+    page, and one torn down late covers a live, tappable app.
+    Registered before `flutter_bootstrap.js` runs, so the event cannot be
+    missed. If the frame never comes the splash deliberately STAYS — a stuck
+    splash is diagnosable, a stuck blank page is not — and after 12s it grows
+    a line of copy explaining itself.
+  -->
+  <script>
+    (function () {
+      var splash = document.getElementById('boot-splash');
+      if (!splash) return;
+
+      var slowTimer = setTimeout(function () {
+        splash.classList.add('is-slow');
+      }, 12000);
+
+      function dismiss() {
+        clearTimeout(slowTimer);
+        splash.classList.add('is-done');
+        // Matches the 300ms opacity transition; removing the node (rather
+        // than leaving an invisible full-screen div) keeps it out of the hit
+        // test and out of the accessibility tree for good.
+        setTimeout(function () {
+          if (splash.parentNode) splash.parentNode.removeChild(splash);
+        }, 350);
+      }
+
+      window.addEventListener('flutter-first-frame', dismiss, { once: true });
     })();
   </script>
   <script src="flutter_bootstrap.js" async></script>

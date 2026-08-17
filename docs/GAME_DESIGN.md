@@ -1612,6 +1612,39 @@ level-ups, inventory placeholder, spellbook with presets, rotate-to-duel guard
 - ✅ Hosting cache: app-shell files (`index.html`, `flutter_bootstrap.js`,
   `flutter_service_worker.js`, `main.dart.js`) serve `Cache-Control: no-cache`
   so returning players always get the latest build.
+  - ⚠️ **Firebase matches header rules against the REQUEST path, not the
+    rewritten one.** `/index.html` had a `no-cache` rule; the URL players
+    actually visit — `/` — matched nothing and fell through to Hosting's
+    `max-age=3600` default, so the shell (and every SPA deep link) was an hour
+    stale. Fixed by a `"source": "**"` → `no-cache` **floor as the first rule**;
+    long-cache rules for `/assets/**`, `/canvaskit/**`, `/icons/**` come after
+    it and win, because **the LAST matching header rule wins** (verified
+    against the hosting emulator — not documented anywhere obvious).
+  - ⚠️ `/assets/*` (one segment: `AssetManifest.bin*`, `FontManifest.json`,
+    `NOTICES`) is pinned back to `no-cache` *after* the `/assets/**` rule. The
+    manifests are the index of every other asset: a fresh `main.dart.js` reading
+    a day-old manifest cannot see art added by that deploy. `*` does not cross
+    `/`, so the payload art under `/assets/assets/**` keeps its 24h cache.
+  - ⚠️ **`no-cache` on Hosting costs the full body, not a 304.** Measured on
+    prod: a conditional `GET` with the correct `If-None-Match` still answers
+    `200` + full payload for `no-cache` files (they are never cached at the
+    Fastly edge, and the origin does not revalidate). Only edge-`HIT` files
+    (e.g. `/icons/**`) return `304`. So every single load re-downloads
+    `main.dart.js` (~725 KB brotli / 3.0 MB raw) — this is the "slow load".
+    Living with it is a deliberate correctness trade: `main.dart.js` is neither
+    content-hashed nor service-worker-managed, so a long browser cache would
+    strand players on stale code with nothing to invalidate it.
+  - 💡 Untried option, needs a trial deploy to confirm: `public, max-age=0,
+    s-maxage=31536000, must-revalidate` on `main.dart.js` — browser revalidates
+    every load, the edge holds the body and answers the revalidation with a
+    `304`. Safe only if a Hosting deploy purges the CDN; verify that before
+    trusting it (deploy a changed build, then confirm the new ETag is served
+    immediately from a warm POP).
+  - Note: `/canvaskit/**` is configured but **never requested** — the default
+    build sets `engineRevision` without `useLocalCanvasKit`, so the engine loads
+    CanvasKit from `https://www.gstatic.com/flutter-canvaskit/<rev>/`. The 37 MB
+    of local `canvaskit/` is deployed dead weight (the rule matters only if a
+    build ever passes `--no-web-resources-cdn`).
 - ✅ Stale-build fix: builds use `--pwa-strategy=none` (no service worker), and a
   **kill-switch service worker** ships at the old worker's URL to purge caches,
   unregister, and reload clients that installed the early offline-first worker.
@@ -1622,6 +1655,15 @@ level-ups, inventory placeholder, spellbook with presets, rotate-to-duel guard
   pubspec). *(Version number in this doc goes stale — trust the constant.)*
 - ✅ **Pixel wizard-hat favicon** + PWA icons (generated, in `web/`); page title
   and manifest branded "Masters of Magic 2".
+- ✅ **Boot splash** (`web/index.html`): the game title in gold on `#141021`
+  with a CSS sigil, inline in the HTML — no images, no webfonts, no fetches —
+  so it paints on the browser's first frame instead of leaving the multi-second
+  `main.dart.js` download as a white page. Torn down on the engine's
+  `flutter-first-frame` window event with a 300ms fade, then the node is
+  removed. ⚠️ **Never swap that event for a timer**: early leaves a blank page,
+  late covers a live app. If the frame never arrives the splash stays on
+  purpose (a stuck splash is diagnosable) and after 12s reveals a line of
+  explanatory copy.
 - ✅ Desktop layout: tab content is centered in a **720px max-width column**;
   the spellbook grid uses fixed-size tiles (no more giant cards on monitors).
 - ⚠️ A throwaway test account (`zephyr@example.com`) exists from verifying signup;
