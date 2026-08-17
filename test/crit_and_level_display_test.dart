@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/ai_personas.dart';
 import 'package:masters_of_magic_2/game/duel_controller.dart';
@@ -148,6 +149,99 @@ void main() {
       );
       expect(impactIntensity(perHit, crit: true), greaterThanOrEqualTo(2.4));
       expect(impactIntensity(perHit, crit: false), lessThan(2.4));
+    });
+
+    group('and the arena says it in words', () {
+      test('only a crit earns the pip', () {
+        expect(showsCriticalPip(hit(crit: true)), isTrue);
+        expect(
+          showsCriticalPip(hit(crit: false)),
+          isFalse,
+          reason: 'an ordinary hit that pipped would make the pip meaningless '
+              'within one turn',
+        );
+      });
+
+      test('no other event pips, however loud', () {
+        // ⚠️ Only DamageEvent carries `crit`. A predicate written as "not a
+        // miss" or keyed off the FX kind would light up on heals and casts —
+        // this names the events that must stay silent.
+        expect(showsCriticalPip(HealedEvent(target, 20)), isFalse);
+        expect(
+          showsCriticalPip(SpellCastEvent(target, Spellbook.bolt,
+              MagicElement.pyro)),
+          isFalse,
+        );
+        expect(
+          showsCriticalPip(ChargedEvent(target, MagicElement.pyro, 3)),
+          isFalse,
+        );
+      });
+
+      testWidgets('a real crit puts CRITICAL HIT! on the screen, and takes it '
+          'back off again', (tester) async {
+        // ⭐ End to end through the widget: the predicate above proves the
+        // decision, this proves the decision reaches a pixel. Crits are 0%
+        // base, so the gear guarantees one; accuracy clears the miss floor so
+        // the cast cannot whiff and leave nothing to crit.
+        tester.view.physicalSize = const Size(1280, 720);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: DuelScreen(
+              loadout: Loadout.starter,
+              driver: LocalAiDriver(persona: AiRoster.all.first, rng: Random(3)),
+              playerGear: const ItemModifiers(
+                critChance: 100,
+                accuracyBonus: ElementTuning.baseMissPercent,
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(
+          find.text(criticalPipText),
+          findsNothing,
+          reason: 'the pip must not be standing chrome — it means nothing if '
+              'it is already there before a hit lands',
+        );
+
+        // Element 1, then spell slot Q (Flick: costs no charge, so one
+        // keypress is one landed hit).
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyQ);
+
+        // Walk the turn forward in small steps: the pip lives for 700ms
+        // somewhere inside the cast/projectile/impact sequence, and pinning
+        // the exact millisecond would break every time an FX duration is
+        // retuned.
+        var seen = false;
+        var gone = false;
+        for (var i = 0; i < 60 && !gone; i++) {
+          await tester.pump(const Duration(milliseconds: 50));
+          final showing = find.text(criticalPipText).evaluate().isNotEmpty;
+          if (showing) seen = true;
+          if (seen && !showing) gone = true;
+        }
+
+        // Tear the arena down inside the test, then let the turn loop's
+        // in-flight delays expire. Leaving mid-turn would trip the binding's
+        // "a Timer is still pending" invariant on a message-hold this test
+        // never asked for.
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump(const Duration(seconds: 5));
+
+        expect(seen, isTrue, reason: 'a guaranteed crit must raise the pip');
+        expect(
+          gone,
+          isTrue,
+          reason: 'it is a flash, not a sticker — a pip that never clears '
+              'would sit over the arena for the rest of the duel',
+        );
+      });
     });
 
     test('the log line carries the crit', () {

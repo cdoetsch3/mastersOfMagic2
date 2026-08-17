@@ -77,16 +77,12 @@ class HomeTab extends StatelessWidget {
                         style: TextStyle(color: AppColors.text, fontSize: 14),
                       ),
                     ),
-                    Text(
-                      // The two the player levels first — a glance without
-                      // opening the ledger.
-                      'Wc ${p.skillLevel('woodcarving')} · '
-                      'Ta ${p.skillLevel('tailoring')}',
-                      style: const TextStyle(
-                        color: AppColors.textDim,
-                        fontSize: 12,
-                      ),
-                    ),
+                    // ⚠️ **Nothing on the right** (designer, 2026-08-16). The
+                    // old 'Wc N · Ta N' glance named two of nine skills in an
+                    // abbreviation nobody decodes, and picking two implied
+                    // they were the important ones. The Ledger is one tap
+                    // away and shows all nine unabbreviated; the blank right
+                    // edge is the correct amount to say here.
                   ],
                 ),
               ),

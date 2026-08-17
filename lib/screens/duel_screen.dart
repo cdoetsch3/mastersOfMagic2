@@ -120,6 +120,27 @@ String impactFloatText(DamageEvent event) => [
 double impactIntensity(double perHit, {required bool crit}) =>
     (1 + perHit * 0.45) * (crit ? 1.7 : 1.0);
 
+/// The text of the centred crit pip — the one piece of arena chrome that
+/// spells the word out.
+@visibleForTesting
+const String criticalPipText = 'CRITICAL HIT!';
+
+/// Whether [event] earns the centred [criticalPipText] banner.
+///
+/// ⭐ **Damage only, crit only.** The float and the log already carry the tag,
+/// but both are small and both are where the player is *not* looking during a
+/// hit — the float rides the target and the log is closed. The pip is the
+/// unmissable third telling (designer, 2026-08-16).
+///
+/// ⚠️ Extracted rather than inlined into the animate switch for the same
+/// reason as [impactFloatText]: everything downstream of the decision is
+/// painted or timed, so this predicate is the last place a test can name it.
+/// A crit that heals or shields is not a thing the engine emits — only
+/// [DamageEvent] carries `crit` — and this must stay false for every other
+/// event rather than pipping on anything that merely *has* a crit field.
+@visibleForTesting
+bool showsCriticalPip(DuelEvent event) => event is DamageEvent && event.crit;
+
 class _DuelScreenState extends State<DuelScreen>
     with SingleTickerProviderStateMixin {
   late final DuelController c = DuelController(
@@ -160,6 +181,38 @@ class _DuelScreenState extends State<DuelScreen>
     final spell = _castSpell;
     if (spell == null) return 0;
     return spell.xCost ? _castCharge : spell.chargeCost;
+  }
+
+  // ---- The crit pip ------------------------------------------------------
+  //
+  // ⭐ Deliberately NOT an AnimationController. The state is a single-ticker
+  // mixin whose one ticker belongs to [_fx], and the pip must be able to fade
+  // on its own clock *while* the impact FX is running — a second controller
+  // would mean a second ticker and a second vsync just to fade one word.
+  // A flag plus a Timer plus a [TweenAnimationBuilder] gets the same fade for
+  // free, and unlike [_fx] it never blocks the turn loop: the pip is pure
+  // decoration, so nothing in [_submit] awaits it.
+  static const Duration _critPipVisible = Duration(milliseconds: 700);
+  bool _critPip = false;
+  Timer? _critPipTimer;
+
+  /// Bumped on every crit so back-to-back crits (a Volley can land two in one
+  /// turn) restart the fade instead of the second one inheriting the first's
+  /// nearly-faded opacity — it keys the [TweenAnimationBuilder].
+  int _critPipSeq = 0;
+
+  void _flashCriticalPip() {
+    _critPipTimer?.cancel();
+    setState(() {
+      _critPip = true;
+      _critPipSeq++;
+    });
+    // ⚠️ mounted-guarded: a duel can be popped mid-animation (forfeit, or the
+    // back button), and a 700ms timer outliving the State would setState on a
+    // dead element.
+    _critPipTimer = Timer(_critPipVisible, () {
+      if (mounted) setState(() => _critPip = false);
+    });
   }
 
   // Every combat message stays up long enough to actually read. Animations
@@ -273,6 +326,7 @@ class _DuelScreenState extends State<DuelScreen>
 
   @override
   void dispose() {
+    _critPipTimer?.cancel();
     _stopMoveTimer();
     SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     c.removeListener(_checkResult);
@@ -439,6 +493,10 @@ class _DuelScreenState extends State<DuelScreen>
           ms: isMultiHit ? 240 : max(280, 420 - weight * 20),
         );
 
+        // Fired with the IMPACT, not the projectile — the pip announces the
+        // landing, so it must not be already fading when the hit connects.
+        // Not awaited: it runs its own 700ms alongside the impact FX below.
+        if (showsCriticalPip(damage)) _flashCriticalPip();
         await _runFx(
           _FxKind.impact,
           atEnemy: isEnemy,
@@ -801,6 +859,20 @@ class _DuelScreenState extends State<DuelScreen>
                           ),
                         ),
                       ),
+                    // ⭐ Above the mages, below the cast banner: the pip owns
+                    // the empty band in the middle of the arena, where the eye
+                    // already is during an exchange. It is INSIDE the shake
+                    // transform with everything else, so a crit's kick throws
+                    // the word around too.
+                    if (_critPip)
+                      Positioned(
+                        top: h * 0.30,
+                        left: 0,
+                        right: 0,
+                        child: IgnorePointer(
+                          child: Center(child: _criticalPip()),
+                        ),
+                      ),
                     Positioned(
                       left: 0,
                       right: 0,
@@ -817,6 +889,47 @@ class _DuelScreenState extends State<DuelScreen>
       ),
     );
   }
+
+  /// The crit pip: white word, gold halo, growing as it fades.
+  ///
+  /// ⭐ White-on-gold rather than the element colour, for the same reason the
+  /// impact float goes white on a crit — a crit must not read as "the same hit
+  /// again, bigger". The scale-up is what separates it from the cast banner
+  /// directly above it, which is static.
+  ///
+  /// ⚠️ The [ValueKey] is load-bearing. Without it a second crit reuses the
+  /// first [TweenAnimationBuilder]'s state and animates from wherever that
+  /// fade had got to, so the follow-up crit of a Volley would blink instead of
+  /// announcing itself.
+  Widget _criticalPip() => TweenAnimationBuilder<double>(
+    key: ValueKey(_critPipSeq),
+    tween: Tween<double>(begin: 1, end: 0),
+    duration: _critPipVisible,
+    // Holds near-full for the first half, then goes: the word has to be
+    // READ, and a linear fade spends most of its life illegible.
+    curve: Curves.easeInCubic,
+    child: const Text(
+      criticalPipText,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 34,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 3,
+        shadows: [
+          Shadow(color: Color(0xFFE8C547), blurRadius: 18),
+          Shadow(color: Color(0xCCE8C547), blurRadius: 34),
+          Shadow(color: Color(0xFF141021), blurRadius: 3),
+        ],
+      ),
+    ),
+    builder: (context, t, child) => Opacity(
+      opacity: t.clamp(0.0, 1.0),
+      // 1.0 → 1.3: it grows *into* the fade, so the last legible frame is
+      // also the biggest one.
+      child: Transform.scale(scale: 1.3 - t * 0.3, child: child),
+    ),
+  );
 
   Widget _mage(Offset pos, double height, {required bool isEnemy}) {
     final shield = isEnemy ? c.shownEnemyShield : c.shownPlayerShield;

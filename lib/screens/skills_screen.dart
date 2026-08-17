@@ -43,24 +43,31 @@ class _SkillsScreenState extends State<SkillsScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(14, 8, 14, 20),
           children: [
-            const SectionLabel('Processing'),
-            for (final s in CraftSkill.values)
-              _SkillRow(
-                game: game,
-                skillKey: s.name,
-                craftSkill: s,
-                expanded: _expanded == s.name,
-                onTap: () => setState(
-                  () => _expanded = _expanded == s.name ? null : s.name,
-                ),
-              ),
-            const SizedBox(height: 12),
+            // ⭐ **Gathering leads** (designer, 2026-08-16). It is where the
+            // loop actually starts — you cannot process what you have not
+            // pulled out of the ground — and it is the shorter group, so the
+            // three rows a new player can already earn XP in sit above the
+            // fold instead of below six crafts they have no materials for.
             const SectionLabel('Gathering'),
             for (final s in GatherSkill.values)
               _SkillRow(
                 game: game,
                 skillKey: s.name,
                 craftSkill: null,
+                expanded: _expanded == s.name,
+                onTap: () => setState(
+                  () => _expanded = _expanded == s.name ? null : s.name,
+                ),
+              ),
+            const SizedBox(height: 12),
+            // 📝 Order WITHIN each group is the enum's own declaration order,
+            // untouched by the swap — that ordering is content, not layout.
+            const SectionLabel('Processing'),
+            for (final s in CraftSkill.values)
+              _SkillRow(
+                game: game,
+                skillKey: s.name,
+                craftSkill: s,
                 expanded: _expanded == s.name,
                 onTap: () => setState(
                   () => _expanded = _expanded == s.name ? null : s.name,

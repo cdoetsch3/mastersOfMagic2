@@ -4,6 +4,8 @@
 /// wrong implementation it kills.
 library;
 
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/catalogue/ashfall_vale_items.dart';
@@ -14,6 +16,8 @@ import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
+import 'package:masters_of_magic_2/game/world.dart';
+import 'package:mom_engine/mom_engine.dart';
 
 class _MemStorage implements ProfileStorage {
   PlayerProfile? saved;
@@ -203,6 +207,47 @@ void main() {
     test('an empty pack is a no-op that moves nothing', () async {
       final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
       expect(await game.depositAll('hearthwood'), 0);
+    });
+  });
+
+  group('a run begins at the GEARED maximum', () {
+    test('the robe\'s health is in the pool the first encounter loads with',
+        () async {
+      // ⚠️ The bug this kills: beginAdventure seeded the run from
+      // MageState.scaledMaxHp(level) alone, while the duel builds the same
+      // mage as curve + gear. The player walked into encounter one already
+      // missing exactly their gear bonus — reported as "148 / 159 when
+      // combat loaded".
+      final game = _gameCarrying('bindweed_robe'); // +6 max health
+      expect(await game.equipFromBackpack(0), isNull,
+          reason: 'guard: the robe must actually be worn');
+      final bonus = game.equipmentTotals.maxHpBonus;
+      expect(bonus, greaterThan(0),
+          reason: 'guard: a zero-bonus item would make every assertion below '
+              'pass against the broken implementation too');
+
+      final run = await game.beginAdventure(
+        World.byId('whispering_woods'),
+        rng: Random(1),
+      );
+
+      final curveOnly = MageState.scaledMaxHp(game.profile.level);
+      expect(run.playerHp, game.maxHp,
+          reason: 'the run must start full against the SAME pool the duel and '
+              'the ration both read');
+      expect(run.playerHp, curveOnly + bonus);
+      expect(run.playerHp, isNot(curveOnly),
+          reason: 'seeding from the bare level curve is the whole bug');
+    });
+
+    test('an ungeared mage is unaffected — the fix adds nothing from nowhere',
+        () async {
+      final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
+      final run = await game.beginAdventure(
+        World.byId('whispering_woods'),
+        rng: Random(1),
+      );
+      expect(run.playerHp, MageState.scaledMaxHp(game.profile.level));
     });
   });
 

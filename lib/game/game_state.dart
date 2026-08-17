@@ -421,7 +421,14 @@ class GameState extends ChangeNotifier {
     final started = AdventureRun.roll(
       zone: zone,
       roster: Bestiary.forZone(zone.id),
-      playerHp: MageState.scaledMaxHp(profile.level),
+      // ⚠️ **[maxHp], not the bare level curve.** The duel builds the player's
+      // pool as curve + gear (DuelController._buildMage), so seeding the run
+      // from the curve alone walked a fully-healed mage into the first fight
+      // already missing every point their robes grant — the "148 / 159 when
+      // combat loaded" report. Healing in the field reads [maxHp] too, so
+      // this is also the only seed that makes a full ration a no-op at full
+      // health rather than a top-up of a gap that should not exist.
+      playerHp: maxHp,
       rng: rng ?? Random(),
     );
     await _mutate(() => profile.run = started);
