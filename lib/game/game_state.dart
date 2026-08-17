@@ -7,6 +7,7 @@ import 'active_trip.dart';
 import 'adventure.dart';
 import 'enemies/bestiary.dart';
 import 'enemies/loot.dart';
+import 'items/carrying.dart';
 import 'items/equipping.dart';
 import 'items/inventory.dart';
 import 'items/item_catalogue.dart';
@@ -66,6 +67,8 @@ class GameState extends ChangeNotifier {
     for (final preset in state.profile.presets) {
       preset.clampToCaps();
     }
+    // ⚠️ …and saves made when a beltless character had two free belt slots.
+    state.settleBeltOverflow();
     await state._persist();
     return state;
   }
@@ -85,6 +88,9 @@ class GameState extends ChangeNotifier {
         for (final preset in profile.presets) {
           preset.clampToCaps();
         }
+        // ⚠️ A cloud save is as old as a local one — same migration, same
+        // reason (settleBeltOverflow is idempotent, so this is free).
+        settleBeltOverflow();
       } else {
         // First time on this account — seed the cloud with the current
         // (guest) profile so nothing is lost.
@@ -771,6 +777,41 @@ class GameState extends ChangeNotifier {
     return moved;
   }
 
+  /// Takes as many of [defId] out of [townId]'s Storeroom as the backpack has
+  /// room for. Returns how many actually moved.
+  ///
+  /// ⭐ **Bounded by space, never an error** (designer, 2026-08-17). Taking 7 of
+  /// 40 because seven slots were free is a *success* — the caller says so, and
+  /// the alternative (refusing unless it all fits) would make the button
+  /// useless in exactly the situation it exists for. ⚠️ Stacks only: a
+  /// non-fungible is one instance, and "take all" of one thing is [withdraw].
+  Future<int> takeAllFromStoreroom(String townId, String defId) async {
+    // ⚠️ Cheap refusals before [_mutate], so a no-op never costs a disk write.
+    final have = profile.storerooms[townId]?.stacks[defId] ?? 0;
+    final free = profile.backpack.free;
+    if (have == 0 || free == 0) return 0;
+    var moved = 0;
+    await _mutate(() {
+      var room = profile.storerooms[townId]!;
+      var pack = profile.backpack;
+      // ⭐ Goes through the same two writers a single Take does, one item at a
+      // time, so a bulk move cannot invent an item a single move would refuse.
+      while (moved < free) {
+        final result = room.withWithdrawn(InventorySlot(defId: defId));
+        final taken = result.taken;
+        if (taken == null) break;
+        final next = pack.withAdded(taken);
+        if (next == null) break;
+        room = result.room;
+        pack = next;
+        moved++;
+      }
+      profile.storerooms[townId] = room;
+      profile.backpack = pack;
+    });
+    return moved;
+  }
+
   /// Takes [want] out of [townId]'s Storeroom, if the backpack has room.
   Future<bool> withdraw(String townId, InventorySlot want) async {
     if (profile.backpack.isFull) return false;
@@ -787,6 +828,126 @@ class GameState extends ChangeNotifier {
       ok = true;
     });
     return ok;
+  }
+
+  // ---- Belt --------------------------------------------------------------
+
+  /// How many things this character can carry into a duel, right now.
+  ///
+  /// ⭐ **One definition, read by the UI and by every belt method here.** Since
+  /// the 2026-08-17 ruling this is worn gear and nothing else: no belt, no
+  /// slots (`Carrying.baseBeltSlots` is 0).
+  int get beltCapacity =>
+      Carrying.beltSlotsFor(fromGear: equipmentTotals.beltSlots);
+
+  /// Hangs one [defId] from the backpack on the belt.
+  ///
+  /// ⭐ **A MOVE, not a copy** (designer, 2026-08-17): the draught is *on your
+  /// belt*, not simultaneously in your pack, so loading frees a pack slot and
+  /// unloading costs one. Anything else is a duplication bug the player would
+  /// find before a test did.
+  ///
+  /// ⚠️ Belt contents are def ids, so only fungible consumables ride here —
+  /// which is exactly what `Beltable` is (no `BeltableDef` carries an
+  /// instance). Rolled, socketed gear cannot be belted and does not need to be.
+  ///
+  /// Returns a player-facing refusal, or null on success.
+  Future<String?> loadOntoBelt(String defId) async {
+    final def = ItemCatalogue.tryById(defId);
+    // ⭐ Legality and space are Carrying's rules, so the belt cannot disagree
+    // with the container rules the rest of the game is written against — and
+    // the greyed-out dialog button quotes the identical string.
+    final no = Carrying.beltRefusal(
+      def,
+      used: profile.belt.used,
+      capacity: beltCapacity,
+    );
+    if (no != null) return no;
+    // ⚠️ The one check Carrying cannot make: it never sees a pack.
+    if (profile.backpack.countOf(defId) == 0) {
+      return 'That is not in your pack.';
+    }
+    await _mutate(() {
+      profile.backpack = profile.backpack.withRemovedFirst(defId);
+      profile.belt = profile.belt.withLoaded(defId);
+    });
+    return null;
+  }
+
+  /// Takes one [defId] off the belt and back into the pack.
+  ///
+  /// ⚠️ **Needs a free pack slot** — the mirror of [unequip], and for the same
+  /// reason: nothing is being vacated in exchange, so a full pack must refuse
+  /// rather than quietly destroy the potion.
+  Future<String?> unloadFromBelt(String defId) async {
+    if (!profile.belt.loaded.contains(defId)) {
+      return 'That is not on your belt.';
+    }
+    if (profile.backpack.isFull) return 'Your pack is full.';
+    await _mutate(() {
+      profile.belt = profile.belt.withUnloaded(defId);
+      profile.backpack =
+          profile.backpack.withAdded(InventorySlot(defId: defId)) ??
+          profile.backpack;
+    });
+    return null;
+  }
+
+  /// Brings a loaded belt back inside its capacity, returning what no longer
+  /// fits. Returns how many items were moved off the belt.
+  ///
+  /// ⚠️ **The 2026-08-17 migration.** Every save written before that ruling
+  /// could hold two belted items with no belt worn; capacity is now 0, and an
+  /// over-capacity belt must neither crash nor eat what it holds. The order is
+  /// deliberate, cheapest-surprise first:
+  ///
+  /// 1. **Backpack** — where the item came from and the first place the player
+  ///    will look for it.
+  /// 2. **This town's Storeroom**, if the pack is full and the character is
+  ///    standing in a town — the same move "Deposit all" makes, to the only
+  ///    Storeroom that is reachable from here (ITEMS §10.3c).
+  /// 3. **Stays loaded**, if the pack is full on the road. ⭐ Nothing is ever
+  ///    destroyed: an over-capacity belt is legal, rendered (the paper doll
+  ///    draws every loaded item, not just the ones inside capacity) and
+  ///    unloadable, so the player can resolve it the moment they have a slot.
+  ///    Silently deleting a potion to satisfy a number is the one outcome that
+  ///    is never worth it.
+  ///
+  /// ⭐ Idempotent, so it can run on every load — including the cloud profile
+  /// adopted at sign-in — without ever moving the same item twice.
+  int settleBeltOverflow() {
+    final capacity = beltCapacity;
+    if (profile.belt.used <= capacity) return 0;
+    // ⭐ The first `capacity` stay put: the player loaded them in that order,
+    // and keeping the head is the only choice that does not reshuffle a belt
+    // that was already correct at the front.
+    final keep = profile.belt.loaded.take(capacity).toList();
+    final overflow = profile.belt.loaded.skip(capacity).toList();
+    final stranded = <String>[];
+    var pack = profile.backpack;
+    final here = profile.locationId;
+    var room = profile.storerooms[here];
+    var moved = 0;
+    for (final defId in overflow) {
+      final next = pack.withAdded(InventorySlot(defId: defId));
+      if (next != null) {
+        pack = next;
+        moved++;
+        continue;
+      }
+      if (profile.location.isTown) {
+        room = (room ?? const Storeroom()).withDeposited(
+          InventorySlot(defId: defId),
+        );
+        moved++;
+        continue;
+      }
+      stranded.add(defId);
+    }
+    profile.backpack = pack;
+    if (room != null) profile.storerooms[here] = room;
+    profile.belt = Belt(loaded: [...keep, ...stranded]);
+    return moved;
   }
 
   void acknowledgeLevelUp() {

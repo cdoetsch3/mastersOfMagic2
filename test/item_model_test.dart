@@ -363,14 +363,43 @@ void main() {
       expect(_ration, isNot(isA<Beltable>()));
     });
 
+    test('⚠️ no belt means NO slots (ruling 2026-08-17)', () {
+      expect(
+        Carrying.beltSlotsFor(),
+        0,
+        reason: 'two free slots with an empty Belt slot read as a bug, and '
+            'made the belt that grants slots look like it did nothing',
+      );
+      expect(Carrying.baseBeltSlots, 0);
+    });
+
     test('the belt grows, but is clamped', () {
-      expect(Carrying.beltSlotsFor(), Carrying.baseBeltSlots);
-      expect(Carrying.beltSlotsFor(fromProgression: 3, fromGear: 2), 7);
+      expect(Carrying.beltSlotsFor(fromProgression: 3, fromGear: 2), 5,
+          reason: 'capacity is gear plus progression and nothing else');
       expect(
         Carrying.beltSlotsFor(fromProgression: 50),
         Carrying.maxBeltSlots,
         reason: 'past the cap, "which do I bring?" stops being a decision',
       );
+    });
+
+    test('beltRefusal names WHICH problem it is', () {
+      // ⚠️ "Full" and "you own no belt" send the player to different screens.
+      expect(
+        Carrying.beltRefusal(_tonic, used: 0, capacity: 0),
+        contains('not wearing a belt'),
+      );
+      expect(
+        Carrying.beltRefusal(_tonic, used: 2, capacity: 2),
+        contains('full'),
+      );
+      expect(Carrying.beltRefusal(_tonic, used: 1, capacity: 2), isNull);
+      expect(
+        Carrying.beltRefusal(_ration, used: 0, capacity: 5),
+        isNotNull,
+        reason: 'space is not legality — a ration never reaches a duel',
+      );
+      expect(Carrying.beltRefusal(null, used: 0, capacity: 5), isNotNull);
     });
 
     test('the Storeroom is unbounded; the backpack is not', () {

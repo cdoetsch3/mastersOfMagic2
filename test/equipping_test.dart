@@ -9,6 +9,7 @@ import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/catalogue/ashfall_vale_items.dart';
+import 'package:masters_of_magic_2/game/items/catalogue/cinderpeak_items.dart';
 import 'package:masters_of_magic_2/game/items/catalogue/whispering_woods_items.dart';
 import 'package:masters_of_magic_2/game/items/equipping.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
@@ -72,6 +73,102 @@ void main() {
       expect(totals.damagePerCharge, 1);
       expect(totals.accuracyBonus, 5);
       expect(totals.maxHpBonus, 6, reason: 'robe HP lost in the sum');
+    });
+  });
+
+  group('describeTotals — the PANEL shows totals, the ITEM shows deltas', () {
+    test('a stat with a base prints the resulting number', () {
+      // ⭐ Level 1 is 100 HP flat (scaledMaxHp's baseline), so the arithmetic
+      // in the assertion is the arithmetic a player would do.
+      final lines = Equipping.describeTotals(
+        const ItemModifiers(maxHpBonus: 11, accuracyBonus: 5),
+        level: 1,
+      );
+      expect(
+        lines,
+        contains('Max health 111 (+11)'),
+        reason: 'a bare "+11 max health" never answers "how much have I got"',
+      );
+      expect(
+        lines,
+        contains('Accuracy 85% (+5)'),
+        reason: 'base hit is 100 − ElementTuning.baseMissPercent, not 100',
+      );
+    });
+
+    test('max health follows the level curve, not a hardcoded 100', () {
+      final lines = Equipping.describeTotals(
+        const ItemModifiers(maxHpBonus: 11),
+        level: 12,
+      );
+      expect(
+        lines.single,
+        'Max health ${MageState.scaledMaxHp(12) + 11} (+11)',
+        reason: 'the panel must agree with GameState.maxHp at every level',
+      );
+      expect(lines.single, isNot(contains('111')));
+    });
+
+    test('the Cinder Loop reads as 5% of 155%, exactly as §9b.8 says', () {
+      final lines = Equipping.describeTotals(
+        CinderpeakItems.cinderLoop.modifiers,
+        level: 1,
+      );
+      expect(lines, contains('Crit chance 5% (+5)'));
+      expect(
+        lines,
+        contains('Crit damage 155% (+5)'),
+        reason: 'a crit is 150% before gear — MageState.critDamage starts at 50',
+      );
+    });
+
+    test('⚠️ a stat with no base keeps the delta form', () {
+      final lines = Equipping.describeTotals(
+        const ItemModifiers(
+          damagePerCast: 2,
+          shieldStrengthPercent: 10,
+          healingReceivedPercent: 15,
+          regrowPercent: 1,
+          beltSlots: 2,
+        ),
+        level: 1,
+      );
+      // Nothing else grants these, so a "total" would be the bonus in disguise.
+      expect(lines, contains('+2 damage per cast'));
+      expect(lines, contains('+10% shield strength'));
+      expect(lines, contains('+15% healing received'));
+      expect(lines, contains('+2 belt slots'));
+      expect(lines.where((l) => l.contains('(+')), isEmpty);
+    });
+
+    test('nothing worn prints nothing at all', () {
+      expect(Equipping.describeTotals(ItemModifiers.none, level: 30), isEmpty);
+    });
+
+    test('⚠️ drift guard: both writers cover the same stats', () {
+      // Every field non-zero, so a stat added to one writer and forgotten in
+      // the other changes exactly one of these counts.
+      const everything = ItemModifiers(
+        accuracyBonus: 1,
+        dodge: 1,
+        critChance: 1,
+        critDamage: 1,
+        deflectChance: 1,
+        deflectAmount: 1,
+        maxHpBonus: 1,
+        damagePerCast: 1,
+        damagePerCharge: 1,
+        shieldStrengthPercent: 1,
+        healingReceivedPercent: 1,
+        regrowPercent: 1,
+        beltSlots: 1,
+      );
+      expect(
+        Equipping.describeTotals(everything, level: 1),
+        hasLength(Equipping.describe(everything).length),
+        reason: 'a stat the item dialog shows and the panel does not is a '
+            'stat the player is told about once and then never again',
+      );
     });
   });
 
@@ -248,6 +345,53 @@ void main() {
         rng: Random(1),
       );
       expect(run.playerHp, MageState.scaledMaxHp(game.profile.level));
+    });
+  });
+
+  group('take all from the Storeroom', () {
+    GameState gameWithStored(int count, {int packUsed = 0}) {
+      final profile = PlayerProfile.newPlayer()
+        ..storerooms['hearthwood'] = Storeroom(stacks: {'oak_log': count})
+        ..backpack = Backpack.of([
+          for (var i = 0; i < packUsed; i++)
+            const InventorySlot(defId: 'bindweed_fibre'),
+        ]);
+      return GameState(_MemStorage(), profile);
+    }
+
+    test('takes the whole stack when it fits, and says how many', () async {
+      final game = gameWithStored(7);
+      expect(await game.takeAllFromStoreroom('hearthwood', 'oak_log'), 7);
+      expect(game.profile.backpack.countOf('oak_log'), 7);
+      expect(
+        game.profile.storerooms['hearthwood']!.stacks['oak_log'],
+        isNull,
+        reason: 'an emptied stack must leave, not linger as a zero',
+      );
+    });
+
+    test('⭐ bounded by space, and that is a SUCCESS not an error', () async {
+      // 18 slots taken, 40 stored: seven come home and the rest waits.
+      final game = gameWithStored(40, packUsed: 18);
+      expect(await game.takeAllFromStoreroom('hearthwood', 'oak_log'), 2);
+      expect(game.profile.backpack.isFull, isTrue);
+      expect(
+        game.profile.storerooms['hearthwood']!.stacks['oak_log'],
+        38,
+        reason: 'the remainder must still be in the Storeroom, not vanished',
+      );
+    });
+
+    test('a full pack or a missing stack moves nothing', () async {
+      final full = gameWithStored(5, packUsed: 20);
+      expect(await full.takeAllFromStoreroom('hearthwood', 'oak_log'), 0);
+      expect(full.profile.storerooms['hearthwood']!.stacks['oak_log'], 5);
+
+      final game = gameWithStored(5);
+      expect(await game.takeAllFromStoreroom('hearthwood', 'bindweed_fibre'), 0);
+      expect(await game.takeAllFromStoreroom('pennycross', 'oak_log'), 0,
+          reason: 'another town\'s Storeroom is not reachable from here');
+      expect(game.profile.backpack.used, 0);
     });
   });
 

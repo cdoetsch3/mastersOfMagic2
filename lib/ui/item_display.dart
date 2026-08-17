@@ -19,11 +19,18 @@ import 'app_theme.dart';
 /// One dialog for every item interaction — what it is, what it does, and
 /// what you can do with it here. [actions] whose `run` returns a refusal
 /// string surface it; null means done.
+///
+/// [unavailable] holds actions that exist for this item but cannot be taken
+/// here. ⭐ **Shown greyed with the reason, not hidden** (2026-08-17): a
+/// "Load onto belt" that vanishes when the belt is full teaches the player
+/// nothing, and they conclude the item is not beltable. A dead button plus
+/// "Your belt is full." teaches them the rule and where to fix it.
 Future<void> showItemDialog(
   BuildContext context, {
   required ItemDef def,
   ItemInstance? instance,
   List<({String label, Future<String?> Function() run})> actions = const [],
+  List<({String label, String reason})> unavailable = const [],
 }) async {
   final lines = def is EquipmentDef
       ? Equipping.describe(def.modifiers)
@@ -51,6 +58,20 @@ Future<void> showItemDialog(
               line,
               style: const TextStyle(color: AppColors.teal, fontSize: 13),
             ),
+          // ⚠️ The reason is text in the body, not only a tooltip on the dead
+          // button — there is no hover on a phone, and a greyed button whose
+          // reason cannot be reached is worse than no button.
+          for (final u in unavailable)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                '${u.label}: ${u.reason}',
+                style: const TextStyle(
+                  color: AppColors.textFaint,
+                  fontSize: 12,
+                ),
+              ),
+            ),
           const SizedBox(height: 8),
           Text(
             def.lore,
@@ -63,6 +84,11 @@ Future<void> showItemDialog(
         ],
       ),
       actions: [
+        for (final u in unavailable)
+          Tooltip(
+            message: u.reason,
+            child: TextButton(onPressed: null, child: Text(u.label)),
+          ),
         for (final a in actions)
           TextButton(
             onPressed: () async {

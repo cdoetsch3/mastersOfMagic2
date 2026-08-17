@@ -2539,6 +2539,16 @@ deliberately **not** combat power.
 ✅ **What a belt grants today: `beltSlots`** — how many consumables reach a duel
 at all.
 
+✅ **No belt means NO slots** (ruling, 2026-08-17). `Carrying.baseBeltSlots` was
+2 and is now **0**: belt capacity comes only from a worn belt (📝 plus
+progression, when that lands). ⚠️ Two slots that appeared with the Belt slot
+empty read as a hardcoded bug, and they made the item that grants capacity look
+like it did nothing. ⚠️ **Migration**: a save whose belt holds more than the new
+capacity returns the overflow to the backpack, then to the current town's
+Storeroom if the pack is full, and otherwise leaves it belted — an
+over-capacity belt is legal and unloadable, because deleting a potion to
+satisfy a number never is.
+
 📝 **More belt modifiers are expected**, shaping what those consumables *do*
 rather than how many fit. ⚠️ Not designed yet; *"potions from this belt heal 20%
 more"* was an illustration, not a spec, and is **not** implemented.

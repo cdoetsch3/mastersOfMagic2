@@ -45,8 +45,16 @@ abstract final class Carrying {
   /// ✅ One item per slot, so twenty Oak Logs fill it (ITEMS §10.3a).
   static const int backpackSlots = 20;
 
-  /// What a new character can bring into a duel, before progression and gear.
-  static const int baseBeltSlots = 2;
+  /// What a character can bring into a duel with **no belt worn**: nothing.
+  ///
+  /// ⚠️ **Zero, ruled 2026-08-17.** This was 2, and two slots that appeared out
+  /// of nowhere read as a hardcoded bug rather than a rule — the paper doll
+  /// offered belt space while the Belt slot sat empty, so the belt item that
+  /// grants slots looked like it did nothing. Belt capacity now comes ONLY from
+  /// a worn belt's `beltSlots` modifier (📝 plus progression, when that lands),
+  /// which is what makes the Tuskhide Belt a real unlock instead of a +2 on top
+  /// of a freebie.
+  static const int baseBeltSlots = 0;
 
   /// ⚠️ The ceiling on belt growth. Past this, "which do I bring?" stops being
   /// a decision — which is the whole reason the belt is bounded.
@@ -69,4 +77,30 @@ abstract final class Carrying {
   /// combat.** Everything else is a matter of space, not legality.
   static bool accepts(ItemContainer where, ItemDef def) =>
       where != ItemContainer.belt || def is Beltable;
+
+  /// Why [def] cannot go on a belt of [capacity] already holding [used] —
+  /// null means it can.
+  ///
+  /// ⭐ **One writer, two readers** (the shape `Equipping.refusal` already
+  /// uses): `GameState.loadOntoBelt` refuses with these words, and the item
+  /// dialog greys its button with the same ones. A screen that invented its own
+  /// wording would eventually contradict what the action actually does.
+  ///
+  /// 📝 Space and legality only — whether the item is actually *in the pack* is
+  /// the caller's business, because this function never sees a pack.
+  static String? beltRefusal(
+    ItemDef? def, {
+    required int used,
+    required int capacity,
+  }) {
+    if (def == null || !accepts(ItemContainer.belt, def)) {
+      return 'Only belt items can be reached mid-duel.';
+    }
+    // ⚠️ Two refusals, not one. Zero capacity is a wardrobe problem (the
+    // 2026-08-17 ruling: no belt, no slots); calling that "full" would send the
+    // player looking for something to unload that does not exist.
+    if (capacity == 0) return 'You are not wearing a belt.';
+    if (used >= capacity) return 'Your belt is full.';
+    return null;
+  }
 }
