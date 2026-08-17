@@ -6,6 +6,7 @@ import 'package:mom_engine/mom_engine.dart';
 import 'ai_personas.dart';
 import 'enemies/enemy_def.dart';
 import 'firestore_rest.dart';
+import 'items/item_def.dart';
 import 'mage_apparel.dart';
 
 /// What one turn's exchange produced: the opponent's action, plus (for
@@ -28,6 +29,21 @@ abstract interface class OpponentDriver {
   /// persona is written for, so beating Procarius means beating a level-60
   /// mage rather than a level-1 one with a good brain.
   int get opponentLevel;
+
+  /// What the opponent's equipment adds up to (ITEMS §7.4 — current PvP is
+  /// the GEARED ladder, so their wardrobe is part of the fight).
+  ///
+  /// ⚠️ **[ItemModifiers.none] for anything that is not another player.**
+  /// Enemies get their numbers from their archetype, never from items
+  /// (ENEMIES §2.1) — a foe reporting gear here would be an archetype and a
+  /// wardrobe stacked on the same body.
+  ///
+  /// ⭐ This is the *opponent's own* totals, carried across the wire by
+  /// matchmaking. Each client applies its own gear from local state and the
+  /// other side's from here, which is the only way both machines build the
+  /// same two mages (the lockstep rule).
+  ItemModifiers get opponentGear => ItemModifiers.none;
+
   MageApparel get opponentApparel;
 
   /// Multiplier on the opponent's max HP, off the level baseline.
@@ -103,6 +119,12 @@ class LocalAiDriver implements OpponentDriver {
   @override
   int get opponentLevel => persona.level;
 
+  /// ⚠️ **Never gear.** A persona's difficulty is its brain and its level, and
+  /// a bestiary entry's is its archetype — items are the player's lane alone.
+  /// (Spelled out rather than inherited: `implements` grants no defaults.)
+  @override
+  ItemModifiers get opponentGear => ItemModifiers.none;
+
   @override
   MageApparel get opponentApparel => persona.apparel;
 
@@ -152,6 +174,9 @@ class RemoteDuelDriver implements OpponentDriver {
   @override
   final int opponentLevel;
 
+  @override
+  final ItemModifiers opponentGear;
+
   static const opponentTimeout = Duration(seconds: 25);
 
   final _rng = Random.secure();
@@ -169,6 +194,11 @@ class RemoteDuelDriver implements OpponentDriver {
     // different fights (HP pools AND damage scaling), which is a lockstep
     // desync, not a display bug.
     required this.opponentLevel,
+    // ⚠️ Required for exactly the same reason, and it is the same bug: gear
+    // that defaults to none makes each client simulate itself geared against
+    // a naked rival (ITEMS §7.4 says PvP counts gear). A silent default is
+    // how the level desync survived as long as it did — so there isn't one.
+    required this.opponentGear,
   });
 
   String get _roomPath => 'duels/$roomId';

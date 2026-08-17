@@ -154,6 +154,68 @@ void main() {
     });
   });
 
+  group('gear totals cross the wire (ITEMS §7.4)', () {
+    // ⚠️ Every field non-zero and every value DISTINCT: with repeated values
+    // a toJson/fromJson pair that swaps two keys would still pass.
+    const full = ItemModifiers(
+      accuracyBonus: 1,
+      dodge: 2,
+      critChance: 3,
+      critDamage: 4,
+      deflectChance: 5,
+      deflectAmount: 6,
+      maxHpBonus: 7,
+      damagePerCast: 8,
+      damagePerCharge: 9,
+      shieldStrengthPercent: 10,
+      healingReceivedPercent: 11,
+      regrowPercent: 12,
+      beltSlots: 13,
+    );
+
+    test('every field survives the round trip', () {
+      // ⭐ This is a lockstep contract, not a save format: a field that fails
+      // to cross is a stat one client applies and the other does not.
+      final back = ItemModifiers.fromJson(full.toJson());
+      expect(back.accuracyBonus, 1);
+      expect(back.dodge, 2);
+      expect(back.critChance, 3);
+      expect(back.critDamage, 4);
+      expect(back.deflectChance, 5);
+      expect(back.deflectAmount, 6);
+      expect(back.maxHpBonus, 7);
+      expect(back.damagePerCast, 8);
+      expect(back.damagePerCharge, 9);
+      expect(back.shieldStrengthPercent, 10);
+      expect(back.healingReceivedPercent, 11);
+      expect(back.regrowPercent, 12);
+      expect(back.beltSlots, 13);
+    });
+
+    test('zeroes are dropped rather than shipped', () {
+      expect(ItemModifiers.none.toJson(), isEmpty);
+      expect(const ItemModifiers(dodge: 3).toJson(), {'dodge': 3});
+    });
+
+    test('a missing key reads as 0, a missing map as none', () {
+      // An older client's ticket, or a room doc written before gear crossed
+      // the wire — "unequipped" is the safe reading, a throw is not.
+      final partial = ItemModifiers.fromJson({'critChance': 5});
+      expect(partial.critChance, 5);
+      expect(partial.critDamage, 0);
+      expect(partial.maxHpBonus, 0);
+      expect(partial.beltSlots, 0);
+      expect(ItemModifiers.fromJson(null).isEmpty, isTrue);
+      expect(ItemModifiers.fromJson({}).isEmpty, isTrue);
+    });
+
+    test('numbers arriving as doubles still read as ints', () {
+      // ⚠️ Firestore hands numbers back as `num`; a hard `as int` would throw
+      // in the middle of matchmaking.
+      expect(ItemModifiers.fromJson({'maxHpBonus': 12.0}).maxHpBonus, 12);
+    });
+  });
+
   group('the name is composed from the facts, never stored', () {
     test('quality, material and form in that order', () {
       expect(

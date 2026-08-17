@@ -197,6 +197,60 @@ class ItemModifiers {
     beltSlots: beltSlots + o.beltSlots,
   );
 
+  /// The wire form, for the matchmaking handshake (ITEMS §7.4 — PvP is the
+  /// GEARED ladder, so both clients must know both wardrobes).
+  ///
+  /// ⚠️ **Only non-zero fields are emitted**, matching `content_export`'s
+  /// `_modifiers`: an absent key and a zero mean the same thing, and shipping
+  /// thirteen zeroes on every queue ticket is bytes nobody reads.
+  ///
+  /// ⚠️ **Total on purpose** — every field here and every field in
+  /// [fromJson]. This map is one half of a lockstep agreement: a field that
+  /// silently fails to cross the wire is a stat one client applies and the
+  /// other does not, which is a desync, not a cosmetic loss.
+  Map<String, Object?> toJson() => {
+    if (accuracyBonus != 0) 'accuracyBonus': accuracyBonus,
+    if (dodge != 0) 'dodge': dodge,
+    if (critChance != 0) 'critChance': critChance,
+    if (critDamage != 0) 'critDamage': critDamage,
+    if (deflectChance != 0) 'deflectChance': deflectChance,
+    if (deflectAmount != 0) 'deflectAmount': deflectAmount,
+    if (maxHpBonus != 0) 'maxHpBonus': maxHpBonus,
+    if (damagePerCast != 0) 'damagePerCast': damagePerCast,
+    if (damagePerCharge != 0) 'damagePerCharge': damagePerCharge,
+    if (shieldStrengthPercent != 0)
+      'shieldStrengthPercent': shieldStrengthPercent,
+    if (healingReceivedPercent != 0)
+      'healingReceivedPercent': healingReceivedPercent,
+    if (regrowPercent != 0) 'regrowPercent': regrowPercent,
+    if (beltSlots != 0) 'beltSlots': beltSlots,
+  };
+
+  /// Reads [toJson]'s output back. ⭐ **Missing key → 0, null map → [none]** —
+  /// the inverse of dropping zeroes, and what makes an older client's ticket
+  /// (or a room doc written before gear crossed the wire) read as "unequipped"
+  /// instead of throwing mid-matchmaking.
+  factory ItemModifiers.fromJson(Map<String, Object?>? json) {
+    if (json == null) return none;
+    // Firestore hands integers back as `num`; be liberal about which.
+    int read(String key) => (json[key] as num?)?.toInt() ?? 0;
+    return ItemModifiers(
+      accuracyBonus: read('accuracyBonus'),
+      dodge: read('dodge'),
+      critChance: read('critChance'),
+      critDamage: read('critDamage'),
+      deflectChance: read('deflectChance'),
+      deflectAmount: read('deflectAmount'),
+      maxHpBonus: read('maxHpBonus'),
+      damagePerCast: read('damagePerCast'),
+      damagePerCharge: read('damagePerCharge'),
+      shieldStrengthPercent: read('shieldStrengthPercent'),
+      healingReceivedPercent: read('healingReceivedPercent'),
+      regrowPercent: read('regrowPercent'),
+      beltSlots: read('beltSlots'),
+    );
+  }
+
   bool get isEmpty =>
       accuracyBonus == 0 &&
       dodge == 0 &&

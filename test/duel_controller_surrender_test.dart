@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mom_engine/mom_engine.dart';
+import 'package:masters_of_magic_2/game/ai_personas.dart';
 import 'package:masters_of_magic_2/game/duel_controller.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/loadout.dart';
@@ -17,8 +18,13 @@ class FakeRemoteDriver implements OpponentDriver {
   @override
   double get opponentPowerScale => 1.0;
 
+  /// ⭐ Settable, because in a remote duel these two ARE the wire: whatever
+  /// the other client claimed about itself is all this side ever knows.
   @override
-  int get opponentLevel => 1;
+  int opponentLevel = 1;
+
+  @override
+  ItemModifiers opponentGear = ItemModifiers.none;
 
   bool surrenderReported = false;
   void Function()? onOpponentSurrendered;
@@ -101,8 +107,147 @@ void main() {
       // ordering come for free.
       expect(geared.player.statuses.whereType<RegrowStatus>(), isNotEmpty);
       expect(geared.enemy.accuracyBonus, 0,
-          reason: 'enemies get archetypes, never the player\'s wardrobe');
+          reason: 'a driver reporting no gear must leave the enemy bare');
       expect(geared.enemy.statuses.whereType<RegrowStatus>(), isEmpty);
+    });
+
+    test('a remote rival\'s gear lands on the ENEMY, and only the enemy', () {
+      // ⭐ ITEMS §7.4: PvP is the GEARED ladder, so what they are wearing is
+      // part of the fight — and it arrives over the wire, from the driver.
+      final duel = DuelController(
+        loadout: Loadout.starter,
+        driver: FakeRemoteDriver()
+          ..opponentGear = const ItemModifiers(
+            maxHpBonus: 20,
+            accuracyBonus: 3,
+            dodge: 4,
+            critChance: 7,
+            critDamage: 5,
+            deflectChance: 2,
+            deflectAmount: 6,
+            damagePerCast: 2,
+            damagePerCharge: 1,
+            shieldStrengthPercent: 15,
+            healingReceivedPercent: 8,
+            regrowPercent: 3,
+          ),
+      );
+      expect(duel.enemy.maxHp, 120);
+      expect(duel.enemy.hp, 120, reason: 'they start full at the bigger pool');
+      expect(duel.enemy.accuracyBonus, 3);
+      expect(duel.enemy.dodge, 4);
+      expect(duel.enemy.critChance, 7);
+      // ⭐ The same 50-base ruling applies to THEIR crits, or the two clients
+      // roll different crit damage from the same seed.
+      expect(duel.enemy.critDamage, 55);
+      expect(duel.enemy.deflectChance, 2);
+      expect(duel.enemy.deflectAmount, 6);
+      expect(duel.enemy.damagePerCast, 2);
+      expect(duel.enemy.damagePerCharge, 1);
+      expect(duel.enemy.shieldStrengthPercent, 15);
+      expect(duel.enemy.healingReceivedPercent, 8);
+      expect(
+        duel.enemy.statuses.whereType<RegrowStatus>().single.percentPerTurn,
+        3,
+        reason: 'their Regrow must tick on our machine too',
+      );
+      // ⚠️ Their wardrobe is theirs — none of it may leak onto us.
+      expect(duel.player.maxHp, 100);
+      expect(duel.player.accuracyBonus, 0);
+      expect(duel.player.critDamage, 50);
+      expect(duel.player.statuses.whereType<RegrowStatus>(), isEmpty);
+    });
+
+    test('⭐ both clients build the same two mages (the lockstep rule)', () {
+      // The whole point of the fix: A applies its OWN gear locally and B's
+      // from the wire, B does the mirror image — so A's enemy must come out
+      // byte-identical to the player B built for itself, and vice versa.
+      // Deliberately asymmetric levels AND kit: equal ones would pass even
+      // if one side's numbers were being used for both mages.
+      const mine = ItemModifiers(
+        maxHpBonus: 30,
+        accuracyBonus: 5,
+        critChance: 5,
+        critDamage: 5,
+        damagePerCast: 3,
+        regrowPercent: 2,
+      );
+      const theirs = ItemModifiers(
+        maxHpBonus: 11,
+        dodge: 9,
+        deflectChance: 4,
+        deflectAmount: 7,
+        damagePerCharge: 2,
+        shieldStrengthPercent: 20,
+        healingReceivedPercent: 12,
+      );
+      final myClient = DuelController(
+        loadout: Loadout.starter,
+        driver: FakeRemoteDriver()
+          ..opponentLevel = 9
+          ..opponentGear = theirs,
+        playerLevel: 4,
+        playerGear: mine,
+      );
+      final theirClient = DuelController(
+        loadout: Loadout.starter,
+        driver: FakeRemoteDriver()
+          ..opponentLevel = 4
+          ..opponentGear = mine,
+        playerLevel: 9,
+        playerGear: theirs,
+      );
+
+      void sameMage(MageState a, MageState b, String who) {
+        expect(a.level, b.level, reason: '$who level');
+        expect(a.maxHp, b.maxHp, reason: '$who maxHp');
+        expect(a.hp, b.hp, reason: '$who starting hp');
+        expect(a.accuracyBonus, b.accuracyBonus, reason: '$who accuracy');
+        expect(a.dodge, b.dodge, reason: '$who dodge');
+        expect(a.critChance, b.critChance, reason: '$who crit chance');
+        expect(a.critDamage, b.critDamage, reason: '$who crit damage');
+        expect(a.deflectChance, b.deflectChance, reason: '$who deflect chance');
+        expect(a.deflectAmount, b.deflectAmount, reason: '$who deflect amount');
+        expect(a.damagePerCast, b.damagePerCast, reason: '$who per cast');
+        expect(a.damagePerCharge, b.damagePerCharge, reason: '$who per charge');
+        expect(a.powerScale, b.powerScale, reason: '$who power scale');
+        expect(
+          a.shieldStrengthPercent,
+          b.shieldStrengthPercent,
+          reason: '$who shield strength',
+        );
+        expect(
+          a.healingReceivedPercent,
+          b.healingReceivedPercent,
+          reason: '$who healing received',
+        );
+        expect(
+          a.statuses.whereType<RegrowStatus>().map((s) => s.percentPerTurn),
+          b.statuses.whereType<RegrowStatus>().map((s) => s.percentPerTurn),
+          reason: '$who regrow',
+        );
+      }
+
+      sameMage(myClient.enemy, theirClient.player, 'the rival');
+      sameMage(theirClient.enemy, myClient.player, 'us');
+      // ⚠️ And the two are genuinely different mages — otherwise the checks
+      // above are satisfied by everyone being identical.
+      expect(myClient.player.maxHp, isNot(myClient.enemy.maxHp));
+    });
+
+    test('a local AI opponent brings no wardrobe at all', () {
+      // ⚠️ Campaign foes get archetypes, never items (ENEMIES §2.1) — the
+      // gear seam must not have quietly opened a second power source.
+      final persona = AiRoster.all.first;
+      final duel = DuelController(
+        loadout: Loadout.starter,
+        driver: LocalAiDriver(persona: persona),
+        playerGear: const ItemModifiers(maxHpBonus: 50, critDamage: 20),
+      );
+      expect(duel.enemy.maxHp, MageState.scaledMaxHp(persona.level));
+      expect(duel.enemy.critDamage, 50);
+      expect(duel.enemy.statuses.whereType<RegrowStatus>(), isEmpty);
+      expect(duel.player.maxHp, 150, reason: 'ours still counts');
     });
 
     test('an unequipped player is byte-identical to the old baseline', () {

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'ai_personas.dart';
 import 'firestore_rest.dart';
+import 'items/item_def.dart';
 import 'opponent_driver.dart';
 
 /// The result of any matchmaking path: either a remote driver (human found)
@@ -89,6 +90,7 @@ class Matchmaking {
     required String uid,
     required String name,
     required int level,
+    required ItemModifiers gear,
   }) async {
     try {
       await FirestoreRest.set('$_queue/${ticket.id}', {
@@ -97,6 +99,10 @@ class Matchmaking {
         // ⭐ The claimer's level rides the claim, so the ticket owner can
         // build the SAME two-level duel we do (the desync fix).
         'claimedByLevel': level,
+        // ⭐ …and their gear, for the same reason: PvP counts equipment
+        // (ITEMS §7.4), so the ticket owner needs our totals to build the
+        // same two mages. Trusted as claimed — server validation is later.
+        'claimedByGear': gear.toJson(),
       });
       final check = await FirestoreRest.get('$_queue/${ticket.id}');
       return check?['claimedBy'] == uid;
@@ -105,6 +111,16 @@ class Matchmaking {
     }
   }
 
+  /// Reads a gear map written by [ItemModifiers.toJson] back out of a doc.
+  ///
+  /// ⚠️ Anything that is not a map — a missing field, a room doc written by a
+  /// client from before gear crossed the wire — reads as **unequipped**. A
+  /// throw here would take down matchmaking itself, and "no gear" is both the
+  /// old behaviour and the safe direction.
+  static ItemModifiers _gearFrom(Object? field) => ItemModifiers.fromJson(
+    field is Map ? field.map((k, v) => MapEntry('$k', v)) : null,
+  );
+
   static RemoteDuelDriver _joinTicket(Map<String, dynamic> ticket) =>
       RemoteDuelDriver(
         roomId: ticket['roomId'] as String,
@@ -112,6 +128,7 @@ class Matchmaking {
         masterSeed: (ticket['masterSeed'] as num).toInt(),
         opponentName: ticket['name'] as String? ?? 'Rival mage',
         opponentLevel: (ticket['level'] as num?)?.toInt() ?? 1,
+        opponentGear: _gearFrom(ticket['gear']),
       );
 
   /// Searches the queue for a waiting player. Joins them if found; otherwise
@@ -124,6 +141,11 @@ class Matchmaking {
     required String uid,
     required String name,
     required int level,
+    // ⭐ Travels beside [level] at every step below — ticket, claim, room doc
+    // — because both are inputs to the mage the OTHER client has to build.
+    // ⚠️ Required, like [level]: a caller that forgets it would put a naked
+    // mage on the opponent's screen and a geared one on ours.
+    required ItemModifiers gear,
     Duration patience = const Duration(seconds: 10),
   }) async {
     try {
@@ -136,7 +158,13 @@ class Matchmaking {
       for (final ticket in waiting) {
         if (ticket.id == uid) continue;
         if (ticket.data['claimedBy'] != null) continue;
-        if (await _claim(ticket, uid: uid, name: name, level: level)) {
+        if (await _claim(
+          ticket,
+          uid: uid,
+          name: name,
+          level: level,
+          gear: gear,
+        )) {
           return MatchResult.human(_joinTicket(ticket.data));
         }
       }
@@ -150,6 +178,9 @@ class Matchmaking {
         'uid': uid,
         'name': name,
         'level': level,
+        // ⭐ Whoever claims this ticket builds their enemy from these two
+        // fields alone, so both must be here before anyone can claim it.
+        'gear': gear.toJson(),
         'roomId': code,
         'masterSeed': seed,
         'createdAt': createdAt,
@@ -165,9 +196,11 @@ class Matchmaking {
             'hostUid': uid,
             'hostName': name,
             'hostLevel': level,
+            'hostGear': gear.toJson(),
             'guestUid': by,
             'guestName': mine?['claimedByName'] as String? ?? 'Rival',
             'guestLevel': (mine?['claimedByLevel'] as num?)?.toInt() ?? 1,
+            'guestGear': _gearFrom(mine?['claimedByGear']).toJson(),
             'masterSeed': seed,
             'createdAt': _now(),
           });
@@ -179,6 +212,10 @@ class Matchmaking {
               masterSeed: seed,
               opponentName: mine?['claimedByName'] as String? ?? 'Rival',
               opponentLevel: (mine?['claimedByLevel'] as num?)?.toInt() ?? 1,
+              // ⚠️ The claimer's OWN totals, read straight back off the claim
+              // — never ours. Each side wears its own wardrobe and simulates
+              // the other's.
+              opponentGear: _gearFrom(mine?['claimedByGear']),
             ),
           );
         }
@@ -202,7 +239,13 @@ class Matchmaking {
           )) {
             continue;
           }
-          if (await _claim(ticket, uid: uid, name: name, level: level)) {
+          if (await _claim(
+            ticket,
+            uid: uid,
+            name: name,
+            level: level,
+            gear: gear,
+          )) {
             await FirestoreRest.delete('$_queue/$uid');
             return MatchResult.human(_joinTicket(ticket.data));
           }
@@ -225,6 +268,7 @@ class Matchmaking {
     required String uid,
     required String name,
     required int level,
+    required ItemModifiers gear,
   }) async {
     final code = _newCode();
     final seed = _newSeed();
@@ -232,9 +276,11 @@ class Matchmaking {
       'status': 'waiting',
       'hostUid': uid,
       'hostName': name,
-      // ⭐ Levels cross the wire in BOTH directions, or the two clients
-      // simulate two different duels (the desync of 2026-08-09).
+      // ⭐ Levels AND gear cross the wire in BOTH directions, or the two
+      // clients simulate two different duels (the level desync of 2026-08-09,
+      // then the gear desync it turned out to share a shape with).
       'hostLevel': level,
+      'hostGear': gear.toJson(),
       'masterSeed': seed,
       'createdAt': _now(),
     });
@@ -247,12 +293,13 @@ class Matchmaking {
     required int seed,
     Duration patience = const Duration(minutes: 5),
   }) async {
-    final guest = await _poll<({String name, int level})>(
+    final guest = await _poll<({String name, int level, ItemModifiers gear})>(
       '$_duels/$code',
       (d) => d?['guestUid'] != null
           ? (
               name: d?['guestName'] as String? ?? 'Rival mage',
               level: (d?['guestLevel'] as num?)?.toInt() ?? 1,
+              gear: _gearFrom(d?['guestGear']),
             )
           : null,
       timeout: patience,
@@ -264,6 +311,7 @@ class Matchmaking {
       masterSeed: seed,
       opponentName: guest.name,
       opponentLevel: guest.level,
+      opponentGear: guest.gear,
     );
   }
 
@@ -273,6 +321,7 @@ class Matchmaking {
     required String uid,
     required String name,
     required int level,
+    required ItemModifiers gear,
   }) async {
     final roomCode = code.toUpperCase().trim();
     final data = await FirestoreRest.get('$_duels/$roomCode');
@@ -283,6 +332,9 @@ class Matchmaking {
       'guestUid': uid,
       'guestName': name,
       'guestLevel': level,
+      // ⭐ Written before the driver is built, so the host's waitForGuest poll
+      // never sees a guest without their wardrobe.
+      'guestGear': gear.toJson(),
       'status': 'active',
     });
     return RemoteDuelDriver(
@@ -291,6 +343,7 @@ class Matchmaking {
       masterSeed: (data['masterSeed'] as num).toInt(),
       opponentName: data['hostName'] as String? ?? 'Rival mage',
       opponentLevel: (data['hostLevel'] as num?)?.toInt() ?? 1,
+      opponentGear: _gearFrom(data['hostGear']),
     );
   }
 

@@ -80,6 +80,9 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         uid: id.uid,
         name: id.name,
         level: game.profile.level,
+        // ⭐ PvP is the geared ladder (ITEMS §7.4): our totals go out so the
+        // opponent's client can build us as we actually are.
+        gear: game.equipmentTotals,
       );
       if (!mounted) return;
       setState(() => _busy = _Busy.none);
@@ -135,6 +138,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         uid: id.uid,
         name: id.name,
         level: game.profile.level,
+        gear: game.equipmentTotals,
       );
       if (!mounted) return;
       setState(() => _roomCode = room.code);
@@ -181,12 +185,14 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       _busy = _Busy.joining;
       _error = null;
     });
+    final game = GameStateScope.read(context);
     try {
       final driver = await Matchmaking.joinRoom(
         code: code,
         uid: id.uid,
         name: id.name,
-        level: GameStateScope.read(context).profile.level,
+        level: game.profile.level,
+        gear: game.equipmentTotals,
       );
       if (!mounted) return;
       setState(() => _busy = _Busy.none);

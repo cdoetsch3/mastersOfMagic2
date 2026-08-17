@@ -113,9 +113,13 @@ class DuelController extends ChangeNotifier {
   /// of half-dead monsters.
   final int? playerStartingHp;
 
-  /// What the player's gear adds up to (Equipping.totals). ⭐ **Applied to
-  /// the player's MageState only** — enemies get their numbers from their
-  /// archetype, never from items.
+  /// What the player's gear adds up to (Equipping.totals).
+  ///
+  /// ⭐ **Always the LOCAL player's own equipment**, read from local state.
+  /// The opposite number is [OpponentDriver.opponentGear], which arrives over
+  /// the wire — a local AI reports none, so campaign enemies stay pure
+  /// archetype (ENEMIES §2.1) while a human rival brings their wardrobe
+  /// (ITEMS §7.4).
   final ItemModifiers playerGear;
 
   DuelController({
@@ -131,46 +135,71 @@ class DuelController extends ChangeNotifier {
 
   bool get playerIsHost => driver.playerIsHost;
 
+  /// Builds one duellist: the level baseline, times its archetype, plus what
+  /// it is wearing.
+  ///
+  /// ⚠️ **Both mages are built here, and nowhere else.** In a remote duel the
+  /// enemy this client builds must be bit-for-bit the player the OTHER client
+  /// builds for itself — same level, same totals, same fields — or the two
+  /// machines resolve different fights from the same seed. Two copies of this
+  /// arithmetic, one per side, is precisely how they would drift apart; one
+  /// function called twice cannot.
+  ///
+  /// Gear reaches the duel HERE, and only here (ITEMS §9b.8): flat HP into the
+  /// constructor (so `hp` starts full at the boosted maximum, not below it),
+  /// everything else onto the MageState fields the engine already rolls.
+  static MageState _buildMage({
+    required String name,
+    required int level,
+    required ItemModifiers gear,
+    double hpScale = 1.0,
+  }) {
+    final mage = MageState(
+      name: name,
+      level: level,
+      // ⚠️ Archetype scales the BASELINE; gear is flat on top. Scaling the
+      // gear too would make a Redoubt's hat worth more than a mage's.
+      maxHp: (MageState.scaledMaxHp(level) * hpScale).round() + gear.maxHpBonus,
+    )
+      ..accuracyBonus = gear.accuracyBonus
+      ..dodge = gear.dodge
+      ..critChance = gear.critChance
+      // ⭐ critDamage ADDS to the engine's 50 base, so Cinder Loop's 5 points
+      // read 155%, exactly as ruled.
+      ..critDamage = 50 + gear.critDamage
+      ..deflectChance = gear.deflectChance
+      ..deflectAmount = gear.deflectAmount
+      ..damagePerCast = gear.damagePerCast
+      ..damagePerCharge = gear.damagePerCharge
+      ..shieldStrengthPercent = gear.shieldStrengthPercent
+      ..healingReceivedPercent = gear.healingReceivedPercent;
+    // ⭐ Regrow rides the status machinery (item_status.dart), so the lane
+    // sort and the HUD pip come for free. Permanent: gear is not taken off
+    // mid-duel.
+    if (gear.regrowPercent > 0) {
+      mage.statuses.add(RegrowStatus(gear.regrowPercent));
+    }
+    return mage;
+  }
+
   void newDuel() {
     // ⭐ Level scales health and damage on both sides (4%/level). An
     // even-level duel plays exactly as it always did; a level gap is now
     // worth something.
-    // ⭐ Gear reaches the duel HERE, and only here (ITEMS §9b.8): flat HP on
-    // the constructor, everything else onto the MageState fields the engine
-    // already rolls. critDamage ADDS to the engine's 50 base, so Cinder
-    // Loop's 5 points read 155%, exactly as ruled.
-    player = MageState(
-      name: 'You',
-      level: playerLevel,
-      maxHp: MageState.scaledMaxHp(playerLevel) + playerGear.maxHpBonus,
-    )
-      ..accuracyBonus = playerGear.accuracyBonus
-      ..dodge = playerGear.dodge
-      ..critChance = playerGear.critChance
-      ..critDamage = 50 + playerGear.critDamage
-      ..deflectChance = playerGear.deflectChance
-      ..deflectAmount = playerGear.deflectAmount
-      ..damagePerCast = playerGear.damagePerCast
-      ..damagePerCharge = playerGear.damagePerCharge
-      ..shieldStrengthPercent = playerGear.shieldStrengthPercent
-      ..healingReceivedPercent = playerGear.healingReceivedPercent;
-    // ⭐ Regrow rides the status machinery (item_status.dart), so the lane
-    // sort and the HUD pip come for free. Permanent: gear is not taken off
-    // mid-duel.
-    if (playerGear.regrowPercent > 0) {
-      player.statuses.add(RegrowStatus(playerGear.regrowPercent));
-    }
+    player = _buildMage(name: 'You', level: playerLevel, gear: playerGear);
     final carried = playerStartingHp;
     if (carried != null) player.hp = carried.clamp(1, player.maxHp);
     // ⭐ An enemy is the level baseline TIMES its archetype (ENEMIES §1.1), so
     // a Glasswing and a Redoubt of the same level are genuinely different
-    // fights rather than the same fight with different names.
-    enemy = MageState(
+    // fights rather than the same fight with different names — plus, for a
+    // human rival, whatever they are wearing. ⚠️ The two are exclusive in
+    // practice: archetypes only come from LocalAiDriver, which reports no
+    // gear, and RemoteDuelDriver pins both scales to 1.0.
+    enemy = _buildMage(
       name: driver.opponentName,
       level: driver.opponentLevel,
-      maxHp:
-          (MageState.scaledMaxHp(driver.opponentLevel) * driver.opponentHpScale)
-              .round(),
+      gear: driver.opponentGear,
+      hpScale: driver.opponentHpScale,
     )..powerScale = driver.opponentPowerScale;
     final host = playerIsHost ? player : enemy;
     final guest = playerIsHost ? enemy : player;
