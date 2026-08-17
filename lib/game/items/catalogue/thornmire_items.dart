@@ -115,8 +115,9 @@ abstract final class ThornmireItems {
   );
 
   /// ⭐ Drop-only jewelry (§9b.8). Multiplies every Draught and Tonic — the
-  /// Flora answer to a fight you cannot end quickly. 📝 Dropper: the
-  /// Fenmother, when the roster is built.
+  /// Flora answer to a fight you cannot end quickly. ✅ Dropper: the mini
+  /// table, authored for the **Fenmother**; the pool shares one table, per the
+  /// Whispering Woods shape.
   static const wickerboundRing = EquipmentDef(
     id: 'wickerbound_ring',
     properName: 'Wickerbound Ring',

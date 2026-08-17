@@ -106,7 +106,9 @@ abstract final class AshfallValeItems {
   /// ⭐⭐ **The Charlock — the quarter's only Epic.** Named for the fire-
   /// following wildflower; regrowth as a stat, off the boss that IS regrowth.
   /// ⚠️ The regrow tick must route through `TurnStatus` when wired (§4.2).
-  /// 📝 Dropper: The Rooting, when the roster is built.
+  /// ✅ Dropper: the boss table, authored for **The Rooting** — regrowth as a
+  /// stat, off the boss that IS regrowth. The pool shares one table, per the
+  /// Whispering Woods shape, so The Blackened Crown pays it too.
   static const theCharlock = EquipmentDef(
     id: 'the_charlock',
     properName: 'The Charlock',

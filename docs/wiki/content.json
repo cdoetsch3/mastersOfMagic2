@@ -3,8 +3,8 @@
   "counts": {
     "zones": 26,
     "towns": 9,
-    "creatures": 11,
-    "items": 44,
+    "creatures": 55,
+    "items": 52,
     "recipes": 20,
     "gatherNodes": 2
   },
@@ -2170,6 +2170,3762 @@
         ],
         "bonus": []
       }
+    },
+    {
+      "id": "brook_naiad",
+      "name": "Brook Naiad",
+      "zoneId": "glimmerbrook",
+      "rank": "common",
+      "archetype": "Adept",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "A child-sized figure of clear water with pale stones hanging inside it where organs should be. Its edge is sharp, not misty, which is the detail that stops it looking like weather.",
+      "moves": [
+        {
+          "id": "gb_ripple",
+          "name": "Ripple",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_pourover",
+          "name": "Pour Over",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_glassover",
+          "name": "Glass Over",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "sapwort",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "foragers_ration",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "shiverfish_shoal",
+      "name": "Shiverfish Shoal",
+      "zoneId": "glimmerbrook",
+      "rank": "common",
+      "archetype": "Lasher",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "Forty fish holding one shape, too rigidly to be natural. It casts a single shadow, and I have not yet seen a fish leave it.",
+      "moves": [
+        {
+          "id": "gb_nip",
+          "name": "Nip",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_turnasone",
+          "name": "Turn As One",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "sapwort",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "glassfleck_wisp",
+      "name": "Glassfleck Wisp",
+      "zoneId": "glimmerbrook",
+      "rank": "common",
+      "archetype": "Glasswing",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "Made of the light off the water rather than of the water. It throws the brightness back at you in pieces, and looks as though touching it would end the argument.",
+      "moves": [
+        {
+          "id": "gb_splinter",
+          "name": "Splinter",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_throwitback",
+          "name": "Throw It Back",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "sapwort",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "sapwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "siltback_crawler",
+      "name": "Siltback Crawler",
+      "zoneId": "glimmerbrook",
+      "rank": "common",
+      "archetype": "Sentinel",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "A crayfish crossed with a boulder, low to the riverbed and crusted over with weed. Two eyes on stalks, set close, and both of them on you the whole time.",
+      "moves": [
+        {
+          "id": "gb_beardown",
+          "name": "Bear Down",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_siltover",
+          "name": "Silt Over",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "fawnhide",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "chill_eel",
+      "name": "Chill Eel",
+      "zoneId": "glimmerbrook",
+      "rank": "common",
+      "archetype": "Skirmisher",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "Bone-white and nearly clear, held straight rather than coiled. Frost forms on the water around it while it is doing nothing whatsoever.",
+      "moves": [
+        {
+          "id": "gb_snapto",
+          "name": "Snap To",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_runcold",
+          "name": "Run Cold",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "fawnhide",
+            "min": 2,
+            "max": 3,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "weirkeeper",
+      "name": "Weirkeeper",
+      "zoneId": "glimmerbrook",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "A man built out of the beams of an old weir, wet timber and river stone, water pouring steadily through the gaps in its chest. It carries nothing, because it does not need to.",
+      "moves": [
+        {
+          "id": "gb_sluice",
+          "name": "Sluice",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_openthegates",
+          "name": "Open the Gates",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_holdback",
+          "name": "Hold Back",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "fawnhide",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "sapwort",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "foragers_ration",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_held_breath",
+      "name": "The Held Breath",
+      "zoneId": "glimmerbrook",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "One bubble of air taller than a man, held under and refusing to rise. There is a curled shape inside it. I have written down twice that it is a thing being kept, not a thing swimming.",
+      "moves": [
+        {
+          "id": "gb_press",
+          "name": "Press",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_holdunder",
+          "name": "Hold Under",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "gb_surfacing",
+          "name": "Surfacing",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "fawnhide",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "sapwort",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "foragers_ration",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "pale_coil",
+      "name": "Pale Coil",
+      "zoneId": "glimmerbrook",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "An eel as thick as a man's waist and three times his length, coiled once with the head up. Blind. The water around it is noticeably clearer than the rest, which I would rather not think about.",
+      "moves": [
+        {
+          "id": "gb_takewhole",
+          "name": "Take Whole",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_downandunder",
+          "name": "Down and Under",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "fawnhide",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "sapwort",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "foragers_ration",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "frostgleam_naiad",
+      "name": "Frostgleam Naiad",
+      "zoneId": "glimmerbrook",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "A Brook Naiad grown up and half frozen — ice blooming across her shoulders and brow while the rest of her still runs. She is not in any hurry, and the stones inside her have stopped moving.",
+      "moves": [
+        {
+          "id": "gb_gleam",
+          "name": "Gleam",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_holdstill",
+          "name": "Hold Still",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_frostover",
+          "name": "Frost Over",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "fawnhide",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "sapwort",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "foragers_ration",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_cold_below",
+      "name": "The Cold Below",
+      "zoneId": "glimmerbrook",
+      "rank": "boss",
+      "archetype": "Juggernaut",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "Broad, flat and wider than a house, seen through water that should not be deep enough to hold it. Only part of it is ever visible. The rest goes down into black and keeps going.",
+      "moves": [
+        {
+          "id": "gb_comeup",
+          "name": "Come Up",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_deepcold",
+          "name": "Deep Cold",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "gb_takeyoudown",
+          "name": "Take You Down",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 6,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 3,
+            "max": 6,
+            "chance": 1.0
+          },
+          {
+            "itemId": "proof_of_the_brook",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "fawnhide",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "sapwort",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "foragers_ration",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "stillwater",
+      "name": "Stillwater",
+      "zoneId": "glimmerbrook",
+      "rank": "boss",
+      "archetype": "Aspect",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "Three storeys of standing pool, mirror-flat on every face, with no features of any kind. It reflects whoever is in front of it. Nothing inside it moves, and that is the entire horror of the thing.",
+      "moves": [
+        {
+          "id": "gb_mirror",
+          "name": "Mirror",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "gb_closeover",
+          "name": "Close Over",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "gb_standup",
+          "name": "Stand Up",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 6,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 3,
+            "max": 6,
+            "chance": 1.0
+          },
+          {
+            "itemId": "proof_of_the_brook",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "fawnhide",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "sapwort",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "foragers_ration",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "ashjaw_brute",
+      "name": "Ashjaw Brute",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "common",
+      "archetype": "Bruiser",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "Ox-sized, and caked in grey ash that has dried and cracked like a riverbed. There is orange light in the cracks. It stands square and keeps its head low, which is not deference.",
+      "moves": [
+        {
+          "id": "cp_shoulder",
+          "name": "Shoulder",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_comedown",
+          "name": "Come Down",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "tuskhide",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "flint_skink",
+      "name": "Flint Skink",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "common",
+      "archetype": "Skirmisher",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "Forearm-length, and its scales are knapped flint — faceted, dark, and glowing orange between the plates. It crosses rock too hot to stand on and does not appear to notice.",
+      "moves": [
+        {
+          "id": "cp_skitter",
+          "name": "Skitter",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_strikesparks",
+          "name": "Strike Sparks",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "cinder_moth",
+      "name": "Cinder Moth",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "common",
+      "archetype": "Glasswing",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "Two hands across, wings a translucent ash-grey shot through with ember veins that brighten toward the body. It looks one touch from disintegrating, and that turns out to be accurate.",
+      "moves": [
+        {
+          "id": "cp_dustoff",
+          "name": "Dust Off",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_gooutbright",
+          "name": "Go Out Bright",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "slagshell_tortoise",
+      "name": "Slagshell Tortoise",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "common",
+      "archetype": "Sentinel",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "The shell is one lump of cooled lava, pitted and cracked with dull red still down in the fissures. The face underneath it is ancient and entirely patient. It draws in slightly and waits you out.",
+      "moves": [
+        {
+          "id": "cp_shove",
+          "name": "Shove",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_drawin",
+          "name": "Draw In",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "tuskhide",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "ventworm",
+      "name": "Ventworm",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "common",
+      "archetype": "Blighter",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "Half out of a fissure and as long as a man, dull red-brown and segmented. Its front end is a ring of small plates rather than a mouth, and sulphur comes out of it steadily whether or not it moves.",
+      "moves": [
+        {
+          "id": "cp_fume",
+          "name": "Fume",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_sourair",
+          "name": "Sour Air",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 2,
+            "max": 3,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "slagheart",
+      "name": "Slagheart",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "A man-shape of cooled black lava, cracked throughout, with one fist-sized cavity in the chest and a molten core sitting in it. The arms do not match. It moves deliberately and it is balanced.",
+      "moves": [
+        {
+          "id": "cp_backhand",
+          "name": "Backhand",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_openthecore",
+          "name": "Open the Core",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_coolover",
+          "name": "Cool Over",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tuskhide",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 2,
+            "max": 4,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "cinder_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "vent_warden",
+      "name": "Vent Warden",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "Twice as wide as a man and barely taller, fused slag and black basalt, with its legs sunk into the rock over a fissure. Its whole chest is a grate glowing deep orange. There is no head; the shoulders simply end.",
+      "moves": [
+        {
+          "id": "cp_vent",
+          "name": "Vent",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_sealover",
+          "name": "Seal Over",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "cp_blowoff",
+          "name": "Blow Off",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tuskhide",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 2,
+            "max": 4,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "cinder_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "char_tusk",
+      "name": "Char-Tusk",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "A boar shoulder-high to a man, hide burnt black and split with glowing seams, two great upward tusks of cracked stone with the tips still hot. It puts one foreleg forward and then does not move again.",
+      "moves": [
+        {
+          "id": "cp_hook",
+          "name": "Hook",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_carrythrough",
+          "name": "Carry Through",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tuskhide",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 2,
+            "max": 4,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "cinder_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_emberqueen",
+      "name": "The Emberqueen",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "A moth the size of a large dog, wings a deep smouldering red held wide and scorched into a pattern I could not copy accurately. She displays rather than beats them. She has not once tried to leave.",
+      "moves": [
+        {
+          "id": "cp_wingdust",
+          "name": "Wing Dust",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_smoulder",
+          "name": "Smoulder",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_scorchmark",
+          "name": "Scorch Mark",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 3,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tuskhide",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 2,
+            "max": 4,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "cinder_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_breathing_stone",
+      "name": "The Breathing Stone",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "boss",
+      "archetype": "Juggernaut",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "Four storeys of grey rock and scree in the rough shape of something hunched. The fissures down its back widen and narrow, slowly, in time. Vapour comes off its shoulders. It is the mountain, and the mountain is what has been breathing.",
+      "moves": [
+        {
+          "id": "cp_breatheout",
+          "name": "Breathe Out",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_closetheseams",
+          "name": "Close the Seams",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "cp_slowheat",
+          "name": "Slow Heat",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 3,
+            "max": 6,
+            "chance": 1.0
+          },
+          {
+            "itemId": "proof_of_the_foothills",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tuskhide",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 4,
+            "max": 8,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "cinder_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 4,
+            "max": 8,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "flintmaw",
+      "name": "Flintmaw",
+      "zoneId": "cinderpeak_foothills",
+      "rank": "boss",
+      "archetype": "Tyrant",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "A great cat rendered in fractured volcanic glass, horse-sized and low, every plane sharp and faintly reflective with molten orange in the seams between. The jaw is too long. It watches, and it waits, and it is clearly deciding something.",
+      "moves": [
+        {
+          "id": "cp_wait",
+          "name": "Wait",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "cp_pickthemoment",
+          "name": "Pick the Moment",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "cp_finishit",
+          "name": "Finish It",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 3,
+            "max": 6,
+            "chance": 1.0
+          },
+          {
+            "itemId": "proof_of_the_foothills",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tuskhide",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "copper_ore",
+            "min": 4,
+            "max": 8,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "cinder_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 4,
+            "max": 8,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "mirewalker",
+      "name": "Mirewalker",
+      "zoneId": "thornmire",
+      "rank": "common",
+      "archetype": "Adept",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "Tall, thin and long in the limb, black waterlogged wood hung with weed, wading upright. Bog water runs out of its joints the whole time. Its head is a narrow bud with nothing on it.",
+      "moves": [
+        {
+          "id": "tm_wadein",
+          "name": "Wade In",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_bearunder",
+          "name": "Bear Under",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_weedover",
+          "name": "Weed Over",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "bogflax_fibre",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "fenroot",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "thirstvine",
+      "name": "Thirstvine",
+      "zoneId": "thornmire",
+      "rank": "common",
+      "archetype": "Siphon",
+      "elements": [
+        "flora"
+      ],
+      "lore": "Coiled like a python and swollen tight with what it has taken. Where it has fed the vine is fat and bright; where it has not, it is thin and grey. You can read its week off it.",
+      "moves": [
+        {
+          "id": "tm_takeadrink",
+          "name": "Take a Drink",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_swell",
+          "name": "Swell",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "bogflax_fibre",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "leechcap",
+      "name": "Leechcap",
+      "zoneId": "thornmire",
+      "rank": "common",
+      "archetype": "Siphon",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "A plate-sized mushroom of wet dark red travelling gill-side down on a fringe of pale feelers. The underside spirals in to a small dark opening. Water runs off the cap and never into it.",
+      "moves": [
+        {
+          "id": "tm_settleon",
+          "name": "Settle On",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_feed",
+          "name": "Feed",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "fenroot",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "amber",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "bog_lantern",
+      "name": "Bog Lantern",
+      "zoneId": "thornmire",
+      "rank": "common",
+      "archetype": "Glasswing",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "A seed-head the size of a man's head floating at chest height, lit greenish-white from inside, trailing a crown of fine filaments. The light is warm. The thing itself is not.",
+      "moves": [
+        {
+          "id": "tm_comecloser",
+          "name": "Come Closer",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_gutter",
+          "name": "Gutter",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "fenroot",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "reedback_lurker",
+      "name": "Reedback Lurker",
+      "zoneId": "thornmire",
+      "rank": "common",
+      "archetype": "Sentinel",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "Boat-sized, half submerged, its back a plate of green-black shell so overgrown with living reed that it reads as a piece of the bank. Two small dark eyes at the waterline. I walked past it twice.",
+      "moves": [
+        {
+          "id": "tm_riseunder",
+          "name": "Rise Under",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_reedover",
+          "name": "Reed Over",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "bogflax_fibre",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "old_wallow",
+      "name": "Old Wallow",
+      "zoneId": "thornmire",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "Cart-sized, low and broad like a hippopotamus, and so thoroughly overgrown with moss and ferns and small saplings that the animal is a rumour under a garden. Small eyes, set high. Half out of the water.",
+      "moves": [
+        {
+          "id": "tm_maul",
+          "name": "Maul",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_rollover",
+          "name": "Roll Over",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_mudover",
+          "name": "Mud Over",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          }
+        ],
+        "main": [
+          {
+            "itemId": "bogflax_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "fenroot",
+            "min": 2,
+            "max": 4,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "amber",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          },
+          {
+            "itemId": "wickerbound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_green_drowning",
+      "name": "The Green Drowning",
+      "zoneId": "thornmire",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "A standing wall of matted weed and root three times a man's height and as wide, rising sheer out of the bog with water pouring off it without stopping. No limbs. No face. It advances.",
+      "moves": [
+        {
+          "id": "tm_advance",
+          "name": "Advance",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_thicken",
+          "name": "Thicken",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "tm_bearover",
+          "name": "Bear Over",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          }
+        ],
+        "main": [
+          {
+            "itemId": "bogflax_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "fenroot",
+            "min": 2,
+            "max": 4,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "amber",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          },
+          {
+            "itemId": "wickerbound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "wickerdrowned",
+      "name": "Wickerdrowned",
+      "zoneId": "thornmire",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "A man-shape woven out of wet withies, hollow all the way through, with black water sloshing audibly inside the ribs. The arms have been sharpened. The head is a woven cage, tilted, listening.",
+      "moves": [
+        {
+          "id": "tm_openyou",
+          "name": "Open You",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_fillyouup",
+          "name": "Fill You Up",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          }
+        ],
+        "main": [
+          {
+            "itemId": "bogflax_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "fenroot",
+            "min": 2,
+            "max": 4,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "amber",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          },
+          {
+            "itemId": "wickerbound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "fenmother",
+      "name": "Fenmother",
+      "zoneId": "thornmire",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "Hunched and broad-hipped, twice a man's bulk, woven reed over black mud and standing waist-deep. Her arms are long bundles of dripping root. Where a face should be there is a mat of green weed, hanging.",
+      "moves": [
+        {
+          "id": "tm_countyou",
+          "name": "Count You",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_weighyoudown",
+          "name": "Weigh You Down",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_takeitback",
+          "name": "Take It Back",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          }
+        ],
+        "main": [
+          {
+            "itemId": "bogflax_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "fenroot",
+            "min": 2,
+            "max": 4,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "amber",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          },
+          {
+            "itemId": "wickerbound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "mirethroat",
+      "name": "Mirethroat",
+      "zoneId": "thornmire",
+      "rank": "boss",
+      "archetype": "Juggernaut",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "A ring of dark muscular plant matter wider than a house, lying level with the bog and opening into a funnel lined with rows of soft inward-pointing spines. The water spirals into it, slowly, always.",
+      "moves": [
+        {
+          "id": "tm_swallow",
+          "name": "Swallow",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_ringclose",
+          "name": "Ring Close",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "tm_drawdown",
+          "name": "Draw Down",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "bogflax_fibre",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "fenroot",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "wickerbound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "amber",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_drinking_grove",
+      "name": "The Drinking Grove",
+      "zoneId": "thornmire",
+      "rank": "boss",
+      "archetype": "Aspect",
+      "elements": [
+        "flora",
+        "aqua"
+      ],
+      "lore": "Six drowned trees that have grown into one four-storey creature, trunks fused and canopy shared. Its roots are lifted clear of the water and end in a thicket of pale swollen tendrils, all dripping. The high branches are in full leaf and perfectly healthy.",
+      "moves": [
+        {
+          "id": "tm_rootup",
+          "name": "Root Up",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_reachdown",
+          "name": "Reach Down",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tm_drinkitdry",
+          "name": "Drink It Dry",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 6,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "bogflax_fibre",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "fenroot",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "wickerbound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "amber",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "cinderbloom_husk",
+      "name": "Cinderbloom Husk",
+      "zoneId": "ashfall_vale",
+      "rank": "common",
+      "archetype": "Blighter",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "A burnt stalk the height of a man, hollow and brittle, topped with a charred seed head that sheds grey without stopping. Green shoots have already broken through the black stem. It walks on stiff roots.",
+      "moves": [
+        {
+          "id": "av_shedash",
+          "name": "Shed Ash",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_seedfall",
+          "name": "Seed Fall",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "charcoal",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "brookmint",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "ashroot_sapling",
+      "name": "Ashroot Sapling",
+      "zoneId": "ashfall_vale",
+      "rank": "common",
+      "archetype": "Siphon",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "No taller than a man, bark scorched black down one side and pale green down the other, walking on a splay of roots. The roots are visibly drawing ash up into the trunk, and the green side is the better for it.",
+      "moves": [
+        {
+          "id": "av_takeup",
+          "name": "Take Up",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_drawthegrey",
+          "name": "Draw the Grey",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "birch_log",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "emberseed",
+      "name": "Emberseed",
+      "zoneId": "ashfall_vale",
+      "rank": "common",
+      "archetype": "Glasswing",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "A melon-sized pod hovering a hand above the ground, husk cracked open in a spiral around a fiercely glowing core. Charred filaments trail behind it. Everything about it reads as about to burst.",
+      "moves": [
+        {
+          "id": "av_crack",
+          "name": "Crack",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_burst",
+          "name": "Burst",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "charcoal",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "scorchmoth",
+      "name": "Scorchmoth",
+      "zoneId": "ashfall_vale",
+      "rank": "common",
+      "archetype": "Skirmisher",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "Hand-sized and narrow in the wing, sooty black with tiny bright green spots across it like new leaves. Thin body, long legs, and it does not hold still long enough to be counted. Ash falls around it constantly.",
+      "moves": [
+        {
+          "id": "av_dartthrough",
+          "name": "Dart Through",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_passclose",
+          "name": "Pass Close",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "brookmint",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "brookmint_tonic",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "charwood_walker",
+      "name": "Charwood Walker",
+      "zoneId": "ashfall_vale",
+      "rank": "common",
+      "archetype": "Bruiser",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "A dead tree twice a man's height, charred and stripped, walking on two thick root-legs with branches for arms. Dull orange heat still sits in the cracks. One green branch grows from a shoulder, and it has not been shed.",
+      "moves": [
+        {
+          "id": "av_swingdown",
+          "name": "Swing Down",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_topple",
+          "name": "Topple",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "birch_log",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "charcoal",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_grey_stag",
+      "name": "The Grey Stag",
+      "zoneId": "ashfall_vale",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "A tall stag the colour of cold ash, coat gone uniform grey, antlers burnt black at the tips. Small green leaves are growing from the base of the antlers. It raises its head and it does not run.",
+      "moves": [
+        {
+          "id": "av_lowerthehead",
+          "name": "Lower the Head",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_drivethrough",
+          "name": "Drive Through",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_greyover",
+          "name": "Grey Over",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          }
+        ],
+        "main": [
+          {
+            "itemId": "birch_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "charcoal",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "brookmint",
+            "min": 2,
+            "max": 4,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookmint_tonic",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "first_green",
+      "name": "First Green",
+      "zoneId": "ashfall_vale",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "A thicket of new growth risen into a squat figure twice a man's width, every surface crowded with bright young leaves. Underneath the green there are glimpses of blackened wood. It is rooted, and it does not intend to move.",
+      "moves": [
+        {
+          "id": "av_pushthrough",
+          "name": "Push Through",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_growover",
+          "name": "Grow Over",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "av_comeback",
+          "name": "Come Back",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          }
+        ],
+        "main": [
+          {
+            "itemId": "birch_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "charcoal",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "brookmint",
+            "min": 2,
+            "max": 4,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookmint_tonic",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "last_ember",
+      "name": "Last Ember",
+      "zoneId": "ashfall_vale",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "Man-height and thin as a whip, charcoal and living flame, trailing sparks it does not seem to miss. Cracked black over white heat all the way down. There is nothing green on it anywhere.",
+      "moves": [
+        {
+          "id": "av_takeitfast",
+          "name": "Take It Fast",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_lastheat",
+          "name": "Last Heat",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          }
+        ],
+        "main": [
+          {
+            "itemId": "birch_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "charcoal",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "brookmint",
+            "min": 2,
+            "max": 4,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookmint_tonic",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "kindleroot",
+      "name": "Kindleroot",
+      "zoneId": "ashfall_vale",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "A cart-wide sprawl of root lifted up off the ground, every tip glowing orange like a slow match. Wherever it has crossed there are small fires and small shoots, both, in the same tracks. It has no head at all.",
+      "moves": [
+        {
+          "id": "av_creep",
+          "name": "Creep",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_bothatonce",
+          "name": "Both At Once",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_catch",
+          "name": "Catch",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.15
+          }
+        ],
+        "main": [
+          {
+            "itemId": "birch_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "charcoal",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "brookmint",
+            "min": 2,
+            "max": 4,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookmint_tonic",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_blackened_crown",
+      "name": "The Blackened Crown",
+      "zoneId": "ashfall_vale",
+      "rank": "boss",
+      "archetype": "Tyrant",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "Four storeys of burnt heartwood in roughly the shape of a man, broad in the shoulder, upright, still. The head is ringed with charred branches burning steadily and white. Nothing grows on it. It looks like it won.",
+      "moves": [
+        {
+          "id": "av_stand",
+          "name": "Stand",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "av_holdthevale",
+          "name": "Hold the Vale",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_burnitagain",
+          "name": "Burn It Again",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "birch_log",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "charcoal",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookmint",
+            "min": 3,
+            "max": 6,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "the_charlock",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_rooting",
+      "name": "The Rooting",
+      "zoneId": "ashfall_vale",
+      "rank": "boss",
+      "archetype": "Aspect",
+      "elements": [
+        "pyro",
+        "flora"
+      ],
+      "lore": "A mound of new growth four storeys across and only two high, made of thousands of young saplings and ferns and vines grown together. Burnt timber and old bones are visible inside it, being swallowed. It looks like it is winning.",
+      "moves": [
+        {
+          "id": "av_spread",
+          "name": "Spread",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_growthrough",
+          "name": "Grow Through",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "av_swallowit",
+          "name": "Swallow It",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 6,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "birch_log",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "charcoal",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "brookmint",
+            "min": 3,
+            "max": 6,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "the_charlock",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
     }
   ],
   "items": [
@@ -2597,6 +6353,45 @@
       "salvage": []
     },
     {
+      "id": "aqua_dust",
+      "name": "Aqua Dust",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "What water leaves when it is broken faster than it can close.",
+      "element": "aqua",
+      "moteTier": "dust"
+    },
+    {
+      "id": "aqua_shard",
+      "name": "Aqua Shard",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Dust that stood in one place long enough to set.",
+      "element": "aqua",
+      "moteTier": "shard"
+    },
+    {
+      "id": "aqua_crystal",
+      "name": "Aqua Crystal",
+      "kind": "mote",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "It is cold, and it does not stop being cold.",
+      "element": "aqua",
+      "moteTier": "crystal"
+    },
+    {
       "id": "sapwort_draught",
       "name": "Sapwort Draught",
       "kind": "beltable",
@@ -2659,6 +6454,18 @@
       "salvage": []
     },
     {
+      "id": "proof_of_the_brook",
+      "name": "Proof of the Brook",
+      "kind": "key",
+      "rarity": "rare",
+      "tradability": "bound",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "A pale river stone that has not warmed since it left the water. The guard on the north road weighs it in his palm and takes his time.",
+      "gates": "hearthwood"
+    },
+    {
       "id": "copper_ore",
       "name": "Copper Ore",
       "kind": "material",
@@ -2685,6 +6492,45 @@
       "skill": "tailoring",
       "tier": 2,
       "salvage": []
+    },
+    {
+      "id": "pyro_dust",
+      "name": "Pyro Dust",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "What a burning thing leaves when it is put out before it finished.",
+      "element": "pyro",
+      "moteTier": "dust"
+    },
+    {
+      "id": "pyro_shard",
+      "name": "Pyro Shard",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Dust that banked itself and went on quietly burning.",
+      "element": "pyro",
+      "moteTier": "shard"
+    },
+    {
+      "id": "pyro_crystal",
+      "name": "Pyro Crystal",
+      "kind": "mote",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "It is hot, and it does not cool.",
+      "element": "pyro",
+      "moteTier": "crystal"
     },
     {
       "id": "tuskhide_belt",
@@ -2734,6 +6580,18 @@
         "critDamage": 5
       },
       "salvage": []
+    },
+    {
+      "id": "proof_of_the_foothills",
+      "name": "Proof of the Foothills",
+      "kind": "key",
+      "rarity": "rare",
+      "tradability": "bound",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "A plate of black glass with the heat still somewhere inside it. The guard on the north road holds each one up to the light before he nods.",
+      "gates": "hearthwood"
     },
     {
       "id": "bogflax_fibre",
@@ -3757,6 +7615,343 @@
   ],
   "index": {
     "itemSources": {
+      "amber": [
+        {
+          "type": "drop",
+          "from": "leechcap",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.1
+        }
+      ],
+      "aqua_crystal": [
+        {
+          "type": "drop",
+          "from": "weirkeeper",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_held_breath",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "pale_coil",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "frostgleam_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_cold_below",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "stillwater",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "aqua_dust": [
+        {
+          "type": "drop",
+          "from": "brook_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "shiverfish_shoal",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "glassfleck_wisp",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "siltback_crawler",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "chill_eel",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "mirewalker",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "thirstvine",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "leechcap",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "bog_lantern",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "reedback_lurker",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        }
+      ],
+      "aqua_shard": [
+        {
+          "type": "drop",
+          "from": "shiverfish_shoal",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "glassfleck_wisp",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "siltback_crawler",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "chill_eel",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "weirkeeper",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_held_breath",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "pale_coil",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "frostgleam_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_cold_below",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "stillwater",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "leechcap",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "reedback_lurker",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
       "bindweed_boots": [
         {
           "type": "craft",
@@ -3909,6 +8104,62 @@
       ],
       "birch_log": [
         {
+          "type": "drop",
+          "from": "ashroot_sapling",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "charwood_walker",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
           "type": "salvage",
           "from": "birch_quarterstaff"
         },
@@ -3946,6 +8197,69 @@
         }
       ],
       "bogflax_fibre": [
+        {
+          "type": "drop",
+          "from": "mirewalker",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "thirstvine",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "reedback_lurker",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.45
+        },
         {
           "type": "salvage",
           "from": "bogflax_hood"
@@ -3999,7 +8313,100 @@
           "skillLevel": 10
         }
       ],
+      "brookmint": [
+        {
+          "type": "drop",
+          "from": "cinderbloom_husk",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "scorchmoth",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.2
+        }
+      ],
       "brookmint_tonic": [
+        {
+          "type": "drop",
+          "from": "scorchmoth",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.05
+        },
         {
           "type": "craft",
           "recipeId": "craft_brookmint_tonic",
@@ -4007,7 +8414,288 @@
           "skillLevel": 10
         }
       ],
+      "brookstone_pendant": [
+        {
+          "type": "drop",
+          "from": "weirkeeper",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_held_breath",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "pale_coil",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "frostgleam_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_cold_below",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "stillwater",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.2
+        }
+      ],
+      "charcoal": [
+        {
+          "type": "drop",
+          "from": "cinderbloom_husk",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "emberseed",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "charwood_walker",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.25
+        }
+      ],
+      "cinder_loop": [
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.2
+        }
+      ],
+      "copper_ore": [
+        {
+          "type": "drop",
+          "from": "flint_skink",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "cinder_moth",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "slagshell_tortoise",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "ventworm",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.25
+        }
+      ],
       "fawnhide": [
+        {
+          "type": "drop",
+          "from": "siltback_crawler",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "chill_eel",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "weirkeeper",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_held_breath",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "pale_coil",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "frostgleam_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_cold_below",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "stillwater",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.45
+        },
         {
           "type": "salvage",
           "from": "fawnhide_belt"
@@ -4019,6 +8707,71 @@
           "recipeId": "craft_fawnhide_belt",
           "skill": "tailoring",
           "skillLevel": 4
+        }
+      ],
+      "fenroot": [
+        {
+          "type": "drop",
+          "from": "mirewalker",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "leechcap",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "bog_lantern",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.25
         }
       ],
       "flora_crystal": [
@@ -4063,6 +8816,90 @@
           "zoneId": "whispering_woods",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "flora_dust": [
@@ -4100,6 +8937,76 @@
           "zoneId": "whispering_woods",
           "bucket": "always",
           "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "mirewalker",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "thirstvine",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "leechcap",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "bog_lantern",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "reedback_lurker",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "cinderbloom_husk",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "ashroot_sapling",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "emberseed",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "scorchmoth",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "charwood_walker",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
         }
       ],
       "flora_shard": [
@@ -4172,6 +9079,111 @@
           "zoneId": "whispering_woods",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "thirstvine",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "bog_lantern",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "ashroot_sapling",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "foragers_ration": [
@@ -4216,6 +9228,55 @@
           "zoneId": "whispering_woods",
           "bucket": "main",
           "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "brook_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "weirkeeper",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_held_breath",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "pale_coil",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "frostgleam_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_cold_below",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "stillwater",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.1
         }
       ],
       "heartwood_stave": [
@@ -4344,6 +9405,38 @@
           "skillLevel": 1
         }
       ],
+      "proof_of_the_brook": [
+        {
+          "type": "drop",
+          "from": "the_cold_below",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "stillwater",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "proof_of_the_foothills": [
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
       "proof_of_the_woods": [
         {
           "type": "drop",
@@ -4360,7 +9453,414 @@
           "chance": 1.0
         }
       ],
+      "pyro_crystal": [
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "pyro_dust": [
+        {
+          "type": "drop",
+          "from": "ashjaw_brute",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "flint_skink",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "cinder_moth",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "slagshell_tortoise",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "ventworm",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "cinderbloom_husk",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "ashroot_sapling",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "emberseed",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "scorchmoth",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "charwood_walker",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        }
+      ],
+      "pyro_shard": [
+        {
+          "type": "drop",
+          "from": "ashjaw_brute",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "flint_skink",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "cinder_moth",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "slagshell_tortoise",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "ventworm",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "emberseed",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "scorchmoth",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "sapwort": [
+        {
+          "type": "drop",
+          "from": "brook_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "shiverfish_shoal",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "glassfleck_wisp",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "weirkeeper",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_held_breath",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "pale_coil",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "frostgleam_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_cold_below",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "stillwater",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.25
+        }
+      ],
       "sapwort_draught": [
+        {
+          "type": "drop",
+          "from": "glassfleck_wisp",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.05
+        },
         {
           "type": "craft",
           "recipeId": "craft_sapwort_draught",
@@ -4412,7 +9912,79 @@
           "chance": 0.2
         }
       ],
+      "the_charlock": [
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.1
+        }
+      ],
       "tuskhide": [
+        {
+          "type": "drop",
+          "from": "ashjaw_brute",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "slagshell_tortoise",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.45
+        },
         {
           "type": "salvage",
           "from": "tuskhide_belt"
@@ -4424,6 +9996,50 @@
           "recipeId": "craft_tuskhide_belt",
           "skill": "tailoring",
           "skillLevel": 11
+        }
+      ],
+      "wickerbound_ring": [
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.2
         }
       ]
     },

@@ -101,13 +101,33 @@ void main() {
     test('⚠️ every declared asset directory exists in pubspec', () {
       // A directory declared in pubspec must exist or the build fails, and
       // one that exists but is NOT declared silently ships nothing.
+      //
+      // ⚠️ **Scoped to zones that HAVE art, not to the roster.** This used to
+      // walk `Bestiary.all`, which quietly made "a zone has a roster" mean "a
+      // zone has sprites". Those are different columns of CONTENT_CHECKLIST
+      // (4/5b vs 9) with very different costs — 55 creatures are now defined
+      // and only the Whispering Woods eleven have been through
+      // `tool/pixelate.py`. Blocking every future roster on an art batch is
+      // not what this test was protecting.
       final pubspec = File('pubspec.yaml').readAsStringSync();
-      for (final e in Bestiary.all) {
+      final zonesWithArt = Directory('assets/creatures')
+          .listSync()
+          .whereType<Directory>()
+          .map((d) => d.uri.pathSegments.where((s) => s.isNotEmpty).last)
+          .toSet();
+      expect(zonesWithArt, isNotEmpty, reason: 'no creature art at all');
+      for (final zone in zonesWithArt) {
         expect(
           pubspec,
-          contains('assets/creatures/${e.zoneId}/'),
-          reason: '${e.zoneId} art would not be bundled',
+          contains('assets/creatures/$zone/'),
+          reason: '$zone art is on disk but would not be bundled',
         );
+      }
+      // ⭐ And the reverse, which is the check that actually decays: art for a
+      // zone no bestiary claims is dead weight in the bundle.
+      final rosterZones = Bestiary.all.map((e) => e.zoneId).toSet();
+      for (final zone in zonesWithArt) {
+        expect(rosterZones, contains(zone), reason: '$zone art is for nothing');
       }
       expect(pubspec, contains('assets/backgrounds/'));
     });

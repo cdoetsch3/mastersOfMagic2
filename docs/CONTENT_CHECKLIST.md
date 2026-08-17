@@ -70,48 +70,60 @@ a per-zone batch, not a per-creature task.
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Backdrop | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Icons | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | **Whispering Woods** | ✅ 1–5 | ✅ Flora | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | 🟡 | ✅ 11 | ⬜ | ✅ 2 | ✅ 2 | ✅ | ✅ | ✅ | ✅ | ⬜ | 🟡 | ✅ |
-| **Glimmerbrook** | ✅ 3–8 | ✅ Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ✅ 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
-| **Cinderpeak Foothills** | ✅ 6–11 | ✅ Pyro | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ✅ 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
-| **Thornmire** | ✅ 8–13 | ✅ Flora+Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ✅ 3 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
-| **Ashfall Vale** | ✅ 10–14 | ✅ Pyro+Flora | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ✅ 3 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
+| **Glimmerbrook** | ✅ 3–8 | ✅ Aqua | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | ⬜ | ⬜ | ⬜ | ✅ 2 | ⬜ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | 📝 |
+| **Cinderpeak Foothills** | ✅ 6–11 | ✅ Pyro | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | ⬜ | ⬜ | ⬜ | ✅ 2 | ⬜ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | 📝 |
+| **Thornmire** | ✅ 8–13 | ✅ Flora+Aqua | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | ⬜ | ⬜ | ⬜ | ✅ 3 | ⬜ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | 📝 |
+| **Ashfall Vale** | ✅ 10–14 | ✅ Pyro+Flora | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | ⬜ | ⬜ | ⬜ | ✅ 3 | ⬜ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | 📝 |
 
-⭐ **Whispering Woods is BUILT** — `lib/game/enemies/whispering_woods.dart` and
-`lib/game/items/catalogue/whispering_woods_items.dart`. 11 creatures with their
-own move sets and drop tables, 13 items, guarded by 24 tests in
-`test/whispering_woods_test.dart`. ⚠️ **It is the template for the other 26**,
-so a change to its shape is a change to all of them.
+⭐ **The whole Primal quarter is BUILT — 55 creatures, 52 items.** Five
+bestiaries in `lib/game/enemies/` and five catalogues in
+`lib/game/items/catalogue/`, each 5 commons + 4 minis + 2 bosses with their own
+move sets and drop tables, guarded by 24 + 36 + 37 + 35 + 36 tests in
+`test/whispering_woods_test.dart` and its four siblings. ⚠️ **Whispering Woods
+is still the template for the remaining 21 zones**, so a change to its shape is
+a change to all of them.
+
+⚠️ **The one rule that governs every future zone's numbers:** raw damage stays
+in the Whispering Woods band (worst case ≤ 60, ≤ 11 per charge). The engine
+already scales damage and HP by level at 4%/level compounding
+(`MageState.levelScale`), so a zone's higher band arrives through the
+**encounter level**, never through bigger raws. Ashfall Vale at 10–14 uses the
+same numbers as the Woods at 1–5. Each zone's test pins this.
 
 ⭐ **The Old Quarry became load-bearing for the story on 2026-08-08.** It is now
 the only road into the range, the place the player first sees Forgeholm's ward
 failing, and the source of the Sigil's Geo essence (NARRATIVE §4b.1). Its roster
 already exists; what it needs is a theme that carries all three jobs.
 
-⭐ It also lands the **first real gate item**: both bosses guarantee
-`proof_of_the_woods`, one of Hearthwood's *"three ordinary proofs"* — until now
-every gate in the game was a prose string with nothing behind it.
+✅ **Hearthwood's north road is now a gate a player can actually open.** All
+**three ordinary proofs** exist and are guaranteed by both bosses of their zone
+— `proof_of_the_woods`, `proof_of_the_brook`, `proof_of_the_foothills`, one per
+Primal **pure** zone, in any order. ⚠️ The hybrids deliberately drop none: a
+fourth proof would let a player skip one of the three zones the gate exists to
+route them through. Each pure zone's test pins the guarantee; each hybrid's
+pins the absence.
 
-✅ **Art is done for this zone** — 11 generated sprites in
+✅ **Art is done for Whispering Woods** — 11 generated sprites in
 `assets/creatures/whispering_woods/`, and `CreatureView` draws them in the
 duel. ⚠️ Two need re-cutting: the Hollow Stag lost its antlers and The
 Standing Green lost detail, both to `rembg` during background removal rather
 than to anything in the palette.
 
-⚠️ Still open for this zone: **BossFX** (what makes each boss more than a big
-statline), **Backdrop**, **Nodes** (gathering placement), **Icons**, and the
-three **achievements**, which need the `progress/` subcollection.
+⚠️ Still open for the quarter: **BossFX** (what makes each boss more than a big
+statline), **Art** and **Backdrop** for four of the five zones, **Nodes**
+(gathering placement), **Icons**, and the three **achievements**, which need
+the `progress/` subcollection.
 
-🟡 **Names:** one placeholder existed per zone in `World.opponentNameFor` —
+✅ **Names:** one placeholder existed per zone in `World.opponentNameFor` —
 Thornback Sprite · Brook Naiad · Ashjaw Brute · Mirewalker · Cinderbloom Husk.
-Good names; all five were **kept as their roster's anchor**.
+Good names; all five were **kept as their roster's anchor**, and each zone's
+test asserts the anchor survived rather than trusting the eye.
 
-📝 **Themes, 5 commons, 4 minis and 2 bosses are now drafted for ALL 25
-rostered zones** (ENEMIES §2d–2e; the Citadel is exempt and needs its own
-structure). ⚠️ **Minis and bosses are names + premises only — no archetypes
-assigned yet**, which ENEMIES §2f flags as the blocking gap.
-
-📝 **Originally drafted for the five Primal zones** — see [ENEMIES_DESIGN.md](ENEMIES_DESIGN.md) §2d. What that
-leaves for the Primal quarter is columns **5b, 8, 9, 10–17**: move sets,
-boss effects, painter recipes, materials, nodes, drop tables and achievements.
+📝 **Themes, 5 commons, 4 minis and 2 bosses are drafted for ALL 25 rostered
+zones** (ENEMIES §2d–2e; the Citadel is exempt and needs its own structure),
+and ✅ **archetypes are assigned to all 150 minis and bosses** (§2g). What the
+remaining 21 zones still lack is move sets, elements per creature, and drop
+tables — the three things a build pass supplies.
 
 📝 **Story is now specified but not written.** Each Primal zone's Tier-1 beat
 is defined by the quarter's arc (GAME_DESIGN §5) — the `arrival` text poses the
@@ -119,9 +131,9 @@ question, and a **zone-clear passage** answers it. The beats are decided; the
 **26** clear passages are not yet drafted (one per combat zone).
 
 ⭐ **The order to do them in is `Mats → Nodes → Drop-*`, not left-to-right.**
-Drop tables cannot be written before the materials exist, and three of the five
-zones still have no materials assigned. Materials are the actual bottleneck for
-eight of the seventeen columns.
+Drop tables cannot be written before the materials exist. ✅ For the Primal
+quarter that bottleneck is cleared — materials landed first, and all fifteen
+drop tables were written against them.
 
 ✅ **Every Primal zone's materials are in code** (ITEMS §9b.8): pure zones
 carry 2, hybrids 3, and the hybrid extras all ⏳ bank for later skills —
@@ -136,13 +148,14 @@ Measured off the grid above, not from memory.
 
 | # | Work | Why it is first |
 |---|---|---|
-| **1** | ⭐ **Build the other four Primal zones** — enemies, moves, items, drop tables | Whispering Woods proved the shape and is the template. Four zones × 11 creatures = the rest of the quarter playable. Everything downstream (icons, nodes, achievements) needs these to exist first |
-| **2** | **Gathering nodes** (col 11) | The only ⬜ that blocks a whole *skill*. Materials exist and drop from kills; nothing can be gathered from the world yet, so Woodcarving has no input that is not a corpse |
-| **3** | **Icons** (col 15b) | New column. Needs `--mode icon` in the pipeline first — small, square, transparent field |
-| **4** | **Backdrops** (col 9b) | 26 prompts already written from the `arrival` text; the pipeline mode exists. Cheapest visual win per hour on the board |
-| **5** | **BossFX** (col 8) | The only design work left in the quarter. What makes Heartwood more than a big statline |
-| **6** | ⛔ **Achievements** (col 16) | Blocked on the `progress/` subcollection, which is logged in IMPLEMENTATION_PLAN and unbuilt |
-| **7** | **Story** (col 17) | 26 zone-clear passages. Arrival poses the question; the clear answers it (GAME_DESIGN §5) |
+| **1** | ✅ ~~**Build the other four Primal zones**~~ | **Done.** 44 creatures, 8 new items, 15 drop tables, 144 tests. The quarter is playable end to end |
+| **2** | ⭐ **Creature art for the four new zones** (col 9) | 44 sprites through `tool/pixelate.py`. Physical descriptions for every one are already written in BESTIARY_ART §Glimmerbrook–Ashfall — this is a pipeline batch, not a design task. ⚠️ `test/creature_sprite_test.dart` now scopes its pubspec check to zones that HAVE art, so each batch is independently shippable |
+| **3** | **Gathering nodes** (col 11) | The only ⬜ that blocks a whole *skill*. Materials exist and drop from kills; nothing can be gathered from the world yet, so Woodcarving has no input that is not a corpse |
+| **4** | **Icons** (col 15b) | New column. Needs `--mode icon` in the pipeline first — small, square, transparent field |
+| **5** | **Backdrops** (col 9b) | 26 prompts already written from the `arrival` text; the pipeline mode exists. Cheapest visual win per hour on the board |
+| **6** | **BossFX** (col 8) | The only design work left in the quarter, and now ten bosses rather than two. What makes Heartwood more than a big statline |
+| **7** | ⛔ **Achievements** (col 16) | Blocked on the `progress/` subcollection, which is logged in IMPLEMENTATION_PLAN and unbuilt |
+| **8** | **Story** (col 17) | 26 zone-clear passages. Arrival poses the question; the clear answers it (GAME_DESIGN §5) |
 
 ⚠️ **Two things are NOT on this list and should be**, because they block
 shipping rather than content:
@@ -291,7 +304,17 @@ may assign one of the two per creature or use both; and in the **Celestial and
 Ethereal quarters** a mini or boss may carry a third element sparingly — never
 the counter to the zone's own, which would punish correct preparation.
 
-⛔ **Still missing per creature:** its move set (§3 — creatures get creature
+✅ **The Primal quarter's 55 creatures now have move sets in code.** ⭐ The
+pattern that emerged and is worth reusing for the other 21 zones: the archetype
+supplies the *shape* (count and cost band, asserted by every zone test), and
+the creature expresses it through **priority** — a Skirmisher at 5, a Hexer at
+1, a Redoubt's wall at 2, a Bruiser paying five charges for its telegraph.
+Priority turned out to be where a theme and an archetype can both be served
+without either bending: Glimmerbrook's Chill Eel is *first* without ever being
+*fast*, in a zone whose whole premise is stillness.
+
+⛔ **Still missing per creature, for the other 21 zones:** its move set (§3 —
+creatures get creature
 moves, not spells). Coefficients stay at the archetype defaults until the
 balance sim moves them.
 

@@ -318,7 +318,13 @@ flavour for the bestiary.
 Each zone gets **5 commons, 4 mini-bosses, 2 bosses**. Existing names from
 `World.opponentNameFor` are kept and marked ✅.
 
-### Whispering Woods · 1–5 · Flora
+> ✅ **All five rosters below are BUILT** — `lib/game/enemies/*.dart`, 55
+> creatures with elements, move sets and drop tables, one test file per zone.
+> Build state per column lives in
+> [CONTENT_CHECKLIST.md](CONTENT_CHECKLIST.md) §2, not here; the ✅ on each
+> heading is only "this design has been implemented as written".
+
+### Whispering Woods · 1–5 · Flora ✅ built
 
 > ⭐ **Theme: the wood is a single creature, and you are standing on it.**
 
@@ -338,7 +344,7 @@ Nothing here is an animal that happens to live in a forest; everything is an
 **Mini-bosses:** Elderroot · The Murmur · Hollow Stag · Mother Spore
 **Bosses:** **Heartwood** (the tree the network runs from) · **The Standing Green** (something the wood grew in the shape of a person — ⚠️ deliberately unsettling, and the quarter's first "this world is not safe" beat)
 
-### Glimmerbrook · 3–8 · Aqua
+### Glimmerbrook · 3–8 · Aqua ✅ built
 
 > ⭐ **Theme: everything here is holding still, and that is the wrong thing for
 > water to do.**
@@ -358,7 +364,7 @@ and things suspended in it.
 **Mini-bosses:** The Held Breath · Weirkeeper · Pale Coil · Frostgleam Naiad
 **Bosses:** **Stillwater** (the pool itself) · **The Cold Below**
 
-### Cinderpeak Foothills · 6–11 · Pyro
+### Cinderpeak Foothills · 6–11 · Pyro ✅ built
 
 > ⭐ **Theme: the mountain is breathing, and it is breathing faster.**
 
@@ -376,7 +382,7 @@ flint."* Pressure, not eruption. Everything here lives **on** heat.
 **Mini-bosses:** Char-Tusk · Vent Warden · The Emberqueen · Slagheart
 **Bosses:** **Flintmaw** · **The Breathing Stone**
 
-### Thornmire · 8–13 · Flora + Aqua ⭐ hybrid
+### Thornmire · 8–13 · Flora + Aqua ⭐ hybrid ✅ built
 
 > ⭐ **Theme: the green has beaten the water, and is drinking it.**
 
@@ -401,7 +407,7 @@ lesson Thornmire exists to teach, but if the player has no burst option at
 level 8–13 it becomes a wall rather than a lesson. **Verify against the actual
 level-8 spell pool before committing.**
 
-### Ashfall Vale · 10–14 · Pyro + Flora ⭐ hybrid
+### Ashfall Vale · 10–14 · Pyro + Flora ⭐ hybrid ✅ built
 
 > ⭐ **Theme: an argument between fire and regrowth, still unresolved.**
 
@@ -1069,9 +1075,13 @@ cost is a run that can draw two of the same shape.
 ### ⚠️ What this pass did NOT do
 
 - ⚠️ **No element assigned per enemy.** A zone's elements are known, but which
-  of a hybrid's two a given creature uses is not decided.
+  of a hybrid's two a given creature uses is not decided. ✅ **Settled in code
+  for the Primal quarter's five zones**, per §2h: both by default, and a lean
+  only where this document names one — the Thirstvine (Flora) and Last Ember
+  (Pyro) are the only two.
 - ⚠️ **No move sets.** §3 requires creature moves, not spells, for anything
-  that is not a mage.
+  that is not a mage. ✅ **Written for the Primal quarter's 55 creatures**; the
+  remaining 21 zones still have none.
 - ⚠️ **Coefficients are untouched** — every Champion is 1.70/1.20 until the
   balance sim says otherwise. ⭐ **That is the point of the archetype layer:**
   these 150 encounters are now buildable and simmable, which they were not an
