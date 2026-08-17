@@ -19,6 +19,19 @@ import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/screens/crafting_act_screen.dart';
 import 'package:masters_of_magic_2/ui/crafting/scoring.dart';
 
+/// A storage whose save takes real time — the fake that EXPOSES the
+/// mid-await frame the instant fake hid (the RangeError caught in play).
+class _SlowMem implements ProfileStorage {
+  PlayerProfile? saved;
+  @override
+  Future<PlayerProfile?> load() async => saved;
+  @override
+  Future<void> save(PlayerProfile profile) =>
+      Future.delayed(const Duration(milliseconds: 80), () => saved = profile);
+  @override
+  Future<void> clear() async => saved = null;
+}
+
 class _Mem implements ProfileStorage {
   PlayerProfile? saved;
   @override
@@ -131,6 +144,61 @@ void main() {
       expect(game.profile.backpack.countOf('oak_log'), 1,
           reason: 'materials consumed by the real craft() path');
       expect(game.profile.skillXp['woodcarving'], isNotNull);
+    });
+
+    testWidgets('a frame rendered while the craft saves must not crash',
+        (tester) async {
+      // ⚠️ The field report: finishing the LAST step (the knot's sand scrub)
+      // threw RangeError(steps[2] of 2) — the view only flipped to the
+      // result AFTER awaiting craft(), and the save's latency let a frame
+      // render in between. Slow storage reproduces it deterministically.
+      final game = GameState(
+        _SlowMem(),
+        PlayerProfile.newPlayer()
+          ..backpack = Backpack.of([
+            for (var i = 0; i < 3; i++)
+              const InventorySlot(defId: 'oak_log'),
+          ]),
+      );
+      await tester.pumpWidget(
+        _wrap(game, CraftingActScreen(recipe: PrimalRecipes.oakWand)),
+      );
+
+      // Play both steps well enough to reach the craft.
+      final g1 = await tester.startGesture(
+        tester.getCenter(find.byType(CraftingActScreen)),
+      );
+      await tester.pump(const Duration(milliseconds: 900));
+      await g1.up();
+      await tester.pump();
+
+      final box = tester.getRect(
+        find.byWidgetPredicate(
+          (w) => w is Container && w.constraints?.maxWidth == 300,
+        ),
+      );
+      Offset pathPoint(double t) => Offset(
+        box.left + 20 + t * 260,
+        box.top + 110 + -55 * math.sin(math.pi * t),
+      );
+      final drag = await tester.startGesture(pathPoint(0));
+      for (var i = 1; i <= 20; i++) {
+        await drag.moveTo(pathPoint(i / 20));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await drag.up();
+
+      // ⭐ THE frame the bug lived in: rendered while craft() awaits the
+      // slow save. Before the fix this pump threw the RangeError.
+      await tester.pump();
+      expect(tester.takeException(), isNull,
+          reason: 'the mid-save frame must render the result, not index '
+              'steps[length]');
+      expect(find.textContaining('Grade'), findsOneWidget,
+          reason: 'the grade flips the view synchronously with the score');
+
+      await tester.pumpAndSettle();
+      expect(game.profile.backpack.countOf('oak_wand'), 1);
     });
 
     testWidgets('a botched act fails and consumes nothing', (tester) async {

@@ -55,25 +55,28 @@ class _CraftingActScreenState extends State<CraftingActScreen> {
   );
 
   Future<void> _onStepDone(double accuracy) async {
-    setState(() => _scores.add(accuracy));
-    if (_scores.length < widget.recipe.steps.length) return;
-
-    final grade = gradeOf(_scores);
-    if (grade < failThreshold(_margin)) {
-      // The attempt fails: nothing was consumed, nothing is paid.
-      setState(() {
+    // ⚠️ The grade must flip the view to the result IN THE SAME setState as
+    // the final score. An earlier version added the score, then AWAITED
+    // craft() before setting the grade — and any frame rendered during that
+    // await saw every step scored while _finished was still false, indexing
+    // steps[length] and throwing RangeError (caught in play on web, where
+    // the save's latency guarantees such a frame; the test fake resolved
+    // before one could render).
+    final isLast = _scores.length + 1 >= widget.recipe.steps.length;
+    final grade = gradeOf([..._scores, accuracy]);
+    setState(() {
+      _scores.add(accuracy);
+      if (isLast) {
         _grade = grade;
-        _failed = true;
-      });
-      return;
-    }
+        _failed = grade < failThreshold(_margin);
+      }
+    });
+    if (!isLast || _failed) return; // failed: nothing consumed, nothing paid
+
     final game = GameStateScope.read(context);
     final outcome = await game.craft(widget.recipe, performance: grade);
     if (!mounted) return;
-    setState(() {
-      _grade = grade;
-      _outcome = outcome;
-    });
+    setState(() => _outcome = outcome);
   }
 
   @override
@@ -316,10 +319,21 @@ class _Result extends StatelessWidget {
                         'XP',
               style: const TextStyle(color: AppColors.teal, fontSize: 13),
             ),
-          ] else
+          ] else if (outcome == null)
+            // The craft is in flight — the grade flipped the view before the
+            // save resolved (see _onStepDone's ⚠️). A breath, not a state.
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.textDim,
+              ),
+            )
+          else
             Text(
               // The craft itself refused (materials vanished mid-act, etc.).
-              outcome?.refusal ?? 'Nothing was made.',
+              outcome!.refusal ?? 'Nothing was made.',
               style: const TextStyle(color: AppColors.ember, fontSize: 13),
             ),
           const SizedBox(height: 22),
