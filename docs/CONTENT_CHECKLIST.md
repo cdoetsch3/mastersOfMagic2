@@ -69,7 +69,7 @@ a per-zone batch, not a per-creature task.
 
 | Zone | Band | Elem | Lore | Roster | Names | Moves | Minis | Boss | BossFX | Art | Backdrop | Mats | Nodes | Motes | Drop-C | Drop-M | Drop-B | Icons | Ach | Story |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Whispering Woods** | ✅ 1–5 | ✅ Flora | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | 🟡 | ✅ 11 | ⬜ | ✅ 2 | ⬜ | ✅ | ✅ | ✅ | ✅ | ⬜ | 🟡 | ✅ |
+| **Whispering Woods** | ✅ 1–5 | ✅ Flora | ✅ | ✅ | ✅ 5 | ✅ | ✅ 4 | ✅ 2 | 🟡 | ✅ 11 | ⬜ | ✅ 2 | ✅ 2 | ✅ | ✅ | ✅ | ✅ | ⬜ | 🟡 | ✅ |
 | **Glimmerbrook** | ✅ 3–8 | ✅ Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ✅ 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Cinderpeak Foothills** | ✅ 6–11 | ✅ Pyro | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ✅ 2 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |
 | **Thornmire** | ✅ 8–13 | ✅ Flora+Aqua | ✅ | 📝 | 📝 5 | ⬜ | 📝 4 | 📝 2 | ⬜ | ⬜ | ⬜ | ✅ 3 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 📝 |

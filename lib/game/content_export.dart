@@ -21,6 +21,7 @@ import 'enemies/drop_table.dart';
 import 'enemies/enemy_def.dart';
 import 'items/item_catalogue.dart';
 import 'items/item_def.dart';
+import 'gathering/gather_node.dart';
 import 'items/recipe_book.dart';
 import 'items/recipe_def.dart';
 import 'world.dart';
@@ -35,6 +36,7 @@ abstract final class ContentExport {
     final creatures = Bestiary.all.map(_creature).toList();
     final items = ItemCatalogue.all.map(_item).toList();
     final recipes = RecipeBook.all.map(_recipe).toList();
+    final gatherNodes = GatherNodes.all.map(_gatherNode).toList();
     return {
       'schemaVersion': schemaVersion,
       'counts': {
@@ -43,11 +45,13 @@ abstract final class ContentExport {
         'creatures': creatures.length,
         'items': items.length,
         'recipes': recipes.length,
+        'gatherNodes': gatherNodes.length,
       },
       'zones': zones,
       'creatures': creatures,
       'items': items,
       'recipes': recipes,
+      'gatherNodes': gatherNodes,
       'index': _index(),
     };
   }
@@ -203,11 +207,21 @@ abstract final class ContentExport {
     if (m.critDamage != 0) 'critDamage': m.critDamage,
     if (m.deflectChance != 0) 'deflectChance': m.deflectChance,
     if (m.deflectAmount != 0) 'deflectAmount': m.deflectAmount,
+    if (m.maxHpBonus != 0) 'maxHpBonus': m.maxHpBonus,
+    if (m.damagePerCast != 0) 'damagePerCast': m.damagePerCast,
+    if (m.damagePerCharge != 0) 'damagePerCharge': m.damagePerCharge,
+    if (m.shieldStrengthPercent != 0)
+      'shieldStrengthPercent': m.shieldStrengthPercent,
+    if (m.healingReceivedPercent != 0)
+      'healingReceivedPercent': m.healingReceivedPercent,
+    if (m.regrowPercent != 0) 'regrowPercent': m.regrowPercent,
     if (m.beltSlots != 0) 'beltSlots': m.beltSlots,
   };
 
   static Map<String, Object?> _effect(ItemEffect e) => {
     if (e.healPercent != 0) 'healPercent': e.healPercent,
+    if (e.healPerTurnPercent != 0) 'healPerTurnPercent': e.healPerTurnPercent,
+    if (e.healTurns != 0) 'healTurns': e.healTurns,
   };
 
   static Map<String, Object?> _recipe(RecipeDef r) => {
@@ -220,6 +234,28 @@ abstract final class ContentExport {
     'inputs': [
       for (final i in r.inputs) {'itemId': i.defId, 'count': i.count},
     ],
+    // The crafting act (ITEMS §9b.9c): levers 1–3, as authored.
+    'steps': [
+      for (final st in r.steps)
+        {
+          'engine': st.engine.name,
+          'category': st.engine.category.name,
+          'skin': st.skin,
+          'reps': st.reps,
+          'complexity': st.complexity,
+        },
+    ],
+  };
+
+  static Map<String, Object?> _gatherNode(GatherNodeDef n) => {
+    'id': n.id,
+    'zoneId': n.zoneId,
+    'skill': n.skill.name,
+    'yieldsItemId': n.yieldsDefId,
+    'min': n.min,
+    'max': n.max,
+    'xp': n.xp,
+    'flavor': n.flavor,
   };
 
   // ---- derived indexes ---------------------------------------------------
@@ -266,6 +302,15 @@ abstract final class ContentExport {
         source(s.defId, {'type': 'salvage', 'from': d.id});
         (usedBy[d.id] ??= []).add({'type': 'salvageInto', 'itemId': s.defId});
       }
+    }
+
+    for (final n in GatherNodes.all) {
+      source(n.yieldsDefId, {
+        'type': 'gather',
+        'nodeId': n.id,
+        'zoneId': n.zoneId,
+        'skill': n.skill.name,
+      });
     }
 
     for (final r in RecipeBook.all) {

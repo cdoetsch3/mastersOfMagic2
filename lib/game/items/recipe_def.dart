@@ -13,6 +13,7 @@ library;
 
 import 'package:flutter/foundation.dart';
 
+import '../crafting/gesture.dart';
 import 'item_def.dart';
 
 /// One input line: [count] of the fungible material [defId].
@@ -59,12 +60,21 @@ class RecipeDef {
 
   final List<RecipeInput> inputs;
 
+  /// The crafting act (ITEMS §9b.9c levers 1–3): which gestures, in order,
+  /// with their reps and base complexity. ⭐ **Authored content, like the
+  /// inputs** — levers 4–6 (windows, tempo, thresholds) are computed at
+  /// craft time from the margin and are deliberately NOT stored.
+  /// ⚠️ Empty = no act authored yet; the Workbench falls back to the plain
+  /// button. Tier-1 scripts hold to the ruling: 2–3 forgiving steps.
+  final List<GestureStep> steps;
+
   const RecipeDef({
     required this.id,
     required this.outputId,
     required this.skill,
     required this.skillLevel,
     required this.inputs,
+    this.steps = const [],
     this.outputCount = 1,
     this.stationRequired = false,
     // ⚠️ No `inputs.length` assert — list members are not const-evaluable.

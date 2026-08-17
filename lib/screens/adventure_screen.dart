@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../game/adventure.dart';
 import '../game/enemies/enemy_def.dart';
 import '../game/game_state.dart';
+import '../game/skills.dart';
 import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
@@ -76,6 +77,14 @@ class _AdventureScreenState extends State<AdventureScreen> {
                       onFight: () => _fight(game, run),
                       onLeave: () => _leave(game),
                     ),
+                  if (!run.isOver && run.currentNode != null) ...[
+                    const SizedBox(height: 14),
+                    _GatherCard(
+                      node: run.currentNode!,
+                      busy: _busy,
+                      onGather: () => _gather(game),
+                    ),
+                  ],
                   if (!run.isOver) ...[
                     const SizedBox(height: 14),
                     _Supplies(
@@ -152,6 +161,32 @@ class _AdventureScreenState extends State<AdventureScreen> {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => LevelUpScreen(from: from ?? level - 1, to: level),
+      ),
+    );
+  }
+
+  Future<void> _gather(GameState game) async {
+    setState(() => _busy = true);
+    final out = await game.gatherNode();
+    if (!mounted) return;
+    setState(() => _busy = false);
+    final messenger = ScaffoldMessenger.of(context);
+    if (!out.succeeded) {
+      messenger.showSnackBar(SnackBar(content: Text(out.refusal!)));
+      return;
+    }
+    final def = ItemCatalogue.tryById(out.defId!);
+    final name = def == null ? out.defId! : ItemCatalogue.displayName(def);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          out.leveledTo != null
+              ? 'Gathered ${out.amount} × $name — '
+                    '${Skills.displayName(out.skillKey!)} is now '
+                    'level ${out.leveledTo}!'
+              : 'Gathered ${out.amount} × $name · +${out.xp} '
+                    '${Skills.displayName(out.skillKey!)} XP',
+        ),
       ),
     );
   }
@@ -664,6 +699,70 @@ class _BroughtHome extends StatelessWidget {
       ),
     ],
   );
+}
+
+/// A gathering spot on the road (ITEMS §9b.7): one harvest, then the run
+/// moves on. ⭐ Ignoring it is free — starting the next fight walks past.
+/// 📝 The gather button becomes the node's gesture act when the engines land.
+class _GatherCard extends StatelessWidget {
+  final ActiveGatherNode node;
+  final bool busy;
+  final VoidCallback onGather;
+
+  const _GatherCard({
+    required this.node,
+    required this.busy,
+    required this.onGather,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final def = node.def;
+    return GamePanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                def.skill == GatherSkill.felling
+                    ? Icons.forest
+                    : def.skill == GatherSkill.mining
+                    ? Icons.terrain
+                    : Icons.grass,
+                color: AppColors.teal,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  Skills.displayName(def.skill.name),
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            def.flavor,
+            style: const TextStyle(color: AppColors.textDim, fontSize: 12.5),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton(
+              onPressed: busy ? null : onGather,
+              child: Text('Gather · +${def.xp} XP'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Everything carried that can be used right now.

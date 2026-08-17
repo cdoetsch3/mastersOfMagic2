@@ -14,6 +14,7 @@ import 'package:mom_engine/mom_engine.dart';
 
 import 'enemies/bestiary.dart';
 import 'enemies/enemy_def.dart';
+import 'gathering/gather_node.dart';
 import 'enemies/enemy_encounter.dart';
 import 'items/item_catalogue.dart';
 import 'items/item_def.dart';
@@ -60,6 +61,13 @@ class AdventureRun {
   /// tension of pushing on. Charge and shields reset; only health carries.
   int playerHp;
 
+  /// Gathering spots rolled into this run, in encounter order.
+  ///
+  /// ⭐ Rolled up front like the encounters — a run IS its roll — and
+  /// serialized with the same abandoned-not-approximated contract: an
+  /// unknown node def on load drops the NODE, never the run.
+  final List<ActiveGatherNode> nodes;
+
   /// Loot taken so far. ⚠️ **Not the player's yet.** It only reaches the
   /// backpack on [RunOutcome.returned] or [RunOutcome.cleared].
   final List<InventorySlot> pendingLoot;
@@ -74,10 +82,12 @@ class AdventureRun {
     required this.encounters,
     required this.playerHp,
     this.index = 0,
+    List<ActiveGatherNode>? nodes,
     List<InventorySlot>? pendingLoot,
     Map<String, ItemInstance>? pendingInstances,
     this.outcome = RunOutcome.running,
-  }) : pendingLoot = pendingLoot ?? [],
+  }) : nodes = nodes ?? [],
+       pendingLoot = pendingLoot ?? [],
        pendingInstances = pendingInstances ?? {};
 
   /// Builds a run from a zone's roster.
@@ -116,6 +126,30 @@ class AdventureRun {
       }
     }
 
+    // ⭐ One gathering spot per section, def and position drawn from the
+    // same rng as everything else — a run IS its roll. Zones without nodes
+    // authored simply roll none.
+    final nodeDefs = GatherNodes.forZone(zone.id);
+    final nodes = <ActiveGatherNode>[];
+    if (nodeDefs.isNotEmpty) {
+      var sectionStart = 0;
+      var section = 0;
+      for (var i = 0; i <= line.length; i++) {
+        final sectionEnds =
+            i == line.length || line[i].rank != EnemyRank.common;
+        if (!sectionEnds) continue;
+        if (i > sectionStart) {
+          final def = nodeDefs[(section + rng.nextInt(nodeDefs.length)) %
+              nodeDefs.length];
+          // After a random encounter within the section, never the boss.
+          final after = sectionStart + rng.nextInt(i - sectionStart);
+          nodes.add(ActiveGatherNode(defId: def.id, afterIndex: after));
+        }
+        sectionStart = i + 1;
+        section++;
+      }
+    }
+
     return AdventureRun(
       zoneId: zone.id,
       encounters: [
@@ -130,7 +164,18 @@ class AdventureRun {
           ),
       ],
       playerHp: playerHp,
+      nodes: nodes,
     );
+  }
+
+  /// The gathering spot standing in front of the player right now, if any:
+  /// reached (its encounter is beaten), unspent, and the run still going.
+  ActiveGatherNode? get currentNode {
+    if (isOver || isFinished) return null;
+    for (final n in nodes) {
+      if (!n.spent && n.afterIndex == index - 1) return n;
+    }
+    return null;
   }
 
   /// Which section (0-2) the encounter at [index] belongs to.
@@ -271,6 +316,8 @@ class AdventureRun {
     'encounters': [
       for (final e in encounters) {'defId': e.def.id, 'level': e.level},
     ],
+    if (nodes.isNotEmpty)
+      'nodes': [for (final n in nodes) n.toJson()],
     'pendingLoot': [for (final s in pendingLoot) s.toJson()],
     'pendingInstances': {
       for (final e in pendingInstances.entries) e.key: e.value.toJson(),
@@ -317,6 +364,13 @@ class AdventureRun {
       zoneId: zoneId,
       encounters: encounters,
       index: index,
+      // ⚠️ A node whose def no longer resolves is dropped alone — losing a
+      // gathering spot is nothing; losing the run over one would be theft.
+      nodes: [
+        for (final n in (json['nodes'] as List? ?? const []))
+          if (n is Map && GatherNodes.byId(n['defId'] as String? ?? '') != null)
+            ActiveGatherNode.fromJson(n.cast<String, dynamic>()),
+      ],
       playerHp: (json['playerHp'] as num?)?.toInt() ?? 0,
       outcome: _outcomeByName(json['outcome'] as String?),
       pendingLoot: [
@@ -400,6 +454,38 @@ class _CommonsBag {
       _bag[_bag.length - 1] = swapped;
     }
   }
+}
+
+/// One rolled gathering spot in a run.
+class ActiveGatherNode {
+  final String defId;
+
+  /// The encounter index whose victory brings the player to this spot; the
+  /// node stands until they start the NEXT fight, then the road moves on.
+  final int afterIndex;
+
+  bool spent;
+
+  ActiveGatherNode({
+    required this.defId,
+    required this.afterIndex,
+    this.spent = false,
+  });
+
+  GatherNodeDef get def => GatherNodes.byId(defId)!;
+
+  Map<String, dynamic> toJson() => {
+    'defId': defId,
+    'afterIndex': afterIndex,
+    if (spent) 'spent': true,
+  };
+
+  factory ActiveGatherNode.fromJson(Map<String, dynamic> json) =>
+      ActiveGatherNode(
+        defId: json['defId'] as String,
+        afterIndex: (json['afterIndex'] as num?)?.toInt() ?? 0,
+        spent: json['spent'] == true,
+      );
 }
 
 /// What using an item did, and whether it was spent doing it.

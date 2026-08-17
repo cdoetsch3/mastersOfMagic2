@@ -253,6 +253,48 @@ class GameState extends ChangeNotifier {
     }
   }
 
+  // ---- Gathering --------------------------------------------------------
+
+  /// Harvests the gathering spot in front of the player.
+  ///
+  /// ⭐ **One simultaneous harvest** (ITEMS §9b.7 ruling): the whole yield in
+  /// one act, the node spent, the run moves on. The yield rides
+  /// [AdventureRun.pendingLoot] — gathered goods walk the same take-home
+  /// picker as drops, and dying still loses them, which is what makes
+  /// gathering on an adventure a push-your-luck act like everything else.
+  /// Skill XP banks immediately, like combat XP — effort is paid even when
+  /// the haul is later lost.
+  ///
+  /// 📝 The gesture act (node.def.step) is not played yet; when the engines
+  /// exist, [performance] arrives the same way craft()'s does.
+  Future<GatherOutcome> gatherNode({Random? rng}) async {
+    final r = run;
+    final node = r?.currentNode;
+    if (r == null || node == null) {
+      return const GatherOutcome.refused('There is nothing to gather here.');
+    }
+    final def = node.def;
+    final roll = rng ?? Random();
+    final amount = def.min + roll.nextInt(def.max - def.min + 1);
+    final levelBefore = profile.skillLevel(def.skill.name);
+    await _mutate(() {
+      node.spent = true;
+      for (var i = 0; i < amount; i++) {
+        r.pendingLoot.add(InventorySlot(defId: def.yieldsDefId));
+      }
+      profile.skillXp[def.skill.name] =
+          (profile.skillXp[def.skill.name] ?? 0) + def.xp;
+    });
+    final levelAfter = profile.skillLevel(def.skill.name);
+    return GatherOutcome.gathered(
+      defId: def.yieldsDefId,
+      amount: amount,
+      xp: def.xp,
+      skillKey: def.skill.name,
+      leveledTo: levelAfter > levelBefore ? levelAfter : null,
+    );
+  }
+
   // ---- Crafting ---------------------------------------------------------
 
   /// Makes [recipe]'s output from backpack materials: checks the gate,
@@ -834,6 +876,33 @@ class CraftOutcome {
 
   const CraftOutcome.made({
     required this.defId,
+    required this.xp,
+    required this.skillKey,
+    this.leveledTo,
+  }) : refusal = null;
+
+  bool get succeeded => refusal == null;
+}
+
+/// What a harvest produced.
+class GatherOutcome {
+  final String? refusal;
+  final String? defId;
+  final int amount;
+  final int xp;
+  final String? skillKey;
+  final int? leveledTo;
+
+  const GatherOutcome.refused(this.refusal)
+    : defId = null,
+      amount = 0,
+      xp = 0,
+      skillKey = null,
+      leveledTo = null;
+
+  const GatherOutcome.gathered({
+    required this.defId,
+    required this.amount,
     required this.xp,
     required this.skillKey,
     this.leveledTo,

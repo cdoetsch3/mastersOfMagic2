@@ -2034,6 +2034,35 @@ is in play without any single moment dumping nine mechanics on the player.
 
 ---
 
+## 9b.9e The schema, in code ✅ (2026-08-10)
+
+Per CONTENT_EXPORT: this section records what exists and where; the data
+itself lives in code and the export.
+
+- **`lib/game/crafting/gesture.dart`** — `GestureEngine` (the nine, each
+  carrying its `GestureCategory`) and `GestureStep` (engine + skin + reps +
+  base complexity). ⚠️ A skin drives copy and art only, never behaviour.
+- **`RecipeDef.steps`** — the authored act (levers 1–3). Empty = plain
+  button. All 20 Primal recipes carry scripts; tier 1 holds to 2–3 steps and
+  the oak kit crosses all three categories (the tutorial-by-fiction).
+- **`lib/game/crafting/craft_quality.dart`** — margin, windowScale, the
+  §9b.9d pipeline (executionCeiling / floor / weighted roll). 📝 All numbers
+  placeholders; the tests pin the SHAPE (at-level perfect can Rough, margin
+  5 escapes it, ceilings clamp, margin tilts weights).
+- **`lib/game/gathering/gather_node.dart`** — `GatherNodeDef` (zone, skill,
+  yield range, a GestureStep for the field act, XP, flavor) + the Zone 1
+  pair: `ww_oak_stand` (Felling) and `ww_bindweed_tangle` (Foraging).
+- **Runtime**: `AdventureRun` rolls one node per section (never after the
+  boss), serializes them with the drop-the-node-not-the-run contract, and
+  `GameState.gatherNode()` does the §9b.7 one-harvest: yield into
+  `pendingLoot` (gathered goods walk the take-home picker and die with the
+  run, like drops), skill XP banked immediately.
+- **Export**: recipes carry `steps`, `gatherNodes` is a top-level list, and
+  the reverse index answers "where does oak_log come from" with drops AND
+  gather nodes.
+
+---
+
 ## 10. Open questions
 
 ✅ **Resolved:** power budget · five archetypes · counter-loop · sim criterion
@@ -2072,6 +2101,13 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-10g.** §9b.9e: the schema shipped — GestureEngine/Step,
+scripts on all 20 Primal recipes, CraftQuality (placeholder numbers, ruled
+shape pinned by tests), GatherNodeDef with Zone 1's two nodes, run
+integration (one node per section, one-harvest, yields ride pendingLoot),
+export coverage, and the modifier-export gap fixed (the six 2026-08-09
+stat fields now export).
 
 **Rev — 2026-08-10f.** §9b.9d floor ruling: the grade raises the floor,
 scaled by margin — at-level a perfect craft can still roll Rough; from

@@ -5,7 +5,8 @@
     "towns": 9,
     "creatures": 11,
     "items": 44,
-    "recipes": 20
+    "recipes": 20,
+    "gatherNodes": 2
   },
   "zones": [
     {
@@ -2297,7 +2298,8 @@
       "setId": null,
       "setTier": null,
       "modifiers": {
-        "accuracyBonus": 5
+        "accuracyBonus": 5,
+        "damagePerCharge": 1
       },
       "salvage": [
         {
@@ -2323,7 +2325,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "damagePerCast": 2
+      },
       "salvage": [
         {
           "itemId": "oak_log",
@@ -2402,7 +2406,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "maxHpBonus": 6
+      },
       "salvage": [
         {
           "itemId": "bindweed_fibre",
@@ -2427,7 +2433,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "maxHpBonus": 4
+      },
       "salvage": [
         {
           "itemId": "bindweed_fibre",
@@ -2452,7 +2460,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "maxHpBonus": 1
+      },
       "salvage": [
         {
           "itemId": "bindweed_fibre",
@@ -2477,7 +2487,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "maxHpBonus": 1
+      },
       "salvage": [
         {
           "itemId": "bindweed_fibre",
@@ -2503,7 +2515,8 @@
       "setId": null,
       "setTier": null,
       "modifiers": {
-        "accuracyBonus": 2
+        "accuracyBonus": 2,
+        "maxHpBonus": 12
       },
       "salvage": [
         {
@@ -2532,7 +2545,8 @@
       "modifiers": {
         "accuracyBonus": 7,
         "critChance": 5,
-        "critDamage": 10
+        "critDamage": 10,
+        "damagePerCharge": 3
       },
       "salvage": [
         {
@@ -2639,7 +2653,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "shieldStrengthPercent": 10
+      },
       "salvage": []
     },
     {
@@ -2804,7 +2820,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "maxHpBonus": 10
+      },
       "salvage": [
         {
           "itemId": "bogflax_fibre",
@@ -2829,7 +2847,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "maxHpBonus": 7
+      },
       "salvage": [
         {
           "itemId": "bogflax_fibre",
@@ -2854,7 +2874,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "maxHpBonus": 2
+      },
       "salvage": [
         {
           "itemId": "bogflax_fibre",
@@ -2879,7 +2901,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "maxHpBonus": 2
+      },
       "salvage": [
         {
           "itemId": "bogflax_fibre",
@@ -2904,7 +2928,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "healingReceivedPercent": 10
+      },
       "salvage": []
     },
     {
@@ -2959,7 +2985,10 @@
       "value": 25,
       "fungible": true,
       "lore": "Drink it and count. The cold goes down, turns around, and comes back up as warmth over the next little while.",
-      "effect": {}
+      "effect": {
+        "healPerTurnPercent": 9,
+        "healTurns": 3
+      }
     },
     {
       "id": "birch_quarterstaff",
@@ -2978,7 +3007,8 @@
       "setId": null,
       "setTier": null,
       "modifiers": {
-        "accuracyBonus": 6
+        "accuracyBonus": 6,
+        "damagePerCharge": 2
       },
       "salvage": [
         {
@@ -3005,7 +3035,8 @@
       "setId": null,
       "setTier": null,
       "modifiers": {
-        "accuracyBonus": 1
+        "accuracyBonus": 1,
+        "damagePerCast": 3
       },
       "salvage": [
         {
@@ -3058,7 +3089,9 @@
       "socketCount": 0,
       "setId": null,
       "setTier": null,
-      "modifiers": {},
+      "modifiers": {
+        "regrowPercent": 2
+      },
       "salvage": []
     }
   ],
@@ -3075,6 +3108,29 @@
           "itemId": "oak_log",
           "count": 3
         }
+      ],
+      "steps": [
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "chop",
+          "reps": 2,
+          "complexity": 1
+        },
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "sand",
+          "reps": 1,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3088,6 +3144,22 @@
         {
           "itemId": "oak_log",
           "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "chop",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 1
         }
       ]
     },
@@ -3103,6 +3175,22 @@
           "itemId": "oak_log",
           "count": 2
         }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "sand",
+          "reps": 1,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3116,6 +3204,29 @@
         {
           "itemId": "birch_log",
           "count": 3
+        }
+      ],
+      "steps": [
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "chop",
+          "reps": 3,
+          "complexity": 1
+        },
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "sand",
+          "reps": 2,
+          "complexity": 1
         }
       ]
     },
@@ -3131,6 +3242,22 @@
           "itemId": "birch_log",
           "count": 2
         }
+      ],
+      "steps": [
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "chop",
+          "reps": 2,
+          "complexity": 1
+        },
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 2
+        }
       ]
     },
     {
@@ -3144,6 +3271,22 @@
         {
           "itemId": "birch_log",
           "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "sand",
+          "reps": 2,
+          "complexity": 1
         }
       ]
     },
@@ -3159,6 +3302,22 @@
           "itemId": "bindweed_fibre",
           "count": 2
         }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 2,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3172,6 +3331,22 @@
         {
           "itemId": "bindweed_fibre",
           "count": 4
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
         }
       ]
     },
@@ -3187,6 +3362,22 @@
           "itemId": "bindweed_fibre",
           "count": 3
         }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3201,6 +3392,22 @@
           "itemId": "bindweed_fibre",
           "count": 2
         }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 2,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3214,6 +3421,22 @@
         {
           "itemId": "bindweed_fibre",
           "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 2,
+          "complexity": 1
         }
       ]
     },
@@ -3233,6 +3456,22 @@
           "itemId": "bindweed_fibre",
           "count": 1
         }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "cut",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "alignCommit",
+          "category": "precision",
+          "skin": "knot",
+          "reps": 1,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3251,6 +3490,29 @@
           "itemId": "bogflax_fibre",
           "count": 1
         }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "cut",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "alignCommit",
+          "category": "precision",
+          "skin": "knot",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 2,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3264,6 +3526,22 @@
         {
           "itemId": "bogflax_fibre",
           "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
         }
       ]
     },
@@ -3279,6 +3557,22 @@
           "itemId": "bogflax_fibre",
           "count": 5
         }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 4,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3292,6 +3586,22 @@
         {
           "itemId": "bogflax_fibre",
           "count": 4
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
         }
       ]
     },
@@ -3307,6 +3617,22 @@
           "itemId": "bogflax_fibre",
           "count": 2
         }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 2,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3320,6 +3646,22 @@
         {
           "itemId": "bogflax_fibre",
           "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 2,
+          "complexity": 1
         }
       ]
     },
@@ -3335,6 +3677,22 @@
           "itemId": "sapwort",
           "count": 2
         }
+      ],
+      "steps": [
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "grind",
+          "reps": 2,
+          "complexity": 1
+        },
+        {
+          "engine": "alignCommit",
+          "category": "precision",
+          "skin": "pour",
+          "reps": 1,
+          "complexity": 1
+        }
       ]
     },
     {
@@ -3349,7 +3707,52 @@
           "itemId": "brookmint",
           "count": 2
         }
+      ],
+      "steps": [
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "grind",
+          "reps": 2,
+          "complexity": 1
+        },
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "swirl",
+          "reps": 2,
+          "complexity": 1
+        },
+        {
+          "engine": "bandKeeper",
+          "category": "regulation",
+          "skin": "simmer",
+          "reps": 1,
+          "complexity": 1
+        }
       ]
+    }
+  ],
+  "gatherNodes": [
+    {
+      "id": "ww_oak_stand",
+      "zoneId": "whispering_woods",
+      "skill": "felling",
+      "yieldsItemId": "oak_log",
+      "min": 2,
+      "max": 4,
+      "xp": 9,
+      "flavor": "An old stand, wind-felled and seasoning where it lies. Good logs, if your arms are willing."
+    },
+    {
+      "id": "ww_bindweed_tangle",
+      "zoneId": "whispering_woods",
+      "skill": "foraging",
+      "yieldsItemId": "bindweed_fibre",
+      "min": 2,
+      "max": 3,
+      "xp": 9,
+      "flavor": "A tangle thick enough to trip a horse. The trick is cutting it before it notices."
     }
   ],
   "index": {
@@ -3456,6 +3859,12 @@
         {
           "type": "salvage",
           "from": "sporecap_mantle"
+        },
+        {
+          "type": "gather",
+          "nodeId": "ww_bindweed_tangle",
+          "zoneId": "whispering_woods",
+          "skill": "foraging"
         }
       ],
       "bindweed_gloves": [
@@ -3911,6 +4320,12 @@
         {
           "type": "salvage",
           "from": "heartwood_stave"
+        },
+        {
+          "type": "gather",
+          "nodeId": "ww_oak_stand",
+          "zoneId": "whispering_woods",
+          "skill": "felling"
         }
       ],
       "oak_quarterstaff": [

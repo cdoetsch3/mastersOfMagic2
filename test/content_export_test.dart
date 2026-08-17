@@ -13,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/content_export.dart';
 import 'package:masters_of_magic_2/game/enemies/bestiary.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
+import 'package:masters_of_magic_2/game/gathering/gather_node.dart';
 import 'package:masters_of_magic_2/game/items/recipe_book.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 
@@ -43,6 +44,11 @@ void main() {
       for (final i in r.inputs) {
         check(i.defId, 'recipe ${r.id} input');
       }
+    }
+    for (final n in GatherNodes.all) {
+      check(n.yieldsDefId, 'gather node ${n.id}');
+      expect(World.exists(n.zoneId), isTrue,
+          reason: '${n.id} spawns in a zone that does not exist');
     }
     // Salvage is already covered by the items' own tests, but the export
     // walks it too — keep the net over the same water.

@@ -14,6 +14,7 @@
 /// their equip levels.
 library;
 
+import '../../crafting/gesture.dart';
 import '../item_def.dart';
 import '../recipe_def.dart';
 
@@ -26,6 +27,11 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.woodcarving,
     skillLevel: 1,
     inputs: [RecipeInput('oak_log', 3)],
+    steps: [
+      GestureStep(GestureEngine.releaseTiming, 'chop', reps: 2),
+      GestureStep(GestureEngine.trace, 'carve', complexity: 1),
+      GestureStep(GestureEngine.rateDrag, 'sand', reps: 1),
+    ],
   );
 
   static const oakWand = RecipeDef(
@@ -34,6 +40,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.woodcarving,
     skillLevel: 1,
     inputs: [RecipeInput('oak_log', 2)],
+    steps: [
+      GestureStep(GestureEngine.releaseTiming, 'chop', reps: 1),
+      GestureStep(GestureEngine.trace, 'carve', complexity: 1),
+    ],
   );
 
   static const oakKnot = RecipeDef(
@@ -42,6 +52,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.woodcarving,
     skillLevel: 1,
     inputs: [RecipeInput('oak_log', 2)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'carve', complexity: 1),
+      GestureStep(GestureEngine.rateDrag, 'sand', reps: 1),
+    ],
   );
 
   static const birchQuarterstaff = RecipeDef(
@@ -50,6 +64,11 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.woodcarving,
     skillLevel: 10,
     inputs: [RecipeInput('birch_log', 3)],
+    steps: [
+      GestureStep(GestureEngine.releaseTiming, 'chop', reps: 3),
+      GestureStep(GestureEngine.trace, 'carve', complexity: 2),
+      GestureStep(GestureEngine.rateDrag, 'sand', reps: 2),
+    ],
   );
 
   static const birchWand = RecipeDef(
@@ -58,6 +77,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.woodcarving,
     skillLevel: 10,
     inputs: [RecipeInput('birch_log', 2)],
+    steps: [
+      GestureStep(GestureEngine.releaseTiming, 'chop', reps: 2),
+      GestureStep(GestureEngine.trace, 'carve', complexity: 2),
+    ],
   );
 
   static const birchKnot = RecipeDef(
@@ -66,6 +89,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.woodcarving,
     skillLevel: 10,
     inputs: [RecipeInput('birch_log', 2)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'carve', complexity: 2),
+      GestureStep(GestureEngine.rateDrag, 'sand', reps: 2),
+    ],
   );
 
   // ---- Tailoring: the Bindweed set ------------------------------------
@@ -76,6 +103,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 1,
     inputs: [RecipeInput('bindweed_fibre', 2)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 1),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 2),
+    ],
   );
 
   static const bindweedRobe = RecipeDef(
@@ -84,6 +115,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 1,
     inputs: [RecipeInput('bindweed_fibre', 4)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 1),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 3),
+    ],
   );
 
   static const bindweedLeggings = RecipeDef(
@@ -92,6 +127,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 1,
     inputs: [RecipeInput('bindweed_fibre', 3)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 1),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 3),
+    ],
   );
 
   static const bindweedBoots = RecipeDef(
@@ -100,6 +139,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 1,
     inputs: [RecipeInput('bindweed_fibre', 2)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 1),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 2),
+    ],
   );
 
   static const bindweedGloves = RecipeDef(
@@ -108,6 +151,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 1,
     inputs: [RecipeInput('bindweed_fibre', 2)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 1),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 2),
+    ],
   );
 
   // ---- Tailoring: belts (hide + thread) -------------------------------
@@ -118,6 +165,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 4,
     inputs: [RecipeInput('fawnhide', 2), RecipeInput('bindweed_fibre', 1)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'cut', complexity: 1),
+      GestureStep(GestureEngine.alignCommit, 'knot'),
+    ],
   );
 
   static const tuskhideBelt = RecipeDef(
@@ -126,6 +177,11 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 11,
     inputs: [RecipeInput('tuskhide', 2), RecipeInput('bogflax_fibre', 1)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'cut', complexity: 2),
+      GestureStep(GestureEngine.alignCommit, 'knot'),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 2),
+    ],
   );
 
   // ---- Tailoring: the Bogflax set -------------------------------------
@@ -136,6 +192,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 10,
     inputs: [RecipeInput('bogflax_fibre', 2)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 2),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 3),
+    ],
   );
 
   static const bogflaxRobe = RecipeDef(
@@ -144,6 +204,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 10,
     inputs: [RecipeInput('bogflax_fibre', 5)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 2),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 4),
+    ],
   );
 
   static const bogflaxLeggings = RecipeDef(
@@ -152,6 +216,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 10,
     inputs: [RecipeInput('bogflax_fibre', 4)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 2),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 3),
+    ],
   );
 
   static const bogflaxBoots = RecipeDef(
@@ -160,6 +228,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 10,
     inputs: [RecipeInput('bogflax_fibre', 2)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 2),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 2),
+    ],
   );
 
   static const bogflaxGloves = RecipeDef(
@@ -168,6 +240,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.tailoring,
     skillLevel: 10,
     inputs: [RecipeInput('bogflax_fibre', 2)],
+    steps: [
+      GestureStep(GestureEngine.trace, 'thread', complexity: 2),
+      GestureStep(GestureEngine.sweetSpot, 'stitch', reps: 2),
+    ],
   );
 
   // ---- Potions & Alchemy ----------------------------------------------
@@ -181,6 +257,10 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.potionsAndAlchemy,
     skillLevel: 1,
     inputs: [RecipeInput('sapwort', 2)],
+    steps: [
+      GestureStep(GestureEngine.rateDrag, 'grind', reps: 2),
+      GestureStep(GestureEngine.alignCommit, 'pour'),
+    ],
   );
 
   static const brookmintTonic = RecipeDef(
@@ -189,6 +269,11 @@ abstract final class PrimalRecipes {
     skill: CraftSkill.potionsAndAlchemy,
     skillLevel: 10,
     inputs: [RecipeInput('brookmint', 2)],
+    steps: [
+      GestureStep(GestureEngine.rateDrag, 'grind', reps: 2),
+      GestureStep(GestureEngine.rateDrag, 'swirl', reps: 2),
+      GestureStep(GestureEngine.bandKeeper, 'simmer'),
+    ],
   );
 
   static const all = <RecipeDef>[
