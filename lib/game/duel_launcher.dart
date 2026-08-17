@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/duel_screen.dart';
 import '../screens/level_up_screen.dart';
 import 'ai_personas.dart';
+import 'duel_controller.dart';
 import 'game_state.dart';
 import 'loadout.dart';
 import 'opponent_driver.dart';
@@ -36,19 +37,21 @@ Future<void> launchDuel(
         // and damage; the opponent's scales the XP the win is worth. This is
         // the only path a real player takes, so a level dropped here is
         // invisible to every test that builds DuelScreen directly.
-        onResult: (won) => game.recordDuelResult(
-          won: won,
-          opponentLevel: driver.opponentLevel,
-          // ⭐ **The one place that can tell a human from a persona** (ruling
-          // 2026-08-17: only a PvP loss pays XP). `campaign` cannot answer it —
-          // a practice bout against Procarius is `campaign: false` and is still
-          // single player — but the driver can: a room is remote, everything
-          // else is a brain on this device. Asked by type, the same way the
-          // duel screen already asks it for the move timer; a getter on the
-          // interface would force every test fake to answer a question only
-          // this line needs.
-          pvp: driver is RemoteDuelDriver,
-        ),
+        onResult: (outcome) {
+          // ⚠️ A fled duel is banked by nobody. It pays no XP, no gold, and
+          // records neither a win nor a loss (2026-08-17 ruling).
+          if (outcome == DuelOutcome.fled) return;
+          game.recordDuelResult(
+            won: outcome == DuelOutcome.won,
+            opponentLevel: driver.opponentLevel,
+            // ⭐ **The one place that can tell a human from a persona**
+            // (ruling 2026-08-17: only a PvP loss pays XP). `campaign`
+            // cannot answer it — a practice bout is campaign:false and still
+            // single player — but the driver can: a room is remote,
+            // everything else is a brain on this device.
+            pvp: driver is RemoteDuelDriver,
+          );
+        },
       ),
     ),
   );

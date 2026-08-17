@@ -2116,6 +2116,33 @@ settle.
 
 ## Changelog
 
+**Rev — 2026-08-17.** Campaign **flee is a rolled escape**, not a surrender.
+Until now "fleeing" an encounter conceded it, so the only two ways out of a
+losing fight were dying and dying on purpose — both paying the full defeat
+penalty. The ruled middle ground:
+
+`fleeChance = clamp(0.80 + 0.05 × levelEdge + 0.75 × healthEdge − rankPenalty,
+0.20, 0.95)`, where `levelEdge` is (player − enemy) level clamped to ±5,
+`healthEdge` is the difference of the two health fractions, and `rankPenalty`
+is 0 / 0.10 / 0.20 for a common / mini-boss / boss. ⚠️ The rank penalty applies
+**before** the clamp, so a boss at death's door is still the 20% floor rather
+than 0%; the 95% ceiling means escape is never certain. Anchors: even level and
+both at full = 80%; even level, you at 10% against an enemy at 55% ≈ 46%; four
+levels up = the ceiling; death's door against +10 = the floor.
+
+**Success** is a clean break — it resolves before the enemy's action, so no
+free hit. The duel ends with **no winner**: no XP (not even the loss floor), no
+gold, no recorded defeat, and the adventure ends the way walking out does
+(`RunOutcome.returned`), haul pending and backpack untouched. **Failure**
+consumes the turn: the enemy's chosen action resolves against a player who did
+nothing, and if that kills them the ordinary death path runs with the ordinary
+penalty — they died fighting after a failed escape, not fleeing. Repeat
+attempts keep the same odds (no decay, no escalation); the free enemy turn per
+failure is the compounding cost. ⚠️ A failed flee is exempt from the
+three-forfeits-in-a-row auto-surrender, which exists to hand a loss to a player
+who has closed their tab — three unlucky rolls must not auto-surrender anyone
+into the wipe. Campaign only: PvP keeps its flat surrender.
+
 **Rev — 2026-08-17. The loot tracker is gone; the stake moved to the
 inventory.** Designer's ruling, five parts, all shipped:
 

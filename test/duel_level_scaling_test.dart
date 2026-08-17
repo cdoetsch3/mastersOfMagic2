@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/ai_personas.dart';
+import 'package:masters_of_magic_2/game/duel_controller.dart';
 import 'package:masters_of_magic_2/game/duel_launcher.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/loadout.dart';
@@ -202,7 +203,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       final screen = tester.widget<DuelScreen>(find.byType(DuelScreen));
-      screen.onResult!(true);
+      screen.onResult!(DuelOutcome.won);
       await tester.pump();
 
       expect(

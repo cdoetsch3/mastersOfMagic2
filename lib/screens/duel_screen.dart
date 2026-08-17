@@ -34,12 +34,17 @@ class DuelScreen extends StatefulWidget {
   /// identical regardless of which it is.
   final OpponentDriver driver;
 
-  /// Campaign battles say "Flee"; PvP-style duels say "Surrender".
+  /// Campaign battles roll to **flee**; PvP-style duels **surrender** flat.
+  ///
+  /// ⚠️ The escape roll is campaign-only (2026-08-17 ruling) — a PvP duel a
+  /// player could roll their way out of would be an unrankable ladder, so
+  /// this flag is what keeps the two affordances apart.
   final bool campaign;
 
-  /// Called once when a duel ends (win, loss, draw, or forfeit) with whether
-  /// the player won. Lets the caller grant XP/gold. Draws report `false`.
-  final void Function(bool playerWon)? onResult;
+  /// Called once when a duel ends, with how it ended. Lets the caller grant
+  /// XP/gold. Draws report [DuelOutcome.lost]; a campaign escape reports
+  /// [DuelOutcome.fled], which pays nothing.
+  final void Function(DuelOutcome outcome)? onResult;
 
   /// ⭐ Health carried in from an adventure (GAME_DESIGN adventure loop). Null
   /// for a standalone duel, which starts at full.
@@ -58,10 +63,24 @@ class DuelScreen extends StatefulWidget {
   /// ⭐ **Awaited before the end screen renders**, which is the whole reason it
   /// exists: loot is rolled by `GameState`, and if that happened after this
   /// screen popped there would be nothing to show. Null for a PvP duel.
-  final Future<List<String>> Function(bool won, int remainingHp)? onSettle;
+  ///
+  /// ⚠️ Takes the [DuelOutcome], not a `won` bool. Fleeing is a third ending
+  /// with its own consequences (the run ends, the haul survives, nothing is
+  /// recorded); as a bool it could only arrive as `false`, i.e. as a defeat —
+  /// which would wipe the very run the escape saved.
+  final Future<List<String>> Function(DuelOutcome outcome, int remainingHp)?
+  onSettle;
 
   /// The player's character level — scales their health and damage.
   final int playerLevel;
+
+  /// ⚠️ **Test seam.** The duel's random stream, so a widget test can pin an
+  /// escape roll instead of hoping the dice fall its way — the flee flow tops
+  /// out at a 95% chance, so every "tap Flee and get away" test would
+  /// otherwise be one roll in twenty from flaking. Null in the real game,
+  /// where the controller opens its own stream.
+  @visibleForTesting
+  final ReseedableRandom? rng;
 
   const DuelScreen({
     super.key,
@@ -74,6 +93,7 @@ class DuelScreen extends StatefulWidget {
     this.onPlayerHpRemaining,
     this.onSettle,
     this.playerLevel = 1,
+    this.rng,
   });
 
   @override
@@ -149,6 +169,7 @@ class _DuelScreenState extends State<DuelScreen>
     playerLevel: widget.playerLevel,
     playerStartingHp: widget.playerStartingHp,
     playerGear: widget.playerGear,
+    rng: widget.rng,
   );
   bool _resultReported = false;
   late final AnimationController _fx = AnimationController(
@@ -312,14 +333,14 @@ class _DuelScreenState extends State<DuelScreen>
   void _checkResult() {
     if (_resultReported || !c.gameOver) return;
     _resultReported = true;
-    widget.onResult?.call(c.playerWon);
+    widget.onResult?.call(c.outcome);
     widget.onPlayerHpRemaining?.call(c.player.hp);
     final settle = widget.onSettle;
     if (settle == null) {
       _loot = const [];
       return;
     }
-    settle(c.playerWon, c.player.hp).then((loot) {
+    settle(c.outcome, c.player.hp).then((loot) {
       if (mounted) setState(() => _loot = loot);
     });
   }
@@ -396,7 +417,7 @@ class _DuelScreenState extends State<DuelScreen>
     if (mounted) setState(() => _fxKind = _FxKind.none);
   }
 
-  Future<void> _submit(MageAction action) async {
+  Future<void> _submit(MageAction action, {bool fleeAttempt = false}) async {
     // Move locked in. For remote duels, keep a visible countdown running so
     // the wait reads as "opponent has N seconds left", not a frozen app.
     if (widget.driver is RemoteDuelDriver) {
@@ -408,7 +429,7 @@ class _DuelScreenState extends State<DuelScreen>
       _stopMoveTimer();
     }
     try {
-      final events = await c.submitTurn(action);
+      final events = await c.submitTurn(action, fleeAttempt: fleeAttempt);
       _stopMoveTimer(); // exchange done — the clock is moot while animating
       for (var i = 0; i < events.length; i++) {
         await _animate(events[i]);
@@ -1104,7 +1125,12 @@ class _DuelScreenState extends State<DuelScreen>
                 const Icon(Icons.flag, size: 12, color: Color(0xFFD85A30)),
                 const SizedBox(width: 4),
                 Text(
-                  widget.campaign ? 'Flee' : 'Surrender',
+                  // ⭐ **The live number is on the button** (ruled). Fleeing is
+                  // a gamble now, and a gamble whose odds are hidden until the
+                  // confirm dialog is a gamble the player cannot plan around —
+                  // this rebuilds with every HP change, so watching the price
+                  // of running away climb IS the decision.
+                  widget.campaign ? 'Flee (${c.fleePercent}%)' : 'Surrender',
                   style: const TextStyle(
                     color: Color(0xFFD85A30),
                     fontSize: 11,
@@ -1160,18 +1186,27 @@ class _DuelScreenState extends State<DuelScreen>
   }
 
   Future<void> _confirmForfeit() async {
-    final verb = widget.campaign ? 'flee' : 'surrender';
+    // ⭐ Two genuinely different acts behind one button. A PvP surrender is a
+    // decision — it ends the duel as a loss, full stop. A campaign flee is a
+    // ROLL (2026-08-17 ruling), so its dialog has to sell odds and a cost,
+    // never "this counts as a loss" — which it no longer does.
+    final percent = c.fleePercent;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1B1531),
         title: Text(
-          widget.campaign ? 'Flee the battle?' : 'Surrender the duel?',
+          widget.campaign ? 'Run for it?' : 'Surrender the duel?',
           style: const TextStyle(color: Colors.white, fontSize: 17),
         ),
-        content: const Text(
-          'This counts as a loss.',
-          style: TextStyle(color: Color(0xFF9C93C4)),
+        content: Text(
+          widget.campaign
+              ? '$percent% chance to get clean away — the adventure ends '
+                    'there and you keep everything you are carrying.\n\n'
+                    'Fail and you lose the turn: ${c.enemy.name} acts and you '
+                    'do not.'
+              : 'This counts as a loss.',
+          style: const TextStyle(color: Color(0xFF9C93C4)),
         ),
         actions: [
           TextButton(
@@ -1181,14 +1216,40 @@ class _DuelScreenState extends State<DuelScreen>
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              widget.campaign ? 'Flee' : 'Surrender',
+              widget.campaign ? 'Flee ($percent%)' : 'Surrender',
               style: const TextStyle(color: Color(0xFFD85A30)),
             ),
           ),
         ],
       ),
     );
-    if (confirmed == true) c.surrender(verb: verb);
+    if (confirmed != true || !mounted) return;
+    if (!widget.campaign) {
+      c.surrender();
+      return;
+    }
+    await _attemptFlee();
+  }
+
+  /// Rolls the escape and pays for a failure.
+  ///
+  /// ⚠️ **The failure branch is a normal turn.** It submits the forfeit
+  /// through the ordinary [_submit] path, so the enemy's action animates and
+  /// resolves exactly as it would against any other move — and if it kills the
+  /// player, they die down the ordinary death path with the ordinary penalty.
+  /// That is the ruling: they died fighting after a failed escape, not fleeing.
+  Future<void> _attemptFlee() async {
+    if (c.attemptFlee()) {
+      // A clean getaway resolves BEFORE the enemy acts — no turn is submitted
+      // at all. The controller listener (_checkResult) settles the run.
+      _stopMoveTimer();
+      await _showMessage('You slip away.', const Color(0xFF7FD4E8));
+      if (mounted) setState(() {});
+      return;
+    }
+    await _showMessage('You cannot break away!', const Color(0xFFD85A30));
+    if (!mounted) return;
+    await _submit(const ForfeitAction(), fleeAttempt: true);
   }
 
   /// The opponent's Creeping Dark is what blinds *my* view. Dusk hides the
@@ -1486,21 +1547,36 @@ class _DuelScreenState extends State<DuelScreen>
 
   Widget _gameOverOverlay() {
     final won = c.playerWon;
-    final title = c.isDraw ? 'Draw' : (won ? 'Victory!' : 'Defeat');
-    final accent = won ? const Color(0xFFE8C547) : const Color(0xFFD85A30);
+    // ⭐ Escaping is its own ending, and it must not wear Defeat's face: the
+    // whole point of the ruling is that the player got away with the run
+    // intact, so a red "Defeat" here would tell them the opposite of what
+    // happened to their haul.
+    final fled = c.fled;
+    final title = fled
+        ? 'Escaped'
+        : c.isDraw
+        ? 'Draw'
+        : (won ? 'Victory!' : 'Defeat');
+    final accent = won
+        ? const Color(0xFFE8C547)
+        : (fled ? const Color(0xFF7FD4E8) : const Color(0xFFD85A30));
     final goldEarned = won ? Progression.winGold : Progression.lossGold;
     // ⚠️ The *actual* award, not the flat base. XP scales with who you beat
     // (Progression.xpForDuel), so showing `winXp` told the player the base
     // while GameState banked base + per-level. Read the formula, never the
     // constants — the 2026-08-10 halving moved both and this stayed correct.
-    final xpEarned = Progression.xpForDuel(
-      won: won,
-      opponentLevel: widget.driver.opponentLevel,
-      // ⚠️ Same flag GameState passes when banking (launchDuel's seam): a
-      // PvP loss pays its 8, single player pays 0 — a display that reads the
-      // formula without the flag would show 0 while the bank paid 8.
-      pvp: !widget.campaign && widget.driver is RemoteDuelDriver,
-    );
+    // ⚠️ A duel nobody won pays nothing at all — not even the consolation a
+    // PvP loss pays. `xpForDuel` has no third case, so the fled ending is
+    // short-circuited rather than taught to the reward formula. For the two
+    // real endings, the display passes the SAME pvp flag GameState banks
+    // with, so it can never show a number the bank did not pay.
+    final xpEarned = fled
+        ? 0
+        : Progression.xpForDuel(
+            won: won,
+            opponentLevel: widget.driver.opponentLevel,
+            pvp: !widget.campaign && widget.driver is RemoteDuelDriver,
+          );
 
     return Positioned.fill(
       child: Container(
@@ -1522,6 +1598,8 @@ class _DuelScreenState extends State<DuelScreen>
                 Icon(
                   won
                       ? Icons.emoji_events
+                      : fled
+                      ? Icons.directions_run
                       : (c.isDraw
                             ? Icons.handshake
                             : Icons.sentiment_dissatisfied),

@@ -1486,8 +1486,13 @@ where the counter game has to be second nature.
   the QWERT and ASDFG shortcut rows align like a keyboard; Channel to the right.
 - ✅ **Keyboard shortcuts** bind to SLOTS, not contents: 1-8 = element slots,
   QWERT/ASDFG = spell slots 1-10, C = channel. Slots are unlockable later.
-- ✅ **Surrender** (PvP) / **Flee** (campaign): forfeits the match as a loss, behind a
-  confirmation dialog. Engine support: `DuelEngine.concede()`.
+- ✅ **Surrender** (PvP): forfeits the match as a loss, behind a confirmation
+  dialog. Engine support: `DuelEngine.concede()`.
+- ✅ **Flee** (campaign): a ROLLED escape, not a surrender (2026-08-17 ruling —
+  formula and consequences in the ITEMS changelog, Rev 2026-08-17). The button
+  shows its live chance
+  ("Flee (73%)"); success ends the adventure as a walk-out with no winner and no
+  loss recorded, failure costs the turn and the enemy acts for free.
 - ✅ Turn resolution plays events in priority order as an animated sequence whose
   intensity scales with charge spent (bigger projectiles, more impact rings, screen
   shake at 3+ charge, full-screen flash at Cataclysm tier).

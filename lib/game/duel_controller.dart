@@ -1,9 +1,29 @@
 import 'package:flutter/foundation.dart';
 import 'package:mom_engine/mom_engine.dart';
 
+import 'enemies/enemy_def.dart';
+import 'flee.dart';
 import 'items/item_def.dart';
 import 'loadout.dart';
 import 'opponent_driver.dart';
+
+/// How a duel ended, for everyone downstream of the arena.
+///
+/// ⭐ **Three outcomes, not a bool.** A campaign escape is neither a win nor a
+/// loss (2026-08-17 ruling): it pays no XP, records no defeat, and must never
+/// reach `GameState.loseEncounter`. Encoding it as `won: false` is exactly the
+/// bug this enum exists to make impossible — every seam that used to carry
+/// `won` now carries the outcome, so the fled case has to be *handled* rather
+/// than silently defaulting to the punishing branch.
+enum DuelOutcome {
+  won,
+
+  /// Defeated, conceded, or drawn — the paths that pay a loss.
+  lost,
+
+  /// Ran away clean. Nobody won.
+  fled,
+}
 
 /// UI-facing snapshot of a shield (engine shields mutate in place, so the
 /// controller keeps its own copies for lagged display during animations).
@@ -28,7 +48,16 @@ class DuelController extends ChangeNotifier {
   late DuelEngine engine;
   late MageState player;
   late MageState enemy;
-  final ReseedableRandom _rng = ReseedableRandom();
+
+  /// The duel's ONE random stream — the engine resolves turns from it, the
+  /// driver reseeds it per turn in remote duels, and [attemptFlee] rolls from
+  /// it too.
+  ///
+  /// ⭐ The flee roll deliberately shares the stream rather than opening a
+  /// private `Random()`: a duel's luck is one seeded sequence, so a scripted
+  /// stream can pin "this escape failed" in a test instead of replaying the
+  /// fight until the dice cooperate.
+  final ReseedableRandom _rng;
 
   // Display state (lags engine during animation).
   late int shownPlayerHp;
@@ -73,6 +102,13 @@ class DuelController extends ChangeNotifier {
       : engine.nextMoonPhase;
   bool playerDefeated = false;
   bool enemyDefeated = false;
+
+  /// ⭐ The player got clean away (campaign only, 2026-08-17 ruling). Both
+  /// mages are still standing and the engine still thinks the fight is live —
+  /// this flag is the ending. ⚠️ Distinct from [playerDefeated] on purpose:
+  /// downstream, defeat wipes a run and this does not.
+  bool _fled = false;
+  bool get fled => _fled;
 
   // Selection state.
   MagicElement? pendingElement;
@@ -128,7 +164,8 @@ class DuelController extends ChangeNotifier {
     this.playerLevel = 1,
     this.playerStartingHp,
     this.playerGear = ItemModifiers.none,
-  }) {
+    ReseedableRandom? rng,
+  }) : _rng = rng ?? ReseedableRandom() {
     newDuel();
     driver.watchOpponentSurrender(_onOpponentSurrendered);
   }
@@ -223,6 +260,7 @@ class DuelController extends ChangeNotifier {
     _replaying = false;
     playerDefeated = false;
     enemyDefeated = false;
+    _fled = false;
     pendingElement = null;
     animating = false;
     waitingForOpponent = false;
@@ -232,9 +270,27 @@ class DuelController extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get gameOver => engine.isOver && !animating;
-  bool get playerWon => engine.winner == player;
-  bool get isDraw => engine.isDraw;
+  /// ⚠️ **The one place "the duel has ended" is decided.** A clean escape ends
+  /// it with both mages standing, which the engine has no way to represent —
+  /// its `isOver` means somebody is at 0 hp, and the two states it can express
+  /// (a concession, a draw) are both *results*, which fleeing is not. So the
+  /// fled ending lives here, beside the engine rather than inside it, and
+  /// every gate that used to ask `engine.isOver` asks this instead.
+  bool get _duelEnded => engine.isOver || _fled;
+
+  bool get gameOver => _duelEnded && !animating;
+
+  /// ⚠️ Explicitly false when [fled]: nobody won a fight nobody finished, and
+  /// `engine.winner` would happily name the enemy the moment anything else set
+  /// this duel over.
+  bool get playerWon => !_fled && engine.winner == player;
+  bool get isDraw => !_fled && engine.isDraw;
+
+  /// How this duel ended, for the screen and the adventure flow.
+  DuelOutcome get outcome => _fled
+      ? DuelOutcome.fled
+      : (playerWon ? DuelOutcome.won : DuelOutcome.lost);
+
   bool get needsElement => player.charge == 0 && pendingElement == null;
   int get turnNumber => engine.turnNumber;
 
@@ -243,13 +299,13 @@ class DuelController extends ChangeNotifier {
 
   bool canAct(Spell spell) =>
       !animating &&
-      !engine.isOver &&
+      !_duelEnded &&
       canAfford(spell) &&
       (player.charge > 0 || pendingElement != null);
 
   bool get canCharge =>
       !animating &&
-      !engine.isOver &&
+      !_duelEnded &&
       player.charge < MageState.maxCharge &&
       (player.charge > 0 || pendingElement != null);
 
@@ -261,7 +317,14 @@ class DuelController extends ChangeNotifier {
 
   /// Exchanges moves through the driver, resolves the turn, and returns the
   /// events for the screen to animate ([applyEvent] after each).
-  Future<List<DuelEvent>> submitTurn(MageAction action) async {
+  ///
+  /// [fleeAttempt] marks this forfeit as the cost of a *failed escape* rather
+  /// than an absent player — see [_trackForfeits] for why that distinction is
+  /// load-bearing.
+  Future<List<DuelEvent>> submitTurn(
+    MageAction action, {
+    bool fleeAttempt = false,
+  }) async {
     animating = true;
     waitingForOpponent = true;
     notifyListeners();
@@ -274,9 +337,11 @@ class DuelController extends ChangeNotifier {
       notifyListeners();
     }
 
-    // The opponent may have surrendered while the exchange was in flight
-    // (the watcher already ended the duel) — nothing left to resolve.
-    if (engine.isOver) {
+    // The duel may have ended while the exchange was in flight (the opponent
+    // surrendered and the watcher already ended it) — nothing left to resolve.
+    // Asks [_duelEnded] rather than the engine so that an ending the engine
+    // cannot see, like an escape, cannot be resolved straight through either.
+    if (_duelEnded) {
       animating = false;
       notifyListeners();
       return const [];
@@ -292,15 +357,32 @@ class DuelController extends ChangeNotifier {
     _frames = result.frames;
     battleLog.add('— Turn ${result.turn}');
     battleLog.addAll(result.events.map(_describe));
-    _trackForfeits(action, theirs);
+    _trackForfeits(action, theirs, fleeAttempt: fleeAttempt);
     notifyListeners();
     return result.events;
   }
 
   /// Applies the [forfeitLimit] rule after a turn resolves: whichever side
   /// has forfeited that many turns in a row surrenders the duel.
-  void _trackForfeits(MageAction mine, MageAction theirs) {
-    _myForfeitStreak = mine is ForfeitAction ? _myForfeitStreak + 1 : 0;
+  ///
+  /// ⚠️ **A failed flee never counts toward the streak** (2026-08-17 ruling).
+  /// The limit exists to hand a loss to a player who has *stopped playing* —
+  /// a closed tab forfeiting every turn on the move timer. A player rolling
+  /// escapes is the opposite of absent, and three unlucky rolls would
+  /// otherwise auto-surrender them straight into the defeat penalty the flee
+  /// ruling exists to spare them: a 20%-chance flee attempted three times
+  /// would go from "three free hits" to "the run is dead" for nothing but bad
+  /// luck. The streak is RESET rather than merely not incremented — deciding
+  /// to run is proof of a live player, so it also clears whatever timeouts
+  /// came before it.
+  void _trackForfeits(
+    MageAction mine,
+    MageAction theirs, {
+    bool fleeAttempt = false,
+  }) {
+    _myForfeitStreak = (mine is ForfeitAction && !fleeAttempt)
+        ? _myForfeitStreak + 1
+        : 0;
     _theirForfeitStreak = theirs is ForfeitAction ? _theirForfeitStreak + 1 : 0;
     if (engine.isOver) return;
     if (_myForfeitStreak >= forfeitLimit) {
@@ -505,9 +587,80 @@ class DuelController extends ChangeNotifier {
     return (shown - event.toHp).clamp(0, event.target.maxHp);
   }
 
+  /// What the creature behind this fight is worth to the escape roll.
+  ///
+  /// ⚠️ A practice persona and a human rival read as [EnemyRank.common] — they
+  /// have no bestiary entry and no rank. Harmless, because the flee button is
+  /// campaign-only; if it ever is not, "no rank" must mean "no penalty" rather
+  /// than a crash.
+  EnemyRank get enemyRank {
+    final d = driver;
+    return d is LocalAiDriver
+        ? (d.enemy?.rank ?? EnemyRank.common)
+        : EnemyRank.common;
+  }
+
+  /// The live escape chance (0–1) — see [Flee.chance] for the ruled formula.
+  ///
+  /// ⭐ Read off the ENGINE's health, not the lagging `shown*` display values:
+  /// the button is disabled while a turn animates, so the only moment this is
+  /// read is a moment the two agree — and if they ever drift, the number the
+  /// player is shown must be the number they are about to roll against.
+  double get fleeChance => Flee.chance(
+    playerLevel: player.level,
+    enemyLevel: enemy.level,
+    playerHp: player.hp,
+    playerMaxHp: player.maxHp,
+    enemyHp: enemy.hp,
+    enemyMaxHp: enemy.maxHp,
+    rank: enemyRank,
+  );
+
+  /// The same number the button prints: whole percent.
+  int get fleePercent => (fleeChance * 100).round();
+
+  /// Rolls an escape attempt (campaign only).
+  ///
+  /// Returns **true** on a clean getaway: the duel is over as [fled] right
+  /// now, before the enemy's action for this turn is ever chosen — the ruled
+  /// semantics are that a successful escape resolves *first*, so the free hit
+  /// a failure hands over is the entire cost of trying.
+  ///
+  /// Returns **false** when the attempt fails, and then the caller owes the
+  /// duel a turn: submit `ForfeitAction` through
+  /// [submitTurn] with `fleeAttempt: true`, so the enemy's move resolves
+  /// against a player who did nothing. ⚠️ If that kills them it is an ordinary
+  /// death down the ordinary path — they died fighting after a failed escape,
+  /// not fleeing — which is precisely why the failure branch does no ending
+  /// bookkeeping of its own.
+  ///
+  /// ⭐ **Flat odds on repeats** (ruled): no decay, no escalation. The free
+  /// enemy turn per failure is already a compounding price, and stacking a
+  /// shrinking chance on top would make the second attempt a trap.
+  bool attemptFlee() {
+    if (_duelEnded || animating) return false;
+    final chance = fleeChance;
+    // `< chance`, so a 0.95 ceiling really does leave a sliver: a roll of
+    // exactly 0.95 fails.
+    final escaped = _rng.nextDouble() < chance;
+    final shown = (chance * 100).round();
+    if (!escaped) {
+      battleLog.add('You break for the exit ($shown%) and fail to get clear.');
+      notifyListeners();
+      return false;
+    }
+    _fled = true;
+    battleLog.add('You break for the exit ($shown%) and get clean away.');
+    // ⚠️ No `driver.reportSurrender()`: this is not a concession, and there is
+    // no remote peer to tell — flee exists only in campaign duels, whose
+    // opponent is a local brain.
+    notifyListeners();
+    return true;
+  }
+
   /// Forfeit the duel ("surrender" in PvP, "flee" in the campaign).
   void surrender({String verb = 'surrender'}) {
-    if (engine.isOver || animating) return;
+    if (_duelEnded || animating) return;
     engine.concede(player);
     playerDefeated = true;
     shownPlayerHp = 0;
@@ -519,7 +672,7 @@ class DuelController extends ChangeNotifier {
   /// The remote opponent surrendered: the duel ends right now as a win,
   /// whether this player was mid-exchange or idle at the move picker.
   void _onOpponentSurrendered() {
-    if (engine.isOver) return;
+    if (_duelEnded) return;
     engine.concede(enemy);
     enemyDefeated = true;
     shownEnemyHp = 0;

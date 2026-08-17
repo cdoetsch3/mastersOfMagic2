@@ -556,6 +556,26 @@ class GameState extends ChangeNotifier {
     return lost;
   }
 
+  /// Records a **fled** encounter: the player rolled a clean escape and the
+  /// run ends here (2026-08-17 flee ruling).
+  ///
+  /// ⭐ **This is the walk-out path, not the defeat path.** Fleeing routes
+  /// through [leaveAdventure] — outcome [RunOutcome.returned], the pending
+  /// haul intact and waiting on the take-home picker, the backpack untouched.
+  /// ⚠️ Deliberately does NOT call [recordDuelResult]: a duel nobody won pays
+  /// no XP, adds no gold, and must not tick `duelsLost`. Routing this anywhere
+  /// near [loseEncounter] would hand the player the full death penalty for
+  /// successfully getting away, which is the exact bug the ruling replaced.
+  Future<void> fleeEncounter({required int remainingHp}) async {
+    final r = run;
+    if (r == null || r.isOver) return;
+    // Truthful to the last, even though the run is ending: the HP the player
+    // escaped with is the HP the ending screen reads. Set before the call so
+    // it rides [leaveAdventure]'s own write to disk rather than a second one.
+    r.playerHp = remainingHp;
+    await leaveAdventure();
+  }
+
   /// Uses a carried item between encounters.
   ///
   /// ⭐ Removes it **only if it was actually spent** — an item that changed

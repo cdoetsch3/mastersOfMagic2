@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../game/adventure.dart';
+import '../game/duel_controller.dart';
 import '../game/enemies/enemy_def.dart';
 import '../game/game_state.dart';
 import '../game/skills.dart';
@@ -135,14 +136,23 @@ class _AdventureScreenState extends State<AdventureScreen> {
           playerStartingHp: run.playerHp,
           // ⚠️ Settled here, awaited by the end screen, so the loot exists
           // before it is drawn.
-          onSettle: (won, remainingHp) async {
-            if (!won) {
-              // ⚠️ The defeat penalty is paid here, on the profile, and this
-              // is the only moment its size is knowable — see [_wiped].
-              _wiped = await game.loseEncounter();
-              return const [];
+          // ⚠️ Three endings, and the third is the reason this is a switch
+          // rather than an `if (!won)`: an escape (2026-08-17 ruling) ends the
+          // run the way walking out does — nothing recorded, backpack kept —
+          // and must never fall into the defeat branch.
+          onSettle: (outcome, remainingHp) async {
+            switch (outcome) {
+              case DuelOutcome.won:
+                return game.winEncounter(remainingHp: remainingHp);
+              case DuelOutcome.fled:
+                await game.fleeEncounter(remainingHp: remainingHp);
+                return const [];
+              case DuelOutcome.lost:
+                // ⚠️ The defeat penalty is paid here, on the profile, and
+                // this is the only moment its size is knowable — see [_wiped].
+                _wiped = await game.loseEncounter();
+                return const [];
             }
-            return game.winEncounter(remainingHp: remainingHp);
           },
         ),
       ),

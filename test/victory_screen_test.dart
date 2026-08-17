@@ -8,6 +8,17 @@ import 'package:masters_of_magic_2/game/loadout.dart';
 import 'package:masters_of_magic_2/game/opponent_driver.dart';
 import 'package:masters_of_magic_2/game/progression.dart';
 import 'package:masters_of_magic_2/screens/duel_screen.dart';
+import 'package:mom_engine/mom_engine.dart';
+
+/// A duel stream whose next double is always 0 — every escape roll succeeds.
+/// ⭐ Pins the campaign route to this card at 100%, where the real chance tops
+/// out at 95%.
+class _AlwaysEscapes extends ReseedableRandom {
+  _AlwaysEscapes() : super(1);
+
+  @override
+  double nextDouble() => 0.0;
+}
 
 void main() {
   test('⚠️ the XP a win is worth is NOT the flat base', () {
@@ -35,8 +46,13 @@ void main() {
   // "Again" is a practice affordance, not a campaign one
   // ======================================================================
   group('the rematch button', () {
-    /// Builds the arena, then loses on purpose — the shortest honest route to
-    /// the end-of-duel card.
+    /// Builds the arena, then bows out on purpose — the shortest honest route
+    /// to the end-of-duel card.
+    ///
+    /// ⚠️ The two modes leave by different doors since the 2026-08-17 flee
+    /// ruling: PvP surrenders flat, while a campaign fight ROLLS to escape. So
+    /// the campaign route forces a winning roll ([_AlwaysEscapes]) rather than
+    /// tapping a button that no longer ends anything by itself.
     Future<void> playToTheEnd(WidgetTester tester,
         {required bool campaign}) async {
       tester.view.physicalSize = const Size(1280, 720);
@@ -47,6 +63,7 @@ void main() {
         home: DuelScreen(
           loadout: Loadout.starter,
           campaign: campaign,
+          rng: campaign ? _AlwaysEscapes() : null,
           driver: LocalAiDriver(
             persona: const EnemyEncounter(
               def: WhisperingWoodsBestiary.sporecapShambler,
@@ -58,13 +75,18 @@ void main() {
         ),
       ));
       await tester.pump();
-      await tester.tap(find.text(campaign ? 'Flee' : 'Surrender').first);
+      // The campaign button carries its live odds ("Flee (70%)"), so match on
+      // the prefix rather than pinning a number this test does not care about.
+      final leave = campaign
+          ? find.textContaining('Flee (')
+          : find.text('Surrender');
+      await tester.tap(leave.first);
       // ⚠️ Never pumpAndSettle here: the arena runs a per-move countdown, so
       // the tree never goes quiet and settling times out.
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 600));
       // The confirmation dialog repeats the verb; the second one is its button.
-      await tester.tap(find.text(campaign ? 'Flee' : 'Surrender').last);
+      await tester.tap(leave.last);
       // ⚠️ Never pumpAndSettle here: the arena runs a per-move countdown, so
       // the tree never goes quiet and settling times out.
       await tester.pump();
