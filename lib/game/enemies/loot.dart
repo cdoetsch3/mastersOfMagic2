@@ -32,7 +32,8 @@ class Loot {
 /// Rolls [table] into items.
 ///
 /// The three tiers behave differently on purpose (see `DropTable`):
-/// - `always` — every entry, every time.
+/// - `always` — every entry gets a roll every kill, subject to its own
+///   `chance` (which defaults to 1, i.e. genuinely guaranteed).
 /// - `main` — ⭐ **exactly one** entry, by weight. This is what bounds what a
 ///   kill can be worth and makes drop rates readable as percentages.
 /// - `bonus` — each rolled independently, on top.
@@ -40,6 +41,20 @@ Loot rollDrops(DropTable table, Random rng) {
   final ids = <String>[];
 
   for (final e in table.always) {
+    // ⚠️ `chance` is honoured HERE too, not just in `bonus`. "always" names
+    // *when* the bucket is consulted — every kill, one roll per entry — not
+    // that every entry pays. Ignoring it silently made every authored rate in
+    // this bucket a lie: `flora_crystal` at `chance: 0.25` on the mini-boss
+    // table dropped on 100% of kills, and `content_export.dart` published the
+    // 0.25 to the wiki under the promise that "a wiki that prints 12% got it
+    // from the roller."
+    //
+    // ⭐ The `< 1` guard is load-bearing, not a micro-optimisation: a
+    // guaranteed entry must not consume a number from [rng], so a table whose
+    // `always` slots are all certain (both bosses) rolls the exact same
+    // sequence it always did. Only tables that actually asked for a chance
+    // shift.
+    if (e.chance < 1 && rng.nextDouble() >= e.chance) continue;
     ids.addAll(_expand(e, rng));
   }
 

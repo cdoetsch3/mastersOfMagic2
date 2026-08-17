@@ -16,8 +16,14 @@ class DropEntry {
   /// Relative weight within [DropTable.main]; ignored elsewhere.
   final int weight;
 
-  /// Independent chance 0–1. Used by [DropTable.always] (always 1) and
-  /// [DropTable.bonus].
+  /// Independent chance 0–1, honoured by [DropTable.always] and
+  /// [DropTable.bonus] alike; ignored by [DropTable.main], which draws by
+  /// [weight] instead.
+  ///
+  /// ⚠️ Defaults to 1, so an `always` entry that says nothing is genuinely
+  /// guaranteed — but an `always` entry that *does* name a chance gets it.
+  /// The two buckets differ in how many entries can pay (all of `always`,
+  /// each of `bonus`), not in whether the number means anything.
   final double chance;
 
   final int min;
@@ -39,7 +45,9 @@ class DropEntry {
 
 @immutable
 class DropTable {
-  /// Rolled every kill, guaranteed. Motes and bulk materials live here.
+  /// Consulted every kill — ⭐ *every* entry gets its own roll, unlike [main]
+  /// where exactly one wins. Motes and bulk materials live here. An entry is
+  /// guaranteed only if it leaves [DropEntry.chance] at its default of 1.
   final List<DropEntry> always;
 
   /// ⭐ **Exactly one entry is drawn**, by weight. This is what bounds a kill's
