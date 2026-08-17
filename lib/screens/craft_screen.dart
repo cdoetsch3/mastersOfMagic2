@@ -7,6 +7,7 @@ import '../game/items/recipe_def.dart';
 import '../game/skills.dart';
 import '../ui/app_theme.dart';
 import '../ui/item_display.dart';
+import 'crafting_act_screen.dart';
 import 'skills_screen.dart' show skillIcon;
 
 /// The Workbench — every recipe, craftable-first, have/need honest.
@@ -15,10 +16,10 @@ import 'skills_screen.dart' show skillIcon;
 /// this screen opens from the Inventory tab wherever the player stands.
 /// Stations become a bonus layered on later, not a precondition.
 ///
-/// 📝 **The craft button is a placeholder for the crafting act.** The planned
-/// minigame (recipe gestures; execution quality → item quality) replaces the
-/// button's instant result and feeds `GameState.craft(performance:)` — the
-/// seam is already in place, so this screen changes locally when that lands.
+/// ⭐ **Craft opens the act** (crafting_act_screen.dart) when the recipe has
+/// a gesture script; **Quick craft** stays as the instant path — the bulk
+/// lane §9b.9b promised, so twenty draughts is never twenty minigames.
+/// 📝 Quick craft will cap quality at Standard once quality affects stats.
 class CraftScreen extends StatelessWidget {
   const CraftScreen({super.key});
 
@@ -170,15 +171,34 @@ class _RecipeCard extends StatelessWidget {
                           fontSize: 11.5,
                         ),
                       )
-                    : FilledButton(
-                        onPressed: canCraft
-                            ? () => _craft(context)
-                            : null,
-                        child: Text(
-                          canCraft
-                              ? 'Craft · +${Skills.xpForRecipe(recipe)} XP'
-                              : 'Missing ${shortfalls.join(", ")}',
-                        ),
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (canCraft && recipe.steps.isNotEmpty)
+                            TextButton(
+                              onPressed: () => _craft(context),
+                              child: const Text('Quick craft'),
+                            ),
+                          const SizedBox(width: 6),
+                          FilledButton(
+                            onPressed: canCraft
+                                ? () => recipe.steps.isEmpty
+                                      ? _craft(context)
+                                      : Navigator.of(context).push(
+                                          MaterialPageRoute<void>(
+                                            builder: (_) => CraftingActScreen(
+                                              recipe: recipe,
+                                            ),
+                                          ),
+                                        )
+                                : null,
+                            child: Text(
+                              canCraft
+                                  ? 'Craft · +${Skills.xpForRecipe(recipe)} XP'
+                                  : 'Missing ${shortfalls.join(", ")}',
+                            ),
+                          ),
+                        ],
                       ),
               ),
             ],

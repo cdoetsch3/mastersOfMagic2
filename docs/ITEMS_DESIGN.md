@@ -2045,6 +2045,17 @@ itself lives in code and the export.
 - **`RecipeDef.steps`** — the authored act (levers 1–3). Empty = plain
   button. All 20 Primal recipes carry scripts; tier 1 holds to 2–3 steps and
   the oak kit crosses all three categories (the tutorial-by-fiction).
+- ✅ **The act is PLAYABLE (2026-08-11)**: six engines built
+  (`lib/ui/crafting/` — releaseTiming, sweetSpot, trace, rateDrag,
+  bandKeeper, alignCommit), orchestrated by `CraftingActScreen`. Engines
+  measure, `scoring.dart` judges (pure, tested), the mean is the grade, the
+  grade feeds `craft(performance:)`. Margin drives StepTuning (wider
+  windows, slower tempo). Below the fail threshold the act aborts with
+  materials returned and says so out loud; from margin +5 it cannot fail.
+  **Quick craft** stays beside the act as the instant bulk lane (📝 caps at
+  Standard once quality affects stats). The three unused engines
+  (stabilizer, placement, callResponse) fall back to an instant pass if a
+  recipe ever names one early.
 - **`lib/game/crafting/craft_quality.dart`** — margin, windowScale, the
   §9b.9d pipeline (executionCeiling / floor / weighted roll). 📝 All numbers
   placeholders; the tests pin the SHAPE (at-level perfect can Rough, margin
@@ -2101,6 +2112,12 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-11.** The crafting act shipped: six gesture engines, the
+act screen, pure scoring (coverage-dominant traces, linear closeness,
+grade labels aligned with the quality ceilings), margin-driven tuning,
+abort-with-refund below the fail threshold, and Quick craft as the bulk
+lane. Widget tests play the act end to end with synthetic gestures.
 
 **Rev — 2026-08-10g.** §9b.9e: the schema shipped — GestureEngine/Step,
 scripts on all 20 Primal recipes, CraftQuality (placeholder numbers, ruled
