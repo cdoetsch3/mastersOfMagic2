@@ -82,6 +82,44 @@ class DuelScreen extends StatefulWidget {
 
 enum _FxKind { none, projectile, impact, shieldUp, charge, heal, flash, status }
 
+/// The floating text that rides an impact: the numbers first, then the tags
+/// that explain them.
+///
+/// ⭐ **CRIT! leads.** A crit's damage is already folded into `toHp`, so
+/// without a tag the only evidence a crit happened is a number the player has
+/// no baseline to compare against — which is exactly why playtesters reported
+/// "crits do nothing". It goes *before* the damage so the eye hits the
+/// exclamation on the way to the number.
+///
+/// ⚠️ Pure and top-level on purpose: the float is painted onto a canvas by
+/// [_FxPainter], where no widget finder can reach it. This is the seam tests
+/// pin the crit tag on.
+@visibleForTesting
+String impactFloatText(DamageEvent event) => [
+  if (event.crit) 'CRIT!',
+  if (event.toHp > 0) '-${event.toHp}',
+  if (event.toHp == 0 && event.toShield > 0) 'blocked',
+  if (shieldMultiplierTag(event.shieldMultiplierPercent) case final t?)
+    '$t vs shield',
+  // ⚠️ Says it at the moment it happens. The shield bar does not move for a
+  // shield-ignoring hit, so without this the wall looks like it simply
+  // failed — the "it hit through my shield" complaint. (Restored at merge:
+  // the extraction had dropped it.)
+  if (event.bypassedShield) 'ignores shields',
+  if (event.shieldBroken) 'shield shattered',
+].join('  ');
+
+/// How hard an impact hits the screen, given this hit's share of the spell.
+///
+/// ⭐ A crit is a **1.7× flourish**, not a bigger number in the same puff of
+/// smoke. The factor is picked so that any single-hit spell's crit clears the
+/// 2.4 "whole-screen flash" threshold in [_FxPainter] — a crit is the moment
+/// the arena lights up, which is what makes it read as an event rather than
+/// as a suspiciously large number.
+@visibleForTesting
+double impactIntensity(double perHit, {required bool crit}) =>
+    (1 + perHit * 0.45) * (crit ? 1.7 : 1.0);
+
 class _DuelScreenState extends State<DuelScreen>
     with SingleTickerProviderStateMixin {
   late final DuelController c = DuelController(
@@ -371,15 +409,12 @@ class _DuelScreenState extends State<DuelScreen>
           intensity: 1 + _castWeight * 0.3,
           ms: 300 + _castWeight * 40,
         );
-      case DamageEvent(
-        :final target,
-        :final toShield,
-        :final toHp,
-        :final shieldMultiplierPercent,
-        :final shieldBroken,
-        :final bypassedShield,
-      ):
-        final isEnemy = target == c.enemy;
+      // Bound whole (rather than destructured) because [impactFloatText] reads
+      // its fields to build the float — passing the event beats threading
+      // each one through by hand.
+      case final DamageEvent damage:
+        final crit = damage.crit;
+        final isEnemy = damage.target == c.enemy;
         final color = _castElement?.style.color ?? Colors.white;
         // The spell's own weight drives every flourish below, so a Flick looks
         // like a Flick no matter how much charge was on the board.
@@ -403,25 +438,24 @@ class _DuelScreenState extends State<DuelScreen>
           intensity: 1 + perHit * 0.35,
           ms: isMultiHit ? 240 : max(280, 420 - weight * 20),
         );
-        final text = [
-          if (toHp > 0) '-$toHp',
-          if (toHp == 0 && toShield > 0) 'blocked',
-          if (shieldMultiplierTag(shieldMultiplierPercent) case final t?)
-            '$t vs shield',
-          // ⚠️ Says it at the moment it happens. The shield bar does not move
-          // for a shield-ignoring hit, so without this the wall looks like it
-          // simply failed — the "it hit through my shield" complaint.
-          if (bypassedShield) 'ignores shields',
-          if (shieldBroken) 'shield shattered',
-        ].join('  ');
+
         await _runFx(
           _FxKind.impact,
           atEnemy: isEnemy,
-          color: color,
-          text: text,
-          intensity: 1 + perHit * 0.45,
-          shake: perHit >= 3 ? (perHit - 2) * 3.5 : 0,
-          ms: isMultiHit ? 320 : 440 + weight * 50,
+          // ⭐ Crits get white, not the element colour. The float is the only
+          // place the crit is spelled out, so it must not blend into the
+          // stream of same-coloured hits it is meant to stand out from.
+          color: crit ? Colors.white : color,
+          text: impactFloatText(damage),
+          intensity: impactIntensity(perHit, crit: crit),
+          // A crit always shakes, even a Flick — the kick is half the tell.
+          shake: perHit >= 3
+              ? (perHit - 2) * 3.5 * (crit ? 1.6 : 1)
+              : (crit ? 4.5 : 0),
+          // Held ~40% longer on a crit so the "CRIT!" is actually readable
+          // instead of scrolling past with the damage number.
+          ms: ((isMultiHit ? 320 : 440 + weight * 50) * (crit ? 1.4 : 1.0))
+              .round(),
         );
       case ShieldRaisedEvent(
         :final mage,
@@ -1053,6 +1087,9 @@ class _DuelScreenState extends State<DuelScreen>
     final midnight = _enemyDark?.midnight ?? false;
     return _StatusPanel(
       name: 'You',
+      // Read off the MageState rather than widget.playerLevel so the two
+      // nameplates can never disagree about who is what level.
+      level: c.player.level,
       hp: c.shownPlayerHp,
       maxHp: c.player.maxHp,
       charge: c.shownPlayerCharge,
@@ -1071,6 +1108,7 @@ class _DuelScreenState extends State<DuelScreen>
     final dark = _enemyDark;
     return _StatusPanel(
       name: c.enemy.name,
+      level: c.enemy.level,
       hp: c.shownEnemyHp,
       maxHp: c.enemy.maxHp,
       charge: c.shownEnemyCharge,
@@ -1620,6 +1658,13 @@ class _DuelScreenState extends State<DuelScreen>
 
 class _StatusPanel extends StatelessWidget {
   final String name;
+
+  /// ⭐ The mage's character level. Shown on **both** nameplates, because a
+  /// level number only means anything next to the other one — "Lv 5" on the
+  /// enemy is alarming exactly when the player reads "Lv 1" on themselves.
+  /// Before this, nothing in the arena distinguished a level-5 boss from a
+  /// level-1 fawn except an HP bar the player has no baseline for.
+  final int level;
   final int hp;
   final int maxHp;
   final int charge;
@@ -1640,6 +1685,7 @@ class _StatusPanel extends StatelessWidget {
 
   const _StatusPanel({
     required this.name,
+    required this.level,
     required this.hp,
     required this.maxHp,
     required this.charge,
@@ -1674,15 +1720,23 @@ class _StatusPanel extends StatelessWidget {
                 ? MainAxisAlignment.end
                 : MainAxisAlignment.start,
             children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+              // ⚠️ Flexible: the panel is a fixed 30% of the arena width, and
+              // the level pill now shares the line with the name. A long
+              // enemy name has to ellipsize rather than overflow the row.
+              Flexible(
+                child: Text(
+                  name,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 5),
+              _levelPill(),
+              const SizedBox(width: 6),
               if (barsVeiled)
                 _veilPill()
               else
@@ -1784,6 +1838,36 @@ class _StatusPanel extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  /// The compact "LV n" chip on the nameplate. Gold and small-caps, matching
+  /// the game's other "this is a stat, not prose" chips — it must be legible
+  /// at a glance without competing with the name it sits beside.
+  ///
+  /// ⚠️ Never veiled. Creeping Dark hides what a mage is *doing* (charge,
+  /// health); their level is public knowledge from the moment they step in.
+  Widget _levelPill() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: AppColors.gold.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+          color: AppColors.gold.withValues(alpha: 0.55),
+          width: 0.8,
+        ),
+      ),
+      child: Text(
+        'LV $level',
+        style: const TextStyle(
+          color: AppColors.gold,
+          fontSize: 9.5,
+          letterSpacing: 0.6,
+          fontWeight: FontWeight.w700,
+          height: 1.2,
+        ),
       ),
     );
   }
