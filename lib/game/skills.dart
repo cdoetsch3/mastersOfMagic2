@@ -86,10 +86,26 @@ abstract final class Skills {
     return remaining;
   }
 
-  /// What one craft of [recipe] pays. ⭐ Scales with the recipe's own gate, so
-  /// tier-2 work out-earns spamming tier-1 — the same shape the character
-  /// curve uses for opponent level.
-  static int xpForRecipe(RecipeDef recipe) => 10 + 5 * recipe.skillLevel;
+  /// What one craft of [recipe] pays: **total ingredients × (4 + 2 × gate)**.
+  ///
+  /// ⭐ **Within a tier, the ratio IS the ingredient count** (designer ruling,
+  /// 2026-08-17). A Quarterstaff eats three logs and a Wand eats two, so the
+  /// staff must pay 3:2 — under the old flat `10 + 5·gate` both paid 15, which
+  /// made the cheapest recipe in every tier the only rational way to grind and
+  /// turned the ladder into a materials-efficiency puzzle instead of a record
+  /// of work done. Counting inputs is the only term that tracks the work.
+  ///
+  /// ⭐ **The gate multiplier preserves the tier-2-out-earns ruling**: the
+  /// per-ingredient rate climbs 6 → 24 from gate 1 to gate 10, so a tier-2
+  /// craft still beats spamming tier-1 even though tier-1 recipes are cheaper
+  /// per unit. ⚠️ Both terms are load-bearing — drop the count and the 3:2 dies,
+  /// drop the gate and tier-1 spam wins again.
+  ///
+  /// 📝 Worked examples the ruling pinned: Oak Quarterstaff (3 logs, gate 1)
+  /// → 3 × 6 = 18; Oak Wand and Oak Knot (2 logs, gate 1) → 2 × 6 = 12.
+  static int xpForRecipe(RecipeDef recipe) =>
+      recipe.inputs.fold<int>(0, (sum, i) => sum + i.count) *
+      (4 + 2 * recipe.skillLevel);
 
   // ---- what a level means (the Ledger's three views) ---------------------
 

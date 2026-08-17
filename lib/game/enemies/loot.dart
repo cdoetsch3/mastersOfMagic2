@@ -12,6 +12,38 @@ import '../items/item_catalogue.dart';
 import '../items/item_instance.dart';
 import 'drop_table.dart';
 
+/// **The one generator every production loot roll draws from.**
+///
+/// ⭐ One long-lived stream rather than a fresh `Random()` per kill. Both are
+/// sound on both backends — see below — but a single stream is the version
+/// that stays sound no matter what a future SDK does with unseeded seeding,
+/// and it removes the need to reason about the question at all. Tests keep
+/// passing their own seeded `Random`; only the unseeded production path lands
+/// here.
+///
+/// 📝 **The web-seeding audit (2026-08-17), so nobody has to redo it.** The
+/// reported "boss Epic three runs running" was suspected to be a dart2js
+/// seeding artefact — many `Random()` built inside one millisecond sharing a
+/// clock-derived seed. That cannot happen on either backend we ship:
+///
+/// - **dart2js**: `Random()` with no seed returns `const _JSRandom()` — a
+///   *const* singleton with no state and no seed at all, delegating every draw
+///   straight to JS `Math.random()`. There is nothing to correlate: every
+///   `Random()` in the program is literally the same object, and the clock is
+///   never consulted. `nextInt(max)` is `(Math.random() * max) >>> 0`, an exact
+///   floor for every `max` these tables use (all ≤ 100, and `_mintId`'s 16), so
+///   ⚠️ the 32-bit `>>> 0` truncation is not a bias source either — it only
+///   becomes one above 2^32, which `nextInt` rejects outright.
+/// - **Dart VM**: `Random()` with no seed takes `_setupSeed(_nextSeed())`, and
+///   `_nextSeed()` *advances a global PRNG* seeded from the VM entropy source.
+///   No clock in that path either, so same-millisecond construction still
+///   yields decorrelated streams.
+///
+/// So the streak was luck (0.1³ = 1 in 1000 per three-boss window, and the
+/// player has killed many bosses). The weight stays 10 by ruling; this shared
+/// stream is hygiene, not a fix.
+final Random lootRng = Random();
+
 /// What one kill produced.
 class Loot {
   /// One entry per *slot* it will occupy — ⭐ three logs are three entries,
@@ -37,7 +69,13 @@ class Loot {
 /// - `main` — ⭐ **exactly one** entry, by weight. This is what bounds what a
 ///   kill can be worth and makes drop rates readable as percentages.
 /// - `bonus` — each rolled independently, on top.
-Loot rollDrops(DropTable table, Random rng) {
+///
+/// ⚠️ **Omitting [rng] is the production call** — it draws from [lootRng], the
+/// one shared stream. Pass a seeded `Random` only to pin a test; a caller that
+/// hands over a fresh `Random()` per kill re-creates exactly the per-kill
+/// construction [lootRng] exists to retire.
+Loot rollDrops(DropTable table, [Random? rng]) {
+  rng ??= lootRng;
   final ids = <String>[];
 
   for (final e in table.always) {

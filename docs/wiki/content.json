@@ -1407,8 +1407,15 @@
             "itemId": "flora_shard",
             "min": 1,
             "max": 1,
-            "weight": 15,
-            "chance": 0.15
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
           }
         ],
         "bonus": []
@@ -1474,8 +1481,15 @@
             "itemId": "flora_shard",
             "min": 1,
             "max": 2,
-            "weight": 25,
-            "chance": 0.25
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
           },
           {
             "itemId": "foragers_ration",
@@ -1548,8 +1562,15 @@
             "itemId": "flora_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": []
@@ -1615,8 +1636,15 @@
             "itemId": "flora_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": [
@@ -1676,7 +1704,13 @@
           {
             "itemId": "flora_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -1766,7 +1800,13 @@
           {
             "itemId": "flora_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -1846,7 +1886,13 @@
           {
             "itemId": "flora_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -1936,7 +1982,13 @@
           {
             "itemId": "flora_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -2031,8 +2083,14 @@
           },
           {
             "itemId": "flora_shard",
-            "min": 3,
-            "max": 6,
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 4,
+            "max": 8,
             "chance": 1.0
           },
           {
@@ -2127,8 +2185,14 @@
           },
           {
             "itemId": "flora_shard",
-            "min": 3,
-            "max": 6,
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 4,
+            "max": 8,
             "chance": 1.0
           },
           {
@@ -2308,8 +2372,15 @@
             "itemId": "aqua_shard",
             "min": 1,
             "max": 1,
-            "weight": 15,
-            "chance": 0.15
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
           }
         ],
         "bonus": []
@@ -2375,8 +2446,15 @@
             "itemId": "aqua_shard",
             "min": 1,
             "max": 2,
-            "weight": 25,
-            "chance": 0.25
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
           },
           {
             "itemId": "sapwort_draught",
@@ -2449,8 +2527,15 @@
             "itemId": "aqua_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": []
@@ -2516,8 +2601,15 @@
             "itemId": "aqua_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": []
@@ -2570,7 +2662,13 @@
           {
             "itemId": "aqua_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -2660,7 +2758,13 @@
           {
             "itemId": "aqua_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -2740,7 +2844,13 @@
           {
             "itemId": "aqua_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -2830,7 +2940,13 @@
           {
             "itemId": "aqua_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -2925,8 +3041,14 @@
           },
           {
             "itemId": "aqua_shard",
-            "min": 3,
-            "max": 6,
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 4,
+            "max": 8,
             "chance": 1.0
           },
           {
@@ -3021,8 +3143,14 @@
           },
           {
             "itemId": "aqua_shard",
-            "min": 3,
-            "max": 6,
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 4,
+            "max": 8,
             "chance": 1.0
           },
           {
@@ -3125,8 +3253,15 @@
             "itemId": "pyro_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": []
@@ -3192,8 +3327,15 @@
             "itemId": "pyro_shard",
             "min": 1,
             "max": 1,
-            "weight": 15,
-            "chance": 0.15
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
           }
         ],
         "bonus": []
@@ -3259,8 +3401,15 @@
             "itemId": "pyro_shard",
             "min": 1,
             "max": 1,
-            "weight": 15,
-            "chance": 0.15
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
           }
         ],
         "bonus": []
@@ -3326,8 +3475,15 @@
             "itemId": "pyro_shard",
             "min": 1,
             "max": 2,
-            "weight": 25,
-            "chance": 0.25
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
           },
           {
             "itemId": "tuskhide",
@@ -3400,8 +3556,15 @@
             "itemId": "pyro_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": []
@@ -3454,7 +3617,13 @@
           {
             "itemId": "pyro_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -3481,10 +3650,17 @@
           },
           {
             "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "pyro_dust",
             "min": 2,
             "max": 4,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 13,
+            "chance": 0.13
           },
           {
             "itemId": "cinder_loop",
@@ -3544,7 +3720,13 @@
           {
             "itemId": "pyro_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -3571,10 +3753,17 @@
           },
           {
             "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "pyro_dust",
             "min": 2,
             "max": 4,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 13,
+            "chance": 0.13
           },
           {
             "itemId": "cinder_loop",
@@ -3624,7 +3813,13 @@
           {
             "itemId": "pyro_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -3651,10 +3846,17 @@
           },
           {
             "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "pyro_dust",
             "min": 2,
             "max": 4,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 13,
+            "chance": 0.13
           },
           {
             "itemId": "cinder_loop",
@@ -3714,7 +3916,13 @@
           {
             "itemId": "pyro_shard",
             "min": 1,
-            "max": 3,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 4,
             "chance": 1.0
           },
           {
@@ -3741,10 +3949,17 @@
           },
           {
             "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "pyro_dust",
             "min": 2,
             "max": 4,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 13,
+            "chance": 0.13
           },
           {
             "itemId": "cinder_loop",
@@ -3809,8 +4024,14 @@
           },
           {
             "itemId": "pyro_shard",
-            "min": 3,
-            "max": 6,
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 4,
+            "max": 8,
             "chance": 1.0
           },
           {
@@ -3844,10 +4065,17 @@
           },
           {
             "itemId": "pyro_shard",
+            "min": 2,
+            "max": 4,
+            "weight": 3,
+            "chance": 0.03
+          },
+          {
+            "itemId": "pyro_dust",
             "min": 4,
             "max": 8,
-            "weight": 10,
-            "chance": 0.1
+            "weight": 7,
+            "chance": 0.07
           }
         ],
         "bonus": []
@@ -3905,8 +4133,14 @@
           },
           {
             "itemId": "pyro_shard",
-            "min": 3,
-            "max": 6,
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 4,
+            "max": 8,
             "chance": 1.0
           },
           {
@@ -3940,10 +4174,17 @@
           },
           {
             "itemId": "pyro_shard",
+            "min": 2,
+            "max": 4,
+            "weight": 3,
+            "chance": 0.03
+          },
+          {
+            "itemId": "pyro_dust",
             "min": 4,
             "max": 8,
-            "weight": 10,
-            "chance": 0.1
+            "weight": 7,
+            "chance": 0.07
           }
         ],
         "bonus": []
@@ -4099,8 +4340,15 @@
             "itemId": "flora_shard",
             "min": 1,
             "max": 1,
-            "weight": 15,
-            "chance": 0.15
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
           }
         ],
         "bonus": []
@@ -4173,8 +4421,15 @@
             "itemId": "aqua_shard",
             "min": 1,
             "max": 2,
-            "weight": 25,
-            "chance": 0.25
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
           },
           {
             "itemId": "amber",
@@ -4254,8 +4509,15 @@
             "itemId": "flora_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": []
@@ -4328,8 +4590,15 @@
             "itemId": "aqua_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": []
@@ -4383,11 +4652,23 @@
           {
             "itemId": "flora_shard",
             "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
             "max": 2,
             "chance": 1.0
           },
           {
-            "itemId": "aqua_shard",
+            "itemId": "aqua_dust",
             "min": 1,
             "max": 2,
             "chance": 1.0
@@ -4486,11 +4767,23 @@
           {
             "itemId": "flora_shard",
             "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
             "max": 2,
             "chance": 1.0
           },
           {
-            "itemId": "aqua_shard",
+            "itemId": "aqua_dust",
             "min": 1,
             "max": 2,
             "chance": 1.0
@@ -4579,11 +4872,23 @@
           {
             "itemId": "flora_shard",
             "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
             "max": 2,
             "chance": 1.0
           },
           {
-            "itemId": "aqua_shard",
+            "itemId": "aqua_dust",
             "min": 1,
             "max": 2,
             "chance": 1.0
@@ -4682,11 +4987,23 @@
           {
             "itemId": "flora_shard",
             "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
             "max": 2,
             "chance": 1.0
           },
           {
-            "itemId": "aqua_shard",
+            "itemId": "aqua_dust",
             "min": 1,
             "max": 2,
             "chance": 1.0
@@ -4796,12 +5113,24 @@
           },
           {
             "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_dust",
             "min": 2,
             "max": 4,
             "chance": 1.0
           },
           {
-            "itemId": "aqua_shard",
+            "itemId": "aqua_dust",
             "min": 2,
             "max": 4,
             "chance": 1.0
@@ -4899,12 +5228,24 @@
           },
           {
             "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_dust",
             "min": 2,
             "max": 4,
             "chance": 1.0
           },
           {
-            "itemId": "aqua_shard",
+            "itemId": "aqua_dust",
             "min": 2,
             "max": 4,
             "chance": 1.0
@@ -5084,8 +5425,15 @@
             "itemId": "flora_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "flora_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": []
@@ -5158,8 +5506,15 @@
             "itemId": "pyro_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           }
         ],
         "bonus": []
@@ -5232,8 +5587,15 @@
             "itemId": "pyro_shard",
             "min": 1,
             "max": 1,
-            "weight": 20,
-            "chance": 0.2
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
           },
           {
             "itemId": "brookmint_tonic",
@@ -5368,11 +5730,23 @@
           {
             "itemId": "pyro_shard",
             "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
             "max": 2,
             "chance": 1.0
           },
           {
-            "itemId": "flora_shard",
+            "itemId": "flora_dust",
             "min": 1,
             "max": 2,
             "chance": 1.0
@@ -5471,11 +5845,23 @@
           {
             "itemId": "pyro_shard",
             "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
             "max": 2,
             "chance": 1.0
           },
           {
-            "itemId": "flora_shard",
+            "itemId": "flora_dust",
             "min": 1,
             "max": 2,
             "chance": 1.0
@@ -5563,11 +5949,23 @@
           {
             "itemId": "pyro_shard",
             "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
             "max": 2,
             "chance": 1.0
           },
           {
-            "itemId": "flora_shard",
+            "itemId": "flora_dust",
             "min": 1,
             "max": 2,
             "chance": 1.0
@@ -5666,11 +6064,23 @@
           {
             "itemId": "pyro_shard",
             "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 0.5
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
             "max": 2,
             "chance": 1.0
           },
           {
-            "itemId": "flora_shard",
+            "itemId": "flora_dust",
             "min": 1,
             "max": 2,
             "chance": 1.0
@@ -5780,12 +6190,24 @@
           },
           {
             "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
             "min": 2,
             "max": 4,
             "chance": 1.0
           },
           {
-            "itemId": "flora_shard",
+            "itemId": "flora_dust",
             "min": 2,
             "max": 4,
             "chance": 1.0
@@ -5883,12 +6305,24 @@
           },
           {
             "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "flora_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
             "min": 2,
             "max": 4,
             "chance": 1.0
           },
           {
-            "itemId": "flora_shard",
+            "itemId": "flora_dust",
             "min": 2,
             "max": 4,
             "chance": 1.0
@@ -6583,7 +7017,7 @@
     },
     {
       "id": "proof_of_the_foothills",
-      "name": "Proof of the Cinder",
+      "name": "Proof of the Foothills",
       "kind": "key",
       "rarity": "rare",
       "tradability": "bound",
@@ -7769,10 +8203,24 @@
         },
         {
           "type": "drop",
+          "from": "shiverfish_shoal",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
           "from": "glassfleck_wisp",
           "zoneId": "glimmerbrook",
           "bucket": "always",
           "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "glassfleck_wisp",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.17
         },
         {
           "type": "drop",
@@ -7783,10 +8231,66 @@
         },
         {
           "type": "drop",
+          "from": "siltback_crawler",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
           "from": "chill_eel",
           "zoneId": "glimmerbrook",
           "bucket": "always",
           "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "chill_eel",
+          "zoneId": "glimmerbrook",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "weirkeeper",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_held_breath",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "pale_coil",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "frostgleam_naiad",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_cold_below",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "stillwater",
+          "zoneId": "glimmerbrook",
+          "bucket": "always",
+          "chance": 1.0
         },
         {
           "type": "drop",
@@ -7811,6 +8315,13 @@
         },
         {
           "type": "drop",
+          "from": "leechcap",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.17
+        },
+        {
+          "type": "drop",
           "from": "bog_lantern",
           "zoneId": "thornmire",
           "bucket": "always",
@@ -7822,6 +8333,55 @@
           "zoneId": "thornmire",
           "bucket": "always",
           "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "reedback_lurker",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "aqua_shard": [
@@ -7830,28 +8390,28 @@
           "from": "shiverfish_shoal",
           "zoneId": "glimmerbrook",
           "bucket": "main",
-          "chance": 0.15
+          "chance": 0.05
         },
         {
           "type": "drop",
           "from": "glassfleck_wisp",
           "zoneId": "glimmerbrook",
           "bucket": "main",
-          "chance": 0.25
+          "chance": 0.08
         },
         {
           "type": "drop",
           "from": "siltback_crawler",
           "zoneId": "glimmerbrook",
           "bucket": "main",
-          "chance": 0.2
+          "chance": 0.07
         },
         {
           "type": "drop",
           "from": "chill_eel",
           "zoneId": "glimmerbrook",
           "bucket": "main",
-          "chance": 0.2
+          "chance": 0.07
         },
         {
           "type": "drop",
@@ -7900,42 +8460,42 @@
           "from": "leechcap",
           "zoneId": "thornmire",
           "bucket": "main",
-          "chance": 0.25
+          "chance": 0.08
         },
         {
           "type": "drop",
           "from": "reedback_lurker",
           "zoneId": "thornmire",
           "bucket": "main",
-          "chance": 0.2
+          "chance": 0.07
         },
         {
           "type": "drop",
           "from": "old_wallow",
           "zoneId": "thornmire",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
           "from": "the_green_drowning",
           "zoneId": "thornmire",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
           "from": "wickerdrowned",
           "zoneId": "thornmire",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
           "from": "fenmother",
           "zoneId": "thornmire",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
@@ -8919,10 +9479,24 @@
         },
         {
           "type": "drop",
+          "from": "thornback_sprite",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
           "from": "sporecap_shambler",
           "zoneId": "whispering_woods",
           "bucket": "always",
           "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "sporecap_shambler",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.17
         },
         {
           "type": "drop",
@@ -8933,10 +9507,66 @@
         },
         {
           "type": "drop",
+          "from": "bindweed_creeper",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
           "from": "rootknuckle",
           "zoneId": "whispering_woods",
           "bucket": "always",
           "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "rootknuckle",
+          "zoneId": "whispering_woods",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "elderroot",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "mother_spore",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "hollow_stag",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_murmur",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "heartwood",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_standing_green",
+          "zoneId": "whispering_woods",
+          "bucket": "always",
+          "chance": 1.0
         },
         {
           "type": "drop",
@@ -8954,6 +9584,13 @@
         },
         {
           "type": "drop",
+          "from": "thirstvine",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
           "from": "leechcap",
           "zoneId": "thornmire",
           "bucket": "always",
@@ -8968,10 +9605,59 @@
         },
         {
           "type": "drop",
+          "from": "bog_lantern",
+          "zoneId": "thornmire",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
           "from": "reedback_lurker",
           "zoneId": "thornmire",
           "bucket": "always",
           "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "old_wallow",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_green_drowning",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "wickerdrowned",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "fenmother",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "mirethroat",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_drinking_grove",
+          "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
         },
         {
           "type": "drop",
@@ -8986,6 +9672,13 @@
           "zoneId": "ashfall_vale",
           "bucket": "always",
           "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "ashroot_sapling",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.13
         },
         {
           "type": "drop",
@@ -9007,6 +9700,48 @@
           "zoneId": "ashfall_vale",
           "bucket": "always",
           "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "flora_shard": [
@@ -9015,28 +9750,28 @@
           "from": "thornback_sprite",
           "zoneId": "whispering_woods",
           "bucket": "main",
-          "chance": 0.15
+          "chance": 0.05
         },
         {
           "type": "drop",
           "from": "sporecap_shambler",
           "zoneId": "whispering_woods",
           "bucket": "main",
-          "chance": 0.25
+          "chance": 0.08
         },
         {
           "type": "drop",
           "from": "bindweed_creeper",
           "zoneId": "whispering_woods",
           "bucket": "main",
-          "chance": 0.2
+          "chance": 0.07
         },
         {
           "type": "drop",
           "from": "rootknuckle",
           "zoneId": "whispering_woods",
           "bucket": "main",
-          "chance": 0.2
+          "chance": 0.07
         },
         {
           "type": "drop",
@@ -9085,42 +9820,42 @@
           "from": "thirstvine",
           "zoneId": "thornmire",
           "bucket": "main",
-          "chance": 0.15
+          "chance": 0.05
         },
         {
           "type": "drop",
           "from": "bog_lantern",
           "zoneId": "thornmire",
           "bucket": "main",
-          "chance": 0.2
+          "chance": 0.07
         },
         {
           "type": "drop",
           "from": "old_wallow",
           "zoneId": "thornmire",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
           "from": "the_green_drowning",
           "zoneId": "thornmire",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
           "from": "wickerdrowned",
           "zoneId": "thornmire",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
           "from": "fenmother",
           "zoneId": "thornmire",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
@@ -9141,35 +9876,35 @@
           "from": "ashroot_sapling",
           "zoneId": "ashfall_vale",
           "bucket": "main",
-          "chance": 0.2
+          "chance": 0.07
         },
         {
           "type": "drop",
           "from": "the_grey_stag",
           "zoneId": "ashfall_vale",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
           "from": "first_green",
           "zoneId": "ashfall_vale",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
           "from": "last_ember",
           "zoneId": "ashfall_vale",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
           "from": "kindleroot",
           "zoneId": "ashfall_vale",
           "bucket": "always",
-          "chance": 1.0
+          "chance": 0.5
         },
         {
           "type": "drop",
@@ -9549,10 +10284,24 @@
         },
         {
           "type": "drop",
+          "from": "ashjaw_brute",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
           "from": "flint_skink",
           "zoneId": "cinderpeak_foothills",
           "bucket": "always",
           "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "flint_skink",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.1
         },
         {
           "type": "drop",
@@ -9563,7 +10312,28 @@
         },
         {
           "type": "drop",
+          "from": "cinder_moth",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
           "from": "slagshell_tortoise",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "slagshell_tortoise",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.17
+        },
+        {
+          "type": "drop",
+          "from": "ventworm",
           "zoneId": "cinderpeak_foothills",
           "bucket": "always",
           "chance": 0.75
@@ -9572,8 +10342,92 @@
           "type": "drop",
           "from": "ventworm",
           "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
           "bucket": "always",
-          "chance": 0.75
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.07
         },
         {
           "type": "drop",
@@ -9598,10 +10452,24 @@
         },
         {
           "type": "drop",
+          "from": "emberseed",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
           "from": "scorchmoth",
           "zoneId": "ashfall_vale",
           "bucket": "always",
           "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "scorchmoth",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.13
         },
         {
           "type": "drop",
@@ -9609,141 +10477,6 @@
           "zoneId": "ashfall_vale",
           "bucket": "always",
           "chance": 0.5
-        }
-      ],
-      "pyro_shard": [
-        {
-          "type": "drop",
-          "from": "ashjaw_brute",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.2
-        },
-        {
-          "type": "drop",
-          "from": "flint_skink",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.15
-        },
-        {
-          "type": "drop",
-          "from": "cinder_moth",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.15
-        },
-        {
-          "type": "drop",
-          "from": "slagshell_tortoise",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.25
-        },
-        {
-          "type": "drop",
-          "from": "ventworm",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.2
-        },
-        {
-          "type": "drop",
-          "from": "slagheart",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "always",
-          "chance": 1.0
-        },
-        {
-          "type": "drop",
-          "from": "slagheart",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.2
-        },
-        {
-          "type": "drop",
-          "from": "vent_warden",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "always",
-          "chance": 1.0
-        },
-        {
-          "type": "drop",
-          "from": "vent_warden",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.2
-        },
-        {
-          "type": "drop",
-          "from": "char_tusk",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "always",
-          "chance": 1.0
-        },
-        {
-          "type": "drop",
-          "from": "char_tusk",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.2
-        },
-        {
-          "type": "drop",
-          "from": "the_emberqueen",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "always",
-          "chance": 1.0
-        },
-        {
-          "type": "drop",
-          "from": "the_emberqueen",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.2
-        },
-        {
-          "type": "drop",
-          "from": "the_breathing_stone",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "always",
-          "chance": 1.0
-        },
-        {
-          "type": "drop",
-          "from": "the_breathing_stone",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.1
-        },
-        {
-          "type": "drop",
-          "from": "flintmaw",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "always",
-          "chance": 1.0
-        },
-        {
-          "type": "drop",
-          "from": "flintmaw",
-          "zoneId": "cinderpeak_foothills",
-          "bucket": "main",
-          "chance": 0.1
-        },
-        {
-          "type": "drop",
-          "from": "emberseed",
-          "zoneId": "ashfall_vale",
-          "bucket": "main",
-          "chance": 0.2
-        },
-        {
-          "type": "drop",
-          "from": "scorchmoth",
-          "zoneId": "ashfall_vale",
-          "bucket": "main",
-          "chance": 0.2
         },
         {
           "type": "drop",
@@ -9772,6 +10505,183 @@
           "zoneId": "ashfall_vale",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_blackened_crown",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_rooting",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "pyro_shard": [
+        {
+          "type": "drop",
+          "from": "ashjaw_brute",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "flint_skink",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "cinder_moth",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "slagshell_tortoise",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.08
+        },
+        {
+          "type": "drop",
+          "from": "ventworm",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "slagheart",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "vent_warden",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "char_tusk",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_emberqueen",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_breathing_stone",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.03
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "flintmaw",
+          "zoneId": "cinderpeak_foothills",
+          "bucket": "main",
+          "chance": 0.03
+        },
+        {
+          "type": "drop",
+          "from": "emberseed",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "scorchmoth",
+          "zoneId": "ashfall_vale",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "the_grey_stag",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "first_green",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "last_ember",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "kindleroot",
+          "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 0.5
         },
         {
           "type": "drop",

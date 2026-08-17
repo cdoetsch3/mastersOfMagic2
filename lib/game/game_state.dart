@@ -453,7 +453,9 @@ class GameState extends ChangeNotifier {
     final r = run;
     if (r == null || r.isOver) return const [];
     final enemy = r.current!;
-    final loot = rollDrops(enemy.def.drops, rng ?? Random());
+    // ⭐ Defaulting inside rollDrops (lootRng, one long-lived stream) — the
+    // hygiene half of the 2026-08-17 drop audit; both shapes measured at 10%.
+    final loot = rollDrops(enemy.def.drops, rng);
     final wasBoss = r.atBoss;
     r.recordVictory(
       loot: loot.slots,

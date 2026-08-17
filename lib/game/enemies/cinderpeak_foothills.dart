@@ -25,6 +25,12 @@ const _zone = 'cinderpeak_foothills';
 const _pyro = [MagicElement.pyro];
 
 /// Motes and bulk fall from everything; the main table is what varies.
+/// ⭐ **Dust routine, Shards uncommon** (ruling, 2026-08-17 — the reasoning is
+/// written out once, on `whispering_woods.dart`). Every `pyro_shard` weight
+/// below is a third of what it was and the freed weight went to `pyro_dust` in
+/// the same table, so the mains still sum to 100. ⚠️ Cinderpeak is the one
+/// zone that also sold Shards out of its mini and boss **main** tables, so it
+/// has two more of these than its neighbours.
 const _commonAlways = [DropEntry('pyro_dust', chance: 0.75, min: 1, max: 2)];
 
 abstract final class CinderpeakBestiary {
@@ -67,7 +73,8 @@ abstract final class CinderpeakBestiary {
       main: [
         DropEntry.nothing(weight: 25),
         DropEntry('tuskhide', weight: 55, min: 1, max: 3),
-        DropEntry('pyro_shard', weight: 20),
+        DropEntry('pyro_shard', weight: 7),
+        DropEntry('pyro_dust', weight: 13, min: 1, max: 2),
       ],
     ),
   );
@@ -105,7 +112,8 @@ abstract final class CinderpeakBestiary {
       main: [
         DropEntry.nothing(weight: 40),
         DropEntry('copper_ore', weight: 45),
-        DropEntry('pyro_shard', weight: 15),
+        DropEntry('pyro_shard', weight: 5),
+        DropEntry('pyro_dust', weight: 10, min: 1, max: 2),
       ],
     ),
   );
@@ -145,7 +153,8 @@ abstract final class CinderpeakBestiary {
       main: [
         DropEntry.nothing(weight: 35),
         DropEntry('copper_ore', weight: 50, min: 1, max: 2),
-        DropEntry('pyro_shard', weight: 15),
+        DropEntry('pyro_shard', weight: 5),
+        DropEntry('pyro_dust', weight: 10, min: 1, max: 2),
       ],
     ),
   );
@@ -185,7 +194,9 @@ abstract final class CinderpeakBestiary {
       main: [
         DropEntry.nothing(weight: 30),
         DropEntry('copper_ore', weight: 40),
-        DropEntry('pyro_shard', weight: 25, min: 1, max: 2),
+        // ⭐ Still the zone's mote-richest common — it just pays in Dust now.
+        DropEntry('pyro_shard', weight: 8, min: 1, max: 2),
+        DropEntry('pyro_dust', weight: 17, min: 2, max: 3),
         DropEntry('tuskhide', weight: 5),
       ],
     ),
@@ -226,7 +237,8 @@ abstract final class CinderpeakBestiary {
       main: [
         DropEntry.nothing(weight: 30),
         DropEntry('copper_ore', weight: 50, min: 2, max: 3),
-        DropEntry('pyro_shard', weight: 20),
+        DropEntry('pyro_shard', weight: 7),
+        DropEntry('pyro_dust', weight: 13, min: 1, max: 2),
       ],
     ),
   );
@@ -484,13 +496,18 @@ abstract final class CinderpeakBestiary {
   /// Woods shape, so it hangs off all four minis at the chase weight.
   static const _miniDrops = DropTable(
     always: [
-      DropEntry('pyro_shard', min: 1, max: 3),
+      // ⭐ One guaranteed Shard, not 1–3: this bucket was the bulk of the
+      // zone's Shard income (see `whispering_woods.dart`'s _miniDrops). The
+      // Dust is new — elevated ranks never dropped any.
+      DropEntry('pyro_shard'),
+      DropEntry('pyro_dust', min: 2, max: 4),
       DropEntry('pyro_crystal', chance: 0.25),
     ],
     main: [
       DropEntry('tuskhide', weight: 40, min: 2, max: 4),
       DropEntry('copper_ore', weight: 35, min: 2, max: 4),
-      DropEntry('pyro_shard', weight: 20, min: 2, max: 4),
+      DropEntry('pyro_shard', weight: 7, min: 1, max: 2),
+      DropEntry('pyro_dust', weight: 13, min: 2, max: 4),
       DropEntry('cinder_loop', weight: 5),
     ],
   );
@@ -502,7 +519,8 @@ abstract final class CinderpeakBestiary {
   static const _bossDrops = DropTable(
     always: [
       DropEntry('pyro_crystal', min: 1, max: 2),
-      DropEntry('pyro_shard', min: 3, max: 6),
+      DropEntry('pyro_shard', min: 1, max: 2),
+      DropEntry('pyro_dust', min: 4, max: 8),
       // ⭐ The gate item. The third of Hearthwood's "three ordinary proofs",
       // and the one that completes the set.
       DropEntry('proof_of_the_foothills'),
@@ -511,7 +529,8 @@ abstract final class CinderpeakBestiary {
       DropEntry('tuskhide', weight: 45, min: 4, max: 8),
       DropEntry('copper_ore', weight: 25, min: 4, max: 8),
       DropEntry('cinder_loop', weight: 20),
-      DropEntry('pyro_shard', weight: 10, min: 4, max: 8),
+      DropEntry('pyro_shard', weight: 3, min: 2, max: 4),
+      DropEntry('pyro_dust', weight: 7, min: 4, max: 8),
     ],
   );
 

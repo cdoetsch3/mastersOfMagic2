@@ -26,6 +26,13 @@ const _zone = 'whispering_woods';
 const _flora = [MagicElement.flora];
 
 /// Motes and bulk fall from everything; the main table is what varies.
+///
+/// ⭐ **Dust is the routine mote; Shards are the uncommon one** (ruling,
+/// 2026-08-17). The player's complaint was that Shards poured in while Dust
+/// piled up unspent — the ladder read backwards. Every `*_shard` weight below
+/// is now about a third of what it was, and the freed weight went to `*_dust`
+/// in the same table, so the tables still sum to 100 and a kill is worth the
+/// same *number* of things; only which rung of the ladder it lands on moved.
 const _commonAlways = [DropEntry('flora_dust', chance: 0.75, min: 1, max: 2)];
 
 abstract final class WhisperingWoodsBestiary {
@@ -95,7 +102,8 @@ abstract final class WhisperingWoodsBestiary {
       main: [
         DropEntry.nothing(weight: 35),
         DropEntry('bindweed_fibre', weight: 50, min: 1, max: 2),
-        DropEntry('flora_shard', weight: 15),
+        DropEntry('flora_shard', weight: 5),
+        DropEntry('flora_dust', weight: 10, min: 1, max: 2),
       ],
     ),
   );
@@ -133,7 +141,9 @@ abstract final class WhisperingWoodsBestiary {
       main: [
         DropEntry.nothing(weight: 30),
         DropEntry('bindweed_fibre', weight: 40),
-        DropEntry('flora_shard', weight: 25, min: 1, max: 2),
+        // ⭐ Still the zone's mote-richest common — it just pays in Dust now.
+        DropEntry('flora_shard', weight: 8, min: 1, max: 2),
+        DropEntry('flora_dust', weight: 17, min: 2, max: 3),
         DropEntry('foragers_ration', weight: 5),
       ],
     ),
@@ -171,7 +181,8 @@ abstract final class WhisperingWoodsBestiary {
       main: [
         DropEntry.nothing(weight: 30),
         DropEntry('bindweed_fibre', weight: 50, min: 2, max: 3),
-        DropEntry('flora_shard', weight: 20),
+        DropEntry('flora_shard', weight: 7),
+        DropEntry('flora_dust', weight: 13, min: 1, max: 2),
       ],
     ),
   );
@@ -209,7 +220,8 @@ abstract final class WhisperingWoodsBestiary {
       main: [
         DropEntry.nothing(weight: 25),
         DropEntry('oak_log', weight: 55, min: 1, max: 3),
-        DropEntry('flora_shard', weight: 20),
+        DropEntry('flora_shard', weight: 7),
+        DropEntry('flora_dust', weight: 13, min: 1, max: 2),
       ],
       bonus: [DropEntry('oak_circlet', chance: 0.02)],
     ),
@@ -438,9 +450,18 @@ abstract final class WhisperingWoodsBestiary {
 
   /// ⚠️ Crystal appears here and nowhere below — the mote ladder's first real
   /// step is a mini-boss reward (ITEMS §8).
+  ///
+  /// ⭐ **This bucket, not the commons, was where the Shard glut lived.** A
+  /// Primal run is 6 commons, 2 minis and a boss, so a guaranteed 1–3 Shards
+  /// per mini plus 3–6 from the boss was ~90% of the zone's whole Shard
+  /// income — cutting only the commons' weights would have left the complaint
+  /// untouched. The mini still *always* pays a Shard (progression must not sit
+  /// behind a dice roll); it pays exactly one, and hands over the Dust the
+  /// elevated ranks never used to drop at all.
   static const _miniDrops = DropTable(
     always: [
-      DropEntry('flora_shard', min: 1, max: 3),
+      DropEntry('flora_shard'),
+      DropEntry('flora_dust', min: 2, max: 4),
       DropEntry('flora_crystal', chance: 0.25),
     ],
     main: [
@@ -454,7 +475,8 @@ abstract final class WhisperingWoodsBestiary {
   static const _bossDrops = DropTable(
     always: [
       DropEntry('flora_crystal', min: 1, max: 2),
-      DropEntry('flora_shard', min: 3, max: 6),
+      DropEntry('flora_shard', min: 1, max: 2),
+      DropEntry('flora_dust', min: 4, max: 8),
       // ⭐ The gate item. One of Hearthwood's "three ordinary proofs".
       DropEntry('proof_of_the_woods'),
     ],

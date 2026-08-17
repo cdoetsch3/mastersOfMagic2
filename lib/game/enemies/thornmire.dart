@@ -39,6 +39,12 @@ const _flora = [MagicElement.flora];
 
 /// ⚠️ A hybrid pays in **two** mote currencies, so each is thinner than a pure
 /// zone's single 0.75 roll — the total handed over stays comparable.
+///
+/// ⭐ **Dust routine, Shards uncommon** (ruling, 2026-08-17 — the reasoning is
+/// written out once, on `whispering_woods.dart`). Every `*_shard` weight below
+/// is a third of what it was and the freed weight went to the matching
+/// `*_dust`, so the mains still sum to 100. ⚠️ A hybrid's elevated ranks pay
+/// **both** ladders, so their per-element bands are half a pure zone's.
 const _commonAlways = [
   DropEntry('flora_dust', chance: 0.5, min: 1, max: 2),
   DropEntry('aqua_dust', chance: 0.5, min: 1, max: 2),
@@ -129,7 +135,8 @@ abstract final class ThornmireBestiary {
       main: [
         DropEntry.nothing(weight: 35),
         DropEntry('bogflax_fibre', weight: 50, min: 1, max: 2),
-        DropEntry('flora_shard', weight: 15),
+        DropEntry('flora_shard', weight: 5),
+        DropEntry('flora_dust', weight: 10, min: 1, max: 2),
       ],
     ),
   );
@@ -170,7 +177,9 @@ abstract final class ThornmireBestiary {
       main: [
         DropEntry.nothing(weight: 30),
         DropEntry('fenroot', weight: 40),
-        DropEntry('aqua_shard', weight: 25, min: 1, max: 2),
+        // ⭐ Still the zone's mote-richest common — it just pays in Dust now.
+        DropEntry('aqua_shard', weight: 8, min: 1, max: 2),
+        DropEntry('aqua_dust', weight: 17, min: 2, max: 3),
         // ⏳ Amber banks for Jewelry, which opens at Rimeholt (45). ⚠️ Kept
         // deliberately thin — an uncommon that a common hands out freely
         // stops being worth banking.
@@ -213,7 +222,8 @@ abstract final class ThornmireBestiary {
       main: [
         DropEntry.nothing(weight: 35),
         DropEntry('fenroot', weight: 45),
-        DropEntry('flora_shard', weight: 20),
+        DropEntry('flora_shard', weight: 7),
+        DropEntry('flora_dust', weight: 13, min: 1, max: 2),
       ],
     ),
   );
@@ -253,7 +263,8 @@ abstract final class ThornmireBestiary {
       main: [
         DropEntry.nothing(weight: 25),
         DropEntry('bogflax_fibre', weight: 55, min: 1, max: 3),
-        DropEntry('aqua_shard', weight: 20),
+        DropEntry('aqua_shard', weight: 7),
+        DropEntry('aqua_dust', weight: 13, min: 1, max: 2),
       ],
     ),
   );
@@ -509,8 +520,17 @@ abstract final class ThornmireBestiary {
   /// Woods shape, so it hangs off all four minis at the chase weight.
   static const _miniDrops = DropTable(
     always: [
-      DropEntry('flora_shard', min: 1, max: 2),
-      DropEntry('aqua_shard', min: 1, max: 2),
+      // ⭐ Half a Shard per ladder, where a pure zone's mini guarantees one —
+      // so a hybrid mini still pays **one Shard on average**, exactly the way
+      // it already splits its Crystal chance (0.15 + 0.15 against a pure
+      // zone's 0.25) instead of handing over two. ⚠️ Two guaranteed Shards
+      // here is what made the hybrids the worst offenders: this bucket was
+      // the bulk of the zone's Shard income (see `whispering_woods.dart`'s
+      // _miniDrops). The Dust is new — elevated ranks never dropped any.
+      DropEntry('flora_shard', chance: 0.5),
+      DropEntry('aqua_shard', chance: 0.5),
+      DropEntry('flora_dust', min: 1, max: 2),
+      DropEntry('aqua_dust', min: 1, max: 2),
       DropEntry('flora_crystal', chance: 0.15),
       DropEntry('aqua_crystal', chance: 0.15),
     ],
@@ -530,8 +550,11 @@ abstract final class ThornmireBestiary {
     always: [
       DropEntry('flora_crystal', min: 1, max: 2),
       DropEntry('aqua_crystal', min: 1, max: 2),
-      DropEntry('flora_shard', min: 2, max: 4),
-      DropEntry('aqua_shard', min: 2, max: 4),
+      // ⭐ Was 2–4 of each; one apiece now, with Dust carrying the volume.
+      DropEntry('flora_shard'),
+      DropEntry('aqua_shard'),
+      DropEntry('flora_dust', min: 2, max: 4),
+      DropEntry('aqua_dust', min: 2, max: 4),
     ],
     main: [
       DropEntry('bogflax_fibre', weight: 45, min: 4, max: 8),

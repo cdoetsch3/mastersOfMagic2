@@ -526,6 +526,41 @@ void main() {
       expect(stone.maxHpAt(11), greaterThan(brute.maxHpAt(11)));
     });
 
+    test('⭐ the Cinder Moth really is meant to have 69 HP at level 9', () {
+      // 📝 A player asked why this creature is so flimsy. It is not a bug, and
+      // this test exists so the next person to ask gets an answer instead of a
+      // rebalance: the Moth is a **Glasswing** (0.50 HP × 1.70 damage), the
+      // archetype whose whole lesson is *"killing fast beats playing safe"*.
+      // Half the health of an even fight is the teaching device — it is the
+      // one enemy in the zone that punishes a player for turtling behind a
+      // shield instead of ending the fight, and it can only do that by dying
+      // fast enough to be worth racing.
+      //
+      // ⚠️ Its own move damage looks small for the same reason its HP does:
+      // both are RAW numbers that the archetype multiplies (see the authoring
+      // note on `cinderMoth`). 12–16 on "Go Out Bright" is 20–27 after 1.70×.
+      final moth = CinderpeakBestiary.cinderMoth;
+      expect(moth.archetype, Archetypes.glasswing);
+      expect(MageState.scaledMaxHp(9), 137, reason: '100 × 1.04^8, rounded');
+      expect(moth.maxHpAt(9), 69, reason: '137 × 0.50 = 68.5, rounded to 69');
+
+      // 🚫 Kills a "fix" that quietly buffs the Moth toward the yardstick: it
+      // must stay the flimsiest thing in the zone, well under an even fight.
+      expect(moth.maxHpAt(9), lessThan(MageState.scaledMaxHp(9) * 0.6),
+          reason: 'a Glasswing that survives a trade is not a Glasswing');
+      for (final e in CinderpeakBestiary.commons) {
+        expect(moth.maxHpAt(9), lessThanOrEqualTo(e.maxHpAt(9)),
+            reason: '${e.id} is now flimsier than the zone\'s glass cannon');
+      }
+      // ⭐ Against the Adept — the 1.0×/1.0× yardstick every archetype is felt
+      // against (§2.7) — the trade is explicit: it gives up half its health
+      // and is paid in damage for it.
+      expect(moth.archetype.damageScale,
+          greaterThan(Archetypes.adept.damageScale),
+          reason: 'it pays for the missing health in damage, or it pays for '
+              'nothing');
+    });
+
     test('no common one-shots a character who just walked in', () {
       // ⚠️ The zone opens at level 6. Anything that can open with a kill from
       // full health is a difficulty spike disguised as a wandering monster.

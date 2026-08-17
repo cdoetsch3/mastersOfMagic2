@@ -7,8 +7,18 @@ library;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/recipe_def.dart';
+import 'package:masters_of_magic_2/game/items/recipes/primal_recipes.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/skills.dart';
+
+/// A throwaway recipe with only the two things [Skills.xpForRecipe] reads.
+RecipeDef _recipe({required int gate, required List<int> counts}) => RecipeDef(
+      id: 'probe',
+      outputId: 'oak_wand',
+      skill: CraftSkill.woodcarving,
+      skillLevel: gate,
+      inputs: [for (final c in counts) RecipeInput('oak_log', c)],
+    );
 
 void main() {
   group('the ladder', () {
@@ -26,25 +36,42 @@ void main() {
     });
 
     test('recipe XP scales with the recipe gate', () {
-      // ⚠️ Kills a flat-XP implementation: spamming tier-1 must not be the
-      // best way to climb past 10.
-      final t1 = Skills.xpForRecipe(
-          const RecipeDef(
-            id: 'a',
-            outputId: 'x',
-            skill: CraftSkill.woodcarving,
-            skillLevel: 1,
-            inputs: [RecipeInput('oak_log', 1)],
-          ));
-      final t2 = Skills.xpForRecipe(
-          const RecipeDef(
-            id: 'b',
-            outputId: 'y',
-            skill: CraftSkill.woodcarving,
-            skillLevel: 10,
-            inputs: [RecipeInput('birch_log', 1)],
-          ));
+      // ⚠️ Kills a count-only implementation: spamming tier-1 must not be the
+      // best way to climb past 10. Same single ingredient either side, so the
+      // gate is the only thing that can move the number.
+      final t1 = Skills.xpForRecipe(_recipe(gate: 1, counts: [1]));
+      final t2 = Skills.xpForRecipe(_recipe(gate: 10, counts: [1]));
+      expect(t1, 6, reason: '1 × (4 + 2×1)');
+      expect(t2, 24, reason: '1 × (4 + 2×10)');
       expect(t2, greaterThan(t1));
+    });
+
+    test('⭐ within a tier, XP is in the ratio of the ingredient counts', () {
+      // 🚫 Kills the flat `10 + 5·gate` this replaced, under which a 3-log
+      // Quarterstaff and a 2-log Wand both paid 15 — making the cheapest
+      // recipe in every tier the only rational grind (ruling, 2026-08-17).
+      final three = Skills.xpForRecipe(_recipe(gate: 1, counts: [3]));
+      final two = Skills.xpForRecipe(_recipe(gate: 1, counts: [2]));
+      expect(three / two, closeTo(3 / 2, 1e-9),
+          reason: 'the within-tier ratio must be exactly the ingredient count');
+    });
+
+    test('the designer\'s worked examples hold, on the shipped recipes', () {
+      // ⚠️ Read off `PrimalRecipes`, not retyped fixtures — a recipe whose
+      // input line drifted would silently keep a fixture-based test green.
+      expect(Skills.xpForRecipe(PrimalRecipes.oakQuarterstaff), 18,
+          reason: '3 oak, gate 1 → 3 × 6');
+      expect(Skills.xpForRecipe(PrimalRecipes.oakWand), 12,
+          reason: '2 oak, gate 1 → 2 × 6');
+      expect(Skills.xpForRecipe(PrimalRecipes.oakKnot), 12,
+          reason: '2 oak, gate 1 → 2 × 6');
+    });
+
+    test('a multi-line recipe counts every line, not the line count', () {
+      // 🚫 Kills `inputs.length` in place of the summed counts: the Belt is
+      // two lines but three items, so the two implementations differ.
+      expect(Skills.xpForRecipe(PrimalRecipes.fawnhideBelt), 3 * (4 + 2 * 4),
+          reason: '2 fawnhide + 1 fibre = 3 ingredients at gate 4');
     });
 
     test('every skill key resolves to a name and the two enums never collide',

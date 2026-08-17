@@ -48,8 +48,9 @@ void main() {
       expect(game.profile.backpack.countOf('oak_log'), 3,
           reason: 'a craft that does not consume is a duplication engine');
       expect(game.profile.backpack.countOf('oak_wand'), 1);
-      expect(game.profile.skillXp['woodcarving'], 15,
-          reason: 'xpForRecipe(level 1) = 15, banked on the ledger');
+      expect(game.profile.skillXp['woodcarving'], 12,
+          reason: 'the Wand eats 2 logs at gate 1: 2 × (4 + 2×1) = 12, banked '
+              'on the ledger');
       // Equipment is non-fungible: the mint must register an instance.
       final slot = game.profile.backpack.slots
           .firstWhere((s) => s?.defId == 'oak_wand');
@@ -93,7 +94,8 @@ void main() {
     });
 
     test('reports the level-up on the craft that crosses it', () async {
-      // 19 XP in: one more level-1 craft (+15) crosses 20.
+      // 19 XP in: the Draught is 2 sapwort at gate 1, so +12 lands on 31 —
+      // past the 20 that opens level 2, short of the 45 that opens level 3.
       final game = _carrying({'sapwort': 2}, skillXp: {'potionsAndAlchemy': 19});
       final out = await game.craft(PrimalRecipes.sapwortDraught);
       expect(out.leveledTo, 2,
@@ -125,7 +127,7 @@ void main() {
       final back = GameState(storage, (await storage.load())!);
       expect(back.profile.backpack.countOf('oak_knot'), 1);
       expect(back.profile.skillLevel('woodcarving'), 1);
-      expect(back.profile.skillXp['woodcarving'], 15,
+      expect(back.profile.skillXp['woodcarving'], 12,
           reason: 'XP that does not survive the save never existed');
     });
   });

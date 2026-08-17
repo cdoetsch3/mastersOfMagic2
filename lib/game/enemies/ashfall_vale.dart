@@ -43,6 +43,12 @@ const _pyro = [MagicElement.pyro];
 
 /// ⚠️ A hybrid pays in **two** mote currencies, so each is thinner than a pure
 /// zone's single 0.75 roll — the total handed over stays comparable.
+///
+/// ⭐ **Dust routine, Shards uncommon** (ruling, 2026-08-17 — the reasoning is
+/// written out once, on `whispering_woods.dart`). Every `*_shard` weight below
+/// is a third of what it was and the freed weight went to the matching
+/// `*_dust`, so the mains still sum to 100. ⚠️ A hybrid's elevated ranks pay
+/// **both** ladders, so their per-element bands are half a pure zone's.
 const _commonAlways = [
   DropEntry('pyro_dust', chance: 0.5, min: 1, max: 2),
   DropEntry('flora_dust', chance: 0.5, min: 1, max: 2),
@@ -129,7 +135,8 @@ abstract final class AshfallValeBestiary {
       main: [
         DropEntry.nothing(weight: 30),
         DropEntry('birch_log', weight: 50, min: 1, max: 2),
-        DropEntry('flora_shard', weight: 20),
+        DropEntry('flora_shard', weight: 7),
+        DropEntry('flora_dust', weight: 13, min: 1, max: 2),
       ],
     ),
   );
@@ -169,7 +176,8 @@ abstract final class AshfallValeBestiary {
       main: [
         DropEntry.nothing(weight: 35),
         DropEntry('charcoal', weight: 45),
-        DropEntry('pyro_shard', weight: 20),
+        DropEntry('pyro_shard', weight: 7),
+        DropEntry('pyro_dust', weight: 13, min: 1, max: 2),
       ],
     ),
   );
@@ -208,7 +216,8 @@ abstract final class AshfallValeBestiary {
       main: [
         DropEntry.nothing(weight: 35),
         DropEntry('brookmint', weight: 40),
-        DropEntry('pyro_shard', weight: 20),
+        DropEntry('pyro_shard', weight: 7),
+        DropEntry('pyro_dust', weight: 13, min: 1, max: 2),
         // ⚠️ Deliberately thin. Tonics are meant to be CRAFTED (§9b.8) — the
         // brookmint is the real drop, and a generous potion faucet would make
         // Potions & Alchemy pointless before it opens.
@@ -515,8 +524,17 @@ abstract final class AshfallValeBestiary {
   /// mini chase, it needs a new Rare authored — not the Charlock moved down.
   static const _miniDrops = DropTable(
     always: [
-      DropEntry('pyro_shard', min: 1, max: 2),
-      DropEntry('flora_shard', min: 1, max: 2),
+      // ⭐ Half a Shard per ladder, where a pure zone's mini guarantees one —
+      // so a hybrid mini still pays **one Shard on average**, exactly the way
+      // it already splits its Crystal chance (0.15 + 0.15 against a pure
+      // zone's 0.25) instead of handing over two. ⚠️ Two guaranteed Shards
+      // here is what made the hybrids the worst offenders: this bucket was
+      // the bulk of the zone's Shard income (see `whispering_woods.dart`'s
+      // _miniDrops). The Dust is new — elevated ranks never dropped any.
+      DropEntry('pyro_shard', chance: 0.5),
+      DropEntry('flora_shard', chance: 0.5),
+      DropEntry('pyro_dust', min: 1, max: 2),
+      DropEntry('flora_dust', min: 1, max: 2),
       DropEntry('pyro_crystal', chance: 0.15),
       DropEntry('flora_crystal', chance: 0.15),
     ],
@@ -540,8 +558,11 @@ abstract final class AshfallValeBestiary {
     always: [
       DropEntry('pyro_crystal', min: 1, max: 2),
       DropEntry('flora_crystal', min: 1, max: 2),
-      DropEntry('pyro_shard', min: 2, max: 4),
-      DropEntry('flora_shard', min: 2, max: 4),
+      // ⭐ Was 2–4 of each; one apiece now, with Dust carrying the volume.
+      DropEntry('pyro_shard'),
+      DropEntry('flora_shard'),
+      DropEntry('pyro_dust', min: 2, max: 4),
+      DropEntry('flora_dust', min: 2, max: 4),
     ],
     main: [
       DropEntry('birch_log', weight: 45, min: 4, max: 8),

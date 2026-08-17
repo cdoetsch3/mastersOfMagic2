@@ -31,6 +31,11 @@ const _zone = 'glimmerbrook';
 const _aqua = [MagicElement.aqua];
 
 /// Motes and bulk fall from everything; the main table is what varies.
+///
+/// ⭐ **Dust routine, Shards uncommon** (ruling, 2026-08-17 — the reasoning is
+/// written out once, on `whispering_woods.dart`). Every `*_shard` weight below
+/// is a third of what it was and the freed weight went to `aqua_dust` in the
+/// same table, so the mains still sum to 100.
 const _commonAlways = [DropEntry('aqua_dust', chance: 0.75, min: 1, max: 2)];
 
 abstract final class GlimmerbrookBestiary {
@@ -120,7 +125,8 @@ abstract final class GlimmerbrookBestiary {
       main: [
         DropEntry.nothing(weight: 35),
         DropEntry('sapwort', weight: 50, min: 1, max: 2),
-        DropEntry('aqua_shard', weight: 15),
+        DropEntry('aqua_shard', weight: 5),
+        DropEntry('aqua_dust', weight: 10, min: 1, max: 2),
       ],
     ),
   );
@@ -160,7 +166,9 @@ abstract final class GlimmerbrookBestiary {
       main: [
         DropEntry.nothing(weight: 30),
         DropEntry('sapwort', weight: 40),
-        DropEntry('aqua_shard', weight: 25, min: 1, max: 2),
+        // ⭐ Still the zone's mote-richest common — it just pays in Dust now.
+        DropEntry('aqua_shard', weight: 8, min: 1, max: 2),
+        DropEntry('aqua_dust', weight: 17, min: 2, max: 3),
         DropEntry('sapwort_draught', weight: 5),
       ],
     ),
@@ -203,7 +211,8 @@ abstract final class GlimmerbrookBestiary {
       main: [
         DropEntry.nothing(weight: 25),
         DropEntry('fawnhide', weight: 55, min: 1, max: 3),
-        DropEntry('aqua_shard', weight: 20),
+        DropEntry('aqua_shard', weight: 7),
+        DropEntry('aqua_dust', weight: 13, min: 1, max: 2),
       ],
     ),
   );
@@ -242,7 +251,8 @@ abstract final class GlimmerbrookBestiary {
       main: [
         DropEntry.nothing(weight: 30),
         DropEntry('fawnhide', weight: 50, min: 2, max: 3),
-        DropEntry('aqua_shard', weight: 20),
+        DropEntry('aqua_shard', weight: 7),
+        DropEntry('aqua_dust', weight: 13, min: 1, max: 2),
       ],
     ),
   );
@@ -498,7 +508,11 @@ abstract final class GlimmerbrookBestiary {
   /// it to one creature is a per-creature table, which no zone has yet.
   static const _miniDrops = DropTable(
     always: [
-      DropEntry('aqua_shard', min: 1, max: 3),
+      // ⭐ One guaranteed Shard, not 1–3: this bucket was ~90% of the zone's
+      // Shard income (see `whispering_woods.dart`'s _miniDrops). The Dust is
+      // new — elevated ranks never dropped any.
+      DropEntry('aqua_shard'),
+      DropEntry('aqua_dust', min: 2, max: 4),
       DropEntry('aqua_crystal', chance: 0.25),
     ],
     main: [
@@ -515,7 +529,8 @@ abstract final class GlimmerbrookBestiary {
   static const _bossDrops = DropTable(
     always: [
       DropEntry('aqua_crystal', min: 1, max: 2),
-      DropEntry('aqua_shard', min: 3, max: 6),
+      DropEntry('aqua_shard', min: 1, max: 2),
+      DropEntry('aqua_dust', min: 4, max: 8),
       // ⭐ The gate item. The second of Hearthwood's "three ordinary proofs".
       DropEntry('proof_of_the_brook'),
     ],
