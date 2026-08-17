@@ -245,11 +245,22 @@ class _AlignCommitStepState extends State<AlignCommitStep>
             ),
           ),
           const SizedBox(height: 16),
+          // ⭐ Copy names the ACTION and the CUE, in that order. 'Tap when
+          // the stream runs level' named neither — a player who has not yet
+          // worked out that the wobbling line IS the stream has nothing to
+          // watch and no moment to wait for (playtest, 2026-08-17).
+          const Text(
+            'Watch the needle — tap the moment it rests in the gold zone',
+            style: TextStyle(color: AppColors.text, fontSize: 14),
+          ),
+          const SizedBox(height: 4),
+          // ⚠️ Flavour SECOND and dimmer: a skin renames the act, it never
+          // explains it (gesture.dart's skin ⭐).
           Text(
             widget.step.skin == 'pour'
-                ? 'Tap when the stream runs level'
-                : 'Tap when it settles in the centre',
-            style: const TextStyle(color: AppColors.text, fontSize: 14),
+                ? 'the pour runs level'
+                : 'the knot settles',
+            style: const TextStyle(color: AppColors.textDim, fontSize: 12),
           ),
         ],
       ),
@@ -283,6 +294,15 @@ class _NeedlePainter extends CustomPainter {
       ),
       Paint()..color = AppColors.gold.withValues(alpha: 0.4),
     );
+    // The target zone names itself — art doing the tutorial's job.
+    final tp = TextPainter(
+      text: const TextSpan(
+        text: 'level',
+        style: TextStyle(color: AppColors.gold, fontSize: 9, letterSpacing: 1),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, Offset(cx - tp.width / 2, baseY + 12));
     final tip = Offset(cx + needle * (size.width / 2 - 10), 8);
     canvas.drawLine(
       Offset(cx, baseY),
