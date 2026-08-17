@@ -1339,8 +1339,9 @@ class _DuelScreenState extends State<DuelScreen>
     final accent = won ? const Color(0xFFE8C547) : const Color(0xFFD85A30);
     final goldEarned = won ? Progression.winGold : Progression.lossGold;
     // ⚠️ The *actual* award, not the flat base. XP scales with who you beat
-    // (Progression.xpForDuel), so showing `winXp` told the player 60 while
-    // GameState banked 60 + 10 per opponent level.
+    // (Progression.xpForDuel), so showing `winXp` told the player the base
+    // while GameState banked base + per-level. Read the formula, never the
+    // constants — the 2026-08-10 halving moved both and this stayed correct.
     final xpEarned = Progression.xpForDuel(
       won: won,
       opponentLevel: widget.driver.opponentLevel,

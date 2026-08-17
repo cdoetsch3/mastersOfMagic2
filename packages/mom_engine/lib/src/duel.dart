@@ -353,9 +353,10 @@ class DuelEngine {
           identical(hasteHolder, mage2) ? [mage2, mage1] : [mage1, mage2];
       for (final mage in order) {
         if (isOver) break;
-        mage.takeHpDamage(dmg);
-        events.add(
-            EffectDamageEvent(mage, 'Fatigue', toShield: 0, toHp: dmg));
+        // Through the one door, so the killing tick reports the health the
+        // mage had left rather than the tick's nominal size.
+        events.add(EffectDamageEvent(mage, 'Fatigue',
+            toShield: 0, toHp: _takeHpDamage(mage, dmg)));
       }
     }
 
@@ -763,8 +764,9 @@ class DuelEngine {
 
       final pierce = piercePct > 0 ? (perHit * piercePct / 100).round() : 0;
       final r = _applyOneHit(target, perHit - pierce, cast.element, ignoresShields);
-      if (pierce > 0) target.takeHpDamage(pierce);
-      final toHp = r.toHp + pierce;
+      // The pierced slice walks through [_takeHpDamage] too, so overkill on it
+      // is clamped exactly like the main portion.
+      final toHp = r.toHp + (pierce > 0 ? _takeHpDamage(target, pierce) : 0);
       totalToHp += toHp;
       events.add(DamageEvent(target, spell,
           toShield: r.toShield,
@@ -777,6 +779,14 @@ class DuelEngine {
           bypassedShield: bypassedShield));
     }
     if (lifesteal > 0 && totalToHp > 0) {
+      // ⭐ [totalToHp] is health actually REMOVED, not damage aimed at health
+      // (playtest ruling): "if an enemy only has 10hp and I hit a leech for
+      // 16, the enemy takes 10 and I heal 5, not 8." Overkill is clamped per
+      // hit inside [_takeHpDamage], so a multi-hit spell that kills mid-
+      // sequence contributes nothing for the hits after the corpse hits 0 —
+      // the sum here is the true total loss across the whole attack. Damage a
+      // shield or Barrier soaked never reaches this counter at all, so a
+      // fully-blocked Drain heals exactly 0.
       // Before/after, because heal() may scale the amount (healing received
       // %) — the event must report what actually happened.
       final before = cast.caster.hp;
@@ -1066,9 +1076,24 @@ class DuelEngine {
     return null;
   }
 
+  /// Removes [amount] health from [target] and returns what was ACTUALLY
+  /// removed — hp floors at 0, so a 16 into a 10hp mage reports 10.
+  ///
+  /// ⭐ The one door all health damage walks through, the mirror of the one
+  /// `heal()` is for healing: every `toHp` the engine reports is measured
+  /// here, so no event ever claims more damage than a body had left to give,
+  /// and lifesteal — which keys off that figure — can't drain a corpse for
+  /// phantom health (playtest ruling).
+  int _takeHpDamage(MageState target, int amount) {
+    final before = target.hp;
+    target.takeHpDamage(amount);
+    return before - target.hp;
+  }
+
   /// Applies one [amount] of damage to [target], resolving shields and counter
   /// math, and mutating hp/shield. Returns the breakdown so callers can emit
-  /// the right event. Shared by spell attacks and status ticks (DoTs), so
+  /// the right event — `toHp` is health genuinely lost, overkill already
+  /// clamped away. Shared by spell attacks and status ticks (DoTs), so
   /// shield behavior is identical everywhere. [attackElement] null = element-
   /// agnostic (never counters); [ignoresShields] strikes health directly.
   ({
@@ -1100,10 +1125,9 @@ class DuelEngine {
     }
     final shield = ignoresShields ? null : target.shield;
     if (shield == null) {
-      target.takeHpDamage(amount);
       return (
         toShield: 0,
-        toHp: amount,
+        toHp: _takeHpDamage(target, amount),
         broken: false,
         multiplierPercent: 100,
         barrierPopped: false
@@ -1141,12 +1165,10 @@ class DuelEngine {
     // health at the normal 1× rate.
     final absorbed = shield.remaining;
     final rawConsumed = (absorbed * 100 + pct - 1) ~/ pct;
-    final toHp = amount - rawConsumed;
     target.shield = null;
-    target.takeHpDamage(toHp);
     return (
       toShield: absorbed,
-      toHp: toHp,
+      toHp: _takeHpDamage(target, amount - rawConsumed),
       broken: true,
       multiplierPercent: pct,
       barrierPopped: false

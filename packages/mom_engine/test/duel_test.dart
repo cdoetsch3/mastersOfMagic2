@@ -174,6 +174,78 @@ void main() {
       expect(alice.hp, 50, reason: 'nothing reached health, nothing healed');
     });
 
+    // ⭐ Playtest ruling: lifesteal pays for health LOST, not damage rolled.
+    // Fixed-band spells (min == max) keep these exact, and [_roll] short-
+    // circuits on min >= max so they consume no RNG either.
+    group('lifesteal pays for health lost, not damage rolled', () {
+      test("the designer's case: 16 into a 10hp mage heals 5, not 8", () {
+        const leech16 = Spell(
+            id: 'leech16',
+            name: 'Leech16',
+            chargeCost: 0,
+            priority: 9,
+            effect: DamageEffect(16, 16, lifesteal: 0.5));
+        alice.hp = 50;
+        bruno.hp = 10;
+        final r = duel.resolveTurn(const CastAction(leech16, MagicElement.umbra),
+            const ChargeAction(MagicElement.aero));
+        expect(bruno.hp, 0);
+        expect(alice.hp, 55,
+            reason: '⚠️ kills healing off pre-clamp damage (would be 58)');
+        expect(r.events.whereType<HealedEvent>().single.amount, 5,
+            reason: '⚠️ kills healing off pre-clamp damage (would be 8)');
+        expect(r.events.whereType<DamageEvent>().single.toHp, 10,
+            reason: '⚠️ kills an event that reports 16 against a 10hp mage');
+      });
+
+      test('a fully-shielded lifesteal hit heals exactly 0', () {
+        const drain40 = Spell(
+            id: 'drain40',
+            name: 'Drain40',
+            chargeCost: 0,
+            priority: 9,
+            effect: DamageEffect(40, 40, lifesteal: 0.5));
+        alice.hp = 50;
+        // Aero shield vs an Umbra hit is 100% (neutral), so 40 of a 100-point
+        // shield is soaked and not one point reaches health.
+        bruno.shield = ActiveShield.elemental(MagicElement.aero, 100);
+        final r = duel.resolveTurn(const CastAction(drain40, MagicElement.umbra),
+            const ChargeAction(MagicElement.aero));
+        expect(bruno.hp, 100);
+        expect(bruno.shield!.remaining, 60);
+        expect(alice.hp, 50,
+            reason: '⚠️ kills healing off rolled or shield-absorbed damage');
+        expect(r.events.whereType<HealedEvent>(), isEmpty,
+            reason: 'no health lost, so no heal event at all');
+      });
+
+      test('a multi-hit kill mid-sequence heals only for the real loss', () {
+        // 3 × 10 into a 16hp mage: 10 lost, then 6, then nothing — 16 total,
+        // so 8 healed. A naive sum of the rolls would say 30 → 15.
+        const flurrySteal = Spell(
+            id: 'flurrySteal',
+            name: 'Flurry Steal',
+            chargeCost: 0,
+            priority: 9,
+            effect: DamageEffect(10, 10, hits: 3, lifesteal: 0.5));
+        alice.hp = 50;
+        bruno.hp = 16;
+        final r = duel.resolveTurn(
+            const CastAction(flurrySteal, MagicElement.umbra),
+            const ChargeAction(MagicElement.aero));
+        expect(bruno.hp, 0);
+        expect(alice.hp, 58,
+            reason: '⚠️ kills summing per-hit damage instead of hp removed '
+                '(would be 65)');
+        expect(r.events.whereType<HealedEvent>().single.amount, 8);
+        expect(
+            r.events.whereType<DamageEvent>().map((e) => e.toHp).toList(),
+            [10, 6, 0],
+            reason: '⚠️ kills per-hit events that ignore the remaining hp — '
+                'the corpse-hit must report 0, not 10');
+      });
+    });
+
     test('empower doubles the next offensive spell', () {
       // Geo, not pyro: a pyro attack can randomly Ignite and skew the hp.
       alice.charge = 3;

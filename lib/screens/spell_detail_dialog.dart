@@ -48,8 +48,11 @@ String _numbers(Spell spell) => switch (spell.effect) {
 String _numbersLabel(Spell spell) => switch (spell.effect) {
   DamageEffect(:final lifesteal) =>
     lifesteal > 0
-        ? 'damage — heals you for ${(lifesteal * 100).round()}% of what '
-              'reaches their health'
+        // 📝 "health they lose", not "damage that reaches their health" —
+        // overkill pays nothing (playtest ruling), so a killing blow heals
+        // for the sliver they had left, and the copy must not promise more.
+        ? 'damage — heals you for ${(lifesteal * 100).round()}% of the '
+              'health they actually lose'
         : 'damage, rolled on cast',
   BarrageEffect() => 'damage, one hit per charge spent',
   OverloadEffect() => "damage per point of the enemy's charge",

@@ -49,9 +49,12 @@ abstract final class Spellbook {
       id: 'barrage', name: 'Barrage', chargeCost: 1, xCost: true, priority: 9,
       effect: BarrageEffect(7, 10));
 
-  // Lifesteal (priority 9) — heals for HALF the damage dealt to health.
-  // Never heals for damage a shield soaked (only [DamageEvent.toHp] counts),
-  // and the Astral Alignment pierce does count, since that lands on health.
+  // Lifesteal (priority 9) — heals for HALF the health the target actually
+  // LOST, not half the damage rolled (playtest ruling). Overkill pays
+  // nothing: a 16 into a 10hp mage heals 5, not 8. Never heals for damage a
+  // shield soaked (only [DamageEvent.toHp] counts, and that is now the
+  // clamped, genuinely-lost figure), and the Astral Alignment pierce does
+  // count, since that lands on health.
   static const _lifestealRate = 0.5;
   static const sap = Spell(
       id: 'sap', name: 'Sap', chargeCost: 1, priority: 9,

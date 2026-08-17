@@ -34,9 +34,14 @@ abstract final class Progression {
 
   // ---- Duel rewards ---------------------------------------------------
 
-  static const int winXp = 60;
+  // ⚠️ 2026-08-10 ruling — single-player XP was HALVED (win 60→30, per-level
+  // 10→5, loss 15→8) because playtesting hit "level 10 before the first zone
+  // was beatable": the curve was handing out levels faster than the campaign
+  // could hand out challenges, so the ladder's difficulty ramp never landed.
+  // [xpForDuel] is the one formula, so the halving reaches every mode.
+  static const int winXp = 30;
   static const int winGold = 30;
-  static const int lossXp = 15;
+  static const int lossXp = 8; // 15 halves to 7.5; the designer chose 8
   static const int lossGold = 0;
 
   /// XP per level of the defeated opponent.
@@ -45,7 +50,7 @@ abstract final class Progression {
   /// farming the easiest reachable enemy the optimal way to level, which is
   /// the opposite of what the campaign wants — the fight worth taking should
   /// be the one that pays.
-  static const int xpPerOpponentLevel = 10;
+  static const int xpPerOpponentLevel = 5;
 
   /// XP for a duel against an opponent of [opponentLevel].
   ///

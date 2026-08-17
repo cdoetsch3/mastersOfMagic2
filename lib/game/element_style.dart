@@ -147,7 +147,9 @@ String spellTooltip(Spell spell) {
       :final lifesteal,
     ) =>
       '${hits > 1 ? '$hits hits of ' : ''}$minAmount-$maxAmount damage'
-          '${lifesteal > 0 ? ', heals for ${(lifesteal * 100).round()}% of the health damage' : ''}',
+          // 📝 "health lost", not "health damage": overkill and shielded
+          // damage both heal nothing (playtest ruling).
+          '${lifesteal > 0 ? ', heals for ${(lifesteal * 100).round()}% of the health lost' : ''}',
     BarrageEffect(:final minPerCharge, :final maxPerCharge) =>
       'One hit per charge spent, each $minPerCharge-$maxPerCharge damage',
     ShieldEffect(:final minStrength, :final maxStrength) =>
@@ -186,9 +188,9 @@ const Map<String, String> spellDescriptions = {
   'barrage':
       'Spends ALL your charge as separate bolts — one per point. '
       'Each meets the shield on its own, so it chews through Barriers.',
-  'sap': 'Heals you for half the damage that reaches their health.',
-  'leech': 'A stronger draught — still half of what reaches their health.',
-  'drain': 'The heaviest steal; heals half the health damage it lands.',
+  'sap': 'Heals you for half the health they lose.',
+  'leech': 'A stronger draught — still half the health they lose.',
+  'drain': 'The heaviest steal; heals half the health it takes off them.',
   'ward': 'A light shield in your element.',
   'aegis': 'A sturdy shield in your element.',
   'bulwark': 'A heavy shield in your element.',

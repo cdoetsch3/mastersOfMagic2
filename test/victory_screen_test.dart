@@ -12,7 +12,8 @@ import 'package:masters_of_magic_2/screens/duel_screen.dart';
 void main() {
   test('⚠️ the XP a win is worth is NOT the flat base', () {
     // The victory screen used to display Progression.winXp while GameState
-    // banked xpForDuel — so beating a level-5 foe said "+60 XP" and paid 110.
+    // banked xpForDuel — so beating a level-5 foe said "+30 XP" and paid 55.
+    // (Numbers are post-2026-08-10 halving; the bug is rate-independent.)
     expect(
       Progression.xpForDuel(won: true, opponentLevel: 5),
       isNot(Progression.winXp),

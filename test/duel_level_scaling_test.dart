@@ -97,15 +97,20 @@ void main() {
   });
 
   group('XP tracks who you beat', () {
-    test('a win pays a base plus 10 per opponent level', () {
+    test('a win pays a base plus 5 per opponent level', () {
+      // The literals are the 2026-08-10 halved rates (base 30, +5/level);
+      // pinning them here is what makes a silent re-tune show up as a failure.
       expect(
         Progression.xpForDuel(won: true, opponentLevel: 1),
-        Progression.winXp + 10,
+        35,
+        reason: '⚠️ kills the pre-halving 60 + 10/level rates',
       );
       expect(
         Progression.xpForDuel(won: true, opponentLevel: 60),
-        Progression.winXp + 600,
+        330,
       );
+      expect(Progression.winXp, 30);
+      expect(Progression.xpPerOpponentLevel, 5);
     });
 
     test('beating something tougher always pays more', () {
@@ -132,6 +137,8 @@ void main() {
         Progression.xpForDuel(won: false, opponentLevel: 1),
         Progression.lossXp,
       );
+      expect(Progression.lossXp, 8,
+          reason: '⚠️ kills the pre-halving 15 consolation');
     });
 
     testWidgets('the launcher reports the opponent level it fought', (
