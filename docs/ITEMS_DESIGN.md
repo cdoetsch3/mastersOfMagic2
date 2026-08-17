@@ -2065,9 +2065,12 @@ itself lives in code and the export.
   pair: `ww_oak_stand` (Felling) and `ww_bindweed_tangle` (Foraging).
 - **Runtime**: `AdventureRun` rolls one node per section (never after the
   boss), serializes them with the drop-the-node-not-the-run contract, and
-  `GameState.gatherNode()` does the §9b.7 one-harvest: yield into
-  `pendingLoot` (gathered goods walk the take-home picker and die with the
-  run, like drops), skill XP banked immediately.
+  `GameState.gatherNode()` does the §9b.7 one-harvest: yield **straight into
+  the backpack** (ruling 2026-08-17 — materials are fungible, so there is
+  nothing to choose between and no instance to register), skill XP banked on
+  a successful harvest. ⚠️ All-or-nothing: a pack that cannot take the whole
+  yield refuses the harvest and the node stays unspent, riding along with the
+  run until there is room.
 - **Export**: recipes carry `steps`, `gatherNodes` is a top-level list, and
   the reverse index answers "where does oak_log come from" with drops AND
   gather nodes.
@@ -2113,6 +2116,33 @@ settle.
 
 ## Changelog
 
+**Rev — 2026-08-17. The loot tracker is gone; the stake moved to the
+inventory.** Designer's ruling, five parts, all shipped:
+
+- **No run-long loot tracker.** `AdventureRun.pendingLoot` /
+  `pendingInstances`, `GameState.takeRunLoot` / `defaultLootChoice`, the
+  end-of-run take-home panels and the Home tab's "claim your haul" card are
+  deleted. A run carries at most one fight's drops, and only until they are
+  answered for.
+- **A picker per victory.** Drops are offered the moment the fight ends
+  (`AdventureRun.unclaimed` → `GameState.claimVictoryLoot`), sorted **rarity
+  descending then alphabetically**, all ticked by default up to the free
+  slots, best first. Unchosen is gone. The batch is serialized, so a
+  force-quit mid-choice resumes the choice rather than losing it.
+- **Death costs the INVENTORY.** `GameState.loseEncounter` empties the
+  backpack and drops the wiped instances. Exempt: **equipped** gear (and any
+  instance the paper doll still names), the **belt and everything loaded on
+  it** (ruled safe on purpose — what keeps you alive is not what you lose),
+  and the Storerooms.
+- **Gathering goes straight to the backpack** — see §9b.9e above.
+- **Single-player losses and flees pay 0 XP** (`Progression.xpForDuel`'s new
+  `pvp` flag, defaulting to single player). PvP losses keep the 8. An AI you
+  can lose to on demand was a farm; a human on the other end is not.
+- **Migration**: a pre-ruling save whose run still holds `pendingLoot` is
+  drained into the backpack on load, best-rarity-first up to the free slots
+  (instances registered for what lands, the rest dropped). The legacy keys are
+  never written back.
+
 **Rev — 2026-08-11.** The crafting act shipped: six gesture engines, the
 act screen, pure scoring (coverage-dominant traces, linear closeness,
 grade labels aligned with the quality ceilings), margin-driven tuning,
@@ -2122,7 +2152,8 @@ lane. Widget tests play the act end to end with synthetic gestures.
 **Rev — 2026-08-10g.** §9b.9e: the schema shipped — GestureEngine/Step,
 scripts on all 20 Primal recipes, CraftQuality (placeholder numbers, ruled
 shape pinned by tests), GatherNodeDef with Zone 1's two nodes, run
-integration (one node per section, one-harvest, yields ride pendingLoot),
+integration (one node per section, one-harvest, yields rode the run's loot
+tracker — superseded 2026-08-17, see above),
 export coverage, and the modifier-export gap fixed (the six 2026-08-09
 stat fields now export).
 

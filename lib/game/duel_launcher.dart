@@ -39,6 +39,15 @@ Future<void> launchDuel(
         onResult: (won) => game.recordDuelResult(
           won: won,
           opponentLevel: driver.opponentLevel,
+          // ⭐ **The one place that can tell a human from a persona** (ruling
+          // 2026-08-17: only a PvP loss pays XP). `campaign` cannot answer it —
+          // a practice bout against Procarius is `campaign: false` and is still
+          // single player — but the driver can: a room is remote, everything
+          // else is a brain on this device. Asked by type, the same way the
+          // duel screen already asks it for the move timer; a getter on the
+          // interface would force every test fake to answer a question only
+          // this line needs.
+          pvp: driver is RemoteDuelDriver,
         ),
       ),
     ),

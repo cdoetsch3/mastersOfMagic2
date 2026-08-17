@@ -632,7 +632,10 @@ void main() {
       while (game.run != null && !game.run!.isOver && !game.run!.isFinished) {
         reported.addAll(await game.winEncounter(remainingHp: 90));
       }
-      final banked = [for (final s in game.run!.pendingLoot) s.defId];
+      // (2026-08-17 model: unanswered victory drops accumulate on
+      // run.unclaimed until the picker claims them — this walk never claims,
+      // so the whole haul is still there to compare.)
+      final banked = [for (final s in game.run!.unclaimed) s.defId];
       expect(
         (reported..sort()).join(','),
         (banked..sort()).join(','),

@@ -20,18 +20,19 @@ class HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final game = GameStateScope.of(context);
     final p = game.profile;
-    // ⭐ Only a run still standing. A finished one lingers on the profile until
-    // the next adventure overwrites it, and offering to "resume" a corpse is
-    // worse than offering nothing.
+    // ⭐ Only a run the player is still inside. A finished one lingers on the
+    // profile until the next adventure overwrites it, and offering to "resume"
+    // a corpse is worse than offering nothing.
     //
-    // ⚠️ **Except a run still holding its haul.** Closing the app on the
-    // take-home step leaves a finished run with loot nobody has claimed, and
-    // without this door back in, that haul would be lost exactly the way the
-    // picker exists to prevent.
+    // ⚠️ **A run holding an unanswered victory picker counts as inside**, even
+    // when the boss is already down: force-quitting on the picker is the one
+    // way loot can still be stranded (ruling 2026-08-17), and this is the door
+    // back to it. Not a second kind of card — the same "you are mid-adventure"
+    // fact, reached from a different second.
     final run = game.run;
     final resumable =
         run != null &&
-            ((!run.isOver && !run.isFinished) || run.awaitingLootChoice)
+            ((!run.isOver && !run.isFinished) || run.unclaimed.isNotEmpty)
         ? run
         : null;
 
@@ -178,33 +179,28 @@ class _ResumeAdventureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final zone = World.byId(run.zoneId);
-    // ⚠️ A finished run has no "encounter 10 of 9" to report, and offering to
-    // "resume" one would promise a fight that is not there.
-    final waiting = run.awaitingLootChoice;
     return GamePanel(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => AdventureScreen(zone: zone)),
       ),
       child: Row(
         children: [
-          Icon(
-            waiting ? Icons.card_giftcard : Icons.flag,
-            color: waiting ? AppColors.gold : AppColors.ember,
-          ),
+          const Icon(Icons.flag, color: AppColors.ember),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  waiting
-                      ? 'Claim your haul — ${zone.name}'
-                      : 'Resume adventure — ${zone.name}',
+                  'Resume adventure — ${zone.name}',
                   style: const TextStyle(color: AppColors.text, fontSize: 14),
                 ),
                 Text(
-                  waiting
-                      ? '${run.pendingLoot.length} waiting to be taken home'
+                  // ⚠️ A run whose line is walked out has no "encounter 10 of
+                  // 9" to report — it is standing on its unanswered spoils, and
+                  // saying so is the only honest subtitle.
+                  run.isFinished || run.isOver
+                      ? '${run.unclaimed.length} still to choose'
                       : 'Encounter ${run.encounterNumber} of '
                             '${run.encounterCount}',
                   style: const TextStyle(

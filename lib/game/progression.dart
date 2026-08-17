@@ -41,6 +41,15 @@ abstract final class Progression {
   // [xpForDuel] is the one formula, so the halving reaches every mode.
   static const int winXp = 30;
   static const int winGold = 30;
+
+  /// The consolation for losing **to another player**, and only that.
+  ///
+  /// ⚠️ **RULING (2026-08-17): losing or fleeing in single player pays 0.** A
+  /// campaign death now costs the whole backpack, and an AI you can lose to on
+  /// purpose is a farm: a floor that paid out regardless made "surrender
+  /// repeatedly" a slow but valid levelling strategy. PvP keeps it because you
+  /// cannot conjure an opponent on demand, and because a human on the other end
+  /// spent the same ten minutes you did.
   static const int lossXp = 8; // 15 halves to 7.5; the designer chose 8
   static const int lossGold = 0;
 
@@ -54,10 +63,22 @@ abstract final class Progression {
 
   /// XP for a duel against an opponent of [opponentLevel].
   ///
-  /// A loss still pays [lossXp] — a floor, deliberately not scaled, so losing
-  /// to something far above you is consolation rather than a payday.
-  static int xpForDuel({required bool won, required int opponentLevel}) =>
-      won ? winXp + xpPerOpponentLevel * opponentLevel : lossXp;
+  /// [pvp] marks a duel against **another player**. A loss pays [lossXp] there
+  /// and **nothing** anywhere else (ruling 2026-08-17) — campaign encounters,
+  /// fleeing one, and practice bouts against a persona are all single player,
+  /// and all pay zero. A win pays the same everywhere: beating something is
+  /// beating something.
+  ///
+  /// ⚠️ **Defaults to single player**, the safe direction: a call site that
+  /// forgets the flag under-pays a human duel, where the reverse default would
+  /// re-open the farm the ruling closed.
+  static int xpForDuel({
+    required bool won,
+    required int opponentLevel,
+    bool pvp = false,
+  }) => won
+      ? winXp + xpPerOpponentLevel * opponentLevel
+      : (pvp ? lossXp : 0);
 
   // ---- Loadout preset slots ------------------------------------------
 

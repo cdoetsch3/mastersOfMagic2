@@ -149,9 +149,9 @@ class PlayerProfile {
   /// *into* the current fight with — no mid-duel state is serialized, and none
   /// should be. Quitting a duel therefore costs that duel's progress and
   /// nothing else: no free escape from a fight going badly, no lost evening
-  /// either. The banked loot from earlier encounters rides along in
-  /// [AdventureRun.pendingLoot] and is still not the player's until they walk
-  /// out.
+  /// either. Everything won on the way in is already in the [backpack] (ruling
+  /// 2026-08-17), so the only loot a stored run can carry is a victory picker
+  /// that was never answered — [AdventureRun.unclaimed].
   AdventureRun? run;
 
   /// Locations the player has visited (unlocks fast context; travel itself is
@@ -349,7 +349,7 @@ class PlayerProfile {
             ?.map((p) => LoadoutPreset.fromJson(p as Map<String, dynamic>))
             .toList() ??
         [LoadoutPreset.starter('Loadout I')];
-    return PlayerProfile(
+    final profile = PlayerProfile(
       name: json['name'] as String? ?? 'Apprentice',
       lastSeenAt: DateTime.tryParse(
         json['lastSeenAt'] as String? ?? '',
@@ -413,7 +413,48 @@ class PlayerProfile {
       duelsWon: (json['duelsWon'] as num?)?.toInt() ?? 0,
       duelsLost: (json['duelsLost'] as num?)?.toInt() ?? 0,
     );
+    _migratePendingLoot(profile);
+    return profile;
   }
+}
+
+/// ⚠️ **The migration of 2026-08-17** — the run-long loot tracker was deleted,
+/// and a save written before that can hold a whole adventure's `pendingLoot`
+/// that nobody will ever be offered again.
+///
+/// ⭐ **Hands it over rather than dropping it**, best-rarity-first up to the
+/// free slots, instances registered for what lands. Deleting a feature must not
+/// delete a playtester's rare, and a picker for a run they finished last week
+/// would be stranger than simply finding it in the pack. Anything past the last
+/// free slot is gone — the same arithmetic the live picker applies.
+///
+/// ⚠️ Lives **here**, in `fromJson`, rather than in `GameState.boot`: every
+/// load path (local store, Firestore adoption on sign-in, tests) goes through
+/// this constructor, and a migration that only one of them runs is a migration
+/// that loses the haul on the other.
+void _migratePendingLoot(PlayerProfile p) {
+  final run = p.run;
+  if (run == null || run.legacyPendingLoot.isEmpty) return;
+  var pack = p.backpack;
+  for (final i in lootDisplayOrder(
+    run.legacyPendingLoot,
+    run.legacyPendingInstances,
+  )) {
+    final slot = run.legacyPendingLoot[i];
+    // ⚠️ The pack is the authority on whether it has room; a full one simply
+    // ends the handover rather than overflowing.
+    final next = pack.withAdded(slot);
+    if (next == null) continue;
+    pack = next;
+    final id = slot.instanceId;
+    final inst = id == null ? null : run.legacyPendingInstances[id];
+    if (inst != null) p.itemInstances[id!] = inst;
+  }
+  p.backpack = pack;
+  // Drained is drained: [AdventureRun.toJson] never writes these keys, so the
+  // next save is a clean, post-ruling one.
+  run.legacyPendingLoot.clear();
+  run.legacyPendingInstances.clear();
 }
 
 /// ⚠️ An unknown slot name is dropped rather than throwing — a save written by

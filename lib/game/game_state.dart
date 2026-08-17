@@ -224,11 +224,19 @@ class GameState extends ChangeNotifier {
   /// **not** defaulted to `won`: an adventure in Phase 1 is a single ordinary
   /// duel, and treating any win as a clear would hand out repeat-clear content
   /// (ENEMIES §2e) the moment real bosses land.
+  ///
+  /// ⚠️ **[pvp] defaults to false, and that is the safe direction** (ruling
+  /// 2026-08-17: a single-player loss pays no XP). A call site that forgets the
+  /// flag under-pays a human duel; a default of `true` would let every farmable
+  /// AI loss pay out, which is the abuse the ruling closes. `launchDuel` is the
+  /// only path that can see a remote opponent, and it is the only one that
+  /// passes it.
   Future<void> recordDuelResult({
     required bool won,
     int opponentLevel = 1,
     bool bossDefeated = false,
     String? locationId,
+    bool pvp = false,
   }) async {
     final before = profile.level;
     await _mutate(() {
@@ -238,6 +246,7 @@ class GameState extends ChangeNotifier {
       profile.xp += Progression.xpForDuel(
         won: won,
         opponentLevel: opponentLevel,
+        pvp: pvp,
       );
       if (won) {
         profile.gold += Progression.winGold;
@@ -264,12 +273,21 @@ class GameState extends ChangeNotifier {
   /// Harvests the gathering spot in front of the player.
   ///
   /// ⭐ **One simultaneous harvest** (ITEMS §9b.7 ruling): the whole yield in
-  /// one act, the node spent, the run moves on. The yield rides
-  /// [AdventureRun.pendingLoot] — gathered goods walk the same take-home
-  /// picker as drops, and dying still loses them, which is what makes
-  /// gathering on an adventure a push-your-luck act like everything else.
-  /// Skill XP banks immediately, like combat XP — effort is paid even when
-  /// the haul is later lost.
+  /// one act, the node spent, the run moves on.
+  ///
+  /// ⭐ **Straight into the backpack** (ruling 2026-08-17). Gathered materials
+  /// are fungible, so nothing is registered in the instance pool and there is
+  /// nothing to choose from — a picker for eight identical logs would be a
+  /// chore, not a decision.
+  ///
+  /// ⚠️ **All or nothing, and a refusal leaves the spot standing.** Splitting a
+  /// yield across a nearly-full pack would silently drop the remainder, which
+  /// is the failure mode this whole redesign exists to end; instead the node
+  /// stays unspent and rides along with the run until there is room. The
+  /// quantity is re-rolled on the next attempt — a refused harvest costs
+  /// nothing, including the roll it never used.
+  ///
+  /// Skill XP banks on a **successful** harvest only: a refusal is not effort.
   ///
   /// 📝 The gesture act (node.def.step) is not played yet; when the engines
   /// exist, [performance] arrives the same way craft()'s does.
@@ -282,12 +300,29 @@ class GameState extends ChangeNotifier {
     final def = node.def;
     final roll = rng ?? Random();
     final amount = def.min + roll.nextInt(def.max - def.min + 1);
+    final free = profile.backpack.free;
+    if (free < amount) {
+      final yieldDef = ItemCatalogue.tryById(def.yieldsDefId);
+      final name = yieldDef == null
+          ? def.yieldsDefId
+          : ItemCatalogue.displayName(yieldDef);
+      return GatherOutcome.refused(
+        'No room for $amount × $name — '
+        '${free == 0 ? 'your pack is full' : 'only $free slots free'}. '
+        'The spot will wait.',
+      );
+    }
     final levelBefore = profile.skillLevel(def.skill.name);
     await _mutate(() {
       node.spent = true;
+      var pack = profile.backpack;
       for (var i = 0; i < amount; i++) {
-        r.pendingLoot.add(InventorySlot(defId: def.yieldsDefId));
+        // ⚠️ Checked above, but the pack is still asked — it is the only
+        // authority on its own room, and `?? pack` here means a miscount can
+        // cost an item rather than crash on a null.
+        pack = pack.withAdded(InventorySlot(defId: def.yieldsDefId)) ?? pack;
       }
+      profile.backpack = pack;
       profile.skillXp[def.skill.name] =
           (profile.skillXp[def.skill.name] ?? 0) + def.xp;
     });
@@ -416,14 +451,10 @@ class GameState extends ChangeNotifier {
   /// ⚠️ Async now that the run is saved — the rolled line **is** the run, and
   /// a crash before the first fight must not leave a zone half-entered.
   Future<AdventureRun> beginAdventure(GameLocation zone, {Random? rng}) async {
-    // ⚠️ **An unclaimed haul must not die to an overwrite.** The picker can be
-    // dodged — force-quit on the end screen, then enter another zone from the
-    // map — and this line is where that path would silently destroy the loot.
-    // Claiming the rarity-first default instead means dodging the picker
-    // costs the choice, never the rare (validator guard, 2026-08-10).
-    if (run?.awaitingLootChoice == true) {
-      await takeRunLoot(defaultLootChoice);
-    }
+    // 📝 No overwrite guard any more: a run no longer *holds* anything the
+    // player has earned (ruling 2026-08-17). Everything kept is already in the
+    // pack, so starting a new adventure can only discard a picker that was
+    // walked away from — which is the same answer as declining it.
     final started = AdventureRun.roll(
       zone: zone,
       roster: Bestiary.forZone(zone.id),
@@ -441,11 +472,16 @@ class GameState extends ChangeNotifier {
     return started;
   }
 
-  /// Records a won encounter, rolling its drops into the run's pending loot.
+  /// Records a won encounter, rolling its drops onto the run as an
+  /// **unanswered picker** ([AdventureRun.unclaimed]).
   ///
   /// ⭐ Returns the def ids that dropped, so the end screen can show them
   /// **before** it renders. Rolling after the duel screen popped would leave
   /// nothing to display.
+  ///
+  /// ⚠️ Nothing reaches the backpack here. The player chooses immediately after
+  /// the fight ([claimVictoryLoot]) — the drops sit on the run only for the
+  /// seconds in between, and survive a force-quit taken in those seconds.
   Future<List<String>> winEncounter({
     required int remainingHp,
     Random? rng,
@@ -470,23 +506,54 @@ class GameState extends ChangeNotifier {
       bossDefeated: wasBoss,
       locationId: r.zoneId,
     );
-    // ⚠️ **A cleared run does NOT hand its loot over here.** Dropping the boss
-    // ends the run, and the take-home step ([takeRunLoot]) is what moves loot
-    // into the pack — one ritual for both endings, so the boss path and the
-    // walk-out path cannot drift apart.
+    // ⚠️ **The boss fight is not special.** Its drops go through the very same
+    // picker as encounter one's, so the last fight of a run cannot drift into
+    // rules of its own.
     notifyListeners();
     return [for (final slot in loot.slots) slot.defId];
   }
 
-  /// Records a lost encounter. ⚠️ The run's loot is gone.
-  Future<void> loseEncounter({Random? rng}) async {
+  /// Records a lost encounter — ⚠️ **the defeat penalty of the 2026-08-17
+  /// ruling: the backpack is emptied.**
+  ///
+  /// > *"If you die in single-player, you lose everything in your INVENTORY —
+  /// > but nothing that's equipped, and the belt (the worn belt AND its loaded
+  /// > consumables) is SAFE."*
+  ///
+  /// ⭐ Three exemptions, each load-bearing:
+  /// - **Worn gear** never enters the backpack, so it is safe by construction;
+  ///   the `equipped` check below only guards the instance *pool*, so a wipe
+  ///   can never orphan the staff still in your hand.
+  /// - **The belt** is a list of def ids, not pack slots, so its loaded
+  ///   consumables are untouched here — deliberately, per the ruling: the
+  ///   things that keep you alive are the things you do not lose for dying.
+  /// - **Storerooms** hold their own instance ids and are never iterated.
+  ///
+  /// Returns how many slots were emptied, so the screen can say it plainly. A
+  /// penalty the player is not told about is indistinguishable from a bug.
+  Future<int> loseEncounter({Random? rng}) async {
     final r = run;
-    if (r == null || r.isOver) return;
+    if (r == null || r.isOver) return 0;
     final enemy = r.current!;
-    r.recordDefeat();
+    var lost = 0;
+    await _mutate(() {
+      final worn = profile.equipped.values.toSet();
+      for (final slot in profile.backpack.contents) {
+        lost++;
+        final id = slot.instanceId;
+        // ⚠️ An instance the paper doll still points at must outlive the wipe —
+        // removing it would leave `equipped` naming an item that no longer
+        // exists, which reads as your gear evaporating.
+        if (id != null && !worn.contains(id)) profile.itemInstances.remove(id);
+      }
+      profile.backpack = Backpack.empty();
+      r.recordDefeat();
+    });
     // The defeat rides to disk on recordDuelResult's write, same as a win.
+    // ⚠️ No `pvp` flag: a campaign death is single-player, so it pays 0 XP.
     await recordDuelResult(won: false, opponentLevel: enemy.level);
     notifyListeners();
+    return lost;
   }
 
   /// Uses a carried item between encounters.
@@ -518,68 +585,69 @@ class GameState extends ChangeNotifier {
 
   /// Walks out early.
   ///
-  /// ⭐ **Ends the run and nothing else.** The loot stays pending, because what
-  /// comes home is now the player's choice and the picker has not been answered
-  /// yet — see [takeRunLoot]. ⚠️ That leaves a legal in-between state on disk
-  /// (a finished run still holding loot), which is why `AdventureRun`
-  /// advertises it as [AdventureRun.awaitingLootChoice] and the Home tab offers
-  /// the way back to it.
+  /// ⭐ **Ends the run and nothing else** — and since the 2026-08-17 ruling
+  /// that is the whole truth: every fight already handed its loot over, so
+  /// there is nothing left to bank, nothing to claim, and no in-between state
+  /// on disk. Walking out is now exactly as cheap as it sounds.
   Future<void> leaveAdventure() async {
     final r = run;
     if (r == null || r.isOver) return;
     await _mutate(r.returnToTown);
   }
 
-  /// The selection the take-home picker opens with: indices into
-  /// `run.pendingLoot`, best first, already trimmed to what will fit.
+  /// The ticks the victory picker opens with: indices into `run.unclaimed`,
+  /// best first, already trimmed to what will fit.
   ///
-  /// ⭐ **Rarity descending.** A playtester lost a rare to the old silent
-  /// overflow, which abandoned whatever happened to be last in the list — so
-  /// the default now spends the last free slot on the best thing found, and a
-  /// player who just taps confirm never loses the item they were excited about.
-  List<int> get defaultLootChoice {
+  /// ⭐ **Rarity descending, so the last free slot is spent on the best thing
+  /// found.** A playtester once lost a rare to a silent overflow that abandoned
+  /// whatever happened to be last in the list; a player who just taps confirm
+  /// must never lose the item they were excited about.
+  List<int> get defaultVictoryChoice {
     final r = run;
     if (r == null) return const [];
-    return _bestFirst(r.pendingLoot).take(profile.backpack.free).toList();
+    return lootDisplayOrder(
+      r.unclaimed,
+      r.unclaimedInstances,
+    ).take(profile.backpack.free).toList();
   }
 
-  /// Takes the chosen part of a finished run's loot home; abandons the rest.
+  /// Takes the chosen part of the last victory's drops; abandons the rest.
   ///
-  /// [chosen] holds indices into `run.pendingLoot`. ⭐ **Everything not chosen
-  /// is gone for good**, and that is the point: the player decides what a full
-  /// pack costs them, where before `_bankRunLoot` silently dropped whatever
-  /// overflowed.
+  /// [chosen] holds indices into `run.unclaimed`. ⭐ **Everything not chosen is
+  /// gone for good**, and that is the point: the player decides what a full
+  /// pack costs them, at the moment the loot appears, rather than finding out
+  /// afterwards that something was quietly dropped.
   ///
   /// ⚠️ **Clamped, never refused.** A selection bigger than the free slots
-  /// keeps its [_bestFirst] prefix and abandons the remainder — a confirm
+  /// keeps its [lootDisplayOrder] prefix and abandons the remainder — a confirm
   /// button that silently does nothing reads as a broken game, and refusing
-  /// would strand the run in its unclaimed state forever.
+  /// would strand the run holding a picker it can never close.
   ///
   /// Returns what landed and what was left, so the screen can report both
   /// halves; a loss the player is not told about is the bug this replaced.
-  Future<({List<InventorySlot> taken, List<InventorySlot> left})> takeRunLoot(
-    Iterable<int> chosen,
-  ) async {
+  Future<({List<InventorySlot> taken, List<InventorySlot> left})>
+  claimVictoryLoot(Iterable<int> chosen) async {
     final r = run;
-    if (r == null || !r.lootIsBanked) {
+    if (r == null || r.unclaimed.isEmpty) {
       return (taken: const <InventorySlot>[], left: const <InventorySlot>[]);
     }
     final taken = <InventorySlot>[];
     final left = <InventorySlot>[];
     await _mutate(() {
-      final wanted = _bestFirst(
-        r.pendingLoot,
+      final wanted = lootDisplayOrder(
+        r.unclaimed,
+        r.unclaimedInstances,
         // ⚠️ Filtered for range here rather than trusted: these indices come
         // from a screen, and a stale one must not read off the end.
         only: {
           for (final i in chosen)
-            if (i >= 0 && i < r.pendingLoot.length) i,
+            if (i >= 0 && i < r.unclaimed.length) i,
         },
       ).take(profile.backpack.free).toSet();
 
       var pack = profile.backpack;
-      for (var i = 0; i < r.pendingLoot.length; i++) {
-        final slot = r.pendingLoot[i];
+      for (var i = 0; i < r.unclaimed.length; i++) {
+        final slot = r.unclaimed[i];
         // ⚠️ The pack is still asked even though `wanted` is already clamped —
         // it is the only authority on whether it has room, and belt-and-braces
         // here is what stops loot vanishing rather than overflowing.
@@ -590,47 +658,23 @@ class GameState extends ChangeNotifier {
         }
         pack = next;
         taken.add(slot);
-        // ⭐ Only an instance whose slot came home enters the pool. An
+        // ⭐ Only an instance whose slot was taken enters the pool. An
         // abandoned staff's rolls must not outlive the staff: a dangling
         // instance is a save that grows forever and a name for an item nobody
         // owns (ITEMS §10.3a, and `PlayerProfile` guards the other direction).
         final id = slot.instanceId;
-        final inst = id == null ? null : r.pendingInstances[id];
+        final inst = id == null ? null : r.unclaimedInstances[id];
         if (inst != null) profile.itemInstances[id!] = inst;
       }
       profile.backpack = pack;
       // ⚠️ Emptied **inside** the write, taken and abandoned alike. Clearing
       // after it would save a run still holding loot that is already in the
       // backpack, and reopening the app would hand it over a second time.
-      r.pendingLoot.clear();
-      r.pendingInstances.clear();
+      r.unclaimed.clear();
+      r.unclaimedInstances.clear();
     });
     return (taken: taken, left: left);
   }
-
-  /// Indices into [loot] (optionally only those in [only]), rarest first.
-  ///
-  /// ⚠️ **One ordering for both the default selection and the clamp.** If they
-  /// disagreed, confirming the default could abandon a different item than the
-  /// one the picker showed as taken. Ties break on drop order, explicitly,
-  /// because Dart's sort is not stable.
-  List<int> _bestFirst(List<InventorySlot> loot, {Set<int>? only}) {
-    final order = [
-      for (var i = 0; i < loot.length; i++)
-        if (only == null || only.contains(i)) i,
-    ];
-    order.sort((a, b) {
-      final byRarity = _rarityRank(loot[b].defId) - _rarityRank(loot[a].defId);
-      return byRarity != 0 ? byRarity : a - b;
-    });
-    return order;
-  }
-
-  /// ⚠️ An id no catalogue entry claims sorts below common rather than
-  /// throwing — a save written before a content patch removed an item must
-  /// still be able to walk out of the woods.
-  static int _rarityRank(String defId) =>
-      ItemCatalogue.tryById(defId)?.rarity.index ?? -1;
 
   // ---- Storeroom --------------------------------------------------------
 

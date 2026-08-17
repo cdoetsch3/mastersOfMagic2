@@ -8,6 +8,8 @@ import 'package:masters_of_magic_2/game/enemies/loot.dart';
 import 'package:masters_of_magic_2/game/enemies/whispering_woods.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/carrying.dart';
+import 'package:masters_of_magic_2/game/items/inventory.dart';
+import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
@@ -189,19 +191,35 @@ void main() {
       expect(run.encounterNumber, 2);
     });
 
-    test('walking out banks the loot', () {
+    test('a victory parks its drops for the picker, and nothing else', () {
       final run = _run()
         ..recordVictory(
           loot: [const InventorySlot(defId: 'oak_log')],
           instances: {},
           remainingHp: 90,
-        )
-        ..returnToTown();
-      expect(run.lootIsBanked, isTrue);
-      expect(run.pendingLoot, hasLength(1));
+        );
+      expect(
+        run.unclaimed.map((s) => s.defId),
+        ['oak_log'],
+        reason:
+            'the run is where a rolled drop waits out the seconds between the '
+            'fight ending and the player answering',
+      );
     });
 
-    test('⚠️ dying costs the whole run', () {
+    test('walking out ends the run and touches nothing else', () {
+      final run = _run()..returnToTown();
+      expect(run.outcome, RunOutcome.returned);
+      expect(
+        run.unclaimed,
+        isEmpty,
+        reason:
+            'since the 2026-08-17 ruling a run holds no haul to hand over on '
+            'the way out — every fight already did',
+      );
+    });
+
+    test('⚠️ dying drops the picker nobody answered', () {
       final run = _run()
         ..recordVictory(
           loot: [const InventorySlot(defId: 'oak_log')],
@@ -210,11 +228,12 @@ void main() {
         )
         ..recordDefeat();
       expect(run.outcome, RunOutcome.died);
-      expect(run.lootIsBanked, isFalse);
       expect(
-        run.pendingLoot,
+        run.unclaimed,
         isEmpty,
-        reason: 'cleared at the source so nothing downstream can bank it',
+        reason:
+            'a picker left on a dead run would be offered again on the next '
+            'load — loot from a fight you did not walk away from',
       );
     });
 
@@ -224,7 +243,6 @@ void main() {
         run.recordVictory(loot: [], instances: {}, remainingHp: 50);
       }
       expect(run.outcome, RunOutcome.cleared);
-      expect(run.lootIsBanked, isTrue);
     });
   });
 
@@ -293,24 +311,24 @@ void main() {
   });
 
   group('the whole loop, end to end', () {
-    test('fight, loot, walk out, stow it in Hearthwood', () async {
+    test('fight, choose, walk out, stow it in Hearthwood', () async {
       final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
       await game.beginAdventure(_woods, rng: Random(3));
 
-      // Clear the first two fights.
+      // Clear the first two fights, answering each picker as it appears.
       await game.winEncounter(remainingHp: 80, rng: Random(3));
-      await game.winEncounter(remainingHp: 65, rng: Random(4));
-      expect(game.run!.pendingLoot, isNotEmpty);
-
-      // Walk out, then take the haul home. ⚠️ Two steps now: walking out ends
-      // the run, and the take-home choice is what makes the loot yours.
-      await game.leaveAdventure();
+      expect(game.run!.unclaimed, isNotEmpty);
       expect(
         game.profile.backpack.used,
         0,
-        reason: 'walking out that banks on its own skips the choice entirely',
+        reason: 'a win that banks on its own skips the choice entirely',
       );
-      await game.takeRunLoot(game.defaultLootChoice);
+      await game.claimVictoryLoot(game.defaultVictoryChoice);
+      await game.winEncounter(remainingHp: 65, rng: Random(4));
+      await game.claimVictoryLoot(game.defaultVictoryChoice);
+
+      // ⭐ The loot is already the player's — walking out is free.
+      await game.leaveAdventure();
       expect(game.profile.backpack.used, greaterThan(0));
 
       // Stow the first slot in Hearthwood's Storeroom.
@@ -331,32 +349,23 @@ void main() {
       expect(game.profile.backpack.used, carried);
     });
 
-    test('dying banks nothing', () async {
-      final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
-      await game.beginAdventure(_woods, rng: Random(5));
-      await game.winEncounter(remainingHp: 40, rng: Random(5));
-      await game.loseEncounter();
-      expect(game.profile.backpack.used, 0);
-      expect(game.run!.outcome, RunOutcome.died);
-    });
-
     test('clearing the zone marks it cleared', () async {
       final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
       await game.beginAdventure(_woods, rng: Random(7));
       while (!game.run!.isFinished) {
         await game.winEncounter(remainingHp: 70, rng: Random(7));
+        await game.claimVictoryLoot(game.defaultVictoryChoice);
       }
       expect(game.profile.hasCleared('whispering_woods'), isTrue);
       expect(game.profile.clearCountFor('whispering_woods'), 1);
     });
 
     test(
-      '⚠️ a full backpack costs the haul out loud, never silently',
+      '⚠️ a full backpack costs the drop out loud, never silently',
       () async {
         // The old behaviour dropped the overflow inside the bank and told
-        // nobody. Now the run ends holding everything, the picker offers zero
-        // free slots, and what is lost is reported. See loot_picker_test.dart
-        // for the choosing itself.
+        // nobody. Now the picker offers zero free slots and reports what was
+        // lost. See loot_picker_test.dart for the choosing itself.
         final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
         // Fill the pack first.
         var pack = game.profile.backpack;
@@ -367,31 +376,219 @@ void main() {
 
         await game.beginAdventure(_woods, rng: Random(11));
         await game.winEncounter(remainingHp: 90, rng: Random(11));
-        final haul = game.run!.pendingLoot.length;
-        expect(haul, greaterThan(0), reason: 'the fixture needs a drop');
+        final dropped = game.run!.unclaimed.length;
+        expect(dropped, greaterThan(0), reason: 'the fixture needs a drop');
 
-        await game.leaveAdventure();
         expect(
-          game.defaultLootChoice,
+          game.defaultVictoryChoice,
           isEmpty,
           reason:
               'a default selection that ignores free slots promises a '
               'slot that is not there',
         );
-        final result = await game.takeRunLoot(game.defaultLootChoice);
+        final result = await game.claimVictoryLoot(game.defaultVictoryChoice);
         expect(
           result.left,
-          hasLength(haul),
+          hasLength(dropped),
           reason: 'loot that fits nowhere still has to be reported as lost',
         );
         expect(game.profile.backpack.isFull, isTrue);
         expect(
           game.profile.backpack.countOf('oak_log'),
           Carrying.backpackSlots,
-          reason: 'a full pack must not be rewritten by the take-home step',
+          reason: 'a full pack must not be rewritten by the picker',
         );
       },
     );
+  });
+
+  // ======================================================================
+  // ⚠️ RULING 2026-08-17 — dying costs the INVENTORY
+  // ======================================================================
+  group('death empties the backpack', () {
+    /// A mage one fight into the woods, carrying [carrying], wearing the
+    /// Sporecap Mantle and a belt, with a draught loaded on it.
+    Future<GameState> kitted({List<InventorySlot> carrying = const []}) async {
+      final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
+      var pack = game.profile.backpack;
+      for (final slot in carrying) {
+        pack = pack.withAdded(slot)!;
+      }
+      game.profile
+        ..backpack = pack
+        ..itemInstances['worn-mantle'] = const ItemInstance(
+          instanceId: 'worn-mantle',
+          defId: 'sporecap_mantle',
+        )
+        ..itemInstances['worn-belt'] = const ItemInstance(
+          instanceId: 'worn-belt',
+          defId: 'fawnhide_belt',
+        )
+        ..equipped[EquipSlot.robeTop] = 'worn-mantle'
+        ..equipped[EquipSlot.belt] = 'worn-belt'
+        ..belt = const Belt(loaded: ['sapwort_draught']);
+      await game.beginAdventure(_woods, rng: Random(5));
+      return game;
+    }
+
+    test('⚠️ every carried slot is gone, and the count is reported', () async {
+      final game = await kitted(
+        carrying: const [
+          InventorySlot(defId: 'oak_log'),
+          InventorySlot(defId: 'foragers_ration'),
+          InventorySlot(defId: 'heartwood_stave', instanceId: 'pack-staff'),
+        ],
+      );
+      game.profile.itemInstances['pack-staff'] = const ItemInstance(
+        instanceId: 'pack-staff',
+        defId: 'heartwood_stave',
+      );
+
+      final lost = await game.loseEncounter();
+
+      expect(
+        game.profile.backpack.used,
+        0,
+        reason:
+            'the 2026-08-17 defeat penalty IS the inventory — a wipe that '
+            'spares the pack is the old "you lose the run\'s haul" rule',
+      );
+      expect(
+        lost,
+        3,
+        reason:
+            'the screen cannot say what dying cost if the call does not count '
+            'it, and an unstated penalty reads as a bug',
+      );
+      expect(
+        game.profile.itemInstances.containsKey('pack-staff'),
+        isFalse,
+        reason:
+            'the rolls of a wiped staff outliving it is a save that grows '
+            'forever and a name for an item nobody owns',
+      );
+    });
+
+    test('⭐ what you were WEARING survives, instance and all', () async {
+      final game = await kitted(
+        carrying: const [InventorySlot(defId: 'oak_log')],
+      );
+      await game.loseEncounter();
+
+      expect(
+        game.profile.equipped[EquipSlot.robeTop],
+        'worn-mantle',
+        reason: 'the ruling exempts worn gear outright',
+      );
+      expect(
+        game.profile.itemInstances['worn-mantle']?.defId,
+        'sporecap_mantle',
+        reason:
+            'dropping the instance leaves `equipped` naming an item that no '
+            'longer exists — the paper doll would show your gear evaporating',
+      );
+    });
+
+    test(
+      '⚠️ a pack slot that names WORN gear cannot orphan the paper doll',
+      () async {
+        // A save where `equipped` and a backpack slot point at the same
+        // instance — corruption, or a migration that duplicated a reference.
+        // The wipe must still not delete an instance the paper doll names.
+        final game = await kitted();
+        game.profile.backpack = game.profile.backpack.withAdded(
+          const InventorySlot(
+            defId: 'sporecap_mantle',
+            instanceId: 'worn-mantle',
+          ),
+        )!;
+
+        await game.loseEncounter();
+
+        expect(
+          game.profile.itemInstances.containsKey('worn-mantle'),
+          isTrue,
+          reason:
+              'wiping by slot alone leaves `equipped` naming an instance that '
+              'no longer exists — the mantle on your body with nothing behind '
+              'it',
+        );
+        expect(game.profile.backpack.used, 0);
+      },
+    );
+
+    test('⭐ the belt and everything loaded on it is SAFE', () async {
+      final game = await kitted(
+        carrying: const [InventorySlot(defId: 'oak_log')],
+      );
+      await game.loseEncounter();
+      expect(
+        game.profile.belt.loaded,
+        ['sapwort_draught'],
+        reason:
+            'ruled safe on purpose: the things that keep you alive are the '
+            'things you do not lose for dying',
+      );
+    });
+
+    test('⭐ a Storeroom is not an inventory', () async {
+      final game = await kitted(
+        carrying: const [InventorySlot(defId: 'oak_log')],
+      );
+      game.profile.storerooms['hearthwood'] = const Storeroom(
+        stacks: {'oak_log': 4},
+        instanceIds: ['stored-staff'],
+      );
+      game.profile.itemInstances['stored-staff'] = const ItemInstance(
+        instanceId: 'stored-staff',
+        defId: 'heartwood_stave',
+      );
+
+      await game.loseEncounter();
+
+      expect(game.profile.storerooms['hearthwood']!.itemCount, 5);
+      expect(
+        game.profile.itemInstances.containsKey('stored-staff'),
+        isTrue,
+        reason:
+            'a wipe that reaches the Storeroom would make the safest place in '
+            'the game the one that loses your things',
+      );
+    });
+
+    test('⚠️ a campaign death pays NO XP, and the loss still counts', () async {
+      final game = await kitted();
+      final xpBefore = game.profile.xp;
+      await game.loseEncounter();
+      expect(
+        game.profile.xp,
+        xpBefore,
+        reason:
+            'ruling 2026-08-17: a single-player loss pays nothing, or losing '
+            'on purpose becomes a levelling strategy',
+      );
+      expect(game.profile.duelsLost, 1, reason: 'the record still happened');
+    });
+
+    test('the wipe reaches disk in the same write as the defeat', () async {
+      final storage = _MemStorage();
+      final game = GameState(storage, PlayerProfile.newPlayer());
+      game.profile.backpack = game.profile.backpack.withAdded(
+        const InventorySlot(defId: 'oak_log'),
+      )!;
+      await game.beginAdventure(_woods, rng: Random(5));
+      await game.loseEncounter();
+
+      final saved = storage.stored!;
+      expect(saved.backpack.used, 0);
+      expect(
+        saved.run!.outcome,
+        RunOutcome.died,
+        reason:
+            'a defeat saved without its penalty (or the reverse) is undone by '
+            'force-quitting at the right moment',
+      );
+    });
   });
 }
 

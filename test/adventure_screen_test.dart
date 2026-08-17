@@ -4,6 +4,10 @@
 /// ⭐ Both come from real playtest reports — "no way to eat a ration" and a
 /// rare lost to a silent overflow. `loot_picker_test.dart` pins the rules; this
 /// file pins that the screen actually reaches them.
+///
+/// ⚠️ Since the 2026-08-17 ruling the say happens **after every fight**, not at
+/// the end of the run, and dying costs the whole backpack — so the panels this
+/// file drives are the victory picker and the defeat notice.
 library;
 
 import 'dart:math';
@@ -111,8 +115,54 @@ void main() {
     });
   });
 
-  group('the take-home step', () {
-    testWidgets('walking out opens the picker, defaulting to the epic', (
+  group('the victory picker', () {
+    /// Wins a fight whose drops are [loot], the way `winEncounter` leaves the
+    /// run: parked, unanswered, and the screen's problem now.
+    void justWon(GameState game, List<InventorySlot> loot) {
+      game.run!.recordVictory(
+        loot: loot,
+        instances: const {
+          'inst-1': ItemInstance(
+            instanceId: 'inst-1',
+            defId: 'heartwood_stave',
+          ),
+        },
+        remainingHp: 90,
+      );
+    }
+
+    testWidgets('⭐ the rarest drop is listed first, whatever order it fell in',
+        (tester) async {
+      final game = await _onAdventure();
+      justWon(game, const [
+        InventorySlot(defId: 'oak_log'),
+        InventorySlot(defId: 'flora_crystal'),
+        InventorySlot(defId: 'heartwood_stave', instanceId: 'inst-1'),
+      ]);
+      await _pump(tester, game);
+
+      final rows = tester
+          .widgetList<Text>(find.byType(Text))
+          .map((t) => t.data)
+          .whereType<String>()
+          .where(
+            (s) => const [
+              'Oak Log',
+              'Flora Crystal',
+              'Heartwood Staff',
+            ].contains(s),
+          )
+          .toList();
+      expect(
+        rows,
+        ['Heartwood Staff', 'Flora Crystal', 'Oak Log'],
+        reason:
+            'rendering in drop order buries the epic under a log — the row '
+            'that decides the choice has to be the one on top',
+      );
+    });
+
+    testWidgets('a win opens the picker, defaulting to the epic', (
       tester,
     ) async {
       final game = await _onAdventure();
@@ -121,19 +171,12 @@ void main() {
         pack = pack.withAdded(const InventorySlot(defId: 'oak_log'))!;
       }
       game.profile.backpack = pack;
-      game.run!
-        ..pendingLoot.addAll(const [
-          InventorySlot(defId: 'oak_log'),
-          InventorySlot(defId: 'heartwood_stave', instanceId: 'inst-1'),
-        ])
-        ..pendingInstances['inst-1'] = const ItemInstance(
-          instanceId: 'inst-1',
-          defId: 'heartwood_stave',
-        );
+      justWon(game, const [
+        InventorySlot(defId: 'oak_log'),
+        InventorySlot(defId: 'heartwood_stave', instanceId: 'inst-1'),
+      ]);
 
       await _pump(tester, game);
-      await tester.tap(find.text('Return to town'));
-      await tester.pumpAndSettle();
 
       expect(
         find.textContaining('Taking 1 of 2 — 1 slot free'),
@@ -146,7 +189,7 @@ void main() {
         reason: 'the item that does not fit has to say why it cannot be picked',
       );
 
-      await tester.tap(find.text('Take 1 home'));
+      await tester.tap(find.text('Take 1'));
       await tester.pumpAndSettle();
 
       expect(
@@ -155,43 +198,114 @@ void main() {
         reason: 'the default kept the log and abandoned the epic',
       );
       expect(
-        find.textContaining('Left behind'),
-        findsOneWidget,
-        reason: 'the receipt has to name what the choice cost',
+        game.profile.itemInstances.containsKey('inst-1'),
+        isTrue,
+        reason: 'a claimed staff with no instance behind it is a nameless husk',
       );
       expect(
-        find.text('Back to the map'),
+        find.textContaining('left behind: Oak Log'),
         findsOneWidget,
-        reason: 'the way out stays shut once the haul is answered for',
+        reason: 'the confirmation has to name what the choice cost',
+      );
+      expect(
+        find.textContaining('Taking'),
+        findsNothing,
+        reason: 'an answered picker that stays on screen can be answered twice',
       );
     });
 
-    testWidgets('⚠️ the exit is barred while loot is still unclaimed', (
+    testWidgets('⚠️ nothing else is offered until the picker is answered', (
       tester,
     ) async {
       final game = await _onAdventure();
-      game.run!.pendingLoot.add(const InventorySlot(defId: 'oak_log'));
-      await game.leaveAdventure();
+      justWon(game, const [InventorySlot(defId: 'oak_log')]);
       await _pump(tester, game);
 
-      final exit = tester.widget<FilledButton>(
-        find.widgetWithText(FilledButton, 'Back to the map'),
-      );
       expect(
-        exit.onPressed,
-        isNull,
+        find.text('Fight'),
+        findsNothing,
+        reason:
+            'walking into the next fight past an unanswered picker leaves the '
+            'drops to be merged into the next batch — one question at a time',
+      );
+      expect(find.text('Return to town'), findsNothing);
+      expect(find.text('Use'), findsNothing,
+          reason: 'the supplies panel is a second decision competing with the '
+              'one where something can be lost');
+
+      await tester.tap(find.text('Take 1'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Fight'),
+        findsOneWidget,
+        reason: 'answering the picker has to give the run back',
+      );
+    });
+
+    testWidgets('⚠️ a cleared run keeps its exit shut until loot is answered', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      final run = game.run!;
+      while (!run.isFinished) {
+        run.recordVictory(loot: const [], instances: const {}, remainingHp: 70);
+      }
+      run.unclaimed.add(const InventorySlot(defId: 'flora_crystal'));
+      await _pump(tester, game);
+
+      expect(
+        find.text('Back to the map'),
+        findsNothing,
         reason:
             'leaving mid-choice strands a finished run holding loot the '
             'player believes they already took',
       );
+      await tester.tap(find.text('Take 1'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Back to the map'),
+        findsOneWidget,
+        reason: 'the door has to open again once the choice is made',
+      );
     });
 
-    testWidgets('a run that died shows no picker at all', (tester) async {
+    testWidgets('nothing dropped means no picker', (tester) async {
       final game = await _onAdventure();
-      game.run!.pendingLoot.add(const InventorySlot(defId: 'oak_log'));
+      justWon(game, const []);
+      await _pump(tester, game);
+      expect(
+        find.textContaining('Taking'),
+        findsNothing,
+        reason: 'a picker with no rows is a button that asks for nothing',
+      );
+      expect(find.text('Fight'), findsOneWidget);
+    });
+  });
+
+  group('the defeat notice', () {
+    testWidgets('⚠️ death says the pack is gone, and what survived', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      game.profile.backpack = game.profile.backpack.withAdded(
+        const InventorySlot(defId: 'oak_log'),
+      )!;
       await game.loseEncounter();
       await _pump(tester, game);
 
+      expect(
+        find.textContaining('backpack'),
+        findsOneWidget,
+        reason:
+            'the 2026-08-17 penalty is the whole inventory — a player who is '
+            'not told has to work it out from an empty pack later',
+      );
+      expect(
+        find.textContaining('belt'),
+        findsOneWidget,
+        reason:
+            'the exemptions are the panel\'s promise: gear and belt came back',
+      );
       expect(find.textContaining('Taking'), findsNothing);
       expect(
         find.text('Back to the map'),

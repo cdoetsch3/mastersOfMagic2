@@ -1496,6 +1496,10 @@ class _DuelScreenState extends State<DuelScreen>
     final xpEarned = Progression.xpForDuel(
       won: won,
       opponentLevel: widget.driver.opponentLevel,
+      // ⚠️ Same flag GameState passes when banking (launchDuel's seam): a
+      // PvP loss pays its 8, single player pays 0 — a display that reads the
+      // formula without the flag would show 0 while the bank paid 8.
+      pvp: !widget.campaign && widget.driver is RemoteDuelDriver,
     );
 
     return Positioned.fill(

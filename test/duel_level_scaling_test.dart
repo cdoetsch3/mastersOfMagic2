@@ -126,19 +126,38 @@ void main() {
       }
     });
 
-    test('a loss pays the flat floor, however big the enemy', () {
+    test('a PvP loss pays the flat floor, however big the enemy', () {
       // ⚠️ Deliberately unscaled: losing to a level-60 must be consolation,
       // not a payday you could farm by throwing fights.
       expect(
-        Progression.xpForDuel(won: false, opponentLevel: 60),
+        Progression.xpForDuel(won: false, opponentLevel: 60, pvp: true),
         Progression.lossXp,
       );
       expect(
-        Progression.xpForDuel(won: false, opponentLevel: 1),
+        Progression.xpForDuel(won: false, opponentLevel: 1, pvp: true),
         Progression.lossXp,
       );
       expect(Progression.lossXp, 8,
           reason: '⚠️ kills the pre-halving 15 consolation');
+    });
+
+    test('⭐ a single-player loss pays NOTHING (ruling 2026-08-17)', () {
+      expect(
+        Progression.xpForDuel(won: false, opponentLevel: 60),
+        0,
+        reason: 'an AI you can lose to on purpose is a farm — the floor only '
+            'exists for opponents you cannot conjure on demand',
+      );
+      expect(
+        Progression.xpForDuel(won: false, opponentLevel: 1, pvp: false),
+        0,
+      );
+      expect(
+        Progression.xpForDuel(won: true, opponentLevel: 4),
+        Progression.xpForDuel(won: true, opponentLevel: 4, pvp: true),
+        reason: 'the ruling touches losses only — a win pays the same wherever '
+            'it was won',
+      );
     });
 
     testWidgets('the launcher reports the opponent level it fought', (

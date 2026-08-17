@@ -68,17 +68,19 @@ void main() {
       );
       expect(back.outcome, RunOutcome.running);
       expect(
-        back.pendingLoot.map((s) => s.defId),
+        back.unclaimed.map((s) => s.defId),
         orderedEquals(['oak_log', 'heartwood_stave']),
-        reason: 'unbanked loot dropped on load is the whole run lost',
+        reason:
+            'a picker dropped on load is a batch of loot the player was in '
+            'the middle of choosing from, silently deleted',
       );
       expect(
-        back.pendingLoot[1].instanceId,
+        back.unclaimed[1].instanceId,
         'inst-1',
         reason: 'a slot that loses its instance id points at nothing',
       );
       expect(
-        back.pendingInstances['inst-1']?.defId,
+        back.unclaimedInstances['inst-1']?.defId,
         'heartwood_stave',
         reason: 'the rolls of a non-fungible drop live only in the instance',
       );
@@ -223,56 +225,53 @@ void main() {
       },
     );
 
-    test('⚠️ reloading mid-run does not duplicate pending loot', () async {
+    test('⚠️ reloading mid-choice does not duplicate the drops', () async {
       final storage = _JsonMem();
       final game = GameState(storage, PlayerProfile.newPlayer());
       await game.beginAdventure(_woods, rng: Random(3));
 
       // Fight until something actually drops, so there is loot to duplicate.
       var seed = 0;
-      while (game.run!.pendingLoot.isEmpty && !game.run!.isFinished) {
+      while (game.run!.unclaimed.isEmpty && !game.run!.isFinished) {
         await game.winEncounter(remainingHp: 70, rng: Random(seed++));
       }
-      final carried = game.run!.pendingLoot.map((s) => s.defId).toList();
-      expect(carried, isNotEmpty, reason: 'the fixture needs a drop');
+      final offered = game.run!.unclaimed.map((s) => s.defId).toList();
+      expect(offered, isNotEmpty, reason: 'the fixture needs a drop');
 
       final reloaded = (await storage.load())!;
       expect(
-        reloaded.run!.pendingLoot.map((s) => s.defId),
-        orderedEquals(carried),
+        reloaded.run!.unclaimed.map((s) => s.defId),
+        orderedEquals(offered),
         reason:
             'loot appended on load rather than replaced would double the '
-            'haul on every reopen',
+            'batch on every reopen',
       );
       expect(
         reloaded.profileBackpackIds,
         isEmpty,
-        reason: 'pending loot is NOT the player\'s until they walk out',
+        reason: 'an unanswered picker is NOT the player\'s yet',
       );
     });
 
-    test('walking out leaves nothing pending to hand over twice', () async {
+    test('claiming leaves nothing on the run to hand over twice', () async {
       final storage = _JsonMem();
       final game = GameState(storage, PlayerProfile.newPlayer());
       await game.beginAdventure(_woods, rng: Random(3));
       var seed = 0;
-      while (game.run!.pendingLoot.isEmpty && !game.run!.isFinished) {
+      while (game.run!.unclaimed.isEmpty && !game.run!.isFinished) {
         await game.winEncounter(remainingHp: 70, rng: Random(seed++));
       }
-      final haul = game.run!.pendingLoot.length;
-      await game.leaveAdventure();
-      // ⚠️ Walking out only ends the run; the take-home choice is what hands
-      // anything over (loot_picker_test.dart owns that story). Here the pack
-      // is empty, so the default takes the lot.
-      await game.takeRunLoot(game.defaultLootChoice);
+      final batch = game.run!.unclaimed.length;
+      // The pack is empty, so the rarity-first default takes the lot.
+      await game.claimVictoryLoot(game.defaultVictoryChoice);
 
       final reloaded = (await storage.load())!;
-      expect(reloaded.backpack.used, haul, reason: 'the loot became real');
+      expect(reloaded.backpack.used, batch, reason: 'the loot became real');
       expect(
-        reloaded.run!.pendingLoot,
+        reloaded.run!.unclaimed,
         isEmpty,
         reason:
-            'banking that clears the run AFTER the save writes a run still '
+            'a claim that clears the run AFTER the save writes a run still '
             'holding loot already in the backpack — reopen and get it again',
       );
     });
@@ -291,7 +290,7 @@ void main() {
             'a stored run that forgets it died would let a force-quit undo '
             'the defeat penalty',
       );
-      expect(reloaded.run!.pendingLoot, isEmpty);
+      expect(reloaded.run!.unclaimed, isEmpty);
     });
   });
 }

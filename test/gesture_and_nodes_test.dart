@@ -14,7 +14,9 @@ import 'package:masters_of_magic_2/game/crafting/gesture.dart';
 import 'package:masters_of_magic_2/game/enemies/bestiary.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/gathering/gather_node.dart';
+import 'package:masters_of_magic_2/game/items/carrying.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
+import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/items/recipe_book.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
@@ -166,31 +168,95 @@ void main() {
       expect(degraded!.nodes.length, run.nodes.length - 1);
     });
 
-    test('gathering yields ride pendingLoot and pay skill XP immediately',
-        () async {
+    /// A run standing at its first gathering spot, with the picker of every
+    /// fight on the way already answered (nothing taken — the pack state is
+    /// the thing under test here).
+    Future<GameState> atFirstNode() async {
       final game = GameState(_JsonMem(), PlayerProfile.newPlayer());
       await game.beginAdventure(woods, rng: Random(7));
       final run = game.run!;
-      // Walk to the first node.
       final node = run.nodes.reduce(
           (a, b) => a.afterIndex < b.afterIndex ? a : b);
       while (run.index <= node.afterIndex) {
         await game.winEncounter(remainingHp: 90, rng: Random(run.index));
+        await game.claimVictoryLoot(const <int>{});
       }
       expect(run.currentNode, isNotNull, reason: 'the spot should be reached');
+      return game;
+    }
 
-      final before = run.pendingLoot.length;
+    test('⭐ gathering goes straight into the backpack, XP with it', () async {
+      // Ruling 2026-08-17: materials are fungible and there is nothing to
+      // choose between, so the yield skips the picker entirely.
+      final game = await atFirstNode();
+      final before = game.profile.backpack.used;
       final out = await game.gatherNode(rng: Random(8));
+
       expect(out.succeeded, isTrue);
-      expect(run.pendingLoot.length, before + out.amount,
-          reason: 'the haul is pending, not banked — dying still loses it');
+      expect(game.profile.backpack.used, before + out.amount,
+          reason: 'a yield parked anywhere but the pack is the deleted loot '
+              'tracker growing back');
+      expect(game.profile.backpack.countOf(out.defId!), out.amount);
+      expect(game.run!.unclaimed, isEmpty,
+          reason: 'materials are fungible — a picker for eight logs is a '
+              'chore, not a decision');
+      expect(game.profile.itemInstances, isEmpty,
+          reason: 'registering an instance for a log is a save that grows '
+              'forever');
       expect(game.profile.skillXp[out.skillKey], out.xp,
-          reason: 'effort is paid even if the haul is later lost');
+          reason: 'the harvest happened, so the effort is paid');
 
       // Spent is spent.
       final again = await game.gatherNode(rng: Random(9));
       expect(again.succeeded, isFalse,
           reason: 'one simultaneous harvest per node, ruled §9b.7');
+    });
+
+    test('⚠️ a pack with no room refuses, and the spot stands', () async {
+      final game = await atFirstNode();
+      var pack = game.profile.backpack;
+      while (!pack.isFull) {
+        pack = pack.withAdded(const InventorySlot(defId: 'oak_log'))!;
+      }
+      game.profile.backpack = pack;
+      final node = game.run!.currentNode!;
+
+      final out = await game.gatherNode(rng: Random(8));
+
+      expect(out.succeeded, isFalse,
+          reason: 'harvesting into a full pack can only drop the yield — the '
+              'exact silent loss the ruling ends');
+      expect(out.refusal, contains('room'),
+          reason: 'a refusal the player cannot read is a dead button');
+      expect(node.spent, isFalse,
+          reason: 'spending the node on a refused harvest destroys the spot '
+              'and the yield together');
+      expect(game.run!.currentNode, same(node),
+          reason: 'the spot persists with the run, so it can be harvested '
+              'once there is room');
+      expect(game.profile.skillXp, isEmpty,
+          reason: 'a refusal is not effort');
+      expect(game.profile.backpack.countOf('oak_log'),
+          Carrying.backpackSlots,
+          reason: 'a full pack must not be rewritten by a refused harvest');
+    });
+
+    test('⚠️ a PARTIAL fit is refused too, never split', () async {
+      final game = await atFirstNode();
+      final node = game.run!.currentNode!;
+      // One slot free, and every node in the zone yields more than one.
+      var pack = game.profile.backpack;
+      while (pack.free > 1) {
+        pack = pack.withAdded(const InventorySlot(defId: 'oak_log'))!;
+      }
+      game.profile.backpack = pack;
+      expect(node.def.min, greaterThan(1), reason: 'the fixture needs a >1 min');
+
+      final out = await game.gatherNode(rng: Random(8));
+      expect(out.succeeded, isFalse,
+          reason: 'taking what fits and dropping the rest is the silent '
+              'overflow wearing a hat');
+      expect(game.profile.backpack.free, 1, reason: 'nothing was taken');
     });
   });
 }

@@ -1,9 +1,16 @@
 /// One run through a zone: the encounters, the push-your-luck choice, and the
-/// loot that is not yours until you walk out with it.
+/// drops of the fight just won, waiting to be chosen from.
 ///
 /// ⭐ **The whole run is rolled up front** (GAME_DESIGN "World structure":
 /// *"each adventure shows its encounter count up front so progress is
 /// visible"*). Rolling per step would make "encounter 3 of 9" a lie.
+///
+/// ⚠️ **RULING (2026-08-17): there is no run-long loot tracker any more.** Loot
+/// is offered the moment the fight ends and goes straight into the backpack, so
+/// what the run carries is at most ONE fight's drops ([AdventureRun.unclaimed])
+/// and only until the player answers the picker. The push-your-luck stake moved
+/// with it: dying no longer costs "the run's haul", it costs the *inventory*
+/// (see `GameState.loseEncounter`).
 library;
 
 import 'dart:math';
@@ -37,13 +44,15 @@ enum RunOutcome {
   /// Still going — the player may push on or walk away.
   running,
 
-  /// Walked out. ⭐ Loot is banked.
+  /// Walked out. ⭐ Everything already claimed is simply *carried* — walking
+  /// out hands nothing over, because every fight already did.
   returned,
 
   /// The boss fell and the zone is cleared.
   cleared,
 
-  /// ⚠️ Died. The run's loot is gone (GAME_DESIGN defeat penalty).
+  /// ⚠️ Died. The **backpack** is gone (ruling 2026-08-17) — see
+  /// `GameState.loseEncounter` for what survives.
   died,
 }
 
@@ -68,12 +77,28 @@ class AdventureRun {
   /// unknown node def on load drops the NODE, never the run.
   final List<ActiveGatherNode> nodes;
 
-  /// Loot taken so far. ⚠️ **Not the player's yet.** It only reaches the
-  /// backpack on [RunOutcome.returned] or [RunOutcome.cleared].
-  final List<InventorySlot> pendingLoot;
+  /// The drops of the fight just won, waiting for the player to say which of
+  /// them come along.
+  ///
+  /// ⭐ **Transient by design, serialized anyway.** It holds one victory's
+  /// worth of loot for the seconds between the roll and the picker's confirm —
+  /// but those seconds can contain a force-quit, so the choice survives on disk
+  /// under the same abandoned-not-approximated contract as the rest of the run.
+  /// ⚠️ Empty is the normal state; anything the player kept is already in the
+  /// backpack, and anything they declined is already gone.
+  final List<InventorySlot> unclaimed;
 
-  /// Instances minted for that loot, waiting on the same condition.
-  final Map<String, ItemInstance> pendingInstances;
+  /// Instances minted for [unclaimed] — only the ones whose slot is actually
+  /// taken enter `PlayerProfile.itemInstances`.
+  final Map<String, ItemInstance> unclaimedInstances;
+
+  /// ⚠️ **The migration of 2026-08-17**, and nothing else. A save written
+  /// before the loot tracker was removed can hold a whole run's `pendingLoot`;
+  /// it is read into here, drained into the backpack best-rarity-first by
+  /// `PlayerProfile.fromJson`, and never written back out. Always empty on a
+  /// run this build created.
+  final List<InventorySlot> legacyPendingLoot;
+  final Map<String, ItemInstance> legacyPendingInstances;
 
   RunOutcome outcome;
 
@@ -83,12 +108,16 @@ class AdventureRun {
     required this.playerHp,
     this.index = 0,
     List<ActiveGatherNode>? nodes,
-    List<InventorySlot>? pendingLoot,
-    Map<String, ItemInstance>? pendingInstances,
+    List<InventorySlot>? unclaimed,
+    Map<String, ItemInstance>? unclaimedInstances,
+    List<InventorySlot>? legacyPendingLoot,
+    Map<String, ItemInstance>? legacyPendingInstances,
     this.outcome = RunOutcome.running,
   }) : nodes = nodes ?? [],
-       pendingLoot = pendingLoot ?? [],
-       pendingInstances = pendingInstances ?? {};
+       unclaimed = unclaimed ?? [],
+       unclaimedInstances = unclaimedInstances ?? {},
+       legacyPendingLoot = legacyPendingLoot ?? [],
+       legacyPendingInstances = legacyPendingInstances ?? {};
 
   /// Builds a run from a zone's roster.
   ///
@@ -211,26 +240,32 @@ class AdventureRun {
   /// Whether the fight now in front of the player ends the zone.
   bool get atBoss => current?.def.rank == EnemyRank.boss;
 
-  /// Banks a win and moves on.
+  /// Banks a win, parks its drops in [unclaimed], and moves on.
+  ///
+  /// ⚠️ **Appended, never assigned.** The screen bars the next fight until the
+  /// picker is answered, so in practice this only ever holds one victory — but
+  /// an assignment would make any future second caller silently destroy a haul,
+  /// and that is the exact bug this whole redesign came out of.
   void recordVictory({
     required List<InventorySlot> loot,
     required Map<String, ItemInstance> instances,
     required int remainingHp,
   }) {
     final wasBoss = atBoss;
-    pendingLoot.addAll(loot);
-    pendingInstances.addAll(instances);
+    unclaimed.addAll(loot);
+    unclaimedInstances.addAll(instances);
     playerHp = remainingHp;
     index++;
     if (wasBoss) outcome = RunOutcome.cleared;
   }
 
-  /// ⚠️ Death costs the entire run's loot (GAME_DESIGN defeat penalty). The
-  /// pending lists are cleared here so nothing downstream can bank them by
-  /// accident.
+  /// ⚠️ Death's cost is paid on the *profile* now (`GameState.loseEncounter`
+  /// empties the backpack). All this clears is the picker that was never
+  /// answered — loot from a fight you did not walk away from was never yours,
+  /// and leaving it here would offer it again on the next load.
   void recordDefeat() {
-    pendingLoot.clear();
-    pendingInstances.clear();
+    unclaimed.clear();
+    unclaimedInstances.clear();
     outcome = RunOutcome.died;
   }
 
@@ -285,20 +320,6 @@ class AdventureRun {
     if (outcome == RunOutcome.running) outcome = RunOutcome.returned;
   }
 
-  /// Whether the loot survived. ⭐ The single question the whole loop turns on.
-  bool get lootIsBanked =>
-      outcome == RunOutcome.returned || outcome == RunOutcome.cleared;
-
-  /// A run that is over, kept its loot, and has not been asked what to take.
-  ///
-  /// ⭐ **The take-home step is a real state, not a screen transition.** Both
-  /// endings — walking out and dropping the boss — land here holding loot, and
-  /// the picker is what empties it (`GameState.takeRunLoot`). ⚠️ It therefore
-  /// survives a force-quit, so the Home tab must offer the way back to it;
-  /// otherwise closing the app on the end screen silently costs the whole haul,
-  /// which is the exact failure the picker exists to end.
-  bool get awaitingLootChoice => lootIsBanked && pendingLoot.isNotEmpty;
-
   // ---- Serialization -----------------------------------------------------
 
   /// ⭐ **Ids and the rolled level, never the creature itself.** Definitions
@@ -318,10 +339,16 @@ class AdventureRun {
     ],
     if (nodes.isNotEmpty)
       'nodes': [for (final n in nodes) n.toJson()],
-    'pendingLoot': [for (final s in pendingLoot) s.toJson()],
-    'pendingInstances': {
-      for (final e in pendingInstances.entries) e.key: e.value.toJson(),
-    },
+    // ⚠️ Written only when there is a choice outstanding, and NEVER under the
+    // old `pendingLoot` key: a downgrade to a pre-ruling build must not find
+    // something it would treat as a run-long haul. [legacyPendingLoot] is
+    // deliberately absent — once drained, it is gone.
+    if (unclaimed.isNotEmpty)
+      'unclaimed': [for (final s in unclaimed) s.toJson()],
+    if (unclaimedInstances.isNotEmpty)
+      'unclaimedInstances': {
+        for (final e in unclaimedInstances.entries) e.key: e.value.toJson(),
+      },
   };
 
   /// Rebuilds a stored run, or returns **null** for one that cannot be
@@ -373,19 +400,80 @@ class AdventureRun {
       ],
       playerHp: (json['playerHp'] as num?)?.toInt() ?? 0,
       outcome: _outcomeByName(json['outcome'] as String?),
-      pendingLoot: [
-        for (final s in (json['pendingLoot'] as List? ?? const []))
-          if (s is Map) InventorySlot.fromJson(s.cast<String, dynamic>()),
-      ],
-      pendingInstances: {
-        for (final e in (json['pendingInstances'] as Map? ?? const {}).entries)
-          if (e.value is Map)
-            e.key as String: ItemInstance.fromJson(
-              (e.value as Map).cast<String, dynamic>(),
-            ),
-      },
+      unclaimed: _slotsFrom(json['unclaimed']),
+      unclaimedInstances: _instancesFrom(json['unclaimedInstances']),
+      // ⚠️ **Migration of 2026-08-17.** The keys of the deleted loot tracker,
+      // read so the haul can be handed over rather than silently deleted with
+      // the feature. Drained (and dropped) by `PlayerProfile.fromJson`.
+      legacyPendingLoot: _slotsFrom(json['pendingLoot']),
+      legacyPendingInstances: _instancesFrom(json['pendingInstances']),
     );
   }
+}
+
+/// ⚠️ A row that is not a map is skipped rather than thrown on — same
+/// contract as everything else read off a save here.
+List<InventorySlot> _slotsFrom(Object? json) => [
+  for (final s in (json as List? ?? const []))
+    if (s is Map) InventorySlot.fromJson(s.cast<String, dynamic>()),
+];
+
+Map<String, ItemInstance> _instancesFrom(Object? json) => {
+  for (final e in (json as Map? ?? const {}).entries)
+    if (e.value is Map)
+      e.key as String: ItemInstance.fromJson(
+        (e.value as Map).cast<String, dynamic>(),
+      ),
+};
+
+/// Indices into [loot], **rarest first, then alphabetically** by the name the
+/// player actually reads (so [instances] matters — a rolled staff sorts under
+/// its rolled name).
+///
+/// ⚠️ **One ordering for the picker's rows, its default ticks, the clamp when
+/// the pack cannot take everything, and the 2026-08-17 migration.** If any two
+/// of those disagreed, confirming the default could abandon a different item
+/// than the one shown as taken — which is the class of bug that got the loot
+/// tracker deleted in the first place. Ties break on drop order last, because
+/// Dart's sort is not stable and identical rows must not shuffle between
+/// builds.
+List<int> lootDisplayOrder(
+  List<InventorySlot> loot,
+  Map<String, ItemInstance> instances, {
+  Set<int>? only,
+}) {
+  final order = [
+    for (var i = 0; i < loot.length; i++)
+      if (only == null || only.contains(i)) i,
+  ];
+  order.sort((a, b) {
+    final byRarity = _rarityRank(loot[b].defId) - _rarityRank(loot[a].defId);
+    if (byRarity != 0) return byRarity;
+    final byName = _lootSortName(
+      loot[a],
+      instances,
+    ).compareTo(_lootSortName(loot[b], instances));
+    return byName != 0 ? byName : a - b;
+  });
+  return order;
+}
+
+/// ⚠️ An id no catalogue entry claims sorts below common rather than throwing —
+/// a save written before a content patch removed an item must still be able to
+/// walk out of the woods.
+int _rarityRank(String defId) =>
+    ItemCatalogue.tryById(defId)?.rarity.index ?? -1;
+
+/// Lower-cased so the alphabetical tier does not depend on capitalisation,
+/// which is an authoring accident rather than a sort key.
+String _lootSortName(InventorySlot slot, Map<String, ItemInstance> instances) {
+  final def = ItemCatalogue.tryById(slot.defId);
+  if (def == null) return slot.defId.toLowerCase();
+  final id = slot.instanceId;
+  return ItemCatalogue.displayName(
+    def,
+    id == null ? null : instances[id],
+  ).toLowerCase();
 }
 
 /// ⚠️ An unrecognised outcome reads as [RunOutcome.running] rather than
