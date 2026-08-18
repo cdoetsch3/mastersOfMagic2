@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
 import 'game/auth_service.dart';
+import 'game/content_version.dart';
 import 'game/game_state.dart';
 import 'game/profile_storage.dart';
+import 'screens/content_gate_screen.dart';
 import 'screens/home_shell.dart';
 import 'ui/app_theme.dart';
 
@@ -29,6 +31,15 @@ class MastersOfMagicApp extends StatefulWidget {
 
 class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
   late final Future<GameState> _future = GameState.boot(LocalProfileStorage());
+
+  /// ⭐ The content-version gate. Started at boot, **beside** the profile load
+  /// rather than after it: `config/content` is public-read (firestore.rules),
+  /// so this needs neither Firebase Auth nor a signed-in user, and a guest on
+  /// a stale build desyncs a duel exactly like an account does.
+  ///
+  /// ⚠️ Fires once per app launch, not once per sign-in — a refresh is the
+  /// only cure, so re-checking later would only annoy someone mid-duel.
+  late final Future<ContentGateDecision> _gate = checkContentVersion();
 
   /// A room code from a scanned QR link (?join=CODE). Read once at boot —
   /// ⭐ the friend scans the host's QR with their phone camera, the browser
@@ -83,32 +94,52 @@ class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
       // Provide the game-state and auth scopes ABOVE the Navigator so every
       // route (including pushed ones like the account screen) can read them.
       builder: (context, child) {
-        return FutureBuilder<GameState>(
-          future: _future,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const ColoredBox(
-                color: AppColors.bg,
-                child: Center(
-                  child: CircularProgressIndicator(color: AppColors.gold),
-                ),
-              );
-            }
-            Widget scoped = GameStateScope(
-              state: snapshot.data!,
-              // ⚠️ Above the Navigator, so every pushed route is constrained
-              // too — not just the tabs.
-              child: MaxWidth(child: child!),
-            );
-            final auth = _auth;
-            if (auth != null) {
-              scoped = AuthScope(service: auth, child: scoped);
-            }
-            return scoped;
+        return FutureBuilder<ContentGateDecision>(
+          future: _gate,
+          builder: (context, gate) {
+            if (!gate.hasData) return const _Booting();
+            // ⭐ The gate sits ABOVE the game-state scope and the Navigator:
+            // a gated client never builds the shell at all, so there is
+            // nothing behind the screen to reach.
+            if (gate.data!.blocks) return const ContentGateScreen();
+            return _buildGame(child!);
           },
         );
       },
       home: HomeShell(pendingJoinCode: _pendingJoinCode),
     );
   }
+
+  /// The scoped game, once the gate has let the player through.
+  Widget _buildGame(Widget child) {
+    return FutureBuilder<GameState>(
+      future: _future,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const _Booting();
+        Widget scoped = GameStateScope(
+          state: snapshot.data!,
+          // ⚠️ Above the Navigator, so every pushed route is constrained
+          // too — not just the tabs.
+          child: MaxWidth(child: child),
+        );
+        final auth = _auth;
+        if (auth != null) {
+          scoped = AuthScope(service: auth, child: scoped);
+        }
+        return scoped;
+      },
+    );
+  }
+}
+
+/// The boot spinner, shown while the profile loads and while the
+/// content-version check is in flight.
+class _Booting extends StatelessWidget {
+  const _Booting();
+
+  @override
+  Widget build(BuildContext context) => const ColoredBox(
+    color: AppColors.bg,
+    child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
+  );
 }

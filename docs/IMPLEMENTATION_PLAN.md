@@ -879,14 +879,29 @@ scaling both would erase the archetype.
   the cheapest place to get personality back if fights feel samey.
 
 
-- **⛔ TO DO before item stats ship: a LOGIN content-version gate.**
+- **✅ BUILT 2026-08-18: the LOGIN content-version gate.**
   ✅ **Approach settled 2026-08-02 (Christian):** the server stores a current
   content version; if a client's version differs at login it is forced to
   update/refresh. ⭐ **Better than the per-match ticket compare below** — a
   ticket only stops a mismatched *pairing*, a login gate stops a mismatched
   client existing at all, and it covers PvE, crafting and prices too. It is
-  also what makes item definitions-in-code safe (ITEMS §10.1). The original
-  framing, kept for the reasoning:
+  also what makes item definitions-in-code safe (ITEMS §10.1).
+
+  **As built:** `lib/game/content_version.dart` holds
+  `ContentVersion.current` (at 1) and the pure `contentGateDecision`;
+  `main.dart` fires `checkContentVersion()` at boot, beside the profile load
+  and **before** sign-in, because `config/content` is public-read
+  (`firestore.rules`) and a stale guest desyncs a duel just like an account.
+  A mismatch renders `ContentGateScreen` above the Navigator, so the shell is
+  never built. ⭐ **Any** difference gates, not just a client that is behind.
+  ⚠️ **The gate fails OPEN** — an error, timeout, missing doc or unparseable
+  field all let the player through; it exists to stop version skew, not to
+  take the game down with Firestore.
+  ⚠️ **Releasing is now two steps** — bump the constant *and* raise the server
+  doc, deploy first, doc second (README "Releasing" → the content-version
+  gate). Forget the second step and every client is gated.
+
+  The original framing, kept for the reasoning:
 
 - **⛔ (superseded framing) a content-version handshake in
   matchmaking.** Verified 2026-08-02 — `matchmaking.dart` compares **no

@@ -205,6 +205,36 @@ firebase deploy --only hosting --project mastersofmagic2
 ⚠️ **Always pass `--project mastersofmagic2`**, so a deploy fails loudly if the
 CLI happens to be authenticated to a different Firebase project.
 
+#### The content-version gate
+
+⭐ **Did this release change anything a duel resolves against** — item stats,
+spell tables, engine tuning, drop tables, prices, the duel wire protocol? Then
+it is a two-step release:
+
+1. Bump `ContentVersion.current` in `lib/game/content_version.dart`, then
+   `flutter clean && flutter build web --release` and deploy (above).
+2. **Then** raise the server's copy to the same number. That is what gates
+   every client still running the old build:
+
+```sh
+curl -X PATCH \
+  "https://firestore.googleapis.com/v1/projects/mastersofmagic2/databases/(default)/documents/config/content?updateMask.fieldPaths=version" \
+  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  -H "Content-Type: application/json" \
+  -d '{"fields":{"version":{"integerValue":"2"}}}'
+```
+
+(The same PATCH creates the document the first time. The Firebase console works
+too — `config` → `content` → `version`, type **number**.)
+
+⚠️ **Deploy first, raise the doc second.** The gate tells the player to
+refresh, so the build that satisfies it has to already be live — flip the doc
+first and gated players refresh into the same stale build, over and over.
+
+⚠️ The value must be a **number** and the path exactly `config/content`
+(`ContentVersion.docPath`): the client fails OPEN on anything it cannot read,
+so a typo does not break the game, it silently switches the gate off.
+
 Verify what actually shipped:
 
 ```sh

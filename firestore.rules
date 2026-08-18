@@ -4,6 +4,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // The login content-version gate (lib/game/content_version.dart).
+    // Public read on purpose: the client compares versions at boot, BEFORE
+    // sign-in, and a guest on a stale build desyncs a duel exactly like an
+    // account does. Nothing secret lives here — one integer.
+    // Never client-writable: a client that could raise the number would gate
+    // every other player out of the game.
+    match /config/{doc} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // Each player owns exactly their own profile document.
     match /players/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
