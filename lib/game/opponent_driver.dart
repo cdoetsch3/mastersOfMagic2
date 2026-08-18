@@ -6,6 +6,7 @@ import 'package:mom_engine/mom_engine.dart';
 import 'ai_personas.dart';
 import 'enemies/enemy_def.dart';
 import 'firestore_rest.dart';
+import 'items/belt_potions.dart';
 import 'items/item_def.dart';
 import 'mage_apparel.dart';
 
@@ -136,7 +137,20 @@ class LocalAiDriver implements OpponentDriver {
 
   @override
   Future<TurnExchange> exchangeTurn(int turn, MageAction playerAction) async {
-    return TurnExchange(_brain.chooseAction(_enemy!, _player!, rng));
+    final action = _brain.chooseAction(_enemy!, _player!, rng);
+    // ⚠️ **Enemies never use items** (ruling 2026-08-18). Belts, potions and
+    // the pack are the player's lane alone — the same rule that keeps gear off
+    // an archetype (ENEMIES §2.1). The brains cannot emit one today; this is
+    // the guard that makes that a *rule* rather than an accident of what has
+    // been written so far, and it fails loudly here rather than quietly
+    // healing a monster in front of the player.
+    if (action is UseItemAction) {
+      throw StateError(
+        '${persona.name} tried to use ${action.itemId}: '
+        'enemies do not carry items.',
+      );
+    }
+    return TurnExchange(action);
   }
 
   @override
@@ -272,7 +286,14 @@ class RemoteDuelDriver implements OpponentDriver {
     }
 
     final seed = deriveTurnSeed(masterSeed, turn, myWire, theirWire);
-    return TurnExchange(decodeAction(theirWire), seed);
+    // ⭐ The catalogue crosses the wire as an id and is resolved HERE, from
+    // this client's own item definitions (ITEMS §10.3b) — the opponent sends
+    // "U|sapwort_draught", never the numbers, so a doctored client cannot
+    // drink a potion this build has never heard of.
+    return TurnExchange(
+      decodeAction(theirWire, consumables: consumableEffectFor),
+      seed,
+    );
   }
 
   /// Polls the turn doc until [ready] passes, or returns null on timeout

@@ -130,6 +130,20 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
+  final hot = snap['healOverTime'];
+  if (hot != null) {
+    // ⭐ A Tonic that ticks invisibly is a Tonic the player believes did
+    // nothing — the turn it cost is the loudest part of the transaction, so
+    // the payout has to be on screen for the turns it lasts.
+    badges.add(
+      StatusBadge(
+        'Tonic',
+        sub: '${hot.magnitude}%/t · ${hot.turnsLeft}t',
+        color: MagicElement.flora.style.color,
+        kind: BadgeKind.buff,
+      ),
+    );
+  }
   if (snap['grace'] != null) {
     badges.add(
       StatusBadge(

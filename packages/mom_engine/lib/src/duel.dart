@@ -6,6 +6,7 @@ import 'element.dart';
 import 'element_status.dart';
 import 'element_tuning.dart';
 import 'events.dart';
+import 'item_status.dart';
 import 'mage.dart';
 import 'spell.dart';
 import 'status.dart';
@@ -221,6 +222,11 @@ class DuelEngine {
       switch (action) {
         case ForfeitAction():
           events.add(ForfeitedEvent(mage));
+        case UseItemAction():
+          // ⭐ Not an entry: a potion is not a cast, so it never enters the
+          // priority sort and can never be fizzled, missed, dodged or blocked.
+          // It resolves in its own lane below — see [_resolvePotions].
+          break;
         case ChargeAction():
           mage.activeElementThisTurn = mage.element ?? action.element;
           entries.add(_Entry(
@@ -333,6 +339,12 @@ class DuelEngine {
           HasteChangedEvent(grab));
     }
 
+    // POTION lane — belt consumables, after every cast has landed and before
+    // any end-of-turn tick. Skipped once the duel is over, like the end phase.
+    if (!isOver) {
+      _resolvePotions(action1, action2, events);
+    }
+
     // END phase — post-move effects (DoTs like Ignite, HoTs like
     // Photosynthesis). Skipped if the main phase already ended the duel.
     if (!isOver) {
@@ -370,6 +382,13 @@ class DuelEngine {
     switch (action) {
       case ForfeitAction():
         break; // always legal — you may always do nothing
+      case UseItemAction():
+        // Always legal HERE. Whether this mage actually has the item on their
+        // belt is a question about a wardrobe the engine has never seen, so it
+        // is the app's gate (`DuelController.canUseItem`) — the engine
+        // resolves the move it is handed, exactly as it does for a cast whose
+        // spell the player has not slotted.
+        break;
       case ChargeAction(:final element):
         if (mage.charge >= MageState.maxCharge) {
           throw ArgumentError(
@@ -401,6 +420,61 @@ class DuelEngine {
           throw ArgumentError(
               '${mage.name} cannot switch elements mid-cycle.');
         }
+    }
+  }
+
+  /// Resolves any belt consumables drunk this turn (ITEMS §10.3b).
+  ///
+  /// ⭐ **The potion lane sits after every cast and before the end-of-turn
+  /// ticks** (P3). Placing it there settles three rulings at once:
+  ///
+  ///  - **Never fizzled, missed, dodged or blocked.** A potion is not a cast:
+  ///    it never becomes an [_Entry], never meets [_resolveCast], and so no
+  ///    accuracy roll, Blind, shield, Barrier or charge drain can reach it.
+  ///    The drinker simply heals.
+  ///  - ⚠️ **The corpse does not drink.** Landing *after* the attacks means a
+  ///    hit that would have been lethal but for the heal **is** lethal — you
+  ///    drank instead of defending, and the opponent committed blind against
+  ///    that choice. The item is spent all the same (the app consumes it at
+  ///    submission, not on resolution). Pinned deliberately: the opposite
+  ///    ruling would make a potion a strictly better shield.
+  ///  - The over-time tick starts **this** turn, because the end phase runs
+  ///    next and reads the status that was just attached — the same "applies
+  ///    now, ticks now" cadence Photosynthesis and Regrow already follow.
+  ///
+  /// Fixed mage1→mage2 order: both lockstep clients agree on who is who, and
+  /// two self-heals cannot interact anyway.
+  void _resolvePotions(MageAction a1, MageAction a2, List<DuelEvent> events) {
+    for (final (mage, action) in [(mage1, a1), (mage2, a2)]) {
+      if (action is UseItemAction) _drink(mage, action.effect, events);
+    }
+  }
+
+  void _drink(MageState mage, ConsumableEffect effect, List<DuelEvent> events) {
+    var healed = 0;
+    if (effect.healNowPercent > 0) {
+      // ⭐ At least 1, matching ItemEffect.healFor and RegrowStatus — a potion
+      // that visibly does nothing reads as a bug. Measured before/after
+      // because [MageState.heal] scales by healing-received gear and caps at
+      // full: the event must report what actually landed.
+      final amount = (mage.maxHp * effect.healNowPercent / 100).round();
+      final before = mage.hp;
+      mage.heal(amount < 1 ? 1 : amount);
+      healed = mage.hp - before;
+    }
+    events.add(ItemUsedEvent(mage, effect.name, healed: healed));
+    if (effect.hotPercentPerTurn > 0 && effect.hotTurns > 0) {
+      // ⚠️ Replaces rather than stacks. A second Tonic refreshes the first:
+      // two identical pips ticking side by side is not a thing the HUD can
+      // express, and stacking heals-over-time was never ruled — the turn cost
+      // is what a potion is balanced against, and stacking would let a player
+      // buy a permanent Regrow with pocket money.
+      mage.statuses.removeWhere((s) => s is HealOverTimeStatus);
+      mage.statuses.add(HealOverTimeStatus(
+        percentPerTurn: effect.hotPercentPerTurn,
+        turnsLeft: effect.hotTurns,
+        source: effect.name,
+      ));
     }
   }
 

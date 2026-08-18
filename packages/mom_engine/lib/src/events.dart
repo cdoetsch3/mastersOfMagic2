@@ -137,6 +137,28 @@ class HealedEvent extends DuelEvent {
   String toString() => '${mage.name} drains $amount health';
 }
 
+/// A belt consumable was drunk (ITEMS §10.3b). The turn was spent on it.
+///
+/// ⭐ [healed] is health **actually restored** — after the drinker's healing-
+/// received bonus and after the cap at full health — so the log reports what
+/// happened rather than what the label promised. A pure heal-over-time reports
+/// 0 here and pays out later as [EffectHealEvent] ticks.
+class ItemUsedEvent extends DuelEvent {
+  final MageState mage;
+
+  /// The item's name, for the log.
+  final String item;
+
+  final int healed;
+
+  const ItemUsedEvent(this.mage, this.item, {this.healed = 0});
+
+  @override
+  String toString() => healed > 0
+      ? '${mage.name} drinks $item — healed $healed'
+      : '${mage.name} drinks $item';
+}
+
 class BuffAppliedEvent extends DuelEvent {
   final MageState mage;
   final String description;

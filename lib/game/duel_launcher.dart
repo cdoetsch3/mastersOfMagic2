@@ -33,6 +33,11 @@ Future<void> launchDuel(
         // ⭐ Gear reaches every duel the player actually fights. Tests that
         // build DuelScreen directly stay at the unequipped baseline.
         playerGear: game.equipmentTotals,
+        // ⭐ And so does the belt (ITEMS §10.3b) — including PvP, which is
+        // ruled to allow consumables. The save happens the moment one is
+        // drunk, not when the duel ends.
+        belt: game.profile.belt.loaded,
+        onItemConsumed: game.consumeBeltItem,
         // ⚠️ Both levels cross this seam. The player's scales their health
         // and damage; the opponent's scales the XP the win is worth. This is
         // the only path a real player takes, so a level dropped here is

@@ -74,6 +74,17 @@ class DuelScreen extends StatefulWidget {
   /// The player's character level — scales their health and damage.
   final int playerLevel;
 
+  /// The consumables loaded on the player's belt (def ids, slot order).
+  ///
+  /// ⭐ Passed in rather than read from `GameState`, like [playerGear]: the
+  /// arena is built directly by tests and by two screens, and it has never
+  /// known what a profile is. Empty means no belt row is drawn at all.
+  final List<String> belt;
+
+  /// Persists the loss of a belt item the instant it is drunk. See
+  /// [DuelController.spendBeltItem] for why it cannot wait for the duel to end.
+  final Future<void> Function(String defId)? onItemConsumed;
+
   /// ⚠️ **Test seam.** The duel's random stream, so a widget test can pin an
   /// escape roll instead of hoping the dice fall its way — the flee flow tops
   /// out at a 95% chance, so every "tap Flee and get away" test would
@@ -93,6 +104,8 @@ class DuelScreen extends StatefulWidget {
     this.onPlayerHpRemaining,
     this.onSettle,
     this.playerLevel = 1,
+    this.belt = const [],
+    this.onItemConsumed,
     this.rng,
   });
 
@@ -169,6 +182,8 @@ class _DuelScreenState extends State<DuelScreen>
     playerLevel: widget.playerLevel,
     playerStartingHp: widget.playerStartingHp,
     playerGear: widget.playerGear,
+    belt: widget.belt,
+    onItemConsumed: widget.onItemConsumed,
     rng: widget.rng,
   );
   bool _resultReported = false;
@@ -558,6 +573,23 @@ class _DuelScreenState extends State<DuelScreen>
           color: const Color(0xFF58B368),
           text: '+$amount',
           intensity: 1 + amount / 30,
+          ms: 500,
+        );
+      case ItemUsedEvent(:final mage, :final item, :final healed):
+        final isEnemy = mage == c.enemy;
+        await _showMessage(
+          isEnemy ? '${c.enemy.name} drinks $item' : 'You drink $item',
+          const Color(0xFF58B368),
+        );
+        // ⭐ The float is shown even on a 0 — a Tonic heals nothing the turn
+        // you drink it beyond its first tick, and a potion that produces no
+        // feedback at all reads as a wasted turn rather than a slow one.
+        await _runFx(
+          _FxKind.heal,
+          atEnemy: isEnemy,
+          color: const Color(0xFF58B368),
+          text: healed > 0 ? '+$healed' : item,
+          intensity: 1 + healed / 30,
           ms: 500,
         );
       case EffectDamageEvent(
@@ -1315,6 +1347,21 @@ class _DuelScreenState extends State<DuelScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // ⭐ Above the elements, because it is not one: a potion is its own
+          // kind of move, and sitting in the element row would read as one
+          // more thing to charge. Absent entirely on an empty belt — an
+          // always-present empty rail would cost the arena a strip of height
+          // to say "you brought nothing".
+          if (c.beltItems.isNotEmpty) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (var i = 0; i < c.beltItems.length; i++)
+                  _beltButton(c.beltItems[i], i),
+              ],
+            ),
+            const SizedBox(height: 6),
+          ],
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -1341,6 +1388,77 @@ class _DuelScreenState extends State<DuelScreen>
         ],
       ),
     );
+  }
+
+  /// One loaded belt slot. Tapping it spends the turn on the potion.
+  ///
+  /// ⚠️ The **turn cost is on the button**, not only in the tooltip — the same
+  /// reason the flee odds are. A heal that silently eats the turn the player
+  /// meant to cast in is the single most expensive misunderstanding the arena
+  /// can sell, and nobody reads a tooltip mid-duel.
+  Widget _beltButton(String defId, int index) {
+    final def = ItemCatalogue.tryById(defId);
+    final name = def == null ? defId : ItemCatalogue.displayName(def);
+    final effect = def is BeltableDef ? def.effect : null;
+    final usable = c.canUseItem(defId);
+    final color = def == null
+        ? const Color(0xFF9C93C4)
+        : rarityColour(def.rarity);
+    return Tooltip(
+      message: [
+        name,
+        if (effect != null) effect.describe,
+        'Costs your turn — never missed or blocked.',
+      ].join('\n'),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 3),
+        child: Opacity(
+          opacity: usable ? 1 : 0.32,
+          child: InkWell(
+            key: ValueKey('belt-$index-$defId'),
+            onTap: usable ? () => _useBeltItem(defId) : null,
+            borderRadius: BorderRadius.circular(15),
+            child: Container(
+              height: 30,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1836),
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: color.withValues(alpha: 0.7)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.local_drink, size: 14, color: color),
+                  const SizedBox(width: 6),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      color: Color(0xFFECE7F8),
+                      fontSize: 11.5,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'turn',
+                    style: TextStyle(color: Color(0xFF9C93C4), fontSize: 9),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Drinks [defId]: the controller spends and saves it, then the move goes
+  /// down the ordinary submission path so it animates, times and resets the
+  /// forfeit streak exactly like a cast.
+  Future<void> _useBeltItem(String defId) async {
+    final action = await c.spendBeltItem(defId);
+    if (action == null || !mounted) return;
+    await _submit(action);
   }
 
   Widget _elementButton(MagicElement element, int slot) {

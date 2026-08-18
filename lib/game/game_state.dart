@@ -988,6 +988,25 @@ class GameState extends ChangeNotifier {
     return null;
   }
 
+  /// Drinks one [defId] off the belt: the slot empties and **nothing comes
+  /// back** — the mirror of [unloadFromBelt], minus the pack.
+  ///
+  /// ⭐ **Consumed on USE, and saved right then** (ruling 2026-08-18). The
+  /// duel calls this the moment the move is submitted, not when the duel ends,
+  /// so a potion drunk in a fight the player then loses, flees or closes the
+  /// tab on is gone either way. Anything later is a duplication bug wearing a
+  /// crash for a disguise: a save written at the end of a duel that never ends
+  /// hands the player their potion back.
+  ///
+  /// ⚠️ Silently does nothing if it is not loaded, rather than throwing. The
+  /// caller ([DuelController.spendBeltItem]) has already gated on the same
+  /// list, so reaching here twice means a double-tap, and a duel is not the
+  /// place to raise.
+  Future<void> consumeBeltItem(String defId) async {
+    if (!profile.belt.loaded.contains(defId)) return;
+    await _mutate(() => profile.belt = profile.belt.withUnloaded(defId));
+  }
+
   /// Brings a loaded belt back inside its capacity, returning what no longer
   /// fits. Returns how many items were moved off the belt.
   ///

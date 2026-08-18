@@ -20,10 +20,24 @@ import 'spellbook.dart';
 /// These functions are pure and transport-agnostic — the Firestore layer sits
 /// on top of them.
 
+/// Resolves a belt consumable's def id into what drinking it does.
+///
+/// ⭐ **Injected, not looked up.** The engine ships without an item catalogue,
+/// and the app owns one — so the wire carries the id and each client resolves
+/// the numbers itself, precisely the way `S|<spellId>` already resolves
+/// through [Spellbook] here. The security property falls out for free: a
+/// hand-edited move cannot smuggle a 900% heal across the wire, because the
+/// receiving client never reads the sender's numbers. The matching hazard is
+/// the one spell ids already carry — two clients on different catalogue
+/// versions resolve different potions, which is a build-skew problem, not a
+/// protocol one.
+typedef ConsumableLookup = ConsumableEffect? Function(String defId);
+
 /// Canonical wire encoding of a [MageAction]. Stable across clients so the
 /// same move always produces the same commitment hash.
 ///   channel: `C|<element>`
 ///   cast:    `S|<spellId>|<element>`
+///   item:    `U|<defId>`
 /// `<element>` is the element name, or empty for null (continuing a cycle).
 String encodeAction(MageAction action) {
   return switch (action) {
@@ -31,11 +45,15 @@ String encodeAction(MageAction action) {
     ChargeAction(:final element) => 'C|${element?.name ?? ''}',
     CastAction(:final spell, :final element) =>
       'S|${spell.id}|${element?.name ?? ''}',
+    UseItemAction(:final itemId) => 'U|$itemId',
   };
 }
 
 /// Inverse of [encodeAction]. Throws [FormatException] on malformed input.
-MageAction decodeAction(String wire) {
+///
+/// [consumables] resolves a `U|<defId>` move — a duel that can carry belt
+/// items must pass one.
+MageAction decodeAction(String wire, {ConsumableLookup? consumables}) {
   MagicElement? elem(String s) =>
       s.isEmpty ? null : MagicElement.values.byName(s);
   final parts = wire.split('|');
@@ -46,6 +64,16 @@ MageAction decodeAction(String wire) {
       return ChargeAction(elem(parts[1]));
     case 'S' when parts.length == 3:
       return CastAction(Spellbook.byId(parts[1]), elem(parts[2]));
+    case 'U' when parts.length == 2:
+      final effect = consumables?.call(parts[1]);
+      // ⚠️ An unresolvable item is a FormatException, never a silently inert
+      // potion. A no-op fallback would let the two clients resolve different
+      // fights from the same move — the one failure lockstep cannot survive —
+      // and the caller already treats a malformed reveal as a forfeit.
+      if (effect == null) {
+        throw FormatException('Unknown belt item in action wire: "$wire"');
+      }
+      return UseItemAction(parts[1], effect);
     default:
       throw FormatException('Malformed action wire: "$wire"');
   }

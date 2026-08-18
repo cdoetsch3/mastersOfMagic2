@@ -3,6 +3,7 @@ import 'package:mom_engine/mom_engine.dart';
 
 import 'enemies/enemy_def.dart';
 import 'flee.dart';
+import 'items/belt_potions.dart';
 import 'items/item_def.dart';
 import 'loadout.dart';
 import 'opponent_driver.dart';
@@ -158,14 +159,36 @@ class DuelController extends ChangeNotifier {
   /// (ITEMS §7.4).
   final ItemModifiers playerGear;
 
+  /// The consumables the player carried in, by def id, in slot order.
+  ///
+  /// ⚠️ **Mutable, and deliberately not reset by [newDuel].** A drunk potion
+  /// is gone; a rematch does not refill the belt any more than it refills the
+  /// pack. Everything else in [newDuel] is duel state, which is exactly why
+  /// this lives outside it.
+  final List<String> _belt;
+
+  /// What is still on the belt right now — what the arena draws.
+  List<String> get beltItems => List.unmodifiable(_belt);
+
+  /// Persists the loss of one belt item, immediately — the seam
+  /// `GameState.consumeBeltItem` fills.
+  ///
+  /// ⭐ A callback rather than a `GameState`: the controller is built by tests
+  /// and by two different screens, and none of them should have to construct a
+  /// profile to fight. Null simply means nothing to save — a practice duel.
+  final Future<void> Function(String defId)? onItemConsumed;
+
   DuelController({
     required this.loadout,
     required this.driver,
     this.playerLevel = 1,
     this.playerStartingHp,
     this.playerGear = ItemModifiers.none,
+    List<String> belt = const [],
+    this.onItemConsumed,
     ReseedableRandom? rng,
-  }) : _rng = rng ?? ReseedableRandom() {
+  }) : _belt = [...belt],
+       _rng = rng ?? ReseedableRandom() {
     newDuel();
     driver.watchOpponentSurrender(_onOpponentSurrendered);
   }
@@ -308,6 +331,47 @@ class DuelController extends ChangeNotifier {
       !_duelEnded &&
       player.charge < MageState.maxCharge &&
       (player.charge > 0 || pendingElement != null);
+
+  /// Whether the player can drink [defId] right now.
+  ///
+  /// ⭐ Deliberately shaped like [canAct]: same animation and duel-over gates,
+  /// because using an item IS a move. The extra clauses are the belt's own —
+  /// it must be loaded, and it must resolve to something the engine can do.
+  ///
+  /// 📝 **The Academy guard point.** The ruled Academy format bans consumables
+  /// outright; when it exists it belongs here (`&& !academy`), as one clause
+  /// on the one predicate the arena asks — not as a check sprinkled through
+  /// the UI, which is how a banned item ends up drinkable by keyboard.
+  bool canUseItem(String defId) =>
+      !animating &&
+      !_duelEnded &&
+      _belt.contains(defId) &&
+      consumableEffectFor(defId) != null;
+
+  /// Spends [defId] off the belt and returns the move to submit, or null if it
+  /// cannot be used.
+  ///
+  /// ⚠️ **Consumption happens HERE, before the turn is submitted, and the
+  /// profile is saved before this future completes** (ruling 2026-08-18). Win,
+  /// lose, flee or close the tab: the potion is spent. Doing it after the turn
+  /// resolved would hand the item back to anyone who quit mid-animation, and
+  /// doing it in the engine is impossible — the engine has no profile.
+  ///
+  /// It returns the action rather than submitting it so the screen keeps its
+  /// one submission path (clock, animation, forfeit tracking) instead of
+  /// growing a second one. That is also what makes the forfeit-streak reset
+  /// free: a [UseItemAction] flows through [submitTurn] like any played turn,
+  /// and [_trackForfeits] resets on anything that is not a [ForfeitAction].
+  Future<UseItemAction?> spendBeltItem(String defId) async {
+    if (!canUseItem(defId)) return null;
+    final effect = consumableEffectFor(defId)!;
+    // Removes the FIRST match: two Draughts on the belt are two Draughts, and
+    // drinking one must leave the other.
+    _belt.remove(defId);
+    notifyListeners();
+    await onItemConsumed?.call(defId);
+    return UseItemAction(defId, effect);
+  }
 
   void selectElement(MagicElement element) {
     if (animating || player.charge > 0) return;
@@ -503,6 +567,15 @@ class DuelController extends ChangeNotifier {
           shownPlayerHp = (shownPlayerHp + amount).clamp(0, player.maxHp);
         } else {
           shownEnemyHp = (shownEnemyHp + amount).clamp(0, enemy.maxHp);
+        }
+      case ItemUsedEvent(:final mage, :final healed):
+        // ⚠️ Charge and element are untouched on purpose — a potion is not a
+        // cast and spends nothing but the turn, so the bar the player was
+        // building is still there when they come back to it.
+        if (mage == player) {
+          shownPlayerHp = (shownPlayerHp + healed).clamp(0, player.maxHp);
+        } else {
+          shownEnemyHp = (shownEnemyHp + healed).clamp(0, enemy.maxHp);
         }
       case EffectDamageEvent(
         :final target,
@@ -730,6 +803,7 @@ class DuelController extends ChangeNotifier {
       'forfeits': 'forfeit',
       'suffers': 'suffer',
       'heals': 'heal',
+      'drinks': 'drink',
     };
     for (final MapEntry(key: third, value: base) in verbs.entries) {
       if (s.startsWith('You $third ')) {
