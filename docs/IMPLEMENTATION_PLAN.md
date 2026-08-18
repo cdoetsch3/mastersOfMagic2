@@ -781,10 +781,10 @@ band-scoped across the quarter by design — `primal_recipes.dart`, 20 shipped,
 | Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Pixel grids | Backdrop | Item icon descs |
 |---|---|---|---|---|---|---|---|---|
 | Whispering Woods | ✅ 11 | ✅ | ✅ 18 defs | ✅ 2 | ✅ 11 | ✅ 11 | 📝 desc | ⬜ |
-| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ✅ 1 | ⬜ | ⬜ | 📝 desc | ⬜ |
-| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ✅ 1 | ⬜ | ⬜ | 📝 desc | ⬜ |
-| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | ⬜ | ⬜ | 📝 desc | ⬜ |
-| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ✅ 3 | ⬜ | ⬜ | 📝 desc | ⬜ |
+| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ✅ 1 | 📝 desc | ⬜ | 📝 desc | ⬜ |
+| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ✅ 1 | 📝 desc | ⬜ | 📝 desc | ⬜ |
+| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | 📝 desc | ⬜ | 📝 desc | ⬜ |
+| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ✅ 3 | 📝 desc | ⬜ | 📝 desc | ⬜ |
 
 (📝 desc = the generator-ready description exists and the loading pipeline is
 verified; only the image itself is missing. ✅ when the PNG lands.)
@@ -809,6 +809,14 @@ Column notes, so a checkmark means the same thing every time:
 - **Art (PNG)** — `assets/creatures/<zone>/` generated sprites, one per
   creature, `manifest.json` beside them; `CreatureView` falls back grid →
   silhouette, so this ships zone-by-zone without breaking anything.
+  ✅ Plumbing verified for all five zones 2026-08-18: pubspec + `.gitkeep`'d
+  dirs, the 44-filename contract enforced by filesystem test (stem must be
+  a real EnemyDef id of THAT zone), silhouettes render in each creature's
+  own element, and a doc-coverage test pins all 55 BESTIARY_ART entries to
+  the roster. To produce a zone: sources at `art/source/<zone>/<id>.png`,
+  then `python3 tool/pixelate.py --zone <zone> --element <lead> --cutout`
+  (aqua / pyro / flora / pyro for gb / cp / tm / av — hybrids use the lead
+  element so fallback and finished art agree).
 - **Pixel grids** — the `CustomPainter` fallback grids (`*_art.dart`). 📝 The
   banked ruling stands: hand-placed grids read as lumps, so grids for the
   other four zones are OPTIONAL — the PNG pipeline is the quality path and

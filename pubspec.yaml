@@ -35,6 +35,25 @@ flutter:
   #
   # ⚠️ Declared per directory, and a declared directory must EXIST — hence the
   # .gitkeep files. Not recursive: a new zone needs a line here.
+  #
+  # ⚠️ **Git does not track an empty directory**, so a bare `mkdir` here works
+  # on this machine and breaks the build on a fresh clone — the directory is
+  # simply absent and `flutter build` stops with "unable to find directory
+  # entry in pubspec.yaml" (verified by deleting one). The `.gitkeep` in each
+  # zone is what survives the clone; it is bundled as an asset itself, which
+  # costs nothing and is why `assets/backgrounds/` has shipped empty since the
+  # arena work.
+  #
+  # ⭐ **All five Primal zones are declared before any of their art exists.**
+  # Four of them are empty today. A creature with no PNG falls back (see
+  # `CreatureView`), so listing the directory early costs a zero-byte asset and
+  # means the maintainer's PNGs load the moment they land — no pubspec edit, no
+  # rebuild-the-plumbing step, nothing between the art and the screen.
+  # `test/creature_art_test.dart` asserts this list and the directories agree.
   assets:
     - assets/creatures/whispering_woods/
+    - assets/creatures/glimmerbrook/
+    - assets/creatures/cinderpeak_foothills/
+    - assets/creatures/thornmire/
+    - assets/creatures/ashfall_vale/
     - assets/backgrounds/
