@@ -19,6 +19,19 @@ String creatureAssetFor(EnemyDef def) =>
     'assets/creatures/${def.zoneId}/${def.id}.png';
 
 /// Where a zone's arena backdrop lives, if one has been made.
+///
+/// ⭐ **Flat, and deliberately without a `manifest.json`** — unlike
+/// `assets/creatures/<zone>/`, which has one. The creature manifest earns its
+/// keep because a zone is a *directory* of eleven files named for hand-written
+/// creature ids, so "the roster and the art agree" is a real claim that can be
+/// checked. A zone has exactly **one** backdrop and its name is the zone id, so
+/// a manifest here could only restate this expression. What is checked instead
+/// is the reverse — that nothing in `assets/backgrounds/` is named for a place
+/// that does not exist — in `test/arena_backdrop_test.dart`, because that is
+/// the only mistake a flat convention still allows.
+///
+/// ⚠️ The generator writes these — `tool/pixelate.py --mode background`, 384×216
+/// out of `art/source/backgrounds/`, one source file per zone id.
 String backdropFor(String zoneId) => 'assets/backgrounds/$zoneId.png';
 
 /// A creature, drawn the best way currently available.

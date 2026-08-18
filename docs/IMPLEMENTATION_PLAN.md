@@ -780,11 +780,14 @@ band-scoped across the quarter by design — `primal_recipes.dart`, 20 shipped,
 
 | Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Pixel grids | Backdrop | Item icon descs |
 |---|---|---|---|---|---|---|---|---|
-| Whispering Woods | ✅ 11 | ✅ | ✅ 18 defs | ✅ 2 | ✅ 11 | ✅ 11 | ⬜ | ⬜ |
-| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ✅ 1 | ⬜ | ⬜ | ⬜ | ⬜ |
-| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ✅ 1 | ⬜ | ⬜ | ⬜ | ⬜ |
-| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | ⬜ | ⬜ | ⬜ | ⬜ |
-| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ✅ 3 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Whispering Woods | ✅ 11 | ✅ | ✅ 18 defs | ✅ 2 | ✅ 11 | ✅ 11 | 📝 desc | ⬜ |
+| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ✅ 1 | ⬜ | ⬜ | 📝 desc | ⬜ |
+| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ✅ 1 | ⬜ | ⬜ | 📝 desc | ⬜ |
+| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | ⬜ | ⬜ | 📝 desc | ⬜ |
+| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ✅ 3 | ⬜ | ⬜ | 📝 desc | ⬜ |
+
+(📝 desc = the generator-ready description exists and the loading pipeline is
+verified; only the image itself is missing. ✅ when the PNG lands.)
 
 Column notes, so a checkmark means the same thing every time:
 - **Bestiary** — 11 `EnemyDef`s (5 commons, 4 minis, 2 bosses) registered in
@@ -810,9 +813,20 @@ Column notes, so a checkmark means the same thing every time:
   banked ruling stands: hand-placed grids read as lumps, so grids for the
   other four zones are OPTIONAL — the PNG pipeline is the quality path and
   the silhouette fallback is acceptable in the meantime.
-- **Backdrop** — `assets/backgrounds/<zone>.png` arena art;
-  `backdropFor(zoneId)` already resolves it, the directory is empty, so every
-  arena currently renders the default.
+- **Backdrop** — `assets/backgrounds/<zone>.png` arena art (flat filenames,
+  no manifest — a zone has one backdrop named for its id, and a
+  filesystem test asserts every PNG's stem is a real `World.locations` id).
+  ✅ Pipeline verified 2026-08-18: `duel_screen` already draws
+  `ArenaBackdrop` at the bottom of the arena Stack for campaign duels
+  (PvP mage-vs-mage correctly gets none), a missing PNG falls back
+  silently (mutation-tested), and pubspec needs no change. 📝 Descriptions
+  live as `### Arena backdrop` per zone in BESTIARY_ART.md, composed for
+  the side-on duel camera. To produce one: drop a 1920×1080 source at
+  `art/source/backgrounds/<zone id>.png`, run
+  `python3 tool/pixelate.py --zone <zone id> --mode background`.
+  ⚠️ Open decision: `art/prompts/backgrounds.md` holds older auto-derived
+  prompts for all 26 zones WITHOUT the composition language — back-port or
+  retire it before the next quarter's backdrops.
 - **Item icon descs** — one image-generator-ready visual description per item
   in the zone's catalogue (requested 2026-08-18), the item counterpart of
   `BESTIARY_ART.md`'s creature descriptions: suggest an `ITEM_ART.md` with a

@@ -32,6 +32,38 @@ if that ever changes, it is a real decision, not a detail.
 generator most reliably ignores, and a knee-high sprite drawn at bear size
 makes a level-1 zone read as a level-40 one.
 
+### Backdrops
+
+⭐ **Each zone below ends with an `### Arena backdrop` entry**, written to a
+different brief from the creatures because it is a different job: a creature is
+a field plate on plain ground, a backdrop is a **stage**. Same rule about lore,
+though — nothing in one that a renderer cannot draw.
+
+⚠️ **The duel screen is the composition the description has to survive.** The
+arena is landscape-only and it puts the two combatants at **24% and 76% of the
+width**, standing on a ground line **just past mid-height**. The middle of the
+frame belongs to the interface — turn chip at the top edge, cast banner at 20%
+height, the crit word at 30% — the top-left and top-right corners are covered
+by the two nameplates, and the action bar sits over the bottom edge. So every
+entry below asks for the same shape: **a level ground line just past
+mid-height, interest in the left and right thirds, an open and quiet centre,
+deep shadow in the bottom fifth, and nothing tall, bright or busy centre-frame**
+that a sprite would have to fight.
+
+⭐ **Generate at 1920×1080 (16:9)**, then
+`python3 tool/pixelate.py --zone <zone id> --mode background`, which
+cover-crops to 384×216, darkens 42% and desaturates 45%; `ArenaBackdrop` lays a
+further dark scrim over it in-game. ⚠️ So paint these **muted and low-contrast
+but still legible** — a source already pushed to black arrives as mud. A
+backdrop must LOSE to the sprites, and three separate steps are already making
+sure of it.
+
+📝 **Backdrops ship as real bundled PNGs**, at `assets/backgrounds/<zone id>.png`
+— one file per zone, no `manifest.json` (the reasoning is on `backdropFor` in
+`lib/ui/creature_art.dart`). ⚠️ The "concept reference only" note above predates
+`assets/creatures/` and `assets/backgrounds/`; both are shipped assets now.
+Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
+
 ---
 
 ## Whispering Woods · Lv 1–5 · Flora
@@ -117,6 +149,25 @@ makes a level-1 zone read as a level-40 one.
 > would be. ⭐ **Unsettling because it is nearly correct**, not because it is
 > monstrous. Arms at its sides. Standing, facing the viewer.
 
+### Arena backdrop
+
+`assets/backgrounds/whispering_woods.png` — *16:9 · Flora palette*
+> Wide 16:9 landscape painting of a forest floor seen side-on at standing eye
+> level, environment only — no creatures, no people, no text. A well-walked
+> earth path runs level across the frame just past mid-height: packed brown
+> soil with pale tree roots crossing it and worn smooth by use. Below the path,
+> the near bank of leaf litter and fern falls into deep shadow across the
+> bottom fifth of the frame. Old birch and oak trunks stand at the far left and
+> far right edges only, cut off by the frame, their bark grey-white and green
+> with moss; the whole centre of the frame is **open woodland floor and empty
+> air**, with no trunk, branch, rock or light source in it. Behind the path,
+> the wood recedes into soft grey-green haze at ground level. The canopy is
+> present only as dark foliage along the top edge, letting scattered pale
+> patches of dappled sun fall on the middle distance. **Flora palette**, the
+> same as the creatures above: birch grey-white, root pale, moss and bracken
+> green, wet black earth. Muted, low-contrast, warm but quiet, and everything
+> holding still.
+
 ---
 
 ## Glimmerbrook · Lv 3–8 · Aqua
@@ -195,6 +246,24 @@ makes a level-1 zone read as a level-40 one.
 > a house — resolving into a vast pale underside ringed with small lights. Only
 > partly visible; the rest disappears into black water. It has been down there
 > the whole time.
+
+### Arena backdrop
+
+`assets/backgrounds/glimmerbrook.png` — *16:9 · Aqua palette*
+> Wide 16:9 landscape painting of a shallow spring-fed brook seen side-on at
+> standing eye level, environment only — no creatures, no people, no fish, no
+> text. A level shelf of pale grey river gravel and flat wet stones runs
+> straight across the frame just past mid-height, wide enough to stand on and
+> broken only at the far edges. Below it the near shallows fall into dark
+> green-black water in deep shadow across the bottom fifth. At the far left and
+> far right edges, low rounded boulders and pale reed clumps no higher than a
+> person's waist, cropped by the frame. The whole centre of the frame is
+> **flat, unbroken, mirror-still water** running back to a low far bank — no
+> rock standing out of it, no waterfall, no bridge, nothing tall. Cold overcast
+> light with no visible sun; the water throws it back in small hard broken
+> flecks of white rather than glare. **Aqua palette**, matching the creatures
+> above: bone-white stone, wet slate grey, glass blue-green, deep still black
+> at depth. Muted, low-contrast, and colder than the season.
 
 ---
 
@@ -275,6 +344,26 @@ makes a level-1 zone read as a level-40 one.
 > with enormous glowing fissures that **widen and narrow as it breathes**.
 > Vapour rises from its shoulders. Barely distinguishable from the slope.
 
+### Arena backdrop
+
+`assets/backgrounds/cinderpeak_foothills.png` — *16:9 · Pyro palette*
+> Wide 16:9 landscape painting of a volcanic foothill bench seen side-on at
+> standing eye level, environment only — no creatures, no people, no text. A
+> level terrace of grey volcanic grit and scree runs straight across the frame
+> just past mid-height, the loose ground scuffed and slipping at its edge.
+> Below it the near slope of coarse dark cinder drops into deep shadow across
+> the bottom fifth. At the far left and far right edges, broken outcrops of
+> black basalt no higher than a person's chest, cropped by the frame, with dull
+> orange heat showing in the fissures between their plates and thin pale
+> sulphur vapour leaking from the ground beside them. The centre of the frame
+> is **bare open grit**, running back to a low grey ridge line and a flat band
+> of ash haze — **the mountain itself is out of shot above the top edge**, so
+> nothing rises centre-frame and nothing glows there. Flat overcast daylight,
+> greyed by suspended ash; all heat is internal, in cracks and seams, never
+> open flame. **Pyro palette**, matching the creatures above: ash grey, black
+> basalt, knapped-flint blue-grey, dull ember orange in the cracks only. Muted,
+> low-contrast, and warm through the soles.
+
 ---
 
 ## Thornmire · Lv 8–13 · Flora + Aqua
@@ -354,6 +443,25 @@ makes a level-1 zone read as a level-40 one.
 > with concentric rows of soft inward-pointing spines. Water spirals slowly into
 > it. Almost no part of it stands above the surface.
 
+### Arena backdrop
+
+`assets/backgrounds/thornmire.png` — *16:9 · Flora + Aqua palette*
+> Wide 16:9 landscape painting of a drowned bog seen side-on at standing eye
+> level, environment only — no creatures, no people, no text. A level causeway
+> of matted root, black peat and trodden sedge runs straight across the frame
+> just past mid-height, barely above the waterline and soaked through. Below
+> it, still brown-black bog water fills the bottom fifth in deep shadow,
+> holding a dull broken reflection. At the far left and far right edges,
+> drowned tree trunks standing knee-deep in the water, cropped by the frame —
+> bark black and waterlogged, trailing curtains of weed and pale hanging
+> lichen, no canopy. The centre of the frame is **flat open standing water and
+> low mist**, skinned with duckweed, with nothing rising out of it and no light
+> source in it. The far bank is a soft grey-green band of reed dissolving into
+> haze. Overcast, windless, heavy air; everything sodden and slightly swollen.
+> **Flora + Aqua palette**, matching the creatures above: sickly yellow-green
+> duckweed and algae, stagnant peat brown, wet black wood, pale grey mist.
+> Muted, low-contrast, and green winning everywhere.
+
 ---
 
 ## Ashfall Vale · Lv 10–14 · Pyro + Flora
@@ -428,6 +536,27 @@ makes a level-1 zone read as a level-40 one.
 > tall, low and unstoppable, made of thousands of young saplings, ferns and
 > vines grown together. Burnt black timber and old bones are visible **being
 > swallowed** inside it. ⭐ It looks like it **is winning**.
+
+### Arena backdrop
+
+`assets/backgrounds/ashfall_vale.png` — *16:9 · Pyro + Flora palette*
+> Wide 16:9 landscape painting of a burnt forest valley floor seen side-on at
+> standing eye level, environment only — no creatures, no people, no text. A
+> level floor of fine grey ash lying deep over burnt ground runs straight
+> across the frame just past mid-height, printed with the shapes of fallen
+> branches beneath it. Below it the near ash bank and charred deadfall drop
+> into deep shadow across the bottom fifth. At the far left and far right
+> edges, charred standing trunks stripped of bark and cropped by the frame,
+> black and cracked, with **bright new green shoots pushing up around their
+> bases** and one or two dull orange embers still alive deep in the splits. The
+> centre of the frame is **open ash flat** running back to a low grey burn-scar
+> slope and a flat band of smoke haze — nothing standing in it, nothing
+> burning. Fine grey ash falls evenly through the whole frame like slow snow,
+> soft and thin, never a plume. Flat colourless daylight. **Pyro + Flora
+> palette**, matching the creatures above: charcoal black, ash grey over
+> everything, one narrow band of vivid new green low in the frame, dull ember
+> orange only inside cracks. Muted, low-contrast — a charcoal drawing of a
+> valley with a little green left in it.
 
 ---
 
