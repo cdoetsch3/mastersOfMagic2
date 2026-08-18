@@ -767,6 +767,10 @@ stale the moment the other four rosters landed). `map_tab` switches on
 
 ### The Q1 zone matrix — what each zone has, and what "done" means
 
+⭐ **Standing direction (Christian, 2026-08-18): finish the Primal quarter
+to PERFECT before starting any other quarter.** Every ⬜ in this table
+outranks new-zone work; the matrix below is the definition of done.
+
 Per-zone content tracks in EIGHT columns. Rows are the Primal quarter; the
 same columns apply to every future zone, so copy this table per quarter as
 rosters land. (Two things deliberately have NO column: **recipes**, which are
