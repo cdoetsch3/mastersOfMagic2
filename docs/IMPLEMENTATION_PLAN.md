@@ -552,7 +552,13 @@ response and are not part of the numbered plan:
 
 ---
 
-# Phase 6 — 📝 DESIGN THEN BUILD: enemies and enemy mechanics
+# Phase 6 — 🟡 PRIMAL QUARTER BUILT — enemies and enemy mechanics
+
+✅ **2026-08-18 status: the Primal quarter's five zones are done** — 55
+`EnemyDef`s (11 per zone) with drop tables, registered and fightable; see
+"The Q1 zone matrix" below for the per-zone ledger and the columns that
+remain (gather nodes, art). Everything below this line describes the
+**other 21 zones**, where it still holds.
 
 ⚠️ **Scope grew with the geography pass.** WORLD_DESIGN settled 22 zones plus
 the Empyrean's three, each wanting a **pool of 3–5 mini-bosses and 1–2 bosses**
@@ -754,23 +760,66 @@ Hearthwood's Storeroom. Built end to end:
 | Drop tables → items → slots | `lib/game/enemies/loot.dart` |
 | Adventure screen, backpack grid, Storeroom | `lib/screens/adventure_screen.dart`, `tabs/inventory_tab.dart` |
 
-⚠️ **Only Whispering Woods has a bestiary.** Every other zone still falls back
-to the single stand-in duel; `map_tab` switches on `Bestiary.forZone(id)` being
-non-empty, so a zone lights up the moment its roster is written.
+✅ **The whole Primal quarter is fightable** (verified 2026-08-18 — this
+paragraph previously said only Whispering Woods had a bestiary, which went
+stale the moment the other four rosters landed). `map_tab` switches on
+`Bestiary.forZone(id)` being non-empty, so all five zones light up today.
+
+### The Q1 zone matrix — what each zone has, and what "done" means
+
+Per-zone content tracks in SEVEN columns. Rows are the Primal quarter; the
+same columns apply to every future zone, so copy this table per quarter as
+rosters land. (Two things deliberately have NO column: **recipes**, which are
+band-scoped across the quarter by design — `primal_recipes.dart`, 20 shipped,
+"a per-zone file would be a fiction" — and **arrival narrative**, done for all
+32 locations in `world.dart` since the map rebuild.)
+
+| Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Pixel grids | Backdrop |
+|---|---|---|---|---|---|---|---|
+| Whispering Woods | ✅ 11 | ✅ | ✅ 18 defs | ✅ 2 | ✅ 11 | ✅ 11 | ⬜ |
+| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ⬜ | ⬜ | ⬜ | ⬜ |
+| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ⬜ | ⬜ | ⬜ | ⬜ |
+| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ⬜ | ⬜ | ⬜ | ⬜ |
+| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ⬜ | ⬜ | ⬜ | ⬜ |
+
+Column notes, so a checkmark means the same thing every time:
+- **Bestiary** — 11 `EnemyDef`s (5 commons, 4 minis, 2 bosses) registered in
+  `Bestiary.all` (⚠️ an unlisted file compiles fine and silently never spawns).
+- **Drop tables** — every table entry resolves against the item catalogue;
+  the referential-integrity tests fail the build otherwise, so this column is
+  ✅ by construction whenever the suite is green.
+- **Item catalogue** — the zone's materials + gear in
+  `lib/game/items/catalogue/`, exported to the wiki's `content.json`.
+- **Gather nodes** — `GatherNodeDef`s in `lib/game/gathering/` feeding the
+  zone's materials to its gathering skill. ⚠️ The biggest real gap: 2 nodes
+  exist in the whole game, both Woods, so four zones' materials are currently
+  drop-only and Mining/Foraging/Felling cannot level outside the Woods.
+- **Art (PNG)** — `assets/creatures/<zone>/` generated sprites, one per
+  creature, `manifest.json` beside them; `CreatureView` falls back grid →
+  silhouette, so this ships zone-by-zone without breaking anything.
+- **Pixel grids** — the `CustomPainter` fallback grids (`*_art.dart`). 📝 The
+  banked ruling stands: hand-placed grids read as lumps, so grids for the
+  other four zones are OPTIONAL — the PNG pipeline is the quality path and
+  the silhouette fallback is acceptable in the meantime.
+- **Backdrop** — `assets/backgrounds/<zone>.png` arena art;
+  `backdropFor(zoneId)` already resolves it, the directory is empty, so every
+  arena currently renders the default.
 
 ⭐ **`MageState.powerScale` is the one engine change**, and it is deliberately
 **damage-only** — never shields. A Sentinel is low damage *and* a wall, and
 scaling both would erase the archetype.
 
-⚠️ **Still missing from the loop:**
-- **The belt is data, not a mechanic.** `Belt` persists and the UI can show it,
-  but nothing loads it and no duel turn spends on a consumable.
-- **Nothing equips.** `EquipmentDef` drops and is carried; `ItemModifiers`
-  reaches no `MageState`.
+⚠️ **Still missing from the loop** (pruned 2026-08-18 — the first two
+entries here, "the belt is data" and "nothing equips", both shipped:
+✅ equipping + `ItemModifiers` reach the duel and cross the PvP wire as
+resolved totals; ✅ the belt is a turn action, campaign and PvP, potion
+lane, consumed on use; ✅ crafted quality and 90/8/2 drop quality scale
+stats; ✅ the login content-version gate is live and seeded):
 - **No death timer.** GAME_DESIGN's escalating respawn penalty is unbuilt; a
-  death currently costs only the run's loot.
-- **A run is not persisted** — deliberate, so a losing fight cannot be dodged
-  by force-quitting. ❓ Revisit if players lose runs to a dropped connection.
+  death now costs the backpack (2026-08-17 wipe ruling) but no time.
+- **A run IS persisted now** (mid-fight resume shipped in the adventure
+  batch) — the old "deliberate non-persistence" note is obsolete; the
+  restart-encounter-on-resume rule is what prevents dodge-by-force-quit.
 
 ---
 
