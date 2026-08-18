@@ -13,20 +13,41 @@ import 'item_def.dart';
 import 'item_instance.dart';
 
 abstract final class Equipping {
+  /// What one **owned** item actually grants: the definition's base stats as
+  /// its own quality roll made them (`ItemModifiers.scaledBy`).
+  ///
+  /// ⭐ **THE resolution seam.** An `ItemDef` says what an item is worth in
+  /// the abstract; only an [ItemInstance] knows what *this* one is worth. Every
+  /// reader — the duel's totals, the equip screen, the item dialog — comes
+  /// through here, so a scaling rule changed once is changed everywhere and no
+  /// two screens can quote different numbers for the same wand.
+  ///
+  /// ⚠️ Anything that is not equipment grants nothing: gems carry modifiers
+  /// too, but a socketed gem is resolved through the *host* item's sockets,
+  /// not by wearing the gem.
+  static ItemModifiers modifiersOf(ItemDef? def, [ItemInstance? instance]) {
+    if (def is! EquipmentDef) return ItemModifiers.none;
+    return def.modifiers.scaledBy(instance?.quality);
+  }
+
   /// The sum of every worn item's modifiers.
   ///
   /// ⭐ **This is THE number the whole system feeds** — the duel reads it, the
   /// belt sizes itself off it, and the Inventory screen shows it. A dangling
   /// instance id contributes nothing rather than throwing: the profile guards
   /// against them, and a stats panel is the wrong place to crash.
+  ///
+  /// ⚠️ **Resolved, then summed** — quality scales each piece on its own,
+  /// because scaling the sum would let one Master ring lift a whole wardrobe.
   static ItemModifiers totals({
     required Map<EquipSlot, String> equipped,
     required Map<String, ItemInstance> instances,
   }) {
     var sum = ItemModifiers.none;
     for (final id in equipped.values) {
-      final def = ItemCatalogue.tryById(instances[id]?.defId ?? '');
-      if (def is EquipmentDef) sum = sum + def.modifiers;
+      final instance = instances[id];
+      final def = ItemCatalogue.tryById(instance?.defId ?? '');
+      sum = sum + modifiersOf(def, instance);
     }
     return sum;
   }

@@ -13,6 +13,7 @@ import 'package:masters_of_magic_2/game/items/catalogue/cinderpeak_items.dart';
 import 'package:masters_of_magic_2/game/items/catalogue/whispering_woods_items.dart';
 import 'package:masters_of_magic_2/game/items/equipping.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
+import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
@@ -30,8 +31,8 @@ class _MemStorage implements ProfileStorage {
   Future<void> clear() async => saved = null;
 }
 
-ItemInstance _inst(String id, String defId) =>
-    ItemInstance(instanceId: id, defId: defId);
+ItemInstance _inst(String id, String defId, {Quality? quality}) =>
+    ItemInstance(instanceId: id, defId: defId, quality: quality);
 
 /// Total XP that lands exactly on [level] (xpToNext is 100 + 50·(n−1)).
 int _xpFor(int level) {
@@ -43,10 +44,10 @@ int _xpFor(int level) {
 }
 
 /// A profile carrying [defId] in backpack slot 0, at [level].
-GameState _gameCarrying(String defId, {int level = 10}) {
+GameState _gameCarrying(String defId, {int level = 10, Quality? quality}) {
   final profile = PlayerProfile.newPlayer()
     ..xp = _xpFor(level)
-    ..itemInstances['i1'] = _inst('i1', defId)
+    ..itemInstances['i1'] = _inst('i1', defId, quality: quality)
     ..backpack = Backpack.of([
       InventorySlot(defId: defId, instanceId: 'i1'),
     ]);
@@ -402,6 +403,88 @@ void main() {
         instances: {'b': _inst('b', 'tuskhide_belt')},
       );
       expect(totals.beltSlots, 2);
+    });
+
+    test('⚠️ and a Master one adds exactly the same two', () {
+      final totals = Equipping.totals(
+        equipped: {EquipSlot.belt: 'b'},
+        instances: {'b': _inst('b', 'tuskhide_belt', quality: Quality.master)},
+      );
+      expect(totals.beltSlots, 2,
+          reason: 'beltSlots is the non-combat axis (§6b.2): 2 × 1.4 = 2.8 → '
+              '3 would be a crafting roll deciding carrying capacity');
+    });
+  });
+
+  group('quality scales what an owned item grants (ruling 2026-08-18)', () {
+    test('modifiersOf is the seam: definition × the instance\'s roll', () {
+      // Sporecap Mantle is +12 HP / +2 accuracy.
+      final def = ItemCatalogue.byId('sporecap_mantle');
+      expect(
+        Equipping.modifiersOf(def, _inst('m', 'sporecap_mantle',
+            quality: Quality.master)).maxHpBonus,
+        17,
+        reason: '12 × 1.40 → 17; reading def.modifiers straight says 12');
+      expect(
+        Equipping.modifiersOf(def, _inst('m', 'sporecap_mantle',
+            quality: Quality.rough)).accuracyBonus,
+        2,
+        reason: '2 × 0.80 = 1.6 → 2');
+      expect(Equipping.modifiersOf(def).maxHpBonus, 12,
+          reason: 'no instance — the Workbench preview of a thing not yet '
+              'made shows the honest base');
+      expect(Equipping.modifiersOf(WhisperingWoodsItems.oakLog).isEmpty, isTrue,
+          reason: 'a log grants nothing, quality or not');
+    });
+
+    test('each worn piece scales on its OWN roll before they are summed', () {
+      final totals = Equipping.totals(
+        equipped: {
+          EquipSlot.robeTop: 'a', // Sporecap Mantle: +12 HP, +2 acc
+          EquipSlot.mainHand: 'b', // Oak Quarterstaff: +1/charge, +5 acc
+        },
+        instances: {
+          'a': _inst('a', 'sporecap_mantle', quality: Quality.master),
+          'b': _inst('b', 'oak_quarterstaff', quality: Quality.rough),
+        },
+      );
+      expect(totals.maxHpBonus, 17, reason: '12 × 1.40 → 17');
+      expect(totals.accuracyBonus, 7,
+          reason: '⚠️ 3 (2 × 1.40) + 4 (5 × 0.80) — scaling the SUM by either '
+              'roll gives 9 or 5, and one Master ring must never lift a whole '
+              'wardrobe');
+      expect(totals.damagePerCharge, 1, reason: '1 × 0.80 = 0.8 → 1');
+    });
+
+    test('an unrolled instance is worth exactly what it always was', () {
+      final totals = Equipping.totals(
+        equipped: {EquipSlot.robeTop: 'a'},
+        instances: {'a': _inst('a', 'sporecap_mantle')},
+      );
+      expect(totals.maxHpBonus, 12,
+          reason: 'a drop rolls an aspect, not a quality — treating null as '
+              'anything but Standard rebalances every dropped item');
+    });
+
+    test('the stat lines quote the scaled numbers', () {
+      final lines = Equipping.describe(
+        Equipping.modifiersOf(
+          ItemCatalogue.byId('sporecap_mantle'),
+          _inst('m', 'sporecap_mantle', quality: Quality.master),
+        ),
+      );
+      expect(lines, contains('+17 max health'),
+          reason: 'a tooltip quoting the base while the duel uses the roll is '
+              'the disagreement the one-writer rule exists to prevent');
+    });
+
+    test('the duel-facing totals scale too, through the same seam', () async {
+      // ⭐ equipmentTotals is what reaches DuelController.playerGear.
+      final game = _gameCarrying('oak_wand', quality: Quality.master);
+      expect(await game.equipFromBackpack(0), isNull);
+      expect(game.equipmentTotals.damagePerCast, 3,
+          reason: '2 × 1.40 = 2.8 → 3; an unscaled duel is quality that '
+              'changes the tooltip and nothing else');
     });
   });
 }

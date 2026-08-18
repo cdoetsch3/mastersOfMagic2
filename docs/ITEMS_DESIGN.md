@@ -1912,6 +1912,39 @@ and tool margin all lift it, which is one more quiet reason to walk to the
 bench. Exact floor/ceiling thresholds 📝 are tuning work for when quality
 affects stats.
 
+#### 9b.9f What quality is WORTH ✅ (Christian, 2026-08-18)
+
+✅ **Ruled: a percent multiplier on every combat stat** — Rough **×0.80**,
+Standard **×1.00**, Ornate **×1.20**, Master **×1.40**, rounding half away
+from zero.
+
+⭐ **A percentage, not a flat bonus**, so quality is worth the same
+proportion at every tier: a Master tier-1 wand can never out-scale an
+ordinary tier-2 one, and the ladder keeps its shape all the way to the §2
+ceiling. ⭐ Zero stays zero — quality multiplies power, it never invents a
+stat the item does not have, so a Master robe gains no crit.
+
+⚠️ **`beltSlots` is exempt.** It is the one deliberately non-combat power
+axis (§6b.2); letting the crafting roll move it would turn quality into a
+carrying-capacity roll and make belt capacity differ between two clients
+that agreed on everything else.
+
+⚠️ **Null quality reads as Standard (×1.00).** Dropped gear rolls an aspect
+instead of a quality (§9b.5b), and every instance minted before this ruling
+has no field at all. Both must keep exactly the numbers they have always
+had; any other reading silently rebalances the existing game.
+
+⭐ **One resolution seam**, so the duel, the equip screen and the tooltip
+cannot disagree: `Equipping.modifiersOf(def, instance)` is the only place a
+definition's stats become an owned item's stats, and `Equipping.totals`
+resolves each worn piece on its OWN roll *before* summing.
+
+⚠️ **PvP is unaffected by construction.** The matchmaking handshake (§7.4)
+already ships *resolved* `ItemModifiers` in both directions — never a defId
+and never a quality tier — so each client scales its own wardrobe locally
+and the peer applies exactly the integers it was handed. Quality adds no
+new way for two clients to disagree.
+
 #### 9b.9c The difficulty model ✅ (Christian's six levers, 2026-08-10)
 
 ⭐ **Simple at the start, like everything else in the game**: fewer mechanics
@@ -2057,9 +2090,15 @@ itself lives in code and the export.
   (stabilizer, placement, callResponse) fall back to an instant pass if a
   recipe ever names one early.
 - **`lib/game/crafting/craft_quality.dart`** — margin, windowScale, the
-  §9b.9d pipeline (executionCeiling / floor / weighted roll). 📝 All numbers
-  placeholders; the tests pin the SHAPE (at-level perfect can Rough, margin
-  5 escapes it, ceilings clamp, margin tilts weights).
+  §9b.9d pipeline (executionCeiling / floor / skillCeiling / weighted roll).
+  📝 All numbers placeholders; the tests pin the SHAPE (at-level perfect can
+  Rough, margin 5 escapes it, ceilings clamp, margin tilts weights).
+- **`GameState.craft(recipe, performance:, rng:)`** — the wiring (§9b.9f):
+  grade = performance, margin = skill − gate, `skillCeiling(margin)` clamps,
+  and the roll is minted onto the `ItemInstance`. `CraftOutcome.instance`
+  carries it back so the Workbench can name what you made.
+- **`ItemModifiers.scaledBy(Quality?)` + `Equipping.modifiersOf`** — the
+  §9b.9f multiplier and the one seam every stat reader goes through.
 - **`lib/game/gathering/gather_node.dart`** — `GatherNodeDef` (zone, skill,
   yield range, a GestureStep for the field act, XP, flavor) + the Zone 1
   pair: `ww_oak_stand` (Felling) and `ww_bindweed_tangle` (Foraging).
@@ -2115,6 +2154,14 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-18.** §9b.9f: quality affects stats — a percent multiplier
+per tier (×0.80 / ×1.00 / ×1.20 / ×1.40) on every combat stat, `beltSlots`
+exempt, null reading as Standard so old saves and drops do not move.
+`GameState.craft` now rolls through the §9b.9d pipeline (grade =
+performance, margin = level − gate, skill ceiling clamping below M ≥ 5) and
+mints the roll onto the instance; `Equipping.modifiersOf` is the single
+resolution seam every reader goes through.
 
 **Rev — 2026-08-17.** Campaign **flee is a rolled escape**, not a surrender.
 Until now "fleeing" an encounter conceded it, so the only two ways out of a

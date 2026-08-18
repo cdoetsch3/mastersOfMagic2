@@ -498,9 +498,13 @@ class _RecipeCard extends StatelessWidget {
       return;
     }
     final def = ItemCatalogue.tryById(outcome.defId!);
+    // ⭐ Named from the INSTANCE, so the roll is the first thing the player
+    // reads back: "Crafted Ornate Oak Wand". ⚠️ Standard stays unwritten
+    // (item_naming) — the middle of the ladder is the ordinary case, and
+    // naming it would make every plain wand read as a variant.
     final name = def == null
         ? outcome.defId!
-        : ItemCatalogue.displayName(def);
+        : ItemCatalogue.displayName(def, outcome.instance);
     messenger.showSnackBar(
       SnackBar(
         content: Text(

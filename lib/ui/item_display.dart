@@ -32,8 +32,13 @@ Future<void> showItemDialog(
   List<({String label, Future<String?> Function() run})> actions = const [],
   List<({String label, String reason})> unavailable = const [],
 }) async {
+  // ⚠️ **The instance's numbers, not the definition's** — quality scales
+  // stats (ruling 2026-08-18), and a tooltip quoting the base while the duel
+  // uses the roll is the disagreement this file exists to prevent. With no
+  // instance (a Workbench preview of a thing not yet made) the base is the
+  // honest answer.
   final lines = def is EquipmentDef
-      ? Equipping.describe(def.modifiers)
+      ? Equipping.describe(Equipping.modifiersOf(def, instance))
       : (def is Usable ? [(def as Usable).effect.describe] : const <String>[]);
   final messenger = ScaffoldMessenger.of(context);
   await showDialog<void>(

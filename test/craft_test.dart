@@ -6,11 +6,16 @@
 library;
 
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
+import 'package:masters_of_magic_2/game/items/equipping.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
+import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
+import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
+import 'package:masters_of_magic_2/game/items/item_naming.dart';
 import 'package:masters_of_magic_2/game/items/recipes/primal_recipes.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
@@ -131,4 +136,159 @@ void main() {
           reason: 'XP that does not survive the save never existed');
     });
   });
+
+  // ---- the quality roll (ruling 2026-08-18: quality affects stats) --------
+  //
+  // ⭐ These test the WIRING, not the pipeline — craft_quality's own rules are
+  // covered in gesture_and_nodes_test. What can break here is the wrong grade,
+  // the wrong margin, a dropped ceiling, or a mint that forgets the roll.
+  group('crafting rolls quality onto what it mints (§9b.9d)', () {
+    test('the mint carries the roll, and the outcome reports it', () async {
+      final game = _carrying({'oak_log': 2});
+      final out = await game.craft(PrimalRecipes.oakWand, rng: Random(1));
+
+      expect(out.quality, isNotNull,
+          reason: 'minting plain is the pre-ruling behaviour — the whole '
+              'point of this change');
+      final slot = game.profile.backpack.slots
+          .firstWhere((s) => s?.defId == 'oak_wand')!;
+      expect(game.profile.itemInstances[slot.instanceId]!.quality, out.quality,
+          reason: 'the outcome must report the roll that was actually '
+              'STORED, or the result panel names an item nobody owns');
+      expect(out.instance!.instanceId, slot.instanceId);
+    });
+
+    test('a fungible output rolls nothing — two draughts are the same', () async {
+      final game = _carrying({'sapwort': 2});
+      final out = await game.craft(PrimalRecipes.sapwortDraught, rng: Random(1));
+      expect(out.quality, isNull,
+          reason: 'a quality on a fungible item has nowhere to live and '
+              'would make two of them different (ITEMS §10.3a)');
+    });
+
+    test('⚠️ the grade is passed through: a botched act cannot exceed Rough',
+        () async {
+      for (var seed = 0; seed < 40; seed++) {
+        final game = _carrying({'oak_log': 2});
+        final out = await game.craft(
+          PrimalRecipes.oakWand,
+          performance: 0,
+          rng: Random(seed),
+        );
+        expect(out.quality, Quality.rough,
+            reason: 'grade 0 caps at Rough (executionCeiling); a craft that '
+                'ignores [performance] and rolls at 1 escapes it');
+      }
+    });
+
+    test('⚠️ the margin is level MINUS the gate, not the level', () async {
+      // Birch is gated at Woodcarving 10; a level-10 crafter is at margin 0,
+      // so even a perfect act can still roll Rough (the explicit ruling).
+      var roughs = 0;
+      var masters = 0;
+      for (var seed = 0; seed < 60; seed++) {
+        final game = _carrying(
+          {'birch_log': 2},
+          skillXp: {'woodcarving': _skillXpForLevel(10)},
+        );
+        final q = (await game.craft(PrimalRecipes.birchWand, rng: Random(seed)))
+            .quality;
+        if (q == Quality.rough) roughs++;
+        if (q == Quality.master) masters++;
+      }
+      expect(roughs, greaterThan(0),
+          reason: 'at the gate the material still fights back — passing the '
+              'raw skill level as the margin (10, not 0) lifts the floor to '
+              'Standard and kills this');
+      expect(masters, 0,
+          reason: 'the skill ceiling is wired: below margin 5 the level caps '
+              'the attempt at Ornate, and a null skillCeiling lets Master '
+              'through');
+    });
+
+    test('⭐ deep margin lifts the floor off Rough and opens Master', () async {
+      // Oak is gated at 1; level 16 is margin 15 — the floor's top step.
+      var masters = 0;
+      for (var seed = 0; seed < 60; seed++) {
+        final game = _carrying(
+          {'oak_log': 2},
+          skillXp: {'woodcarving': _skillXpForLevel(16)},
+        );
+        final q = (await game.craft(PrimalRecipes.oakWand, rng: Random(seed)))
+            .quality;
+        expect(q, isNot(Quality.rough),
+            reason: 'margin 15 with a perfect grade floors at Ornate');
+        expect(q, isNot(Quality.standard),
+            reason: 'same floor — Standard is below it');
+        if (q == Quality.master) masters++;
+      }
+      expect(masters, greaterThan(0),
+          reason: 'a skill ceiling that never reaches Master makes the top '
+              'tier unobtainable');
+    });
+
+    test('the result panel can name the roll: "Ornate Oak Wand"', () async {
+      // Margin 15 with a perfect grade floors at Ornate, so the name always
+      // carries a quality word here (Standard is unwritten by design).
+      final game = _carrying(
+        {'oak_log': 2},
+        skillXp: {'woodcarving': _skillXpForLevel(16)},
+      );
+      final out = await game.craft(PrimalRecipes.oakWand, rng: Random(0));
+      final name = ItemCatalogue.displayName(
+        ItemCatalogue.byId(out.defId!),
+        out.instance,
+      );
+      expect(name, '${qualityWord(out.quality!)} Oak Wand',
+          reason: 'the Workbench names the item off the OUTCOME — an outcome '
+              'that does not carry the instance can only say "Oak Wand", and '
+              'the reveal is the best beat in crafting');
+    });
+
+    test('the roll survives a JSON reload', () async {
+      final storage = _JsonMem();
+      final profile = PlayerProfile.newPlayer()
+        ..backpack = Backpack.of(const [
+          InventorySlot(defId: 'oak_log'),
+          InventorySlot(defId: 'oak_log'),
+        ]);
+      final game = GameState(storage, profile);
+      final out = await game.craft(PrimalRecipes.oakWand, rng: Random(7));
+
+      final back = GameState(storage, (await storage.load())!);
+      final slot = back.profile.backpack.slots
+          .firstWhere((s) => s?.defId == 'oak_wand')!;
+      expect(back.profile.itemInstances[slot.instanceId]!.quality, out.quality,
+          reason: 'a roll that does not survive the save is an item that '
+              'changes its stats when you close the tab');
+    });
+
+    test('⚠️ a save written before this ruling loads plain and scales ×1.00',
+        () async {
+      // An instance minted by the old craft(): no quality key at all.
+      final old = ItemInstance.fromJson(const {
+        'instanceId': 'old-1',
+        'defId': 'oak_wand',
+      });
+      expect(old.quality, isNull, reason: 'a missing key must not throw');
+      expect(
+        Equipping.modifiersOf(ItemCatalogue.byId('oak_wand'), old)
+            .damagePerCast,
+        2,
+        reason: 'the Oak Wand has always been +2 per cast, and an old save '
+            'must not silently change the moment quality lands');
+    });
+  });
+}
+
+/// Exactly enough skill XP to stand on [level] (the ladder is 20 + 5·(n−1)).
+///
+/// ⚠️ Computed, not a literal: a hand-typed number silently means a different
+/// level the day the curve is tuned, and these tests turn on the exact margin.
+int _skillXpForLevel(int level) {
+  var xp = 0;
+  for (var n = 1; n < level; n++) {
+    xp += 20 + 5 * (n - 1);
+  }
+  return xp;
 }

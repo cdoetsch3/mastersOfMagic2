@@ -25,7 +25,28 @@ enum Tradability { tradeable, untradeable, bound }
 
 /// The crafting roll (ITEMS §9b.4). ⚠️ **Quality never raises equip level** —
 /// a Master Oak wand is still a level-1 item, deliberately.
-enum Quality { rough, standard, ornate, master }
+enum Quality {
+  rough,
+  standard,
+  ornate,
+  master;
+
+  /// What every COMBAT stat is multiplied by (ruling, Christian 2026-08-18):
+  /// ⭐ **a percentage of the definition, never a flat bonus**, so quality is
+  /// worth the same proportion at every tier and a Master tier-1 wand can
+  /// never out-scale an ordinary tier-2 one.
+  ///
+  /// ⚠️ Standard is 100 on purpose — the middle of the ladder is the
+  /// *baseline*, which is why null (a drop, or an instance minted before this
+  /// ruling) can read as Standard without changing a single number.
+  /// 📝 The four values are the tuning knob; the shape is the ruling.
+  int get statPercent => switch (this) {
+    Quality.rough => 80,
+    Quality.standard => 100,
+    Quality.ornate => 120,
+    Quality.master => 140,
+  };
+}
 
 /// Ten slots (ITEMS §1). ⭐ Only the five armour slots carry sets (§3.2).
 enum EquipSlot {
@@ -196,6 +217,49 @@ class ItemModifiers {
     regrowPercent: regrowPercent + o.regrowPercent,
     beltSlots: beltSlots + o.beltSlots,
   );
+
+  /// This item's stats **as the quality roll made them** (ruling 2026-08-18):
+  /// every combat field times [Quality.statPercent].
+  ///
+  /// ⚠️ **[beltSlots] passes through untouched.** It is the one deliberately
+  /// non-combat axis (ITEMS §6b.2), and letting quality move it would turn a
+  /// crafting roll into a carrying-capacity roll — the exact power-creep lane
+  /// §6b.2 exists to keep open *without* stats attached.
+  ///
+  /// ⭐ **Null is Standard, not "no quality"** — dropped gear rolls an aspect
+  /// instead (see [ItemInstance.quality]) and every instance minted before
+  /// this ruling has no field at all. Both must keep exactly the numbers they
+  /// have always had, so ×1.00 is the only safe reading and this returns
+  /// `this` untouched for it.
+  ///
+  /// ⚠️ **Integer arithmetic on purpose.** `(v * pct + 50) ~/ 100` is
+  /// round-half-away-from-zero *exactly*; `(v * 1.4).round()` is at the mercy
+  /// of binary floating point (12 × 1.4 is 16.799999999999997). Truncation
+  /// toward zero after a signed nudge is what keeps negatives symmetric.
+  ///
+  /// ⭐ Zero stays zero at every tier: quality multiplies power, it never
+  /// invents a stat the definition does not have.
+  ItemModifiers scaledBy(Quality? quality) {
+    if (quality == null || quality == Quality.standard) return this;
+    final pct = quality.statPercent;
+    int s(int v) => (v * pct + (v < 0 ? -50 : 50)) ~/ 100;
+    return ItemModifiers(
+      accuracyBonus: s(accuracyBonus),
+      dodge: s(dodge),
+      critChance: s(critChance),
+      critDamage: s(critDamage),
+      deflectChance: s(deflectChance),
+      deflectAmount: s(deflectAmount),
+      maxHpBonus: s(maxHpBonus),
+      damagePerCast: s(damagePerCast),
+      damagePerCharge: s(damagePerCharge),
+      shieldStrengthPercent: s(shieldStrengthPercent),
+      healingReceivedPercent: s(healingReceivedPercent),
+      regrowPercent: s(regrowPercent),
+      // ⚠️ Not scaled. See the doc above — this is the ruling, not an omission.
+      beltSlots: beltSlots,
+    );
+  }
 
   /// The wire form, for the matchmaking handshake (ITEMS §7.4 — PvP is the
   /// GEARED ladder, so both clients must know both wardrobes).

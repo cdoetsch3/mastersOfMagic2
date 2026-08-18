@@ -5,6 +5,7 @@ import 'package:mom_engine/mom_engine.dart';
 
 import 'active_trip.dart';
 import 'adventure.dart';
+import 'crafting/craft_quality.dart';
 import 'enemies/bestiary.dart';
 import 'enemies/loot.dart';
 import 'items/carrying.dart';
@@ -350,12 +351,19 @@ class GameState extends ChangeNotifier {
   /// pack that could afford its inputs. The assert guards the recipe that
   /// would break the theorem.
   ///
-  /// 📝 **The performance seam**: when the crafting minigame lands, its
-  /// execution score arrives through [performance] (0–1) and becomes the
-  /// quality roll (§9b.4). Until quality moves stats, output is minted plain
-  /// and the score is accepted but unused — the seam exists so the minigame
-  /// bolts on without rewiring this method.
-  Future<CraftOutcome> craft(RecipeDef recipe, {double performance = 1}) async {
+  /// ⭐ **The performance seam is live** (ruling 2026-08-18, quality affects
+  /// stats): [performance] is the crafting act's grade (0–1) and feeds the
+  /// §9b.9d pipeline, which mints a [Quality] onto the output. 📝 Until the
+  /// minigame lands nothing calls this with a grade below 1, so the Workbench
+  /// button crafts at a perfect grade — the roll still decides the tier, which
+  /// is exactly the ruling ("the grade is a ceiling, never a guarantee").
+  ///
+  /// [rng] is injectable so a test can pin the roll; production rolls fresh.
+  Future<CraftOutcome> craft(
+    RecipeDef recipe, {
+    double performance = 1,
+    Random? rng,
+  }) async {
     final skillKey = recipe.skill.name;
     final have = profile.skillLevel(skillKey);
     if (have < recipe.skillLevel) {
@@ -385,6 +393,23 @@ class GameState extends ChangeNotifier {
       'a recipe that nets slots would make craft() able to overflow the pack',
     );
 
+    // ⭐ The quality roll, through the one pipeline (§9b.9d): the grade sets
+    // the ceiling, the margin lifts the floor, and the level caps both. ⚠️
+    // Rolled ONCE per act — one execution is one performance, so a recipe that
+    // ever yields two non-fungible items yields two of the same tier.
+    // 📝 Bench and tool bonuses are the margin's other two terms and are not
+    // modelled yet; when they are, they arrive here.
+    final margin = CraftQuality.margin(
+      skillLevel: have,
+      recipeGate: recipe.skillLevel,
+    );
+    final quality = CraftQuality.roll(
+      grade: performance.clamp(0, 1),
+      margin: margin,
+      rng: rng ?? Random(),
+      skillCeiling: CraftQuality.skillCeiling(margin),
+    );
+
     final levelBefore = profile.skillLevel(skillKey);
     final gained = Skills.xpForRecipe(recipe);
     ItemInstance? minted;
@@ -400,11 +425,14 @@ class GameState extends ChangeNotifier {
         if (outputDef.isFungible) {
           slot = InventorySlot(defId: outputDef.id);
         } else {
-          // ⭐ Minted plain — no quality until quality changes stats (ruling
-          // 2026-08-09); the [performance] seam is where it will come from.
+          // ⭐ The roll rides the instance, which is the only thing that
+          // knows what THIS one is worth (Equipping.modifiersOf reads it).
+          // ⚠️ Fungible outputs — every consumable — get no instance and so
+          // no quality, deliberately: two draughts are interchangeable.
           minted = ItemInstance(
             instanceId: _mintCraftId(),
             defId: outputDef.id,
+            quality: quality,
           );
           profile.itemInstances[minted!.instanceId] = minted!;
           slot = InventorySlot(
@@ -423,6 +451,7 @@ class GameState extends ChangeNotifier {
       xp: gained,
       skillKey: skillKey,
       leveledTo: levelAfter > levelBefore ? levelAfter : null,
+      instance: minted,
     );
   }
 
@@ -1102,17 +1131,30 @@ class CraftOutcome {
   /// celebrate, mirroring the character pendingLevelUp shape.
   final int? leveledTo;
 
+  /// What was minted, when the output was non-fungible.
+  ///
+  /// ⭐ **The instance, not just the tier**, because the result panel names the
+  /// item — and the name is composed from the instance's own facts
+  /// (`ItemCatalogue.displayName`), never written down. Null for consumables,
+  /// which are fungible and roll nothing.
+  final ItemInstance? instance;
+
+  /// The tier the craft rolled (§9b.9d), for a panel that wants only that.
+  Quality? get quality => instance?.quality;
+
   const CraftOutcome.refused(this.refusal)
     : defId = null,
       xp = 0,
       skillKey = null,
-      leveledTo = null;
+      leveledTo = null,
+      instance = null;
 
   const CraftOutcome.made({
     required this.defId,
     required this.xp,
     required this.skillKey,
     this.leveledTo,
+    this.instance,
   }) : refusal = null;
 
   bool get succeeded => refusal == null;

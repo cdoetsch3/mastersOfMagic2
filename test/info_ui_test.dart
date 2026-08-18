@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
+import 'package:masters_of_magic_2/game/items/item_def.dart';
+import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/screens/element_detail_dialog.dart';
 import 'package:masters_of_magic_2/screens/gameplay_guide_screen.dart';
 import 'package:masters_of_magic_2/screens/spell_detail_dialog.dart';
+import 'package:masters_of_magic_2/ui/item_display.dart';
 import 'package:mom_engine/mom_engine.dart';
 
 /// Layout regression tests for the info UI. These drive the real render
@@ -64,6 +68,48 @@ void main() {
       );
       expect(find.text(spell.name), findsWidgets, reason: spell.id);
     }
+  });
+
+  testWidgets('⭐ the item dialog quotes the INSTANCE, not the definition', (
+    tester,
+  ) async {
+    // Sporecap Mantle is +12 HP / +2 accuracy in the catalogue; a Master one
+    // is worth ×1.40 of that (ruling 2026-08-18).
+    const master = ItemInstance(
+      instanceId: 'm1',
+      defId: 'sporecap_mantle',
+      quality: Quality.master,
+    );
+    await expectOpensCleanly(
+      tester,
+      (context) => showItemDialog(
+        context,
+        def: ItemCatalogue.byId('sporecap_mantle'),
+        instance: master,
+      ),
+      reason: 'item dialog: a Master mantle',
+    );
+    expect(find.text('Master Sporecap Mantle'), findsOneWidget,
+        reason: 'the roll is part of the name (§9b.5a) and the dialog must '
+            'be given the instance to compose it');
+    expect(find.text('+17 max health'), findsOneWidget,
+        reason: '12 × 1.40 → 17 — a tooltip printing the base 12 while the '
+            'duel fights with 17 is exactly the disagreement the one-writer '
+            'rule exists to prevent');
+  });
+
+  testWidgets('an unrolled item still shows its plain numbers', (tester) async {
+    await expectOpensCleanly(
+      tester,
+      (context) => showItemDialog(
+        context,
+        def: ItemCatalogue.byId('sporecap_mantle'),
+      ),
+      reason: 'item dialog: no instance at all',
+    );
+    expect(find.text('+12 max health'), findsOneWidget,
+        reason: 'the Workbench previews items nobody owns yet — the base is '
+            'the honest answer, and null must never scale');
   });
 
   testWidgets('the gameplay guide lays out on a phone screen', (tester) async {

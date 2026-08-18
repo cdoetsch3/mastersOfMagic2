@@ -52,6 +52,17 @@ abstract final class CraftQuality {
     return Quality.rough;
   }
 
+  /// §9b.9d step 3 — the cap your LEVEL allows for this recipe's tier, to be
+  /// passed as [roll]'s `skillCeiling`.
+  ///
+  /// ⭐ **Reuses the floor's own M ≥ 5 line rather than inventing a second
+  /// number**, and cuts both ways with it: below the line you are working at
+  /// the edge of your ability, so a perfect grade can neither escape Rough
+  /// (see [floor]) nor reach Master. Above it, hands are the only limit.
+  /// 📝 Placeholder like every number in this file.
+  static Quality skillCeiling(int margin) =>
+      margin >= 5 ? Quality.master : Quality.ornate;
+
   /// The full §9b.9d pipeline: weighted roll in [floor..ceiling].
   ///
   /// [skillCeiling] is the level-derived cap for the recipe's tier (null =
