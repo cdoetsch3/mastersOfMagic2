@@ -2155,6 +2155,18 @@ settle.
 
 ## Changelog
 
+**Rev — 2026-08-18 (later the same day).** Two §9b.9f amendments, both
+ruled: **(1) the Master-at-margin-5 cap stays** (it mirrors the floor's
+line), but Master right at the cap is deliberately *difficult* — the roll
+damps the Master lane by `masterEase(margin)` so a flawless act mints
+Master ~4% at margin 5, ~10% at +10, and full weight from +15 where the
+floor lifting to Ornate takes over. The tier you just unlocked is the tier
+you barely make. **(2) Drops carry quality too**, rolled at mint:
+Standard 90% / Ornate 8% / Master 2%, and **never Rough** — Rough is a
+crafting story (your hands at the edge of your ability); on found gear it
+would be a penalty with no story. Null quality still reads Standard, so
+nothing pre-ruling moves.
+
 **Rev — 2026-08-18.** §9b.9f: quality affects stats — a percent multiplier
 per tier (×0.80 / ×1.00 / ×1.20 / ×1.40) on every combat stat, `beltSlots`
 exempt, null reading as Standard so old saves and drops do not move.

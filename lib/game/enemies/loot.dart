@@ -9,6 +9,7 @@ library;
 import 'dart:math';
 
 import '../items/item_catalogue.dart';
+import '../items/item_def.dart';
 import '../items/item_instance.dart';
 import 'drop_table.dart';
 
@@ -114,11 +115,32 @@ Loot rollDrops(DropTable table, [Random? rng]) {
       slots.add(InventorySlot(defId: id));
     } else {
       final instanceId = _mintId(rng);
-      instances[instanceId] = ItemInstance(instanceId: instanceId, defId: id);
+      instances[instanceId] = ItemInstance(
+        instanceId: instanceId,
+        defId: id,
+        quality: rollDropQuality(rng),
+      );
       slots.add(InventorySlot(defId: id, instanceId: instanceId));
     }
   }
   return Loot(slots, instances);
+}
+
+/// The quality a DROPPED piece of equipment arrives at (ruling 2026-08-18):
+/// Standard 90%, Ornate 8%, Master 2%.
+///
+/// ⭐ **No Rough.** Rough exists to make crafting at the edge of your ability
+/// feel like working at the edge of your ability; a drop was never your
+/// hands, so a sub-baseline tier would be a penalty with no story. The floor
+/// of found gear is the baseline.
+///
+/// ⚠️ Same [Random] stream as the drop roll itself, so a seeded run is fully
+/// reproducible — do not give quality its own rng.
+Quality rollDropQuality(Random rng) {
+  final r = rng.nextDouble();
+  if (r < 0.02) return Quality.master;
+  if (r < 0.10) return Quality.ornate;
+  return Quality.standard;
 }
 
 /// One entry's ids, repeated by its rolled quantity.

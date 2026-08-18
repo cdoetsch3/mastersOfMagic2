@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:masters_of_magic_2/game/crafting/craft_quality.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/equipping.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
@@ -142,6 +143,58 @@ void main() {
   // ⭐ These test the WIRING, not the pipeline — craft_quality's own rules are
   // covered in gesture_and_nodes_test. What can break here is the wrong grade,
   // the wrong margin, a dropped ceiling, or a mint that forgets the roll.
+  group('Master at the cap is rare, and skill buys it back (§9b.9f)', () {
+    /// The Master rate over [n] flawless rolls at [margin], one seed each.
+    double masterRate(int margin, {int n = 4000}) {
+      var hits = 0;
+      for (var seed = 0; seed < n; seed++) {
+        final q = CraftQuality.roll(
+          grade: 1.0,
+          margin: margin,
+          rng: Random(seed),
+          skillCeiling: CraftQuality.skillCeiling(margin),
+        );
+        if (q == Quality.master) hits++;
+      }
+      return hits / n;
+    }
+
+    test('at margin 5 a flawless act mints Master rarely but truly', () {
+      final rate = masterRate(5);
+      expect(rate, greaterThan(0.01),
+          reason: '⚠️ the mutant this kills: an ease of 0 at the cap, which '
+              'would silently turn "difficult" into "impossible" and make '
+              'skillCeiling read as margin ≥ 6');
+      expect(rate, lessThan(0.08),
+          reason: '⭐ the ruling: the tier the cap just opened is the tier '
+              'you barely make — undamped weights sit near 10%, and this '
+              'bound is what pins the masterEase damping into the roll');
+    });
+
+    test('the Master rate climbs with margin, all the way up', () {
+      final atCap = masterRate(5);
+      final past = masterRate(10);
+      final deep = masterRate(15);
+      expect(past, greaterThan(atCap),
+          reason: 'skill past the cap must keep buying odds — a flat ease '
+              'would freeze the cap rate forever');
+      expect(deep, greaterThan(past),
+          reason: '⭐ at margin 15 the floor lifts to Ornate and the band '
+              'narrows — the deep-margin veteran sees Master most of all');
+      expect(deep, greaterThan(0.3),
+          reason: 'the §9b.9d floor ruling: deep margin makes Master the '
+              'expected outcome of a flawless act, not a jackpot');
+    });
+
+    test('masterEase is clamped at both ends', () {
+      expect(CraftQuality.masterEase(15), 1.0,
+          reason: 'full weight from the point the floor takes over');
+      expect(CraftQuality.masterEase(0), CraftQuality.masterEase(-5),
+          reason: 'an uncapped raw roll below the cap still tames Master '
+              'instead of going negative and inverting the pick');
+    });
+  });
+
   group('crafting rolls quality onto what it mints (§9b.9d)', () {
     test('the mint carries the roll, and the outcome reports it', () async {
       final game = _carrying({'oak_log': 2});

@@ -27,6 +27,7 @@ import 'package:masters_of_magic_2/game/enemies/enemy_def.dart';
 import 'package:masters_of_magic_2/game/enemies/loot.dart';
 import 'package:masters_of_magic_2/game/enemies/whispering_woods.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
+import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
@@ -615,6 +616,53 @@ void main() {
           }
         }
       }
+    });
+  });
+
+  group('dropped gear arrives Standard 90 / Ornate 8 / Master 2 (§9b.9f)', () {
+    test('the tier frequencies hold, and Rough never drops', () {
+      // Same counting discipline as the tables above: fixed seeds, bounds
+      // far tighter than any plausible bug's bias (the cheapest wrong
+      // implementation — reusing the crafting weights — moves Ornate by
+      // over 15 points).
+      final counts = <Quality, int>{};
+      final rng = Random(11);
+      for (var i = 0; i < _n; i++) {
+        final q = rollDropQuality(rng);
+        counts[q] = (counts[q] ?? 0) + 1;
+      }
+      expect(counts[Quality.rough], isNull,
+          reason: '⭐ the ruling: a drop was never your hands — Rough is a '
+              'crafting story, and on found gear it is only a penalty');
+      expect(counts[Quality.standard]! / _n, closeTo(0.90, 0.01));
+      expect(counts[Quality.ornate]! / _n, closeTo(0.08, 0.01),
+          reason: '⚠️ kills a <= where < belongs on the 0.10 boundary');
+      expect(counts[Quality.master]! / _n, closeTo(0.02, 0.005),
+          reason: 'the 2% jackpot is declared, not vibes');
+    });
+
+    test('rolled equipment instances carry the tier; fungibles never do', () {
+      // Roll real Whispering Woods tables until both kinds have appeared.
+      var sawGear = false, sawFungible = false;
+      final rng = Random(3);
+      for (var i = 0; i < 400 && !(sawGear && sawFungible); i++) {
+        for (final enemy in WhisperingWoodsBestiary.all) {
+          final loot = rollDrops(enemy.drops, rng);
+          for (final slot in loot.slots) {
+            if (slot.instanceId != null) {
+              sawGear = true;
+              expect(loot.instances[slot.instanceId]!.quality, isNotNull,
+                  reason: '⚠️ the mutant this kills: minting drops plain, '
+                      'which silently reads as Standard forever and deletes '
+                      'the 10% that should shine');
+            } else {
+              sawFungible = true;
+            }
+          }
+        }
+      }
+      expect(sawGear && sawFungible, isTrue,
+          reason: 'the fixture must exercise both mint paths');
     });
   });
 

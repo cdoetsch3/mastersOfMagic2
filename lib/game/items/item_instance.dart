@@ -23,13 +23,16 @@ class ItemInstance {
 
   final String defId;
 
-  /// The crafting roll (ITEMS §9b.4). Null for dropped gear, which rolls an
-  /// [aspect] instead.
+  /// The quality tier that scales this piece's stats (ITEMS §9b.9f).
+  ///
+  /// ⭐ Crafted gear rolls it through the §9b.9d pipeline; dropped gear rolls
+  /// it at mint (90/8/2 Standard/Ornate/Master, never Rough — a drop was not
+  /// your hands, so there is nothing to fumble). Null — any pre-ruling
+  /// instance — reads as Standard.
   final Quality? quality;
 
-  /// The element prefix a drop carries (ITEMS §9b.5b). ⚠️ Mutually exclusive
-  /// with [quality] in practice — crafted items roll quality, drops roll
-  /// aspect — but not enforced here, because boss uniques may do both.
+  /// The element prefix a drop carries (ITEMS §9b.5b). 📝 Not rolled by
+  /// anything yet; independent of [quality].
   final MagicElement? aspect;
 
   /// Gem def ids, positionally. Length must not exceed the def's socketCount.

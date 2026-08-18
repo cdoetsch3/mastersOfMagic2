@@ -63,11 +63,25 @@ abstract final class CraftQuality {
   static Quality skillCeiling(int margin) =>
       margin >= 5 ? Quality.master : Quality.ornate;
 
+  /// How much of Master's natural weight the roll keeps at this margin.
+  ///
+  /// ⭐ **The tier you just unlocked is the tier you barely make** (ruling
+  /// 2026-08-18): at the margin-5 cap that [skillCeiling] opens, Master is
+  /// meant to be *possible but difficult* — ~4% on a flawless act — and to
+  /// climb steadily with skill (~10% at +10, full weight by +15, where the
+  /// [floor] lifting to Ornate takes over as the improvement).
+  ///
+  /// ⚠️ Clamped below so a raw uncapped roll (no [skillCeiling]) still tames
+  /// Master rather than zeroing it. 📝 Placeholder numbers, like the rest.
+  static double masterEase(int margin) =>
+      (0.35 + 0.065 * (margin - 5)).clamp(0.35, 1.0);
+
   /// The full §9b.9d pipeline: weighted roll in [floor..ceiling].
   ///
   /// [skillCeiling] is the level-derived cap for the recipe's tier (null =
   /// uncapped). ⭐ Weights lean low and are tilted upward by margin — "better
-  /// odds at higher skill" (§9b.4) lives here, as weight-shaping.
+  /// odds at higher skill" (§9b.4) lives here, as weight-shaping — and the
+  /// Master lane is additionally damped by [masterEase] near the cap.
   static Quality roll({
     required double grade,
     required int margin,
@@ -88,7 +102,9 @@ abstract final class CraftQuality {
       for (var q = lo.index; q <= ceiling.index; q++) Quality.values[q],
     ];
     final weights = [
-      for (var i = 0; i < options.length; i++) pow(falloff, -i).toDouble(),
+      for (var i = 0; i < options.length; i++)
+        pow(falloff, -i).toDouble() *
+            (options[i] == Quality.master ? masterEase(margin) : 1),
     ];
     final total = weights.fold<double>(0, (a, b) => a + b);
     var pick = rng.nextDouble() * total;
