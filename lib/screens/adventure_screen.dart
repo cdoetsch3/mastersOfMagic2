@@ -14,6 +14,7 @@ import '../ui/app_theme.dart';
 import 'duel_screen.dart';
 import 'level_up_screen.dart';
 import '../ui/item_display.dart' show rarityColour;
+import '../ui/item_icon.dart';
 
 /// One run through a zone: what is in front of you, how far in you are, and
 /// the only question that matters — press on, or walk out with what you have.
@@ -620,6 +621,16 @@ class _LootChoiceRow extends StatelessWidget {
               color: picked ? AppColors.teal : AppColors.borderDim,
             ),
             const SizedBox(width: 10),
+            // ⭐ The picker is where the player decides what a slot is worth,
+            // so it is the one list that most wants a picture. ⚠️ The gap
+            // travels with the icon, so today the name still starts 10px
+            // after the checkbox exactly as it did.
+            ItemIcon(
+              defId: slot.defId,
+              size: 20,
+              gap: 8,
+              fallback: const SizedBox.shrink(),
+            ),
             Expanded(
               child: Text(
                 _lootName(slot, instance),
@@ -783,6 +794,14 @@ class _ConsumableRow extends StatelessWidget {
     padding: const EdgeInsets.symmetric(vertical: 3),
     child: Row(
       children: [
+        // ⭐ The between-encounters twin of the duel's belt rail, and wired the
+        // same way so a potion looks like the same object in both places.
+        ItemIcon(
+          defId: def.id,
+          size: 22,
+          gap: 8,
+          fallback: const SizedBox.shrink(),
+        ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

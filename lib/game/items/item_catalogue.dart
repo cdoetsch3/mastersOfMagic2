@@ -19,15 +19,51 @@ abstract final class ItemCatalogue {
   /// ⚠️ **Every zone catalogue must be listed here.** An unlisted one compiles
   /// fine and simply never resolves, which is exactly the silent failure the
   /// id test exists to catch.
-  static const List<ItemDef> all = <ItemDef>[
-    ...WhisperingWoodsItems.all,
-    ...GlimmerbrookItems.all,
-    ...CinderpeakItems.all,
-    ...ThornmireItems.all,
-    ...AshfallValeItems.all,
+  ///
+  /// ⭐ **Keyed by zone id, and that key is load-bearing** — it is the only
+  /// place in the game that records *which zone defines an item*, which is
+  /// what [zoneOf] and therefore `assets/items/<zone>/<id>.png` are built on.
+  /// ⚠️ The key must be a real `World.locations` id, not a display name or a
+  /// class name; a test asserts it.
+  ///
+  /// ⭐ **A cross-zone recipe output belongs to the file that DEFINES it**, not
+  /// to the zone whose materials it eats — the Tuskhide Belt is Cinderpeak's
+  /// even though Thornmire supplies its thread. That is the same rule the
+  /// catalogue files already follow for motes ("the mote lives with the zone
+  /// that first yields it"), so nothing falls between two zones.
+  static const Map<String, List<ItemDef>> byZone = <String, List<ItemDef>>{
+    'whispering_woods': WhisperingWoodsItems.all,
+    'glimmerbrook': GlimmerbrookItems.all,
+    'cinderpeak_foothills': CinderpeakItems.all,
+    'thornmire': ThornmireItems.all,
+    'ashfall_vale': AshfallValeItems.all,
+  };
+
+  /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists
+  /// of the same five catalogues is exactly how an item ends up resolvable by
+  /// id but owned by no zone — an icon that can never load, with nothing
+  /// failing to say so.
+  static final List<ItemDef> all = <ItemDef>[
+    for (final defs in byZone.values) ...defs,
   ];
 
   static final Map<String, ItemDef> _byId = {for (final d in all) d.id: d};
+
+  static final Map<String, String> _zoneById = {
+    for (final e in byZone.entries)
+      for (final d in e.value) d.id: e.key,
+  };
+
+  /// Which zone's catalogue file defines [defId].
+  ///
+  /// ⭐ **A lookup rather than a field on [ItemDef].** A `zoneId` on every def
+  /// would be a fact stated twice — once by which file the `static const`
+  /// lives in and once by the string beside it — and the two can disagree.
+  /// Here the file placement *is* the answer, so it cannot.
+  ///
+  /// ⚠️ Null means no catalogue claims the id, which callers must treat the
+  /// way `tryById` does: a save written before a content patch, not a crash.
+  static String? zoneOf(String defId) => _zoneById[defId];
 
   /// Null when nothing owns [id] — callers should treat that as a bug, not a
   /// missing item.

@@ -10,6 +10,7 @@ import '../../game/items/item_instance.dart';
 import '../../game/world.dart';
 import '../../ui/app_theme.dart';
 import '../../ui/item_display.dart';
+import '../../ui/item_icon.dart';
 import '../craft_screen.dart';
 import '../home_shell.dart';
 
@@ -312,14 +313,31 @@ class _EquipSlotChip extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 2),
-          Text(
-            filled ? ItemCatalogue.displayName(def, inst) : 'Empty',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: filled ? colour : AppColors.textFaint,
-              fontSize: 11,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ⭐ The icon leads the name, and takes its own 6px of breathing
+              // room with it when there is no PNG — see [ItemIcon.gap]. An
+              // empty slot has no item and therefore never asks for one.
+              if (filled)
+                ItemIcon(
+                  defId: def.id,
+                  size: 18,
+                  gap: 6,
+                  fallback: const SizedBox.shrink(),
+                ),
+              Expanded(
+                child: Text(
+                  filled ? ItemCatalogue.displayName(def, inst) : 'Empty',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: filled ? colour : AppColors.textFaint,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -427,9 +445,16 @@ class _BeltSlot extends StatelessWidget {
       child: def == null
           ? null
           : Center(
-              child: Text(
-                ItemCatalogue.displayName(def, null).substring(0, 1),
-                style: TextStyle(color: colour, fontSize: 13),
+              // ⭐ The icon REPLACES the initial rather than joining it — a
+              // 34px box has room for one thing, and "S" for Sapwort Draught
+              // was only ever standing in for a picture.
+              child: ItemIcon(
+                defId: def.id,
+                size: 26,
+                fallback: Text(
+                  ItemCatalogue.displayName(def, null).substring(0, 1),
+                  style: TextStyle(color: colour, fontSize: 13),
+                ),
               ),
             ),
     );
@@ -600,12 +625,23 @@ class _ItemSlot extends StatelessWidget {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(3),
-              child: Text(
-                name,
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: colour, fontSize: 9, height: 1.15),
+              // ⭐ The icon REPLACES the wrapped 9px name. A tile that showed
+              // both would show neither legibly, and the name is already on
+              // the tooltip and in the dialog one tap away.
+              //
+              // ⚠️ **No `size`** — the tile is the grid's to size (five
+              // across, whatever the window is), so a hard number would
+              // overflow it on a narrow phone. Unsized, the image takes its
+              // intrinsic 64px capped by the tile's own constraints.
+              child: ItemIcon(
+                defId: slot.defId,
+                fallback: Text(
+                  name,
+                  textAlign: TextAlign.center,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: colour, fontSize: 9, height: 1.15),
+                ),
               ),
             ),
           ),
@@ -729,6 +765,7 @@ class _StoreroomListState extends State<_StoreroomList> {
             ),
           for (final e in shown)
             _StoredRow(
+              defId: e.defId,
               label: e.label,
               count: e.count,
               colour: e.def == null
@@ -881,6 +918,9 @@ class _FilterChip extends StatelessWidget {
 }
 
 class _StoredRow extends StatelessWidget {
+  /// ⚠️ The **def** id, not the instance id — an icon is a fact about the
+  /// definition, and two rolls of the same staff share one picture.
+  final String defId;
   final String label;
   final int count;
   final Color colour;
@@ -892,6 +932,7 @@ class _StoredRow extends StatelessWidget {
   final VoidCallback? onWear;
 
   const _StoredRow({
+    required this.defId,
     required this.label,
     required this.count,
     required this.colour,
@@ -913,6 +954,16 @@ class _StoredRow extends StatelessWidget {
       children: [
         Container(width: 8, height: 8, color: colour),
         const SizedBox(width: 8),
+        // ⭐ Beside the rarity swatch, not instead of it: the swatch answers
+        // "how good is this" at a glance and an icon does not. ⚠️ 18px sits
+        // inside the row's existing 13px-text line box, so the rows do not
+        // grow when the art lands — and with no art the gap goes too.
+        ItemIcon(
+          defId: defId,
+          size: 18,
+          gap: 8,
+          fallback: const SizedBox.shrink(),
+        ),
         Expanded(
           child: Text(
             label,

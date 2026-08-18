@@ -60,8 +60,14 @@ still a painter.
 sprite is ~8 KB and a few minutes; the bestiary is 275 of them. Budget them as
 a per-zone batch, not a per-creature task.
 
-⚠️ **Icons (15b) has no pipeline mode yet.** Creatures and backdrops do;
-`--mode icon` (small, square, probably 48px on a transparent field) is unbuilt.
+✅ **Icons (15b) has a pipeline now** (2026-08-18). `tool/pixelate.py
+--mode icon` reads `art/source/items/<zone>/` and writes 64×64 to
+`assets/items/<zone>/`. ⚠️ The old guess here said "transparent field" — it is
+a **plain dark ground with a square cover-crop** instead, because the shared
+style preamble in [ITEM_ART.md](ITEM_ART.md) asks for one object on a flat
+near-black background and there is then nothing to cut out. Descriptions for
+all 52 Primal items are written; the loading side (`ItemIcon`) is wired into
+every screen and falls back to today's text until the PNGs land.
 
 ---
 
@@ -151,7 +157,7 @@ Measured off the grid above, not from memory.
 | **1** | ✅ ~~**Build the other four Primal zones**~~ | **Done.** 44 creatures, 8 new items, 15 drop tables, 144 tests. The quarter is playable end to end |
 | **2** | ⭐ **Creature art for the four new zones** (col 9) | 44 sprites through `tool/pixelate.py`. Physical descriptions for every one are already written in BESTIARY_ART §Glimmerbrook–Ashfall — this is a pipeline batch, not a design task. ⚠️ `test/creature_sprite_test.dart` now scopes its pubspec check to zones that HAVE art, so each batch is independently shippable |
 | **3** | **Gathering nodes** (col 11) | The only ⬜ that blocks a whole *skill*. Materials exist and drop from kills; nothing can be gathered from the world yet, so Woodcarving has no input that is not a corpse |
-| **4** | **Icons** (col 15b) | New column. Needs `--mode icon` in the pipeline first — small, square, transparent field |
+| **4** | **Icons** (col 15b) | ⭐ **Now a pipeline batch, not design work.** `--mode icon` exists, `ItemIcon` is wired into every screen that shows an item, and all 52 Primal descriptions are in [ITEM_ART.md](ITEM_ART.md). What is left is generating and running them, one zone at a time |
 | **5** | **Backdrops** (col 9b) | 26 prompts already written from the `arrival` text; the pipeline mode exists. Cheapest visual win per hour on the board |
 | **6** | **BossFX** (col 8) | The only design work left in the quarter, and now ten bosses rather than two. What makes Heartwood more than a big statline |
 | **7** | ⛔ **Achievements** (col 16) | Blocked on the `progress/` subcollection, which is logged in IMPLEMENTATION_PLAN and unbuilt |

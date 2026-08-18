@@ -9,6 +9,8 @@ art/
   source/
     <zone>/     one image per creature, named after its EnemyDef id
     backgrounds/  one image per zone, named after its zone id
+    items/
+      <zone>/   one image per item, named after its ItemDef id
   palettes/     one per element, generated from lib/game/element_style.dart
 ```
 
@@ -50,6 +52,28 @@ visual impact, since the background is most of the screen.
 on top of what the prompt already asks for; measured, a backdrop comes out at
 roughly **55% of the source's mean luminance**. The failure mode is a beautiful
 backdrop that makes the creature standing on it unreadable.
+
+## Item icons
+
+Descriptions: [../docs/ITEM_ART.md](../docs/ITEM_ART.md) — which is written to
+be pasted straight in, so ⭐ **there is no generated `prompts/items.md`**. The
+per-entry paragraph plus the shared style preamble at the top of that file is
+the whole prompt, and a second copy would be one more thing to drift.
+
+```sh
+python3 tool/pixelate.py --zone whispering_woods --mode icon
+```
+
+⭐ **64×64, and nothing done to it but quantising.** No element remap (a Flora
+zone's catalogue holds copper ore and black glass), no darken/desaturate (an
+icon shown at 14px on the duel's belt rail needs every scrap of contrast it
+has). ⚠️ **No `--cutout` either** — the shared style preamble asks for one
+object on a plain dark ground, so the mode square cover-crops rather than
+trimming to alpha.
+
+⭐ **52 icons for the Primal quarter**, in five zone folders matching
+`ItemCatalogue.byZone`. Every stem must be a real item id in the right zone;
+`test/item_icon_test.dart` fails the suite if one is not.
 
 ## Regenerating the prompts
 

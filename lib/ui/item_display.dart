@@ -4,8 +4,9 @@
 /// Workbench, the backpack, the paper doll and the loot picker all open THIS
 /// dialog, so an item reads identically wherever it is met. Stats come from
 /// the same writers the duel uses (`Equipping.describe`, `effect.describe`),
-/// so no screen can disagree with the game. 📝 The name line grows a sprite
-/// when item icons exist (CONTENT_CHECKLIST col 15b).
+/// so no screen can disagree with the game. ✅ The name line grows a sprite
+/// when item icons exist (CONTENT_CHECKLIST col 15b) — wired, and a no-op
+/// until `assets/items/` has PNGs in it (see [ItemIcon]).
 library;
 
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
 import 'app_theme.dart';
+import 'item_icon.dart';
 
 /// One dialog for every item interaction — what it is, what it does, and
 /// what you can do with it here. [actions] whose `run` returns a refusal
@@ -45,9 +47,25 @@ Future<void> showItemDialog(
     context: context,
     builder: (dialogContext) => AlertDialog(
       backgroundColor: AppColors.panel,
-      title: Text(
-        ItemCatalogue.displayName(def, instance),
-        style: TextStyle(color: rarityColour(def.rarity), fontSize: 16),
+      // ⭐ The sprite the header line was always going to grow. ⚠️ It carries
+      // its own trailing gap ([ItemIcon.gap]) so the title sits exactly where
+      // it sits today while `assets/items/` is empty — a reserved 32px of
+      // nothing in front of every item name would be the opposite of a no-op.
+      title: Row(
+        children: [
+          ItemIcon(
+            defId: def.id,
+            size: 26,
+            gap: 8,
+            fallback: const SizedBox.shrink(),
+          ),
+          Expanded(
+            child: Text(
+              ItemCatalogue.displayName(def, instance),
+              style: TextStyle(color: rarityColour(def.rarity), fontSize: 16),
+            ),
+          ),
+        ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,

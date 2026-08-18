@@ -771,20 +771,20 @@ stale the moment the other four rosters landed). `map_tab` switches on
 to PERFECT before starting any other quarter.** Every ⬜ in this table
 outranks new-zone work; the matrix below is the definition of done.
 
-Per-zone content tracks in EIGHT columns. Rows are the Primal quarter; the
+Per-zone content tracks in NINE columns. Rows are the Primal quarter; the
 same columns apply to every future zone, so copy this table per quarter as
 rosters land. (Two things deliberately have NO column: **recipes**, which are
 band-scoped across the quarter by design — `primal_recipes.dart`, 20 shipped,
 "a per-zone file would be a fiction" — and **arrival narrative**, done for all
 32 locations in `world.dart` since the map rebuild.)
 
-| Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Pixel grids | Backdrop | Item icon descs |
-|---|---|---|---|---|---|---|---|---|
-| Whispering Woods | ✅ 11 | ✅ | ✅ 18 defs | ✅ 2 | ✅ 11 | ✅ 11 | 📝 desc | ⬜ |
-| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ✅ 1 | 📝 desc | ⬜ | 📝 desc | ⬜ |
-| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ✅ 1 | 📝 desc | ⬜ | 📝 desc | ⬜ |
-| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | 📝 desc | ⬜ | 📝 desc | ⬜ |
-| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ✅ 3 | 📝 desc | ⬜ | 📝 desc | ⬜ |
+| Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Pixel grids | Backdrop | Item icon descs | Item icons (PNG) |
+|---|---|---|---|---|---|---|---|---|---|
+| Whispering Woods | ✅ 11 | ✅ | ✅ 18 defs | ✅ 2 | ✅ 11 | ✅ 11 | 📝 desc | ✅ 18 | ⬜ |
+| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ✅ 1 | 📝 desc | ⬜ | 📝 desc | ✅ 9 | ⬜ |
+| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ✅ 1 | 📝 desc | ⬜ | 📝 desc | ✅ 8 | ⬜ |
+| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | 📝 desc | ⬜ | 📝 desc | ✅ 9 | ⬜ |
+| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ✅ 3 | 📝 desc | ⬜ | 📝 desc | ✅ 8 | ⬜ |
 
 (📝 desc = the generator-ready description exists and the loading pipeline is
 verified; only the image itself is missing. ✅ when the PNG lands.)
@@ -835,19 +835,23 @@ Column notes, so a checkmark means the same thing every time:
   ⚠️ Open decision: `art/prompts/backgrounds.md` holds older auto-derived
   prompts for all 26 zones WITHOUT the composition language — back-port or
   retire it before the next quarter's backdrops.
-- **Item icon descs** — one image-generator-ready visual description per item
-  in the zone's catalogue (requested 2026-08-18), the item counterpart of
-  `BESTIARY_ART.md`'s creature descriptions: suggest an `ITEM_ART.md` with a
-  section per zone, one prompt-ready paragraph per def (what the object IS,
-  materials, palette, silhouette — no lore the renderer can't draw), written
-  to a shared style preamble so the icon set reads as one set. The rendered
-  icons then replace the text labels in the backpack/Storeroom/tooltips —
-  presumably `assets/items/<zone>/<defId>.png` with the same
-  manifest-plus-fallback pattern `CreatureView` uses. ⚠️ Nothing exists for
-  ANY zone yet — `ItemDef` has no description field and no doc covers items —
-  which is why even the Woods row is ⬜. Cross-zone items the recipes mint
-  (band gear, potions) belong to the zone whose catalogue file defines them,
-  so nothing falls between rows.
+- **Item icon descs** — ✅ COLUMN COMPLETE 2026-08-18: `docs/ITEM_ART.md`,
+  52 entries mechanically verified 1:1 against the five catalogues. Shared
+  style preamble, a stat→look convention table (damagePerCharge reads
+  heavy, critChance a hairline of live ember, heals soft and green…),
+  rarity-as-light (never a frame — the UI already draws rarity as the slot
+  border). 📝 Mythic/Legendary look undefined — deliberate, nothing in Q1
+  is either. Cross-zone recipe outputs belong to the defining catalogue
+  file (`ItemCatalogue.byZone` is now the single source of zone-of-def).
+- **Item icons (PNG)** — the rendered icons at `assets/items/<zone>/<id>.png`.
+  ✅ Pipeline verified 2026-08-18: `ItemIcon` wired at 8 sites (backpack
+  grid, belt slots, Storeroom, duel belt rail, duel loot chip, take-home
+  picker, paper doll + item dialog, adventure Supplies) with pixel-exact
+  fallback to today's rendering — an absent icon measures 0.0px, so
+  nothing shifts until art lands. To produce: 1024×1024 sources at
+  `art/source/items/<zone>/<id>.png`, then
+  `python3 tool/pixelate.py --zone <zone> --mode icon` (64×64 cover-crop,
+  20-colour quantise, no darken).
 
 ⭐ **`MageState.powerScale` is the one engine change**, and it is deliberately
 **damage-only** — never shields. A Sentinel is low damage *and* a wall, and

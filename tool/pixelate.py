@@ -3,12 +3,27 @@
 
     python3 tool/pixelate.py --zone whispering_woods --element flora --cutout
     python3 tool/pixelate.py --zone whispering_woods --mode background
+    python3 tool/pixelate.py --zone whispering_woods --mode icon
 
 **Creature mode** (default) reads `art/source/<zone>/`, and writes a small,
 palette-locked sprite per creature to `assets/creatures/<zone>/`.
 
 **Background mode** reads `art/source/backgrounds/<zone>.*` and writes one wide
 arena backdrop to `assets/backgrounds/`.
+
+**Icon mode** reads `art/source/items/<zone>/` and writes one 64x64 item icon
+per file to `assets/items/<zone>/`, named for the item id. Prompts:
+`docs/ITEM_ART.md`.
+
+⭐ **An icon is neither a creature nor a background, and gets neither
+treatment.** No element remap: a Flora zone's catalogue contains copper ore and
+black glass, and locking them to a green ramp would make the icon set lie about
+what the objects are. No darken/desaturate either: a backdrop is pushed back
+because it must lose to the sprites, but an icon shown at 14px on the duel's
+belt rail has the opposite problem and needs every scrap of contrast it has.
+⚠️ Square **cover**-crop rather than the creature path's alpha-trim — the
+descriptions ask for one centred object on a plain ground, so there is nothing
+to trim to and letterboxing an icon inside its slot reads as a bug.
 
 ⭐ **A background must LOSE to the sprites.** It is most of the screen, so the
 temptation is to make it beautiful — but creature legibility is what the fight
@@ -62,6 +77,7 @@ PALETTE_DIR = ROOT / "art" / "palettes"
 SOURCE_DIR = ROOT / "art" / "source"
 OUT_DIR = ROOT / "assets" / "creatures"
 BG_OUT = ROOT / "assets" / "backgrounds"
+ICON_OUT = ROOT / "assets" / "items"
 
 # ⚠️ **128, not 64.** 64 was the first guess and it was too small — measured on
 # the Listening Fawn, the root legs and the lowered head both dissolved. 128
@@ -76,6 +92,17 @@ BACKGROUND_SIZE = (384, 216)
 
 # A scene needs more than a creature's 16 — fewer and skies band badly.
 BACKGROUND_COLOURS = 28
+
+# ⭐ **64, not the creature's 128.** An icon is shown between 14px (the duel's
+# belt rail) and roughly 40px (a backpack tile), so 128 would be four times the
+# pixels anyone ever sees — and 52 icons at 64px is about 130 KB for the whole
+# Primal quarter. ⚠️ Square, because every slot that shows one is square.
+ICON_SIZE = (64, 64)
+
+# ⭐ Between a creature's 16 and a scene's 28. An icon is one object with a
+# small number of materials, and a tight palette is what makes fifty-two
+# separately generated pictures read as one set.
+ICON_COLOURS = 20
 
 # ⚠️ How far a background is pushed back. Both deliberate: without them a good
 # backdrop makes the creature standing on it unreadable.
@@ -250,15 +277,13 @@ def to_sprite(
     return canvas
 
 
-def to_background(src: pathlib.Path, size: tuple[int, int]) -> Image.Image:
-    """A wide, dimmed, quantised arena backdrop.
+def cover_crop(img: "Image.Image", size: tuple[int, int]) -> "Image.Image":
+    """Fills [size] exactly, cropping the overflow off the centre.
 
-    ⚠️ No element remap. A scene is many hues; forcing it through one ramp
-    turns a forest into a green smear.
+    ⭐ Cover, never contain — letterboxing a backdrop or an icon inside its own
+    slot looks like a bug rather than a framing choice. ⚠️ `Image.BOX` is the
+    area average the whole file depends on; see the module docstring.
     """
-    img = Image.open(src).convert("RGB")
-
-    # Cover-fit, then centre-crop — letterboxing a backdrop looks like a bug.
     tw, th = size
     scale = max(tw / img.width, th / img.height)
     img = img.resize(
@@ -267,7 +292,16 @@ def to_background(src: pathlib.Path, size: tuple[int, int]) -> Image.Image:
     )
     left = (img.width - tw) // 2
     top = (img.height - th) // 2
-    img = img.crop((left, top, left + tw, top + th))
+    return img.crop((left, top, left + tw, top + th))
+
+
+def to_background(src: pathlib.Path, size: tuple[int, int]) -> Image.Image:
+    """A wide, dimmed, quantised arena backdrop.
+
+    ⚠️ No element remap. A scene is many hues; forcing it through one ramp
+    turns a forest into a green smear.
+    """
+    img = cover_crop(Image.open(src).convert("RGB"), size)
 
     # ⭐ Push it back BEFORE quantising, so the palette is chosen from the
     # colours that will actually be shown rather than the bright originals.
@@ -282,6 +316,52 @@ def to_background(src: pathlib.Path, size: tuple[int, int]) -> Image.Image:
         method=Image.Quantize.MEDIANCUT,
         dither=Image.Dither.NONE,
     ).convert("RGB")
+
+
+def to_icon(src: pathlib.Path, size: tuple[int, int]) -> Image.Image:
+    """One square item icon, quantised and nothing else.
+
+    ⚠️ **Deliberately the shortest path in this file.** No element remap (a
+    Flora zone yields copper ore), no darken/desaturate (an icon at 14px needs
+    all the contrast it has), no alpha handling (the shared style preamble in
+    docs/ITEM_ART.md asks for one object on a plain dark ground, so there is
+    nothing to cut out). Every one of those is a step the other two modes need
+    and this one would be actively harmed by.
+    """
+    img = cover_crop(Image.open(src).convert("RGB"), size)
+    return img.quantize(
+        colors=ICON_COLOURS,
+        method=Image.Quantize.MEDIANCUT,
+        dither=Image.Dither.NONE,
+    ).convert("RGB")
+
+
+def run_icons(zone: str, size: tuple[int, int]) -> None:
+    src_dir = SOURCE_DIR / "items" / zone
+    if not src_dir.is_dir():
+        sys.exit(
+            f"no source art at {src_dir}\n"
+            f"  Put generated images there, named after the ITEM id "
+            f"(oak_log.png, heartwood_stave.png, ...).\n"
+            f"  Prompts: docs/ITEM_ART.md"
+        )
+    out_dir = ICON_OUT / zone
+    out_dir.mkdir(parents=True, exist_ok=True)
+    sources = sorted(
+        f
+        for f in src_dir.iterdir()
+        if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}
+    )
+    w, h = size
+    for src in sources:
+        # ⭐ Always .png out, whatever went in — the ITEM id is the stem, and
+        # `test/item_icon_test.dart` fails the build if one is not a real id.
+        dst = out_dir / f"{src.stem}.png"
+        to_icon(src, size).save(dst)
+        print(f"  {src.name} -> {dst.relative_to(ROOT)}  ({w}x{h})")
+    print(f"\n{len(sources)} icons for {zone}")
+    if not sources:
+        print("⚠️  nothing to do — the source directory is empty")
 
 
 def run_backgrounds(zone: str) -> None:
@@ -308,7 +388,7 @@ def main() -> None:
     ap.add_argument("--zone", required=True, help="e.g. whispering_woods")
     ap.add_argument(
         "--mode",
-        choices=["creature", "background"],
+        choices=["creature", "background", "icon"],
         default="creature",
     )
     ap.add_argument("--element", help="e.g. flora — creature mode only")
@@ -322,6 +402,15 @@ def main() -> None:
 
     if args.mode == "background":
         run_backgrounds(args.zone)
+        return
+
+    if args.mode == "icon":
+        # ⭐ `--size` still works, squared: an icon's box is square by
+        # definition, so one number is the whole of it.
+        run_icons(
+            args.zone,
+            ICON_SIZE if args.size == DEFAULT_SIZE else (args.size, args.size),
+        )
         return
 
     if not args.element:

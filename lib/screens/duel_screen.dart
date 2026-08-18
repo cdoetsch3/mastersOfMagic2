@@ -21,6 +21,7 @@ import '../game/enemies/enemy_def.dart';
 import '../ui/app_theme.dart';
 import '../ui/creature_art.dart';
 import '../ui/item_display.dart' show rarityColour;
+import '../ui/item_icon.dart';
 import '../ui/element_text.dart';
 import 'home_shell.dart';
 
@@ -1429,7 +1430,15 @@ class _DuelScreenState extends State<DuelScreen>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.local_drink, size: 14, color: color),
+                  // ⭐ The icon REPLACES the generic drink glyph — every belt
+                  // item is a bottle today, so the glyph says nothing the
+                  // rail's shape does not. ⚠️ Same 14px box, so the rail keeps
+                  // its height and the buttons keep their width.
+                  ItemIcon(
+                    defId: defId,
+                    size: 14,
+                    fallback: Icon(Icons.local_drink, size: 14, color: color),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     name,
@@ -2773,6 +2782,15 @@ class _LootChip extends StatelessWidget {
           children: [
             Container(width: 8, height: 8, color: colour),
             const SizedBox(width: 6),
+            // ⭐ Beside the rarity swatch, as in the Storeroom — the swatch
+            // ranks it, the icon names it. ⚠️ The 6px gap is the icon's own,
+            // so the chip is byte-for-byte its old width with no art.
+            ItemIcon(
+              defId: defId,
+              size: 16,
+              gap: 6,
+              fallback: const SizedBox.shrink(),
+            ),
             Text(name, style: TextStyle(color: colour, fontSize: 11.5)),
             if (count > 1)
               Text(

@@ -2202,6 +2202,37 @@ settle.
 
 ## Changelog
 
+**Rev — 2026-08-18 (item icons).** The quarter's items get pictures — or
+rather, everything *except* the pictures. Two halves. **(1)
+[ITEM_ART.md](ITEM_ART.md)**, the item counterpart of BESTIARY_ART: a shared
+style preamble meant to be prepended to every prompt so 52 separately generated
+images read as one set, then one generator-ready paragraph per def across all
+five Primal catalogues — 18 / 9 / 8 / 9 / 8, exactly matching
+`ItemCatalogue.byZone`. ⭐ **The stats are the brief**: the doc fixes a
+convention table mapping each modifier to a look (`damagePerCharge` → heavy and
+two-handed, `damagePerCast` → thin and quick, `critChance` → a hairline of live
+ember, `shieldStrengthPercent` → water-worn with nothing sharp on it,
+`healingReceivedPercent` → green, soft and rounded, `beltSlots` → loops drawn
+**empty**, because the capacity is the stat). ⚠️ Rarity is expressed as *light*
+and never as a frame — the UI already draws rarity as the slot's border colour,
+and an icon with its own border fights the one cue the interface has. **(2) The
+loading pipeline**, shipped before the paint the same way `ArenaBackdrop` was:
+`ItemIcon` tries `assets/items/<zone>/<defId>.png` and otherwise renders
+*exactly what that screen drew before* — the fallback is passed in per call
+site, never invented, because six screens show an item six different ways.
+⭐ **Zone-of-item is a lookup, not a field**: `ItemCatalogue.byZone` keys the
+five catalogues by zone id and `zoneOf` derives from it, so which file defines
+a def *is* the answer and the two cannot disagree. ⚠️ Two traps found and
+closed: an icon added to a row that has none today reserves a gap forever
+unless the gap is drawn as extra width **on the image**, where the errorBuilder
+takes it away too; and an asset load is asynchronous **even when it is going to
+fail**, so an `errorBuilder` alone flashes every inventory tile blank on open —
+`frameBuilder` covers the loading frames and four existing tests caught it.
+`tool/pixelate.py` gains `--mode icon` (64×64 square cover-crop, quantise, and
+deliberately none of the other modes' darkening, desaturating, element remap or
+alpha cutout). 12 new tests; the whole thing is a visual no-op until the PNGs
+exist, which is the point.
+
 **Rev — 2026-08-18 (gathering).** New **§9b.7b**: the Primal quarter's other
 four zones have nodes. `GatherNodes.all` held two, both Whispering Woods, so
 every other zone's materials were drop-only and **Mining had nowhere in the

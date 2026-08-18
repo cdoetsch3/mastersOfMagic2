@@ -50,6 +50,7 @@ flutter:
   # means the maintainer's PNGs load the moment they land — no pubspec edit, no
   # rebuild-the-plumbing step, nothing between the art and the screen.
   # `test/creature_art_test.dart` asserts this list and the directories agree.
+  # (The same contract covers assets/items/<zone>/ — icons, one per def.)
   assets:
     - assets/creatures/whispering_woods/
     - assets/creatures/glimmerbrook/
@@ -57,3 +58,11 @@ flutter:
     - assets/creatures/thornmire/
     - assets/creatures/ashfall_vale/
     - assets/backgrounds/
+    # One per Primal zone, matching `ItemCatalogue.byZone`'s keys. Empty until
+    # `tool/pixelate.py --mode icon` is run; `ItemIcon` falls back silently
+    # meanwhile (test/item_icon_test.dart holds that true).
+    - assets/items/whispering_woods/
+    - assets/items/glimmerbrook/
+    - assets/items/cinderpeak_foothills/
+    - assets/items/thornmire/
+    - assets/items/ashfall_vale/
