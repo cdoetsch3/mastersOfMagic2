@@ -1723,6 +1723,52 @@ is an interaction decision, not a tuning one.
 gives birch) or roll a small table? Flat-by-zone is more legible and makes the
 map teach itself (§9b.6); a small roll adds variance cheaply.
 
+✅ **Answered by the build (2026-08-18):** *one node, one material* — a node
+names what it yields and never rolls a table. The variance lives one level up,
+in **which** of a zone's nodes the run draws for each of its three sections, so
+a Thornmire visit is a different mix of fibre / root / amber every time while
+each spot stays legible on sight. ⭐ That keeps the map teaching itself: what
+you learn from a node is true of that node forever.
+
+### 9b.7b Which materials get a node ✅ (2026-08-18)
+
+⭐ **A node is for what the world holds still.** Wood, fibre, herb, root, ore
+and gem are gathered; **hides and motes are kill-only** and deliberately have
+no node — a hide comes off the creature wearing it and a mote is what a
+creature leaves, so a node for either is a second source that contradicts its
+own fiction (and would make the kill-only jewelry pools skippable). §9b.7's
+"region materials also drop from that region's enemies" runs one way only.
+
+⚠️ **This is why node count does not track material count.** Glimmerbrook and
+Cinderpeak are pure two-material zones with **one** node each, because their
+second material is a hide. The hybrids carry three apiece, because all three
+of their materials are world-held.
+
+✅ **Every ⏳ banking material is gathered**, on §9b.8's own words: Copper,
+Charcoal, Fenroot and Amber are called *"gatherable now, spendable next
+quarter"*, so each has a node. A banking material without one is a promise the
+world cannot keep.
+
+✅ **The gathering skill is read off the material's consuming skill**, per
+§6a.1's table — Woodcarving ← Felling, Tailoring / Potions ← Foraging, Jewelry
+(gems) + Metalworking (ore) ← Mining. 📝 **One documented exception: Charcoal
+is Felling, not Mining.** Its consumer is Metalworking, but §6a.1 pairs
+Metalworking with Mining *for ore*, and char is not ore — it is wood, taken
+standing, from snags that burned where they stood. Reading the table as a rule
+would put an axeman's job in a pickaxe's ladder.
+
+✅ **Node XP is `9 + 2 × (zone band floor − 1)`** — the Woods' authored 9 at
+floor 1, extended by the only zone number the design publishes. ⭐ Because
+`Skills.xpToNext` climbs `20 + 5 × (level − 1)` and an in-band gatherer sits
+roughly one skill level above the band floor, the two curves cancel: **every
+zone costs about 2.6 harvests per skill level**. Flat XP would make the Woods
+the fastest place to level Foraging forever; a steeper slope would make the
+last zone the only one worth visiting.
+
+⭐ **Mining finally exists.** Before this pass no node in the game used it, so
+the skill could not leave level 1 anywhere; `cp_copper_seam` is the first, and
+`tm_amber_bog_oak` the second.
+
 ## 9b.8 The Q1 catalogue rulings ✅ (session 2026-08-09)
 
 The first quarter's items, recipes and stats are **in code** — catalogue files
@@ -2100,8 +2146,9 @@ itself lives in code and the export.
 - **`ItemModifiers.scaledBy(Quality?)` + `Equipping.modifiersOf`** — the
   §9b.9f multiplier and the one seam every stat reader goes through.
 - **`lib/game/gathering/gather_node.dart`** — `GatherNodeDef` (zone, skill,
-  yield range, a GestureStep for the field act, XP, flavor) + the Zone 1
-  pair: `ww_oak_stand` (Felling) and `ww_bindweed_tangle` (Foraging).
+  yield range, a GestureStep for the field act, XP, flavor) + **all ten Primal
+  nodes** (§9b.7b): the Zone 1 pair `ww_oak_stand` / `ww_bindweed_tangle`, one
+  each for the two remaining pure zones, and three each for the two hybrids.
 - **Runtime**: `AdventureRun` rolls one node per section (never after the
   boss), serializes them with the drop-the-node-not-the-run contract, and
   `GameState.gatherNode()` does the §9b.7 one-harvest: yield **straight into
@@ -2154,6 +2201,23 @@ settle.
 ---
 
 ## Changelog
+
+**Rev — 2026-08-18 (gathering).** New **§9b.7b**: the Primal quarter's other
+four zones have nodes. `GatherNodes.all` held two, both Whispering Woods, so
+every other zone's materials were drop-only and **Mining had nowhere in the
+game to level at all**. Eight nodes added — Glimmerbrook 1, Cinderpeak 1,
+Thornmire 3, Ashfall Vale 3 — bringing the total to ten. The rules the pass
+settled: **hides and motes are kill-only** and never get a node, which is why
+the two pure zones carry one node and the hybrids three; **every ⏳ banking
+material is gathered**, on §9b.8's own "gatherable now"; the **gathering skill
+follows §6a.1's table** off the material's consumer, with **Charcoal ruled
+Felling rather than Mining** (char is wood, not ore); and **XP is
+`9 + 2 × (band floor − 1)`**, which holds the cost at ~2.6 harvests per skill
+level in every zone. §9b.7a's open "by zone or by table" question is answered
+**one node, one material** — the variance is which node a section draws.
+⭐ `cp_copper_seam` is the first Mining node the game has ever had. The spawn
+path needed no changes: `AdventureRun.roll` already drew from
+`GatherNodes.forZone`, so registration was the whole of the wiring.
 
 **Rev — 2026-08-18 (later the same day).** Two §9b.9f amendments, both
 ruled: **(1) the Master-at-margin-5 cap stays** (it mirrors the floor's

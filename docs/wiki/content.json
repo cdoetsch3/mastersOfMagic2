@@ -6,7 +6,7 @@
     "creatures": 55,
     "items": 52,
     "recipes": 20,
-    "gatherNodes": 2
+    "gatherNodes": 10
   },
   "zones": [
     {
@@ -8045,6 +8045,86 @@
       "max": 3,
       "xp": 9,
       "flavor": "A tangle thick enough to trip a horse. The trick is cutting it before it notices."
+    },
+    {
+      "id": "gb_sapwort_shallows",
+      "zoneId": "glimmerbrook",
+      "skill": "foraging",
+      "yieldsItemId": "sapwort",
+      "min": 2,
+      "max": 4,
+      "xp": 13,
+      "flavor": "It crowds the shallows where the light comes back off the stones. Cut at the waterline and the roots carry on without you."
+    },
+    {
+      "id": "cp_copper_seam",
+      "zoneId": "cinderpeak_foothills",
+      "skill": "mining",
+      "yieldsItemId": "copper_ore",
+      "min": 2,
+      "max": 4,
+      "xp": 19,
+      "flavor": "The grit gives out on a seam the slope has been keeping to itself, rust-green and warm to the back of the hand. It comes away in flakes."
+    },
+    {
+      "id": "tm_bogflax_retting",
+      "zoneId": "thornmire",
+      "skill": "foraging",
+      "yieldsItemId": "bogflax_fibre",
+      "min": 2,
+      "max": 3,
+      "xp": 23,
+      "flavor": "The mire rets its own flax and leaves it hanging in the current like hair. Draw it steadily; it comes free in lengths, or not at all."
+    },
+    {
+      "id": "tm_fenroot_hummock",
+      "zoneId": "thornmire",
+      "skill": "foraging",
+      "yieldsItemId": "fenroot",
+      "min": 2,
+      "max": 3,
+      "xp": 23,
+      "flavor": "It has been down there longer than the trees have. Follow it by feel; the water will not tell you where it stops."
+    },
+    {
+      "id": "tm_amber_bog_oak",
+      "zoneId": "thornmire",
+      "skill": "mining",
+      "yieldsItemId": "amber",
+      "min": 2,
+      "max": 3,
+      "xp": 23,
+      "flavor": "A drowned trunk, black as tar, with something gold caught in the split of it. Whatever summer that was, the water kept it."
+    },
+    {
+      "id": "av_birch_stand",
+      "zoneId": "ashfall_vale",
+      "skill": "felling",
+      "yieldsItemId": "birch_log",
+      "min": 2,
+      "max": 4,
+      "xp": 27,
+      "flavor": "Pale trunks in ranks, every one of them the same age, straight enough to sight along. The vale grew them itself in the years since."
+    },
+    {
+      "id": "av_brookmint_rill",
+      "zoneId": "ashfall_vale",
+      "skill": "foraging",
+      "yieldsItemId": "brookmint",
+      "min": 2,
+      "max": 3,
+      "xp": 27,
+      "flavor": "A green line drawn down the grey where a stream still runs. Cold in the hand, which is the first cold thing all day."
+    },
+    {
+      "id": "av_charcoal_burn",
+      "zoneId": "ashfall_vale",
+      "skill": "felling",
+      "yieldsItemId": "charcoal",
+      "min": 2,
+      "max": 4,
+      "xp": 27,
+      "flavor": "Snags burned through and still standing, black the whole way in. Take the char and leave the ash — nothing here needs burning twice."
     }
   ],
   "index": {
@@ -8098,6 +8178,12 @@
           "zoneId": "thornmire",
           "bucket": "main",
           "chance": 0.1
+        },
+        {
+          "type": "gather",
+          "nodeId": "tm_amber_bog_oak",
+          "zoneId": "thornmire",
+          "skill": "mining"
         }
       ],
       "aqua_crystal": [
@@ -8730,6 +8816,12 @@
         {
           "type": "salvage",
           "from": "birch_knot"
+        },
+        {
+          "type": "gather",
+          "nodeId": "av_birch_stand",
+          "zoneId": "ashfall_vale",
+          "skill": "felling"
         }
       ],
       "birch_quarterstaff": [
@@ -8839,6 +8931,12 @@
         {
           "type": "salvage",
           "from": "bogflax_gloves"
+        },
+        {
+          "type": "gather",
+          "nodeId": "tm_bogflax_retting",
+          "zoneId": "thornmire",
+          "skill": "foraging"
         }
       ],
       "bogflax_gloves": [
@@ -8929,6 +9027,12 @@
           "zoneId": "ashfall_vale",
           "bucket": "main",
           "chance": 0.2
+        },
+        {
+          "type": "gather",
+          "nodeId": "av_brookmint_rill",
+          "zoneId": "ashfall_vale",
+          "skill": "foraging"
         }
       ],
       "brookmint_tonic": [
@@ -9081,6 +9185,12 @@
           "zoneId": "ashfall_vale",
           "bucket": "main",
           "chance": 0.25
+        },
+        {
+          "type": "gather",
+          "nodeId": "av_charcoal_burn",
+          "zoneId": "ashfall_vale",
+          "skill": "felling"
         }
       ],
       "cinder_loop": [
@@ -9197,6 +9307,12 @@
           "zoneId": "cinderpeak_foothills",
           "bucket": "main",
           "chance": 0.25
+        },
+        {
+          "type": "gather",
+          "nodeId": "cp_copper_seam",
+          "zoneId": "cinderpeak_foothills",
+          "skill": "mining"
         }
       ],
       "fawnhide": [
@@ -9332,6 +9448,12 @@
           "zoneId": "thornmire",
           "bucket": "main",
           "chance": 0.25
+        },
+        {
+          "type": "gather",
+          "nodeId": "tm_fenroot_hummock",
+          "zoneId": "thornmire",
+          "skill": "foraging"
         }
       ],
       "flora_crystal": [
@@ -10761,6 +10883,12 @@
           "zoneId": "glimmerbrook",
           "bucket": "main",
           "chance": 0.25
+        },
+        {
+          "type": "gather",
+          "nodeId": "gb_sapwort_shallows",
+          "zoneId": "glimmerbrook",
+          "skill": "foraging"
         }
       ],
       "sapwort_draught": [

@@ -1,4 +1,5 @@
-/// The gesture schema, the quality pipeline, and Zone 1's gathering nodes.
+/// The gesture schema, the quality pipeline, and the Primal quarter's
+/// gathering nodes.
 ///
 /// ⭐ Mutation-verified: each assertion names the wrong implementation it
 /// kills.
@@ -15,11 +16,13 @@ import 'package:masters_of_magic_2/game/enemies/bestiary.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/gathering/gather_node.dart';
 import 'package:masters_of_magic_2/game/items/carrying.dart';
+import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/items/recipe_book.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
+import 'package:masters_of_magic_2/game/skills.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 
 class _JsonMem implements ProfileStorage {
@@ -257,6 +260,344 @@ void main() {
           reason: 'taking what fits and dropping the rest is the silent '
               'overflow wearing a hat');
       expect(game.profile.backpack.free, 1, reason: 'nothing was taken');
+    });
+  });
+
+  group('the rest of the Primal quarter gathers too (§9b.7)', () {
+    /// ⭐ The literal registry. Written out rather than derived so that
+    /// deleting an entry from [GatherNodes.all] — the file's own named silent
+    /// failure, since an unlisted node compiles and simply never spawns —
+    /// fails here instead of quietly emptying a zone.
+    const authored = <String, ({String zone, GatherSkill skill, String yield})>{
+      'ww_oak_stand': (
+        zone: 'whispering_woods',
+        skill: GatherSkill.felling,
+        yield: 'oak_log',
+      ),
+      'ww_bindweed_tangle': (
+        zone: 'whispering_woods',
+        skill: GatherSkill.foraging,
+        yield: 'bindweed_fibre',
+      ),
+      'gb_sapwort_shallows': (
+        zone: 'glimmerbrook',
+        skill: GatherSkill.foraging,
+        yield: 'sapwort',
+      ),
+      'cp_copper_seam': (
+        zone: 'cinderpeak_foothills',
+        skill: GatherSkill.mining,
+        yield: 'copper_ore',
+      ),
+      'tm_bogflax_retting': (
+        zone: 'thornmire',
+        skill: GatherSkill.foraging,
+        yield: 'bogflax_fibre',
+      ),
+      'tm_fenroot_hummock': (
+        zone: 'thornmire',
+        skill: GatherSkill.foraging,
+        yield: 'fenroot',
+      ),
+      'tm_amber_bog_oak': (
+        zone: 'thornmire',
+        skill: GatherSkill.mining,
+        yield: 'amber',
+      ),
+      'av_birch_stand': (
+        zone: 'ashfall_vale',
+        skill: GatherSkill.felling,
+        yield: 'birch_log',
+      ),
+      'av_brookmint_rill': (
+        zone: 'ashfall_vale',
+        skill: GatherSkill.foraging,
+        yield: 'brookmint',
+      ),
+      'av_charcoal_burn': (
+        zone: 'ashfall_vale',
+        skill: GatherSkill.felling,
+        yield: 'charcoal',
+      ),
+    };
+
+    const primalZones = [
+      'whispering_woods',
+      'glimmerbrook',
+      'cinderpeak_foothills',
+      'thornmire',
+      'ashfall_vale',
+    ];
+
+    test('⚠️ every authored node is REGISTERED, and nothing extra is', () {
+      expect(
+        GatherNodes.all.map((n) => n.id).toSet(),
+        authored.keys.toSet(),
+        reason: 'a node left out of GatherNodes.all compiles fine and simply '
+            'never spawns — the file warns about exactly this, so the '
+            'registry is what the test pins',
+      );
+      expect(GatherNodes.all.map((n) => n.id).toSet(),
+          hasLength(GatherNodes.all.length),
+          reason: 'a duplicated id would make byId resolve one node and the '
+              'other unreachable');
+      for (final e in authored.entries) {
+        final n = GatherNodes.byId(e.key);
+        expect(n, isNotNull, reason: '${e.key} does not resolve by id');
+        expect(n!.zoneId, e.value.zone);
+        expect(n.skill, e.value.skill);
+        expect(n.yieldsDefId, e.value.yield);
+      }
+    });
+
+    test('⚠️ forZone reaches every node — the spawn path is the only door', () {
+      // AdventureRun.roll draws from forZone and nothing else, so a node that
+      // is in `all` but whose zoneId is a typo is invisible in exactly the
+      // same way an unlisted one is.
+      final reached = <String>{};
+      for (final zoneId in primalZones) {
+        final here = GatherNodes.forZone(zoneId);
+        expect(here, isNotEmpty,
+            reason: '$zoneId has no node: its materials would be drop-only '
+                'and no GatherSkill could level there');
+        for (final n in here) {
+          expect(n.zoneId, zoneId);
+          reached.add(n.id);
+        }
+      }
+      expect(reached, authored.keys.toSet(),
+          reason: 'a node no zone claims is dead content');
+      expect(GatherNodes.forZone('hearthwood'), isEmpty,
+          reason: 'a town is not a gathering zone; forZone matching loosely '
+              'would spawn nodes on the map screen');
+    });
+
+    test('every node yields a real, fungible, stackable material', () {
+      for (final n in GatherNodes.all) {
+        final def = ItemCatalogue.tryById(n.yieldsDefId);
+        expect(def, isNotNull,
+            reason: '${n.id} yields ${n.yieldsDefId}, which no catalogue '
+                'owns — gatherNode would name the raw id at the player');
+        expect(def, isA<MaterialDef>(),
+            reason: '${n.id} yields something that is not a material; '
+                'equipment would need a quality roll and an instance, which '
+                'is the picker §9b.7 rules the yield out of');
+        expect(def!.isFungible, isTrue,
+            reason: '${n.id}: gatherNode adds `InventorySlot(defId:)` N times '
+                'and registers no instance, so a non-fungible yield loses its '
+                'rolls in silence');
+      }
+    });
+
+    test('⚠️ nothing that comes off a corpse has a node', () {
+      // Hides drop from the creature wearing them and motes from the thing
+      // unmade; a node for either is a second source that contradicts its own
+      // fiction (and would make the kill-only jewelry pools skippable).
+      final yielded = GatherNodes.all.map((n) => n.yieldsDefId).toSet();
+      for (final id in ['fawnhide', 'tuskhide']) {
+        expect(yielded, isNot(contains(id)),
+            reason: '$id comes off a creature — foraging it out of the ground '
+                'is the no-second-source ruling broken');
+      }
+      for (final d in ItemCatalogue.all.whereType<MoteDef>()) {
+        expect(yielded, isNot(contains(d.id)),
+            reason: '${d.id}: motes are combat drops (§6.1); a mote node '
+                'would uncouple Enchanting from fighting entirely');
+      }
+    });
+
+    test("⭐ every Q1 material EXCEPT the kill-only ones has a node", () {
+      // The other half of the ruling: §9b.8 calls Copper, Charcoal, Fenroot
+      // and Amber alike "gatherable now", so a banking material without a
+      // node is a promise the world cannot keep.
+      const killOnly = {'fawnhide', 'tuskhide'};
+      final yielded = GatherNodes.all.map((n) => n.yieldsDefId).toSet();
+      for (final d in ItemCatalogue.all.whereType<MaterialDef>()) {
+        if (killOnly.contains(d.id)) continue;
+        expect(yielded, contains(d.id),
+            reason: '${d.id} is a world material with nowhere to gather it — '
+                'drop-only is what this whole pass exists to end');
+      }
+    });
+
+    test('⭐ node XP is 9 + 2×(band floor − 1), and climbs with the band', () {
+      // The Woods' authored 9 at floor 1, extended by the only zone number
+      // the design publishes. Flat XP would make the Woods the fastest place
+      // to level Foraging forever.
+      for (final n in GatherNodes.all) {
+        final zone = World.byId(n.zoneId);
+        expect(n.xp, 9 + 2 * (zone.minLevel - 1),
+            reason: '${n.id} (${n.zoneId}, floor ${zone.minLevel}) breaks the '
+                'documented scaling');
+        expect(n.xp, greaterThan(0),
+            reason: 'a node that pays nothing is a button with no reason');
+      }
+
+      final byBand = [...GatherNodes.all]
+        ..sort((a, b) =>
+            World.byId(a.zoneId).minLevel.compareTo(World.byId(b.zoneId).minLevel));
+      for (var i = 1; i < byBand.length; i++) {
+        expect(byBand[i].xp, greaterThanOrEqualTo(byBand[i - 1].xp),
+            reason: '${byBand[i].id} pays less than a node in an EASIER band — '
+                'that makes the low zone the efficient grind');
+      }
+      expect(byBand.last.xp, greaterThan(byBand.first.xp),
+          reason: 'if every band paid the same, the formula is not a formula');
+    });
+
+    test('every node is harvestable and worth the trip', () {
+      for (final n in GatherNodes.all) {
+        expect(n.min, greaterThan(1),
+            reason: '${n.id}: the yield is all-or-nothing, so a 1-min node '
+                'reads as a bug the first time a nearly-full pack refuses it');
+        expect(n.max, greaterThanOrEqualTo(n.min),
+            reason: '${n.id}: gatherNode calls nextInt(max - min + 1), which '
+                'throws outright on an inverted range');
+        expect(n.flavor, isNotEmpty, reason: '${n.id} has no flavor');
+        expect(n.flavor.length, greaterThan(40),
+            reason: '${n.id}: the node IS how the world teaches, so a stub '
+                'line is a missing feature');
+      }
+    });
+
+    test('⚠️ the skill key every node pays actually resolves', () {
+      // gatherNode writes `profile.skillXp[def.skill.name]`, and the Skills
+      // ledger reads it back by string. Mining is the live risk: this is the
+      // first content that ever exercises it.
+      for (final n in GatherNodes.all) {
+        final key = n.skill.name;
+        expect(Skills.allKeys, contains(key),
+            reason: '${n.id} pays "$key", a key the ledger never lists — the '
+                'XP would land in a row nothing renders');
+        expect(Skills.isGathering(key), isTrue);
+        expect(Skills.displayName(key), isNot(key),
+            reason: '$key falls through the displayName switch and would show '
+                'the raw enum name to the player');
+        expect(Skills.blurb(key), isNotEmpty);
+      }
+      expect(GatherNodes.all.map((n) => n.skill).toSet(),
+          GatherSkill.values.toSet(),
+          reason: 'all three gathering skills must have somewhere to level; '
+              'mining had nowhere at all before this content');
+    });
+
+    test('the gathering act reuses engines and never invents a step', () {
+      for (final n in GatherNodes.all) {
+        expect(GestureEngine.values, contains(n.step.engine));
+        expect(n.step.skin, isNotEmpty,
+            reason: '${n.id}: the skin is the copy and art key');
+      }
+      // ⭐ Birch is Oak's engine and skin with one more rep — the wood
+      // ladder's tier 2 raises difficulty, not exposure (§9b.9c, lever 3).
+      final oak = GatherNodes.byId('ww_oak_stand')!.step;
+      final birch = GatherNodes.byId('av_birch_stand')!.step;
+      expect(birch.engine, oak.engine);
+      expect(birch.skin, oak.skin);
+      expect(birch.reps, greaterThan(oak.reps),
+          reason: 'a tier-2 stand that plays identically to tier 1 wastes the '
+              'only difficulty lever the schema stores');
+    });
+
+    // ---- the round trip, in a zone that had nothing before ---------------
+
+    /// A run in [zoneId] standing at its first gathering spot, every picker
+    /// on the way declined.
+    Future<GameState> atFirstNodeIn(String zoneId, {int seed = 11}) async {
+      final zone = World.byId(zoneId);
+      final game = GameState(_JsonMem(), PlayerProfile.newPlayer());
+      await game.beginAdventure(zone, rng: Random(seed));
+      final run = game.run!;
+      expect(run.nodes, isNotEmpty,
+          reason: '$zoneId rolled a run with no spots — forZone found nothing');
+      final node =
+          run.nodes.reduce((a, b) => a.afterIndex < b.afterIndex ? a : b);
+      while (run.index <= node.afterIndex) {
+        await game.winEncounter(remainingHp: 90, rng: Random(run.index));
+        await game.claimVictoryLoot(const <int>{});
+      }
+      expect(run.currentNode, isNotNull);
+      return game;
+    }
+
+    test('⭐ Cinderpeak: the first Mining harvest in the game round-trips',
+        () async {
+      final game = await atFirstNodeIn('cinderpeak_foothills');
+      final before = game.profile.backpack.used;
+      final out = await game.gatherNode(rng: Random(12));
+
+      expect(out.succeeded, isTrue);
+      expect(out.skillKey, 'mining',
+          reason: 'the whole point of this zone: Mining had no node anywhere, '
+              'so the skill could not leave level 1');
+      expect(out.defId, 'copper_ore');
+      expect(game.profile.backpack.used, before + out.amount,
+          reason: 'a yield parked anywhere but the pack is the deleted loot '
+              'tracker growing back');
+      expect(game.profile.backpack.countOf('copper_ore'), out.amount);
+      expect(game.run!.unclaimed, isEmpty,
+          reason: 'materials are fungible — ore goes straight to the pack');
+      expect(game.profile.itemInstances, isEmpty,
+          reason: 'registering an instance per ore is a save that grows '
+              'forever');
+      expect(game.profile.skillXp['mining'], 19,
+          reason: "Cinderpeak's band floor is 6, so 9 + 2×5");
+
+      final again = await game.gatherNode(rng: Random(13));
+      expect(again.succeeded, isFalse,
+          reason: 'one simultaneous harvest per node, ruled §9b.7');
+    });
+
+    test('⚠️ Ashfall: a full pack refuses, and the spot stands', () async {
+      final game = await atFirstNodeIn('ashfall_vale');
+      var pack = game.profile.backpack;
+      while (!pack.isFull) {
+        pack = pack.withAdded(const InventorySlot(defId: 'oak_log'))!;
+      }
+      game.profile.backpack = pack;
+      final node = game.run!.currentNode!;
+
+      final out = await game.gatherNode(rng: Random(14));
+
+      expect(out.succeeded, isFalse,
+          reason: 'the all-or-nothing rule is not zone 1 special-casing');
+      expect(out.refusal, contains('room'));
+      expect(node.spent, isFalse,
+          reason: 'spending the node on a refused harvest destroys the spot '
+              'and the yield together');
+      expect(game.profile.skillXp, isEmpty, reason: 'a refusal is not effort');
+      expect(game.profile.backpack.countOf('oak_log'), Carrying.backpackSlots,
+          reason: 'a full pack must not be rewritten by a refused harvest');
+    });
+
+    test('every Primal zone can actually surface its nodes on a run', () {
+      // The spawn path takes zone + roster and nothing else; this is the
+      // end-to-end proof that no zone needed extra wiring.
+      for (final zoneId in primalZones) {
+        final zone = World.byId(zoneId);
+        final authoredHere =
+            GatherNodes.forZone(zoneId).map((n) => n.id).toSet();
+        final seen = <String>{};
+        for (var seed = 0; seed < 40; seed++) {
+          final run = AdventureRun.roll(
+            zone: zone,
+            roster: Bestiary.forZone(zoneId),
+            playerHp: 100,
+            rng: Random(seed),
+          );
+          expect(run.nodes, hasLength(3),
+              reason: '$zoneId: three sections, three spots');
+          for (final n in run.nodes) {
+            expect(GatherNodes.byId(n.defId), isNotNull);
+            expect(n.afterIndex, lessThan(run.encounters.length - 1),
+                reason: 'a node after the boss could never be reached');
+            seen.add(n.defId);
+          }
+        }
+        expect(seen, authoredHere,
+            reason: '$zoneId authors ${authoredHere.length} node(s) but only '
+                '${seen.length} ever spawned — a def the draw cannot reach is '
+                'the unlisted-node failure wearing a hat');
+      }
     });
   });
 }

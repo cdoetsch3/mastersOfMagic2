@@ -781,10 +781,10 @@ band-scoped across the quarter by design — `primal_recipes.dart`, 20 shipped,
 | Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Pixel grids | Backdrop | Item icon descs |
 |---|---|---|---|---|---|---|---|---|
 | Whispering Woods | ✅ 11 | ✅ | ✅ 18 defs | ✅ 2 | ✅ 11 | ✅ 11 | ⬜ | ⬜ |
-| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ✅ 1 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ✅ 1 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ✅ 3 | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Column notes, so a checkmark means the same thing every time:
 - **Bestiary** — 11 `EnemyDef`s (5 commons, 4 minis, 2 bosses) registered in
@@ -795,9 +795,14 @@ Column notes, so a checkmark means the same thing every time:
 - **Item catalogue** — the zone's materials + gear in
   `lib/game/items/catalogue/`, exported to the wiki's `content.json`.
 - **Gather nodes** — `GatherNodeDef`s in `lib/game/gathering/` feeding the
-  zone's materials to its gathering skill. ⚠️ The biggest real gap: 2 nodes
-  exist in the whole game, both Woods, so four zones' materials are currently
-  drop-only and Mining/Foraging/Felling cannot level outside the Woods.
+  zone's materials to its gathering skill. ✅ COLUMN COMPLETE 2026-08-18:
+  10 nodes across the quarter (§9b.7b), including the game's first Mining
+  nodes (copper seam, amber bog-oak). Counts differ by design — hides and
+  motes are kill-drops, so a pure two-material zone whose second material
+  is a hide gets one node. XP is `9 + 2×(zone.minLevel − 1)`, ~2.6 harvests
+  per skill level in every band. ⚠️ One call flagged for the designer:
+  charcoal gathers under FELLING (wood off standing burn-snags), the only
+  divergence from §6a.1's skill table.
 - **Art (PNG)** — `assets/creatures/<zone>/` generated sprites, one per
   creature, `manifest.json` beside them; `CreatureView` falls back grid →
   silhouette, so this ships zone-by-zone without breaking anything.
