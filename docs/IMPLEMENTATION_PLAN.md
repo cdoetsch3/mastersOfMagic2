@@ -767,20 +767,20 @@ stale the moment the other four rosters landed). `map_tab` switches on
 
 ### The Q1 zone matrix — what each zone has, and what "done" means
 
-Per-zone content tracks in SEVEN columns. Rows are the Primal quarter; the
+Per-zone content tracks in EIGHT columns. Rows are the Primal quarter; the
 same columns apply to every future zone, so copy this table per quarter as
 rosters land. (Two things deliberately have NO column: **recipes**, which are
 band-scoped across the quarter by design — `primal_recipes.dart`, 20 shipped,
 "a per-zone file would be a fiction" — and **arrival narrative**, done for all
 32 locations in `world.dart` since the map rebuild.)
 
-| Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Pixel grids | Backdrop |
-|---|---|---|---|---|---|---|---|
-| Whispering Woods | ✅ 11 | ✅ | ✅ 18 defs | ✅ 2 | ✅ 11 | ✅ 11 | ⬜ |
-| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ⬜ | ⬜ | ⬜ | ⬜ |
-| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ⬜ | ⬜ | ⬜ | ⬜ |
-| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ⬜ | ⬜ | ⬜ | ⬜ |
-| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ⬜ | ⬜ | ⬜ | ⬜ |
+| Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Pixel grids | Backdrop | Item icon descs |
+|---|---|---|---|---|---|---|---|---|
+| Whispering Woods | ✅ 11 | ✅ | ✅ 18 defs | ✅ 2 | ✅ 11 | ✅ 11 | ⬜ | ⬜ |
+| Glimmerbrook | ✅ 11 | ✅ | ✅ 9 defs | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Cinderpeak Foothills | ✅ 11 | ✅ | ✅ 8 defs | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Thornmire | ✅ 11 | ✅ | ✅ 9 defs | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Ashfall Vale | ✅ 11 | ✅ | ✅ 8 defs | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Column notes, so a checkmark means the same thing every time:
 - **Bestiary** — 11 `EnemyDef`s (5 commons, 4 minis, 2 bosses) registered in
@@ -804,6 +804,19 @@ Column notes, so a checkmark means the same thing every time:
 - **Backdrop** — `assets/backgrounds/<zone>.png` arena art;
   `backdropFor(zoneId)` already resolves it, the directory is empty, so every
   arena currently renders the default.
+- **Item icon descs** — one image-generator-ready visual description per item
+  in the zone's catalogue (requested 2026-08-18), the item counterpart of
+  `BESTIARY_ART.md`'s creature descriptions: suggest an `ITEM_ART.md` with a
+  section per zone, one prompt-ready paragraph per def (what the object IS,
+  materials, palette, silhouette — no lore the renderer can't draw), written
+  to a shared style preamble so the icon set reads as one set. The rendered
+  icons then replace the text labels in the backpack/Storeroom/tooltips —
+  presumably `assets/items/<zone>/<defId>.png` with the same
+  manifest-plus-fallback pattern `CreatureView` uses. ⚠️ Nothing exists for
+  ANY zone yet — `ItemDef` has no description field and no doc covers items —
+  which is why even the Woods row is ⬜. Cross-zone items the recipes mint
+  (band gear, potions) belong to the zone whose catalogue file defines them,
+  so nothing falls between rows.
 
 ⭐ **`MageState.powerScale` is the one engine change**, and it is deliberately
 **damage-only** — never shields. A Sentinel is low damage *and* a wall, and
