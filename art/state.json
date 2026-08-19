@@ -45,12 +45,12 @@
       "zone": "whispering_woods",
       "target": "assets/creatures/whispering_woods/hollow_stag.png",
       "source": "art/source/whispering_woods/hollow_stag.png",
-      "status": "approved",
+      "status": "generated",
       "prompt_hash": "sha256:6b1c34d34425e690",
-      "model": "pre-artgen (hand run)",
-      "attempts": 0,
+      "model": "gpt-image-1",
+      "attempts": 1,
       "processed": true,
-      "updated": "2026-08-19T00:00:00+00:00",
+      "updated": "2026-08-19T18:03:46+00:00",
       "feedback": []
     },
     "listening_fawn": {

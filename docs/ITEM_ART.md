@@ -35,7 +35,7 @@ what a generator gets wrong when left to guess.
 
 > A single game item icon. One object only, centred, filling about 80% of a
 > square frame, seen from a three-quarter front view slightly above. Plain flat
-> near-black background — no scene, no table, no floor, no props, no hands, no
+> pure-white background — no scene, no table, no floor, no props, no hands, no
 > packaging, no text, no watermark, no border and no frame. Even soft lighting
 > from the upper left with one dim fill from the right; a small soft contact
 > shadow directly beneath the object and nothing else. Hand-painted fantasy
@@ -45,9 +45,10 @@ what a generator gets wrong when left to guess.
 > background.
 
 ⚠️ **Every word of that is load-bearing.** "One object" stops the generator
-returning a display case of variants; "plain near-black background" is what the
-pipeline's square cover-crop assumes and what lets an icon sit on the game's own
-dark panels; "no border and no frame" matters because **the UI already draws
+returning a display case of variants; "plain pure-white background" keys out
+cleanly when the API's transparency fails and never bleeds into the object's
+own darks (ruling 2026-08-19 — it replaced near-black after a no-cutout run
+shipped baked-in grounds); "no border and no frame" matters because **the UI already draws
 rarity as the border colour** around every slot (`rarityColour`) — an icon that
 paints its own frame fights the one cue the interface already has.
 

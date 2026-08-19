@@ -29,7 +29,9 @@ without editing. They deliberately state **form, scale, material, colour and
 posture**, because those are what a generator gets wrong when left to guess.
 
 ⭐ **A house style, so the set looks like one bestiary:** a naturalist's field
-plate — creature isolated on a plain ground, full body, side-on or
+plate — creature isolated on a plain flat pure-white background (nothing else
+behind it: no ground texture, no gradient, no vignette — white keys out
+cleanly in the cutout step), full body, side-on or
 three-quarter, even light, no scenery, no action pose, no text. That framing
 also matches the game's own voice: these are observations, not portraits.
 
