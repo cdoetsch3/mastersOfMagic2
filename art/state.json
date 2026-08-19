@@ -1,6 +1,19 @@
 {
   "version": 1,
   "assets": {
+    "bindweed_boots": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/bindweed_boots.png",
+      "source": "art/source/items/whispering_woods/bindweed_boots.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b8213fa2147ef905",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
     "bindweed_creeper": {
       "kind": "creature",
       "zone": "whispering_woods",
@@ -13,6 +26,71 @@
       "processed": true,
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
+    },
+    "bindweed_fibre": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/bindweed_fibre.png",
+      "source": "art/source/items/whispering_woods/bindweed_fibre.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:fa32e215c2ec68ac",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "bindweed_gloves": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/bindweed_gloves.png",
+      "source": "art/source/items/whispering_woods/bindweed_gloves.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:00f4e4885cbb6350",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "bindweed_hood": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/bindweed_hood.png",
+      "source": "art/source/items/whispering_woods/bindweed_hood.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:79fb0e4776bd1f9e",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "bindweed_leggings": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/bindweed_leggings.png",
+      "source": "art/source/items/whispering_woods/bindweed_leggings.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:8c11987d5304264c",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "bindweed_robe": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/bindweed_robe.png",
+      "source": "art/source/items/whispering_woods/bindweed_robe.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:0d58f6b4e34ca80c",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
     },
     "elderroot": {
       "kind": "creature",
@@ -27,6 +105,58 @@
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
     },
+    "flora_crystal": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/flora_crystal.png",
+      "source": "art/source/items/whispering_woods/flora_crystal.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b0204e1628793715",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "flora_dust": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/flora_dust.png",
+      "source": "art/source/items/whispering_woods/flora_dust.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b25c785a392b8fd4",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "flora_shard": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/flora_shard.png",
+      "source": "art/source/items/whispering_woods/flora_shard.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:400b9adef0b04982",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "foragers_ration": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/foragers_ration.png",
+      "source": "art/source/items/whispering_woods/foragers_ration.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:86a82398199e7427",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
     "heartwood": {
       "kind": "creature",
       "zone": "whispering_woods",
@@ -39,6 +169,19 @@
       "processed": true,
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
+    },
+    "heartwood_stave": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/heartwood_stave.png",
+      "source": "art/source/items/whispering_woods/heartwood_stave.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:351214a769f2f58d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
     },
     "hollow_stag": {
       "kind": "creature",
@@ -79,6 +222,84 @@
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
     },
+    "oak_circlet": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/oak_circlet.png",
+      "source": "art/source/items/whispering_woods/oak_circlet.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:08e7b1397fa9ca81",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "oak_knot": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/oak_knot.png",
+      "source": "art/source/items/whispering_woods/oak_knot.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:0e4a44c9e47a98e9",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "oak_log": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/oak_log.png",
+      "source": "art/source/items/whispering_woods/oak_log.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d583abd2292d3c8a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "oak_quarterstaff": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/oak_quarterstaff.png",
+      "source": "art/source/items/whispering_woods/oak_quarterstaff.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:751934d25777d89d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "oak_wand": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/oak_wand.png",
+      "source": "art/source/items/whispering_woods/oak_wand.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:396f021e5e33d787",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "proof_of_the_woods": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/proof_of_the_woods.png",
+      "source": "art/source/items/whispering_woods/proof_of_the_woods.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:de862e3f31eb6abf",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
+    },
     "rootknuckle": {
       "kind": "creature",
       "zone": "whispering_woods",
@@ -91,6 +312,19 @@
       "processed": true,
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
+    },
+    "sporecap_mantle": {
+      "kind": "icon",
+      "zone": "whispering_woods",
+      "target": "assets/items/whispering_woods/sporecap_mantle.png",
+      "source": "art/source/items/whispering_woods/sporecap_mantle.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:652d9de026e10b8d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:22:12+00:00"
     },
     "sporecap_shambler": {
       "kind": "creature",
