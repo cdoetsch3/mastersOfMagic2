@@ -18,6 +18,14 @@ border colour.
 
 ## How to use these
 
+⚠️ **This file is a live prompt source, and its formatting is load-bearing.**
+`tool/artgen.py` parses it on every run — an entry is `**Name** — *rarity ·
+kind · stats*` followed by its `` `assets/items/<zone>/<id>.png` `` filename
+line and one blockquote, each zone states a wrapped `**Palette:**` line, and
+the shared preamble below is quoted verbatim into all 52 icon prompts. Reword
+the prose freely; change those shapes and the tool silently finds fewer icons,
+which `test/item_icon_test.dart` and `tool/test_artgen.py` both fail on.
+
 Each entry is written so it can be pasted straight into an image generator
 **after the style preamble below**, without editing. They deliberately state
 **form, real-world size, material, colour and silhouette**, because those are

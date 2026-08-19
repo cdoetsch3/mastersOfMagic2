@@ -15,6 +15,15 @@ bestiary is a mage**, and the art has to stop saying otherwise.
 
 ## How to use these
 
+⚠️ **This file is a live prompt source, and its formatting is load-bearing.**
+`tool/artgen.py` parses it on every run — an entry is `**Name** — *rank ·
+archetype · element*` on one line followed by a blockquote, a backdrop is an
+`### Arena backdrop` heading with a `` `assets/backgrounds/<zone>.png` ``
+filename line and one blockquote, and the house-style paragraph below is
+quoted verbatim into all 55 creature prompts. Reword the prose freely; change
+those shapes and the tool silently finds fewer creatures, which
+`test/creature_art_test.dart` and `tool/test_artgen.py` both fail on.
+
 Each entry is written so it can be pasted straight into an image generator
 without editing. They deliberately state **form, scale, material, colour and
 posture**, because those are what a generator gets wrong when left to guess.

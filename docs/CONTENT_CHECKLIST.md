@@ -30,7 +30,7 @@ Design lives elsewhere — this file only tracks *state*:
 | 6 | **Minis** | Pool of **4** mini-bosses, coherent with the region (ENEMIES §4) | Roster |
 | 7 | **Boss** | Pool of **2** bosses, coherent with the region (ENEMIES §4) | Roster |
 | 8 | **BossFX** | What makes each boss more than a big statline | Boss |
-| 9 | **Art** | ⭐ A **generated sprite per creature**, run through `tool/pixelate.py`. Prompts in `art/prompts/<zone>.md` | Names |
+| 9 | **Art** | ⭐ A **generated sprite per creature**, made by `tool/artgen.py --zone <zone>`. Descriptions in `docs/BESTIARY_ART.md` | Names |
 | 9b | **Backdrop** | The zone's arena scene, `--mode background`. One per zone, not per encounter | Lore |
 | 10 | **Mats** | Which raw materials this zone yields | ITEMS §9b.6 |
 | 11 | **Nodes** | Resource nodes placed — which skill, which material, per section | Mats |

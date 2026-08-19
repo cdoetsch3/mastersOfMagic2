@@ -15,6 +15,11 @@ arena backdrop to `assets/backgrounds/`.
 per file to `assets/items/<zone>/`, named for the item id. Prompts:
 `docs/ITEM_ART.md`.
 
+📝 **`tool/artgen.py` is the front door**, and it calls every mode below with
+the right flags after fetching the source art from an image API. This file
+stays usable on its own — hand-made or hand-downloaded art still goes through
+exactly these three modes — and remains the only place the picture maths lives.
+
 ⭐ **An icon is neither a creature nor a background, and gets neither
 treatment.** No element remap: a Flora zone's catalogue contains copper ore and
 black glass, and locking them to a green ramp would make the icon set lie about
@@ -343,7 +348,9 @@ def run_icons(zone: str, size: tuple[int, int]) -> None:
             f"no source art at {src_dir}\n"
             f"  Put generated images there, named after the ITEM id "
             f"(oak_log.png, heartwood_stave.png, ...).\n"
-            f"  Prompts: docs/ITEM_ART.md"
+            f"  Prompts: docs/ITEM_ART.md\n"
+            f"  Or let the generator fetch them: "
+            f"python3 tool/artgen.py --zone {zone} --kind icons"
         )
     out_dir = ICON_OUT / zone
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -374,7 +381,9 @@ def run_backgrounds(zone: str) -> None:
     if not matches:
         sys.exit(
             f"no backdrop at {src_dir}/{zone}.png\n"
-            f"  Prompts: art/prompts/backgrounds.md"
+            f"  Prompts: the `### Arena backdrop` entry in docs/BESTIARY_ART.md\n"
+            f"  Or let the generator fetch it: "
+            f"python3 tool/artgen.py --zone {zone} --kind backdrop"
         )
     BG_OUT.mkdir(parents=True, exist_ok=True)
     dst = BG_OUT / f"{zone}.png"
@@ -427,7 +436,9 @@ def main() -> None:
             f"no source art at {src_dir}\n"
             f"  Put generated images there, named after the creature id "
             f"(listening_fawn.png, heartwood.png, ...).\n"
-            f"  Prompts: art/prompts/{args.zone}.md"
+            f"  Prompts: docs/BESTIARY_ART.md\n"
+            f"  Or let the generator fetch them: "
+            f"python3 tool/artgen.py --zone {args.zone} --kind creatures"
         )
 
     out_dir = OUT_DIR / args.zone

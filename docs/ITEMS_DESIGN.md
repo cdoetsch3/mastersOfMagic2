@@ -2202,6 +2202,37 @@ settle.
 
 ## Changelog
 
+**Rev — 2026-08-19 (the icons get generated).** `tool/artgen.py`: one command
+per zone that turns [ITEM_ART.md](ITEM_ART.md) and
+[BESTIARY_ART.md](BESTIARY_ART.md) into actual PNGs. It enumerates every
+awaited picture in a zone — 11 creatures, one arena backdrop, 8–18 item icons —
+assembles each prompt, calls the image API, saves the raw where
+`tool/pixelate.py` expects it, runs pixelate, checks the file landed on the
+path the game asks for, and runs the three Dart contract suites. ⭐ **The docs
+are the prompt database and nothing is copied out of them**: both files are
+parsed on every run, and the shared style preamble §"How to use these" told
+everyone to prepend is now quoted verbatim into all 52 icon prompts rather than
+pasted by hand. That makes their anchor formats load-bearing, so both now carry
+a ⚠️ line saying so, and 67 stdlib-only Python tests pin the counts at 55 / 52 /
+5 in both directions — the same "a regex that stopped matching makes the
+coverage check compare two empty sets" trap `test/item_icon_test.dart`
+documents. ⭐ **A rejection is an edit, not a re-roll**: `--review` serves a
+local contact sheet showing the 1024px source beside *what the game will
+actually draw at the size it draws it* (an icon in a 40px slot mock, a creature
+at 2× its 128px sprite, a backdrop at 384×216), and a reject with feedback
+sends the previous raw plus every note so far to the edits endpoint, so attempt
+two keeps whatever was right about attempt one. ⚠️ **Four seams, because a
+service extraction is coming**: `PromptSource`, `ImageGenerator`,
+`PostProcessor`, `Ledger` — and only the generator knows a vendor exists, so a
+Gemini adapter is one class and no other edit. ⚠️ The API key is never printed,
+logged or formatted into an exception, and a key the API echoes back is
+redacted; `.env` and `art/source/` are both gitignored, since `art/state.json`
+(committed) holds the prompt, its hash and the review history and a raw costs
+cents to make again. 📝 **`art/prompts/` is deleted** — the back-port-or-retire
+question banked against the auto-derived backdrop prompts is settled as
+**retired**, because the two art docs say it all better and a second copy only
+drifts. Nothing in the game changes until the pictures land, which is the point.
+
 **Rev — 2026-08-18 (item icons).** The quarter's items get pictures — or
 rather, everything *except* the pictures. Two halves. **(1)
 [ITEM_ART.md](ITEM_ART.md)**, the item counterpart of BESTIARY_ART: a shared

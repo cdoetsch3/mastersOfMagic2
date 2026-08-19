@@ -50,3 +50,18 @@ app.*.map.json
 
 # Claude Code session state and agent worktrees
 .claude/
+
+# Generator credentials. ⚠️ Read by tool/artgen.py when OPENAI_API_KEY is not
+# already in the environment. A key must never reach a commit, a log line or an
+# exception message — the tool is written so it cannot, and this is the other
+# half of that promise.
+.env
+
+# Raw generated artwork. ⭐ art/state.json is committed and holds the prompt,
+# its hash and the review history for every asset; the raws themselves cost
+# cents to make again and are hundreds of megabytes to carry forever. What
+# ships is the pixelated output under assets/, which IS committed.
+# ⚠️ Whispering Woods' eleven creature sources predate artgen and are already
+# tracked — git keeps tracking them, deliberately: nothing in the ledger can
+# reproduce art that was made before the ledger existed.
+art/source/

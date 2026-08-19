@@ -832,9 +832,12 @@ Column notes, so a checkmark means the same thing every time:
   the side-on duel camera. To produce one: drop a 1920×1080 source at
   `art/source/backgrounds/<zone id>.png`, run
   `python3 tool/pixelate.py --zone <zone id> --mode background`.
-  ⚠️ Open decision: `art/prompts/backgrounds.md` holds older auto-derived
-  prompts for all 26 zones WITHOUT the composition language — back-port or
-  retire it before the next quarter's backdrops.
+  ✅ Decision settled 2026-08-18: `art/prompts/` is RETIRED (deleted) —
+  `tool/artgen.py` assembles prompts live from BESTIARY_ART.md / ITEM_ART.md,
+  making the docs the single prompt source. The generation pipeline
+  (gpt-image-1 behind an adapter seam, ledger at art/state.json, review
+  contact sheet, per-asset regen with accumulated feedback) is built; see
+  art/README.md for the full workflow.
 - **Item icon descs** — ✅ COLUMN COMPLETE 2026-08-18: `docs/ITEM_ART.md`,
   52 entries mechanically verified 1:1 against the five catalogues. Shared
   style preamble, a stat→look convention table (damagePerCharge reads
