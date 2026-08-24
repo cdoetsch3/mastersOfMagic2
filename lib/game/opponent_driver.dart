@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:mom_engine/mom_engine.dart';
 
 import 'ai_personas.dart';
+import 'enemies/enemy_combat_stats.dart';
 import 'enemies/enemy_def.dart';
 import 'firestore_rest.dart';
 import 'items/belt_potions.dart';
@@ -44,6 +45,17 @@ abstract interface class OpponentDriver {
   /// other side's from here, which is the only way both machines build the
   /// same two mages (the lockstep rule).
   ItemModifiers get opponentGear => ItemModifiers.none;
+
+  /// The opponent's crit / dodge / deflection block (KINETIC_CONTRACT §2.2).
+  ///
+  /// ⚠️ **The new seam, deliberately separate from [opponentGear].** A
+  /// bestiary entry's combat stats are its archetype's lean, not a wardrobe —
+  /// routing them through `opponentGear` would stack an archetype and a
+  /// wardrobe on the same body, exactly what that field's own doc forbids.
+  /// [EnemyCombatStats.none] for anything that is not a campaign encounter —
+  /// same rule as [opponentHpScale]: archetype-flavoured stats must never
+  /// touch PvP.
+  EnemyCombatStats get opponentCombatStats => EnemyCombatStats.none;
 
   MageApparel get opponentApparel;
 
@@ -108,6 +120,13 @@ class LocalAiDriver implements OpponentDriver {
 
   @override
   double get opponentPowerScale => enemy?.archetype.damageScale ?? 1.0;
+
+  /// ⭐ Where an `EnemyDef`'s crit/dodge/deflection reaches the duel
+  /// (KINETIC_CONTRACT §2.2). `EnemyCombatStats.none` for a practice persona
+  /// with no bestiary entry behind it, exactly like [opponentHpScale].
+  @override
+  EnemyCombatStats get opponentCombatStats =>
+      enemy?.combatStats ?? EnemyCombatStats.none;
 
   void bind(MageState player, MageState enemy) {
     _player = player;
@@ -178,6 +197,12 @@ class RemoteDuelDriver implements OpponentDriver {
 
   @override
   double get opponentPowerScale => 1.0;
+
+  /// ⚠️ Pinned to [EnemyCombatStats.none], same rule as [opponentHpScale] and
+  /// [opponentPowerScale] — a human rival's crit/dodge/deflection comes from
+  /// their gear wire (`opponentGear`), never from this seam.
+  @override
+  EnemyCombatStats get opponentCombatStats => EnemyCombatStats.none;
 
   final String roomId;
   final bool isHost;

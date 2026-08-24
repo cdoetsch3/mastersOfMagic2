@@ -10,6 +10,7 @@ import 'package:mom_engine/mom_engine.dart';
 
 import 'drop_table.dart';
 import 'enemy_archetype.dart';
+import 'enemy_combat_stats.dart';
 
 /// Where in a zone's structure this creature sits.
 enum EnemyRank {
@@ -53,6 +54,12 @@ class EnemyDef {
 
   final DropTable drops;
 
+  /// Crit / dodge / deflection, KINETIC_CONTRACT §2.2/§2.3. ⚠️ Optional and
+  /// inert by default (`EnemyCombatStats.none`) — every Q1 `EnemyDef` omits
+  /// it and stays stat-free by construction. Reaches the duel through
+  /// `OpponentDriver.opponentCombatStats`, never through `opponentGear`.
+  final EnemyCombatStats combatStats;
+
   const EnemyDef({
     required this.id,
     required this.name,
@@ -63,6 +70,7 @@ class EnemyDef {
     required this.lore,
     required this.moves,
     this.drops = DropTable.empty,
+    this.combatStats = EnemyCombatStats.none,
   });
 
   /// Max HP for this creature at [level], off the shared level baseline.

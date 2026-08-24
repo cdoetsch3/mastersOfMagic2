@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/ai_personas.dart';
 import 'package:masters_of_magic_2/game/duel_controller.dart';
+import 'package:masters_of_magic_2/game/enemies/enemy_combat_stats.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/belt_potions.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
@@ -397,6 +398,8 @@ class _FakeDriver implements OpponentDriver {
   double get opponentHpScale => 1.0;
   @override
   double get opponentPowerScale => 1.0;
+  @override
+  EnemyCombatStats get opponentCombatStats => EnemyCombatStats.none;
   @override
   bool get playerIsHost => true;
   @override

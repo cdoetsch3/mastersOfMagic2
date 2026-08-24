@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mom_engine/mom_engine.dart';
 import 'package:masters_of_magic_2/game/ai_personas.dart';
 import 'package:masters_of_magic_2/game/duel_controller.dart';
+import 'package:masters_of_magic_2/game/enemies/enemy_combat_stats.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/loadout.dart';
 import 'package:masters_of_magic_2/game/mage_apparel.dart';
@@ -17,6 +18,9 @@ class FakeRemoteDriver implements OpponentDriver {
 
   @override
   double get opponentPowerScale => 1.0;
+
+  @override
+  EnemyCombatStats get opponentCombatStats => EnemyCombatStats.none;
 
   /// ⭐ Settable, because in a remote duel these two ARE the wire: whatever
   /// the other client claimed about itself is all this side ever knows.

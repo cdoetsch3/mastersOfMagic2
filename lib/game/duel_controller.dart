@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:mom_engine/mom_engine.dart';
 
+import 'enemies/enemy_combat_stats.dart';
 import 'enemies/enemy_def.dart';
 import 'flee.dart';
 import 'items/belt_potions.dart';
@@ -208,11 +209,18 @@ class DuelController extends ChangeNotifier {
   /// Gear reaches the duel HERE, and only here (ITEMS §9b.8): flat HP into the
   /// constructor (so `hp` starts full at the boosted maximum, not below it),
   /// everything else onto the MageState fields the engine already rolls.
+  ///
+  /// An `EnemyDef`'s combat stats land beside the gear application, the same
+  /// seam (KINETIC_CONTRACT §2.2) — [combatStats] defaults to
+  /// [EnemyCombatStats.none], so a player (who never has one) and every Q1
+  /// enemy (whose def doesn't set one) build byte-identical mages to before
+  /// this parameter existed.
   static MageState _buildMage({
     required String name,
     required int level,
     required ItemModifiers gear,
     double hpScale = 1.0,
+    EnemyCombatStats combatStats = EnemyCombatStats.none,
   }) {
     final mage = MageState(
       name: name,
@@ -221,14 +229,14 @@ class DuelController extends ChangeNotifier {
       // gear too would make a Redoubt's hat worth more than a mage's.
       maxHp: (MageState.scaledMaxHp(level) * hpScale).round() + gear.maxHpBonus,
     )
-      ..accuracyBonus = gear.accuracyBonus
-      ..dodge = gear.dodge
-      ..critChance = gear.critChance
+      ..accuracyBonus = gear.accuracyBonus + combatStats.accuracyBonus
+      ..dodge = gear.dodge + combatStats.dodge
+      ..critChance = gear.critChance + combatStats.critChance
       // ⭐ critDamage ADDS to the engine's 50 base, so Cinder Loop's 5 points
-      // read 155%, exactly as ruled.
-      ..critDamage = 50 + gear.critDamage
-      ..deflectChance = gear.deflectChance
-      ..deflectAmount = gear.deflectAmount
+      // read 155%, exactly as ruled — an archetype's lean adds the same way.
+      ..critDamage = 50 + gear.critDamage + combatStats.critDamage
+      ..deflectChance = gear.deflectChance + combatStats.deflectChance
+      ..deflectAmount = gear.deflectAmount + combatStats.deflectAmount
       ..damagePerCast = gear.damagePerCast
       ..damagePerCharge = gear.damagePerCharge
       ..shieldStrengthPercent = gear.shieldStrengthPercent
@@ -260,6 +268,7 @@ class DuelController extends ChangeNotifier {
       level: driver.opponentLevel,
       gear: driver.opponentGear,
       hpScale: driver.opponentHpScale,
+      combatStats: driver.opponentCombatStats,
     )..powerScale = driver.opponentPowerScale;
     final host = playerIsHost ? player : enemy;
     final guest = playerIsHost ? enemy : player;
