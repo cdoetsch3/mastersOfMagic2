@@ -100,7 +100,42 @@ that lies.
 catalogue is a hand-maintained list precisely so that one test can walk it;
 the integrity tests exist because step 4's mistake is silent otherwise.
 
-## 6. What the wiki itself will be
+## 6. The human-readable rendering: `docs/wiki/REFERENCE.md`
+
+📖 **A SECOND GENERATED OUTPUT of the same pipeline** (designer ask,
+2026-08-20), built by [`ContentReference.build()`](../lib/game/content_reference.dart)
+and written by the same `tool/export_content_test.dart` run that writes
+`content.json` — one `flutter test` refreshes both. Never hand-edited; never
+a second truth, because it walks the exact catalogues `ContentExport` walks
+(`Bestiary`, `ItemCatalogue`, `RecipeBook`, `GatherNodes`, `World`) rather
+than parsing `content.json` back apart.
+
+**The headline feature is the reverse stat index** — one table per
+`ItemModifiers` field (accuracy, dodge, crit, deflect, max HP, the two
+damage-per-cast lanes, shield strength, healing received, regrow, belt
+slots), listing every item that carries it. "What already grants % shield"
+used to mean grepping five catalogue files; now it is one lookup, with a
+field no item carries listed explicitly under "No item grants" so absence
+reads as *checked*, not *forgotten*.
+
+⚠️ Values there are the DEF's base numbers — quality (Rough/Standard/Ornate/
+Master) scales every combat stat per-instance at 80/100/120/140%
+(`ItemModifiers.scaledBy`), so a dropped or crafted instance can read higher
+or lower than the table.
+
+Below that: items by zone (with a stat summary and a derived "obtained by" —
+craft output, gather yield, or drop, cross-referencing `RecipeBook`,
+`GatherNodes` and every `Bestiary` drop table), bestiary by zone (rank,
+archetype, element, the zone's enemy band, HP/damage scale, and notable
+main/bonus drops), and recipes by skill (gate, inputs, output, and XP from
+the shipped `Skills.xpForRecipe` formula — never a re-typed number).
+
+Guarded by `test/content_reference_test.dart`, mutation-shaped per the two
+failure modes a reverse index can have without anyone noticing: a scan that
+only walks the first zone's catalogue, and a filter that leaks zero-valued
+fields into a table that promises only nonzero ones.
+
+## 7. What the wiki itself will be
 
 📝 Unbuilt, deliberately. When it exists it is a static site generated from
 `content.json` — no game code, no Dart, just a renderer over the export. That
