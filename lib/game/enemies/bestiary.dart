@@ -8,6 +8,7 @@ library;
 import 'ashfall_vale.dart';
 import 'cinderpeak_foothills.dart';
 import 'enemy_def.dart';
+import 'frostfell_pass.dart';
 import 'glimmerbrook.dart';
 import 'old_quarry.dart';
 import 'stormcliff_coast.dart';
@@ -33,6 +34,7 @@ abstract final class Bestiary {
     ...OldQuarryBestiary.all,
     ...WindwardSteppeBestiary.all,
     ...StormcliffCoastBestiary.all,
+    ...FrostfellPassBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>

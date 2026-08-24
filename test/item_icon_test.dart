@@ -292,11 +292,11 @@ void main() {
       }
       expect(
         ItemCatalogue.all.length,
-        89,
+        95,
         reason: 'the Primal quarter is 18/9/8/9/8 (52) plus the Kinetic '
-            'pure zones 9/13/15 (37); if this number moved, '
-            'docs/ITEM_ART.md is now short an entry (or carries a stale one) '
-            'and nothing else in the suite would say so',
+            'pure zones 9/13/15 (37) plus Frostfell Pass (6); if this number '
+            'moved, docs/ITEM_ART.md is now short an entry (or carries a '
+            'stale one) and nothing else in the suite would say so',
       );
     });
 

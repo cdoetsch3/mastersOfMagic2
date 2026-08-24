@@ -60,6 +60,7 @@ flutter:
     - assets/creatures/old_quarry/
     - assets/creatures/windward_steppe/
     - assets/creatures/stormcliff_coast/
+    - assets/creatures/frostfell_pass/
     - assets/backgrounds/
     # One per zone, matching `ItemCatalogue.byZone`'s keys. Empty until
     # `tool/pixelate.py --mode icon` is run; `ItemIcon` falls back silently
@@ -72,3 +73,4 @@ flutter:
     - assets/items/old_quarry/
     - assets/items/windward_steppe/
     - assets/items/stormcliff_coast/
+    - assets/items/frostfell_pass/

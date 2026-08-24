@@ -51,6 +51,7 @@ const _primalZones = <String>[
   'old_quarry',
   'stormcliff_coast',
   'windward_steppe',
+  'frostfell_pass',
 ];
 
 /// The one zone whose art has actually shipped.
@@ -147,11 +148,11 @@ void main() {
       }
       expect(
         Bestiary.all.length,
-        88,
+        99,
         reason: 'the Primal quarter (5 x 11 = 55) plus the three Kinetic '
-            'pure zones (3 x 11); a zone landing in Bestiary.all needs '
-            'its own pubspec directory and description section before its '
-            'art can load',
+            'pure zones (3 x 11) plus Frostfell Pass (11); a zone landing '
+            'in Bestiary.all needs its own pubspec directory and '
+            'description section before its art can load',
       );
     });
 
@@ -340,8 +341,8 @@ void main() {
           .toList();
       expect(
         noGrid.length,
-        77,
-        reason: 'seven zones x 11 have no pixel grid — if this number moves, '
+        88,
+        reason: 'eight zones x 11 have no pixel grid — if this number moves, '
             'either a roster changed or a zone grew grids, and the loop below '
             'is no longer testing what it says it is',
       );
@@ -490,7 +491,7 @@ void main() {
     test('the parser still finds the entries it is anchored on', () {
       expect(
         described.length,
-        88,
+        99,
         reason: 'the entry format changed (or the file moved) and the coverage '
             'check below has quietly become a comparison of two empty sets — '
             'entries are `**Name** — *rank · archetype · element*`',

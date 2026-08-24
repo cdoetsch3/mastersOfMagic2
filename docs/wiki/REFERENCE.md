@@ -16,7 +16,7 @@ the framework both live under.
 
 | Zones | Towns | Creatures | Items | Recipes | Gather nodes |
 |---|---|---|---|---|---|
-| 26 | 9 | 88 | 89 | 20 | 16 |
+| 26 | 9 | 99 | 95 | 20 | 18 |
 
 ## Contents
 
@@ -62,6 +62,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Leanstone Charm | `leanstone_charm` | 6 | ring | rare | 22 | windward_steppe |
 | The Long Lean | `the_long_lean` | 8 | robeTop | epic | 24 | windward_steppe |
 | Tussock Boots | `tussock_boots` | 3 | boots | common | 24 | windward_steppe |
+| Rimebound Ring | `rimebound_ring` | 3 | ring | rare | 24 | frostfell_pass |
 
 ### `critChance`
 
@@ -89,6 +90,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | The Given Weight | `the_given_weight` | 10 | neck | epic | 19 | old_quarry |
 | Seawrack Gloves | `seawrack_gloves` | 6 | gloves | common | 16 | stormcliff_coast |
 | Tussock Gloves | `tussock_gloves` | 8 | gloves | common | 24 | windward_steppe |
+| Rimebound Ring | `rimebound_ring` | 10 | ring | rare | 24 | frostfell_pass |
 
 ### `deflectAmount`
 
@@ -98,6 +100,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | The Given Weight | `the_given_weight` | 25 | neck | epic | 19 | old_quarry |
 | Seawrack Gloves | `seawrack_gloves` | 15 | gloves | common | 16 | stormcliff_coast |
 | Tussock Gloves | `tussock_gloves` | 20 | gloves | common | 24 | windward_steppe |
+| Rimebound Ring | `rimebound_ring` | 20 | ring | rare | 24 | frostfell_pass |
 
 ### `maxHpBonus`
 
@@ -146,6 +149,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Name | Id | Value | Slot | Rarity | Equip Lv | Zone |
 |---|---|---|---|---|---|---|
 | Brookstone Pendant | `brookstone_pendant` | 10 | neck | rare | 6 | glimmerbrook |
+| The Holdfast | `the_holdfast` | 15 | neck | epic | 25 | frostfell_pass |
 
 ### `healingReceivedPercent`
 
@@ -165,6 +169,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 |---|---|---|---|---|---|---|
 | Fawnhide Belt | `fawnhide_belt` | 1 | belt | common | 4 | glimmerbrook |
 | Tuskhide Belt | `tuskhide_belt` | 2 | belt | common | 11 | cinderpeak_foothills |
+| Rimepelt Belt | `rimepelt_belt` | 3 | belt | common | 23 | frostfell_pass |
 
 
 ## Items by zone
@@ -196,9 +201,9 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 
 | Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
 |---|---|---|---|---|---|---|---|
-| `aqua_crystal` | Aqua Crystal | mote |  | uncommon | 1 |  | drop: `weirkeeper`; drop: `the_held_breath`; drop: `pale_coil`; drop: `frostgleam_naiad`; drop: `the_cold_below`; drop: `stillwater`; +6 more (see content.json) |
-| `aqua_dust` | Aqua Dust | mote |  | common | 1 |  | drop: `brook_naiad`; drop: `shiverfish_shoal`; drop: `glassfleck_wisp`; drop: `siltback_crawler`; drop: `chill_eel`; drop: `weirkeeper`; +16 more (see content.json) |
-| `aqua_shard` | Aqua Shard | mote |  | common | 1 |  | drop: `shiverfish_shoal`; drop: `glassfleck_wisp`; drop: `siltback_crawler`; drop: `chill_eel`; drop: `weirkeeper`; drop: `the_held_breath`; +12 more (see content.json) |
+| `aqua_crystal` | Aqua Crystal | mote |  | uncommon | 1 |  | drop: `weirkeeper`; drop: `the_held_breath`; drop: `pale_coil`; drop: `frostgleam_naiad`; drop: `the_cold_below`; drop: `stillwater`; +12 more (see content.json) |
+| `aqua_dust` | Aqua Dust | mote |  | common | 1 |  | drop: `brook_naiad`; drop: `shiverfish_shoal`; drop: `glassfleck_wisp`; drop: `siltback_crawler`; drop: `chill_eel`; drop: `weirkeeper`; +27 more (see content.json) |
+| `aqua_shard` | Aqua Shard | mote |  | common | 1 |  | drop: `shiverfish_shoal`; drop: `glassfleck_wisp`; drop: `siltback_crawler`; drop: `chill_eel`; drop: `weirkeeper`; drop: `the_held_breath`; +20 more (see content.json) |
 | `fawnhide` | Fawnhide | material |  | common | 1 |  | drop: `siltback_crawler`; drop: `chill_eel`; drop: `weirkeeper`; drop: `the_held_breath`; drop: `pale_coil`; drop: `frostgleam_naiad`; +2 more (see content.json) |
 | `proof_of_the_brook` | Proof of the Brook | key |  | rare | 1 |  | drop: `the_cold_below`; drop: `stillwater` |
 | `sapwort` | Sapwort | material |  | common | 1 |  | gather: `gb_sapwort_shallows`; drop: `brook_naiad`; drop: `shiverfish_shoal`; drop: `glassfleck_wisp`; drop: `weirkeeper`; drop: `the_held_breath`; drop: `pale_coil`; +3 more (see content.json) |
@@ -254,7 +259,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `geo_crystal` | Geo Crystal | mote |  | uncommon | 1 |  | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course` |
 | `geo_dust` | Geo Dust | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; +5 more (see content.json) |
 | `geo_shard` | Geo Shard | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; +4 more (see content.json) |
-| `hardtack` | Hardtack | consumable |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +10 more (see content.json) |
+| `hardtack` | Hardtack | consumable |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +12 more (see content.json) |
 | `quarry_jasper` | Quarry Jasper | material |  | uncommon | 1 |  | gather: `oq_jasper_face`; drop: `chiselback`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; +2 more (see content.json) |
 | `tin_ore` | Tin Ore | material |  | common | 1 |  | gather: `oq_tin_seam`; drop: `quarry_golem`; drop: `tailings_drudge`; drop: `gravelswarm`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +3 more (see content.json) |
 | `overseers_seal` | Overseer's Seal | equipment | ring | rare | 18 | deflectChance +12, deflectAmount +20 | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course` |
@@ -282,9 +287,9 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 
 | Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
 |---|---|---|---|---|---|---|---|
-| `aero_crystal` | Aero Crystal | mote |  | uncommon | 1 |  | drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; drop: `the_unbroken_blow`; drop: `tempest_monarch` |
-| `aero_dust` | Aero Dust | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `tumblehusk`; drop: `kitewing`; drop: `old_lean`; +5 more (see content.json) |
-| `aero_shard` | Aero Shard | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; +4 more (see content.json) |
+| `aero_crystal` | Aero Crystal | mote |  | uncommon | 1 |  | drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; drop: `the_unbroken_blow`; drop: `tempest_monarch`; +6 more (see content.json) |
+| `aero_dust` | Aero Dust | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `tumblehusk`; drop: `kitewing`; drop: `old_lean`; +16 more (see content.json) |
+| `aero_shard` | Aero Shard | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; +12 more (see content.json) |
 | `tussock_flax` | Tussock Flax | material |  | common | 1 |  | gather: `ws_tussock_swale`; drop: `steppe_harrier`; drop: `chaff`; drop: `tumblehusk`; drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; +3 more (see content.json) |
 | `yew_log` | Yew Log | material |  | common | 1 |  | gather: `ws_yew_break`; drop: `leanstone`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; +2 more (see content.json) |
 | `yew_knot` | Yew Knot | equipment | offHand | common | 20 | accuracyBonus +5 | drop |
@@ -297,6 +302,17 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `tussock_hood` | Tussock Hood | equipment | hat | common | 24 | accuracyBonus +4 | drop |
 | `tussock_leggings` | Tussock Leggings | equipment | robeBottom | common | 24 | maxHpBonus +14 | drop |
 | `tussock_robe` | Tussock Robe | equipment | robeTop | common | 24 | maxHpBonus +20 | drop |
+
+### Frostfell Pass (`frostfell_pass`) — 6 items
+
+| Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
+|---|---|---|---|---|---|---|---|
+| `everice` | Everice | material |  | uncommon | 1 |  | gather: `ff_everice_seam`; drop: `cairnwight`; drop: `snowblind_wanderer`; drop: `the_last_cairn`; drop: `hoarking`; drop: `coldsnap`; drop: `the_certain_road`; +2 more (see content.json) |
+| `hoarlichen` | Hoarlichen | material |  | common | 1 |  | gather: `ff_lichen_shelf`; drop: `breathfrost`; drop: `cairnwight`; drop: `the_last_cairn`; drop: `hoarking`; drop: `coldsnap`; drop: `the_certain_road`; +2 more (see content.json) |
+| `rimepelt` | Rimepelt | material |  | common | 1 |  | drop: `rime_stalker`; drop: `hoarbound`; drop: `the_last_cairn`; drop: `hoarking`; drop: `coldsnap`; drop: `the_certain_road`; +2 more (see content.json) |
+| `rimepelt_belt` | Rimepelt Belt | equipment | belt | common | 23 | beltSlots +3 | drop |
+| `rimebound_ring` | Rimebound Ring | equipment | ring | rare | 24 | dodge +3, deflectChance +10, deflectAmount +20 | drop: `the_last_cairn`; drop: `hoarking`; drop: `coldsnap`; drop: `the_certain_road`; drop: `the_white_corridor`; drop: `the_road_under` |
+| `the_holdfast` | The Holdfast | equipment | neck | epic | 25 | shieldStrengthPercent +15 | drop: `the_white_corridor`; drop: `the_road_under` |
 
 
 ## Bestiary by zone
@@ -428,6 +444,22 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `wind_wraith` | Wind Wraith | Mini-boss | Hexer | aero | 19-24 | ×1.6 | ×0.75 | Yew Log, Tussock Flax, Hardtack, Leanstone Charm |
 | `tempest_monarch` | Tempest Monarch | Boss | Tyrant | aero | 19-24 | ×2.6 | ×1.7 | Yew Log, Tussock Flax, Leanstone Charm, The Long Lean |
 | `the_unbroken_blow` | The Unbroken Blow | Boss | Juggernaut | aero | 19-24 | ×3.6 | ×1.4 | Yew Log, Tussock Flax, Leanstone Charm, The Long Lean |
+
+### Frostfell Pass (`frostfell_pass`) — 11 creatures
+
+| Id | Name | Rank | Archetype | Element | Level | HP scale | Power scale | Notable drops |
+|---|---|---|---|---|---|---|---|---|
+| `breathfrost` | Breathfrost | Wild | Glasswing | aero | 21-26 | ×0.5 | ×1.7 | Hoarlichen, Aero Shard, Aero Dust |
+| `cairnwight` | Cairnwight | Wild | Blighter | aqua/aero | 21-26 | ×1.0 | ×0.6 | Hoarlichen, Everice |
+| `hoarbound` | Hoarbound | Wild | Sentinel | aqua | 21-26 | ×1.25 | ×0.7 | Rimepelt, Aqua Shard, Aqua Dust, Hardtack |
+| `rime_stalker` | Rime Stalker | Wild | Adept | aqua/aero | 21-26 | ×1.0 | ×0.9 | Rimepelt, Aqua Shard, Aqua Dust |
+| `snowblind_wanderer` | Snowblind Wanderer | Wild | Drudge | aero | 21-26 | ×0.8 | ×0.7 | Everice, Aero Shard, Aero Dust, Hardtack |
+| `coldsnap` | Coldsnap | Mini-boss | Executioner | aqua | 21-26 | ×1.2 | ×1.9 | Rimepelt, Hoarlichen, Everice, Rimebound Ring |
+| `hoarking` | Hoarking | Mini-boss | Redoubt | aqua | 21-26 | ×2.2 | ×0.85 | Rimepelt, Hoarlichen, Everice, Rimebound Ring |
+| `the_certain_road` | The Certain Road | Mini-boss | Hexer | aqua/aero | 21-26 | ×1.6 | ×0.75 | Rimepelt, Hoarlichen, Everice, Rimebound Ring |
+| `the_last_cairn` | The Last Cairn | Mini-boss | Champion | aqua/aero | 21-26 | ×1.7 | ×1.2 | Rimepelt, Hoarlichen, Everice, Rimebound Ring |
+| `the_road_under` | The Road Under | Boss | Aspect | aqua | 21-26 | ×2.6 | ×1.5 | Rimepelt, Hoarlichen, Everice, Rimebound Ring, The Holdfast |
+| `the_white_corridor` | The White Corridor | Boss | Juggernaut | aqua/aero | 21-26 | ×3.6 | ×1.4 | Rimepelt, Hoarlichen, Everice, Rimebound Ring, The Holdfast |
 
 
 ## Recipes by skill

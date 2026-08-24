@@ -8,6 +8,7 @@ library;
 
 import 'catalogue/ashfall_vale_items.dart';
 import 'catalogue/cinderpeak_items.dart';
+import 'catalogue/frostfell_pass_items.dart';
 import 'catalogue/glimmerbrook_items.dart';
 import 'catalogue/old_quarry_items.dart';
 import 'catalogue/stormcliff_coast_items.dart';
@@ -43,6 +44,7 @@ abstract final class ItemCatalogue {
     'old_quarry': OldQuarryItems.all,
     'windward_steppe': WindwardSteppeItems.all,
     'stormcliff_coast': StormcliffCoastItems.all,
+    'frostfell_pass': FrostfellPassItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists

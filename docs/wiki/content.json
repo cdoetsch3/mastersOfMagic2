@@ -3,10 +3,10 @@
   "counts": {
     "zones": 26,
     "towns": 9,
-    "creatures": 88,
-    "items": 89,
+    "creatures": 99,
+    "items": 95,
     "recipes": 20,
-    "gatherNodes": 16
+    "gatherNodes": 18
   },
   "zones": [
     {
@@ -9179,6 +9179,1106 @@
         ],
         "bonus": []
       }
+    },
+    {
+      "id": "rime_stalker",
+      "name": "Rime Stalker",
+      "zoneId": "frostfell_pass",
+      "rank": "common",
+      "archetype": "Adept",
+      "elements": [
+        "aqua",
+        "aero"
+      ],
+      "lore": "A tall, frost-whitened figure that walks the road at an even pace, never hurrying and never stopping, the way someone certain of the route walks it. Its breath hangs in the air a beat longer than anyone else's would.",
+      "moves": [
+        {
+          "id": "ff_stepthrough",
+          "name": "Step Through",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_breakthedrift",
+          "name": "Break the Drift",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_bracethewind",
+          "name": "Brace the Wind",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "rimepelt",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "hoarbound",
+      "name": "Hoarbound",
+      "zoneId": "frostfell_pass",
+      "rank": "common",
+      "archetype": "Sentinel",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "A heavy shape bound in white rime from the ground up, thicker each season it stands here, until the frost is doing as much of the holding as the creature underneath it.",
+      "moves": [
+        {
+          "id": "ff_closein",
+          "name": "Close In",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_setlikeice",
+          "name": "Set Like Ice",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "rimepelt",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "breathfrost",
+      "name": "Breathfrost",
+      "zoneId": "frostfell_pass",
+      "rank": "common",
+      "archetype": "Glasswing",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A visible held breath, person-sized, that never quite disperses. It rises the way breath does in the cold and simply never comes back down, thinning at the edges into wing shapes that beat once in a while, out of habit more than need.",
+      "moves": [
+        {
+          "id": "ff_catchtheupdraft",
+          "name": "Catch the Updraft",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_fallstill",
+          "name": "Fall Still",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "hoarlichen",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "cairnwight",
+      "name": "Cairnwight",
+      "zoneId": "frostfell_pass",
+      "rank": "common",
+      "archetype": "Blighter",
+      "elements": [
+        "aqua",
+        "aero"
+      ],
+      "lore": "A standing pile of trail-stones with just enough shape to be a person, added to by everyone who passed and did not make it the rest of the way. It never stops being added to.",
+      "moves": [
+        {
+          "id": "ff_addastone",
+          "name": "Add a Stone",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_buildthecairn",
+          "name": "Build the Cairn",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "hoarlichen",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "everice",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "snowblind_wanderer",
+      "name": "Snowblind Wanderer",
+      "zoneId": "frostfell_pass",
+      "rank": "common",
+      "archetype": "Drudge",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A muffled shape that walks in a shallow curve rather than a straight line, wrapped past recognizing, following a road it can no longer see and has stopped trying to.",
+      "moves": [
+        {
+          "id": "ff_wanderintoit",
+          "name": "Wander Into It",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "everice",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": [
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "chance": 0.02
+          }
+        ]
+      }
+    },
+    {
+      "id": "the_last_cairn",
+      "name": "The Last Cairn",
+      "zoneId": "frostfell_pass",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "aqua",
+        "aero"
+      ],
+      "lore": "Taller than the trail-markers it grew from, stones bound together with ice instead of intent, still gaining height the way the smaller ones do. Nobody added the top of it on purpose.",
+      "moves": [
+        {
+          "id": "ff_addanothermarker",
+          "name": "Add Another Marker",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_bringthewholeweight",
+          "name": "Bring the Whole Weight",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_stackhigher",
+          "name": "Stack Higher",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "rimepelt",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "hoarlichen",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "everice",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "rimebound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "hoarking",
+      "name": "Hoarking",
+      "zoneId": "frostfell_pass",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "A crowned shape of packed rime, seated rather than standing, that has been in the same drift long enough for the drift to have stopped moving around it instead.",
+      "moves": [
+        {
+          "id": "ff_pressthecoldin",
+          "name": "Press the Cold In",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_freezesolid",
+          "name": "Freeze Solid",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "ff_takethewarmth",
+          "name": "Take the Warmth",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "rimepelt",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "hoarlichen",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "everice",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "rimebound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "coldsnap",
+      "name": "Coldsnap",
+      "zoneId": "frostfell_pass",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "The temperature dropping fast enough to notice, given a shape just long enough to close the distance. It is gone again before the cold it left behind finishes registering.",
+      "moves": [
+        {
+          "id": "ff_dropthetemperature",
+          "name": "Drop the Temperature",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_allatonce",
+          "name": "All at Once",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "rimepelt",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "hoarlichen",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "everice",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "rimebound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_certain_road",
+      "name": "The Certain Road",
+      "zoneId": "frostfell_pass",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "aqua",
+        "aero"
+      ],
+      "lore": "A low, worn track visible only when the light is wrong, that a traveler will swear they remember walking before. It has never once been wrong about where it leads.",
+      "moves": [
+        {
+          "id": "ff_marktheway",
+          "name": "Mark the Way",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_alreadydecided",
+          "name": "Already Decided",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_theroaddoesnotask",
+          "name": "The Road Does Not Ask",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "rimepelt",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "hoarlichen",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "everice",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "rimebound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_white_corridor",
+      "name": "The White Corridor",
+      "zoneId": "frostfell_pass",
+      "rank": "boss",
+      "archetype": "Juggernaut",
+      "elements": [
+        "aqua",
+        "aero"
+      ],
+      "lore": "A wall of packed white that fills the whole cut from side to side, as tall as the pass itself and moving at the speed the pass accumulates snow — which is to say, always, and without hurrying.",
+      "moves": [
+        {
+          "id": "ff_grindthrough",
+          "name": "Grind Through",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_packthewalls",
+          "name": "Pack the Walls",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "ff_bringitalldown",
+          "name": "Bring It All Down",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "rimepelt",
+            "min": 4,
+            "max": 8,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "hoarlichen",
+            "min": 3,
+            "max": 6,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "everice",
+            "min": 2,
+            "max": 4,
+            "weight": 15,
+            "chance": 0.15
+          },
+          {
+            "itemId": "rimebound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "the_holdfast",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_road_under",
+      "name": "The Road Under",
+      "zoneId": "frostfell_pass",
+      "rank": "boss",
+      "archetype": "Aspect",
+      "elements": [
+        "aqua"
+      ],
+      "lore": "Not a body — the road itself, still exactly where it was laid, simply no longer on top. Everything that has ever tried to cross it is somewhere in the layers between here and the surface.",
+      "moves": [
+        {
+          "id": "ff_underfoot",
+          "name": "Underfoot",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_deeperthanitlooks",
+          "name": "Deeper Than It Looks",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ff_everythinggetsheld",
+          "name": "Everything Gets Held",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aqua_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aqua_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "rimepelt",
+            "min": 4,
+            "max": 8,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "hoarlichen",
+            "min": 3,
+            "max": 6,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "everice",
+            "min": 2,
+            "max": 4,
+            "weight": 15,
+            "chance": 0.15
+          },
+          {
+            "itemId": "rimebound_ring",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "the_holdfast",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
     }
   ],
   "items": [
@@ -10942,6 +12042,119 @@
         "damagePerCast": 6
       },
       "salvage": []
+    },
+    {
+      "id": "rimepelt",
+      "name": "Rimepelt",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 12,
+      "fungible": true,
+      "lore": "Thick fur gone white and stiff with frost that never fully thaws, even carried indoors. It holds the cold the way it once held in the warmth.",
+      "skill": "tailoring",
+      "tier": 4,
+      "salvage": []
+    },
+    {
+      "id": "hoarlichen",
+      "name": "Hoarlichen",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 11,
+      "fungible": true,
+      "lore": "Grey-green scale grown flat against black rock, the only living colour in the pass. It keeps growing at temperatures that should have finished it.",
+      "skill": "potionsAndAlchemy",
+      "tier": 4,
+      "salvage": []
+    },
+    {
+      "id": "everice",
+      "name": "Everice",
+      "kind": "material",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 26,
+      "fungible": true,
+      "lore": "Ice caught inside the rock itself, clear as glass and never once warmed by anything the black walls have done since. It comes free in one clean piece or not at all.",
+      "skill": "jewelry",
+      "tier": 5,
+      "salvage": []
+    },
+    {
+      "id": "rimepelt_belt",
+      "name": "Rimepelt Belt",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 23,
+      "value": 220,
+      "fungible": false,
+      "lore": "Three loops stitched into rimepelt gone stiff enough to hold its shape on its own. Cold to the touch, always, no matter how long it has been worn.",
+      "slot": "belt",
+      "form": "Belt",
+      "material": "Rimepelt",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "beltSlots": 3
+      },
+      "salvage": [
+        {
+          "itemId": "rimepelt",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "rimebound_ring",
+      "name": "Rimebound Ring",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 24,
+      "value": 290,
+      "fungible": false,
+      "lore": "A band of clear ice-shot stone that has never once cracked, worn by people who swore the cold in it was doing something for them. They may have been right.",
+      "slot": "ring",
+      "form": "Ring",
+      "material": "Everice",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "dodge": 3,
+        "deflectChance": 10,
+        "deflectAmount": 20
+      },
+      "salvage": []
+    },
+    {
+      "id": "the_holdfast",
+      "name": "The Holdfast",
+      "kind": "equipment",
+      "rarity": "epic",
+      "tradability": "untradeable",
+      "equipLevel": 25,
+      "value": 760,
+      "fungible": false,
+      "lore": "A grip of stone-grey rimestone worn at the throat, cut the shape kelp uses to anchor itself against a current that would otherwise take it. Whatever it is holding onto, it has not let go yet.",
+      "slot": "neck",
+      "form": "Anchor",
+      "material": "Rimestone",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "shieldStrengthPercent": 15
+      },
+      "salvage": []
     }
   ],
   "recipes": [
@@ -11742,6 +12955,26 @@
       "max": 3,
       "xp": 41,
       "flavor": "It grows where the spray reaches and nowhere the spray does not — a ledge you can find with your eyes shut, once you know the smell."
+    },
+    {
+      "id": "ff_lichen_shelf",
+      "zoneId": "frostfell_pass",
+      "skill": "foraging",
+      "yieldsItemId": "hoarlichen",
+      "min": 2,
+      "max": 3,
+      "xp": 49,
+      "flavor": "Grey-green scale on black rock, the only living colour in the pass."
+    },
+    {
+      "id": "ff_everice_seam",
+      "zoneId": "frostfell_pass",
+      "skill": "mining",
+      "yieldsItemId": "everice",
+      "min": 2,
+      "max": 3,
+      "xp": 49,
+      "flavor": "Ice in the rock that the black walls have never warmed."
     }
   ],
   "index": {
@@ -11786,6 +13019,48 @@
           "type": "drop",
           "from": "tempest_monarch",
           "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
           "bucket": "always",
           "chance": 1.0
         }
@@ -11895,6 +13170,97 @@
           "zoneId": "windward_steppe",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "rime_stalker",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "hoarbound",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "breathfrost",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "breathfrost",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "cairnwight",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "snowblind_wanderer",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "snowblind_wanderer",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "aero_shard": [
@@ -11965,6 +13331,62 @@
           "type": "drop",
           "from": "tempest_monarch",
           "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "breathfrost",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "snowblind_wanderer",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
           "bucket": "always",
           "chance": 1.0
         }
@@ -12108,6 +13530,48 @@
           "type": "drop",
           "from": "the_drinking_grove",
           "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
           "bucket": "always",
           "chance": 1.0
         }
@@ -12308,6 +13772,97 @@
           "zoneId": "thornmire",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "rime_stalker",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "rime_stalker",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "hoarbound",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "hoarbound",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.17
+        },
+        {
+          "type": "drop",
+          "from": "breathfrost",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "cairnwight",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "snowblind_wanderer",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "aqua_shard": [
@@ -12434,6 +13989,62 @@
           "type": "drop",
           "from": "the_drinking_grove",
           "zoneId": "thornmire",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "rime_stalker",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "hoarbound",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.08
+        },
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
           "bucket": "always",
           "chance": 1.0
         }
@@ -13376,6 +14987,70 @@
           "zoneId": "stormcliff_coast",
           "bucket": "always",
           "chance": 1.0
+        }
+      ],
+      "everice": [
+        {
+          "type": "drop",
+          "from": "cairnwight",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "snowblind_wanderer",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "gather",
+          "nodeId": "ff_everice_seam",
+          "zoneId": "frostfell_pass",
+          "skill": "mining"
         }
       ],
       "fawnhide": [
@@ -14578,6 +16253,20 @@
           "zoneId": "stormcliff_coast",
           "bucket": "bonus",
           "chance": 0.02
+        },
+        {
+          "type": "drop",
+          "from": "hoarbound",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "snowblind_wanderer",
+          "zoneId": "frostfell_pass",
+          "bucket": "bonus",
+          "chance": 0.02
         }
       ],
       "heartwood_stave": [
@@ -14594,6 +16283,70 @@
           "zoneId": "whispering_woods",
           "bucket": "main",
           "chance": 0.1
+        }
+      ],
+      "hoarlichen": [
+        {
+          "type": "drop",
+          "from": "breathfrost",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "cairnwight",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "gather",
+          "nodeId": "ff_lichen_shelf",
+          "zoneId": "frostfell_pass",
+          "skill": "foraging"
         }
       ],
       "leanstone_charm": [
@@ -15416,6 +17169,112 @@
           "skill": "mining"
         }
       ],
+      "rimebound_ring": [
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.2
+        }
+      ],
+      "rimepelt": [
+        {
+          "type": "drop",
+          "from": "rime_stalker",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "hoarbound",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_last_cairn",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "hoarking",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "coldsnap",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_certain_road",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "salvage",
+          "from": "rimepelt_belt"
+        }
+      ],
       "saltwort": [
         {
           "type": "drop",
@@ -15766,6 +17625,22 @@
           "type": "drop",
           "from": "the_empty_course",
           "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.1
+        }
+      ],
+      "the_holdfast": [
+        {
+          "type": "drop",
+          "from": "the_white_corridor",
+          "zoneId": "frostfell_pass",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "the_road_under",
+          "zoneId": "frostfell_pass",
           "bucket": "main",
           "chance": 0.1
         }
@@ -16380,6 +18255,12 @@
         {
           "type": "salvageInto",
           "itemId": "oak_log"
+        }
+      ],
+      "rimepelt_belt": [
+        {
+          "type": "salvageInto",
+          "itemId": "rimepelt"
         }
       ],
       "sapwort": [

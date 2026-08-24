@@ -94,6 +94,7 @@ ZONES = [
     "old_quarry",
     "stormcliff_coast",
     "windward_steppe",
+    "frostfell_pass",
 ]
 
 # ⭐ The palette a zone's creatures are locked to by `pixelate.py`. Hybrid
@@ -108,6 +109,7 @@ ZONE_ELEMENT = {
     "thornmire": "flora",
     "ashfall_vale": "pyro",
     "stormcliff_coast": "electro",
+    "frostfell_pass": "aqua",
 }
 
 KINDS = ("creature", "icon", "backdrop")

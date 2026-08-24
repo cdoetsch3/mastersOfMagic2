@@ -1063,10 +1063,76 @@ crit damage · Lv 22 · 1 socket*
 
 ---
 
+## Frostfell Pass · Lv 21–26 · Aqua + Aero · **6 items**
+
+> ⭐ *Everything that moves through here gets held.* The fusion is breath
+> frozen mid-air — Aero stopped by Aqua. ⚠️ Nothing here should read as wet;
+> everything is already stopped, not still freezing. Rime white and stone
+> grey first, colour only where the shield stat or the epic's anchor motif
+> earns it.
+
+**Palette:** rime white, packed-frost grey, pale stone, faint held-breath
+blue, one cold grey-white light for deflection.
+
+### Materials
+
+**Rimepelt** — *common · material · Tailoring t4*
+`assets/items/frostfell_pass/rimepelt.png`
+> A folded pelt of thick white fur the size of a lap-blanket, laid flat, edges
+> still faintly stiff with frost that has not thawed. Dense pale fur with a
+> grey undercoat showing at the part, a fine crust of white rime clinging to
+> the guard hairs. Matte, cold-looking, no shine anywhere.
+
+**Hoarlichen** — *common · material · Potions & Alchemy t4 · ⏳ banks for Q2*
+`assets/items/frostfell_pass/hoarlichen.png`
+> A single flat scab of lichen the size of a hand, peeled whole off black
+> rock, grey-green fading to pale white at the crinkled edges. Rough, dry,
+> faintly crystalline texture across its face. ⭐ Uncommon note of colour
+> against the palette — the only living green in the whole zone.
+
+**Everice** — *uncommon · material · Jewelry t5 · ⏳ banks for Q2*
+`assets/items/frostfell_pass/everice.png`
+> A single clean shard of clear ice the size of a thumb, resting on one flat
+> face where it broke free of the rock. Glass-clear at the core, a faint milky
+> haze at the edges, one hairline internal crack catching the light. ⭐
+> Uncommon — one cold blue-white note, unlit, no melt anywhere on it.
+
+### Equipment
+
+**Rimepelt Belt** — *common · belt · +3 belt slots · Lv 23*
+`assets/items/frostfell_pass/rimepelt_belt.png`
+> A wide belt of stiff white rimepelt, laid out in a loose open curve, with a
+> plain dark bone buckle. ⭐ **Three empty loops** of the same pelt stitched
+> along the strap, each wide enough for a bottle and visibly holding nothing.
+> ⚠️ The loops are the entire point — draw them large, open and unmistakable,
+> because the capacity *is* the stat.
+
+**Rimebound Ring** — *rare · ring · 10% deflect, 20% amount, +3 dodge · Lv 24*
+`assets/items/frostfell_pass/rimebound_ring.png`
+> A slim band of clear ice-shot stone shown standing upright, near-colourless
+> with one faint milky vein running around its circumference. ⭐ Rare, so both
+> stats read as light: a thin cool grey-white line traces the deflect vein,
+> and a second, fainter thread of pale blue seems to lift slightly off the
+> band's outer edge — dodge as a thing barely touching the surface it sits on.
+
+**The Holdfast** — *epic · neck · +15% shield strength · Lv 25*
+`assets/items/frostfell_pass/the_holdfast.png`
+> A heavy grip of stone-grey rimestone worn at the throat on a plain cord,
+> shaped the way kelp anchors itself to rock — a splayed, gripping base
+> tapering to a smooth worn top. ⭐ Epic, so it is visibly doing something: a
+> faint cool grey-white light pulses slowly along the gripping base, as though
+> testing its hold and finding it every time. ⚠️ Nothing sharp anywhere on
+> it — the shield stat's convention, carried by the whole object rather than
+> one feature.
+
+---
+
 ## ⚠️ Still to describe — the rest of Kinetic and two more quarters
 
 The **Primal quarter (52 items)** and **Stormcliff Coast (13 items)** are
 written.
+The **Primal quarter (52 items)** and **Frostfell Pass (6 items)**, the
+quarter's first hybrid zone, are written.
 
 | Quarter | Zones | Items | Status |
 |---|---|---|---|
@@ -1074,6 +1140,7 @@ written.
 | Kinetic 15–29 | 6 | 58 (target) | 1/6 zones described (Old Quarry, 9) |
 | Kinetic 15–29 | 6 | 15+❓ | 🔶 Windward Steppe described, 5 zones left |
 | Kinetic 15–29 | 6 | 58 | 🚧 1/6 zones — Stormcliff Coast (13) described |
+| Kinetic 15–29 | 6 | 58 | 🚧 4/6 zones (37) — Old Quarry, Windward Steppe, Stormcliff Coast, Frostfell Pass |
 | Celestial 30–47 | 7 | ❓ | ⬜ no catalogue yet |
 | Ethereal 45–60 | 7 | ❓ | ⬜ no catalogue yet |
 

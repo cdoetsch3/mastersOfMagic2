@@ -349,6 +349,16 @@ void main() {
         skill: GatherSkill.foraging,
         yield: 'saltwort',
       ),
+      'ff_lichen_shelf': (
+        zone: 'frostfell_pass',
+        skill: GatherSkill.foraging,
+        yield: 'hoarlichen',
+      ),
+      'ff_everice_seam': (
+        zone: 'frostfell_pass',
+        skill: GatherSkill.mining,
+        yield: 'everice',
+      ),
     };
 
     const primalZones = [
@@ -360,6 +370,7 @@ void main() {
       'old_quarry',
       'stormcliff_coast',
       'windward_steppe',
+      'frostfell_pass',
     ];
 
     test('⚠️ every authored node is REGISTERED, and nothing extra is (within '
@@ -457,7 +468,9 @@ void main() {
       // both correctly gathered) plus `bronze_ingot`, an intermediate good
       // crafted from them rather than gathered, which this Q1-only check
       // was never meant to reach.
-      const killOnly = {'fawnhide', 'tuskhide'};
+      // ⚠️ Frostfell Pass adds `rimepelt` — a hide, kill-only by the same
+      // rule (§9b.7b) as Cinderpeak's Tuskhide and Whispering Woods' Fawnhide.
+      const killOnly = {'fawnhide', 'tuskhide', 'rimepelt'};
       // ⚠️ Crafted intermediates wear the MaterialDef type but are outputs,
       // not world materials — bronze_ingot is Metalworking's t3 product
       // (KINETIC_CONTRACT §3), smelted from tin+copper, never gathered.

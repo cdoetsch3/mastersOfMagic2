@@ -878,6 +878,108 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 
 ---
 
+## Frostfell Pass · Lv 21–26 · Aqua + Aero
+
+> ⭐ *Everything that moves through here gets held.* The fusion is **breath
+> frozen mid-air** — Aero stopped by Aqua. ⚠️ This zone assigns its element
+> per creature, not "both" by default: some things here are pure held-breath
+> (Aero), some are pure held-ground (Aqua), and only the ones the roster
+> names both are visibly frost AND wind at once. White, rime-grey and
+> breath-pale throughout; nothing here is wet, only stopped.
+
+### Commons
+
+**Rime Stalker** — *common · Adept · Aqua+Aero*
+> A tall, frost-whitened humanoid figure, a head taller than a person,
+> standing in profile, body and head turned toward the right edge of the
+> image. Rime crusts every fold of it like clothing gone to ice, and a single
+> held plume of breath hangs frozen in front of its face, a beat behind where
+> it should already have dispersed. Walking, unhurried, even-paced.
+
+**Hoarbound** — *common · Sentinel · Aqua*
+> A heavy quadruped the size of a small ox, hide entirely bound in thick
+> white rime built up in overlapping layers like tree rings, thicker at the
+> shoulders than anywhere else. Blunt frost-crusted head lowered. Standing
+> completely still, weight settled, facing right.
+
+**Breathfrost** — *common · Glasswing · Aero*
+> A person-sized cloud of visibly held breath given a rough winged shape,
+> pale translucent white shot through with faint blue at the core, thinning
+> to nothing at the edges. No solid body at all. Caught rising, angled
+> upward and to the right, mid-beat.
+
+**Cairnwight** — *common · Blighter · Aqua+Aero*
+> A standing pile of frost-rimed trail-stones roughly person-height, just
+> enough shape to read as a figure — a rounded stack for a head, flatter
+> slabs for shoulders. Pale grey stone crusted white on every windward
+> face. Motionless, upright, facing right.
+
+**Snowblind Wanderer** — *common · Drudge · Aero*
+> A muffled humanoid shape, person-sized, wrapped in layers of pale
+> wind-scoured cloth until no features show at all, walking in a shallow
+> curve rather than a straight line. Dull white-grey throughout, nothing
+> bright on it anywhere. Shuffling, off-balance, facing right.
+
+### Mini-bosses
+
+**The Last Cairn** — *mini · Champion · Aqua+Aero*
+> A trail-cairn grown to twice a person's height, frost-bound stones stacked
+> well past where hands could have placed them, the topmost stones still
+> visibly settling. Pale grey stone, heavy white rime in every gap. Standing,
+> balanced, facing right, entirely still.
+
+**Hoarking** — *mini · Redoubt · Aqua*
+> A crowned, seated mass of packed white rime the size of a loaded cart,
+> broader than it is tall, set into a drift that has stopped moving around
+> it rather than the reverse. Dense, unbroken white, faint blue in the deep
+> creases. Facing right, immovable.
+
+**Coldsnap** — *mini · Executioner · Aqua*
+> A lean, sharp-shouldered humanoid figure of clear blue-white ice, person
+> height, edges faceted rather than smooth, built for closing distance fast.
+> Caught mid-stride, weight thrown forward and right, one arm already drawn
+> back.
+
+**The Certain Road** — *mini · Hexer · Aqua+Aero*
+> A low, worn track of pale stone made faintly visible only by the frost
+> outlining its edges, given just enough height and shape at one end to read
+> as a robed figure bent over it, person-height at the shoulder. Muted white
+> and stone-grey. Stooped, attentive, facing right.
+
+### Bosses
+
+**The White Corridor** — *boss · Juggernaut · Aqua+Aero*
+> A wall of packed white filling the whole width of the frame from waist
+> height up, four storeys tall, its face a mass of compacted rime-stone and
+> frozen breath with no single silhouette — only more of it, climbing out of
+> frame at the top. Advancing slowly, facing right, unstoppable.
+
+**The Road Under** — *boss · Aspect · Aqua*
+> Not a body — a cross-section of pale packed road-stone and ice standing
+> upright as if the ground itself had been tipped on end, four storeys tall,
+> layered bands of frost and stone visible all the way down. No limbs, no
+> head, no need of either. Facing right, entirely still, patient past
+> reckoning.
+
+### Arena backdrop
+
+`assets/backgrounds/frostfell_pass.png` — *16:9 · Aqua + Aero palette*
+> Wide 16:9 landscape painting of a high mountain pass seen side-on at
+> standing eye level, environment only — no creatures, no people, no text. A
+> level shelf of packed snow and pale trail-stone runs straight across the
+> frame just past mid-height, frost-rimed cairns marking its edge. Below it,
+> the pass drops away into deep blue-grey shadow across the bottom fifth. At
+> the far left and far right edges, broken rock outcrops cropped by the
+> frame, dusted white and hung with short frozen-breath plumes that never
+> disperse. The centre of the frame is **open pale sky and drifting snow
+> haze**, with nothing rising out of it and no light source in it. Overcast,
+> windless despite the theme, bitterly still. **Aqua + Aero palette**,
+> matching the creatures above: rime white, stone grey, faint held-breath
+> blue, nothing wet. Muted, low-contrast, and everything holding its
+> position.
+
+---
+
 ## ⚠️ Still to describe — 209 creatures
 
 The **Primal quarter (55)** and **Old Quarry (11)** are written. The rest of
@@ -892,6 +994,10 @@ The **Primal quarter (55)** and **Stormcliff Coast (11)** are written. The
 rest of Kinetic and all of Celestial and Ethereal have full rosters in
 ENEMIES_DESIGN §2e / KINETIC_CONTRACT §4 — names, ranks, archetypes and
 premises — but no physical descriptions yet.
+The **Primal quarter (55)** and **Frostfell Pass (11)**, the quarter's first
+hybrid zone, are written. The rest of Kinetic and all of Celestial and
+Ethereal have full rosters in ENEMIES_DESIGN §2e / KINETIC_CONTRACT §4 —
+names, ranks, archetypes and premises — but no physical descriptions yet.
 
 | Quarter | Zones | Creatures | Status |
 |---|---|---|---|
@@ -899,6 +1005,7 @@ premises — but no physical descriptions yet.
 | Kinetic 15–29 | 6 | 66 | 1/6 zones described (Old Quarry) |
 | Kinetic 15–29 | 6 | 66 | 🔶 Windward Steppe (11) described, 5 zones (55) left |
 | Kinetic 15–29 | 6 | 66 | 🚧 1/6 zones — Stormcliff Coast (11) described |
+| Kinetic 15–29 | 6 | 66 | 🚧 4/6 zones (44) described — Old Quarry, Windward Steppe, Stormcliff Coast, Frostfell Pass |
 | Celestial 30–47 | 7 | 77 | ⬜ |
 | Ethereal 45–60 | 7 | 77 | ⬜ |
 | The Eclipsed Citadel | 1 | ❓ | needs its own structure first (§2e) |

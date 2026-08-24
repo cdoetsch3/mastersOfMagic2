@@ -363,6 +363,39 @@ abstract final class GatherNodes {
         'ledge you can find with your eyes shut, once you know the smell.',
   );
 
+  // ---- Frostfell Pass (Aqua + Aero, band 21–26, KINETIC_CONTRACT §6) ----
+  //
+  // ⚠️ Two nodes, not three — a hybrid's 3-per-zone rule (§3.1/§9b.8 ruling
+  // 7), but Rimepelt is a hide and kill-only (§9b.7b), so only Hoarlichen and
+  // Everice are world-held and get a node.
+  // ⭐ XP is `9 + 2 × (zone.minLevel − 1)` = `9 + 2 × 20` = 49.
+
+  static const ffLichenShelf = GatherNodeDef(
+    id: 'ff_lichen_shelf',
+    zoneId: 'frostfell_pass',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'hoarlichen',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.trace, 'peel', complexity: 2),
+    xp: 49,
+    flavor:
+        'Grey-green scale on black rock, the only living colour in the '
+        'pass.',
+  );
+
+  static const ffEvericeSeam = GatherNodeDef(
+    id: 'ff_everice_seam',
+    zoneId: 'frostfell_pass',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'everice',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'pry', complexity: 3),
+    xp: 49,
+    flavor: 'Ice in the rock that the black walls have never warmed.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -382,6 +415,8 @@ abstract final class GatherNodes {
     tussockSwale,
     wrackline,
     saltwortLedge,
+    ffLichenShelf,
+    ffEvericeSeam,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {
