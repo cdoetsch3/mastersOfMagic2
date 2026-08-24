@@ -5,8 +5,8 @@ implementation. ⚠️ **Nothing here is built.** This document is the single
 source four parallel builders implement from, and the merge coordinator
 verifies code against.
 
-**Scope:** the six Kinetic zones, Lv 15–29 — 66 creatures, 64 item
-definitions, 26 recipes, 13 gather nodes.
+**Scope:** the six Kinetic zones, Lv 15–29 — 66 creatures, 58 item
+definitions, 21 recipes, 13 gather nodes.
 
 > ### How to read this
 >
@@ -46,14 +46,16 @@ definitions, 26 recipes, 13 gather nodes.
 | Materials: 2 per pure zone, 3 per hybrid | ITEMS §9b.8 ruling 7 |
 | Every mote tier below Heart drops; Hearts are craft-only | ITEMS §6.0, §8 |
 | The Overseer's Seal is Q2's, dropped by its namesake in the Old Quarry | ITEMS §9b.8 ruling 9 |
-| The Kinetic Sigil is three essences, one per Kinetic **pure** zone | NARRATIVE §4b.1/§4b.2 |
+| The Kinetic Sigil is three essences, one per Kinetic **pure** zone (mechanism deferred, §8.6) | NARRATIVE §4b.1/§4b.2 |
 
 ### 0.2 The four standing rulings this contract encodes (Christian, 2026-08-19)
 
 1. **Stat curve L15–29 = the shipped Q1 curve, extrapolated.** §1.
 2. **Crit / dodge / deflect come online this quarter, from both sides.** §2.
-3. **Recipe density matches Q1 (~20–26); Metalworking and Jewelry debut on
-   Q1's banked materials plus this quarter's.** §5.
+3. **Recipe density matches Q1 (~20–26); Metalworking debuts on Q1's banked
+   materials plus this quarter's.** ⚠️ Jewelry does **not** debut this
+   quarter (§8.1) — Q2 finds jewel materials that bank until Rimeholt
+   instead. §5.
 4. **The Molten Deep ships as a standard 3-section adventure.** The
    descending-dungeon structure is a later feature; the roster below is
    written to fit `Adventure`'s existing shape.
@@ -387,13 +389,20 @@ crit to exactly one ring and one boss unique; the quarter should open by
 letting the player *meet* crit on an enemy before it can be bought. Rowan
 (equip 25) is where crafting gets it.
 
-### 2.6 ⚠️ "Gear ≈ ten levels" — where the invariant binds
+### 2.6 ✅ "Gear ≈ ten levels" — re-anchored, and where it binds
 
-The standing invariant (ITEMS §9b.4a, GAME_DESIGN) says a fully-geared
-character fights about ten levels above their own. Measured against the
-shipped curve, **ten levels is +48% on HP *and* +48% on damage** — the
-compounding makes the ratio constant, so this is a percentage target at every
-level, not an absolute one.
+✅ **Ruling 8.2 (Christian, 2026-08-20) re-anchors the invariant verbatim:**
+*"a fully geared L30 with best-in-slot should be similar in power to a naked
+L40, more or less."* Read literally, that is a **best-in-slot target**, not a
+crafted-gear target and not a retired idea — §8.2 chose reading (a) of the
+three the draft offered. Crafted-only gear sitting well under ten levels all
+quarter is therefore **correct**, not under-budgeted: §9b.4a makes a Master
+crafted item the floor and a boss-unique drop the ceiling, and the invariant
+is measured at the ceiling.
+
+Measured against the shipped curve, **ten levels is +48% on HP *and* +48% on
+damage** — the compounding makes the ratio constant, so this is a percentage
+target at every level, not an absolute one.
 
 Expressing a loadout as `Ghp × Gdmg = 1.04^(2L)` and solving for L:
 
@@ -407,19 +416,21 @@ Expressing a loadout as `Ghp × Gdmg = 1.04^(2L)` and solving for L:
 
 ⭐ **Three findings the designer should see together.**
 
-1. ✅ **The invariant is satisfiable, and this budget satisfies it — but only
-   at the very top, and only with drops.** That is arguably the correct shape:
-   §9b.4a says a Master crafted item is the *floor* and boss uniques are the
-   deliberate exception. Crafted-only tops out near 7 levels all quarter.
+1. ✅ **Ruled: the invariant passes "more or less," and only at the top, only
+   with drops — which is the target, not a shortfall.** Q2 best-in-slot ≈
+   10.7 levels against a verbatim ten-level target. Crafted-only tops out near
+   6.9–7 levels all quarter, which is §9b.4a's floor working as designed, not
+   an under-budget.
 2. ⚠️ **Q1 never reached ten levels either** — its best-in-slot is 6.7. So the
-   line in the docs has never been true of shipped content. This is the first
-   quarter where it can be, because crit and deflection are multiplicative and
-   flat HP is not.
-3. ⚠️ **Flat modifiers decay against a geometric curve.** The Tussock robe's
-   +20 HP is 8% of the baseline at its equip level 24 and 6.7% at L29. Any
-   "gear = N levels" target must therefore be re-stated **per material tier at
-   that tier's equip level**, which is exactly what §9b.4a's *"gear advantage
-   caps at roughly one material tier"* already means. 📝 See Decisions §8.2.
+   line in the docs has never been true of shipped content until now, because
+   crit and deflection are multiplicative and flat HP is not.
+3. 📝 **Note for future quarters: flat modifiers decay against a geometric
+   curve.** The Tussock robe's +20 HP is 8% of the baseline at its equip level
+   24 and 6.7% at L29. Any "gear = N levels" target has to be re-stated **per
+   material tier at that tier's equip level**, which is exactly what §9b.4a's
+   *"gear advantage caps at roughly one material tier"* already means. Whoever
+   re-measures this at Q3's numbers should re-derive it fresh rather than
+   extrapolate Q2's ratios.
 
 ---
 
@@ -432,20 +443,29 @@ Expressing a loadout as `Ghp × Gdmg = 1.04^(2L)` and solving for L:
 | id | Name | Zone | Consuming skill | Tier | Gathered by | Node? |
 |---|---|---|---|---|---|---|
 | `tin_ore` | Tin Ore | old_quarry | Metalworking | 3 | Mining | ✅ |
-| `quarry_jasper` | Quarry Jasper | old_quarry | Jewelry | 3 | Mining | ✅ |
+| `quarry_jasper` ⏳ | Quarry Jasper | old_quarry | Jewelry | 3 | Mining | ✅ |
 | `seawrack_fibre` | Seawrack Fibre | stormcliff_coast | Tailoring | 3 | Foraging | ✅ |
 | `saltwort` | Saltwort | stormcliff_coast | Potions & Alchemy | 3 | Foraging | ✅ |
 | `yew_log` | Yew Log | windward_steppe | Woodcarving | 3 | Felling | ✅ |
 | `tussock_flax` | Tussock Flax | windward_steppe | Tailoring | 4 | Foraging | ✅ |
 | `rimepelt` | Rimepelt | frostfell_pass | Tailoring | 4 | — | ⚠️ **kill-only** |
-| `hoarlichen` | Hoarlichen | frostfell_pass | Potions & Alchemy | 4 | Foraging | ✅ |
+| `hoarlichen` ⏳ | Hoarlichen | frostfell_pass | Potions & Alchemy | 4 | Foraging | ✅ |
 | `everice` ⏳ | Everice | frostfell_pass | Jewelry | 5 | Mining | ✅ |
 | `rowan_log` | Rowan Log | thunderspire_peaks | Woodcarving | 4 | Felling | ✅ |
 | `iron_ore` | Iron Ore | thunderspire_peaks | Metalworking | 4 | Mining | ✅ |
 | `hum_quartz` ⏳ | Hum Quartz | thunderspire_peaks | Enchanting | 4 | Mining | ✅ |
-| `obsidian` | Obsidian | the_molten_deep | Jewelry | 4 | Mining | ✅ |
-| `firesalt` | Firesalt | the_molten_deep | Potions & Alchemy | 5 | Foraging | ✅ |
+| `obsidian` ⏳ | Obsidian | the_molten_deep | Jewelry | 4 | Mining | ✅ |
+| `firesalt` ⏳ | Firesalt | the_molten_deep | Potions & Alchemy | 5 | Foraging | ✅ |
 | `emberhide` | Emberhide | the_molten_deep | Tailoring | 5 | — | ⚠️ **kill-only** |
+
+📝 **Five of these now bank rather than spend, as a direct consequence of two
+rulings.** `quarry_jasper`, `everice` and `obsidian` bank until Jewelry
+unlocks at Rimeholt, L45 (§8.1 — Jewelry does not debut this quarter, and Q2
+only *finds* jewel materials, the same pattern Q1 set for ore before
+Metalworking). `hoarlichen` and `firesalt` bank until the Antidote and
+offensive-potion vocabulary ships (§8.5, §9 Fast-follow). `everice` and
+`hum_quartz` were already banking materials before either ruling; see the
+note below.
 
 ⭐ **The economy's spine is Bronze, and it is why Copper banked.** ITEMS §9b.8
 banked `copper_ore` from Cinderpeak and `charcoal` from Ashfall Vale as
@@ -454,12 +474,15 @@ banked `copper_ore` from Cinderpeak and `charcoal` from Ashfall Vale as
 Metalworking opens. ⚠️ That is the payoff the banking clause promised, and it
 is the first recipe a Kinetic player should meet.
 
-⭐ **The Kinetic hybrids bank forward in turn, but only twice.** `everice`
-(Jewelry tier 5) and `hum_quartz` (Enchanting) have no Kinetic consumer;
-Enchanting's station is Meridian at L36, so Hum Quartz is Q2 seeding Q3
-exactly as §9b.8 says the pattern should be. 📝 The other four hybrid
-materials are spendable in-band — the banking clause existed because Q1 had
-*no* maker for two skills, and Q2 opens both.
+⭐ **`hum_quartz` (Enchanting) banks purely on schedule** — Enchanting's
+station is Meridian at L36, so Hum Quartz is Q2 seeding Q3 exactly as §9b.8
+says the pattern should be. ⚠️ **The other four banking materials bank for a
+different reason than the draft assumed:** `quarry_jasper`, `everice` and
+`obsidian` were meant to be spent by this quarter's three Jewelry recipes, and
+`hoarlichen` and `firesalt` by the Antidote and offensive potion — both
+consumers were cut by ruling (§8.1, §8.5). `rimepelt` and `emberhide` stay
+kill-only hides, spent nowhere either way (below). Every other Kinetic
+material is spendable in-band.
 
 ⚠️ **Two materials are kill-only and must have no node** (ITEMS §9b.7b):
 `rimepelt` and `emberhide` are hides. Node count is 13, not 15, for exactly
@@ -500,29 +523,20 @@ rare; possibly never drops"* and ITEMS §9's band table puts Core and Heart at
 within the quarter by Dust → Shard → Crystal at escalating rarity; introducing
 a Kinetic Core that essentially never falls would be noise, not a ladder rung.
 
-### 3.3 The gate — the Kinetic Sigil, in three parts ✅
+### 3.3 The gate — mechanism rejected, deferred (Christian, 2026-08-20 — §8.6)
 
-`world.dart` gates Concordance on *"The Kinetic Sigil, in three parts, shown
-at the gate."* NARRATIVE §4b.1: the three parts are **three essences from the
-three Kinetic pure zones** — Geo at the Old Quarry, Electro at Stormcliff,
-Aero on the Steppe — and they are Forgeholm's failed containment ward, not a
-permission slip.
+✅ **Canon still holds:** `world.dart` gates Concordance on *"The Kinetic
+Sigil, in three parts, shown at the gate,"* and NARRATIVE §4b.1 ties the
+three parts to the three Kinetic pure zones. ⚠️ **What is rejected is this
+draft's implementation of that canon** — three collectible `Key` items
+(`geo_essence`, `electro_essence`, `aero_essence`), one guaranteed per pure
+zone's bosses. Christian ruled the collect-three-keys **mechanism** wrong, not
+the underlying gate.
 
-| id | Name | Zone | `gates` |
-|---|---|---|---|
-| `geo_essence` | Geo Essence | old_quarry | `concordance` |
-| `electro_essence` | Electro Essence | stormcliff_coast | `concordance` |
-| `aero_essence` | Aero Essence | windward_steppe | `concordance` |
-
-⚠️ **Both bosses of each pure zone guarantee their essence on `always`**,
-exactly as the three proofs do. Progression must never sit behind a main-table
-roll. ⚠️ **The three hybrids drop none** — a fourth part would let a player
-skip one of the three zones the gate exists to route them through, which is
-the same reason Thornmire and Ashfall Vale drop no proof.
-
-📝 Naming: *"Geo Essence"* matches the Celestial Totem's *"charged with Solar,
-Lunar and Astral"* and NARRATIVE's own word. It does **not** match Q1's
-evocative *"Proof of the Woods"*. See Decisions §8.6.
+No essence items ship this quarter. **No Kinetic `EnemyDef` drops one, no
+catalogue defines one, and no item count includes one.** The replacement
+mechanism is TBD and explicitly **not** collection-based — see **§9
+Fast-follow (Q2.1)**, to be designed alongside the potions rework.
 
 ### 3.4 Id conventions ✅
 
@@ -544,8 +558,8 @@ A test already enforces this.
 ⚠️ **Which catalogue file defines a cross-zone crafted output:** the file for
 the zone that supplies its **headline** material; where the headline material
 is a banked Q1 material, it goes to the Q2 zone supplying the recipe's other
-half. That is why `bronze_ingot` and `amber_ring` live in
-`old_quarry_items.dart`. ⚠️ **No builder edits a Q1 catalogue file.**
+half. That is why `bronze_ingot` lives in `old_quarry_items.dart` (Q1's
+Copper and Charcoal, Q2's Tin). ⚠️ **No builder edits a Q1 catalogue file.**
 
 ---
 
@@ -620,7 +634,7 @@ _commonAlways = [ DropEntry('geo_dust', chance: 0.75, min: 1, max: 2) ]
 ```
 _miniDrops  always: geo_shard ×1 · geo_dust 2–4 · geo_crystal chance 0.25
             main:   tin_ore 40 (2–4) · quarry_jasper 30 (2–4) · hardtack 25 · overseers_seal 5
-_bossDrops  always: geo_crystal 1–2 · geo_shard 1–2 · geo_dust 4–8 · geo_essence ✅ guaranteed
+_bossDrops  always: geo_crystal 1–2 · geo_shard 1–2 · geo_dust 4–8      ⚠️ NO essence — see §8.6
             main:   tin_ore 45 (4–8) · quarry_jasper 25 (3–6) · overseers_seal 20 · the_given_weight 10
 ```
 
@@ -629,21 +643,22 @@ Crystal is a mini-boss reward, the ladder's first felt step (ITEMS §8).
 ⚠️ **`the_given_weight` (Epic) is the boss table only.** 📝 10 weight = one in
 ten clears.
 
-#### Catalogue — 12 defs (`lib/game/items/catalogue/old_quarry_items.dart`)
+#### Catalogue — 9 defs (`lib/game/items/catalogue/old_quarry_items.dart`)
+
+⚠️ **Was 12; three are cut.** `amber_ring` and `jasper_pendant` were Jewelry
+recipe outputs with no other source — cut with their recipes (§8.1).
+`geo_essence` was the Sigil's Geo key — cut with the mechanism (§8.6).
 
 | id | Kind | Rarity | Slot / detail | Equip | Modifiers | Value |
 |---|---|---|---|---|---|---|
 | `tin_ore` | Material | common | Metalworking t3 | 1 | — | 6 📝 |
-| `quarry_jasper` | Material | uncommon | Jewelry t3 | 1 | — | 14 📝 |
+| `quarry_jasper` ⏳ | Material | uncommon | Jewelry t3 · 📝 **banks until Rimeholt (L45), §8.1** | 1 | — | 14 📝 |
 | `geo_dust` / `geo_shard` | Mote | common | dust / shard | 1 | — | 2 / 12 📝 |
 | `geo_crystal` | Mote | uncommon | crystal | 1 | — | 60 📝 |
 | `hardtack` | **Consumable** ⚠️ not Beltable | common | between encounters | 1 | `healPercent: 35` 📝 | 9 |
-| `bronze_ingot` | Material | common | Metalworking t3 output ⭐ feeds 6 recipes | 1 | — | 30 📝 |
-| `amber_ring` | Equipment | uncommon | ring · Ring / Amber | 15 | `maxHpBonus: 8, healingReceivedPercent: 6` 📝 | 120 |
-| `jasper_pendant` | Equipment | uncommon | neck · Pendant / Jasper | 18 | `deflectChance: 8, deflectAmount: 15` (EV 1.2%) 📝 | 150 |
+| `bronze_ingot` | Material | common | Metalworking t3 output ⭐ feeds 4 recipes | 1 | — | 30 📝 |
 | `overseers_seal` | Equipment ✅ *owed by §9b.8* | **rare** | ring · Signet / Bronze · `properName` · untradeable | 18 | `deflectChance: 12, deflectAmount: 20` (EV 2.4%) 📝 | 260 |
 | `the_given_weight` | Equipment | **epic** | neck · Locket / Quarrystone · `properName` · untradeable | 19 | `maxHpBonus: 30, deflectChance: 10, deflectAmount: 25` (EV 2.5%) 📝 | 720 |
-| `geo_essence` | **Key** | rare | `gates: 'concordance'` · bound | 1 | — | 0 |
 
 ⭐ **The Overseer's Seal is the item ITEMS §9b.8 ruling 9 explicitly deferred
 to this quarter, dropped by its namesake.** It is also the game's first
@@ -712,11 +727,14 @@ _commonAlways = [ DropEntry('electro_dust', chance: 0.75, min: 1, max: 2) ]
 ```
 _miniDrops  always: electro_shard ×1 · electro_dust 2–4 · electro_crystal chance 0.25
             main:   seawrack_fibre 40 (2–4) · saltwort 30 (2–4) · saltwort_draught 25 · fulgurite_pendant 5
-_bossDrops  always: electro_crystal 1–2 · electro_shard 1–2 · electro_dust 4–8 · electro_essence ✅ guaranteed
+_bossDrops  always: electro_crystal 1–2 · electro_shard 1–2 · electro_dust 4–8      ⚠️ NO essence — see §8.6
             main:   seawrack_fibre 45 (4–8) · saltwort 25 (3–6) · fulgurite_pendant 20 · uplight 10
 ```
 
-#### Catalogue — 14 defs (`stormcliff_coast_items.dart`)
+#### Catalogue — 13 defs (`stormcliff_coast_items.dart`)
+
+⚠️ **Was 14; `electro_essence` is cut** — the Sigil's Electro key, cut with
+the mechanism (§8.6).
 
 | id | Kind | Rarity | Slot / detail | Equip | Modifiers | Value |
 |---|---|---|---|---|---|---|
@@ -732,7 +750,6 @@ _bossDrops  always: electro_crystal 1–2 · electro_shard 1–2 · electro_dust
 | `seawrack_gloves` | Equipment | common | gloves · Gloves / Seawrack | 16 | `maxHpBonus: 3, deflectChance: 6, deflectAmount: 15` ⭐ **first crafted deflect** (EV 0.9%) | 55 |
 | `fulgurite_pendant` | Equipment | **rare** | neck · Pendant / Fulgurite · `properName` · untradeable | 20 | `critChance: 8, critDamage: 10` 📝 | 280 |
 | `uplight` | Equipment | **epic** | mainHand · Wand / Fulgurite · `properName` · untradeable · **1 socket** | 22 | `damagePerCast: 6, accuracyBonus: 4, critChance: 12, critDamage: 15` 📝 | 760 |
-| `electro_essence` | **Key** | rare | `gates: 'concordance'` · bound | 1 | — | 0 |
 
 ⭐ **Seawrack set total: 31 HP · 3 acc · 2 dodge · 6/15 deflect.** Against the
 level-16 baseline (180 HP) that is +17% health, the same proportion Q1's
@@ -773,9 +790,9 @@ Staff, and the crit pair on it is the first time a weapon has carried both.
 
 ⭐ **The boss pair:** *Tempest Monarch* is **the gust — the exception** (a
 will, so Tyrant); *The Unbroken Blow* is **the constant** (a force, so
-Juggernaut). ⚠️ ENEMIES §2f floats a third option for this zone — *the empty
-arena*, one draw where nothing is there at all. **This contract ships two real
-bosses**; see Decisions §8.3.
+Juggernaut). **This contract ships two real bosses.** ✅ **RULED dead, not
+deferred (Christian, 2026-08-20, §8.3)** — ENEMIES §2f's *"empty arena"* row
+is removed from `docs/ENEMIES_DESIGN.md`'s §2f table; it is not coming back.
 
 ⚠️ **A Drudge at level 19–24 needs watching.** §2f flags Drudges at 45–54 as
 wasted encounter slots; Tumblehusk at 0.80/0.70 is nearer the edge than
@@ -800,11 +817,14 @@ _commonAlways = [ DropEntry('aero_dust', chance: 0.75, min: 1, max: 2) ]
 ```
 _miniDrops  always: aero_shard ×1 · aero_dust 2–4 · aero_crystal chance 0.25
             main:   yew_log 40 (2–4) · tussock_flax 30 (2–4) · hardtack 25 · leanstone_charm 5
-_bossDrops  always: aero_crystal 1–2 · aero_shard 1–2 · aero_dust 4–8 · aero_essence ✅ guaranteed
+_bossDrops  always: aero_crystal 1–2 · aero_shard 1–2 · aero_dust 4–8      ⚠️ NO essence — see §8.6
             main:   yew_log 45 (4–8) · tussock_flax 25 (3–6) · leanstone_charm 20 · the_long_lean 10
 ```
 
-#### Catalogue — 16 defs (`windward_steppe_items.dart`)
+#### Catalogue — 15 defs (`windward_steppe_items.dart`)
+
+⚠️ **Was 16; `aero_essence` is cut** — the Sigil's Aero key, cut with the
+mechanism (§8.6).
 
 | id | Kind | Rarity | Slot / detail | Equip | Modifiers | Value |
 |---|---|---|---|---|---|---|
@@ -822,7 +842,6 @@ _bossDrops  always: aero_crystal 1–2 · aero_shard 1–2 · aero_dust 4–8 ·
 | `tussock_gloves` | Equipment | common | gloves · Gloves / Tussock | 24 | `maxHpBonus: 4, deflectChance: 8, deflectAmount: 20` (EV 1.6%) | 100 |
 | `leanstone_charm` | Equipment | **rare** | ring · Ring / Leanstone · `properName` · untradeable | 22 | `dodge: 6, accuracyBonus: 2` 📝 | 270 |
 | `the_long_lean` | Equipment | **epic** | robeTop · Mantle / Windgrass · `properName` · untradeable | 24 | `maxHpBonus: 24, dodge: 8, accuracyBonus: 3` 📝 | 740 |
-| `aero_essence` | **Key** | rare | `gates: 'concordance'` · bound | 1 | — | 0 |
 
 ⭐ **Yew continues the Q1 weapon ladder exactly** (Oak 1/5, Birch 2/6, Yew 3/7
 on the staff; 2/0, 3/1, 4/2 on the wand; knot accuracy 3, 4, 5). No crit —
@@ -851,7 +870,7 @@ the number to re-check the moment a second dodge source is added.
 
 | id | Name | Rank | Archetype | Element(s) | Level | HP |
 |---|---|---|---|---|---|---|
-| `rime_stalker` ✅ | Rime Stalker | Common | Skirmisher | aqua + aero | 21–26 | 153–187 |
+| `rime_stalker` ✅ | Rime Stalker | Common | **Adept** | aqua + aero | 21–26 | 219–267 |
 | `hoarbound` | Hoarbound | Common | Sentinel | **aqua** | 21–26 | 274–334 |
 | `breathfrost` | Breathfrost | Common | Glasswing | **aero** | 21–26 | 110–134 |
 | `cairnwight` | Cairnwight | Common | Blighter | aqua + aero | 21–26 | 219–267 |
@@ -873,6 +892,10 @@ also sure. ⚠️ Do not "fix" this into a symmetry.
 ⚠️ **The Aspect must be single-element** (ENEMIES §2.5: it *is* one element's passive
 taken to an extreme). Aqua's Waterlogged — the thing that slows you and holds
 you — is the only reading of *The Road Under* that works.
+
+✅ **`rime_stalker` is Skirmisher → Adept, ruled (§8.4).** A stalker that
+fights honestly is believable, and it is the zone's anchor name — the
+cheapest of the three swaps the draft offered.
 
 #### Drop table
 
@@ -896,28 +919,42 @@ _miniDrops  always: aqua_shard ×1 · aero_shard ×1 · aqua_dust 2–4 · aero_
                     · aqua_crystal chance 0.25 · aero_crystal chance 0.25
             main:   rimepelt 40 (2–4) · hoarlichen 30 (2–4) · everice 25 (1–2) · rimebound_ring 5
 _bossDrops  always: aqua_crystal 1–2 · aero_crystal 1–2 · aqua_shard 1–2 · aero_shard 1–2
-                    · aqua_dust 4–8 · aero_dust 4–8      ⚠️ NO essence — hybrid
-            main:   rimepelt 40 (4–8) · hoarlichen 25 (3–6) · everice 20 (2–4) · rimebound_ring 15
+                    · aqua_dust 4–8 · aero_dust 4–8      ⚠️ NO essence — hybrid, and see §8.6
+            main:   rimepelt 35 (4–8) · hoarlichen 20 (3–6) · everice 15 (2–4) · rimebound_ring 20
+                    · the_holdfast 10
 ```
 
-⚠️ **No epic here, and no essence.** ⭐ The reason is stated so nobody
-"balances" it back in: the four Kinetic epics sit on the four boss pools that
-carry canon element-roster names (Mountain Heart, Storm Lord, Tempest Monarch,
-Efreet). Frostfell and Thunderspire pay in **doubled crystals** instead — a
-hybrid boss hands over both parents' Crystal on `always`, which is the richest
-mote payout in the quarter and the concrete reason to run a hybrid.
-📝 This is a real tuning call; see Decisions §8.7.
+✅ **RULED — Frostfell gets an epic (Christian, 2026-08-20, §8.7).** The
+draft's original reasoning — that the four Kinetic epics sit only on boss
+pools carrying canon element-roster names, and that Frostfell and
+Thunderspire pay in **doubled Crystals** instead — is rejected along with the
+substitution. `the_holdfast` drops off the boss pool alongside the other
+boss-table rewards; the `always` line's doubled Crystal payout stays exactly
+as it was, because that is just the standard hybrid mote shape (§7.3, two
+parents' motes on every hybrid boss), not a consolation for lacking an epic.
 
 #### Catalogue — 6 defs (`frostfell_pass_items.dart`)
+
+⚠️ **Still 6, but the set changed.** `hoarlichen_antidote` is cut (§8.5, no
+`ItemEffect` vocabulary to write it against) and `the_holdfast` is added
+(§8.7's epic) — the count is coincidentally the same.
 
 | id | Kind | Rarity | Slot / detail | Equip | Modifiers | Value |
 |---|---|---|---|---|---|---|
 | `rimepelt` | Material | common | Tailoring t4 · ⚠️ **kill-only, no node** | 1 | — | 12 📝 |
-| `hoarlichen` | Material | common | Potions t4 | 1 | — | 11 📝 |
-| `everice` ⏳ | Material | uncommon | Jewelry t5 · **banks for Q3** | 1 | — | 26 📝 |
+| `hoarlichen` ⏳ | Material | common | Potions t4 · 📝 **banks — Antidote deferred, §8.5/§9** | 1 | — | 11 📝 |
+| `everice` ⏳ | Material | uncommon | Jewelry t5 · 📝 **banks until Rimeholt (L45), §8.1** | 1 | — | 26 📝 |
 | `rimepelt_belt` | Equipment | common | belt · Belt / Rimepelt | 23 | `beltSlots: 3` ⚠️ capacity only, per Q1 | 220 |
-| `hoarlichen_antidote` | **Beltable** | uncommon | ⚠️ **needs new `ItemEffect` vocabulary** — see §8.5 | 1 | cleanse 📝 | 55 |
 | `rimebound_ring` | Equipment | **rare** | ring · Ring / Everice · `properName` · untradeable | 24 | `deflectChance: 10, deflectAmount: 20, dodge: 3` (EV 2.0%) 📝 | 290 |
+| `the_holdfast` | Equipment | **epic** | neck · Anchor / Rimestone · `properName` · untradeable | 25 | `shieldStrengthPercent: 15` 📝 | 760 |
+
+⭐ **`the_holdfast` is Frostfell's epic, added by ruling 8.7.** 📝
+`shieldStrengthPercent: 15` — lowered from an initial 25; the only shipped
+shield-strength item is Brookstone Pendant at 10 (Glimmerbrook), so 15 is the
+next rung up, not a leap. Slot and lore lean on the zone's own metaphor: a
+holdfast is the anchor a kelp grips stone with, and *"everything that moves
+through here gets held"* is the zone's premise stated as an item. Dropper:
+the boss pool, equip 25, in-band for a 21–26 zone.
 
 ⭐ **Belt capacity ladder: Fawnhide 1 → Tuskhide 2 → Rimepelt 3 → Emberhide 4.**
 `Carrying.maxBeltSlots` is 10, so there is room for the whole game.
@@ -947,10 +984,10 @@ both.
 | `humming_ore` | Humming Ore | Common | Sentinel | **electro** | 23–28 | 296–360 |
 | `flashcount` | Flashcount | Common | Lasher | **electro** | 23–28 | 201–245 |
 | `updraft_wisp` | Updraft Wisp | Common | Glasswing | **aero** | 23–28 | 118–144 |
-| `ionwake` | Ionwake | Common | Skirmisher | electro + aero | 23–28 | 166–202 |
+| `ionwake` | Ionwake | Common | **Adept** | electro + aero | 23–28 | 237–288 |
 | `crown_fire` | Crown Fire | Mini | Champion | **electro** | 28 | 490 |
 | `anvilhead` | Anvilhead | Mini | Redoubt | electro + aero | 28 | 634 |
-| `thunder_roc` ✅✅ | Thunder Roc | Mini | Executioner | **aero** | 28 | 346 |
+| `thunder_roc` ✅✅ | Thunder Roc | Mini | Executioner | **electro** | 28 | 346 |
 | `the_shortening` | The Shortening | Mini | Hexer | **electro** | 28 | 461 |
 | `the_storm_that_passes` | The Storm That Passes | **Boss** | Juggernaut | electro + aero | 28 | 1037 |
 | `the_strike_that_lands` | The Strike That Lands | **Boss** | **Aspect** | **electro** | 28 | 749 |
@@ -963,15 +1000,24 @@ the stack is visibly accelerating.
 taken to an extreme); *The Storm That Passes* is the one that does not (a mass
 that simply keeps going — Juggernaut).
 ⚠️ **`stormcrest_roc` and `thunder_roc` are two rocs in one zone** — the
-anchor and a re-homed Electro mini. Kept; they are different sizes and
-different elements (Aero vs Aero — ⚠️ see below).
+anchor and a re-homed Electro mini. Kept; they are different sizes *and*
+different elements (Aero vs Electro), which is exactly what keeps the pair
+from reading as the same creature at two sizes rather than courting it.
 
-⚠️ **Thunder Roc is a GAME_DESIGN §5 *Electro* name assigned Aero here.** The
-reason is that it is the zone's Executioner and its sibling common is the
-Bruiser roc — two rocs sharing an element would make the pair read as the same
-creature at two sizes, which §2f explicitly says is a *different* pattern
-(Starfall Basin's). 📝 Flip it to Electro if the designer prefers the roster
-name to keep its roster element.
+✅ **RULED (Christian, 2026-08-20, §8.8): Thunder Roc keeps its GAME_DESIGN §5
+Electro assignment**, per roster canon. The earlier draft flipped it to Aero
+to *avoid* a same-element pair — backwards: matching Stormcrest Roc's Aero is
+what would have made them read as one species at two sizes (§2f's Starfall
+Basin pattern); Electro was always the fix, not the risk.
+
+✅ **Element-coverage audit, confirmed:** each Kinetic element keeps exactly
+one pure region — Geo = Old Quarry, Electro = Stormcliff Coast, Aero =
+Windward Steppe — plus its hybrids. Thunder Roc's Electro does not disturb
+this: Thunderspire is already a hybrid Electro+Aero zone, so one more Electro
+creature is on-theme, not a new pure region.
+
+✅ **`ionwake` is Skirmisher → Adept, ruled (§8.4).** A cheap swap — the
+zone's premise (a countdown) does not lean on it either way.
 
 #### Drop table
 
@@ -993,11 +1039,19 @@ _miniDrops  always: electro_shard ×1 · aero_shard ×1 · electro_dust 2–4 ·
                     · electro_crystal chance 0.25 · aero_crystal chance 0.25
             main:   iron_ore 40 (2–4) · rowan_log 30 (2–4) · hum_quartz 25 (1–2) · countstone_pendant 5
 _bossDrops  always: electro_crystal 1–2 · aero_crystal 1–2 · electro_shard 1–2 · aero_shard 1–2
-                    · electro_dust 4–8 · aero_dust 4–8     ⚠️ NO essence — hybrid
-            main:   iron_ore 40 (4–8) · rowan_log 25 (3–6) · hum_quartz 20 (2–4) · countstone_pendant 15
+                    · electro_dust 4–8 · aero_dust 4–8     ⚠️ NO essence — hybrid, and see §8.6
+            main:   iron_ore 35 (4–8) · rowan_log 25 (3–6) · hum_quartz 15 (2–4) · countstone_pendant 15
+                    · groundfault_grips 10
 ```
 
-#### Catalogue — 8 defs (`thunderspire_peaks_items.dart`)
+✅ **RULED — Thunderspire gets an epic too (Christian, 2026-08-20, §8.7).**
+Same reversal as Frostfell's: the "doubled Crystals in place of an epic"
+substitution is deleted; `groundfault_grips` drops off the boss pool and the
+`always` line's doubled Crystal payout is unchanged, standard hybrid shape.
+
+#### Catalogue — 9 defs (`thunderspire_peaks_items.dart`)
+
+⚠️ **Was 8; `groundfault_grips` is added** (§8.7's epic).
 
 | id | Kind | Rarity | Slot / detail | Equip | Modifiers | Value |
 |---|---|---|---|---|---|---|
@@ -1009,6 +1063,7 @@ _bossDrops  always: electro_crystal 1–2 · aero_crystal 1–2 · electro_shard
 | `rowan_wand` | Equipment | common | mainHand · Wand / Rowan · **1 socket** | 25 | `damagePerCast: 5, accuracyBonus: 3, critChance: 4, critDamage: 6` | 280 |
 | `rowan_knot` | Equipment | common | offHand · Knot / Rowan · **1 socket** | 25 | `accuracyBonus: 6, critChance: 2` | 230 |
 | `countstone_pendant` | Equipment | **rare** | neck · Pendant / Hum Quartz · `properName` · untradeable | 26 | `critChance: 10, critDamage: 12` 📝 | 300 |
+| `groundfault_grips` | Equipment | **epic** | gloves · Grips / Groundfault · `properName` — **"Groundfault Grips"** (Christian, 2026-08-20) · untradeable | 28 | `accuracyBonus: 5, damagePerCast: 4` 📝 | 790 |
 
 ⭐ **Rowan is where crafting gets crit, and where sockets arrive** — §9b.6
 gives Rowan "0–1 gem slots" and this contract spends the 1. ⚠️ Gems themselves
@@ -1017,6 +1072,11 @@ Celestial quarter keeps. 📝 If that reads badly, drop `socketCount` to 0 and
 move sockets to Ironwood (L30).
 ⭐ **`countstone_pendant`'s name is the zone** — it counts the intervals, and
 the intervals are getting shorter.
+⭐ **`groundfault_grips` is Thunderspire's epic, added by ruling 8.7** and
+named by Christian (2026-08-20). 📝 `accuracyBonus: 5, damagePerCast: 4` —
+the Electro identity is on-hit damage plus the accuracy to land it, in-band
+with the quarter's other epics. Dropper: the boss pool, equip 28 — zone max,
+matching the other epics' top-of-band placement.
 
 ---
 
@@ -1038,7 +1098,7 @@ zone's data may assume a descending structure.**
 | id | Name | Rank | Archetype | Element(s) | Level | HP |
 |---|---|---|---|---|---|---|
 | `molten_warden` ✅ | Molten Warden | Common | Sentinel | pyro + geo | 25–29 | 320–375 |
-| `slagswimmer` | Slagswimmer | Common | Skirmisher | **pyro** | 25–29 | 179–210 |
+| `slagswimmer` | Slagswimmer | Common | **Adept** | **pyro** | 25–29 | 256–300 |
 | `crustwalker` | Crustwalker | Common | Bruiser | **geo** | 25–29 | 294–345 |
 | `ember_vent` | Ember Vent | Common | Blighter | **pyro** | 25–29 | 256–300 |
 | `cooling_thing` | Cooling Thing | Common | Glasswing | **geo** | 25–29 | 128–150 |
@@ -1056,6 +1116,8 @@ wants a volcano, not foothills.
 ⚠️ **1080 HP is the largest number in the quarter by 4%.** See §1.2's 📝.
 ⭐ **`cooling_thing` as the Glasswing is the theme's sharpest edge** — the only
 thing down here that has stopped moving is the one thing that shatters.
+✅ **`slagswimmer` is Skirmisher → Adept, ruled (§8.4).** Workable, cheap, and
+the last of the quarter's three swaps.
 
 #### Drop table
 
@@ -1087,24 +1149,29 @@ _bossDrops  always: pyro_crystal 1–2 · geo_crystal 1–2 · pyro_shard 1–2 
 one clear in seven, against Old Quarry's 10. The Deep is the last zone and the
 hardest fight; 📝 flatten both to 12 if that reads as favouritism.
 
-#### Catalogue — 8 defs (`the_molten_deep_items.dart`)
+#### Catalogue — 6 defs (`the_molten_deep_items.dart`)
+
+⚠️ **Was 8; two are cut.** `obsidian_ring` was a Jewelry recipe output with no
+other source — cut with its recipe (§8.1). `firesalt_flask` was the quarter's
+offensive potion — cut with the Antidote (§8.5). Neither Molten Deep zone has
+an epic gap to fill (§8.7 only touches Frostfell and Thunderspire), so nothing
+replaces them.
 
 | id | Kind | Rarity | Slot / detail | Equip | Modifiers | Value |
 |---|---|---|---|---|---|---|
-| `obsidian` | Material | uncommon | Jewelry t4 | 1 | — | 22 📝 |
-| `firesalt` | Material | common | Potions t5 | 1 | — | 16 📝 |
+| `obsidian` ⏳ | Material | uncommon | Jewelry t4 · 📝 **banks until Rimeholt (L45), §8.1** | 1 | — | 22 📝 |
+| `firesalt` ⏳ | Material | common | Potions t5 · 📝 **banks — offensive potion deferred, §8.5/§9** | 1 | — | 16 📝 |
 | `emberhide` | Material | common | Tailoring t5 · ⚠️ **kill-only, no node** | 1 | — | 18 📝 |
-| `obsidian_ring` | Equipment | **rare** | ring · Ring / Obsidian | 26 | `critChance: 8, critDamage: 12` 📝 | 340 |
 | `emberhide_belt` | Equipment | common | belt · Belt / Emberhide | 27 | `beltSlots: 4` | 380 |
-| `firesalt_flask` | **Beltable** | uncommon | ⚠️ **needs new `ItemEffect` vocabulary** — the quarter's offensive potion, §8.5 | 1 | direct damage 📝 | 70 |
 | `firstmelt_loop` | Equipment | **rare** | ring · Loop / Firstmelt · `properName` · untradeable | 28 | `critChance: 5, critDamage: 25` 📝 | 360 |
 | `the_long_cooling` | Equipment | **epic** | hat · Circlet / Obsidian · `properName` · untradeable | 29 | `maxHpBonus: 22, deflectChance: 12, deflectAmount: 25, critDamage: 15` (EV 3.0%) 📝 | 820 |
 
-⚠️ **`obsidian_ring` (crafted Rare) and `firstmelt_loop` (dropped Rare) share a
-slot on purpose, and they must stay sidegrades** (§9b.4a): 8/12 is consistent
-damage, 5/25 is the gambler. ⭐ That is ITEMS §4.1a's *"low-chance/high-crit-damage
-glass cannon vs high-accuracy consistent"* build axis, expressed as two rings
-you choose between. Neither is strictly better.
+⚠️ **The `obsidian_ring` / `firstmelt_loop` sidegrade pairing this draft
+described (8/12 consistent damage vs 5/25 gambler) no longer holds** —
+`obsidian_ring` is cut with Jewelry (§8.1). `firstmelt_loop` stands alone as
+the Deep's crit ring; ITEMS §4.1a's *"low-chance/high-crit-damage glass
+cannon vs high-accuracy consistent"* axis has no second ring to express it
+against until Jewelry opens at Rimeholt.
 ⚠️ **`the_long_cooling` competes with `tussock_hood`** — the same
 break-your-set decision as `the_long_lean`, at the other end of the quarter.
 
@@ -1112,10 +1179,12 @@ break-your-set decision as `the_long_lean`, at the other end of the quarter.
 
 ## 5. The recipe ladder
 
-✅ **Ruling 3.** 26 recipes, band-scoped and cross-zone, in one file:
+✅ **Ruling 3.** 21 recipes, band-scoped and cross-zone, in one file:
 `lib/game/items/recipes/kinetic_recipes.dart`, registered in `RecipeBook.all`.
-⭐ Q1 shipped 20 across three skills; Q2 ships 26 across **five**, because
-Metalworking and Jewelry both debut.
+⭐ Q1 shipped 20 across three skills; Q2 ships 21 across **four**, because only
+Metalworking debuts this quarter — ⚠️ Jewelry stays at Rimeholt (§8.1) and the
+Antidote / offensive potion are deferred (§8.5), five recipes lighter than the
+original 26-recipe draft.
 
 ⚠️ **Skill level gates who can MAKE; `equipLevel` gates who can WEAR** (§9b.3).
 The two never move together and conflating them kills the twink lane.
@@ -1124,49 +1193,56 @@ The two never move together and conflating them kills the twink lane.
 
 XP is `Σ input counts × (4 + 2 × gate)`, computed, not guessed.
 
+⚠️ **Five recipes from the original 26-recipe draft are cut.** The three
+Jewelry recipes (`craft_amber_ring`, `craft_jasper_pendant`,
+`craft_obsidian_ring` — §8.1) and the Antidote and offensive potion
+(`craft_hoarlichen_antidote`, `craft_firesalt_flask` — §8.5). The table below
+is renumbered 1–21 to close the gaps; **no builder should look for recipe
+numbers 22–26 from an earlier draft.**
+
 | # | Recipe id | Skill | Gate | Inputs (id × count) | Output | **XP** |
 |---|---|---|---|---|---|---|
 | 1 | `craft_bronze_ingot` | Metalworking | 1 | `copper_ore` ×2 ⏳, `tin_ore` ×1, `charcoal` ×1 ⏳ | `bronze_ingot` | **24** |
 | 2 | `craft_iron_ingot` | Metalworking | 10 | `iron_ore` ×3, `charcoal` ×2 ⏳ | `iron_ingot` | **120** |
-| 3 | `craft_amber_ring` | Jewelry | 1 | `amber` ×2 ⏳, `bronze_ingot` ×1 | `amber_ring` | **18** |
-| 4 | `craft_jasper_pendant` | Jewelry | 5 | `quarry_jasper` ×2, `bronze_ingot` ×1 | `jasper_pendant` | **42** |
-| 5 | `craft_obsidian_ring` | Jewelry | 12 | `obsidian` ×2, `iron_ingot` ×1 | `obsidian_ring` | **84** |
-| 6 | `craft_yew_quarterstaff` | Woodcarving | 20 | `yew_log` ×3, `bronze_ingot` ×1 | `yew_quarterstaff` | **176** |
-| 7 | `craft_yew_wand` | Woodcarving | 20 | `yew_log` ×2, `bronze_ingot` ×1 | `yew_wand` | **132** |
-| 8 | `craft_yew_knot` | Woodcarving | 20 | `yew_log` ×2 | `yew_knot` | **88** |
-| 9 | `craft_rowan_quarterstaff` | Woodcarving | 30 | `rowan_log` ×3, `iron_ingot` ×1 | `rowan_quarterstaff` | **256** |
-| 10 | `craft_rowan_wand` | Woodcarving | 30 | `rowan_log` ×2, `iron_ingot` ×1 | `rowan_wand` | **192** |
-| 11 | `craft_rowan_knot` | Woodcarving | 30 | `rowan_log` ×2 | `rowan_knot` | **128** |
-| 12 | `craft_seawrack_hood` | Tailoring | 20 | `seawrack_fibre` ×2 | `seawrack_hood` | **88** |
-| 13 | `craft_seawrack_robe` | Tailoring | 20 | `seawrack_fibre` ×5 | `seawrack_robe` | **220** |
-| 14 | `craft_seawrack_leggings` | Tailoring | 20 | `seawrack_fibre` ×4 | `seawrack_leggings` | **176** |
-| 15 | `craft_seawrack_boots` | Tailoring | 20 | `seawrack_fibre` ×2 | `seawrack_boots` | **88** |
-| 16 | `craft_seawrack_gloves` | Tailoring | 20 | `seawrack_fibre` ×2 | `seawrack_gloves` | **88** |
-| 17 | `craft_rimepelt_belt` | Tailoring | 24 | `rimepelt` ×2, `tussock_flax` ×1 | `rimepelt_belt` | **156** |
-| 18 | `craft_tussock_hood` | Tailoring | 30 | `tussock_flax` ×3 | `tussock_hood` | **192** |
-| 19 | `craft_tussock_robe` | Tailoring | 30 | `tussock_flax` ×6 | `tussock_robe` | **384** |
-| 20 | `craft_tussock_leggings` | Tailoring | 30 | `tussock_flax` ×5 | `tussock_leggings` | **320** |
-| 21 | `craft_tussock_boots` | Tailoring | 30 | `tussock_flax` ×3 | `tussock_boots` | **192** |
-| 22 | `craft_tussock_gloves` | Tailoring | 30 | `tussock_flax` ×3 | `tussock_gloves` | **192** |
-| 23 | `craft_emberhide_belt` | Tailoring | 34 | `emberhide` ×2, `tussock_flax` ×1 | `emberhide_belt` | **216** |
-| 24 | `craft_saltwort_draught` | Potions & Alchemy | 20 | `saltwort` ×2 | `saltwort_draught` | **88** |
-| 25 | `craft_hoarlichen_antidote` | Potions & Alchemy | 25 | `hoarlichen` ×2, `fenroot` ×1 ⏳ | `hoarlichen_antidote` | **162** |
-| 26 | `craft_firesalt_flask` | Potions & Alchemy | 30 | `firesalt` ×2, `pyro_dust` ×1 | `firesalt_flask` | **192** |
+| 3 | `craft_yew_quarterstaff` | Woodcarving | 20 | `yew_log` ×3, `bronze_ingot` ×1 | `yew_quarterstaff` | **176** |
+| 4 | `craft_yew_wand` | Woodcarving | 20 | `yew_log` ×2, `bronze_ingot` ×1 | `yew_wand` | **132** |
+| 5 | `craft_yew_knot` | Woodcarving | 20 | `yew_log` ×2 | `yew_knot` | **88** |
+| 6 | `craft_rowan_quarterstaff` | Woodcarving | 30 | `rowan_log` ×3, `iron_ingot` ×1 | `rowan_quarterstaff` | **256** |
+| 7 | `craft_rowan_wand` | Woodcarving | 30 | `rowan_log` ×2, `iron_ingot` ×1 | `rowan_wand` | **192** |
+| 8 | `craft_rowan_knot` | Woodcarving | 30 | `rowan_log` ×2 | `rowan_knot` | **128** |
+| 9 | `craft_seawrack_hood` | Tailoring | 20 | `seawrack_fibre` ×2 | `seawrack_hood` | **88** |
+| 10 | `craft_seawrack_robe` | Tailoring | 20 | `seawrack_fibre` ×5 | `seawrack_robe` | **220** |
+| 11 | `craft_seawrack_leggings` | Tailoring | 20 | `seawrack_fibre` ×4 | `seawrack_leggings` | **176** |
+| 12 | `craft_seawrack_boots` | Tailoring | 20 | `seawrack_fibre` ×2 | `seawrack_boots` | **88** |
+| 13 | `craft_seawrack_gloves` | Tailoring | 20 | `seawrack_fibre` ×2 | `seawrack_gloves` | **88** |
+| 14 | `craft_rimepelt_belt` | Tailoring | 24 | `rimepelt` ×2, `tussock_flax` ×1 | `rimepelt_belt` | **156** |
+| 15 | `craft_tussock_hood` | Tailoring | 30 | `tussock_flax` ×3 | `tussock_hood` | **192** |
+| 16 | `craft_tussock_robe` | Tailoring | 30 | `tussock_flax` ×6 | `tussock_robe` | **384** |
+| 17 | `craft_tussock_leggings` | Tailoring | 30 | `tussock_flax` ×5 | `tussock_leggings` | **320** |
+| 18 | `craft_tussock_boots` | Tailoring | 30 | `tussock_flax` ×3 | `tussock_boots` | **192** |
+| 19 | `craft_tussock_gloves` | Tailoring | 30 | `tussock_flax` ×3 | `tussock_gloves` | **192** |
+| 20 | `craft_emberhide_belt` | Tailoring | 34 | `emberhide` ×2, `tussock_flax` ×1 | `emberhide_belt` | **216** |
+| 21 | `craft_saltwort_draught` | Potions & Alchemy | 20 | `saltwort` ×2 | `saltwort_draught` | **88** |
 
-⭐ **Every one of Q1's four banked materials is spent, and each by the recipe
-its banking clause named:** Copper and Charcoal into Bronze at Forgeholm,
-Fenroot into the Antidote, Amber into Jewelry's first ring. ⚠️ **That is the
-promise §9b.8 made and it must not be quietly dropped** — a builder who
-substitutes a Kinetic material for one of these has broken a fifteen-level
-setup.
+⭐ **Two of Q1's four banked materials are spent this quarter; the other two
+keep banking.** Copper and Charcoal go into Bronze at Forgeholm exactly as
+their banking clause promised. ⚠️ **Fenroot and Amber do not** — both cuts
+trace to a ruling, not an oversight: §8.1 keeps Jewelry at Rimeholt (taking
+Amber's ring with it) and §8.5 defers the Antidote (taking Fenroot with it).
+Both continue banking exactly as before, spendable once their maker finally
+opens — a builder must not invent a Kinetic consumer for either to force the
+old four-for-four promise; the promise was "spendable when the maker opens,"
+not "spendable this quarter."
 
 ⭐ **Metalworking is a pure feeder lane, and that is §6a.1's design, not an
-oversight.** It has two recipes and **nine downstream consumers** (six
-Woodcarving, three Jewelry). *"Metalworking is the refinement lane for Mining
-— many of those outputs are inputs to other recipes (a staff needs a ferrule;
-a ring needs a band)."* 📝 If the designer wants the fittings spelled out as
-their own step, add `craft_bronze_fitting` and `craft_iron_fitting` (→ 28
-recipes) and re-point recipes 6, 7, 9, 10, 3, 4, 5 at them.
+oversight.** It has two recipes and **four downstream consumers, all
+Woodcarving** — down from the original draft's nine (six Woodcarving, three
+Jewelry) now that Jewelry's three ingot-consuming recipes are cut (§8.1).
+*"Metalworking is the refinement lane for Mining — many of those outputs are
+inputs to other recipes (a staff needs a ferrule; a ring needs a band)."* 📝
+If the designer wants the fittings spelled out as their own step, add
+`craft_bronze_fitting` and `craft_iron_fitting` (→ 23 recipes) and re-point
+recipes 3, 4, 6, 7 at them.
 
 ### 5.2 Gate progression — does the ladder actually climb?
 
@@ -1175,21 +1251,21 @@ recipes) and re-point recipes 6, 7, 9, 10, 3, 4, 5 at them.
 | Gate | XP to reach | Cheapest route | Crafts needed |
 |---|---|---|---|
 | Metalworking 10 | 360 | Bronze Ingot (24) | 15 |
-| Jewelry 5 | 110 | Amber Ring (18) | 7 |
-| Jewelry 12 | 495 | Jasper Pendant (42) | ~10 |
 | Woodcarving 20 | 1235 | ⭐ **from Q1's Birch** | continuous |
 | Tailoring 20 | 1235 | ⭐ from Q1's Bogflax | continuous |
 | Tailoring 30 | 2610 | Seawrack Robe (220) | ~7 after gate 20 |
-| Potions 30 | 2610 | Saltwort Draught (88) | ~16 after gate 20 |
+
+⚠️ **Jewelry's two gates and Potions' gate-30 row are cut with their
+recipes** (§8.1, §8.5) — reaching them has nothing to craft against in Q2
+content.
 
 ⭐ **Woodcarving and Tailoring enter the quarter already climbing** — a player
 who worked Q1's ladder arrives near 15–18 and the tier-3 gate at 20 is a short
-push. **Metalworking and Jewelry start at 1**, which is the correct feel for a
-skill you just learned, and their first gates are cheap so the debut is not a
-wall.
-⚠️ **Potions' Q2 gates (20/25/30) are the steepest climb in the quarter**
-because Q1 gave the skill only two recipes. 📝 Consider dropping the Antidote
-to gate 22.
+push. **Metalworking starts at 1**, which is the correct feel for a skill you
+just learned, and its first gate is cheap so the debut is not a wall.
+⚠️ **Potions reaches only gate 20 this quarter** (Saltwort Draught) — the
+Antidote (25) and offensive potion (30) gates are cut with their recipes; see
+§8.5 and §9's fast-follow.
 
 ### 5.3 §6a.1 slot coverage — what this quarter fills
 
@@ -1203,14 +1279,18 @@ to gate 22.
 | Belt | Tailoring (2 belts) | Tailoring (2 belts) | continues |
 | Main hand | Woodcarving (Oak/Birch) | Woodcarving (Yew/Rowan) | continues |
 | Off hand | Woodcarving (Knot) | Woodcarving (Knot) | continues |
-| **Neck** | ⚠️ **drop-only** | ✅ **Jewelry — Jasper Pendant** | ⭐ **newly filled** |
-| **Ring** | ⚠️ **drop-only** | ✅ **Jewelry — Amber Ring, Obsidian Ring** | ⭐ **newly filled** |
-| — | — | Metalworking → feeds 9 recipes | ⭐ newly filled |
+| **Neck** | ⚠️ **drop-only** | ⚠️ **still drop-only** | unchanged — §8.1 |
+| **Ring** | ⚠️ **drop-only** | ⚠️ **still drop-only** | unchanged — §8.1 |
+| — | — | Metalworking → feeds 4 recipes | ⭐ newly filled |
 | — | — | ⚠️ **Enchanting: still empty** | Meridian, L36 |
+| — | — | ⚠️ **Jewelry: still empty** | Rimeholt, L45 — §8.1 |
 
-⭐ **§6a.1's *"every slot has a maker"* becomes true for the first time in this
-quarter.** Q1 satisfied it on paper only — Neck and Ring were drop-only by
-ruling because no maker existed.
+⭐ **§6a.1's *"every slot has a maker"* does NOT become true this quarter.**
+Neck and Ring stay drop-only exactly as Q1 left them — Jewelry's station and
+its learning both stay at Rimeholt (§8.1). What debuts instead is materials
+*banking* toward that future maker: `quarry_jasper`, `everice` and `obsidian`
+gatherable now, spendable at Rimeholt — the Q1-ore-before-Metalworking pattern
+repeated one skill later.
 
 ---
 
@@ -1258,20 +1338,25 @@ if a third mining engine is unwelcome.
 
 ### 7.1 Counts
 
+⚠️ **Recomputed after all eight rulings (§8).** Creatures are unaffected —
+only element and archetype fields changed on three commons and one mini, none
+added or removed. Items and recipes both shrank; §7.2's id-uniqueness count
+below is updated to match.
+
 | Thing | Count | Check |
 |---|---|---|
-| Creatures | **66** | ✅ 6 zones × (5 commons + 4 minis + 2 bosses) |
-| — commons | 30 | ✅ 5 per zone; ⚠️ no zone repeats an archetype inside its five |
+| Creatures | **66** | ✅ 6 zones × (5 commons + 4 minis + 2 bosses) — unchanged |
+| — commons | 30 | ✅ 5 per zone; ⚠️ no zone repeats an archetype inside its five (holds after the §8.4 swaps) |
 | — minis | 24 | ✅ one Champion, one Redoubt, one Executioner, one Hexer per zone (§2g) |
 | — bosses | 12 | ✅ 5 Juggernaut · 4 Tyrant · 3 Aspect |
-| Item definitions | **64** | Old Quarry 12 · Stormcliff 14 · Windward 16 · Frostfell 6 · Thunderspire 8 · Molten Deep 8 |
-| — materials | 15 | ✅ 2+2+2+3+3+3 (§9b.8 ruling 7) |
+| Item definitions | **58** | Old Quarry 9 · Stormcliff 13 · Windward 15 · Frostfell 6 · Thunderspire 9 · Molten Deep 6 |
+| — materials | 15 | ✅ 2+2+2+3+3+3 (§9b.8 ruling 7) — unchanged; five now bank instead of spend (§3.1) |
 | — motes | 9 | 3 families × dust/shard/crystal |
-| — consumables | 4 | `hardtack` (drop-only) + 3 crafted |
+| — consumables | 2 | `hardtack` (drop-only) + `saltwort_draught` — Antidote and offensive potion cut, §8.5 |
 | — intermediate goods | 2 | `bronze_ingot`, `iron_ingot` |
-| — equipment | 31 | 21 crafted + 10 drop-only |
-| — keys | 3 | the Sigil's three parts |
-| Recipes | **26** | ✅ Ruling 3's "~20–26"; Woodcarving 6 · Metalworking 2 · Tailoring 12 · Potions 3 · Jewelry 3 |
+| — equipment | 30 | 18 crafted + 12 drop-only — 3 Jewelry-crafted items cut (§8.1), 2 epics added (§8.7) |
+| — keys | 0 | ✅ removed — the Sigil mechanism is rejected, §8.6 |
+| Recipes | **21** | ✅ Ruling 3's "~20–26"; Woodcarving 6 · Metalworking 2 · Tailoring 12 · Potions 1 · Jewelry 0 (§8.1) |
 | Gather nodes | **13** | 15 materials − 2 kill-only hides |
 | New files | **10** | 6 bestiaries, 6 catalogues, 1 recipe file, 13 nodes appended to `GatherNodes` — plus registrations |
 
@@ -1286,8 +1371,10 @@ Checked mechanically against all 289 ids currently in
 `lib/game/items/catalogue/`, `lib/game/items/recipes/`, `lib/game/gathering/`
 and `lib/game/enemies/`:
 
-> ✅ **66 creature ids + 64 item ids + 26 recipe ids + 13 node ids = 169 new
-> ids. Zero collisions with shipped ids, and zero duplicates among themselves.**
+> ✅ **66 creature ids + 58 item ids + 21 recipe ids + 13 node ids = 158 new
+> ids.** (Was 169 before the eight rulings: 8 items cut — 3 Jewelry-crafted,
+> 3 Sigil keys, 2 potions — and 2 epics added back; 5 recipes cut.) Zero
+> collisions with shipped ids, and zero duplicates among themselves.
 
 Near-misses worth knowing about, all distinct and all deliberate:
 
@@ -1296,7 +1383,7 @@ Near-misses worth knowing about, all distinct and all deliberate:
 | creature `leanstone` / item `leanstone_charm` | Q1 precedent: creature `heartwood` / item `heartwood_stave` |
 | creature `fulgurite_crawler` / item `fulgurite_pendant` | different namespaces, different strings |
 | creature `firstmelt` / item `firstmelt_loop` | as above |
-| creature `obsidian_golem` / material `obsidian` / item `obsidian_ring` | ⚠️ the Golem is Old Quarry's, the material is the Deep's — a Geo name in a Geo zone and a Pyro+Geo material |
+| creature `obsidian_golem` / material `obsidian` | ⚠️ the Golem is Old Quarry's, the material is the Deep's — different zones, different namespaces. (The item `obsidian_ring` that used to complete this trio is cut, §8.1.) |
 | creature `the_overseer` / item `overseers_seal` | ✅ exactly the pairing §9b.8 ruling 9 asked for |
 | mini `the_long_line` / epic `the_long_lean` / epic `the_long_cooling` | ⚠️ three "The Long …" names in one quarter. Distinct ids, but 📝 the *display* names may read as a set they are not |
 | move prefixes `oq_ sc_ ws_ ff_ tp_ md_` | none collide with `ww_ gb_ cp_ tm_ av_` |
@@ -1305,11 +1392,11 @@ Near-misses worth knowing about, all distinct and all deliberate:
 
 | Zone | Ids referenced | All defined? |
 |---|---|---|
-| old_quarry | `geo_dust` `geo_shard` `geo_crystal` `tin_ore` `quarry_jasper` `hardtack` `overseers_seal` `the_given_weight` `geo_essence` | ✅ all in `old_quarry_items.dart` |
-| stormcliff_coast | `electro_*` `seawrack_fibre` `saltwort` `saltwort_draught` `hardtack` `fulgurite_pendant` `uplight` `electro_essence` | ✅ `hardtack` from Old Quarry, rest local |
-| windward_steppe | `aero_*` `yew_log` `tussock_flax` `hardtack` `leanstone_charm` `the_long_lean` `aero_essence` | ✅ |
-| frostfell_pass | `aqua_*` ✅ **Q1** `aero_*` `rimepelt` `hoarlichen` `everice` `hardtack` `rimebound_ring` | ✅ `aqua_*` resolve to `glimmerbrook_items.dart` |
-| thunderspire_peaks | `electro_*` `aero_*` `rowan_log` `iron_ore` `hum_quartz` `hardtack` `countstone_pendant` | ✅ |
+| old_quarry | `geo_dust` `geo_shard` `geo_crystal` `tin_ore` `quarry_jasper` `hardtack` `overseers_seal` `the_given_weight` | ✅ all in `old_quarry_items.dart`; ⚠️ `geo_essence` removed, §8.6 |
+| stormcliff_coast | `electro_*` `seawrack_fibre` `saltwort` `saltwort_draught` `hardtack` `fulgurite_pendant` `uplight` | ✅ `hardtack` from Old Quarry, rest local; ⚠️ `electro_essence` removed, §8.6 |
+| windward_steppe | `aero_*` `yew_log` `tussock_flax` `hardtack` `leanstone_charm` `the_long_lean` | ✅ ⚠️ `aero_essence` removed, §8.6 |
+| frostfell_pass | `aqua_*` ✅ **Q1** `aero_*` `rimepelt` `hoarlichen` `everice` `hardtack` `rimebound_ring` `the_holdfast` | ✅ `aqua_*` resolve to `glimmerbrook_items.dart`; `the_holdfast` added, §8.7 |
+| thunderspire_peaks | `electro_*` `aero_*` `rowan_log` `iron_ore` `hum_quartz` `hardtack` `countstone_pendant` `groundfault_grips` | ✅ `groundfault_grips` added, §8.7 |
 | the_molten_deep | `pyro_*` ✅ **Q1** `geo_*` `emberhide` `obsidian` `firesalt` `hardtack` `firstmelt_loop` `the_long_cooling` | ✅ `pyro_*` resolve to `cinderpeak_items.dart` |
 
 ⭐ **Four cross-quarter references, all deliberate:** `aqua_*` and `pyro_*`
@@ -1318,14 +1405,17 @@ drops both its parents' motes"*, and here one parent is a Primal element.
 
 ### 7.4 Every recipe input is obtainable in-band
 
+⚠️ **`amber`, `fenroot`, `quarry_jasper` and `obsidian` are removed from this
+table** — none of them is an input to any of the 21 remaining recipes.
+`amber` and `fenroot` lost their consumer with the Jewelry and Antidote cuts
+(§8.1, §8.5); `quarry_jasper` and `obsidian` lost theirs with Jewelry (§8.1).
+All four still drop and gather exactly as before — see §3.1's banking note.
+
 | Input | Source | In band? |
 |---|---|---|
 | `copper_ore` ⏳ | `cp_copper_seam`, Cinderpeak 6–11 | ✅ banked, re-farmable |
 | `charcoal` ⏳ | `av_charcoal_burn`, Ashfall 10–14 | ✅ banked, re-farmable |
-| `amber` ⏳ | `tm_amber_bog_oak`, Thornmire 8–13 | ✅ banked, re-farmable |
-| `fenroot` ⏳ | `tm_fenroot_hummock`, Thornmire 8–13 | ✅ banked, re-farmable |
 | `tin_ore` | `oq_tin_seam` + Old Quarry commons | ✅ |
-| `quarry_jasper` | `oq_jasper_face` + Old Quarry commons | ✅ |
 | `bronze_ingot` | crafted (#1) | ✅ |
 | `iron_ore` / `iron_ingot` | `tp_iron_seam` + Thunderspire commons / crafted (#2) | ✅ |
 | `seawrack_fibre` | `sc_wrackline` + Stormcliff commons | ✅ |
@@ -1333,17 +1423,16 @@ drops both its parents' motes"*, and here one parent is a Primal element.
 | `yew_log` | `ws_yew_break` + Windward commons | ✅ |
 | `tussock_flax` | `ws_tussock_swale` + Windward commons | ✅ |
 | `rimepelt` | ⚠️ Frostfell **kills only** — Rime Stalker, Hoarbound, minis, bosses | ✅ by design |
-| `hoarlichen` | `ff_lichen_shelf` + Frostfell commons | ✅ |
 | `rowan_log` | `tp_rowan_stand` + Thunderspire commons | ✅ |
 | `emberhide` | ⚠️ Molten Deep **kills only** — Molten Warden, Crustwalker, minis, bosses | ✅ by design |
-| `obsidian` | `md_obsidian_flow` + Molten Deep commons | ✅ |
-| `firesalt` | `md_firesalt_crust` + Molten Deep commons | ✅ |
-| `pyro_dust` | ✅ Q1 + The Molten Deep's `always` bucket | ✅ |
 
-⚠️ **`everice` and `hum_quartz` have no Kinetic consumer, by design** (⏳
-banking, §3.1). ⚠️ **A test must assert that**, or the "every material is
-consumed" check will flag them as orphans forever — exactly as Q1's suites had
-to for Copper and Amber.
+⚠️ **`quarry_jasper`, `everice`, `obsidian` and `hum_quartz` have no Kinetic
+consumer, by design** (⏳ banking — the first three to Rimeholt L45 per §8.1,
+`hum_quartz` to Meridian L36 per §3.1). `hoarlichen` and `firesalt` join them,
+banking until the Antidote and offensive potion ship (§8.5). ⚠️ **A test must
+assert all six unconsumed**, or the "every material is consumed" check will
+flag them as orphans forever — exactly as Q1's suites had to for Copper and
+Amber.
 
 ### 7.5 Economy invariants
 
@@ -1355,8 +1444,7 @@ to for Copper and Amber.
 | Core never drops | ✅ no Core defined this quarter (§3.2) |
 | Hearts are craft-only | ✅ no Heart defined |
 | Rare components only off difficult enemies (§3.5) | ✅ no `ComponentDef` this quarter — components are Tier III/IV set parts (L45+). The equivalent, drop-only Rare and Epic gear, appears **only** on `_miniDrops` and `_bossDrops` |
-| Gate items never behind a dice roll | Three essences on `always`, both bosses of each pure zone |
-| Hybrids drop no gate item | ✅ Frostfell, Thunderspire, Molten Deep |
+| No quarter-progression gate item ships this quarter | ✅ the collect-three-keys mechanism is rejected (§8.6); the replacement is deferred to §9 |
 | Crafted is the floor, drops are the ceiling (§9b.4a) | §2.6's table: crafted-only ≈ 6.9 levels, best-in-slot ≈ 10.7 |
 | Common rarity = flat stats only (§8) | ✅ every crafted set piece and weapon is Common and carries only flat numbers or a paired chance/amount |
 | Belts are capacity, never power (§6b.2) | ✅ both belts are `beltSlots` alone |
@@ -1369,155 +1457,103 @@ One file per zone, mirroring `test/glimmerbrook_test.dart`:
 - ⚠️ `maxHpAt` equals `scaledMaxHp(L) × hpScale` for one common and one boss
 - ⚠️ **raw damage ≤ 60 and ≤ 12 per charge on every move** (§1.3)
 - every drop id resolves through `ItemCatalogue`
-- pure zones: **both** bosses guarantee the essence; hybrids: **no** essence anywhere
+- ⚠️ **no zone's boss drops a gate item this quarter** — the Sigil mechanism
+  is deferred (§8.6); no test should assert `geo_essence` / `electro_essence`
+  / `aero_essence` exist
 - no Crystal on any common table
 - move names pass the §3.3 voice check
-- ⚠️ `everice` and `hum_quartz` are asserted **unconsumed** (§7.4)
+- ⚠️ `quarry_jasper`, `everice`, `obsidian`, `hum_quartz`, `hoarlichen` and
+  `firesalt` are asserted **unconsumed** (§7.4)
 - ⚠️ Q1 regression: no Q1 `EnemyDef` carries a combat-stat block (§2.2)
 
 ---
 
-## 8. Decisions needed
+## 8. Decisions — ruled
 
-⚠️ **Eight items. Each blocks or reshapes something a builder will otherwise
-guess at.**
+⚠️ **Eight items, all ruled below (Christian, 2026-08-20). Nothing here is
+still open.** The consequences of each are applied throughout §§0–7; this
+section is the record of the ruling itself, not the working-through.
 
-### 8.1 Where is Jewelry learned?
+### 8.1 ✅ RULED (Christian, 2026-08-20)
 
-Ruling 3 says Jewelry debuts this quarter on banked Amber. But `world.dart`
-sites Jewelry at **Rimeholt, `opensAtLevel: 45`**, ITEMS §9b.1's final station
-map agrees, and §9b.8 ruling 9 says *"Jewelry is drop-only all quarter (no
-maker until Rimeholt)"* — a statement about Q1 that gave a Q4 reason.
-`world.dart`'s own comment is *"each town is the only place its skill can be
-learned, until Zenith."*
+**Jewelry does not debut in Q2.** The station — and the *learning* — stay at
+Rimeholt exactly as `world.dart` has them, taking option (c) from the draft's
+table further than it proposed. Q2's role is to start **finding** jewel
+materials that bank until Jewelry unlocks — the same pattern Q1 set for ore
+before Metalworking. The three Jewelry recipes are cut from §5; `quarry_jasper`,
+`everice` and `obsidian` stay in the drops and catalogues, each flagged 📝
+**banks until Rimeholt (L45)**.
 
-**A level-15 player cannot reach Rimeholt.** So: where do they learn Jewelry?
+### 8.2 ✅ RULED (Christian, 2026-08-20)
 
-| Option | Cost |
-|---|---|
-| **(a)** Move Jewelry's *learning* to Forgeholm and leave the *station* at Rimeholt | Splits "learn" from "station" — a new concept, but §9b.2 already says stations are convenience not gates, so the split is half-made already |
-| **(b)** Give Forgeholm two skills (Metalworking + Jewelry) | ⚠️ Breaks the one-skill-per-town shape that makes the map teach |
-| **(c)** Cut the three Jewelry recipes; Amber keeps banking to L45 | ⚠️ Contradicts Ruling 3 and leaves Neck/Ring drop-only for another thirty levels |
-| **(d)** Galehaven (L22) takes Jewelry as a second skill | Coastal trade town, "nothing here is made locally except the ships" — ⚠️ the arrival text argues against it |
+The invariant is re-anchored, verbatim: *"a fully geared L30 with best-in-slot
+should be similar in power to a naked L40, more or less."* Best-in-slot at a
+quarter's top ≈ +10 levels is the **target** (reading (a)) — crafted-only
+sitting lower is correct, per §9b.4a's crafted-is-the-floor. This contract's
+measured Q2 BiS ≈ 10.7 **passes** "more or less." The flat-modifier-decay
+warning stands as a note for whoever re-measures this at Q3's numbers.
 
-📝 **Recommendation: (a).** It is the smallest change, it fits §9b.2, and the
-three recipes are a clean excision if the answer turns out to be (c) —
-removing them leaves **23 recipes**, still in the ruled range.
+### 8.3 ✅ RULED (Christian, 2026-08-20)
 
-### 8.2 Is "gear ≈ ten levels" a target, a ceiling, or retired?
+**The empty arena is dead**, not deferred. The two shipped Windward Steppe
+bosses (*The Unbroken Blow*, *Tempest Monarch*) stand as written in §4.3.
+ENEMIES §2f's *"empty arena"* row is deleted from its §2f table in
+`docs/ENEMIES_DESIGN.md` — a later "add the empty draw" is not on any future
+quarter's roadmap for this zone.
 
-§2.6 measures it: Q1's best-in-slot is **6.7 levels**; this budget reaches
-**10.7** at the very top, and **6.9** on crafted gear alone. Three readings,
-and the answer changes twenty numbers:
+### 8.4 ✅ RULED (Christian, 2026-08-20)
 
-- **(a) Ten levels is the best-in-slot target.** ✅ This contract's budget
-  already lands there. Q1 is then simply under-budgeted, which is fine.
-- **(b) Ten levels is what *crafted* gear should reach.** Every Q2 crafted
-  stat roughly doubles. ⚠️ That makes crafted gear beat Q1's boss uniques,
-  which §9b.4a forbids.
-- **(c) The invariant is retired** and replaced by §9b.4a's *"gear advantage
-  caps at roughly one material tier"*, measured per tier at that tier's equip
-  level.
+Add the Adept via the smallest swap in **Frostfell Pass** (`rime_stalker`),
+**Thunderspire Peaks** (`ionwake`) and **The Molten Deep** (`slagswimmer`) —
+all three Skirmisher→Adept. **Old Quarry and Windward Steppe stay
+Adept-less**; every candidate swap in those two zones fights the ENEMIES §2b
+rule harder than it serves the yardstick. 📝 **Principle:** thematic absence
+is legitimate — a zone of large slow rock creatures needs no fast or fragile
+archetypes (Christian's ruling). Swaps replace, never append; all six rosters
+stay 11.
 
-⚠️ **Whichever is chosen, note that flat modifiers decay against a 4%/level
-geometric curve** — a +20 HP robe is 8% of the bar at equip 24 and 6.7% at 29.
-Any invariant stated in *levels* has to be re-anchored per tier or it drifts
-by construction.
+### 8.5 ✅ RULED (Christian, 2026-08-20)
 
-### 8.3 Windward Steppe's empty arena
+Wanted, but deferred. Both recipes (`craft_hoarlichen_antidote`,
+`craft_firesalt_flask`) are cut from §5 — the `ItemEffect` vocabulary they
+need doesn't exist yet. `hoarlichen` and `firesalt` stay as banked,
+📝-flagged drop/catalogue materials. See **§9 Fast-follow (Q2.1)**.
 
-ENEMIES §2f proposes, 📝, that one of the Steppe's two boss draws be **nothing
-at all** — *"you reach the end and it just keeps blowing"* — and immediately
-flags it as *"mechanically awkward."* This contract ships two real bosses
-(*The Unbroken Blow*, *Tempest Monarch*), which is what §2g's table says.
+### 8.6 ✅ RULED (Christian, 2026-08-20)
 
-**Is the empty arena dead, deferred, or should *The Unbroken Blow* be written
-as a deliberately very short encounter?** ⚠️ If it is deferred, say so here,
-because a later "add the empty draw" is a change to `Adventure`'s line builder
-and to the zone-clear path, not to the bestiary.
+The Kinetic Sigil's collect-three-keys gate is **rejected as a mechanism**.
+`geo_essence`, `electro_essence` and `aero_essence` are removed from §3, from
+every boss drop table, and from the item counts. The underlying canon —
+Concordance is gated by "the Kinetic Sigil, in three parts" (`world.dart`,
+NARRATIVE §4b.1/§4b.2) — still stands; only this draft's
+collection-of-three-key-items implementation is rejected. See **§9
+Fast-follow (Q2.1)**.
 
-### 8.4 The Adept is missing from five of six Kinetic zones
+### 8.7 ✅ RULED (Christian, 2026-08-20)
 
-ENEMIES §2f: *"Adept appears in only 10 of 25 zones, and it is the yardstick…
-in the 15 zones without one, the player has no baseline — every fight is an
-exception to a rule they never met. Adept should arguably be mandatory in
-every zone."*
+Both epic-less zones get an epic; the doubled-Crystals substitution is
+deleted. **Frostfell Pass** drops `the_holdfast` (neck, `shieldStrengthPercent:
+15`, equip 25) off the boss pool. **Thunderspire Peaks** drops
+`groundfault_grips` (gloves, `accuracyBonus +5 / damagePerCast +4` 📝, equip
+28) off the boss pool — named **Groundfault Grips**, Christian, 2026-08-20.
+§4.4 and §4.5's catalogues, drop tables and item counts are updated to match.
 
-Only **Stormcliff Coast** has one (the Tidecaller). §2e's rosters are canon,
-so this contract encodes them as written. If the designer wants the yardstick
-everywhere, here is the smallest swap per zone:
+### 8.8 ✅ RULED (Christian, 2026-08-20)
 
-| Zone | Change | Cost |
-|---|---|---|
-| Old Quarry | `gravelswarm` Lasher → **Adept** | ⚠️ loses the swarm's multi-hit lesson; a gravel swarm is a poor Adept |
-| Old Quarry (alt) | `quarry_golem` Bruiser → **Adept** | ⚠️ it is the anchor name and a golem is a Bruiser |
-| Windward Steppe | `chaff` Lasher → **Adept** | ⚠️ chaff is by definition many small pieces |
-| Frostfell Pass | `rime_stalker` Skirmisher → **Adept** | ⭐ **cheapest** — a stalker that fights honestly is believable, and it is the anchor |
-| Thunderspire Peaks | `ionwake` Skirmisher → **Adept** | ⭐ cheap |
-| The Molten Deep | `slagswimmer` Skirmisher → **Adept** | 🟡 workable |
+**Thunder Roc is Electro**, per roster canon (GAME_DESIGN §5) — the draft's
+Aero reassignment is reversed; §4.5 is updated. ✅ **Element-coverage audit,
+confirmed:** each Kinetic element keeps exactly one pure region — Geo = Old
+Quarry, Electro = Stormcliff Coast, Aero = Windward Steppe — plus its
+hybrids.
 
-📝 **Recommendation: yes for Frostfell, Thunderspire and the Deep** (three
-cheap Skirmisher→Adept swaps), **no for Old Quarry and Windward Steppe**,
-where every candidate fights the ENEMIES §2b rule. That gives the quarter four
-yardsticks in six zones without inventing a creature nobody believes in.
+---
 
-### 8.5 The Antidote and the offensive potion need engine vocabulary
+## 9. Fast-follow (Q2.1)
 
-ITEMS §9b.8 ruling 5 makes both this quarter's job. But `ItemEffect` has
-exactly three fields — `healPercent`, `healPerTurnPercent`, `healTurns` — and
-its own doc says it is *"deliberately small. Only healing exists because only
-healing is designed."*
-
-So `hoarlichen_antidote` (#25) and `firesalt_flask` (#26) cannot be written
-against the shipped type. **What vocabulary do they get?**
-
-- **Antidote:** cleanse *which* statuses? All? A named list (Burn, Waterlog,
-  Blind)? One, chosen by the ingredient, per §9b.8's *"form = mechanic,
-  ingredient = magnitude"* grammar? ⚠️ And *"Antidote"* is a **form** name in
-  that grammar, so whatever it does defines every future Antidote.
-- **Offensive potion:** flat damage, or element-typed? ⚠️ If it is typed it
-  interacts with the counter wheel and with shields, which is a much larger
-  change than a number.
-- ⚠️ **`HealOverTimeStatus` exists but has no in-duel trigger** (§9b.8) —
-  using a belt item as a turn action is unbuilt. Both new potions are Beltable
-  and land on the same missing feature.
-
-📝 **This is the only place in the contract that names an output nothing can
-represent.** If the vocabulary is not ruled, recipes 25 and 26 must be cut
-(→ **24 recipes**) and `hoarlichen` and `firesalt` re-banked ⏳ for Q3.
-
-### 8.6 Sigil part naming
-
-The three gate items are written **Geo Essence / Electro Essence / Aero
-Essence** — matching NARRATIVE's own word and the Celestial Totem's *"charged
-with Solar, Lunar and Astral"*. ⚠️ It does **not** match Q1's voice, where the
-same object was *Proof of the Woods*, *Proof of the Brook*, *Proof of the
-Foothills* — evocative, place-named, and much better lore.
-
-📝 The place-named alternative, if wanted: **The Quarry's Weight** ·
-**The Standing Charge** · **The Long Blow**. Ids would become
-`the_quarrys_weight`, `the_standing_charge`, `the_long_blow` — ⚠️ and the last
-of those collides in *reading* with `the_long_line` / `the_long_lean` /
-`the_long_cooling` (§7.2's flagged near-miss).
-
-### 8.7 Two of the six zones get no Epic
-
-Frostfell Pass and Thunderspire Peaks have a Rare mini drop and no Epic; the
-other four have both. §4.4 gives the reason — the four Epics sit on the four
-boss pools carrying canon element-roster names — and pays the two hybrids in
-**doubled Crystals** instead.
-
-📝 **Confirm or reject.** The alternative is six Epics (one per zone), which
-is three times Q1's density across only slightly more content. ⚠️ Whichever
-way, the reason should be written into the zone files, because "why does the
-White Corridor drop nothing special" is a question a player will ask.
-
-### 8.8 Thunder Roc's element
-
-`thunder_roc` is a GAME_DESIGN §5 **Electro** roster name, assigned **Aero**
-in §4.5 so that it does not read as the same creature as `stormcrest_roc` at
-two sizes. 📝 One-line ruling either way; it changes one field and one move
-set's element.
+- **Antidote + offensive potion** — needs `ItemEffect` vocabulary the engine
+  lacks; materials already banked (`hoarlichen`, `firesalt` — §8.5).
+- **Quarter progression gate** — mechanism TBD, explicitly NOT
+  collection-based (Christian); design with the potions rework (§8.6).
 
 ---
 
@@ -1557,3 +1593,14 @@ conflicting edits to the same list.
 **2026-08-24 — first draft.** Written against `100dc7f`. Encodes Christian's
 four rulings of 2026-08-19. Numbers computed from the shipped engine, not
 estimated; id uniqueness verified mechanically against 289 shipped ids.
+
+**2026-08-24 — §8 rulings applied.** All eight §8 decisions ruled by Christian
+(2026-08-20): Jewelry stays at Rimeholt, Q2 only finds jewel materials that
+bank (8.1); the gear-levels invariant re-anchored verbatim and confirmed
+passing (8.2); the empty arena killed, not deferred (8.3); three
+Skirmisher→Adept swaps applied in Frostfell, Thunderspire and the Deep (8.4);
+the Antidote and offensive potion deferred to Q2.1 (8.5); the Sigil's
+collect-three-keys mechanism rejected, deferred to Q2.1 (8.6); Frostfell and
+Thunderspire each get an epic, `the_holdfast` and `groundfault_grips` (8.7);
+Thunder Roc reverted to Electro, per canon (8.8). Recipes 26→21, item
+definitions 64→58, creatures unchanged at 66.

@@ -963,7 +963,6 @@ that still give the pool a reason to exist:
 |---|---|---|
 | **Starfall Basin** | two scales | *What Landed* is small and already down; *The Next One* is enormous and inbound. Drawing the small one is a **warning about the big one** |
 | **Frostfell Pass** | boss and its cause | Killing *The White Corridor* does not free *The Road Under*. ⭐ Reads as **futility**, which suits a pass full of people who were also sure |
-| **Windward Steppe** | 📝 the empty arena | The premise is a wind that has never stopped, so one draw is *nothing at all* — you reach the end and it just keeps blowing. ⚠️ **Mechanically awkward** — a zone-clear with no fight — so it probably needs to be a very short encounter rather than literally empty. Worth trying because no other zone would do it |
 
 ⭐ **And the strongest one, now unblocked:** **The Unwritten Library** gets a
 **third boss that only exists on a repeat clear**. The zone's premise is *"it
