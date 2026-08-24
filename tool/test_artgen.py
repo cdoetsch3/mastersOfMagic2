@@ -35,16 +35,18 @@ import artgen  # noqa: E402
 
 ROOT = artgen.ROOT
 
-# The whole Primal quarter, and the numbers every other check hangs off.
-EXPECTED_CREATURES = 55
-EXPECTED_ICONS = 52
-EXPECTED_BACKDROPS = 5
+# The whole Primal quarter plus Old Quarry (the Kinetic quarter's first
+# zone), and the numbers every other check hangs off.
+EXPECTED_CREATURES = 66
+EXPECTED_ICONS = 61
+EXPECTED_BACKDROPS = 6
 ICONS_PER_ZONE = {
     "whispering_woods": 18,
     "glimmerbrook": 9,
     "cinderpeak_foothills": 8,
     "thornmire": 9,
     "ashfall_vale": 8,
+    "old_quarry": 9,
 }
 
 ONE_PIXEL_PNG = base64.b64decode(
@@ -109,7 +111,7 @@ class ParseTest(unittest.TestCase):
         self.assertEqual(
             len(creatures),
             EXPECTED_CREATURES,
-            "docs/BESTIARY_ART.md must yield 5 zones x 11 creatures — a lower "
+            "docs/BESTIARY_ART.md must yield 6 zones x 11 creatures — a lower "
             "number means the `**Name** — *meta*` anchor moved and artgen is "
             "silently skipping art nobody will notice is missing",
         )

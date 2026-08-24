@@ -9,6 +9,7 @@ library;
 import 'catalogue/ashfall_vale_items.dart';
 import 'catalogue/cinderpeak_items.dart';
 import 'catalogue/glimmerbrook_items.dart';
+import 'catalogue/old_quarry_items.dart';
 import 'catalogue/thornmire_items.dart';
 import 'catalogue/whispering_woods_items.dart';
 import 'item_def.dart';
@@ -37,6 +38,7 @@ abstract final class ItemCatalogue {
     'cinderpeak_foothills': CinderpeakItems.all,
     'thornmire': ThornmireItems.all,
     'ashfall_vale': AshfallValeItems.all,
+    'old_quarry': OldQuarryItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists

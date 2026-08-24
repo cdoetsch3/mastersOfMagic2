@@ -3,10 +3,10 @@
   "counts": {
     "zones": 26,
     "towns": 9,
-    "creatures": 55,
-    "items": 52,
+    "creatures": 66,
+    "items": 61,
     "recipes": 20,
-    "gatherNodes": 10
+    "gatherNodes": 12
   },
   "zones": [
     {
@@ -6360,6 +6360,939 @@
         ],
         "bonus": []
       }
+    },
+    {
+      "id": "quarry_golem",
+      "name": "Quarry Golem",
+      "zoneId": "old_quarry",
+      "rank": "common",
+      "archetype": "Bruiser",
+      "elements": [
+        "geo"
+      ],
+      "lore": "Stacked terrace stone that never settled after it was cut, holding roughly the shape of what used to stand there. It moves like something remembering how to walk.",
+      "moves": [
+        {
+          "id": "oq_pressin",
+          "name": "Press In",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_bringitdown",
+          "name": "Bring It Down",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "tin_ore",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": [
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "chance": 0.02
+          }
+        ]
+      }
+    },
+    {
+      "id": "tailings_drudge",
+      "name": "Tailings Drudge",
+      "zoneId": "old_quarry",
+      "rank": "common",
+      "archetype": "Drudge",
+      "elements": [
+        "geo"
+      ],
+      "lore": "Loose spoil piled by hands that stopped caring where it went, shuffling in slow circles because nobody ever told it the digging was over.",
+      "moves": [
+        {
+          "id": "oq_giveway",
+          "name": "Give Way",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "tin_ore",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "chiselback",
+      "name": "Chiselback",
+      "zoneId": "old_quarry",
+      "rank": "common",
+      "archetype": "Skirmisher",
+      "elements": [
+        "geo"
+      ],
+      "lore": "Fist-sized and quick, its shell scored with the same parallel grooves a chisel leaves in a cut face. It moves before the tool marks finish settling.",
+      "moves": [
+        {
+          "id": "oq_scuttle",
+          "name": "Scuttle",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_chipaway",
+          "name": "Chip Away",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "quarry_jasper",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "gravelswarm",
+      "name": "Gravelswarm",
+      "zoneId": "old_quarry",
+      "rank": "common",
+      "archetype": "Lasher",
+      "elements": [
+        "geo"
+      ],
+      "lore": "Not one thing but hundreds of loose stones holding a single shape between them, shifting and re-forming with every stride like scree that decided to walk uphill.",
+      "moves": [
+        {
+          "id": "oq_patter",
+          "name": "Patter",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_tumblethrough",
+          "name": "Tumble Through",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "tin_ore",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "plumbline_sentry",
+      "name": "Plumbline Sentry",
+      "zoneId": "old_quarry",
+      "rank": "common",
+      "archetype": "Sentinel",
+      "elements": [
+        "geo"
+      ],
+      "lore": "A slab hung dead vertical on nothing, exactly the way a mason's plumbline hangs, and it does not lean no matter what strikes it.",
+      "moves": [
+        {
+          "id": "oq_holdtheline",
+          "name": "Hold the Line",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_squareoff",
+          "name": "Square Off",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "quarry_jasper",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "obsidian_golem",
+      "name": "Obsidian Golem",
+      "zoneId": "old_quarry",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "geo"
+      ],
+      "lore": "Black glass where the quarry face sheared clean, taller than a man and balanced without effort, both fists a different size because nothing made them match.",
+      "moves": [
+        {
+          "id": "oq_swingwide",
+          "name": "Swing Wide",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_bringtheweight",
+          "name": "Bring the Weight",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_settle",
+          "name": "Settle",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tin_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "quarry_jasper",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "overseers_seal",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "earth_titan",
+      "name": "Earth Titan",
+      "zoneId": "old_quarry",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "geo"
+      ],
+      "lore": "Three terraces' worth of stone gathered into one standing weight, planted wherever it stops as if the ground had always meant to be that shape.",
+      "moves": [
+        {
+          "id": "oq_grindforward",
+          "name": "Grind Forward",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_rootin",
+          "name": "Root In",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "oq_takeitback",
+          "name": "Take It Back",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tin_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "quarry_jasper",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "overseers_seal",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "deadweight",
+      "name": "Deadweight",
+      "zoneId": "old_quarry",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "geo"
+      ],
+      "lore": "A slab shaped for hauling, still moving the way something on a sledge moves — slow, then all at once, and it does not stop where a person would.",
+      "moves": [
+        {
+          "id": "oq_leanin",
+          "name": "Lean In",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_dropitsweight",
+          "name": "Drop Its Weight",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tin_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "quarry_jasper",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "overseers_seal",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_overseer",
+      "name": "The Overseer",
+      "zoneId": "old_quarry",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "geo"
+      ],
+      "lore": "Wears the old measuring marks cut into the rock as though they were its own joints, and it corrects anything that has drifted out of true, including itself.",
+      "moves": [
+        {
+          "id": "oq_markit",
+          "name": "Mark It",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_takemeasure",
+          "name": "Take Measure",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_striketheline",
+          "name": "Strike the Line",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tin_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "quarry_jasper",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "overseers_seal",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "mountain_heart",
+      "name": "Mountain Heart",
+      "zoneId": "old_quarry",
+      "rank": "boss",
+      "archetype": "Juggernaut",
+      "elements": [
+        "geo"
+      ],
+      "lore": "The mass the quarry gave up, wearing its own crater like a chest cavity. Whatever was carried out of this mountain, it remembers carrying it.",
+      "moves": [
+        {
+          "id": "oq_grindon",
+          "name": "Grind On",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_settledeeper",
+          "name": "Settle Deeper",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "oq_collapseinward",
+          "name": "Collapse Inward",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tin_ore",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "quarry_jasper",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "overseers_seal",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "the_given_weight",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_empty_course",
+      "name": "The Empty Course",
+      "zoneId": "old_quarry",
+      "rank": "boss",
+      "archetype": "Tyrant",
+      "elements": [
+        "geo"
+      ],
+      "lore": "A hollow the exact shape of what is missing, walking upright because the missing thing once did. It has no face, only the place a face was cut from.",
+      "moves": [
+        {
+          "id": "oq_holdstill",
+          "name": "Hold Still",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "oq_takethestep",
+          "name": "Take the Step",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "oq_fillthespace",
+          "name": "Fill the Space",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "tin_ore",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "quarry_jasper",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "overseers_seal",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "the_given_weight",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
     }
   ],
   "items": [
@@ -7385,6 +8318,146 @@
         "regrowPercent": 2
       },
       "salvage": []
+    },
+    {
+      "id": "tin_ore",
+      "name": "Tin Ore",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Grey ore veined bright where a chisel caught it wrong, common enough that the diggers barely bent down to pick it up.",
+      "skill": "metalworking",
+      "tier": 3,
+      "salvage": []
+    },
+    {
+      "id": "quarry_jasper",
+      "name": "Quarry Jasper",
+      "kind": "material",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Red banding cut square through a terrace face, squarer than anything the mountain grows on its own.",
+      "skill": "jewelry",
+      "tier": 3,
+      "salvage": []
+    },
+    {
+      "id": "geo_dust",
+      "name": "Geo Dust",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "What breaks off a standing stone before the stone itself gives way.",
+      "element": "geo",
+      "moteTier": "dust"
+    },
+    {
+      "id": "geo_shard",
+      "name": "Geo Shard",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Dust that held its shape long enough to grow edges.",
+      "element": "geo",
+      "moteTier": "shard"
+    },
+    {
+      "id": "geo_crystal",
+      "name": "Geo Crystal",
+      "kind": "mote",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "It is heavy, and it does not get lighter.",
+      "element": "geo",
+      "moteTier": "crystal"
+    },
+    {
+      "id": "hardtack",
+      "name": "Hardtack",
+      "kind": "consumable",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 9,
+      "fungible": true,
+      "lore": "Baked hard enough to survive a quarry cart, and eaten the same way — in pieces, with effort.",
+      "effect": {
+        "healPercent": 35
+      }
+    },
+    {
+      "id": "bronze_ingot",
+      "name": "Bronze Ingot",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Copper and tin gone into the crucible together and come out neither, holding an edge better than either one alone.",
+      "skill": "metalworking",
+      "tier": 3,
+      "salvage": []
+    },
+    {
+      "id": "overseers_seal",
+      "name": "Overseer's Seal",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 18,
+      "value": 260,
+      "fungible": false,
+      "lore": "A signet worn smooth in one groove and sharp everywhere else, exactly like something used to press its will into stone and nothing else.",
+      "slot": "ring",
+      "form": "Signet",
+      "material": "Bronze",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "deflectChance": 12,
+        "deflectAmount": 20
+      },
+      "salvage": []
+    },
+    {
+      "id": "the_given_weight",
+      "name": "The Given Weight",
+      "kind": "equipment",
+      "rarity": "epic",
+      "tradability": "untradeable",
+      "equipLevel": 19,
+      "value": 720,
+      "fungible": false,
+      "lore": "The precise mass the hole is missing, worn on a chain, and heavier than its size has any right to be.",
+      "slot": "neck",
+      "form": "Locket",
+      "material": "Quarrystone",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "deflectChance": 10,
+        "deflectAmount": 25,
+        "maxHpBonus": 30
+      },
+      "salvage": []
     }
   ],
   "recipes": [
@@ -8125,6 +9198,26 @@
       "max": 4,
       "xp": 27,
       "flavor": "Snags burned through and still standing, black the whole way in. Take the char and leave the ash — nothing here needs burning twice."
+    },
+    {
+      "id": "oq_tin_seam",
+      "zoneId": "old_quarry",
+      "skill": "mining",
+      "yieldsItemId": "tin_ore",
+      "min": 2,
+      "max": 4,
+      "xp": 37,
+      "flavor": "A seam in a terrace wall the diggers left because it was not what they came for."
+    },
+    {
+      "id": "oq_jasper_face",
+      "zoneId": "old_quarry",
+      "skill": "mining",
+      "yieldsItemId": "quarry_jasper",
+      "min": 2,
+      "max": 3,
+      "xp": 37,
+      "flavor": "Red banding in a cut face, squarer than anything nature makes."
     }
   ],
   "index": {
@@ -10136,6 +11229,280 @@
           "chance": 0.1
         }
       ],
+      "geo_crystal": [
+        {
+          "type": "drop",
+          "from": "obsidian_golem",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "earth_titan",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "deadweight",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_overseer",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "mountain_heart",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_empty_course",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "geo_dust": [
+        {
+          "type": "drop",
+          "from": "quarry_golem",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "quarry_golem",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "tailings_drudge",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "chiselback",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "chiselback",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "gravelswarm",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "gravelswarm",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "plumbline_sentry",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "plumbline_sentry",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.17
+        },
+        {
+          "type": "drop",
+          "from": "obsidian_golem",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "earth_titan",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "deadweight",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_overseer",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "mountain_heart",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_empty_course",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "geo_shard": [
+        {
+          "type": "drop",
+          "from": "quarry_golem",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "chiselback",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "gravelswarm",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "plumbline_sentry",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.08
+        },
+        {
+          "type": "drop",
+          "from": "obsidian_golem",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "earth_titan",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "deadweight",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_overseer",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "mountain_heart",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_empty_course",
+          "zoneId": "old_quarry",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "hardtack": [
+        {
+          "type": "drop",
+          "from": "quarry_golem",
+          "zoneId": "old_quarry",
+          "bucket": "bonus",
+          "chance": 0.02
+        },
+        {
+          "type": "drop",
+          "from": "tailings_drudge",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "plumbline_sentry",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "obsidian_golem",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "earth_titan",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "deadweight",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_overseer",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.25
+        }
+      ],
       "heartwood_stave": [
         {
           "type": "drop",
@@ -10260,6 +11627,50 @@
           "recipeId": "craft_oak_wand",
           "skill": "woodcarving",
           "skillLevel": 1
+        }
+      ],
+      "overseers_seal": [
+        {
+          "type": "drop",
+          "from": "obsidian_golem",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "earth_titan",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "deadweight",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_overseer",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "mountain_heart",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_empty_course",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.2
         }
       ],
       "proof_of_the_brook": [
@@ -10820,6 +12231,70 @@
           "chance": 1.0
         }
       ],
+      "quarry_jasper": [
+        {
+          "type": "drop",
+          "from": "chiselback",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "plumbline_sentry",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "obsidian_golem",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "earth_titan",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "deadweight",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_overseer",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "mountain_heart",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_empty_course",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "gather",
+          "nodeId": "oq_jasper_face",
+          "zoneId": "old_quarry",
+          "skill": "mining"
+        }
+      ],
       "sapwort": [
         {
           "type": "drop",
@@ -10964,6 +12439,93 @@
           "zoneId": "ashfall_vale",
           "bucket": "main",
           "chance": 0.1
+        }
+      ],
+      "the_given_weight": [
+        {
+          "type": "drop",
+          "from": "mountain_heart",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "the_empty_course",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.1
+        }
+      ],
+      "tin_ore": [
+        {
+          "type": "drop",
+          "from": "quarry_golem",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "tailings_drudge",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "gravelswarm",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "obsidian_golem",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "earth_titan",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "deadweight",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_overseer",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "mountain_heart",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "the_empty_course",
+          "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "gather",
+          "nodeId": "oq_tin_seam",
+          "zoneId": "old_quarry",
+          "skill": "mining"
         }
       ],
       "tuskhide": [

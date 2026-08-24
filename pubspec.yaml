@@ -57,6 +57,7 @@ flutter:
     - assets/creatures/cinderpeak_foothills/
     - assets/creatures/thornmire/
     - assets/creatures/ashfall_vale/
+    - assets/creatures/old_quarry/
     - assets/backgrounds/
     # One per Primal zone, matching `ItemCatalogue.byZone`'s keys. Empty until
     # `tool/pixelate.py --mode icon` is run; `ItemIcon` falls back silently
@@ -66,3 +67,4 @@ flutter:
     - assets/items/cinderpeak_foothills/
     - assets/items/thornmire/
     - assets/items/ashfall_vale/
+    - assets/items/old_quarry/

@@ -22,7 +22,7 @@ border colour.
 `tool/artgen.py` parses it on every run — an entry is `**Name** — *rarity ·
 kind · stats*` followed by its `` `assets/items/<zone>/<id>.png` `` filename
 line and one blockquote, each zone states a wrapped `**Palette:**` line, and
-the shared preamble below is quoted verbatim into all 52 icon prompts. Reword
+the shared preamble below is quoted verbatim into all 61 icon prompts. Reword
 the prose freely; change those shapes and the tool silently finds fewer icons,
 which `test/item_icon_test.dart` and `tool/test_artgen.py` both fail on.
 
@@ -686,15 +686,106 @@ orange, one vivid new green.
 
 ---
 
-## ⚠️ Still to describe — the other three quarters
+## Old Quarry · Lv 15–19 · Geo · **9 items**
 
-Only the **Primal quarter (52 items)** is written, matching BESTIARY_ART's
-coverage exactly.
+> ⭐ *Everything here is what the hole gave back.* ⚠️ Grey stone and dust
+> first, colour only where a material or a mechanic earns it — jasper's
+> red-brown, bronze's warm gold, and deflection's cool grey-white light.
+> Nothing in this zone should read as bright or decorative by default.
+
+**Palette:** quarry grey, tool-mark black, dull red-brown jasper, tin-ore
+silver-grey, bronze warm gold-brown.
+
+### Materials
+
+**Tin Ore** — *common · material · Metalworking t3*
+`assets/items/old_quarry/tin_ore.png`
+> Two or three broken lumps of dull silver-grey ore the size of eggs, resting
+> together as one mass. Fine metallic glints scattered through a grey rock
+> matrix, faintly bright where freshly broken. Gritty, heavy, unremarkable —
+> no glow, no colour.
+
+**Quarry Jasper** — *uncommon · material · Jewelry t3 · ⏳ banks for Q2*
+`assets/items/old_quarry/quarry_jasper.png`
+> A single squared chunk of banded stone about the size of a fist, cut with
+> one flat face where a chisel took it clean. Deep brick-red banding running
+> parallel through a duller grey-brown body, polished only on the cut face.
+> ⭐ Uncommon — one clean warm red note against the grey, unlit.
+
+### Motes
+
+**Geo Dust** — *common · mote · dust · Geo*
+`assets/items/old_quarry/geo_dust.png`
+> A small loose heap of fine grey powder, roughly a spoonful, mounded on
+> nothing. Pale stone-grey on the lit side, darker slate in the shadow of the
+> heap, with a scatter of coarser grit mixed through. ⚠️ Same form as the
+> other dusts — colour is the only difference. Inert and matte, exactly what
+> falls off a chisel stroke.
+
+**Geo Shard** — *common · mote · shard · Geo*
+`assets/items/old_quarry/geo_shard.png`
+> A single angular splinter of grey mineral, thumb-length, standing on end at
+> a slight lean. Sharp fracture faces, pale stone-grey deepening to a darker
+> slate at the base. ⭐ One hairline vein of dull ochre runs through the
+> body — dust that held its shape long enough to grow edges.
+
+**Geo Crystal** — *uncommon · mote · crystal · Geo*
+`assets/items/old_quarry/geo_crystal.png`
+> A whole hexagonal crystal the size of a plum, resting on one facet. Clear
+> deep grey-brown mineral, every face flat and true, with a dense, heavy
+> presence rather than any glow. ⚠️ *"It is heavy, and it does not get
+> lighter"* — a small compression mark pressed into the ground directly
+> beneath it.
+
+### Consumables
+
+**Hardtack** — *common · consumable · heals 35%*
+`assets/items/old_quarry/hardtack.png`
+> A single flat brick of dense pale biscuit, cracked at one corner, about the
+> size of a deck of cards. Dry matte tan-grey surface, faint grain lines
+> pressed into it like tool marks. Plain, hard-edged, entirely unglamorous.
+
+### Intermediate goods
+
+**Bronze Ingot** — *common · material · Metalworking t3 output*
+`assets/items/old_quarry/bronze_ingot.png`
+> A single cast bar of bronze the size of a hand, resting flat, edges
+> slightly rounded from the mould. Warm gold-brown metal with a faint ruddy
+> sheen, a thin seam line down one side where the mould closed. ⭐ Neither
+> copper's pink nor tin's grey — bronze reads as its own colour, the two gone
+> into the crucible and come out something new.
+
+### Equipment
+
+**Overseer's Seal** — *rare · ring · 12% deflect, 20% amount · Lv 18*
+`assets/items/old_quarry/overseers_seal.png`
+> A single flat signet ring shown standing upright, bronze in the same warm
+> gold-brown as the ingot, with one groove on its face worn bright and smooth
+> from use and every other surface still sharp-edged and matte. ⭐ Rare, so
+> the deflection reads as a light source: a thin cool grey-white line traces
+> the worn groove, as though something in it were still measuring. ⚠️ No
+> border — the ring's own bright groove is the whole cue.
+
+**The Given Weight** — *epic · neck · +30 HP, 10% deflect, 25% amount · Lv 19*
+`assets/items/old_quarry/the_given_weight.png`
+> A heavy locket on a fine chain, shown hanging, disc-shaped and the size of a
+> large coin, cut from dense dark quarrystone rather than metal. ⭐ Epic, so
+> it is visibly doing something: a faint grey-white haze of dust drifts
+> continuously from a hairline crack around its rim, as though it is still
+> settling. ⚠️ The dust never stops — that is the whole tell of *"the precise
+> mass the hole is missing."*
+
+---
+
+## ⚠️ Still to describe — the other three quarters (minus Old Quarry)
+
+The **Primal quarter (52 items)** and **Old Quarry (9 items)** are written,
+matching BESTIARY_ART's coverage exactly.
 
 | Quarter | Zones | Items | Status |
 |---|---|---|---|
 | **Primal** 1–14 | 5 | 52 | ✅ described |
-| Kinetic 15–29 | 6 | ❓ | ⬜ no catalogue yet |
+| Kinetic 15–29 | 6 | 58 (target) | 1/6 zones described (Old Quarry, 9) |
 | Celestial 30–47 | 7 | ❓ | ⬜ no catalogue yet |
 | Ethereal 45–60 | 7 | ❓ | ⬜ no catalogue yet |
 
@@ -707,5 +798,5 @@ rather than a described-later backlog: ITEMS §9b.8 covers Q1 only.
 
 📝 The count in each zone heading above must equal that zone's list in
 `lib/game/items/catalogue/`. `test/item_icon_test.dart` asserts the catalogue
-total is 52, so an item added without an entry here fails the suite with a
+total is 61, so an item added without an entry here fails the suite with a
 pointer to this file.

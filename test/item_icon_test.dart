@@ -264,6 +264,10 @@ void main() {
         'assets/items/thornmire/wickerbound_ring.png',
       );
       expect(
+        itemIconFor('tin_ore'),
+        'assets/items/old_quarry/tin_ore.png',
+      );
+      expect(
         itemIconFor('the_charlock'),
         'assets/items/ashfall_vale/the_charlock.png',
       );
@@ -292,8 +296,9 @@ void main() {
       }
       expect(
         ItemCatalogue.all.length,
-        52,
-        reason: 'the Primal quarter is 18/9/8/9/8; if this number moved, '
+        61,
+        reason: 'the Primal quarter is 18/9/8/9/8 (52), plus Old Quarry (the '
+            'Kinetic quarter\'s first zone) at 9 more; if this number moved, '
             'docs/ITEM_ART.md is now short an entry (or carries a stale one) '
             'and nothing else in the suite would say so',
       );

@@ -91,6 +91,7 @@ ZONES = [
     "cinderpeak_foothills",
     "thornmire",
     "ashfall_vale",
+    "old_quarry",
 ]
 
 # ⭐ The palette a zone's creatures are locked to by `pixelate.py`. Hybrid
@@ -102,6 +103,7 @@ ZONE_ELEMENT = {
     "cinderpeak_foothills": "pyro",
     "thornmire": "flora",
     "ashfall_vale": "pyro",
+    "old_quarry": "geo",
 }
 
 KINDS = ("creature", "icon", "backdrop")

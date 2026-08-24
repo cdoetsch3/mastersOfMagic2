@@ -20,7 +20,7 @@ bestiary is a mage**, and the art has to stop saying otherwise.
 archetype · element*` on one line followed by a blockquote, a backdrop is an
 `### Arena backdrop` heading with a `` `assets/backgrounds/<zone>.png` ``
 filename line and one blockquote, and the house-style paragraph below is
-quoted verbatim into all 55 creature prompts. Reword the prose freely; change
+quoted verbatim into all 66 creature prompts. Reword the prose freely; change
 those shapes and the tool silently finds fewer creatures, which
 `test/creature_art_test.dart` and `tool/test_artgen.py` both fail on.
 
@@ -579,16 +579,117 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 
 ---
 
-## ⚠️ Still to describe — 220 creatures
+## Old Quarry · Lv 15–19 · Geo
 
-Only the **Primal quarter (55)** is written. The Kinetic, Celestial and
-Ethereal quarters have full rosters in ENEMIES_DESIGN §2e — names, ranks,
-archetypes and premises — but no physical descriptions yet.
+> ⭐ *The hole remembers what filled it.* ⚠️ **Absence, not stone.** Everything
+> here should read as negative space gone solid — a shape with tool-marks and
+> no explanation, always slightly too regular for anything nature makes.
+
+### Commons
+
+**Quarry Golem** — *common · Bruiser · Geo*
+> A hunched bipedal mass of stacked terrace stone the height of a doorway,
+> squared grey blocks held together with no visible mortar, every face scored
+> with the same parallel tool-marks cut into the quarry walls. Blunt slab
+> head, no neck, arms too thick for the body. Standing square, head low.
+
+**Tailings Drudge** — *common · Drudge · Geo*
+> A shapeless heap of loose grey spoil about waist high, holding together in a
+> rough hunched mound with no clear head or limbs — just a leading edge that
+> drags forward, shedding a thin trail of grit. Dull matte stone-dust grey
+> throughout. Slow, low, shuffling.
+
+**Chiselback** — *common · Skirmisher · Geo*
+> A many-legged creature the size of a large beetle, its back a single flat
+> plate scored with parallel chisel-groove ridges, dark quarry-grey with pale
+> dust caught in the grooves. Low and flat to the ground, legs splayed, poised
+> mid-scuttle.
+
+**Gravelswarm** — *common · Lasher · Geo*
+> Hundreds of fist-sized stones holding one rough heap-shape about waist high,
+> shifting constantly as individual stones tumble and resettle at the edges.
+> Uniform grey scree and gravel, no single silhouette staying still. Low,
+> wide, spilling forward.
+
+**Plumbline Sentry** — *common · Sentinel · Geo*
+> A flat rectangular slab of dressed grey stone the height of a person, hung
+> perfectly vertical on nothing, thin against its height, with a single dark
+> groove running dead-straight down its centre like a plumbline's own string.
+> Motionless, upright, unnervingly true.
+
+### Mini-bosses
+
+**Obsidian Golem** — *mini · Champion · Geo*
+> A humanoid figure of black volcanic glass a head taller than a person,
+> sheared clean along every plane, each facet catching the light differently.
+> Its two fists are visibly mismatched in size. Standing upright, balanced,
+> deliberate.
+
+**Earth Titan** — *mini · Redoubt · Geo*
+> A colossal squared mass of stacked terrace stone twice the height of a
+> person and half again as wide, tapering slightly at the top like a dressed
+> block left standing on end. No visible face — just a flat weathered front.
+> Planted, immovable, patient.
+
+**Deadweight** — *mini · Executioner · Geo*
+> A long low slab-bodied creature built like a loaded stone sledge, waist-high
+> and twice as long as a person, four short thick legs beneath a flat grey
+> top. Head-end blunt and squared, low to the ground, gathering itself before
+> a short slow drag.
+
+**The Overseer** — *mini · Hexer · Geo*
+> A tall thin figure of jointed grey stone, person-height, its limbs and torso
+> scored all over with fine measuring lines and notches like a mason's rule.
+> No visible eyes — a flat grooved face marked with a single vertical line.
+> Upright, still, precise.
+
+### Bosses
+
+**Mountain Heart** — *boss · Juggernaut · Geo*
+> A colossal boulder-bodied creature four storeys tall, roughly humanoid and
+> deeply hunched, made of the terrace stone itself in massive uneven slabs. A
+> wide crater-shaped hollow sits dead centre of its chest, empty and exact.
+> Barely distinguishable from the quarry wall behind it.
+
+**The Empty Course** — *boss · Tyrant · Geo*
+> A tall gaunt humanoid outline the height of a house wall, its whole body a
+> smooth dark hollow — the same negative shape a standing figure would leave
+> in packed earth — edged in a thin rim of pale stone dust. No face, no
+> visible material filling it, only the edge. Upright, watchful, unnervingly
+> patient.
+
+### Arena backdrop
+
+`assets/backgrounds/old_quarry.png` — *16:9 · Geo palette*
+> Wide 16:9 landscape painting of a stepped quarry terrace seen side-on at
+> standing eye level, environment only — no creatures, no people, no text. A
+> level terrace of cut grey stone runs straight across the frame just past
+> mid-height, its edge squared and precise where the terrace above it was
+> worked away. Below it the near terrace wall drops in a sheer cut face into
+> deep shadow across the bottom fifth. At the far left and far right edges,
+> broken quarried blocks no higher than a person's chest, cropped by the
+> frame, tool-groove marks still visible on their faces. The centre of the
+> frame is **bare open terrace floor**, running back to a low grey quarry wall
+> and a flat band of stone-dust haze — **the working face itself is out of
+> shot above the top edge**, so nothing rises centre-frame. Flat overcast
+> daylight, greyed by rock dust. **Geo palette**, matching the creatures
+> above: quarry grey, tool-mark black, pale dust white, one narrow band of
+> dull red-brown jasper banding low in a cut face. Muted, low-contrast, and
+> heavy underfoot.
+
+---
+
+## ⚠️ Still to describe — 209 creatures
+
+The **Primal quarter (55)** and **Old Quarry (11)** are written. The rest of
+the Kinetic quarter, and the Celestial and Ethereal quarters, have full
+rosters in ENEMIES_DESIGN §2e — names, ranks, archetypes and premises — but
+no physical descriptions yet.
 
 | Quarter | Zones | Creatures | Status |
 |---|---|---|---|
 | **Primal** 1–14 | 5 | 55 | ✅ described |
-| Kinetic 15–29 | 6 | 66 | ⬜ |
+| Kinetic 15–29 | 6 | 66 | 1/6 zones described (Old Quarry) |
 | Celestial 30–47 | 7 | 77 | ⬜ |
 | Ethereal 45–60 | 7 | 77 | ⬜ |
 | The Eclipsed Citadel | 1 | ❓ | needs its own structure first (§2e) |

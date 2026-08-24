@@ -329,9 +329,17 @@ void main() {
       'ashfall_vale',
     ];
 
-    test('⚠️ every authored node is REGISTERED, and nothing extra is', () {
+    test('⚠️ every authored node is REGISTERED, and nothing extra is (within '
+        'the Primal quarter)', () {
+      // ⚠️ Scoped to `primalZones` — the Kinetic quarter's zones (Old Quarry
+      // and onward) register their own nodes in `GatherNodes.all` too, and
+      // this literal registry is deliberately only the original five.
+      final primalNodeIds = GatherNodes.all
+          .where((n) => primalZones.contains(n.zoneId))
+          .map((n) => n.id)
+          .toSet();
       expect(
-        GatherNodes.all.map((n) => n.id).toSet(),
+        primalNodeIds,
         authored.keys.toSet(),
         reason: 'a node left out of GatherNodes.all compiles fine and simply '
             'never spawns — the file warns about exactly this, so the '
@@ -410,10 +418,17 @@ void main() {
       // The other half of the ruling: §9b.8 calls Copper, Charcoal, Fenroot
       // and Amber alike "gatherable now", so a banking material without a
       // node is a promise the world cannot keep.
+      //
+      // ⚠️ Scoped to materials DEFINED in a Primal-zone catalogue — Old
+      // Quarry (Kinetic) defines its own materials (Tin Ore, Quarry Jasper —
+      // both correctly gathered) plus `bronze_ingot`, an intermediate good
+      // crafted from them rather than gathered, which this Q1-only check
+      // was never meant to reach.
       const killOnly = {'fawnhide', 'tuskhide'};
       final yielded = GatherNodes.all.map((n) => n.yieldsDefId).toSet();
       for (final d in ItemCatalogue.all.whereType<MaterialDef>()) {
         if (killOnly.contains(d.id)) continue;
+        if (!primalZones.contains(ItemCatalogue.zoneOf(d.id))) continue;
         expect(yielded, contains(d.id),
             reason: '${d.id} is a world material with nowhere to gather it — '
                 'drop-only is what this whole pass exists to end');

@@ -263,6 +263,40 @@ abstract final class GatherNodes {
         'Take the char and leave the ash — nothing here needs burning twice.',
   );
 
+  // ---- Old Quarry (Geo, band 15–19) --------------------------------------
+  //
+  // ✅ 2 nodes — a pure zone's 2-per-zone rule (KINETIC_CONTRACT §3.1/§6).
+  // ⚠️ Tin and Jasper are the zone's only world-held materials; nothing here
+  // is a hide or a mote, so both of the zone's materials get a node.
+  // ⭐ XP is `9 + 2 × (zone.minLevel − 1)` = `9 + 2 × 14` = 37.
+
+  static const oqTinSeam = GatherNodeDef(
+    id: 'oq_tin_seam',
+    zoneId: 'old_quarry',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'tin_ore',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.sweetSpot, 'strike', reps: 3),
+    xp: 37,
+    flavor:
+        'A seam in a terrace wall the diggers left because it was not what '
+        'they came for.',
+  );
+
+  static const oqJasperFace = GatherNodeDef(
+    id: 'oq_jasper_face',
+    zoneId: 'old_quarry',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'quarry_jasper',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'split', complexity: 2),
+    xp: 37,
+    flavor:
+        'Red banding in a cut face, squarer than anything nature makes.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -276,6 +310,8 @@ abstract final class GatherNodes {
     birchStand,
     brookmintRill,
     charcoalBurn,
+    oqTinSeam,
+    oqJasperFace,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

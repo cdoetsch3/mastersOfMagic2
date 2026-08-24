@@ -16,7 +16,7 @@ the framework both live under.
 
 | Zones | Towns | Creatures | Items | Recipes | Gather nodes |
 |---|---|---|---|---|---|
-| 26 | 9 | 55 | 52 | 20 | 10 |
+| 26 | 9 | 66 | 61 | 20 | 12 |
 
 ## Contents
 
@@ -60,6 +60,20 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Heartwood Staff | `heartwood_stave` | 10 | mainHand | epic | 5 | whispering_woods |
 | Cinder Loop | `cinder_loop` | 5 | ring | rare | 9 | cinderpeak_foothills |
 
+### `deflectChance`
+
+| Name | Id | Value | Slot | Rarity | Equip Lv | Zone |
+|---|---|---|---|---|---|---|
+| Overseer's Seal | `overseers_seal` | 12 | ring | rare | 18 | old_quarry |
+| The Given Weight | `the_given_weight` | 10 | neck | epic | 19 | old_quarry |
+
+### `deflectAmount`
+
+| Name | Id | Value | Slot | Rarity | Equip Lv | Zone |
+|---|---|---|---|---|---|---|
+| Overseer's Seal | `overseers_seal` | 20 | ring | rare | 18 | old_quarry |
+| The Given Weight | `the_given_weight` | 25 | neck | epic | 19 | old_quarry |
+
 ### `maxHpBonus`
 
 | Name | Id | Value | Slot | Rarity | Equip Lv | Zone |
@@ -73,6 +87,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Bogflax Gloves | `bogflax_gloves` | 2 | gloves | common | 10 | thornmire |
 | Bogflax Leggings | `bogflax_leggings` | 7 | robeBottom | common | 10 | thornmire |
 | Bogflax Robe | `bogflax_robe` | 10 | robeTop | common | 10 | thornmire |
+| The Given Weight | `the_given_weight` | 30 | neck | epic | 19 | old_quarry |
 
 ### `damagePerCast`
 
@@ -116,7 +131,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 
 ### No item grants
 
-`dodge`, `deflectChance`, `deflectAmount`
+`dodge`
 
 
 ## Items by zone
@@ -197,6 +212,20 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `birch_quarterstaff` | Birch Quarterstaff | equipment | mainHand | common | 10 | accuracyBonus +6, damagePerCharge +2 | craft: `craft_birch_quarterstaff` |
 | `birch_wand` | Birch Wand | equipment | mainHand | common | 10 | accuracyBonus +1, damagePerCast +3 | craft: `craft_birch_wand` |
 | `the_charlock` | The Charlock | equipment | neck | epic | 14 | regrowPercent +2 | drop: `the_blackened_crown`; drop: `the_rooting` |
+
+### Old Quarry (`old_quarry`) — 9 items
+
+| Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
+|---|---|---|---|---|---|---|---|
+| `bronze_ingot` | Bronze Ingot | material |  | common | 1 |  | drop |
+| `geo_crystal` | Geo Crystal | mote |  | uncommon | 1 |  | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course` |
+| `geo_dust` | Geo Dust | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; +5 more (see content.json) |
+| `geo_shard` | Geo Shard | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; +4 more (see content.json) |
+| `hardtack` | Hardtack | consumable |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +1 more (see content.json) |
+| `quarry_jasper` | Quarry Jasper | material |  | uncommon | 1 |  | gather: `oq_jasper_face`; drop: `chiselback`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; +2 more (see content.json) |
+| `tin_ore` | Tin Ore | material |  | common | 1 |  | gather: `oq_tin_seam`; drop: `quarry_golem`; drop: `tailings_drudge`; drop: `gravelswarm`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +3 more (see content.json) |
+| `overseers_seal` | Overseer's Seal | equipment | ring | rare | 18 | deflectChance +12, deflectAmount +20 | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course` |
+| `the_given_weight` | The Given Weight | equipment | neck | epic | 19 | deflectChance +10, deflectAmount +25, maxHpBonus +30 | drop: `mountain_heart`; drop: `the_empty_course` |
 
 
 ## Bestiary by zone
@@ -280,6 +309,22 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `the_grey_stag` | The Grey Stag | Mini-boss | Champion | pyro/flora | 10-14 | ×1.7 | ×1.2 | Birch Log, Charcoal, Brookmint, Brookmint Tonic |
 | `the_blackened_crown` | The Blackened Crown | Boss | Tyrant | pyro/flora | 10-14 | ×2.6 | ×1.7 | Birch Log, Charcoal, Brookmint, The Charlock |
 | `the_rooting` | The Rooting | Boss | Aspect | pyro/flora | 10-14 | ×2.6 | ×1.5 | Birch Log, Charcoal, Brookmint, The Charlock |
+
+### Old Quarry (`old_quarry`) — 11 creatures
+
+| Id | Name | Rank | Archetype | Element | Level | HP scale | Power scale | Notable drops |
+|---|---|---|---|---|---|---|---|---|
+| `chiselback` | Chiselback | Wild | Skirmisher | geo | 15-19 | ×0.7 | ×1.15 | Quarry Jasper, Geo Shard, Geo Dust |
+| `gravelswarm` | Gravelswarm | Wild | Lasher | geo | 15-19 | ×0.85 | ×1.0 | Tin Ore, Geo Shard, Geo Dust |
+| `plumbline_sentry` | Plumbline Sentry | Wild | Sentinel | geo | 15-19 | ×1.25 | ×0.7 | Quarry Jasper, Geo Shard, Geo Dust, Hardtack |
+| `quarry_golem` | Quarry Golem | Wild | Bruiser | geo | 15-19 | ×1.15 | ×1.1 | Tin Ore, Geo Shard, Geo Dust, Hardtack |
+| `tailings_drudge` | Tailings Drudge | Wild | Drudge | geo | 15-19 | ×0.8 | ×0.7 | Tin Ore, Hardtack |
+| `deadweight` | Deadweight | Mini-boss | Executioner | geo | 15-19 | ×1.2 | ×1.9 | Tin Ore, Quarry Jasper, Hardtack, Overseer's Seal |
+| `earth_titan` | Earth Titan | Mini-boss | Redoubt | geo | 15-19 | ×2.2 | ×0.85 | Tin Ore, Quarry Jasper, Hardtack, Overseer's Seal |
+| `obsidian_golem` | Obsidian Golem | Mini-boss | Champion | geo | 15-19 | ×1.7 | ×1.2 | Tin Ore, Quarry Jasper, Hardtack, Overseer's Seal |
+| `the_overseer` | The Overseer | Mini-boss | Hexer | geo | 15-19 | ×1.6 | ×0.75 | Tin Ore, Quarry Jasper, Hardtack, Overseer's Seal |
+| `mountain_heart` | Mountain Heart | Boss | Juggernaut | geo | 15-19 | ×3.6 | ×1.4 | Tin Ore, Quarry Jasper, Overseer's Seal, The Given Weight |
+| `the_empty_course` | The Empty Course | Boss | Tyrant | geo | 15-19 | ×2.6 | ×1.7 | Tin Ore, Quarry Jasper, Overseer's Seal, The Given Weight |
 
 
 ## Recipes by skill
