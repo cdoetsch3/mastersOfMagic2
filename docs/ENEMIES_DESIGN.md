@@ -504,7 +504,7 @@ mini/boss names from the element rosters in GAME_DESIGN §5.
 
 ### Kinetic · 15–29
 
-#### Old Quarry · 15–19 · Geo
+#### Old Quarry · 15–19 · Geo ✅ built
 > *"Whatever was quarried out of here left a shape, and the shape has started to move."*
 
 ⭐ **Theme: the hole remembers what filled it.** The threat is the **absence**,
@@ -527,7 +527,7 @@ by rethinking one of them — unstated, it reads as duplication.
 **Minis:** Earth Titan ✅ · Obsidian Golem ✅ · The Overseer · Deadweight
 **Bosses:** ⭐ **Mountain Heart** ✅ *(what was taken)* · **The Empty Course** *(the shape of what is gone, walking)*
 
-#### Stormcliff Coast · 17–22 · Electro
+#### Stormcliff Coast · 17–22 · Electro ✅ built
 > *"The cliffs take the whole weight of it… the rock is scorched in **long vertical lines**."*
 
 ⭐ **Theme: everything here is a path to the ground, including you.** The
@@ -552,7 +552,7 @@ Thunderspire is *when it comes*.
 *(what goes back up)* — the return stroke is the bright half of a real bolt and
 it travels **upward**: the ground answering the sky
 
-#### Windward Steppe · 19–24 · Aero
+#### Windward Steppe · 19–24 · Aero ✅ built
 > *"The wind does not gust; it simply blows, and has been blowing since before there was anyone to notice."*
 
 ⭐ **Theme: one direction, forever — everything here has stopped resisting.**
@@ -569,7 +569,7 @@ Not violence. **Relentlessness**, which no other Aero zone claims.
 **Minis:** Wind Wraith ✅ · Gale Serpent ✅ · Sky Titan ✅ · Old Lean
 **Bosses:** ⭐ **Tempest Monarch** ✅ *(the gust — the exception)* · **The Unbroken Blow** *(the constant)*
 
-#### Frostfell Pass · 21–26 · Aqua + Aero ⭐ hybrid
+#### Frostfell Pass · 21–26 · Aqua + Aero ⭐ hybrid ✅ built
 > *"Your breath goes up and does not come down. The road is under here somewhere, and other people have been sure of that too."*
 
 ⭐ **Theme: everything that moves through here gets held.** The fusion is
@@ -591,7 +591,7 @@ Corridor does **not** free the Road — nothing you do down here digs anyone out
 ⭐ The pool reads as futility rather than symmetry, which suits a pass whose
 arrival text is about people who were also sure.
 
-#### Thunderspire Peaks · 23–28 · Electro + Aero ⭐ hybrid
+#### Thunderspire Peaks · 23–28 · Electro + Aero ⭐ hybrid ✅ built
 > *"The cloud is lit from within at intervals, and the intervals are getting shorter."*
 
 ⭐ **Theme: you are inside the storm, and it is building to something.** The
@@ -610,7 +610,7 @@ this one is a countdown.
 **Minis:** Thunder Roc ✅ · The Shortening · Anvilhead · Crown Fire
 **Bosses:** ⭐ **The Strike That Lands** · **The Storm That Passes**
 
-#### The Molten Deep · 25–29 · Pyro + Geo ⭐ hybrid · 🏰
+#### The Molten Deep · 25–29 · Pyro + Geo ⭐ hybrid · 🏰 ✅ built
 > *"There is a floor down here that moves like water because it is not water."*
 
 ⭐ **Theme: the stone is a liquid and has been the whole time.** The fusion is

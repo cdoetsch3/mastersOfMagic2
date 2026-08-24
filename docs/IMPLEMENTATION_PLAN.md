@@ -552,13 +552,18 @@ response and are not part of the numbered plan:
 
 ---
 
-# Phase 6 — 🟡 PRIMAL QUARTER BUILT — enemies and enemy mechanics
+# Phase 6 — 🟡 PRIMAL + KINETIC BUILT — enemies and enemy mechanics
 
-✅ **2026-08-18 status: the Primal quarter's five zones are done** — 55
-`EnemyDef`s (11 per zone) with drop tables, registered and fightable; see
-"The Q1 zone matrix" below for the per-zone ledger and the columns that
-remain (gather nodes, art). Everything below this line describes the
-**other 21 zones**, where it still holds.
+✅ **2026-08-20 status: eleven zones are done** — the Primal quarter's five
+(2026-08-18) and the Kinetic quarter's six (2026-08-20, built from
+`docs/contracts/KINETIC_CONTRACT.md` through the contract→red-pen→builders
+wave: 66 new `EnemyDef`s with §2.3 combat-stat blocks, drop tables, 58
+items, 21 recipes incl. Metalworking's debut, 13 nodes). Enemy
+crit/dodge/deflect shipped via `EnemyCombatStats` (campaign-only seam,
+PvP untouched). See the two zone matrices below. Everything below this
+line describes the **remaining 15 zones** (Celestial, Ethereal), where it
+still holds — ⚠️ Celestial drags in Phase 8 (sets/sockets/enchants) and
+the environment rules; the systems interlude comes first by ruling.
 
 ⚠️ **Scope grew with the geography pass.** WORLD_DESIGN settled 22 zones plus
 the Empyrean's three, each wanting a **pool of 3–5 mini-bosses and 1–2 bosses**
@@ -764,6 +769,28 @@ Hearthwood's Storeroom. Built end to end:
 paragraph previously said only Whispering Woods had a bestiary, which went
 stale the moment the other four rosters landed). `map_tab` switches on
 `Bestiary.forZone(id)` being non-empty, so all five zones light up today.
+
+### The Kinetic zone matrix (Q2) — same columns, same definition of done
+
+Built 2026-08-20 from KINETIC_CONTRACT (all eight §8 rulings applied).
+Recipes are band-scoped as ever (`kinetic_recipes.dart`, 21). Art columns
+follow the Q1 convention: 📝 desc = generator-ready description + verified
+pipeline, awaiting Christian's image pass. Pixel grids are deliberately
+n/a — the ruling that grids are the fallback, PNGs the quality path,
+predates this quarter.
+
+| Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Backdrop | Item icon descs | Item icons (PNG) |
+|---|---|---|---|---|---|---|---|---|
+| Old Quarry | ✅ 11 | ✅ | ✅ 9 defs | ✅ 2 | 📝 desc | 📝 desc | ✅ 9 | ⬜ |
+| Stormcliff Coast | ✅ 11 | ✅ | ✅ 13 defs | ✅ 2 | 📝 desc | 📝 desc | ✅ 13 | ⬜ |
+| Windward Steppe | ✅ 11 | ✅ | ✅ 15 defs | ✅ 2 | 📝 desc | 📝 desc | ✅ 15 | ⬜ |
+| Frostfell Pass | ✅ 11 | ✅ | ✅ 6 defs | ✅ 2 | 📝 desc | 📝 desc | ✅ 6 | ⬜ |
+| Thunderspire Peaks | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | 📝 desc | 📝 desc | ✅ 9 | ⬜ |
+| The Molten Deep | ✅ 11 | ✅ | ✅ 6 defs | ✅ 2 | 📝 desc | 📝 desc | ✅ 6 | ⬜ |
+
+📝 Deliberate debts, ruled and recorded: contract §9 Fast-follow (potion
+vocabulary; a non-collection quarter gate), the deferred descending-dungeon
+structure (Molten Deep ships standard), and Jewelry banking until Rimeholt.
 
 ### The Q1 zone matrix — what each zone has, and what "done" means
 
