@@ -396,6 +396,88 @@ abstract final class GatherNodes {
     flavor: 'Ice in the rock that the black walls have never warmed.',
   );
 
+  // ---- Thunderspire Peaks (Electro + Aero, band 23–28) -------------------
+  //
+  // ⭐ Hybrid zone, three world-held materials (KINETIC_CONTRACT §3.1/§6):
+  // Rowan Log, Iron Ore and Hum Quartz. Nothing here is a hide or a mote, so
+  // all three get a node.
+
+  static const tpRowanStand = GatherNodeDef(
+    id: 'tp_rowan_stand',
+    zoneId: 'thunderspire_peaks',
+    skill: GatherSkill.felling,
+    yieldsDefId: 'rowan_log',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.releaseTiming, 'chop', reps: 4),
+    xp: 53,
+    flavor: 'Mountain ash above the treeline, which should not be possible.',
+  );
+
+  static const tpIronSeam = GatherNodeDef(
+    id: 'tp_iron_seam',
+    zoneId: 'thunderspire_peaks',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'iron_ore',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.sweetSpot, 'strike', reps: 4),
+    xp: 53,
+    flavor:
+        'Rust-red rock that the storm has been finding for a very long '
+        'time.',
+  );
+
+  /// ⚠️ `bandKeeper`, which no gather node has used before — deliberate
+  /// (§9b.9c's "more difficulty, not more vocabulary" is about tiers; this is
+  /// a new material with a fiction that names its own engine).
+  static const tpHummingFace = GatherNodeDef(
+    id: 'tp_humming_face',
+    zoneId: 'thunderspire_peaks',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'hum_quartz',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.bandKeeper, 'ring'),
+    xp: 53,
+    flavor: 'Quartz with a note in it. Strike it wrong and the note stops.',
+  );
+
+  // ---- The Molten Deep (Pyro + Geo, band 25–29, KINETIC_CONTRACT §6) -----
+  //
+  // ⭐ Hybrid zone, three materials (§3.1's 3-per-hybrid rule): Obsidian and
+  // Firesalt are world-held and each get a node; Emberhide is a hide and
+  // stays kill-only, so this zone authors two, not three.
+  // ⭐ XP is `9 + 2 × (zone.minLevel − 1)` = `9 + 2 × 24` = 57.
+
+  static const mdObsidianFlow = GatherNodeDef(
+    id: 'md_obsidian_flow',
+    zoneId: 'the_molten_deep',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'obsidian',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'flake', complexity: 3),
+    xp: 57,
+    flavor:
+        'A glass front where the floor stopped being liquid, still sharp '
+        'along every edge it broke on.',
+  );
+
+  static const mdFiresaltCrust = GatherNodeDef(
+    id: 'md_firesalt_crust',
+    zoneId: 'the_molten_deep',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'firesalt',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.rateDrag, 'scrape', reps: 2),
+    xp: 57,
+    flavor:
+        'White crust at a vent\'s lip, where the heat leaves something '
+        'behind on its way out.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -417,6 +499,11 @@ abstract final class GatherNodes {
     saltwortLedge,
     ffLichenShelf,
     ffEvericeSeam,
+    tpRowanStand,
+    tpIronSeam,
+    tpHummingFace,
+    mdObsidianFlow,
+    mdFiresaltCrust,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

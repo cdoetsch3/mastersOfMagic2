@@ -40,10 +40,12 @@ ROOT = artgen.ROOT
 # Stormcliff Coast (11 creatures / 13 icons / 1 backdrop) is the only Kinetic
 # zone present in this worktree — the merge coordinator recomputes these once
 # Old Quarry and Windward Steppe land alongside it.
-EXPECTED_CREATURES = 55 + 44  # Primal + three Kinetic pure zones + Frostfell Pass
-EXPECTED_ICONS = 52 + 43  # + Old Quarry 9, Stormcliff 13, Windward 15, Frostfell 6
-EXPECTED_BACKDROPS = 5 + 4
+EXPECTED_CREATURES = 55 + 66  # Primal + the whole Kinetic quarter
+EXPECTED_ICONS = 52 + 58  # + OQ 9, SC 13, WS 15, FF 6, TP 9, MD 6
+EXPECTED_BACKDROPS = 5 + 6
 ICONS_PER_ZONE = {
+    "thunderspire_peaks": 9,
+    "frostfell_pass": 6,
     "whispering_woods": 18,
     "glimmerbrook": 9,
     "cinderpeak_foothills": 8,
@@ -52,7 +54,7 @@ ICONS_PER_ZONE = {
     "old_quarry": 9,
     "stormcliff_coast": 13,
     "windward_steppe": 15,
-    "frostfell_pass": 6,
+    "the_molten_deep": 6,
 }
 
 ONE_PIXEL_PNG = base64.b64decode(

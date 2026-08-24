@@ -12,7 +12,9 @@ import 'catalogue/frostfell_pass_items.dart';
 import 'catalogue/glimmerbrook_items.dart';
 import 'catalogue/old_quarry_items.dart';
 import 'catalogue/stormcliff_coast_items.dart';
+import 'catalogue/the_molten_deep_items.dart';
 import 'catalogue/thornmire_items.dart';
+import 'catalogue/thunderspire_peaks_items.dart';
 import 'catalogue/whispering_woods_items.dart';
 import 'catalogue/windward_steppe_items.dart';
 import 'item_def.dart';
@@ -45,6 +47,8 @@ abstract final class ItemCatalogue {
     'windward_steppe': WindwardSteppeItems.all,
     'stormcliff_coast': StormcliffCoastItems.all,
     'frostfell_pass': FrostfellPassItems.all,
+    'thunderspire_peaks': ThunderspirePeaksItems.all,
+    'the_molten_deep': TheMoltenDeepItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists

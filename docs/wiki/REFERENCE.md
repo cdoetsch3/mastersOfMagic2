@@ -16,7 +16,7 @@ the framework both live under.
 
 | Zones | Towns | Creatures | Items | Recipes | Gather nodes |
 |---|---|---|---|---|---|
-| 26 | 9 | 99 | 95 | 20 | 18 |
+| 26 | 9 | 121 | 110 | 20 | 23 |
 
 ## Contents
 
@@ -53,6 +53,10 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Leanstone Charm | `leanstone_charm` | 2 | ring | rare | 22 | windward_steppe |
 | The Long Lean | `the_long_lean` | 3 | robeTop | epic | 24 | windward_steppe |
 | Tussock Hood | `tussock_hood` | 4 | hat | common | 24 | windward_steppe |
+| Rowan Knot | `rowan_knot` | 6 | offHand | common | 25 | thunderspire_peaks |
+| Rowan Quarterstaff | `rowan_quarterstaff` | 8 | mainHand | common | 25 | thunderspire_peaks |
+| Rowan Wand | `rowan_wand` | 3 | mainHand | common | 25 | thunderspire_peaks |
+| Groundfault Grips | `groundfault_grips` | 5 | gloves | epic | 28 | thunderspire_peaks |
 
 ### `dodge`
 
@@ -72,6 +76,11 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Cinder Loop | `cinder_loop` | 5 | ring | rare | 9 | cinderpeak_foothills |
 | Fulgurite Pendant | `fulgurite_pendant` | 8 | neck | rare | 20 | stormcliff_coast |
 | Uplight | `uplight` | 12 | mainHand | epic | 22 | stormcliff_coast |
+| Rowan Knot | `rowan_knot` | 2 | offHand | common | 25 | thunderspire_peaks |
+| Rowan Quarterstaff | `rowan_quarterstaff` | 3 | mainHand | common | 25 | thunderspire_peaks |
+| Rowan Wand | `rowan_wand` | 4 | mainHand | common | 25 | thunderspire_peaks |
+| Countstone Pendant | `countstone_pendant` | 10 | neck | rare | 26 | thunderspire_peaks |
+| Firstmelt Loop | `firstmelt_loop` | 5 | ring | rare | 28 | the_molten_deep |
 
 ### `critDamage`
 
@@ -81,6 +90,11 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Cinder Loop | `cinder_loop` | 5 | ring | rare | 9 | cinderpeak_foothills |
 | Fulgurite Pendant | `fulgurite_pendant` | 10 | neck | rare | 20 | stormcliff_coast |
 | Uplight | `uplight` | 15 | mainHand | epic | 22 | stormcliff_coast |
+| Rowan Quarterstaff | `rowan_quarterstaff` | 8 | mainHand | common | 25 | thunderspire_peaks |
+| Rowan Wand | `rowan_wand` | 6 | mainHand | common | 25 | thunderspire_peaks |
+| Countstone Pendant | `countstone_pendant` | 12 | neck | rare | 26 | thunderspire_peaks |
+| Firstmelt Loop | `firstmelt_loop` | 25 | ring | rare | 28 | the_molten_deep |
+| The Long Cooling | `the_long_cooling` | 15 | hat | epic | 29 | the_molten_deep |
 
 ### `deflectChance`
 
@@ -91,6 +105,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Seawrack Gloves | `seawrack_gloves` | 6 | gloves | common | 16 | stormcliff_coast |
 | Tussock Gloves | `tussock_gloves` | 8 | gloves | common | 24 | windward_steppe |
 | Rimebound Ring | `rimebound_ring` | 10 | ring | rare | 24 | frostfell_pass |
+| The Long Cooling | `the_long_cooling` | 12 | hat | epic | 29 | the_molten_deep |
 
 ### `deflectAmount`
 
@@ -101,6 +116,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Seawrack Gloves | `seawrack_gloves` | 15 | gloves | common | 16 | stormcliff_coast |
 | Tussock Gloves | `tussock_gloves` | 20 | gloves | common | 24 | windward_steppe |
 | Rimebound Ring | `rimebound_ring` | 20 | ring | rare | 24 | frostfell_pass |
+| The Long Cooling | `the_long_cooling` | 25 | hat | epic | 29 | the_molten_deep |
 
 ### `maxHpBonus`
 
@@ -125,6 +141,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Tussock Gloves | `tussock_gloves` | 4 | gloves | common | 24 | windward_steppe |
 | Tussock Leggings | `tussock_leggings` | 14 | robeBottom | common | 24 | windward_steppe |
 | Tussock Robe | `tussock_robe` | 20 | robeTop | common | 24 | windward_steppe |
+| The Long Cooling | `the_long_cooling` | 22 | hat | epic | 29 | the_molten_deep |
 
 ### `damagePerCast`
 
@@ -134,6 +151,8 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Birch Wand | `birch_wand` | 3 | mainHand | common | 10 | ashfall_vale |
 | Uplight | `uplight` | 6 | mainHand | epic | 22 | stormcliff_coast |
 | Yew Wand | `yew_wand` | 4 | mainHand | common | 20 | windward_steppe |
+| Rowan Wand | `rowan_wand` | 5 | mainHand | common | 25 | thunderspire_peaks |
+| Groundfault Grips | `groundfault_grips` | 4 | gloves | epic | 28 | thunderspire_peaks |
 
 ### `damagePerCharge`
 
@@ -143,6 +162,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Heartwood Staff | `heartwood_stave` | 3 | mainHand | epic | 5 | whispering_woods |
 | Birch Quarterstaff | `birch_quarterstaff` | 2 | mainHand | common | 10 | ashfall_vale |
 | Yew Quarterstaff | `yew_quarterstaff` | 3 | mainHand | common | 20 | windward_steppe |
+| Rowan Quarterstaff | `rowan_quarterstaff` | 4 | mainHand | common | 25 | thunderspire_peaks |
 
 ### `shieldStrengthPercent`
 
@@ -170,6 +190,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Fawnhide Belt | `fawnhide_belt` | 1 | belt | common | 4 | glimmerbrook |
 | Tuskhide Belt | `tuskhide_belt` | 2 | belt | common | 11 | cinderpeak_foothills |
 | Rimepelt Belt | `rimepelt_belt` | 3 | belt | common | 23 | frostfell_pass |
+| Emberhide Belt | `emberhide_belt` | 4 | belt | common | 27 | the_molten_deep |
 
 
 ## Items by zone
@@ -217,9 +238,9 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 |---|---|---|---|---|---|---|---|
 | `copper_ore` | Copper Ore | material |  | common | 1 |  | gather: `cp_copper_seam`; drop: `flint_skink`; drop: `cinder_moth`; drop: `slagshell_tortoise`; drop: `ventworm`; drop: `slagheart`; drop: `vent_warden`; +4 more (see content.json) |
 | `proof_of_the_foothills` | Proof of the Foothills | key |  | rare | 1 |  | drop: `the_breathing_stone`; drop: `flintmaw` |
-| `pyro_crystal` | Pyro Crystal | mote |  | uncommon | 1 |  | drop: `slagheart`; drop: `vent_warden`; drop: `char_tusk`; drop: `the_emberqueen`; drop: `the_breathing_stone`; drop: `flintmaw`; +6 more (see content.json) |
-| `pyro_dust` | Pyro Dust | mote |  | common | 1 |  | drop: `ashjaw_brute`; drop: `flint_skink`; drop: `cinder_moth`; drop: `slagshell_tortoise`; drop: `ventworm`; drop: `slagheart`; +16 more (see content.json) |
-| `pyro_shard` | Pyro Shard | mote |  | common | 1 |  | drop: `ashjaw_brute`; drop: `flint_skink`; drop: `cinder_moth`; drop: `slagshell_tortoise`; drop: `ventworm`; drop: `slagheart`; +13 more (see content.json) |
+| `pyro_crystal` | Pyro Crystal | mote |  | uncommon | 1 |  | drop: `slagheart`; drop: `vent_warden`; drop: `char_tusk`; drop: `the_emberqueen`; drop: `the_breathing_stone`; drop: `flintmaw`; +12 more (see content.json) |
+| `pyro_dust` | Pyro Dust | mote |  | common | 1 |  | drop: `ashjaw_brute`; drop: `flint_skink`; drop: `cinder_moth`; drop: `slagshell_tortoise`; drop: `ventworm`; drop: `slagheart`; +27 more (see content.json) |
+| `pyro_shard` | Pyro Shard | mote |  | common | 1 |  | drop: `ashjaw_brute`; drop: `flint_skink`; drop: `cinder_moth`; drop: `slagshell_tortoise`; drop: `ventworm`; drop: `slagheart`; +21 more (see content.json) |
 | `tuskhide` | Tuskhide | material |  | common | 1 |  | drop: `ashjaw_brute`; drop: `slagshell_tortoise`; drop: `slagheart`; drop: `vent_warden`; drop: `char_tusk`; drop: `the_emberqueen`; +2 more (see content.json) |
 | `cinder_loop` | Cinder Loop | equipment | ring | rare | 9 | critChance +5, critDamage +5 | drop: `slagheart`; drop: `vent_warden`; drop: `char_tusk`; drop: `the_emberqueen`; drop: `the_breathing_stone`; drop: `flintmaw` |
 | `tuskhide_belt` | Tuskhide Belt | equipment | belt | common | 11 | beltSlots +2 | craft: `craft_tuskhide_belt` |
@@ -256,10 +277,10 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
 |---|---|---|---|---|---|---|---|
 | `bronze_ingot` | Bronze Ingot | material |  | common | 1 |  | drop |
-| `geo_crystal` | Geo Crystal | mote |  | uncommon | 1 |  | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course` |
-| `geo_dust` | Geo Dust | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; +5 more (see content.json) |
-| `geo_shard` | Geo Shard | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; +4 more (see content.json) |
-| `hardtack` | Hardtack | consumable |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +12 more (see content.json) |
+| `geo_crystal` | Geo Crystal | mote |  | uncommon | 1 |  | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course`; +6 more (see content.json) |
+| `geo_dust` | Geo Dust | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; +16 more (see content.json) |
+| `geo_shard` | Geo Shard | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; +12 more (see content.json) |
+| `hardtack` | Hardtack | consumable |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +16 more (see content.json) |
 | `quarry_jasper` | Quarry Jasper | material |  | uncommon | 1 |  | gather: `oq_jasper_face`; drop: `chiselback`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; +2 more (see content.json) |
 | `tin_ore` | Tin Ore | material |  | common | 1 |  | gather: `oq_tin_seam`; drop: `quarry_golem`; drop: `tailings_drudge`; drop: `gravelswarm`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +3 more (see content.json) |
 | `overseers_seal` | Overseer's Seal | equipment | ring | rare | 18 | deflectChance +12, deflectAmount +20 | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course` |
@@ -269,9 +290,9 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 
 | Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
 |---|---|---|---|---|---|---|---|
-| `electro_crystal` | Electro Crystal | mote |  | uncommon | 1 |  | drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman`; drop: `storm_lord`; drop: `the_return_stroke` |
-| `electro_dust` | Electro Dust | mote |  | common | 1 |  | drop: `stormcliff_tidecaller`; drop: `fulgurite_crawler`; drop: `sparkwing`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; +5 more (see content.json) |
-| `electro_shard` | Electro Shard | mote |  | common | 1 |  | drop: `fulgurite_crawler`; drop: `sparkwing`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; drop: `the_long_line`; +4 more (see content.json) |
+| `electro_crystal` | Electro Crystal | mote |  | uncommon | 1 |  | drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman`; drop: `storm_lord`; drop: `the_return_stroke`; +6 more (see content.json) |
+| `electro_dust` | Electro Dust | mote |  | common | 1 |  | drop: `stormcliff_tidecaller`; drop: `fulgurite_crawler`; drop: `sparkwing`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; +16 more (see content.json) |
+| `electro_shard` | Electro Shard | mote |  | common | 1 |  | drop: `fulgurite_crawler`; drop: `sparkwing`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; drop: `the_long_line`; +13 more (see content.json) |
 | `saltwort` | Saltwort | material |  | common | 1 |  | gather: `sc_saltwort_ledge`; drop: `stormcliff_tidecaller`; drop: `sparkwing`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman`; +2 more (see content.json) |
 | `saltwort_draught` | Saltwort Draught | beltable |  | common | 1 |  | drop: `fulgurite_crawler`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman` |
 | `seawrack_fibre` | Seawrack Fibre | material |  | common | 1 |  | gather: `sc_wrackline`; drop: `fulgurite_crawler`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; +3 more (see content.json) |
@@ -287,9 +308,9 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 
 | Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
 |---|---|---|---|---|---|---|---|
-| `aero_crystal` | Aero Crystal | mote |  | uncommon | 1 |  | drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; drop: `the_unbroken_blow`; drop: `tempest_monarch`; +6 more (see content.json) |
-| `aero_dust` | Aero Dust | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `tumblehusk`; drop: `kitewing`; drop: `old_lean`; +16 more (see content.json) |
-| `aero_shard` | Aero Shard | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; +12 more (see content.json) |
+| `aero_crystal` | Aero Crystal | mote |  | uncommon | 1 |  | drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; drop: `the_unbroken_blow`; drop: `tempest_monarch`; +12 more (see content.json) |
+| `aero_dust` | Aero Dust | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `tumblehusk`; drop: `kitewing`; drop: `old_lean`; +27 more (see content.json) |
+| `aero_shard` | Aero Shard | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; +19 more (see content.json) |
 | `tussock_flax` | Tussock Flax | material |  | common | 1 |  | gather: `ws_tussock_swale`; drop: `steppe_harrier`; drop: `chaff`; drop: `tumblehusk`; drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; +3 more (see content.json) |
 | `yew_log` | Yew Log | material |  | common | 1 |  | gather: `ws_yew_break`; drop: `leanstone`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; +2 more (see content.json) |
 | `yew_knot` | Yew Knot | equipment | offHand | common | 20 | accuracyBonus +5 | drop |
@@ -313,6 +334,31 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `rimepelt_belt` | Rimepelt Belt | equipment | belt | common | 23 | beltSlots +3 | drop |
 | `rimebound_ring` | Rimebound Ring | equipment | ring | rare | 24 | dodge +3, deflectChance +10, deflectAmount +20 | drop: `the_last_cairn`; drop: `hoarking`; drop: `coldsnap`; drop: `the_certain_road`; drop: `the_white_corridor`; drop: `the_road_under` |
 | `the_holdfast` | The Holdfast | equipment | neck | epic | 25 | shieldStrengthPercent +15 | drop: `the_white_corridor`; drop: `the_road_under` |
+
+### Thunderspire Peaks (`thunderspire_peaks`) — 9 items
+
+| Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
+|---|---|---|---|---|---|---|---|
+| `hum_quartz` | Hum Quartz | material |  | uncommon | 1 |  | gather: `tp_humming_face`; drop: `humming_ore`; drop: `ionwake`; drop: `crown_fire`; drop: `anvilhead`; drop: `thunder_roc`; drop: `the_shortening`; +2 more (see content.json) |
+| `iron_ingot` | Iron Ingot | material |  | common | 1 |  | drop |
+| `iron_ore` | Iron Ore | material |  | common | 1 |  | gather: `tp_iron_seam`; drop: `flashcount`; drop: `ionwake`; drop: `crown_fire`; drop: `anvilhead`; drop: `thunder_roc`; drop: `the_shortening`; +2 more (see content.json) |
+| `rowan_log` | Rowan Log | material |  | common | 1 |  | gather: `tp_rowan_stand`; drop: `stormcrest_roc`; drop: `updraft_wisp`; drop: `crown_fire`; drop: `anvilhead`; drop: `thunder_roc`; drop: `the_shortening`; +2 more (see content.json) |
+| `rowan_knot` | Rowan Knot | equipment | offHand | common | 25 | accuracyBonus +6, critChance +2 | drop |
+| `rowan_quarterstaff` | Rowan Quarterstaff | equipment | mainHand | common | 25 | accuracyBonus +8, critChance +3, critDamage +8, damagePerCharge +4 | drop |
+| `rowan_wand` | Rowan Wand | equipment | mainHand | common | 25 | accuracyBonus +3, critChance +4, critDamage +6, damagePerCast +5 | drop |
+| `countstone_pendant` | Countstone Pendant | equipment | neck | rare | 26 | critChance +10, critDamage +12 | drop: `crown_fire`; drop: `anvilhead`; drop: `thunder_roc`; drop: `the_shortening`; drop: `the_storm_that_passes`; drop: `the_strike_that_lands` |
+| `groundfault_grips` | Groundfault Grips | equipment | gloves | epic | 28 | accuracyBonus +5, damagePerCast +4 | drop: `the_storm_that_passes`; drop: `the_strike_that_lands` |
+
+### The Molten Deep (`the_molten_deep`) — 6 items
+
+| Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
+|---|---|---|---|---|---|---|---|
+| `emberhide` | Emberhide | material |  | common | 1 |  | drop: `molten_warden`; drop: `crustwalker`; drop: `the_floor`; drop: `magma_behemoth`; drop: `pyroclast`; drop: `firstmelt`; +2 more (see content.json) |
+| `firesalt` | Firesalt | material |  | common | 1 |  | gather: `md_firesalt_crust`; drop: `slagswimmer`; drop: `ember_vent`; drop: `the_floor`; drop: `magma_behemoth`; drop: `pyroclast`; drop: `firstmelt` |
+| `obsidian` | Obsidian | material |  | uncommon | 1 |  | gather: `md_obsidian_flow`; drop: `ember_vent`; drop: `cooling_thing`; drop: `the_floor`; drop: `magma_behemoth`; drop: `pyroclast`; drop: `firstmelt`; +2 more (see content.json) |
+| `emberhide_belt` | Emberhide Belt | equipment | belt | common | 27 | beltSlots +4 | drop |
+| `firstmelt_loop` | Firstmelt Loop | equipment | ring | rare | 28 | critChance +5, critDamage +25 | drop: `the_floor`; drop: `magma_behemoth`; drop: `pyroclast`; drop: `firstmelt`; drop: `the_slow_stone`; drop: `efreet` |
+| `the_long_cooling` | The Long Cooling | equipment | hat | epic | 29 | critDamage +15, deflectChance +12, deflectAmount +25, maxHpBonus +22 | drop: `the_slow_stone`; drop: `efreet` |
 
 
 ## Bestiary by zone
@@ -460,6 +506,38 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `the_last_cairn` | The Last Cairn | Mini-boss | Champion | aqua/aero | 21-26 | ×1.7 | ×1.2 | Rimepelt, Hoarlichen, Everice, Rimebound Ring |
 | `the_road_under` | The Road Under | Boss | Aspect | aqua | 21-26 | ×2.6 | ×1.5 | Rimepelt, Hoarlichen, Everice, Rimebound Ring, The Holdfast |
 | `the_white_corridor` | The White Corridor | Boss | Juggernaut | aqua/aero | 21-26 | ×3.6 | ×1.4 | Rimepelt, Hoarlichen, Everice, Rimebound Ring, The Holdfast |
+
+### Thunderspire Peaks (`thunderspire_peaks`) — 11 creatures
+
+| Id | Name | Rank | Archetype | Element | Level | HP scale | Power scale | Notable drops |
+|---|---|---|---|---|---|---|---|---|
+| `flashcount` | Flashcount | Wild | Lasher | electro | 23-28 | ×0.85 | ×1.0 | Iron Ore, Electro Shard, Electro Dust |
+| `humming_ore` | Humming Ore | Wild | Sentinel | electro | 23-28 | ×1.25 | ×0.7 | Hum Quartz, Electro Shard, Electro Dust, Hardtack |
+| `ionwake` | Ionwake | Wild | Adept | electro/aero | 23-28 | ×1.0 | ×0.9 | Iron Ore, Hum Quartz |
+| `stormcrest_roc` | Stormcrest Roc | Wild | Bruiser | aero | 23-28 | ×1.15 | ×1.1 | Rowan Log, Electro Shard, Electro Dust, Hardtack |
+| `updraft_wisp` | Updraft Wisp | Wild | Glasswing | aero | 23-28 | ×0.5 | ×1.7 | Rowan Log, Aero Shard, Aero Dust |
+| `anvilhead` | Anvilhead | Mini-boss | Redoubt | electro/aero | 23-28 | ×2.2 | ×0.85 | Iron Ore, Rowan Log, Hum Quartz, Countstone Pendant |
+| `crown_fire` | Crown Fire | Mini-boss | Champion | electro | 23-28 | ×1.7 | ×1.2 | Iron Ore, Rowan Log, Hum Quartz, Countstone Pendant |
+| `the_shortening` | The Shortening | Mini-boss | Hexer | electro | 23-28 | ×1.6 | ×0.75 | Iron Ore, Rowan Log, Hum Quartz, Countstone Pendant |
+| `thunder_roc` | Thunder Roc | Mini-boss | Executioner | electro | 23-28 | ×1.2 | ×1.9 | Iron Ore, Rowan Log, Hum Quartz, Countstone Pendant |
+| `the_storm_that_passes` | The Storm That Passes | Boss | Juggernaut | electro/aero | 23-28 | ×3.6 | ×1.4 | Iron Ore, Rowan Log, Hum Quartz, Countstone Pendant, Groundfault Grips |
+| `the_strike_that_lands` | The Strike That Lands | Boss | Aspect | electro | 23-28 | ×2.6 | ×1.5 | Iron Ore, Rowan Log, Hum Quartz, Countstone Pendant, Groundfault Grips |
+
+### The Molten Deep (`the_molten_deep`) — 11 creatures
+
+| Id | Name | Rank | Archetype | Element | Level | HP scale | Power scale | Notable drops |
+|---|---|---|---|---|---|---|---|---|
+| `cooling_thing` | Cooling Thing | Wild | Glasswing | geo | 25-29 | ×0.5 | ×1.7 | Obsidian, Geo Shard, Geo Dust |
+| `crustwalker` | Crustwalker | Wild | Bruiser | geo | 25-29 | ×1.15 | ×1.1 | Emberhide, Geo Shard, Geo Dust, Hardtack |
+| `ember_vent` | Ember Vent | Wild | Blighter | pyro | 25-29 | ×1.0 | ×0.6 | Firesalt, Obsidian |
+| `molten_warden` | Molten Warden | Wild | Sentinel | pyro/geo | 25-29 | ×1.25 | ×0.7 | Emberhide, Pyro Shard, Pyro Dust, Hardtack |
+| `slagswimmer` | Slagswimmer | Wild | Adept | pyro | 25-29 | ×1.0 | ×0.9 | Firesalt, Pyro Shard, Pyro Dust |
+| `firstmelt` | Firstmelt | Mini-boss | Hexer | pyro/geo | 25-29 | ×1.6 | ×0.75 | Emberhide, Obsidian, Firesalt, Firstmelt Loop |
+| `magma_behemoth` | Magma Behemoth | Mini-boss | Redoubt | pyro | 25-29 | ×2.2 | ×0.85 | Emberhide, Obsidian, Firesalt, Firstmelt Loop |
+| `pyroclast` | Pyroclast | Mini-boss | Executioner | pyro | 25-29 | ×1.2 | ×1.9 | Emberhide, Obsidian, Firesalt, Firstmelt Loop |
+| `the_floor` | The Floor | Mini-boss | Champion | pyro/geo | 25-29 | ×1.7 | ×1.2 | Emberhide, Obsidian, Firesalt, Firstmelt Loop |
+| `efreet` | Efreet | Boss | Tyrant | pyro | 25-29 | ×2.6 | ×1.7 | Emberhide, Obsidian, Firstmelt Loop, The Long Cooling |
+| `the_slow_stone` | The Slow Stone | Boss | Juggernaut | geo | 25-29 | ×3.6 | ×1.4 | Emberhide, Obsidian, Firstmelt Loop, The Long Cooling |
 
 
 ## Recipes by skill

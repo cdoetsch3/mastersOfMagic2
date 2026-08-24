@@ -91,16 +91,20 @@ ZONES = [
     "cinderpeak_foothills",
     "thornmire",
     "ashfall_vale",
+    "thunderspire_peaks",
+    "frostfell_pass",
     "old_quarry",
     "stormcliff_coast",
     "windward_steppe",
-    "frostfell_pass",
+    "the_molten_deep",
 ]
 
 # ⭐ The palette a zone's creatures are locked to by `pixelate.py`. Hybrid
 # zones use their LEAD element, so the generated art and the silhouette
 # fallback agree about what you are fighting (IMPLEMENTATION_PLAN, Art row).
 ZONE_ELEMENT = {
+    "thunderspire_peaks": "electro",
+    "frostfell_pass": "aqua",
     "old_quarry": "geo",
     "windward_steppe": "aero",
     "whispering_woods": "flora",
@@ -109,7 +113,9 @@ ZONE_ELEMENT = {
     "thornmire": "flora",
     "ashfall_vale": "pyro",
     "stormcliff_coast": "electro",
-    "frostfell_pass": "aqua",
+    # ⚠️ Hybrid zones lock to their LEAD element — The Molten Deep is Pyro
+    # first (KINETIC_CONTRACT §4.6).
+    "the_molten_deep": "pyro",
 }
 
 KINDS = ("creature", "icon", "backdrop")

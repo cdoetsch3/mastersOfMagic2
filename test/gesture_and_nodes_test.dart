@@ -359,6 +359,31 @@ void main() {
         skill: GatherSkill.mining,
         yield: 'everice',
       ),
+      'tp_rowan_stand': (
+        zone: 'thunderspire_peaks',
+        skill: GatherSkill.felling,
+        yield: 'rowan_log',
+      ),
+      'tp_iron_seam': (
+        zone: 'thunderspire_peaks',
+        skill: GatherSkill.mining,
+        yield: 'iron_ore',
+      ),
+      'tp_humming_face': (
+        zone: 'thunderspire_peaks',
+        skill: GatherSkill.mining,
+        yield: 'hum_quartz',
+      ),
+      'md_obsidian_flow': (
+        zone: 'the_molten_deep',
+        skill: GatherSkill.mining,
+        yield: 'obsidian',
+      ),
+      'md_firesalt_crust': (
+        zone: 'the_molten_deep',
+        skill: GatherSkill.foraging,
+        yield: 'firesalt',
+      ),
     };
 
     const primalZones = [
@@ -371,6 +396,8 @@ void main() {
       'stormcliff_coast',
       'windward_steppe',
       'frostfell_pass',
+      'thunderspire_peaks',
+      'the_molten_deep',
     ];
 
     test('⚠️ every authored node is REGISTERED, and nothing extra is (within '
@@ -470,11 +497,13 @@ void main() {
       // was never meant to reach.
       // ⚠️ Frostfell Pass adds `rimepelt` — a hide, kill-only by the same
       // rule (§9b.7b) as Cinderpeak's Tuskhide and Whispering Woods' Fawnhide.
-      const killOnly = {'fawnhide', 'tuskhide', 'rimepelt'};
+      // `emberhide` (The Molten Deep) is the same kill-only-hide shape.
+      const killOnly = {'fawnhide', 'tuskhide', 'rimepelt', 'emberhide'};
       // ⚠️ Crafted intermediates wear the MaterialDef type but are outputs,
       // not world materials — bronze_ingot is Metalworking's t3 product
-      // (KINETIC_CONTRACT §3), smelted from tin+copper, never gathered.
-      const craftedIntermediates = {'bronze_ingot'};
+      // (KINETIC_CONTRACT §3), smelted from tin+copper, never gathered;
+      // iron_ingot is Thunderspire Peaks' equivalent, smelted from iron ore.
+      const craftedIntermediates = {'bronze_ingot', 'iron_ingot'};
       final yielded = GatherNodes.all.map((n) => n.yieldsDefId).toSet();
       for (final d in ItemCatalogue.all.whereType<MaterialDef>()) {
         if (killOnly.contains(d.id)) continue;

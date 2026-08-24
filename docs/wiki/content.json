@@ -3,10 +3,10 @@
   "counts": {
     "zones": 26,
     "towns": 9,
-    "creatures": 99,
-    "items": 95,
+    "creatures": 121,
+    "items": 110,
     "recipes": 20,
-    "gatherNodes": 18
+    "gatherNodes": 23
   },
   "zones": [
     {
@@ -10279,6 +10279,2208 @@
         ],
         "bonus": []
       }
+    },
+    {
+      "id": "stormcrest_roc",
+      "name": "Stormcrest Roc",
+      "zoneId": "thunderspire_peaks",
+      "rank": "common",
+      "archetype": "Bruiser",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A roc the size of a cart, wings storm-grey and ragged at the tips, riding the up-draft off the ridge without a single wingbeat wasted. It reads the cloud the way a sailor reads water and is always somewhere above the next flash before it happens.",
+      "moves": [
+        {
+          "id": "tp_wingbeat",
+          "name": "Wingbeat",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_fulldive",
+          "name": "Full Dive",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "rowan_log",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": [
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "chance": 0.02
+          }
+        ]
+      }
+    },
+    {
+      "id": "humming_ore",
+      "name": "Humming Ore",
+      "zoneId": "thunderspire_peaks",
+      "rank": "common",
+      "archetype": "Sentinel",
+      "elements": [
+        "electro"
+      ],
+      "lore": "An outcrop of rust-veined rock that should be silent and is not — a low, steady hum runs through it that you feel in the teeth before you hear it. It does not move to defend itself. It has never needed to.",
+      "moves": [
+        {
+          "id": "tp_resonate",
+          "name": "Resonate",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_lockthecharge",
+          "name": "Lock the Charge",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hum_quartz",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "flashcount",
+      "name": "Flashcount",
+      "zoneId": "thunderspire_peaks",
+      "rank": "common",
+      "archetype": "Lasher",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A loose cluster of finger-length white filaments that arc between the rocks in a rapid, uneven stutter, never resting on one point twice in a row. It is not aiming. It is counting.",
+      "moves": [
+        {
+          "id": "tp_quickcount",
+          "name": "Quick Count",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_racingcount",
+          "name": "Racing Count",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "iron_ore",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "updraft_wisp",
+      "name": "Updraft Wisp",
+      "zoneId": "thunderspire_peaks",
+      "rank": "common",
+      "archetype": "Glasswing",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A hand-span knot of pale down and static, riding a thermal with no weight to speak of. It rides the same rising air the cloud does, and it goes wherever the air decides, which is occasionally through you.",
+      "moves": [
+        {
+          "id": "tp_catchthedraft",
+          "name": "Catch the Draft",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_burstupdraft",
+          "name": "Burst Updraft",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "rowan_log",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "ionwake",
+      "name": "Ionwake",
+      "zoneId": "thunderspire_peaks",
+      "rank": "common",
+      "archetype": "Adept",
+      "elements": [
+        "electro",
+        "aero"
+      ],
+      "lore": "A compact, upright shape of charged wind and standing light, no taller than a person, moving with an even, deliberate gait against gusts that would stagger anything less certain of its footing. It trails a thin visible wake of disturbed air.",
+      "moves": [
+        {
+          "id": "tp_trail",
+          "name": "Trail",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_closethegap",
+          "name": "Close the Gap",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_holdtheline",
+          "name": "Hold the Line",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "iron_ore",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "hum_quartz",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "crown_fire",
+      "name": "Crown Fire",
+      "zoneId": "thunderspire_peaks",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A crackling halo of white-blue light that has settled on the highest point of a ridge and stayed, bright enough to read a map by, competent at everything a storm can do. It does not build to anything — it is simply always ready.",
+      "moves": [
+        {
+          "id": "tp_arcover",
+          "name": "Arc Over",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_coronalstrike",
+          "name": "Coronal Strike",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_ringthecrown",
+          "name": "Ring the Crown",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "iron_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "rowan_log",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hum_quartz",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "countstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "anvilhead",
+      "name": "Anvilhead",
+      "zoneId": "thunderspire_peaks",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "electro",
+        "aero"
+      ],
+      "lore": "A squat mass of storm-scarred stone shaped, almost too neatly, like an anvil — every strike the peak has taken for a hundred years seems to have found it and it has never once cracked. Wind piles up against it and goes nowhere.",
+      "moves": [
+        {
+          "id": "tp_hammersquall",
+          "name": "Hammer Squall",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_setheanvil",
+          "name": "Set the Anvil",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "tp_drawthestormdown",
+          "name": "Draw the Storm Down",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "iron_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "rowan_log",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hum_quartz",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "countstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "thunder_roc",
+      "name": "Thunder Roc",
+      "zoneId": "thunderspire_peaks",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A leaner, faster roc than the ridge-riders below, feathers dark and faintly branching with trapped white light down every barb. It circles once, high, and then there is no interval left at all before it stoops.",
+      "moves": [
+        {
+          "id": "tp_stoop",
+          "name": "Stoop",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_fullstoop",
+          "name": "Full Stoop",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "iron_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "rowan_log",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hum_quartz",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "countstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_shortening",
+      "name": "The Shortening",
+      "zoneId": "thunderspire_peaks",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "electro"
+      ],
+      "lore": "Not a body — an interval. A gap between flashes that keeps counting itself down, marked by a low floating knot of white sparks that brightens a fraction more each time the cloud lights. There is always less of it left than there was.",
+      "moves": [
+        {
+          "id": "tp_countthegap",
+          "name": "Count the Gap",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_closing",
+          "name": "Closing",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_nogapleft",
+          "name": "No Gap Left",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "iron_ore",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "rowan_log",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hum_quartz",
+            "min": 1,
+            "max": 2,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "countstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_storm_that_passes",
+      "name": "The Storm That Passes",
+      "zoneId": "thunderspire_peaks",
+      "rank": "boss",
+      "archetype": "Juggernaut",
+      "elements": [
+        "electro",
+        "aero"
+      ],
+      "lore": "A vast standing front of cloud and charged wind, three storeys of it, moving through the peaks at a slow, indifferent walking pace that nothing here has ever managed to turn aside. It was moving before you arrived and it will still be moving after.",
+      "moves": [
+        {
+          "id": "tp_holdstill",
+          "name": "Hold Still",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "tp_keepcoming",
+          "name": "Keep Coming",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_passthrough",
+          "name": "Pass Through",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "iron_ore",
+            "min": 4,
+            "max": 8,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "rowan_log",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "hum_quartz",
+            "min": 2,
+            "max": 4,
+            "weight": 15,
+            "chance": 0.15
+          },
+          {
+            "itemId": "countstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          },
+          {
+            "itemId": "groundfault_grips",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_strike_that_lands",
+      "name": "The Strike That Lands",
+      "zoneId": "thunderspire_peaks",
+      "rank": "boss",
+      "archetype": "Aspect",
+      "elements": [
+        "electro"
+      ],
+      "lore": "Not yet a shape — a brightening. The cloud overhead has stopped flickering and started to hold its light a little longer each time, building toward a single column that has not come down yet. When it does, there will be nothing left to count.",
+      "moves": [
+        {
+          "id": "tp_firstwarning",
+          "name": "First Warning",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_closer",
+          "name": "Closer",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "tp_thestrikelands",
+          "name": "The Strike Lands",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "iron_ore",
+            "min": 4,
+            "max": 8,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "rowan_log",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "hum_quartz",
+            "min": 2,
+            "max": 4,
+            "weight": 15,
+            "chance": 0.15
+          },
+          {
+            "itemId": "countstone_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          },
+          {
+            "itemId": "groundfault_grips",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "molten_warden",
+      "name": "Molten Warden",
+      "zoneId": "the_molten_deep",
+      "rank": "common",
+      "archetype": "Sentinel",
+      "elements": [
+        "pyro",
+        "geo"
+      ],
+      "lore": "A standing plate of crust gone thick enough to hold its shape, hinged at nothing, planted over whatever is moving underneath it. It does not attack so much as refuse to be somewhere else.",
+      "moves": [
+        {
+          "id": "md_pressback",
+          "name": "Press Back",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_holdthecrust",
+          "name": "Hold the Crust",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "emberhide",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "slagswimmer",
+      "name": "Slagswimmer",
+      "zoneId": "the_molten_deep",
+      "rank": "common",
+      "archetype": "Adept",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "A long low body that moves through rock the way an eel moves through water, parting stone that is only pretending to be solid and closing again behind it, unhurried.",
+      "moves": [
+        {
+          "id": "md_lap",
+          "name": "Lap",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_surgeunder",
+          "name": "Surge Under",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_skinover",
+          "name": "Skin Over",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "firesalt",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "crustwalker",
+      "name": "Crustwalker",
+      "zoneId": "the_molten_deep",
+      "rank": "common",
+      "archetype": "Bruiser",
+      "elements": [
+        "geo"
+      ],
+      "lore": "Something the size and shape of a boulder, walking on legs it grew for the occasion, its underside always a shade darker than the top — the part that has not finished cooling yet.",
+      "moves": [
+        {
+          "id": "md_crackforward",
+          "name": "Crack Forward",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_breakthecrust",
+          "name": "Break the Crust",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "emberhide",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": [
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "chance": 0.02
+          }
+        ]
+      }
+    },
+    {
+      "id": "ember_vent",
+      "name": "Ember Vent",
+      "zoneId": "the_molten_deep",
+      "rank": "common",
+      "archetype": "Blighter",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "A split in the floor no wider than a hand, breathing heat in slow irregular pulses. It has no body to speak of — only the vent, and what comes out of it.",
+      "moves": [
+        {
+          "id": "md_spitcinder",
+          "name": "Spit Cinder",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_flareup",
+          "name": "Flare Up",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "firesalt",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "obsidian",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "cooling_thing",
+      "name": "Cooling Thing",
+      "zoneId": "the_molten_deep",
+      "rank": "common",
+      "archetype": "Glasswing",
+      "elements": [
+        "geo"
+      ],
+      "lore": "A slick black skin over something that used to move, gone still long enough to hold an edge. Everything else down here is still liquid; this is what liquid looks like once it loses the argument.",
+      "moves": [
+        {
+          "id": "md_crack",
+          "name": "Crack",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_shatter",
+          "name": "Shatter",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.5
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "obsidian",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_floor",
+      "name": "The Floor",
+      "zoneId": "the_molten_deep",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "pyro",
+        "geo"
+      ],
+      "lore": "Not a creature standing on the floor — the floor itself, for as far as the light reaches, moving the way water moves when nobody is watching it closely enough to call it solid.",
+      "moves": [
+        {
+          "id": "md_giveunderfoot",
+          "name": "Give Underfoot",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_openbeneathyou",
+          "name": "Open Beneath You",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_firmup",
+          "name": "Firm Up",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "emberhide",
+            "min": 2,
+            "max": 4,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "obsidian",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "firesalt",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "firstmelt_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "magma_behemoth",
+      "name": "Magma Behemoth",
+      "zoneId": "the_molten_deep",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "A mass the size of a house, moving at the speed a house should move, its whole hide a slow tide of black crust cracking open on bright orange and closing over it again a step later.",
+      "moves": [
+        {
+          "id": "md_pushtheflow",
+          "name": "Push the Flow",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_crustover",
+          "name": "Crust Over",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "md_reclaim",
+          "name": "Reclaim",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "emberhide",
+            "min": 2,
+            "max": 4,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "obsidian",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "firesalt",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "firstmelt_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "pyroclast",
+      "name": "Pyroclast",
+      "zoneId": "the_molten_deep",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "A tight, fast-moving knot of molten rock thrown clear of whatever is boiling below, still airborne more often than not. It does not so much attack as arrive, all at once.",
+      "moves": [
+        {
+          "id": "md_buildpressure",
+          "name": "Build Pressure",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_blow",
+          "name": "Blow",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "emberhide",
+            "min": 2,
+            "max": 4,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "obsidian",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "firesalt",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "firstmelt_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "firstmelt",
+      "name": "Firstmelt",
+      "zoneId": "the_molten_deep",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "pyro",
+        "geo"
+      ],
+      "lore": "The first place the floor gave way, still soft at the centre long after everything around it set. It knows exactly where every other weak point is, because it used to be one.",
+      "moves": [
+        {
+          "id": "md_findtheseam",
+          "name": "Find the Seam",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_readtheheat",
+          "name": "Read the Heat",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_meltthrough",
+          "name": "Melt Through",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "emberhide",
+            "min": 2,
+            "max": 4,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "obsidian",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "firesalt",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "firstmelt_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_slow_stone",
+      "name": "The Slow Stone",
+      "zoneId": "the_molten_deep",
+      "rank": "boss",
+      "archetype": "Juggernaut",
+      "elements": [
+        "geo"
+      ],
+      "lore": "The one part of the floor that never joined the rest, holding its shape long after everything around it went liquid. It has had a very long time to decide it is not going to be told otherwise.",
+      "moves": [
+        {
+          "id": "md_advance",
+          "name": "Advance",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_coolthesurface",
+          "name": "Cool the Surface",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "md_comedown",
+          "name": "Come Down",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "emberhide",
+            "min": 4,
+            "max": 8,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "obsidian",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "firstmelt_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "the_long_cooling",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "efreet",
+      "name": "Efreet",
+      "zoneId": "the_molten_deep",
+      "rank": "boss",
+      "archetype": "Tyrant",
+      "elements": [
+        "pyro"
+      ],
+      "lore": "A shape that holds itself upright out of pure insistence, fire wearing the idea of a body rather than needing one. It has opinions about who is allowed down here, and it is standing on all of them.",
+      "moves": [
+        {
+          "id": "md_bankthecoals",
+          "name": "Bank the Coals",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "md_stepthrough",
+          "name": "Step Through",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "md_erupt",
+          "name": "Erupt",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "pyro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "pyro_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          },
+          {
+            "itemId": "geo_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "emberhide",
+            "min": 4,
+            "max": 8,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "obsidian",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "firstmelt_loop",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "the_long_cooling",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
     }
   ],
   "items": [
@@ -12155,6 +14357,303 @@
         "shieldStrengthPercent": 15
       },
       "salvage": []
+    },
+    {
+      "id": "rowan_log",
+      "name": "Rowan Log",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Mountain ash above the treeline, which should not be possible — and yet here it stands, twisted hard by the wind and pale under the bark, one of the only living things taller than a person this high up.",
+      "skill": "woodcarving",
+      "tier": 4,
+      "salvage": []
+    },
+    {
+      "id": "iron_ore",
+      "name": "Iron Ore",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Rust-red rock that the storm has been finding for a very long time — every vein runs true to where the last strike landed, and the next one will find it again.",
+      "skill": "metalworking",
+      "tier": 4,
+      "salvage": []
+    },
+    {
+      "id": "hum_quartz",
+      "name": "Hum Quartz",
+      "kind": "material",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Quartz with a note in it. Strike it wrong and the note stops; strike it right and it rings on for longer than seems reasonable, held somewhere inside the crystal rather than in the air.",
+      "skill": "enchanting",
+      "tier": 4,
+      "salvage": []
+    },
+    {
+      "id": "iron_ingot",
+      "name": "Iron Ingot",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Ore gone into the crucible and come out true, holding a straighter edge than the rock it was cut from ever promised.",
+      "skill": "metalworking",
+      "tier": 4,
+      "salvage": []
+    },
+    {
+      "id": "rowan_quarterstaff",
+      "name": "Rowan Quarterstaff",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 25,
+      "value": 330,
+      "fungible": false,
+      "lore": "Cut from wood that spent its whole life arguing with the wind and never lost. Lighter than Yew, and it holds an edge of white light along the grain after a strike that takes a moment to fade.",
+      "slot": "mainHand",
+      "form": "Quarterstaff",
+      "material": "Rowan",
+      "socketCount": 1,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 8,
+        "critChance": 3,
+        "critDamage": 8,
+        "damagePerCharge": 4
+      },
+      "salvage": [
+        {
+          "itemId": "rowan_log",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "rowan_wand",
+      "name": "Rowan Wand",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 25,
+      "value": 280,
+      "fungible": false,
+      "lore": "Trimmed thin and true from a straight run of grain, still faintly warm from wherever it was standing. The first wand in the game with somewhere to set a gem.",
+      "slot": "mainHand",
+      "form": "Wand",
+      "material": "Rowan",
+      "socketCount": 1,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 3,
+        "critChance": 4,
+        "critDamage": 6,
+        "damagePerCast": 5
+      },
+      "salvage": [
+        {
+          "itemId": "rowan_log",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "rowan_knot",
+      "name": "Rowan Knot",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 25,
+      "value": 230,
+      "fungible": false,
+      "lore": "A burl grown tight and hard where the tree fought a bad lean for years. Carved smooth on one face; the socket is cut into the other, where the grain runs deepest.",
+      "slot": "offHand",
+      "form": "Knot",
+      "material": "Rowan",
+      "socketCount": 1,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 6,
+        "critChance": 2
+      },
+      "salvage": [
+        {
+          "itemId": "rowan_log",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "countstone_pendant",
+      "name": "Countstone Pendant",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 26,
+      "value": 300,
+      "fungible": false,
+      "lore": "A finger of Hum Quartz on a plaited cord that has never once gone quiet, its note quickening the closer the cloud overhead gets to lighting again. You learn to time your breathing to it.",
+      "slot": "neck",
+      "form": "Pendant",
+      "material": "Hum Quartz",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "critChance": 10,
+        "critDamage": 12
+      },
+      "salvage": []
+    },
+    {
+      "id": "groundfault_grips",
+      "name": "Groundfault Grips",
+      "kind": "equipment",
+      "rarity": "epic",
+      "tradability": "untradeable",
+      "equipLevel": 28,
+      "value": 790,
+      "fungible": false,
+      "lore": "Gloves worn by whoever stood closest to the ground the last time it took the whole charge at once. The seams still carry a hairline of live white light, and they have never once let a strike through to the hand.",
+      "slot": "gloves",
+      "form": "Grips",
+      "material": "Groundfault",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 5,
+        "damagePerCast": 4
+      },
+      "salvage": []
+    },
+    {
+      "id": "obsidian",
+      "name": "Obsidian",
+      "kind": "material",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Black glass where the floor sheared clean and cooled too fast to crystallise, sharp along every broken edge and sharper than it looks.",
+      "skill": "jewelry",
+      "tier": 4,
+      "salvage": []
+    },
+    {
+      "id": "firesalt",
+      "name": "Firesalt",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "A crust of pale mineral left behind at a vent's lip, where the heat leaves something solid on its way out. Bitter, and warm long after it is pocketed.",
+      "skill": "potionsAndAlchemy",
+      "tier": 5,
+      "salvage": []
+    },
+    {
+      "id": "emberhide",
+      "name": "Emberhide",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "A hide that never fully cooled, dull orange still showing through the black in a scatter of hairline cracks whenever it flexes.",
+      "skill": "tailoring",
+      "tier": 5,
+      "salvage": []
+    },
+    {
+      "id": "emberhide_belt",
+      "name": "Emberhide Belt",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 27,
+      "value": 380,
+      "fungible": false,
+      "lore": "A wide strap of Emberhide worn low, four loops sewn into it and still faintly warm to the touch no matter how long it has hung on a peg.",
+      "slot": "belt",
+      "form": "Belt",
+      "material": "Emberhide",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "beltSlots": 4
+      },
+      "salvage": []
+    },
+    {
+      "id": "firstmelt_loop",
+      "name": "Firstmelt Loop",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 28,
+      "value": 360,
+      "fungible": false,
+      "lore": "A ring cast in one motion from rock that was still moving when it set, its band never quite closing into a true circle. Warm, and unwilling to let go of a grip once it has one.",
+      "slot": "ring",
+      "form": "Loop",
+      "material": "Firstmelt",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "critChance": 5,
+        "critDamage": 25
+      },
+      "salvage": []
+    },
+    {
+      "id": "the_long_cooling",
+      "name": "The Long Cooling",
+      "kind": "equipment",
+      "rarity": "epic",
+      "tradability": "untradeable",
+      "equipLevel": 29,
+      "value": 820,
+      "fungible": false,
+      "lore": "A circlet of polished obsidian, worn smooth in one groove around the brow and still sharp everywhere else. It is still cooling; it will always still be cooling.",
+      "slot": "hat",
+      "form": "Circlet",
+      "material": "Obsidian",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "critDamage": 15,
+        "deflectChance": 12,
+        "deflectAmount": 25,
+        "maxHpBonus": 22
+      },
+      "salvage": []
     }
   ],
   "recipes": [
@@ -12975,6 +15474,56 @@
       "max": 3,
       "xp": 49,
       "flavor": "Ice in the rock that the black walls have never warmed."
+    },
+    {
+      "id": "tp_rowan_stand",
+      "zoneId": "thunderspire_peaks",
+      "skill": "felling",
+      "yieldsItemId": "rowan_log",
+      "min": 2,
+      "max": 4,
+      "xp": 53,
+      "flavor": "Mountain ash above the treeline, which should not be possible."
+    },
+    {
+      "id": "tp_iron_seam",
+      "zoneId": "thunderspire_peaks",
+      "skill": "mining",
+      "yieldsItemId": "iron_ore",
+      "min": 2,
+      "max": 4,
+      "xp": 53,
+      "flavor": "Rust-red rock that the storm has been finding for a very long time."
+    },
+    {
+      "id": "tp_humming_face",
+      "zoneId": "thunderspire_peaks",
+      "skill": "mining",
+      "yieldsItemId": "hum_quartz",
+      "min": 2,
+      "max": 3,
+      "xp": 53,
+      "flavor": "Quartz with a note in it. Strike it wrong and the note stops."
+    },
+    {
+      "id": "md_obsidian_flow",
+      "zoneId": "the_molten_deep",
+      "skill": "mining",
+      "yieldsItemId": "obsidian",
+      "min": 2,
+      "max": 3,
+      "xp": 57,
+      "flavor": "A glass front where the floor stopped being liquid, still sharp along every edge it broke on."
+    },
+    {
+      "id": "md_firesalt_crust",
+      "zoneId": "the_molten_deep",
+      "skill": "foraging",
+      "yieldsItemId": "firesalt",
+      "min": 2,
+      "max": 4,
+      "xp": 57,
+      "flavor": "White crust at a vent's lip, where the heat leaves something behind on its way out."
     }
   ],
   "index": {
@@ -13061,6 +15610,48 @@
           "type": "drop",
           "from": "the_road_under",
           "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
           "bucket": "always",
           "chance": 1.0
         }
@@ -13261,6 +15852,90 @@
           "zoneId": "frostfell_pass",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "stormcrest_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "humming_ore",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "flashcount",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "updraft_wisp",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "updraft_wisp",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "ionwake",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "aero_shard": [
@@ -13387,6 +16062,55 @@
           "type": "drop",
           "from": "the_road_under",
           "zoneId": "frostfell_pass",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "updraft_wisp",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
           "bucket": "always",
           "chance": 1.0
         }
@@ -14766,6 +17490,50 @@
           "skill": "mining"
         }
       ],
+      "countstone_pendant": [
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.15
+        }
+      ],
       "electro_crystal": [
         {
           "type": "drop",
@@ -14806,6 +17574,48 @@
           "type": "drop",
           "from": "the_return_stroke",
           "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
           "bucket": "always",
           "chance": 1.0
         }
@@ -14915,6 +17725,104 @@
           "zoneId": "stormcliff_coast",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "stormcrest_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "stormcrest_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "humming_ore",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "humming_ore",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.17
+        },
+        {
+          "type": "drop",
+          "from": "flashcount",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "flashcount",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "updraft_wisp",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "ionwake",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "electro_shard": [
@@ -14987,6 +17895,127 @@
           "zoneId": "stormcliff_coast",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "stormcrest_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "humming_ore",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.08
+        },
+        {
+          "type": "drop",
+          "from": "flashcount",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "emberhide": [
+        {
+          "type": "drop",
+          "from": "molten_warden",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "crustwalker",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.35
         }
       ],
       "everice": [
@@ -15192,6 +18221,100 @@
           "nodeId": "tm_fenroot_hummock",
           "zoneId": "thornmire",
           "skill": "foraging"
+        }
+      ],
+      "firesalt": [
+        {
+          "type": "drop",
+          "from": "slagswimmer",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "ember_vent",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "gather",
+          "nodeId": "md_firesalt_crust",
+          "zoneId": "the_molten_deep",
+          "skill": "foraging"
+        }
+      ],
+      "firstmelt_loop": [
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.25
         }
       ],
       "flora_crystal": [
@@ -15960,6 +19083,48 @@
           "zoneId": "old_quarry",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "geo_dust": [
@@ -16067,6 +19232,97 @@
           "zoneId": "old_quarry",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "molten_warden",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "slagswimmer",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "crustwalker",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "crustwalker",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "ember_vent",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "cooling_thing",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "cooling_thing",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "geo_shard": [
@@ -16139,6 +19395,78 @@
           "zoneId": "old_quarry",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "crustwalker",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "cooling_thing",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "groundfault_grips": [
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.1
         }
       ],
       "hardtack": [
@@ -16267,6 +19595,34 @@
           "zoneId": "frostfell_pass",
           "bucket": "bonus",
           "chance": 0.02
+        },
+        {
+          "type": "drop",
+          "from": "stormcrest_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "bonus",
+          "chance": 0.02
+        },
+        {
+          "type": "drop",
+          "from": "humming_ore",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "molten_warden",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "crustwalker",
+          "zoneId": "the_molten_deep",
+          "bucket": "bonus",
+          "chance": 0.02
         }
       ],
       "heartwood_stave": [
@@ -16347,6 +19703,134 @@
           "nodeId": "ff_lichen_shelf",
           "zoneId": "frostfell_pass",
           "skill": "foraging"
+        }
+      ],
+      "hum_quartz": [
+        {
+          "type": "drop",
+          "from": "humming_ore",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "ionwake",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "gather",
+          "nodeId": "tp_humming_face",
+          "zoneId": "thunderspire_peaks",
+          "skill": "mining"
+        }
+      ],
+      "iron_ore": [
+        {
+          "type": "drop",
+          "from": "flashcount",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "ionwake",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.35
+        },
+        {
+          "type": "gather",
+          "nodeId": "tp_iron_seam",
+          "zoneId": "thunderspire_peaks",
+          "skill": "mining"
         }
       ],
       "leanstone_charm": [
@@ -16501,6 +19985,70 @@
           "recipeId": "craft_oak_wand",
           "skill": "woodcarving",
           "skillLevel": 1
+        }
+      ],
+      "obsidian": [
+        {
+          "type": "drop",
+          "from": "ember_vent",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "cooling_thing",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "gather",
+          "nodeId": "md_obsidian_flow",
+          "zoneId": "the_molten_deep",
+          "skill": "mining"
         }
       ],
       "overseers_seal": [
@@ -16677,6 +20225,48 @@
           "type": "drop",
           "from": "the_rooting",
           "zoneId": "ashfall_vale",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
           "bucket": "always",
           "chance": 1.0
         }
@@ -16926,6 +20516,97 @@
           "zoneId": "ashfall_vale",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "molten_warden",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "molten_warden",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.17
+        },
+        {
+          "type": "drop",
+          "from": "slagswimmer",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "slagswimmer",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "crustwalker",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "ember_vent",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "cooling_thing",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "pyro_shard": [
@@ -17103,6 +20784,62 @@
           "zoneId": "ashfall_vale",
           "bucket": "always",
           "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "molten_warden",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.08
+        },
+        {
+          "type": "drop",
+          "from": "slagswimmer",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "the_floor",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "magma_behemoth",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "pyroclast",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "firstmelt",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
+          "bucket": "always",
+          "chance": 1.0
         }
       ],
       "quarry_jasper": [
@@ -17273,6 +21010,82 @@
         {
           "type": "salvage",
           "from": "rimepelt_belt"
+        }
+      ],
+      "rowan_log": [
+        {
+          "type": "drop",
+          "from": "stormcrest_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "updraft_wisp",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "crown_fire",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "anvilhead",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "thunder_roc",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_shortening",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_storm_that_passes",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_strike_that_lands",
+          "zoneId": "thunderspire_peaks",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "salvage",
+          "from": "rowan_quarterstaff"
+        },
+        {
+          "type": "salvage",
+          "from": "rowan_wand"
+        },
+        {
+          "type": "salvage",
+          "from": "rowan_knot"
+        },
+        {
+          "type": "gather",
+          "nodeId": "tp_rowan_stand",
+          "zoneId": "thunderspire_peaks",
+          "skill": "felling"
         }
       ],
       "saltwort": [
@@ -17643,6 +21456,22 @@
           "zoneId": "frostfell_pass",
           "bucket": "main",
           "chance": 0.1
+        }
+      ],
+      "the_long_cooling": [
+        {
+          "type": "drop",
+          "from": "the_slow_stone",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "efreet",
+          "zoneId": "the_molten_deep",
+          "bucket": "main",
+          "chance": 0.15
         }
       ],
       "the_long_lean": [
@@ -18261,6 +22090,24 @@
         {
           "type": "salvageInto",
           "itemId": "rimepelt"
+        }
+      ],
+      "rowan_knot": [
+        {
+          "type": "salvageInto",
+          "itemId": "rowan_log"
+        }
+      ],
+      "rowan_quarterstaff": [
+        {
+          "type": "salvageInto",
+          "itemId": "rowan_log"
+        }
+      ],
+      "rowan_wand": [
+        {
+          "type": "salvageInto",
+          "itemId": "rowan_log"
         }
       ],
       "sapwort": [

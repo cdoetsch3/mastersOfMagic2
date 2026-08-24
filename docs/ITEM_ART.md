@@ -1061,6 +1061,97 @@ crit damage · Lv 22 · 1 socket*
 > upward*. One small empty socket cut into the grip, waiting. Light, quick,
 > obviously one-handed.
 
+## Thunderspire Peaks · Lv 23–28 · Electro + Aero · **9 items**
+
+> ⭐ *You are inside the storm, and it is building to something.* Everything
+> here should read as **gathering charge, not spending it** — light lives in
+> tight coiled veins and single bright points rather than open glow. ⚠️ No
+> motes here: a hybrid drops its parents' Electro and Aero families rather
+> than owning any of its own, so this zone's icon set is materials, an
+> intermediate good, and equipment only.
+
+**Palette:** pale rowan wood, rust-red iron ore, humming quartz white-violet,
+storm-cloud grey, one hairline vein of white-blue light.
+
+### Materials
+
+**Rowan Log** — *common · material · Woodcarving t4*
+`assets/items/thunderspire_peaks/rowan_log.png`
+> A single straight-grained length of pale ash-white wood, forearm-long,
+> resting at a slight angle. Bark stripped from one face, the exposed grain
+> faintly silvered, twisted subtly along its length from a life spent leaning
+> into wind. ⭐ *Mountain ash above the treeline, which should not be
+> possible.*
+
+**Iron Ore** — *common · material · Metalworking t4*
+`assets/items/thunderspire_peaks/iron_ore.png`
+> Two or three broken lumps of dense rust-red rock the size of eggs, resting
+> together as one mass. A dull metallic sheen where freshly broken, otherwise
+> matte and grainy. Heavier-looking than Tin — no glow, no colour beyond the
+> rust.
+
+**Hum Quartz** — *uncommon · material · Enchanting t4 · ⏳ banks for Q3*
+`assets/items/thunderspire_peaks/hum_quartz.png`
+> A single rough crystal point the size of a thumb, pale white shot through
+> with faint violet, standing on its broken end. ⭐ **A hairline blur around
+> the tip** — the note it holds, drawn as the one thing in the image that
+> is not quite still. ⚠️ Uncommon — no other light on it.
+
+### Intermediate goods
+
+**Iron Ingot** — *common · material · Metalworking t4 output*
+`assets/items/thunderspire_peaks/iron_ingot.png`
+> A single cast bar of iron the size of a hand, resting flat, edges sharp
+> from the mould. Dull grey-black metal with a faint cold sheen, a thin seam
+> line down one side. ⭐ Plainer than Bronze — iron reads as workmanlike, not
+> ornamental, exactly what a weapon's core should look like.
+
+### Equipment — the Rowan set (Woodcarving)
+
+> ⭐ **The first crafted crit in the game, and the wood ladder's first gem
+> socket.** ⚠️ Keep the socket small, dark and genuinely empty — a shallow
+> round recess with no gem in it yet, never a stand-in glow.
+
+**Rowan Quarterstaff** — *common · main hand · +4 dmg/charge, +8 accuracy, 3%
+crit, +8 crit damage · Lv 25 · 1 socket*
+`assets/items/thunderspire_peaks/rowan_quarterstaff.png`
+> A long staff of pale ash-white Rowan wood, shown diagonally, grain running
+> true and straight the full length. A hairline of white-blue light traces
+> one edge of the grain, brightest near the top and fading toward the base.
+> One small dark empty socket cut into the shaft below the grip, waiting.
+
+**Rowan Wand** — *common · main hand · +5 dmg/cast, +3 accuracy, 4% crit,
++6 crit damage · Lv 25 · 1 socket*
+`assets/items/thunderspire_peaks/rowan_wand.png`
+> A short one-handed wand of pale Rowan wood, forearm-length, trimmed thin
+> and straight-grained. The same hairline white-blue vein as the quarterstaff
+> runs its length. One small dark empty socket at the base of the grip.
+
+**Rowan Knot** — *common · off hand · +6 accuracy, 2% crit · Lv 25 ·
+1 socket*
+`assets/items/thunderspire_peaks/rowan_knot.png`
+> A burl of dense, tightly whorled pale wood, fist-sized, carved smooth on
+> one face and left rough on the other where the grain is deepest. The
+> socket is cut into the smooth face, small and dark, empty. A single faint
+> white-blue thread follows one whorl of the grain.
+
+### Equipment — the chase
+
+**Countstone Pendant** — *rare · neck · 10% crit, +12 crit damage · Lv 26*
+`assets/items/thunderspire_peaks/countstone_pendant.png`
+> A finger-length shard of Hum Quartz on a plaited cord, hung point-down.
+> ⭐ Rare, so the crit reads as a live point: a single bright white-violet
+> pulse sits at the tip, sharp rather than diffuse — spiky and hot, the same
+> convention crit always draws to. The rest of the crystal is pale and matte.
+
+**Groundfault Grips** — *epic · gloves · +5 accuracy, +4 dmg/cast · Lv 28*
+`assets/items/thunderspire_peaks/groundfault_grips.png`
+> A pair of heavy full-fingered gloves, dark storm-grey leather over a
+> reinforced knuckle and palm plate. ⚠️ Epic, so it is doing something: a
+> hairline of live white-blue light runs the seam of every finger and meets
+> at the palm's centre in one small bright point, as though the last charge
+> that hit them is still finding its way out. Scorched, not decorative.
+
 ---
 
 ## Frostfell Pass · Lv 21–26 · Aqua + Aero · **6 items**
@@ -1127,12 +1218,82 @@ blue, one cold grey-white light for deflection.
 
 ---
 
+## The Molten Deep · Lv 25–29 · Pyro + Geo · **6 items**
+
+> ⭐ *The stone is a liquid and has been the whole time.* ⚠️ Nothing here
+> should read as two elements sharing a frame — it is one substance at two
+> temperatures. Black cooled crust and dull ash grey first; ember orange only
+> where a crack, a mechanic, or a crit earns it; deflection's cool grey-white
+> light where the Geo half earns it instead.
+
+**Palette:** black cooled crust, ember orange, dull ash grey, cool grey-white
+deflection light.
+
+### Materials
+
+**Obsidian** — *uncommon · material · Jewelry t4 · ⏳ banks for Q2*
+`assets/items/the_molten_deep/obsidian.png`
+> A single chunk of glassy black stone about the size of a fist, sheared
+> along one conchoidal face that catches the light in a sharp curve. Deep
+> matte black elsewhere, no glow. ⭐ Uncommon — one clean edge of reflected
+> light along the broken face, unlit.
+
+**Firesalt** — *common · material · Potions & Alchemy t5 · ⏳ banks for Q2*
+`assets/items/the_molten_deep/firesalt.png`
+> A small crust of pale mineral flakes, roughly a handful, mounded loosely on
+> nothing. Dusty white-grey with a faint yellow bloom at the edges where the
+> heat concentrated it. Dry, inert, no shimmer.
+
+**Emberhide** — *common · material · Tailoring t5 · kill-only, no node*
+`assets/items/the_molten_deep/emberhide.png`
+> A single folded hide the size of a lap-blanket, matte black on the outer
+> face with a scatter of hairline cracks. Dull ember orange shows through
+> only at the cracks, never as a wash. Heavy, faintly warm.
+
+### Equipment
+
+**Emberhide Belt** — *common · belt · 4 belt slots · Lv 27*
+`assets/items/the_molten_deep/emberhide_belt.png`
+> A wide strap of black Emberhide shown laid flat, four empty loops sewn
+> along its length. ⭐ **Loops drawn empty** — the capacity is the point.
+> Hairline orange cracks run through the leather itself, the same texture as
+> the raw hide.
+
+**Firstmelt Loop** — *rare · ring · 5% crit, +25 crit damage · Lv 28*
+`assets/items/the_molten_deep/firstmelt_loop.png`
+> A single ring shown standing upright, cast in one motion from dark stone
+> that never quite closed into a true circle — a visible seam where the ends
+> nearly meet. ⭐ Rare, so the crit reads as a light source: a hairline of
+> live ember-orange runs the seam, a point rather than a face, the rest of
+> the band matte black. ⚠️ No border — the ring's own ember seam is the whole
+> cue.
+
+**The Long Cooling** — *epic · hat · +22 max HP, 12% deflect, 25% amount, +15
+crit damage · Lv 29*
+`assets/items/the_molten_deep/the_long_cooling.png`
+> A circlet of polished black obsidian, shown from a three-quarter angle,
+> smooth and worn bright in one groove around the brow. ⚠️ Epic, so it is
+> visibly doing two things at once: the groove itself carries a cool
+> grey-white light, smooth and closed, nothing sharp for a blow to catch on
+> — the deflect; and one hairline crack low on the band still shows a live
+> ember-orange point — the crit. ⭐ *"It is still cooling; it will always
+> still be cooling"* — the two lights never meet.
+
+---
+
 ## ⚠️ Still to describe — the rest of Kinetic and two more quarters
 
 The **Primal quarter (52 items)** and **Stormcliff Coast (13 items)** are
 written.
 The **Primal quarter (52 items)** and **Frostfell Pass (6 items)**, the
 quarter's first hybrid zone, are written.
+The **Primal quarter (52 items)** and **Thunderspire Peaks (9 items)** are
+written.
+The **Primal quarter (52 items)** and **The Molten Deep (6 items)**, a hybrid
+zone, are written. 🚧 Landed alongside Frostfell Pass and Thunderspire Peaks
+in parallel worktrees — this paragraph and the table row below are this
+builder's own count and will need the merge coordinator's reconciliation
+against the other two.
 
 | Quarter | Zones | Items | Status |
 |---|---|---|---|
@@ -1141,6 +1302,8 @@ quarter's first hybrid zone, are written.
 | Kinetic 15–29 | 6 | 15+❓ | 🔶 Windward Steppe described, 5 zones left |
 | Kinetic 15–29 | 6 | 58 | 🚧 1/6 zones — Stormcliff Coast (13) described |
 | Kinetic 15–29 | 6 | 58 | 🚧 4/6 zones (37) — Old Quarry, Windward Steppe, Stormcliff Coast, Frostfell Pass |
+| Kinetic 15–29 | 6 | 58 | 🚧 1/6 zones — Thunderspire Peaks (9) described |
+| Kinetic 15–29 | 6 | 58 | 🚧 The Molten Deep (6) described, 2 hybrids left |
 | Celestial 30–47 | 7 | ❓ | ⬜ no catalogue yet |
 | Ethereal 45–60 | 7 | ❓ | ⬜ no catalogue yet |
 
@@ -1163,3 +1326,6 @@ total is 67 (52 Primal + 15 Windward Steppe), so an item added without an
 entry here fails the suite with a pointer to this file.
 total (65, with Stormcliff Coast landed), so an item added without an entry
 here fails the suite with a pointer to this file.
+total (98, with Old Quarry, Stormcliff Coast, Windward Steppe and
+Thunderspire Peaks all landed — 52 Primal + 9 + 13 + 15 + 9), so an item
+added without an entry here fails the suite with a pointer to this file.

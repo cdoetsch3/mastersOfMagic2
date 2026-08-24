@@ -875,6 +875,191 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > above: wet black rock, storm-cloud grey, pale sea-foam white, one thread of
 > hairline white-blue light per feature. Muted, low-contrast, and grey
 > winning everywhere except the thin live seams.
+## The Molten Deep · Lv 25–29 · Pyro + Geo
+
+> ⭐ *The stone is a liquid and has been the whole time.* ⚠️ **Geo revealed as
+> Pyro's slow state, not two elements sharing a room.** Everything here should
+> read as one substance at two temperatures — black crust and orange melt,
+> never fire and rock treated as separate things.
+
+### Commons
+
+**Molten Warden** — *common · Sentinel · Pyro+Geo*
+> A flat standing plate of black crust the height of a person, hinged at
+> nothing and planted upright over the floor it guards, hairline cracks along
+> every edge showing dull orange beneath. No limbs, no face. Motionless,
+> squared, immovable.
+
+**Slagswimmer** — *common · Adept · Pyro*
+> A long low body the length of a person, moving through molten rock the way
+> an eel moves through water, glossy black skin over a core that glows faint
+> orange through its seams. Low, sinuous, mid-glide.
+
+**Crustwalker** — *common · Bruiser · Geo*
+> A boulder-sized mass on four thick stone legs, its underside a shade
+> darker orange-black than the weathered grey top, as though it has not
+> finished cooling on one side. Squat, heavy, standing square.
+
+**Ember Vent** — *common · Blighter · Pyro*
+> A hand-wide split in the ground with no body beyond it, breathing heat in
+> slow irregular pulses that show as a dull orange glow deep in the crack.
+> Flat to the floor, motionless except for the breathing.
+
+**Cooling Thing** — *common · Glasswing · Geo*
+> A slick black slab the size of a large dog, its surface fused to a hard
+> obsidian sheen with sharp broken edges along one side. The only thing here
+> that has stopped moving. Still, low, angular.
+
+### Mini-bosses
+
+**The Floor** — *mini · Champion · Pyro+Geo*
+> Not a creature on the floor but a stretch of the floor itself, roughly
+> person-sized where it rises, black crust cracking open on bright orange
+> and closing over a step later. Level, spreading, deceptively calm.
+
+**Magma Behemoth** — *mini · Redoubt · Pyro*
+> A house-sized mass of slow-moving black crust, its whole hide a tide of
+> cracking plates opening on bright orange and sealing shut again. Massive,
+> ponderous, advancing at a walk.
+
+**Pyroclast** — *mini · Executioner · Pyro*
+> A tight fist-sized knot of molten rock, glowing bright orange-white at its
+> core through a thin black skin, more often airborne than not. Compact,
+> fast, caught mid-arc.
+
+**Firstmelt** — *mini · Hexer · Pyro+Geo*
+> A person-sized patch of ground gone permanently soft, black crust sagging
+> inward at the centre with a faint orange glow showing through the give.
+> Low, uneven, unsettlingly aware of where it is standing.
+
+### Bosses
+
+**The Slow Stone** — *boss · Juggernaut · Geo*
+> A colossal black mass three storeys tall, roughly boulder-shaped, standing
+> where everything around it has gone liquid, its surface a matte unlit grey
+> unlike anything else in the zone. Planted, immense, entirely still.
+
+**Efreet** — *boss · Tyrant · Pyro*
+> A tall humanoid silhouette the height of two people, built from standing
+> fire rather than wearing it, bright orange-white at the core fading to a
+> thin dark edge at its outline. Upright, composed, unhurried.
+
+### Arena backdrop
+
+`assets/backgrounds/the_molten_deep.png` — *16:9 · Pyro palette*
+> Wide 16:9 landscape painting of a deep volcanic gallery seen side-on at
+> standing eye level, environment only — no creatures, no people, no text. A
+> level shelf of black cooled crust runs straight across the frame just past
+> mid-height, hairline cracks showing dull orange beneath. Below it, the
+> shelf drops into a slow-moving band of molten rock across the bottom
+> fifth, its surface glowing orange-red under a black skin that never fully
+> closes. At the far left and far right edges, broken standing crust cropped
+> by the frame, black and cracked, each threaded with a single vein of
+> orange light. The centre of the frame is **open dark gallery air**, running
+> back to a low black rock ceiling and a faint red haze — nothing rises
+> centre-frame. Heat-shimmer drifts through the whole frame like slow
+> distortion. Dim, ember-lit, warm. **Pyro palette**, matching the creatures
+> above: black cooled crust, ember orange, dull ash grey, one thread of
+> molten light per feature. Muted, low-contrast, and dark winning everywhere
+> except the live seams.
+
+## Thunderspire Peaks · Lv 23–28 · Electro + Aero
+
+> ⭐ *You are inside the storm, and it is building to something.* The fusion
+> is a storm as a **single accelerating event** rather than weather —
+> Stormcliff is where the lightning goes, this is *when* it comes. ⚠️ Nothing
+> here should read as already discharged; everything is charging, and the
+> light should look like it is gathering rather than spent.
+
+### Commons
+
+**Stormcrest Roc** — *common · Bruiser · Aero*
+> A roc the size of a cart, wingspan wider than two people standing arm to
+> arm, storm-grey plumage ragged at the wingtips. Caught in profile riding an
+> up-draft, body and head turned toward the right edge of the image, wings
+> swept back and barely moving.
+
+**Humming Ore** — *common · Sentinel · Electro*
+> A standing outcrop of rust-veined rock the height of a person, motionless,
+> with fine branching lines of white-blue light threaded through the veins
+> like something alive under the surface. No limbs, no face — a rock,
+> charged, waiting.
+
+**Flashcount** — *common · Lasher · Electro*
+> A loose cluster of finger-length white filaments arcing between points in
+> the air, no larger than a dinner plate all together, none of them ever
+> resting in the same place twice. Pale white-blue throughout, faint trailing
+> afterimages.
+
+**Updraft Wisp** — *common · Glasswing · Aero*
+> A hand-span knot of pale down and static riding a visible thermal shimmer,
+> weightless and barely holding a shape. Near-white, faintly translucent at
+> the edges, caught mid-rise and already fraying.
+
+**Ionwake** — *common · Adept · Electro+Aero*
+> A compact, person-height humanoid figure of charged wind and standing
+> white-blue light, upright and even-postured, body turned toward the right
+> edge of the image. A thin visible wake of disturbed, faintly lit air trails
+> behind it.
+
+### Mini-bosses
+
+**Crown Fire** — *mini · Champion · Electro*
+> A crackling halo of white-blue light the width of a cartwheel, hovering
+> fixed at head height above a bare outcrop, bright enough to cast a shadow.
+> No body beneath it — light alone, holding a steady ring shape rather than
+> flickering.
+
+**Anvilhead** — *mini · Redoubt · Electro+Aero*
+> A squat mass of storm-scarred grey stone, cart-sized, weathered into the
+> unmistakable shape of an anvil. Deep pitted scorch marks cover every
+> upward-facing surface. Wind visibly piles and curls against its windward
+> face and goes nowhere.
+
+**Thunder Roc** — *mini · Executioner · Electro*
+> A leaner, faster roc than Stormcrest, wingspan a little narrower, feathers
+> dark slate rather than storm-grey and branched through with trapped
+> white-blue light down every barb. Caught mid-stoop, wings swept tight,
+> angled steeply down and to the right.
+
+**The Shortening** — *mini · Hexer · Electro*
+> A low floating knot of white sparks the size of a fist, orbited by a loose,
+> barely-there haze of disturbed air, hovering at chest height with nothing
+> solid beneath it. ⭐ It should look like **a held breath**, not yet a body.
+
+### Bosses
+
+**The Storm That Passes** — *boss · Juggernaut · Electro+Aero*
+> A vast standing front of cloud and charged wind three storeys tall, its
+> silhouette a huge rolling mass rather than any creature shape, pale
+> grey-white shot through with slow branching veins of white-blue light. No
+> face, no limbs — weather with the momentum of a mountain.
+
+**The Strike That Lands** — *boss · Aspect · Electro*
+> A brightening column of white-blue light four storeys tall, not yet
+> touched down, its lower end trailing off into open air above a bare peak.
+> Denser and more solid at the top than at the base, gathering rather than
+> discharged. The only creature in the bestiary caught **before** it
+> arrives.
+
+### Arena backdrop
+
+`assets/backgrounds/thunderspire_peaks.png` — *16:9 · Electro palette*
+> Wide 16:9 landscape painting of a high storm-wrapped mountain summit seen
+> side-on at standing eye level, environment only — no creatures, no people,
+> no text. A level line of bare wind-scoured rock runs straight across the
+> frame just past mid-height, thin rust-red ore veins showing through the
+> stone. Below it, the peak drops into deep shadow and cloud across the
+> bottom fifth. At the far left and far right edges, broken storm-worn rock
+> spires cropped by the frame, dark grey, each threaded with a single
+> hairline vein of white-blue light. The centre of the frame is **a dense,
+> low, roiling cloud bank**, lit from within at one point, low and quiet —
+> nothing bright or busy close to camera, the light gathering rather than
+> discharged. Heavy blown mist drifts through the whole frame. Overcast,
+> charged, cold. **Electro palette**, matching the creatures above: rust-red
+> stone, storm-cloud grey, pale sea-foam white, one thread of hairline
+> white-blue light per feature, gathering rather than spent. Muted,
+> low-contrast, and the whole frame reads as **held**, not yet released.
 
 ---
 
@@ -981,6 +1166,7 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 ---
 
 ## ⚠️ Still to describe — 209 creatures
+## ⚠️ Still to describe — 198 creatures
 
 The **Primal quarter (55)** and **Old Quarry (11)** are written. The rest of
 the Kinetic quarter, and the Celestial and Ethereal quarters, have full
@@ -998,6 +1184,15 @@ The **Primal quarter (55)** and **Frostfell Pass (11)**, the quarter's first
 hybrid zone, are written. The rest of Kinetic and all of Celestial and
 Ethereal have full rosters in ENEMIES_DESIGN §2e / KINETIC_CONTRACT §4 —
 names, ranks, archetypes and premises — but no physical descriptions yet.
+The **Primal quarter (55)** and **Thunderspire Peaks (11)** are written. The
+rest of Kinetic and all of Celestial and Ethereal have full rosters in
+ENEMIES_DESIGN §2e / KINETIC_CONTRACT §4 — names, ranks, archetypes and
+premises — but no physical descriptions yet.
+The **Primal quarter (55)** and **The Molten Deep (11)**, a hybrid zone, are
+written. 🚧 Landed alongside Frostfell Pass and Thunderspire Peaks in
+parallel worktrees — this paragraph and the table row below are this
+builder's own count and will need the merge coordinator's reconciliation
+against the other two.
 
 | Quarter | Zones | Creatures | Status |
 |---|---|---|---|
@@ -1006,6 +1201,8 @@ names, ranks, archetypes and premises — but no physical descriptions yet.
 | Kinetic 15–29 | 6 | 66 | 🔶 Windward Steppe (11) described, 5 zones (55) left |
 | Kinetic 15–29 | 6 | 66 | 🚧 1/6 zones — Stormcliff Coast (11) described |
 | Kinetic 15–29 | 6 | 66 | 🚧 4/6 zones (44) described — Old Quarry, Windward Steppe, Stormcliff Coast, Frostfell Pass |
+| Kinetic 15–29 | 6 | 66 | 🚧 1/6 zones — Thunderspire Peaks (11) described |
+| Kinetic 15–29 | 6 | 66 | 🚧 The Molten Deep (11) described, 2 hybrids left |
 | Celestial 30–47 | 7 | 77 | ⬜ |
 | Ethereal 45–60 | 7 | 77 | ⬜ |
 | The Eclipsed Citadel | 1 | ❓ | needs its own structure first (§2e) |
