@@ -113,7 +113,10 @@ void main() {
 
     test('view-everything is complete and in unlock order', () {
       final all = Skills.allRecipesFor(CraftSkill.tailoring);
-      expect(all.length, 12, reason: '5 Bindweed + 5 Bogflax + 2 belts');
+      // Primal: 5 Bindweed + 5 Bogflax + 2 belts (Fawnhide, Tuskhide) = 12.
+      // Kinetic (KINETIC_CONTRACT §5): 5 Seawrack + 5 Tussock + 2 belts
+      // (Rimepelt, Emberhide) = 12 more.
+      expect(all.length, 24, reason: '12 Primal + 12 Kinetic');
       for (var i = 1; i < all.length; i++) {
         expect(all[i].skillLevel, greaterThanOrEqualTo(all[i - 1].skillLevel),
             reason: 'the sheet scrolls the ladder, not the authoring order');

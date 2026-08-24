@@ -5,7 +5,7 @@
     "towns": 9,
     "creatures": 121,
     "items": 110,
-    "recipes": 20,
+    "recipes": 41,
     "gatherNodes": 23
   },
   "zones": [
@@ -15292,6 +15292,714 @@
           "complexity": 1
         }
       ]
+    },
+    {
+      "id": "craft_bronze_ingot",
+      "outputId": "bronze_ingot",
+      "outputCount": 1,
+      "skill": "metalworking",
+      "skillLevel": 1,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "copper_ore",
+          "count": 2
+        },
+        {
+          "itemId": "tin_ore",
+          "count": 1
+        },
+        {
+          "itemId": "charcoal",
+          "count": 1
+        }
+      ],
+      "steps": [
+        {
+          "engine": "bandKeeper",
+          "category": "regulation",
+          "skin": "stoke",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "alignCommit",
+          "category": "precision",
+          "skin": "pour",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "quench",
+          "reps": 2,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_iron_ingot",
+      "outputId": "iron_ingot",
+      "outputCount": 1,
+      "skill": "metalworking",
+      "skillLevel": 10,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "iron_ore",
+          "count": 3
+        },
+        {
+          "itemId": "charcoal",
+          "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "bandKeeper",
+          "category": "regulation",
+          "skin": "stoke",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "alignCommit",
+          "category": "precision",
+          "skin": "pour",
+          "reps": 1,
+          "complexity": 3
+        },
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "quench",
+          "reps": 3,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_yew_quarterstaff",
+      "outputId": "yew_quarterstaff",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 20,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "yew_log",
+          "count": 3
+        },
+        {
+          "itemId": "bronze_ingot",
+          "count": 1
+        }
+      ],
+      "steps": [
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "chop",
+          "reps": 4,
+          "complexity": 1
+        },
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 3
+        },
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "sand",
+          "reps": 3,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_yew_wand",
+      "outputId": "yew_wand",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 20,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "yew_log",
+          "count": 2
+        },
+        {
+          "itemId": "bronze_ingot",
+          "count": 1
+        }
+      ],
+      "steps": [
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "chop",
+          "reps": 3,
+          "complexity": 1
+        },
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 3
+        }
+      ]
+    },
+    {
+      "id": "craft_yew_knot",
+      "outputId": "yew_knot",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 20,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "yew_log",
+          "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 3
+        },
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "sand",
+          "reps": 3,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_rowan_quarterstaff",
+      "outputId": "rowan_quarterstaff",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 30,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "rowan_log",
+          "count": 3
+        },
+        {
+          "itemId": "iron_ingot",
+          "count": 1
+        }
+      ],
+      "steps": [
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "chop",
+          "reps": 5,
+          "complexity": 1
+        },
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 4
+        },
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "sand",
+          "reps": 4,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_rowan_wand",
+      "outputId": "rowan_wand",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 30,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "rowan_log",
+          "count": 2
+        },
+        {
+          "itemId": "iron_ingot",
+          "count": 1
+        }
+      ],
+      "steps": [
+        {
+          "engine": "releaseTiming",
+          "category": "timing",
+          "skin": "chop",
+          "reps": 4,
+          "complexity": 1
+        },
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 4
+        }
+      ]
+    },
+    {
+      "id": "craft_rowan_knot",
+      "outputId": "rowan_knot",
+      "outputCount": 1,
+      "skill": "woodcarving",
+      "skillLevel": 30,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "rowan_log",
+          "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "carve",
+          "reps": 1,
+          "complexity": 4
+        },
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "sand",
+          "reps": 4,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_seawrack_hood",
+      "outputId": "seawrack_hood",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 20,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "seawrack_fibre",
+          "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 3
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_seawrack_robe",
+      "outputId": "seawrack_robe",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 20,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "seawrack_fibre",
+          "count": 5
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 3
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 4,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_seawrack_leggings",
+      "outputId": "seawrack_leggings",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 20,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "seawrack_fibre",
+          "count": 4
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 3
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_seawrack_boots",
+      "outputId": "seawrack_boots",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 20,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "seawrack_fibre",
+          "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 3
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 2,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_seawrack_gloves",
+      "outputId": "seawrack_gloves",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 20,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "seawrack_fibre",
+          "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 3
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 2,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_rimepelt_belt",
+      "outputId": "rimepelt_belt",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 24,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "rimepelt",
+          "count": 2
+        },
+        {
+          "itemId": "tussock_flax",
+          "count": 1
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "cut",
+          "reps": 1,
+          "complexity": 2
+        },
+        {
+          "engine": "alignCommit",
+          "category": "precision",
+          "skin": "knot",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 2,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_tussock_hood",
+      "outputId": "tussock_hood",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 30,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "tussock_flax",
+          "count": 3
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 4
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_tussock_robe",
+      "outputId": "tussock_robe",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 30,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "tussock_flax",
+          "count": 6
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 4
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 5,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_tussock_leggings",
+      "outputId": "tussock_leggings",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 30,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "tussock_flax",
+          "count": 5
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 4
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 4,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_tussock_boots",
+      "outputId": "tussock_boots",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 30,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "tussock_flax",
+          "count": 3
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 4
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_tussock_gloves",
+      "outputId": "tussock_gloves",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 30,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "tussock_flax",
+          "count": 3
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "thread",
+          "reps": 1,
+          "complexity": 4
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_emberhide_belt",
+      "outputId": "emberhide_belt",
+      "outputCount": 1,
+      "skill": "tailoring",
+      "skillLevel": 34,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "emberhide",
+          "count": 2
+        },
+        {
+          "itemId": "tussock_flax",
+          "count": 1
+        }
+      ],
+      "steps": [
+        {
+          "engine": "trace",
+          "category": "precision",
+          "skin": "cut",
+          "reps": 1,
+          "complexity": 3
+        },
+        {
+          "engine": "alignCommit",
+          "category": "precision",
+          "skin": "knot",
+          "reps": 1,
+          "complexity": 1
+        },
+        {
+          "engine": "sweetSpot",
+          "category": "timing",
+          "skin": "stitch",
+          "reps": 3,
+          "complexity": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_saltwort_draught",
+      "outputId": "saltwort_draught",
+      "outputCount": 1,
+      "skill": "potionsAndAlchemy",
+      "skillLevel": 20,
+      "stationRequired": false,
+      "inputs": [
+        {
+          "itemId": "saltwort",
+          "count": 2
+        }
+      ],
+      "steps": [
+        {
+          "engine": "rateDrag",
+          "category": "regulation",
+          "skin": "grind",
+          "reps": 3,
+          "complexity": 1
+        },
+        {
+          "engine": "alignCommit",
+          "category": "precision",
+          "skin": "pour",
+          "reps": 1,
+          "complexity": 2
+        }
+      ]
     }
   ],
   "gatherNodes": [
@@ -17146,6 +17854,14 @@
           "skillLevel": 10
         }
       ],
+      "bronze_ingot": [
+        {
+          "type": "craft",
+          "recipeId": "craft_bronze_ingot",
+          "skill": "metalworking",
+          "skillLevel": 1
+        }
+      ],
       "brookmint": [
         {
           "type": "drop",
@@ -18016,6 +18732,14 @@
           "zoneId": "the_molten_deep",
           "bucket": "main",
           "chance": 0.35
+        }
+      ],
+      "emberhide_belt": [
+        {
+          "type": "craft",
+          "recipeId": "craft_emberhide_belt",
+          "skill": "tailoring",
+          "skillLevel": 34
         }
       ],
       "everice": [
@@ -19769,6 +20493,14 @@
           "skill": "mining"
         }
       ],
+      "iron_ingot": [
+        {
+          "type": "craft",
+          "recipeId": "craft_iron_ingot",
+          "skill": "metalworking",
+          "skillLevel": 10
+        }
+      ],
       "iron_ore": [
         {
           "type": "drop",
@@ -21012,6 +21744,22 @@
           "from": "rimepelt_belt"
         }
       ],
+      "rimepelt_belt": [
+        {
+          "type": "craft",
+          "recipeId": "craft_rimepelt_belt",
+          "skill": "tailoring",
+          "skillLevel": 24
+        }
+      ],
+      "rowan_knot": [
+        {
+          "type": "craft",
+          "recipeId": "craft_rowan_knot",
+          "skill": "woodcarving",
+          "skillLevel": 30
+        }
+      ],
       "rowan_log": [
         {
           "type": "drop",
@@ -21086,6 +21834,22 @@
           "nodeId": "tp_rowan_stand",
           "zoneId": "thunderspire_peaks",
           "skill": "felling"
+        }
+      ],
+      "rowan_quarterstaff": [
+        {
+          "type": "craft",
+          "recipeId": "craft_rowan_quarterstaff",
+          "skill": "woodcarving",
+          "skillLevel": 30
+        }
+      ],
+      "rowan_wand": [
+        {
+          "type": "craft",
+          "recipeId": "craft_rowan_wand",
+          "skill": "woodcarving",
+          "skillLevel": 30
         }
       ],
       "saltwort": [
@@ -21187,6 +21951,12 @@
           "zoneId": "stormcliff_coast",
           "bucket": "main",
           "chance": 0.25
+        },
+        {
+          "type": "craft",
+          "recipeId": "craft_saltwort_draught",
+          "skill": "potionsAndAlchemy",
+          "skillLevel": 20
         }
       ],
       "sapwort": [
@@ -21273,6 +22043,14 @@
           "recipeId": "craft_sapwort_draught",
           "skill": "potionsAndAlchemy",
           "skillLevel": 1
+        }
+      ],
+      "seawrack_boots": [
+        {
+          "type": "craft",
+          "recipeId": "craft_seawrack_boots",
+          "skill": "tailoring",
+          "skillLevel": 20
         }
       ],
       "seawrack_fibre": [
@@ -21364,6 +22142,38 @@
           "nodeId": "sc_wrackline",
           "zoneId": "stormcliff_coast",
           "skill": "foraging"
+        }
+      ],
+      "seawrack_gloves": [
+        {
+          "type": "craft",
+          "recipeId": "craft_seawrack_gloves",
+          "skill": "tailoring",
+          "skillLevel": 20
+        }
+      ],
+      "seawrack_hood": [
+        {
+          "type": "craft",
+          "recipeId": "craft_seawrack_hood",
+          "skill": "tailoring",
+          "skillLevel": 20
+        }
+      ],
+      "seawrack_leggings": [
+        {
+          "type": "craft",
+          "recipeId": "craft_seawrack_leggings",
+          "skill": "tailoring",
+          "skillLevel": 20
+        }
+      ],
+      "seawrack_robe": [
+        {
+          "type": "craft",
+          "recipeId": "craft_seawrack_robe",
+          "skill": "tailoring",
+          "skillLevel": 20
         }
       ],
       "sporecap_mantle": [
@@ -21631,6 +22441,14 @@
           "skillLevel": 11
         }
       ],
+      "tussock_boots": [
+        {
+          "type": "craft",
+          "recipeId": "craft_tussock_boots",
+          "skill": "tailoring",
+          "skillLevel": 30
+        }
+      ],
       "tussock_flax": [
         {
           "type": "drop",
@@ -21722,6 +22540,38 @@
           "skill": "foraging"
         }
       ],
+      "tussock_gloves": [
+        {
+          "type": "craft",
+          "recipeId": "craft_tussock_gloves",
+          "skill": "tailoring",
+          "skillLevel": 30
+        }
+      ],
+      "tussock_hood": [
+        {
+          "type": "craft",
+          "recipeId": "craft_tussock_hood",
+          "skill": "tailoring",
+          "skillLevel": 30
+        }
+      ],
+      "tussock_leggings": [
+        {
+          "type": "craft",
+          "recipeId": "craft_tussock_leggings",
+          "skill": "tailoring",
+          "skillLevel": 30
+        }
+      ],
+      "tussock_robe": [
+        {
+          "type": "craft",
+          "recipeId": "craft_tussock_robe",
+          "skill": "tailoring",
+          "skillLevel": 30
+        }
+      ],
       "uplight": [
         {
           "type": "drop",
@@ -21780,6 +22630,14 @@
           "zoneId": "thornmire",
           "bucket": "main",
           "chance": 0.2
+        }
+      ],
+      "yew_knot": [
+        {
+          "type": "craft",
+          "recipeId": "craft_yew_knot",
+          "skill": "woodcarving",
+          "skillLevel": 20
         }
       ],
       "yew_log": [
@@ -21856,6 +22714,22 @@
           "nodeId": "ws_yew_break",
           "zoneId": "windward_steppe",
           "skill": "felling"
+        }
+      ],
+      "yew_quarterstaff": [
+        {
+          "type": "craft",
+          "recipeId": "craft_yew_quarterstaff",
+          "skill": "woodcarving",
+          "skillLevel": 20
+        }
+      ],
+      "yew_wand": [
+        {
+          "type": "craft",
+          "recipeId": "craft_yew_wand",
+          "skill": "woodcarving",
+          "skillLevel": 20
         }
       ]
     },
@@ -22019,11 +22893,49 @@
           "itemId": "bogflax_fibre"
         }
       ],
+      "bronze_ingot": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_yew_quarterstaff",
+          "outputId": "yew_quarterstaff"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_yew_wand",
+          "outputId": "yew_wand"
+        }
+      ],
       "brookmint": [
         {
           "type": "recipeInput",
           "recipeId": "craft_brookmint_tonic",
           "outputId": "brookmint_tonic"
+        }
+      ],
+      "charcoal": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bronze_ingot",
+          "outputId": "bronze_ingot"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_iron_ingot",
+          "outputId": "iron_ingot"
+        }
+      ],
+      "copper_ore": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bronze_ingot",
+          "outputId": "bronze_ingot"
+        }
+      ],
+      "emberhide": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_emberhide_belt",
+          "outputId": "emberhide_belt"
         }
       ],
       "fawnhide": [
@@ -22043,6 +22955,25 @@
         {
           "type": "salvageInto",
           "itemId": "oak_log"
+        }
+      ],
+      "iron_ingot": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_rowan_quarterstaff",
+          "outputId": "rowan_quarterstaff"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_rowan_wand",
+          "outputId": "rowan_wand"
+        }
+      ],
+      "iron_ore": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_iron_ingot",
+          "outputId": "iron_ingot"
         }
       ],
       "oak_circlet": [
@@ -22086,6 +23017,13 @@
           "itemId": "oak_log"
         }
       ],
+      "rimepelt": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_rimepelt_belt",
+          "outputId": "rimepelt_belt"
+        }
+      ],
       "rimepelt_belt": [
         {
           "type": "salvageInto",
@@ -22096,6 +23034,23 @@
         {
           "type": "salvageInto",
           "itemId": "rowan_log"
+        }
+      ],
+      "rowan_log": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_rowan_quarterstaff",
+          "outputId": "rowan_quarterstaff"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_rowan_wand",
+          "outputId": "rowan_wand"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_rowan_knot",
+          "outputId": "rowan_knot"
         }
       ],
       "rowan_quarterstaff": [
@@ -22110,6 +23065,13 @@
           "itemId": "rowan_log"
         }
       ],
+      "saltwort": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_saltwort_draught",
+          "outputId": "saltwort_draught"
+        }
+      ],
       "sapwort": [
         {
           "type": "recipeInput",
@@ -22121,6 +23083,33 @@
         {
           "type": "salvageInto",
           "itemId": "seawrack_fibre"
+        }
+      ],
+      "seawrack_fibre": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_seawrack_hood",
+          "outputId": "seawrack_hood"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_seawrack_robe",
+          "outputId": "seawrack_robe"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_seawrack_leggings",
+          "outputId": "seawrack_leggings"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_seawrack_boots",
+          "outputId": "seawrack_boots"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_seawrack_gloves",
+          "outputId": "seawrack_gloves"
         }
       ],
       "seawrack_gloves": [
@@ -22153,6 +23142,13 @@
           "itemId": "bindweed_fibre"
         }
       ],
+      "tin_ore": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_bronze_ingot",
+          "outputId": "bronze_ingot"
+        }
+      ],
       "tuskhide": [
         {
           "type": "recipeInput",
@@ -22170,6 +23166,43 @@
         {
           "type": "salvageInto",
           "itemId": "tussock_flax"
+        }
+      ],
+      "tussock_flax": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_rimepelt_belt",
+          "outputId": "rimepelt_belt"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_tussock_hood",
+          "outputId": "tussock_hood"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_tussock_robe",
+          "outputId": "tussock_robe"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_tussock_leggings",
+          "outputId": "tussock_leggings"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_tussock_boots",
+          "outputId": "tussock_boots"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_tussock_gloves",
+          "outputId": "tussock_gloves"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_emberhide_belt",
+          "outputId": "emberhide_belt"
         }
       ],
       "tussock_gloves": [
@@ -22200,6 +23233,23 @@
         {
           "type": "salvageInto",
           "itemId": "yew_log"
+        }
+      ],
+      "yew_log": [
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_yew_quarterstaff",
+          "outputId": "yew_quarterstaff"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_yew_wand",
+          "outputId": "yew_wand"
+        },
+        {
+          "type": "recipeInput",
+          "recipeId": "craft_yew_knot",
+          "outputId": "yew_knot"
         }
       ],
       "yew_quarterstaff": [

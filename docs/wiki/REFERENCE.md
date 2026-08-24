@@ -16,7 +16,7 @@ the framework both live under.
 
 | Zones | Towns | Creatures | Items | Recipes | Gather nodes |
 |---|---|---|---|---|---|
-| 26 | 9 | 121 | 110 | 20 | 23 |
+| 26 | 9 | 121 | 110 | 41 | 23 |
 
 ## Contents
 
@@ -276,7 +276,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 
 | Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
 |---|---|---|---|---|---|---|---|
-| `bronze_ingot` | Bronze Ingot | material |  | common | 1 |  | drop |
+| `bronze_ingot` | Bronze Ingot | material |  | common | 1 |  | craft: `craft_bronze_ingot` |
 | `geo_crystal` | Geo Crystal | mote |  | uncommon | 1 |  | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course`; +6 more (see content.json) |
 | `geo_dust` | Geo Dust | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; +16 more (see content.json) |
 | `geo_shard` | Geo Shard | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; +12 more (see content.json) |
@@ -294,13 +294,13 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `electro_dust` | Electro Dust | mote |  | common | 1 |  | drop: `stormcliff_tidecaller`; drop: `fulgurite_crawler`; drop: `sparkwing`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; +16 more (see content.json) |
 | `electro_shard` | Electro Shard | mote |  | common | 1 |  | drop: `fulgurite_crawler`; drop: `sparkwing`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; drop: `the_long_line`; +13 more (see content.json) |
 | `saltwort` | Saltwort | material |  | common | 1 |  | gather: `sc_saltwort_ledge`; drop: `stormcliff_tidecaller`; drop: `sparkwing`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman`; +2 more (see content.json) |
-| `saltwort_draught` | Saltwort Draught | beltable |  | common | 1 |  | drop: `fulgurite_crawler`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman` |
+| `saltwort_draught` | Saltwort Draught | beltable |  | common | 1 |  | craft: `craft_saltwort_draught`; drop: `fulgurite_crawler`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman` |
 | `seawrack_fibre` | Seawrack Fibre | material |  | common | 1 |  | gather: `sc_wrackline`; drop: `fulgurite_crawler`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; +3 more (see content.json) |
-| `seawrack_boots` | Seawrack Boots | equipment | boots | common | 16 | dodge +2, maxHpBonus +3 | drop |
-| `seawrack_gloves` | Seawrack Gloves | equipment | gloves | common | 16 | deflectChance +6, deflectAmount +15, maxHpBonus +3 | drop |
-| `seawrack_hood` | Seawrack Hood | equipment | hat | common | 16 | accuracyBonus +3 | drop |
-| `seawrack_leggings` | Seawrack Leggings | equipment | robeBottom | common | 16 | maxHpBonus +10 | drop |
-| `seawrack_robe` | Seawrack Robe | equipment | robeTop | common | 16 | maxHpBonus +15 | drop |
+| `seawrack_boots` | Seawrack Boots | equipment | boots | common | 16 | dodge +2, maxHpBonus +3 | craft: `craft_seawrack_boots` |
+| `seawrack_gloves` | Seawrack Gloves | equipment | gloves | common | 16 | deflectChance +6, deflectAmount +15, maxHpBonus +3 | craft: `craft_seawrack_gloves` |
+| `seawrack_hood` | Seawrack Hood | equipment | hat | common | 16 | accuracyBonus +3 | craft: `craft_seawrack_hood` |
+| `seawrack_leggings` | Seawrack Leggings | equipment | robeBottom | common | 16 | maxHpBonus +10 | craft: `craft_seawrack_leggings` |
+| `seawrack_robe` | Seawrack Robe | equipment | robeTop | common | 16 | maxHpBonus +15 | craft: `craft_seawrack_robe` |
 | `fulgurite_pendant` | Fulgurite Pendant | equipment | neck | rare | 20 | critChance +8, critDamage +10 | drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman`; drop: `storm_lord`; drop: `the_return_stroke` |
 | `uplight` | Uplight | equipment | mainHand | epic | 22 | accuracyBonus +4, critChance +12, critDamage +15, damagePerCast +6 | drop: `storm_lord`; drop: `the_return_stroke` |
 
@@ -313,16 +313,16 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `aero_shard` | Aero Shard | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; +19 more (see content.json) |
 | `tussock_flax` | Tussock Flax | material |  | common | 1 |  | gather: `ws_tussock_swale`; drop: `steppe_harrier`; drop: `chaff`; drop: `tumblehusk`; drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; +3 more (see content.json) |
 | `yew_log` | Yew Log | material |  | common | 1 |  | gather: `ws_yew_break`; drop: `leanstone`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; +2 more (see content.json) |
-| `yew_knot` | Yew Knot | equipment | offHand | common | 20 | accuracyBonus +5 | drop |
-| `yew_quarterstaff` | Yew Quarterstaff | equipment | mainHand | common | 20 | accuracyBonus +7, damagePerCharge +3 | drop |
-| `yew_wand` | Yew Wand | equipment | mainHand | common | 20 | accuracyBonus +2, damagePerCast +4 | drop |
+| `yew_knot` | Yew Knot | equipment | offHand | common | 20 | accuracyBonus +5 | craft: `craft_yew_knot` |
+| `yew_quarterstaff` | Yew Quarterstaff | equipment | mainHand | common | 20 | accuracyBonus +7, damagePerCharge +3 | craft: `craft_yew_quarterstaff` |
+| `yew_wand` | Yew Wand | equipment | mainHand | common | 20 | accuracyBonus +2, damagePerCast +4 | craft: `craft_yew_wand` |
 | `leanstone_charm` | Leanstone Charm | equipment | ring | rare | 22 | accuracyBonus +2, dodge +6 | drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; drop: `the_unbroken_blow`; drop: `tempest_monarch` |
 | `the_long_lean` | The Long Lean | equipment | robeTop | epic | 24 | accuracyBonus +3, dodge +8, maxHpBonus +24 | drop: `the_unbroken_blow`; drop: `tempest_monarch` |
-| `tussock_boots` | Tussock Boots | equipment | boots | common | 24 | dodge +3, maxHpBonus +4 | drop |
-| `tussock_gloves` | Tussock Gloves | equipment | gloves | common | 24 | deflectChance +8, deflectAmount +20, maxHpBonus +4 | drop |
-| `tussock_hood` | Tussock Hood | equipment | hat | common | 24 | accuracyBonus +4 | drop |
-| `tussock_leggings` | Tussock Leggings | equipment | robeBottom | common | 24 | maxHpBonus +14 | drop |
-| `tussock_robe` | Tussock Robe | equipment | robeTop | common | 24 | maxHpBonus +20 | drop |
+| `tussock_boots` | Tussock Boots | equipment | boots | common | 24 | dodge +3, maxHpBonus +4 | craft: `craft_tussock_boots` |
+| `tussock_gloves` | Tussock Gloves | equipment | gloves | common | 24 | deflectChance +8, deflectAmount +20, maxHpBonus +4 | craft: `craft_tussock_gloves` |
+| `tussock_hood` | Tussock Hood | equipment | hat | common | 24 | accuracyBonus +4 | craft: `craft_tussock_hood` |
+| `tussock_leggings` | Tussock Leggings | equipment | robeBottom | common | 24 | maxHpBonus +14 | craft: `craft_tussock_leggings` |
+| `tussock_robe` | Tussock Robe | equipment | robeTop | common | 24 | maxHpBonus +20 | craft: `craft_tussock_robe` |
 
 ### Frostfell Pass (`frostfell_pass`) — 6 items
 
@@ -331,7 +331,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `everice` | Everice | material |  | uncommon | 1 |  | gather: `ff_everice_seam`; drop: `cairnwight`; drop: `snowblind_wanderer`; drop: `the_last_cairn`; drop: `hoarking`; drop: `coldsnap`; drop: `the_certain_road`; +2 more (see content.json) |
 | `hoarlichen` | Hoarlichen | material |  | common | 1 |  | gather: `ff_lichen_shelf`; drop: `breathfrost`; drop: `cairnwight`; drop: `the_last_cairn`; drop: `hoarking`; drop: `coldsnap`; drop: `the_certain_road`; +2 more (see content.json) |
 | `rimepelt` | Rimepelt | material |  | common | 1 |  | drop: `rime_stalker`; drop: `hoarbound`; drop: `the_last_cairn`; drop: `hoarking`; drop: `coldsnap`; drop: `the_certain_road`; +2 more (see content.json) |
-| `rimepelt_belt` | Rimepelt Belt | equipment | belt | common | 23 | beltSlots +3 | drop |
+| `rimepelt_belt` | Rimepelt Belt | equipment | belt | common | 23 | beltSlots +3 | craft: `craft_rimepelt_belt` |
 | `rimebound_ring` | Rimebound Ring | equipment | ring | rare | 24 | dodge +3, deflectChance +10, deflectAmount +20 | drop: `the_last_cairn`; drop: `hoarking`; drop: `coldsnap`; drop: `the_certain_road`; drop: `the_white_corridor`; drop: `the_road_under` |
 | `the_holdfast` | The Holdfast | equipment | neck | epic | 25 | shieldStrengthPercent +15 | drop: `the_white_corridor`; drop: `the_road_under` |
 
@@ -340,12 +340,12 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
 |---|---|---|---|---|---|---|---|
 | `hum_quartz` | Hum Quartz | material |  | uncommon | 1 |  | gather: `tp_humming_face`; drop: `humming_ore`; drop: `ionwake`; drop: `crown_fire`; drop: `anvilhead`; drop: `thunder_roc`; drop: `the_shortening`; +2 more (see content.json) |
-| `iron_ingot` | Iron Ingot | material |  | common | 1 |  | drop |
+| `iron_ingot` | Iron Ingot | material |  | common | 1 |  | craft: `craft_iron_ingot` |
 | `iron_ore` | Iron Ore | material |  | common | 1 |  | gather: `tp_iron_seam`; drop: `flashcount`; drop: `ionwake`; drop: `crown_fire`; drop: `anvilhead`; drop: `thunder_roc`; drop: `the_shortening`; +2 more (see content.json) |
 | `rowan_log` | Rowan Log | material |  | common | 1 |  | gather: `tp_rowan_stand`; drop: `stormcrest_roc`; drop: `updraft_wisp`; drop: `crown_fire`; drop: `anvilhead`; drop: `thunder_roc`; drop: `the_shortening`; +2 more (see content.json) |
-| `rowan_knot` | Rowan Knot | equipment | offHand | common | 25 | accuracyBonus +6, critChance +2 | drop |
-| `rowan_quarterstaff` | Rowan Quarterstaff | equipment | mainHand | common | 25 | accuracyBonus +8, critChance +3, critDamage +8, damagePerCharge +4 | drop |
-| `rowan_wand` | Rowan Wand | equipment | mainHand | common | 25 | accuracyBonus +3, critChance +4, critDamage +6, damagePerCast +5 | drop |
+| `rowan_knot` | Rowan Knot | equipment | offHand | common | 25 | accuracyBonus +6, critChance +2 | craft: `craft_rowan_knot` |
+| `rowan_quarterstaff` | Rowan Quarterstaff | equipment | mainHand | common | 25 | accuracyBonus +8, critChance +3, critDamage +8, damagePerCharge +4 | craft: `craft_rowan_quarterstaff` |
+| `rowan_wand` | Rowan Wand | equipment | mainHand | common | 25 | accuracyBonus +3, critChance +4, critDamage +6, damagePerCast +5 | craft: `craft_rowan_wand` |
 | `countstone_pendant` | Countstone Pendant | equipment | neck | rare | 26 | critChance +10, critDamage +12 | drop: `crown_fire`; drop: `anvilhead`; drop: `thunder_roc`; drop: `the_shortening`; drop: `the_storm_that_passes`; drop: `the_strike_that_lands` |
 | `groundfault_grips` | Groundfault Grips | equipment | gloves | epic | 28 | accuracyBonus +5, damagePerCast +4 | drop: `the_storm_that_passes`; drop: `the_strike_that_lands` |
 
@@ -356,7 +356,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `emberhide` | Emberhide | material |  | common | 1 |  | drop: `molten_warden`; drop: `crustwalker`; drop: `the_floor`; drop: `magma_behemoth`; drop: `pyroclast`; drop: `firstmelt`; +2 more (see content.json) |
 | `firesalt` | Firesalt | material |  | common | 1 |  | gather: `md_firesalt_crust`; drop: `slagswimmer`; drop: `ember_vent`; drop: `the_floor`; drop: `magma_behemoth`; drop: `pyroclast`; drop: `firstmelt` |
 | `obsidian` | Obsidian | material |  | uncommon | 1 |  | gather: `md_obsidian_flow`; drop: `ember_vent`; drop: `cooling_thing`; drop: `the_floor`; drop: `magma_behemoth`; drop: `pyroclast`; drop: `firstmelt`; +2 more (see content.json) |
-| `emberhide_belt` | Emberhide Belt | equipment | belt | common | 27 | beltSlots +4 | drop |
+| `emberhide_belt` | Emberhide Belt | equipment | belt | common | 27 | beltSlots +4 | craft: `craft_emberhide_belt` |
 | `firstmelt_loop` | Firstmelt Loop | equipment | ring | rare | 28 | critChance +5, critDamage +25 | drop: `the_floor`; drop: `magma_behemoth`; drop: `pyroclast`; drop: `firstmelt`; drop: `the_slow_stone`; drop: `efreet` |
 | `the_long_cooling` | The Long Cooling | equipment | hat | epic | 29 | critDamage +15, deflectChance +12, deflectAmount +25, maxHpBonus +22 | drop: `the_slow_stone`; drop: `efreet` |
 
@@ -542,7 +542,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 
 ## Recipes by skill
 
-### Woodcarving — 6 recipes
+### Woodcarving — 12 recipes
 
 | Id | Gate | Inputs | Output | XP |
 |---|---|---|---|---|
@@ -552,8 +552,14 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `craft_birch_knot` | 10 | 2x Birch Log | 1x Birch Knot | 48 |
 | `craft_birch_quarterstaff` | 10 | 3x Birch Log | 1x Birch Quarterstaff | 72 |
 | `craft_birch_wand` | 10 | 2x Birch Log | 1x Birch Wand | 48 |
+| `craft_yew_knot` | 20 | 2x Yew Log | 1x Yew Knot | 88 |
+| `craft_yew_quarterstaff` | 20 | 3x Yew Log, 1x Bronze Ingot | 1x Yew Quarterstaff | 176 |
+| `craft_yew_wand` | 20 | 2x Yew Log, 1x Bronze Ingot | 1x Yew Wand | 132 |
+| `craft_rowan_knot` | 30 | 2x Rowan Log | 1x Rowan Knot | 128 |
+| `craft_rowan_quarterstaff` | 30 | 3x Rowan Log, 1x Iron Ingot | 1x Rowan Quarterstaff | 256 |
+| `craft_rowan_wand` | 30 | 2x Rowan Log, 1x Iron Ingot | 1x Rowan Wand | 192 |
 
-### Tailoring — 12 recipes
+### Tailoring — 24 recipes
 
 | Id | Gate | Inputs | Output | XP |
 |---|---|---|---|---|
@@ -569,12 +575,32 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `craft_bogflax_leggings` | 10 | 4x Bogflax Fibre | 1x Bogflax Leggings | 96 |
 | `craft_bogflax_robe` | 10 | 5x Bogflax Fibre | 1x Bogflax Robe | 120 |
 | `craft_tuskhide_belt` | 11 | 2x Tuskhide, 1x Bogflax Fibre | 1x Tuskhide Belt | 78 |
+| `craft_seawrack_boots` | 20 | 2x Seawrack Fibre | 1x Seawrack Boots | 88 |
+| `craft_seawrack_gloves` | 20 | 2x Seawrack Fibre | 1x Seawrack Gloves | 88 |
+| `craft_seawrack_hood` | 20 | 2x Seawrack Fibre | 1x Seawrack Hood | 88 |
+| `craft_seawrack_leggings` | 20 | 4x Seawrack Fibre | 1x Seawrack Leggings | 176 |
+| `craft_seawrack_robe` | 20 | 5x Seawrack Fibre | 1x Seawrack Robe | 220 |
+| `craft_rimepelt_belt` | 24 | 2x Rimepelt, 1x Tussock Flax | 1x Rimepelt Belt | 156 |
+| `craft_tussock_boots` | 30 | 3x Tussock Flax | 1x Tussock Boots | 192 |
+| `craft_tussock_gloves` | 30 | 3x Tussock Flax | 1x Tussock Gloves | 192 |
+| `craft_tussock_hood` | 30 | 3x Tussock Flax | 1x Tussock Hood | 192 |
+| `craft_tussock_leggings` | 30 | 5x Tussock Flax | 1x Tussock Leggings | 320 |
+| `craft_tussock_robe` | 30 | 6x Tussock Flax | 1x Tussock Robe | 384 |
+| `craft_emberhide_belt` | 34 | 2x Emberhide, 1x Tussock Flax | 1x Emberhide Belt | 216 |
 
-### Potions & Alchemy — 2 recipes
+### Metalworking — 2 recipes
+
+| Id | Gate | Inputs | Output | XP |
+|---|---|---|---|---|
+| `craft_bronze_ingot` | 1 | 2x Copper Ore, 1x Tin Ore, 1x Charcoal | 1x Bronze Ingot | 24 |
+| `craft_iron_ingot` | 10 | 3x Iron Ore, 2x Charcoal | 1x Iron Ingot | 120 |
+
+### Potions & Alchemy — 3 recipes
 
 | Id | Gate | Inputs | Output | XP |
 |---|---|---|---|---|
 | `craft_sapwort_draught` | 1 | 2x Sapwort | 1x Sapwort Draught | 12 |
 | `craft_brookmint_tonic` | 10 | 2x Brookmint | 1x Brookmint Tonic | 48 |
+| `craft_saltwort_draught` | 20 | 2x Saltwort | 1x Saltwort Draught | 88 |
 
 

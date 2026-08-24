@@ -147,13 +147,17 @@ void main() {
         findsOneWidget,
         reason: 'tailoring owns recipes, so it must offer a chip',
       );
+      // ⚠️ Metalworking debuted in the Kinetic quarter (KINETIC_CONTRACT
+      // §5) and now owns recipes — Jewelry is the skill still waiting on
+      // its own maker (Rimeholt, L45, §8.1), so it is the one this
+      // assertion needs.
       expect(
-        RecipeBook.all.any((r) => r.skill == CraftSkill.metalworking),
+        RecipeBook.all.any((r) => r.skill == CraftSkill.jewelry),
         isFalse,
         reason: 'the assertion below is only meaningful while this holds',
       );
       expect(
-        find.text('Metalworking'),
+        find.text('Jewelry'),
         findsNothing,
         reason: 'a chip whose filter can only ever show an empty shelf '
             'teaches the player the screen is broken',

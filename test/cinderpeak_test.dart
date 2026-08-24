@@ -484,15 +484,23 @@ void main() {
       expect(World.byId('hearthwood').gate, isNotNull);
     });
 
-    test('⏳ the banking material actually banks', () {
-      // ⚠️ ITEMS §9b.8 — copper has no Q1 recipe **by ruling**. That makes it
-      // the one material a player could reasonably think is broken, so the
-      // piles must be large enough to read as a promise rather than as litter.
-      expect(
-        RecipeBook.all.any((r) => r.inputs.any((i) => i.defId == 'copper_ore')),
-        isFalse,
-        reason: 'copper is no longer a banking material — update the doc',
-      );
+    test('⏳ the banking material pays off exactly on schedule '
+        '(KINETIC_CONTRACT §3.1/§5.1)', () {
+      // ⚠️ ITEMS §9b.8 banked copper with no Q1 recipe **by ruling** — "the
+      // one material a player could reasonably think is broken", so the
+      // piles had to be large enough to read as a promise rather than
+      // litter. The Kinetic quarter is that promise paid: Bronze is the
+      // missing recipe, and Bronze alone — copper must not gain a SECOND
+      // consumer nobody asked for.
+      final copperConsumers = RecipeBook.all
+          .where((r) => r.inputs.any((i) => i.defId == 'copper_ore'))
+          .map((r) => r.id)
+          .toSet();
+      expect(copperConsumers, {'craft_bronze_ingot'},
+          reason: 'copper banked for exactly one maker — Bronze Ingot, the '
+              'first Kinetic recipe a player meets; anything else here means '
+              'either the payoff recipe went missing or a second, uninvited '
+              'consumer appeared');
       for (final b in CinderpeakBestiary.bosses) {
         final copper = b.drops.main.firstWhere((d) => d.defId == 'copper_ore');
         expect(copper.max, greaterThanOrEqualTo(4));
