@@ -10,8 +10,10 @@ import 'cinderpeak_foothills.dart';
 import 'enemy_def.dart';
 import 'glimmerbrook.dart';
 import 'old_quarry.dart';
+import 'stormcliff_coast.dart';
 import 'thornmire.dart';
 import 'whispering_woods.dart';
+import 'windward_steppe.dart';
 
 abstract final class Bestiary {
   /// ⚠️ **Every zone bestiary must be listed here.** An unlisted one compiles
@@ -19,9 +21,9 @@ abstract final class Bestiary {
   /// [ItemCatalogue] guards against for items.
   ///
   /// ✅ The whole **Primal quarter** is built: 5 zones × 11 creatures = 55.
-  /// Old Quarry is the Kinetic quarter's first zone, bringing the total to
-  /// 66. The other 20 zones have full rosters designed (ENEMIES §2d–2g) but
-  /// no definitions yet.
+  /// The Kinetic quarter (KINETIC_CONTRACT) is landing zone by zone on top.
+  /// Remaining zones have full rosters designed (ENEMIES §2d–2g) but no
+  /// definitions yet.
   static const List<EnemyDef> all = [
     ...WhisperingWoodsBestiary.all,
     ...GlimmerbrookBestiary.all,
@@ -29,6 +31,8 @@ abstract final class Bestiary {
     ...ThornmireBestiary.all,
     ...AshfallValeBestiary.all,
     ...OldQuarryBestiary.all,
+    ...WindwardSteppeBestiary.all,
+    ...StormcliffCoastBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>

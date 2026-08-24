@@ -676,6 +676,205 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > above: quarry grey, tool-mark black, pale dust white, one narrow band of
 > dull red-brown jasper banding low in a cut face. Muted, low-contrast, and
 > heavy underfoot.
+## Windward Steppe · Lv 19–24 · Aero
+
+> ⭐ *One direction, forever — everything here has stopped resisting.* Not
+> violence. **Relentlessness**, which no other Aero zone claims. Nothing
+> should look like it is fighting the wind; everything should look like it
+> gave up fighting it a long time ago and found a shape that works anyway.
+
+### Commons
+
+**Steppe Harrier** — *common · Skirmisher · Aero*
+> A lean bird of prey with long stiff-angled wings, wingspan about a person's
+> armspan, banking low over grass rather than flapping. Mottled tan and grey
+> plumage, pale belly, sharp hooked bill, small fierce eyes. Caught mid-glide,
+> already correcting.
+
+**Leanstone** — *common · Sentinel · Aero*
+> A standing stone the height of a person, weathered to a permanent lean, the
+> windward face worn smooth pale grey and the leeward face still rough dark
+> grey with sharp broken edges. No limbs, no face — a rock, planted, patient.
+> ⭐ Should read as **immovable**, the wall the archetype needs.
+
+**Chaff** — *common · Lasher · Aero*
+> A loose drifting mass of threshed stalk, seed husk and dry grass, roughly
+> the size of a large dog, holding a rough body-shape only because the wind
+> keeps refilling it from behind. Pale straw-tan throughout, ragged edges,
+> streaming outward on the windward side.
+
+**Tumblehusk** — *common · Drudge · Aero*
+> A hollow dried-out husk of a rootless plant, basketball-sized, rolling
+> end over end across open ground. Brittle grey-tan, cracked and curled in on
+> itself, empty at the centre. ⭐ It should look incapable of doing anything on
+> purpose — it is only ever in the way.
+
+**Kitewing** — *common · Glasswing · Aero*
+> A kite-shaped flier with a wingspan about as wide as two hands, its wings a
+> translucent pale membrane stretched over hair-thin bone, veined faintly tan.
+> Small tapering body. ⭐ Fragile and buoyant; it should look **one gust from
+> tearing**.
+
+### Mini-bosses
+
+**Old Lean** — *mini · Champion · Aero*
+> A person-shaped figure roughly a head taller than a human, built from
+> wind-scoured grey rock and knotted dry root fused together, standing at a
+> fixed lean like Leanstone but upright and balanced. Deliberate, composed,
+> the one thing here that looks like it chose its stance.
+
+**Sky Titan** — *mini · Redoubt · Aero*
+> A towering column of visibly moving air, roughly twice human height,
+> compressed hard enough at its core to hold a rough humanoid silhouette —
+> pale grey-white, semi-translucent, its edges constantly fraying and
+> refilling. No fixed face.
+
+**Gale Serpent** — *mini · Executioner · Aero*
+> A long sinuous rope of fast-moving air, snake-thick and several body-lengths
+> long, coiled tight on itself. Pale grey-white, near-transparent at the
+> edges, visible mainly by the dust and grit it carries. Coiled, poised to
+> strike.
+
+**Wind Wraith** — *mini · Hexer · Aero*
+> A loose, barely-held humanoid shape made of moving air and carried dust,
+> person-sized, its edges never quite resolving into a solid outline. Pale
+> grey, near-invisible where the dust thins. ⭐ Should look like it is always
+> at the edge of the frame, never squarely in it.
+
+### Bosses
+
+**The Unbroken Blow** — *boss · Juggernaut · Aero*
+> An enormous, mostly featureless mass of compressed wind roughly three
+> storeys tall, its silhouette a huge rounded column rather than any creature
+> shape. Pale grey-white throughout, dense and opaque at the core, fraying to
+> visible streaming air at its edges. No face, no limbs — a weather system
+> given a standing shape.
+
+**Tempest Monarch** — *boss · Tyrant · Aero*
+> A tall, upright, roughly humanoid figure of dense compressed wind the height
+> of two people, holding a far more solid and defined silhouette than Sky
+> Titan or The Unbroken Blow — deliberately composed rather than diffuse.
+> Pale grey-white, faint darker banding suggesting layered robes of moving
+> air. Still, watchful, unhurried.
+
+### Arena backdrop
+
+`assets/backgrounds/windward_steppe.png` — *16:9 · Aero palette*
+> Wide 16:9 landscape painting of a high flat tableland seen side-on at
+> standing eye level, environment only — no creatures, no people, no text. A
+> level line of scoured pale earth and low wind-flattened tussock grass runs
+> straight across the frame just past mid-height, every blade of grass bent
+> the same direction. Below it the near ground of packed pale dirt drops into
+> deep shadow across the bottom fifth. At the far left and far right edges,
+> a single weathered standing stone at each side, no higher than a person's
+> chest, cropped by the frame, worn to the same permanent lean as the grass,
+> smooth on the windward face. The centre of the frame is **bare open
+> tableland**, running back to a low flat horizon and a pale band of wind
+> haze — nothing standing tall in it, nothing breaking the sky. Flat
+> overcast light with no visible sun, a faint suggestion of motion in the
+> haze and the grass but nothing sharp or busy. **Aero palette**, matching
+> the creatures above: pale straw tan, scoured grey stone, dust-pale white,
+> muted overcast sky-grey. Muted, low-contrast, and constantly, quietly
+> moving.
+## Stormcliff Coast · Lv 17–22 · Electro
+
+> ⭐ *Everything here is a path to the ground, including you.* The coast is not
+> a target, it is a **conductor** — things are charged in passing rather than
+> struck. ⚠️ Reflect that: nothing here is on fire or glowing all over. The
+> light lives in **cracks, veins and single points**, exactly where a strike
+> would enter or leave; everything else stays wet dark rock, sea-bleached hide
+> or storm-cloud grey.
+
+### Commons
+
+**Stormcliff Tidecaller** — *common · Adept · Electro*
+> A tall, narrow humanoid figure of wet black rock, person-height, standing in
+> profile, body and smooth featureless head turned toward the right edge of
+> the image. Hairline cracks of white-blue light run down its front like the
+> cliff behind it, brightest at the crown and fading toward the feet. No
+> visible face — a smooth rounded head canted slightly forward, listening for
+> the next flash.
+
+**Fulgurite Crawler** — *common · Sentinel · Electro*
+> A knee-high many-legged creature the size of a large dog, its whole
+> carapace fused dark glass, branching veins of trapped white light through
+> the shell like frozen root growth. Squat and low to the rock, legs drawn in
+> tight, holding still, weight settled.
+
+**Sparkwing** — *common · Glasswing · Electro*
+> A hand-span winged insect no larger than a fist, translucent wings shot
+> through with a single bright line of white-blue light down each vein over a
+> dark wet-slate body. Caught mid-flight, angled sharply upward, wings
+> blurred with motion.
+
+**Static Shoal** — *common · Lasher · Electro*
+> A loose drift of a dozen finger-length eels, pale translucent grey-white,
+> moving as one sinuous mass just above the ground. A faint blue-white
+> shimmer travels through the whole group at once, low and coiled, about to
+> surge forward.
+
+**Groundling** — *common · Skirmisher · Electro*
+> A low, quick lizard-like creature about knee height, hide a dull wet slate
+> colour, close to the rock. A single bright line of white light runs down
+> its spine and earths at the tail. Caught mid-dash, legs splayed, weight
+> thrown forward.
+
+### Mini-bosses
+
+**Brinecharge** — *mini · Champion · Electro*
+> A man-tall humanoid figure the size of a large ox at the shoulder, built
+> from churning white water and standing light, a held wave that never
+> finishes breaking. Branching white-blue veins light it from within. Stance
+> even and balanced, deliberate.
+
+**The Long Line** — *mini · Redoubt · Electro*
+> An unbroken vertical run of white-blue light down a wet rock face, wide as
+> a doorway and three times a person's height, no head and no visible front —
+> only more light, climbing out of frame at the top. Fused flush to the rock
+> it stands on.
+
+**Voltgeist** — *mini · Executioner · Electro*
+> A standing, man-sized shape of pure white afterimage, edges soft and
+> smeared as if caught mid-blink, held in a low ready crouch. No detail on it
+> stays still except a single point of blinding white where a hand would be.
+
+**Storm Shaman** — *mini · Hexer · Electro*
+> A stooped, robed figure at the height of a tall person, cloth soaked black,
+> arms raised, body turned toward the right edge of the image. A crown of
+> small floating sparks orbits its head and never quite goes out.
+> Cliff-edge posture, weight forward into the wind.
+
+### Bosses
+
+**Storm Lord** — *boss · Tyrant · Electro*
+> A vast standing figure three storeys tall, built entirely of falling and
+> rising light in a roughly humanoid silhouette, shoulders broad, stance wide
+> and still, body turned toward the right edge of the image. Never the same
+> shape twice at the edges, but the core holds steady, watching.
+
+**The Return Stroke** — *boss · Aspect · Electro*
+> Not a body at all — a standing column of blinding white-blue light the
+> width of a person, four storeys tall, rooted in scorched black rock and
+> reaching up out of frame. The only creature in the bestiary with no limbs
+> and no head, and no need of either.
+
+### Arena backdrop
+
+`assets/backgrounds/stormcliff_coast.png` — *16:9 · Electro palette*
+> Wide 16:9 landscape painting of a storm-lashed sea cliff seen side-on at
+> standing eye level, environment only — no creatures, no people, no text. A
+> level ledge of wet dark rock runs straight across the frame just past
+> mid-height, streaked with long vertical scorch lines. Below it, the cliff
+> drops away into deep shadow and spray across the bottom fifth. At the far
+> left and far right edges, broken standing rock stacks cropped by the frame,
+> black and wet, each threaded with a single hairline vein of white-blue
+> light. The centre of the frame is **open grey sky and sea-haze**, with one
+> distant, quiet flash low on the horizon — nothing bright or busy close to
+> camera. Heavy salt spray drifts through the whole frame like fine rain.
+> Overcast, storm-lit, cold. **Electro palette**, matching the creatures
+> above: wet black rock, storm-cloud grey, pale sea-foam white, one thread of
+> hairline white-blue light per feature. Muted, low-contrast, and grey
+> winning everywhere except the thin live seams.
 
 ---
 
@@ -685,14 +884,24 @@ The **Primal quarter (55)** and **Old Quarry (11)** are written. The rest of
 the Kinetic quarter, and the Celestial and Ethereal quarters, have full
 rosters in ENEMIES_DESIGN §2e — names, ranks, archetypes and premises — but
 no physical descriptions yet.
+The **Primal quarter (55)** and **Windward Steppe (11)**, the first Kinetic
+zone, are written. The rest of the Kinetic quarter and all of Celestial and
+Ethereal have full rosters in ENEMIES_DESIGN §2e — names, ranks, archetypes
+and premises — but no physical descriptions yet.
+The **Primal quarter (55)** and **Stormcliff Coast (11)** are written. The
+rest of Kinetic and all of Celestial and Ethereal have full rosters in
+ENEMIES_DESIGN §2e / KINETIC_CONTRACT §4 — names, ranks, archetypes and
+premises — but no physical descriptions yet.
 
 | Quarter | Zones | Creatures | Status |
 |---|---|---|---|
 | **Primal** 1–14 | 5 | 55 | ✅ described |
 | Kinetic 15–29 | 6 | 66 | 1/6 zones described (Old Quarry) |
+| Kinetic 15–29 | 6 | 66 | 🔶 Windward Steppe (11) described, 5 zones (55) left |
+| Kinetic 15–29 | 6 | 66 | 🚧 1/6 zones — Stormcliff Coast (11) described |
 | Celestial 30–47 | 7 | 77 | ⬜ |
 | Ethereal 45–60 | 7 | 77 | ⬜ |
 | The Eclipsed Citadel | 1 | ❓ | needs its own structure first (§2e) |
 
 ⭐ **The Primal quarter is the one that matters first** — it is the only
-content built, and it is the player's first impression.
+content shipped, and it is the player's first impression.

@@ -319,6 +319,36 @@ void main() {
         skill: GatherSkill.felling,
         yield: 'charcoal',
       ),
+      'ws_yew_break': (
+        zone: 'windward_steppe',
+        skill: GatherSkill.felling,
+        yield: 'yew_log',
+      ),
+      'ws_tussock_swale': (
+        zone: 'windward_steppe',
+        skill: GatherSkill.foraging,
+        yield: 'tussock_flax',
+      ),
+      'oq_tin_seam': (
+        zone: 'old_quarry',
+        skill: GatherSkill.mining,
+        yield: 'tin_ore',
+      ),
+      'oq_jasper_face': (
+        zone: 'old_quarry',
+        skill: GatherSkill.mining,
+        yield: 'quarry_jasper',
+      ),
+      'sc_wrackline': (
+        zone: 'stormcliff_coast',
+        skill: GatherSkill.foraging,
+        yield: 'seawrack_fibre',
+      ),
+      'sc_saltwort_ledge': (
+        zone: 'stormcliff_coast',
+        skill: GatherSkill.foraging,
+        yield: 'saltwort',
+      ),
     };
 
     const primalZones = [
@@ -327,6 +357,9 @@ void main() {
       'cinderpeak_foothills',
       'thornmire',
       'ashfall_vale',
+      'old_quarry',
+      'stormcliff_coast',
+      'windward_steppe',
     ];
 
     test('⚠️ every authored node is REGISTERED, and nothing extra is (within '
@@ -425,9 +458,14 @@ void main() {
       // crafted from them rather than gathered, which this Q1-only check
       // was never meant to reach.
       const killOnly = {'fawnhide', 'tuskhide'};
+      // ⚠️ Crafted intermediates wear the MaterialDef type but are outputs,
+      // not world materials — bronze_ingot is Metalworking's t3 product
+      // (KINETIC_CONTRACT §3), smelted from tin+copper, never gathered.
+      const craftedIntermediates = {'bronze_ingot'};
       final yielded = GatherNodes.all.map((n) => n.yieldsDefId).toSet();
       for (final d in ItemCatalogue.all.whereType<MaterialDef>()) {
         if (killOnly.contains(d.id)) continue;
+        if (craftedIntermediates.contains(d.id)) continue;
         if (!primalZones.contains(ItemCatalogue.zoneOf(d.id))) continue;
         expect(yielded, contains(d.id),
             reason: '${d.id} is a world material with nowhere to gather it — '

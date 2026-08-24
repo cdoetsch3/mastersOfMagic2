@@ -3,10 +3,10 @@
   "counts": {
     "zones": 26,
     "towns": 9,
-    "creatures": 66,
-    "items": 61,
+    "creatures": 88,
+    "items": 89,
     "recipes": 20,
-    "gatherNodes": 12
+    "gatherNodes": 16
   },
   "zones": [
     {
@@ -7293,6 +7293,1892 @@
         ],
         "bonus": []
       }
+    },
+    {
+      "id": "steppe_harrier",
+      "name": "Steppe Harrier",
+      "zoneId": "windward_steppe",
+      "rank": "common",
+      "archetype": "Skirmisher",
+      "elements": [
+        "aero"
+      ],
+      "lore": "Wings held stiff and angled, it does not flap so much as let the wind carry it low over the grass, correcting by inches. It strikes from the same glide it was already holding.",
+      "moves": [
+        {
+          "id": "ws_wingover",
+          "name": "Wingover",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_stoop",
+          "name": "Stoop",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "tussock_flax",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "leanstone",
+      "name": "Leanstone",
+      "zoneId": "windward_steppe",
+      "rank": "common",
+      "archetype": "Sentinel",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A standing stone worn to a permanent lean, the windward face smoothed to nothing and the leeward face still sharp. It has not moved in longer than anyone has been counting, and it is not going to start for you.",
+      "moves": [
+        {
+          "id": "ws_lean_in",
+          "name": "Lean In",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_root_down",
+          "name": "Root Down",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "yew_log",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "chaff",
+      "name": "Chaff",
+      "zoneId": "windward_steppe",
+      "rank": "common",
+      "archetype": "Lasher",
+      "elements": [
+        "aero"
+      ],
+      "lore": "Threshed stalk and seed husk, blown into a moving mass that holds its shape only because the wind keeps refilling it from behind. It stings in passing and is already somewhere else.",
+      "moves": [
+        {
+          "id": "ws_scatter",
+          "name": "Scatter",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_windrow",
+          "name": "Windrow",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "tussock_flax",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "tumblehusk",
+      "name": "Tumblehusk",
+      "zoneId": "windward_steppe",
+      "rank": "common",
+      "archetype": "Drudge",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A hollow dried-out husk of something that used to root, rolling end over end because it stopped holding on. It only ever hits you by having been in the way.",
+      "moves": [
+        {
+          "id": "ws_bump",
+          "name": "Bump",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "tussock_flax",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "kitewing",
+      "name": "Kitewing",
+      "zoneId": "windward_steppe",
+      "rank": "common",
+      "archetype": "Glasswing",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A membrane of wing stretched over hollow bone, kite-shaped and paper-thin, held up entirely by the wind it flies in. It looks one gust from tearing, which is also how it kills you.",
+      "moves": [
+        {
+          "id": "ws_flit",
+          "name": "Flit",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_last_gust",
+          "name": "Last Gust",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "yew_log",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": [
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "chance": 0.02
+          }
+        ]
+      }
+    },
+    {
+      "id": "old_lean",
+      "name": "Old Lean",
+      "zoneId": "windward_steppe",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "aero"
+      ],
+      "lore": "The oldest lean on the steppe, grown into something like a person-shape out of wind-scoured rock and root. Everything else here gave way a long time ago. This did not.",
+      "moves": [
+        {
+          "id": "ws_shoulder_it",
+          "name": "Shoulder It",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_full_lean",
+          "name": "Full Lean",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_brace",
+          "name": "Brace",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "yew_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "tussock_flax",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "leanstone_charm",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "sky_titan",
+      "name": "Sky Titan",
+      "zoneId": "windward_steppe",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A standing column of wind compressed hard enough to hold a shape, roughly a person twice over. Take a piece off it and the wind behind simply fills the gap.",
+      "moves": [
+        {
+          "id": "ws_gust_slap",
+          "name": "Gust Slap",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_stand_fast",
+          "name": "Stand Fast",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "ws_draw_breath",
+          "name": "Draw Breath",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "yew_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "tussock_flax",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "leanstone_charm",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "gale_serpent",
+      "name": "Gale Serpent",
+      "zoneId": "windward_steppe",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A rope of visibly moving air, coiled tight before it strikes and sinuous the rest of the time. It has no body to speak of, only the shape the wind is currently making.",
+      "moves": [
+        {
+          "id": "ws_coil",
+          "name": "Coil",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_uncoil",
+          "name": "Uncoil",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "yew_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "tussock_flax",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "leanstone_charm",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "wind_wraith",
+      "name": "Wind Wraith",
+      "zoneId": "windward_steppe",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "aero"
+      ],
+      "lore": "A shape the wind makes and unmakes without ever quite finishing it, always at the edge of where you are looking. It has never once been seen arriving.",
+      "moves": [
+        {
+          "id": "ws_whisper",
+          "name": "Whisper",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_keening",
+          "name": "Keening",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_through_the_seam",
+          "name": "Through the Seam",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "yew_log",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "tussock_flax",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "leanstone_charm",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_unbroken_blow",
+      "name": "The Unbroken Blow",
+      "zoneId": "windward_steppe",
+      "rank": "boss",
+      "archetype": "Juggernaut",
+      "elements": [
+        "aero"
+      ],
+      "lore": "Not a shape so much as a direction, huge and featureless and entirely without hurry. It has been blowing across this exact stretch of ground longer than the ground has been ground, and it shows no sign of having noticed you.",
+      "moves": [
+        {
+          "id": "ws_the_blow",
+          "name": "The Blow",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_hold_the_line",
+          "name": "Hold the Line",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "ws_steady_press",
+          "name": "Steady Press",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "yew_log",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "tussock_flax",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "leanstone_charm",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "the_long_lean",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "tempest_monarch",
+      "name": "Tempest Monarch",
+      "zoneId": "windward_steppe",
+      "rank": "boss",
+      "archetype": "Tyrant",
+      "elements": [
+        "aero"
+      ],
+      "lore": "Regal only in that it holds a shape at all — a single decided gust standing apart from the wind that made it, watching, in no hurry to spend what it is clearly saving.",
+      "moves": [
+        {
+          "id": "ws_bide",
+          "name": "Bide",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "ws_choose_the_gust",
+          "name": "Choose the Gust",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "ws_the_gust_itself",
+          "name": "The Gust Itself",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "aero_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "aero_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "yew_log",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "tussock_flax",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "leanstone_charm",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "the_long_lean",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "stormcliff_tidecaller",
+      "name": "Stormcliff Tidecaller",
+      "zoneId": "stormcliff_coast",
+      "rank": "common",
+      "archetype": "Adept",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A tall, narrow figure of wet black rock standing where the spray lands hardest, hairline cracks of white light running down its front like the cliff behind it. It does not so much move as arrive, a half-second after the flash.",
+      "moves": [
+        {
+          "id": "sc_arc",
+          "name": "Arc",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_runtoearth",
+          "name": "Run to Earth",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_holdthecharge",
+          "name": "Hold the Charge",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "saltwort",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "weight": 15,
+            "chance": 0.15
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "fulgurite_crawler",
+      "name": "Fulgurite Crawler",
+      "zoneId": "stormcliff_coast",
+      "rank": "common",
+      "archetype": "Sentinel",
+      "elements": [
+        "electro"
+      ],
+      "lore": "Knee-high and many-legged, its whole carapace fused glass, dark and faintly branching like a root system frozen mid-growth. It picks across broken rock without a single wasted step and draws in tight the moment the air starts to hum.",
+      "moves": [
+        {
+          "id": "sc_pincer",
+          "name": "Pincer",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_setinglass",
+          "name": "Set in Glass",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "seawrack_fibre",
+            "min": 1,
+            "max": 1,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 2,
+            "weight": 8,
+            "chance": 0.08
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 3,
+            "weight": 17,
+            "chance": 0.17
+          },
+          {
+            "itemId": "saltwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "sparkwing",
+      "name": "Sparkwing",
+      "zoneId": "stormcliff_coast",
+      "rank": "common",
+      "archetype": "Glasswing",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A hand-span of translucent wing over a body no bigger than a knuckle, riding the up-draught off the cliff face. A line of white light runs the length of each wing vein and brightens just before it lets go of the air entirely.",
+      "moves": [
+        {
+          "id": "sc_flicker",
+          "name": "Flicker",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 7,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_flashover",
+          "name": "Flash Over",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "saltwort",
+            "min": 1,
+            "max": 1,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "static_shoal",
+      "name": "Static Shoal",
+      "zoneId": "stormcliff_coast",
+      "rank": "common",
+      "archetype": "Lasher",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A loose drift of finger-length eels, pale and nearly transparent, moving as one shape in the wash at the cliff's foot. Touch any part of the shoal and the whole thing answers at once.",
+      "moves": [
+        {
+          "id": "sc_needle",
+          "name": "Needle",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_swarmthecurrent",
+          "name": "Swarm the Current",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 35,
+            "chance": 0.35
+          },
+          {
+            "itemId": "seawrack_fibre",
+            "min": 1,
+            "max": 2,
+            "weight": 50,
+            "chance": 0.5
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "groundling",
+      "name": "Groundling",
+      "zoneId": "stormcliff_coast",
+      "rank": "common",
+      "archetype": "Skirmisher",
+      "elements": [
+        "electro"
+      ],
+      "lore": "Low, quick and close to the rock, a shape like a lizard cast in wet slate. It crosses open ground in short bursts timed to the flash, never caught mid-stride when the light comes back down.",
+      "moves": [
+        {
+          "id": "sc_dash",
+          "name": "Dash",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_earththrough",
+          "name": "Earth Through",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 5,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "chance": 0.75
+          }
+        ],
+        "main": [
+          {
+            "itemId": null,
+            "min": 0,
+            "max": 0,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "seawrack_fibre",
+            "min": 1,
+            "max": 3,
+            "weight": 55,
+            "chance": 0.55
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "weight": 7,
+            "chance": 0.07
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 1,
+            "max": 2,
+            "weight": 13,
+            "chance": 0.13
+          }
+        ],
+        "bonus": [
+          {
+            "itemId": "hardtack",
+            "min": 1,
+            "max": 1,
+            "chance": 0.02
+          }
+        ]
+      }
+    },
+    {
+      "id": "brinecharge",
+      "name": "Brinecharge",
+      "zoneId": "stormcliff_coast",
+      "rank": "mini",
+      "archetype": "Champion",
+      "elements": [
+        "electro"
+      ],
+      "lore": "Man-tall and built like a breaking wave that never finished breaking, a churn of white water and standing light. It comes on at an even pace across open rock, balanced, entirely unhurried.",
+      "moves": [
+        {
+          "id": "sc_surge",
+          "name": "Surge",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_overrun",
+          "name": "Overrun",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_seawall",
+          "name": "Sea Wall",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "seawrack_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "saltwort",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "saltwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "fulgurite_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_long_line",
+      "name": "The Long Line",
+      "zoneId": "stormcliff_coast",
+      "rank": "mini",
+      "archetype": "Redoubt",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A single unbroken run of white light down a wet gully wall, wide as a road and taller than a man, never quite going dark between flashes. There is no head, no front — only more of it, further up.",
+      "moves": [
+        {
+          "id": "sc_undertow",
+          "name": "Undertow",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 8,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_bracethecurrent",
+          "name": "Brace the Current",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "sc_drawdown",
+          "name": "Draw Down",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "seawrack_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "saltwort",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "saltwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "fulgurite_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "voltgeist",
+      "name": "Voltgeist",
+      "zoneId": "stormcliff_coast",
+      "rank": "mini",
+      "archetype": "Executioner",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A standing shape of pure white afterimage, roughly a man's size and gone before the eye settles on it, only to be standing exactly where it was a moment later. It puts everything into the one blow it is clearly building toward.",
+      "moves": [
+        {
+          "id": "sc_snap",
+          "name": "Snap",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_fullcharge",
+          "name": "Full Charge",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "seawrack_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "saltwort",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "saltwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "fulgurite_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "storm_shaman",
+      "name": "Storm Shaman",
+      "zoneId": "stormcliff_coast",
+      "rank": "mini",
+      "archetype": "Hexer",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A stooped, robed shape at the very edge of the cliff, arms raised to a sky that is already answering. Wet rock, wet cloth, and a crown of small floating sparks that never quite go out.",
+      "moves": [
+        {
+          "id": "sc_crackle",
+          "name": "Crackle",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 4,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_callthebolt",
+          "name": "Call the Bolt",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 1,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_throughthewards",
+          "name": "Through the Wards",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 1,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 2,
+            "max": 4,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 1,
+            "chance": 0.25
+          }
+        ],
+        "main": [
+          {
+            "itemId": "seawrack_fibre",
+            "min": 2,
+            "max": 4,
+            "weight": 40,
+            "chance": 0.4
+          },
+          {
+            "itemId": "saltwort",
+            "min": 2,
+            "max": 4,
+            "weight": 30,
+            "chance": 0.3
+          },
+          {
+            "itemId": "saltwort_draught",
+            "min": 1,
+            "max": 1,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "fulgurite_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 5,
+            "chance": 0.05
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "storm_lord",
+      "name": "Storm Lord",
+      "zoneId": "stormcliff_coast",
+      "rank": "boss",
+      "archetype": "Tyrant",
+      "elements": [
+        "electro"
+      ],
+      "lore": "A vast standing figure built entirely of falling and rising light, never the same shape twice and never less than man-height at the shoulder. It watches the whole cliff at once and answers whatever it decides is a threat first.",
+      "moves": [
+        {
+          "id": "sc_gathercharge",
+          "name": "Gather Charge",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 3,
+          "effect": "ShieldEffect",
+          "offensive": false
+        },
+        {
+          "id": "sc_choosethemoment",
+          "name": "Choose the Moment",
+          "chargeCost": 3,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 2,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_thefullbolt",
+          "name": "The Full Bolt",
+          "chargeCost": 5,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "seawrack_fibre",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "saltwort",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "fulgurite_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "uplight",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
+    },
+    {
+      "id": "the_return_stroke",
+      "name": "The Return Stroke",
+      "zoneId": "stormcliff_coast",
+      "rank": "boss",
+      "archetype": "Aspect",
+      "elements": [
+        "electro"
+      ],
+      "lore": "Not a body at all — a standing column of light the width of a man, rooted in the scorched rock and reaching up out of sight into the weather. It does not move to attack. The whole coast is already wired to it, and the strike simply arrives.",
+      "moves": [
+        {
+          "id": "sc_firstlight",
+          "name": "First Light",
+          "chargeCost": 1,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_climbing",
+          "name": "Climbing",
+          "chargeCost": 2,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        },
+        {
+          "id": "sc_thereturn",
+          "name": "The Return",
+          "chargeCost": 4,
+          "xCost": false,
+          "accuracy": 100,
+          "priority": 9,
+          "effect": "DamageEffect",
+          "offensive": true
+        }
+      ],
+      "drops": {
+        "always": [
+          {
+            "itemId": "electro_crystal",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_shard",
+            "min": 1,
+            "max": 2,
+            "chance": 1.0
+          },
+          {
+            "itemId": "electro_dust",
+            "min": 4,
+            "max": 8,
+            "chance": 1.0
+          }
+        ],
+        "main": [
+          {
+            "itemId": "seawrack_fibre",
+            "min": 4,
+            "max": 8,
+            "weight": 45,
+            "chance": 0.45
+          },
+          {
+            "itemId": "saltwort",
+            "min": 3,
+            "max": 6,
+            "weight": 25,
+            "chance": 0.25
+          },
+          {
+            "itemId": "fulgurite_pendant",
+            "min": 1,
+            "max": 1,
+            "weight": 20,
+            "chance": 0.2
+          },
+          {
+            "itemId": "uplight",
+            "min": 1,
+            "max": 1,
+            "weight": 10,
+            "chance": 0.1
+          }
+        ],
+        "bonus": []
+      }
     }
   ],
   "items": [
@@ -8458,6 +10344,604 @@
         "maxHpBonus": 30
       },
       "salvage": []
+    },
+    {
+      "id": "yew_log",
+      "name": "Yew Log",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "The only trees on the steppe, and every one of them leaning the same way. Cut with the lean, not against it, or the grain fights you the whole way through.",
+      "skill": "woodcarving",
+      "tier": 3,
+      "salvage": []
+    },
+    {
+      "id": "tussock_flax",
+      "name": "Tussock Flax",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Wiry stalk grown low and dense, in tussocks that have learned to grow around each other rather than up. Tough as rope once it is stripped and dried.",
+      "skill": "tailoring",
+      "tier": 4,
+      "salvage": []
+    },
+    {
+      "id": "aero_dust",
+      "name": "Aero Dust",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "What a moving thing leaves when the wind gets there first.",
+      "element": "aero",
+      "moteTier": "dust"
+    },
+    {
+      "id": "aero_shard",
+      "name": "Aero Shard",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Dust that caught on something and stopped moving, briefly.",
+      "element": "aero",
+      "moteTier": "shard"
+    },
+    {
+      "id": "aero_crystal",
+      "name": "Aero Crystal",
+      "kind": "mote",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "It is moving, and it does not stop.",
+      "element": "aero",
+      "moteTier": "crystal"
+    },
+    {
+      "id": "yew_quarterstaff",
+      "name": "Yew Quarterstaff",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 20,
+      "value": 160,
+      "fungible": false,
+      "lore": "Straight-grained where the tree was not, because the carver chose the one branch that never learned to lean. Heavier than it looks.",
+      "slot": "mainHand",
+      "form": "Quarterstaff",
+      "material": "Yew",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 7,
+        "damagePerCharge": 3
+      },
+      "salvage": [
+        {
+          "itemId": "yew_log",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "yew_wand",
+      "name": "Yew Wand",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 20,
+      "value": 135,
+      "fungible": false,
+      "lore": "Trimmed thin enough to whip in the wind and not break, which is the whole test a Yew wand has to pass before it is sold.",
+      "slot": "mainHand",
+      "form": "Wand",
+      "material": "Yew",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 2,
+        "damagePerCast": 4
+      },
+      "salvage": [
+        {
+          "itemId": "yew_log",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "yew_knot",
+      "name": "Yew Knot",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 20,
+      "value": 110,
+      "fungible": false,
+      "lore": "A burl carved from a lean-side branch, where the grain knots up from decades of holding against the same wind.",
+      "slot": "offHand",
+      "form": "Knot",
+      "material": "Yew",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 5
+      },
+      "salvage": [
+        {
+          "itemId": "yew_log",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "tussock_hood",
+      "name": "Tussock Hood",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 24,
+      "value": 110,
+      "fungible": false,
+      "lore": "Woven tight enough that the wind whistles instead of getting in.",
+      "slot": "hat",
+      "form": "Hood",
+      "material": "Tussock",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 4
+      },
+      "salvage": [
+        {
+          "itemId": "tussock_flax",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "tussock_robe",
+      "name": "Tussock Robe",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 24,
+      "value": 170,
+      "fungible": false,
+      "lore": "Layered flax against the chest, thick enough to break a gust.",
+      "slot": "robeTop",
+      "form": "Robe",
+      "material": "Tussock",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "maxHpBonus": 20
+      },
+      "salvage": [
+        {
+          "itemId": "tussock_flax",
+          "min": 3,
+          "max": 4
+        }
+      ]
+    },
+    {
+      "id": "tussock_leggings",
+      "name": "Tussock Leggings",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 24,
+      "value": 140,
+      "fungible": false,
+      "lore": "Cut long, so the hem does not catch and drag you sideways.",
+      "slot": "robeBottom",
+      "form": "Leggings",
+      "material": "Tussock",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "maxHpBonus": 14
+      },
+      "salvage": [
+        {
+          "itemId": "tussock_flax",
+          "min": 2,
+          "max": 3
+        }
+      ]
+    },
+    {
+      "id": "tussock_boots",
+      "name": "Tussock Boots",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 24,
+      "value": 100,
+      "fungible": false,
+      "lore": "Soled thick and laced tight. Standing still in them still feels like leaning into something.",
+      "slot": "boots",
+      "form": "Boots",
+      "material": "Tussock",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "dodge": 3,
+        "maxHpBonus": 4
+      },
+      "salvage": [
+        {
+          "itemId": "tussock_flax",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "tussock_gloves",
+      "name": "Tussock Gloves",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 24,
+      "value": 100,
+      "fungible": false,
+      "lore": "Palms toughened from bracing against things that keep moving.",
+      "slot": "gloves",
+      "form": "Gloves",
+      "material": "Tussock",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "deflectChance": 8,
+        "deflectAmount": 20,
+        "maxHpBonus": 4
+      },
+      "salvage": [
+        {
+          "itemId": "tussock_flax",
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "leanstone_charm",
+      "name": "Leanstone Charm",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 22,
+      "value": 270,
+      "fungible": false,
+      "lore": "A finger-length sliver worn from the windward face of a leaning stone. Held loosely, it wants to point the same direction every time.",
+      "slot": "ring",
+      "form": "Ring",
+      "material": "Leanstone",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 2,
+        "dodge": 6
+      },
+      "salvage": []
+    },
+    {
+      "id": "the_long_lean",
+      "name": "The Long Lean",
+      "kind": "equipment",
+      "rarity": "epic",
+      "tradability": "untradeable",
+      "equipLevel": 24,
+      "value": 740,
+      "fungible": false,
+      "lore": "Windgrass grown thick and combed flat, worn over the shoulders like the steppe itself decided to stop resisting for you instead. It has been leaning the same way since it was cut.",
+      "slot": "robeTop",
+      "form": "Mantle",
+      "material": "Windgrass",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 3,
+        "dodge": 8,
+        "maxHpBonus": 24
+      },
+      "salvage": []
+    },
+    {
+      "id": "seawrack_fibre",
+      "name": "Seawrack Fibre",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "The tideline's own rope, laid out in long dark ropes and salt-cured by the weather before anyone gets to it. Stiff until it is worked.",
+      "skill": "tailoring",
+      "tier": 3,
+      "salvage": []
+    },
+    {
+      "id": "saltwort",
+      "name": "Saltwort",
+      "kind": "material",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "A low, fleshy herb that grows only where the spray reaches and nowhere the spray does not. Bites back the way the ocean does.",
+      "skill": "potionsAndAlchemy",
+      "tier": 3,
+      "salvage": []
+    },
+    {
+      "id": "electro_dust",
+      "name": "Electro Dust",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "What a struck thing leaves after the light is already gone.",
+      "element": "electro",
+      "moteTier": "dust"
+    },
+    {
+      "id": "electro_shard",
+      "name": "Electro Shard",
+      "kind": "mote",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "Dust that held its charge a moment longer than the rest.",
+      "element": "electro",
+      "moteTier": "shard"
+    },
+    {
+      "id": "electro_crystal",
+      "name": "Electro Crystal",
+      "kind": "mote",
+      "rarity": "uncommon",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 0,
+      "fungible": true,
+      "lore": "It is live, and it does not discharge.",
+      "element": "electro",
+      "moteTier": "crystal"
+    },
+    {
+      "id": "saltwort_draught",
+      "name": "Saltwort Draught",
+      "kind": "beltable",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 1,
+      "value": 30,
+      "fungible": true,
+      "lore": "Bitter, briny, and it clears the head fast. Galehaven sailors carry two and swear by both.",
+      "effect": {
+        "healPercent": 30
+      }
+    },
+    {
+      "id": "seawrack_hood",
+      "name": "Seawrack Hood",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 16,
+      "value": 60,
+      "fungible": false,
+      "lore": "Salt-stiff and close-fitting. It keeps the spray out of the eyes.",
+      "slot": "hat",
+      "form": "Hood",
+      "material": "Seawrack",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 3
+      },
+      "salvage": [
+        {
+          "itemId": "seawrack_fibre",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "seawrack_robe",
+      "name": "Seawrack Robe",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 16,
+      "value": 95,
+      "fungible": false,
+      "lore": "Woven tight against the wind off the water. Never quite dries.",
+      "slot": "robeTop",
+      "form": "Robe",
+      "material": "Seawrack",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "maxHpBonus": 15
+      },
+      "salvage": [
+        {
+          "itemId": "seawrack_fibre",
+          "min": 2,
+          "max": 4
+        }
+      ]
+    },
+    {
+      "id": "seawrack_leggings",
+      "name": "Seawrack Leggings",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 16,
+      "value": 78,
+      "fungible": false,
+      "lore": "Salt crusts white along every seam by the second wearing.",
+      "slot": "robeBottom",
+      "form": "Leggings",
+      "material": "Seawrack",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "maxHpBonus": 10
+      },
+      "salvage": [
+        {
+          "itemId": "seawrack_fibre",
+          "min": 1,
+          "max": 3
+        }
+      ]
+    },
+    {
+      "id": "seawrack_boots",
+      "name": "Seawrack Boots",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 16,
+      "value": 55,
+      "fungible": false,
+      "lore": "Soled for wet rock. You stop thinking about your footing in them.",
+      "slot": "boots",
+      "form": "Boots",
+      "material": "Seawrack",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "dodge": 2,
+        "maxHpBonus": 3
+      },
+      "salvage": [
+        {
+          "itemId": "seawrack_fibre",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "seawrack_gloves",
+      "name": "Seawrack Gloves",
+      "kind": "equipment",
+      "rarity": "common",
+      "tradability": "tradeable",
+      "equipLevel": 16,
+      "value": 55,
+      "fungible": false,
+      "lore": "Thick enough to close a fist around bare wire without noticing.",
+      "slot": "gloves",
+      "form": "Gloves",
+      "material": "Seawrack",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "deflectChance": 6,
+        "deflectAmount": 15,
+        "maxHpBonus": 3
+      },
+      "salvage": [
+        {
+          "itemId": "seawrack_fibre",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "fulgurite_pendant",
+      "name": "Fulgurite Pendant",
+      "kind": "equipment",
+      "rarity": "rare",
+      "tradability": "untradeable",
+      "equipLevel": 20,
+      "value": 280,
+      "fungible": false,
+      "lore": "A shard of fused glass on a plaited cord, dark and faintly branching, still warm at the core the way a struck thing stays warm long after the strike.",
+      "slot": "neck",
+      "form": "Pendant",
+      "material": "Fulgurite",
+      "socketCount": 0,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "critChance": 8,
+        "critDamage": 10
+      },
+      "salvage": []
+    },
+    {
+      "id": "uplight",
+      "name": "Uplight",
+      "kind": "equipment",
+      "rarity": "epic",
+      "tradability": "untradeable",
+      "equipLevel": 22,
+      "value": 760,
+      "fungible": false,
+      "lore": "A wand of fused glass, branching like a root at the tip, that never stops feeling faintly live in the hand. It does not glow so much as it is always about to.",
+      "slot": "mainHand",
+      "form": "Wand",
+      "material": "Fulgurite",
+      "socketCount": 1,
+      "setId": null,
+      "setTier": null,
+      "modifiers": {
+        "accuracyBonus": 4,
+        "critChance": 12,
+        "critDamage": 15,
+        "damagePerCast": 6
+      },
+      "salvage": []
     }
   ],
   "recipes": [
@@ -9218,10 +11702,273 @@
       "max": 3,
       "xp": 37,
       "flavor": "Red banding in a cut face, squarer than anything nature makes."
+    },
+    {
+      "id": "ws_yew_break",
+      "zoneId": "windward_steppe",
+      "skill": "felling",
+      "yieldsItemId": "yew_log",
+      "min": 2,
+      "max": 4,
+      "xp": 45,
+      "flavor": "The only trees on the steppe, and every one of them leaning the same way."
+    },
+    {
+      "id": "ws_tussock_swale",
+      "zoneId": "windward_steppe",
+      "skill": "foraging",
+      "yieldsItemId": "tussock_flax",
+      "min": 2,
+      "max": 3,
+      "xp": 45,
+      "flavor": "A dip where the wind passes over rather than through."
+    },
+    {
+      "id": "sc_wrackline",
+      "zoneId": "stormcliff_coast",
+      "skill": "foraging",
+      "yieldsItemId": "seawrack_fibre",
+      "min": 2,
+      "max": 4,
+      "xp": 41,
+      "flavor": "The tideline's own rope, laid out and salt-cured by the weather. Draw it steadily and it comes free in lengths."
+    },
+    {
+      "id": "sc_saltwort_ledge",
+      "zoneId": "stormcliff_coast",
+      "skill": "foraging",
+      "yieldsItemId": "saltwort",
+      "min": 2,
+      "max": 3,
+      "xp": 41,
+      "flavor": "It grows where the spray reaches and nowhere the spray does not — a ledge you can find with your eyes shut, once you know the smell."
     }
   ],
   "index": {
     "itemSources": {
+      "aero_crystal": [
+        {
+          "type": "drop",
+          "from": "old_lean",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "sky_titan",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "gale_serpent",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "wind_wraith",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_unbroken_blow",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "tempest_monarch",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "aero_dust": [
+        {
+          "type": "drop",
+          "from": "steppe_harrier",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "steppe_harrier",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "leanstone",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "leanstone",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.17
+        },
+        {
+          "type": "drop",
+          "from": "chaff",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "chaff",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "tumblehusk",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "kitewing",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "kitewing",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "old_lean",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "sky_titan",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "gale_serpent",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "wind_wraith",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_unbroken_blow",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "tempest_monarch",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "aero_shard": [
+        {
+          "type": "drop",
+          "from": "steppe_harrier",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "leanstone",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.08
+        },
+        {
+          "type": "drop",
+          "from": "chaff",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "kitewing",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "old_lean",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "sky_titan",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "gale_serpent",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "wind_wraith",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_unbroken_blow",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "tempest_monarch",
+          "zoneId": "windward_steppe",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
       "amber": [
         {
           "type": "drop",
@@ -10408,6 +13155,229 @@
           "skill": "mining"
         }
       ],
+      "electro_crystal": [
+        {
+          "type": "drop",
+          "from": "brinecharge",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_long_line",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "voltgeist",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "storm_shaman",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "storm_lord",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_return_stroke",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "electro_dust": [
+        {
+          "type": "drop",
+          "from": "stormcliff_tidecaller",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "fulgurite_crawler",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "fulgurite_crawler",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.17
+        },
+        {
+          "type": "drop",
+          "from": "sparkwing",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "sparkwing",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "static_shoal",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "static_shoal",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "groundling",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 0.75
+        },
+        {
+          "type": "drop",
+          "from": "groundling",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.13
+        },
+        {
+          "type": "drop",
+          "from": "brinecharge",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_long_line",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "voltgeist",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "storm_shaman",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "storm_lord",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_return_stroke",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
+      "electro_shard": [
+        {
+          "type": "drop",
+          "from": "fulgurite_crawler",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.08
+        },
+        {
+          "type": "drop",
+          "from": "sparkwing",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "static_shoal",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "groundling",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.07
+        },
+        {
+          "type": "drop",
+          "from": "brinecharge",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_long_line",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "voltgeist",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "storm_shaman",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "storm_lord",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        },
+        {
+          "type": "drop",
+          "from": "the_return_stroke",
+          "zoneId": "stormcliff_coast",
+          "bucket": "always",
+          "chance": 1.0
+        }
+      ],
       "fawnhide": [
         {
           "type": "drop",
@@ -11229,6 +14199,50 @@
           "chance": 0.1
         }
       ],
+      "fulgurite_pendant": [
+        {
+          "type": "drop",
+          "from": "brinecharge",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_long_line",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "voltgeist",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "storm_shaman",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "storm_lord",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "the_return_stroke",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.2
+        }
+      ],
       "geo_crystal": [
         {
           "type": "drop",
@@ -11501,6 +14515,69 @@
           "zoneId": "old_quarry",
           "bucket": "main",
           "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "leanstone",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "tumblehusk",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "kitewing",
+          "zoneId": "windward_steppe",
+          "bucket": "bonus",
+          "chance": 0.02
+        },
+        {
+          "type": "drop",
+          "from": "old_lean",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "sky_titan",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "gale_serpent",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "wind_wraith",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "stormcliff_tidecaller",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.15
+        },
+        {
+          "type": "drop",
+          "from": "groundling",
+          "zoneId": "stormcliff_coast",
+          "bucket": "bonus",
+          "chance": 0.02
         }
       ],
       "heartwood_stave": [
@@ -11517,6 +14594,50 @@
           "zoneId": "whispering_woods",
           "bucket": "main",
           "chance": 0.1
+        }
+      ],
+      "leanstone_charm": [
+        {
+          "type": "drop",
+          "from": "old_lean",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "sky_titan",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "gale_serpent",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "wind_wraith",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "the_unbroken_blow",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.2
+        },
+        {
+          "type": "drop",
+          "from": "tempest_monarch",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.2
         }
       ],
       "oak_circlet": [
@@ -12295,6 +15416,107 @@
           "skill": "mining"
         }
       ],
+      "saltwort": [
+        {
+          "type": "drop",
+          "from": "stormcliff_tidecaller",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "sparkwing",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "brinecharge",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_long_line",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "voltgeist",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "storm_shaman",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "storm_lord",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_return_stroke",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "gather",
+          "nodeId": "sc_saltwort_ledge",
+          "zoneId": "stormcliff_coast",
+          "skill": "foraging"
+        }
+      ],
+      "saltwort_draught": [
+        {
+          "type": "drop",
+          "from": "fulgurite_crawler",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.05
+        },
+        {
+          "type": "drop",
+          "from": "brinecharge",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "the_long_line",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "voltgeist",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "storm_shaman",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.25
+        }
+      ],
       "sapwort": [
         {
           "type": "drop",
@@ -12381,6 +15603,97 @@
           "skillLevel": 1
         }
       ],
+      "seawrack_fibre": [
+        {
+          "type": "drop",
+          "from": "fulgurite_crawler",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "static_shoal",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "groundling",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "brinecharge",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_long_line",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "voltgeist",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "storm_shaman",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "storm_lord",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "the_return_stroke",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "salvage",
+          "from": "seawrack_hood"
+        },
+        {
+          "type": "salvage",
+          "from": "seawrack_robe"
+        },
+        {
+          "type": "salvage",
+          "from": "seawrack_leggings"
+        },
+        {
+          "type": "salvage",
+          "from": "seawrack_boots"
+        },
+        {
+          "type": "salvage",
+          "from": "seawrack_gloves"
+        },
+        {
+          "type": "gather",
+          "nodeId": "sc_wrackline",
+          "zoneId": "stormcliff_coast",
+          "skill": "foraging"
+        }
+      ],
       "sporecap_mantle": [
         {
           "type": "drop",
@@ -12453,6 +15766,22 @@
           "type": "drop",
           "from": "the_empty_course",
           "zoneId": "old_quarry",
+          "bucket": "main",
+          "chance": 0.1
+        }
+      ],
+      "the_long_lean": [
+        {
+          "type": "drop",
+          "from": "the_unbroken_blow",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "tempest_monarch",
+          "zoneId": "windward_steppe",
           "bucket": "main",
           "chance": 0.1
         }
@@ -12598,6 +15927,113 @@
           "skillLevel": 11
         }
       ],
+      "tussock_flax": [
+        {
+          "type": "drop",
+          "from": "steppe_harrier",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "chaff",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.5
+        },
+        {
+          "type": "drop",
+          "from": "tumblehusk",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "old_lean",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "sky_titan",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "gale_serpent",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "wind_wraith",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.3
+        },
+        {
+          "type": "drop",
+          "from": "the_unbroken_blow",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "drop",
+          "from": "tempest_monarch",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.25
+        },
+        {
+          "type": "salvage",
+          "from": "tussock_hood"
+        },
+        {
+          "type": "salvage",
+          "from": "tussock_robe"
+        },
+        {
+          "type": "salvage",
+          "from": "tussock_leggings"
+        },
+        {
+          "type": "salvage",
+          "from": "tussock_boots"
+        },
+        {
+          "type": "salvage",
+          "from": "tussock_gloves"
+        },
+        {
+          "type": "gather",
+          "nodeId": "ws_tussock_swale",
+          "zoneId": "windward_steppe",
+          "skill": "foraging"
+        }
+      ],
+      "uplight": [
+        {
+          "type": "drop",
+          "from": "storm_lord",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.1
+        },
+        {
+          "type": "drop",
+          "from": "the_return_stroke",
+          "zoneId": "stormcliff_coast",
+          "bucket": "main",
+          "chance": 0.1
+        }
+      ],
       "wickerbound_ring": [
         {
           "type": "drop",
@@ -12640,6 +16076,82 @@
           "zoneId": "thornmire",
           "bucket": "main",
           "chance": 0.2
+        }
+      ],
+      "yew_log": [
+        {
+          "type": "drop",
+          "from": "leanstone",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "kitewing",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.55
+        },
+        {
+          "type": "drop",
+          "from": "old_lean",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "sky_titan",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "gale_serpent",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "wind_wraith",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.4
+        },
+        {
+          "type": "drop",
+          "from": "the_unbroken_blow",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "drop",
+          "from": "tempest_monarch",
+          "zoneId": "windward_steppe",
+          "bucket": "main",
+          "chance": 0.45
+        },
+        {
+          "type": "salvage",
+          "from": "yew_quarterstaff"
+        },
+        {
+          "type": "salvage",
+          "from": "yew_wand"
+        },
+        {
+          "type": "salvage",
+          "from": "yew_knot"
+        },
+        {
+          "type": "gather",
+          "nodeId": "ws_yew_break",
+          "zoneId": "windward_steppe",
+          "skill": "felling"
         }
       ]
     },
@@ -12877,6 +16389,36 @@
           "outputId": "sapwort_draught"
         }
       ],
+      "seawrack_boots": [
+        {
+          "type": "salvageInto",
+          "itemId": "seawrack_fibre"
+        }
+      ],
+      "seawrack_gloves": [
+        {
+          "type": "salvageInto",
+          "itemId": "seawrack_fibre"
+        }
+      ],
+      "seawrack_hood": [
+        {
+          "type": "salvageInto",
+          "itemId": "seawrack_fibre"
+        }
+      ],
+      "seawrack_leggings": [
+        {
+          "type": "salvageInto",
+          "itemId": "seawrack_fibre"
+        }
+      ],
+      "seawrack_robe": [
+        {
+          "type": "salvageInto",
+          "itemId": "seawrack_fibre"
+        }
+      ],
       "sporecap_mantle": [
         {
           "type": "salvageInto",
@@ -12894,6 +16436,54 @@
         {
           "type": "salvageInto",
           "itemId": "tuskhide"
+        }
+      ],
+      "tussock_boots": [
+        {
+          "type": "salvageInto",
+          "itemId": "tussock_flax"
+        }
+      ],
+      "tussock_gloves": [
+        {
+          "type": "salvageInto",
+          "itemId": "tussock_flax"
+        }
+      ],
+      "tussock_hood": [
+        {
+          "type": "salvageInto",
+          "itemId": "tussock_flax"
+        }
+      ],
+      "tussock_leggings": [
+        {
+          "type": "salvageInto",
+          "itemId": "tussock_flax"
+        }
+      ],
+      "tussock_robe": [
+        {
+          "type": "salvageInto",
+          "itemId": "tussock_flax"
+        }
+      ],
+      "yew_knot": [
+        {
+          "type": "salvageInto",
+          "itemId": "yew_log"
+        }
+      ],
+      "yew_quarterstaff": [
+        {
+          "type": "salvageInto",
+          "itemId": "yew_log"
+        }
+      ],
+      "yew_wand": [
+        {
+          "type": "salvageInto",
+          "itemId": "yew_log"
         }
       ]
     }

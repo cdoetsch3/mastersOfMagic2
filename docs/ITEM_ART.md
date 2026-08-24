@@ -781,18 +781,310 @@ silver-grey, bronze warm gold-brown.
 
 The **Primal quarter (52 items)** and **Old Quarry (9 items)** are written,
 matching BESTIARY_ART's coverage exactly.
+## Windward Steppe · Lv 19–24 · Aero · **15 items**
+
+> ⭐ *One direction, forever.* Everything here is shaped by having stopped
+> resisting a single steady force. ⚠️ **Dodge and deflection debut this
+> quarter** (KINETIC_CONTRACT §2) — dodge reads as **poised, light, already
+> leaning into the next step**; deflection (on the Tussock gloves) reads as a
+> **smooth, blunt surface with nothing for a blow to catch on**, the same
+> "nothing sharp" instinct the shield-strength convention above already uses.
+
+**Palette:** pale straw tan, silvered yew-grey, dust-pale white, one thin
+overcast sky-grey accent.
+
+### Materials
+
+**Yew Log** — *common · material · Woodcarving t3*
+`assets/items/windward_steppe/yew_log.png`
+> A single length of yew about a forearm and a half long, shown at a slight
+> diagonal. Dense reddish-brown heartwood at the core, a narrow band of pale
+> creamy sapwood just under the bark. ⭐ **The whole piece has a faint but
+> unmistakable lean along its grain** — cut with the wind's own bias rather
+> than straight, which is the recognisable thing about it. Both ends cut
+> clean, slightly weathered along the top face.
+
+**Tussock Flax** — *common · material · Tailoring t4*
+`assets/items/windward_steppe/tussock_flax.png`
+> A hand-sized hank of stripped fibre, wiry and pale straw-tan, bound loosely
+> at the middle with a single twist of itself. Individual strands are visibly
+> tough and slightly kinked rather than smooth — *grown low and dense, in
+> tussocks that learned to grow around each other*. A little pale grit caught
+> in the twist near the base.
+
+### Motes
+
+**Aero Dust** — *common · mote · dust · Aero*
+`assets/items/windward_steppe/aero_dust.png`
+> A small loose heap of fine pale grey-white powder, roughly a spoonful,
+> mounded on nothing, with two or three grains caught mid-drift just above it
+> as though a breath moved them a moment ago. ⚠️ Same form as the other dusts
+> — colour is the only difference. *What a moving thing leaves when the wind
+> gets there first.*
+
+**Aero Shard** — *common · mote · shard · Aero*
+`assets/items/windward_steppe/aero_shard.png`
+> A single angular splinter of translucent pale grey mineral, thumb-length,
+> standing on end at a slight lean — the same lean every object in this zone
+> carries. Sharp glassy fracture faces, near-white at the edge deepening to a
+> soft blue-grey in the body. ⭐ *Dust that caught on something and stopped
+> moving, briefly* — faint motion-blur striations run along one face.
+
+**Aero Crystal** — *uncommon · mote · crystal · Aero*
+`assets/items/windward_steppe/aero_crystal.png`
+> A whole hexagonal crystal the size of a plum, resting on one facet but
+> angled as if about to tip. Clear pale grey-blue mineral, every face flat and
+> true, with a faint internal shimmer that reads as **captured motion** rather
+> than light — a blurred inner facet or two, as though something inside it is
+> still moving very slowly. ⚠️ *"It is moving, and it does not stop"* — a thin
+> drift of dust perpetually sliding off its upper edge.
+
+### Equipment — Yew weapons (Woodcarving)
+
+⭐ **Yew is the wood ladder's tier-3 rung, equipping at 20** — the third stop
+after Oak and Birch. No crit anywhere below: it stays off Yew entirely this
+quarter (§2.5), so nothing here should carry a hot or spiky note.
+
+**Yew Quarterstaff** — *common · main hand · +3 dmg/charge, +7 accuracy · Lv 20*
+`assets/items/windward_steppe/yew_quarterstaff.png`
+> A two-handed staff of yew as tall as a person, shown at a diagonal. Thick,
+> blunt-ended, heavily committed silhouette, same weight class as Oak and
+> Birch before it. Dense reddish-brown heartwood with a pale sapwood edge
+> along one side. ⭐ **A single straight, unbroken grain line runs its full
+> length** — the one branch that never learned to lean, which is why it was
+> chosen. Bark left only at the grip.
+
+**Yew Wand** — *common · main hand · +4 dmg/cast, +2 accuracy · Lv 20*
+`assets/items/windward_steppe/yew_wand.png`
+> A short one-handed wand of yew, forearm-length and finger-thin, tapering to
+> a fine flexible tip. Reddish-brown heartwood, smooth pale sapwood edge.
+> ⭐ *Trimmed thin enough to whip in the wind and not break* — drawn with a
+> very slight live curve along its length, as though caught mid-flex. Light,
+> quick, obviously one-handed.
+
+**Yew Knot** — *common · off hand · +5 accuracy · Lv 20*
+`assets/items/windward_steppe/yew_knot.png`
+> A rounded burl of yew the size of an apple, worked smooth and palm-sized.
+> Deep reddish-brown, with the grain knotted tightly at the centre —
+> *carved from a lean-side branch, where the grain knots up from decades of
+> holding against the same wind*. Slightly flattened where it sits in a hand,
+> the knot's spiral running one clear followable direction.
+
+### Equipment — the Tussock set (Tailoring)
+
+⭐ **The dodge and deflect debut** (§2.5): boots carry the zone's first dodge,
+gloves its first crafted deflect. ⚠️ Flat HP and accuracy elsewhere, exactly
+Q1's shape — only the boots and gloves carry the new stats.
+
+**Tussock Hood** — *common · hat · +4 accuracy · Lv 24*
+`assets/items/windward_steppe/tussock_hood.png`
+> A close-fitting hood woven from tussock flax, pale straw-tan, the weave
+> visibly tight and even. Drawn snug with a single cord at the crown. Straight
+> true stitching lines running front to back — *woven tight enough that the
+> wind whistles instead of getting in*.
+
+**Tussock Robe** — *common · robe top · +20 max HP · Lv 24*
+`assets/items/windward_steppe/tussock_robe.png`
+> A layered tunic of woven flax, shown from the front, straw-tan throughout.
+> ⭐ **Visibly doubled fabric across the chest** — two full layers stitched
+> together with a clear seam line, thicker and heavier than the hood or
+> leggings beside it. Loose at the shoulders, snug at the waist with a simple
+> tie.
+
+**Tussock Leggings** — *common · robe bottom · +14 max HP · Lv 24*
+`assets/items/windward_steppe/tussock_leggings.png`
+> Straight-cut leggings of the same straw-tan woven flax, shown laid flat.
+> Cut long, with a doubled panel of fabric at the shins and thighs — visible
+> stitched-over layering, lighter than the robe's but still a clear second
+> ply. Plain cord ties at the waist.
+
+**Tussock Boots** — *common · boots · +4 max HP, dodge · Lv 24*
+`assets/items/windward_steppe/tussock_boots.png`
+> A pair of low woven boots, straw-tan flax over a thick pale sole, laced
+> tight up the ankle. ⭐ **Dodge, so the silhouette wants poise, not bulk** —
+> shown lifted slightly on the toe, as though already mid-step, laces drawn
+> at a slight forward-leaning angle rather than straight up.
+
+**Tussock Gloves** — *common · gloves · +4 max HP, deflect · Lv 24*
+`assets/items/windward_steppe/tussock_gloves.png`
+> A pair of fingerless woven gloves, straw-tan flax, shown one resting over
+> the other. ⭐ **Deflect, so the palms are the whole brief** — the palm and
+> outer edge of each glove are a smooth, doubled, slightly domed panel with no
+> texture or seam to catch on, in clear contrast to the coarser woven backs.
+
+### Equipment — the chases
+
+**Leanstone Charm** — *rare · ring · dodge, +2 accuracy · Lv 22*
+`assets/items/windward_steppe/leanstone_charm.png`
+> A single finger ring, shown standing upright: a finger-length sliver of pale
+> weathered stone set into a plain dark band. The sliver leans at a fixed
+> angle off the band rather than sitting flush — *worn from the windward face
+> of a leaning stone, and held loosely it wants to point the same direction
+> every time*. ⭐ Dodge, so the whole piece reads off-balance in one consistent
+> direction, poised rather than planted.
+
+**The Long Lean** — *epic · robe top · max HP, dodge, accuracy · Lv 24*
+`assets/items/windward_steppe/the_long_lean.png`
+> A heavy mantle worn over the shoulders, shown from the front: thick combed
+> windgrass in the same straw-tan as Tussock but visibly coarser and denser,
+> lying flat across the shoulders all in one combed direction. ⭐ **Epic, so it
+> is visibly doing something** — a faint pale motion-blur trails off the lower
+> edge and one shoulder, as though the whole garment is very slowly being
+> pulled sideways and simply keeping its shape. *It has been leaning the same
+> way since it was cut.*
+
+---
+
+## ⚠️ Still to describe — the other three quarters
+
+The **Primal quarter (52 items)** and **Windward Steppe (15)**, the first
+Kinetic zone, are written; both match BESTIARY_ART's coverage exactly.
+## Stormcliff Coast · Lv 17–22 · Electro · **13 items**
+
+> ⭐ *Everything here has been charged in passing, not struck.* ⚠️ Nothing in
+> this zone glows all over — the light lives in **hairline cracks and single
+> veins**, exactly where a strike would enter or leave. Everything else is wet
+> dark rock, sea-bleached fibre or storm-cloud grey.
+
+**Palette:** wet black rock, storm-cloud grey, pale sea-foam white, salt-cured
+tan fibre, one hairline vein of white-blue light.
+
+### Materials
+
+**Seawrack Fibre** — *common · material · Tailoring t3*
+`assets/items/stormcliff_coast/seawrack_fibre.png`
+> A coiled hank of dark rope-like fibre the size of two fists, laid in loose
+> loops. Stiff, salt-crusted, weathered tan-brown, drying pale white where the
+> salt has bloomed on the outer wraps. ⭐ *The tideline's own rope* — a few
+> strands still hold the crimped wave-pattern of the water that laid it out.
+
+**Saltwort** — *common · material · Potions & Alchemy t3*
+`assets/items/stormcliff_coast/saltwort.png`
+> A small bundle of low, fleshy herb stems, a hand's length, tied at the base.
+> Thick blue-green paddle-shaped leaves with a fine white salt bloom dusted
+> across every surface. A single bead of clear brine sits in the crook of one
+> leaf. *Grows where the spray reaches and nowhere the spray does not.*
+
+### Motes
+
+**Electro Dust** — *common · mote · dust · Electro*
+`assets/items/stormcliff_coast/electro_dust.png`
+> A small loose heap of fine white-blue powder, roughly a spoonful, mounded on
+> nothing. Bright hairline-white on the lit side, deep storm grey in the shadow
+> of the heap, a few grains suspended just above it as if still faintly charged.
+> ⚠️ Same form as the other two dusts — colour is the only difference.
+
+**Electro Shard** — *common · mote · shard · Electro*
+`assets/items/stormcliff_coast/electro_shard.png`
+> A single angular splinter of translucent pale mineral, thumb-length, standing
+> on end at a slight lean. Sharp glassy fracture faces, near-white at the tip
+> deepening to a cold storm-blue in the body. ⭐ *Dust that held its charge a
+> moment longer* — one hairline crack in the body carries a faint live white
+> line, and that is the only light on it.
+
+**Electro Crystal** — *uncommon · mote · crystal · Electro*
+`assets/items/stormcliff_coast/electro_crystal.png`
+> A whole hexagonal crystal the size of a plum, resting on one facet. Clear
+> pale blue-white mineral, every face flat and true, lit from **inside** by a
+> flickering, unsteady white light that never settles the way an ember would.
+> ⚠️ *"It is live, and it does not discharge"* — a fine static haze clings to
+> the air immediately around it.
+
+### Consumables
+
+**Saltwort Draught** — *common · beltable · 30% health*
+`assets/items/stormcliff_coast/saltwort_draught.png`
+> A short, wide glass bottle the height of a hand, corked and sealed with dark
+> wax. The liquid inside is a cloudy, briny blue-grey with fine white sediment
+> settled at the bottom and a thin salt-crust ring at the waterline. Cold, and
+> faintly sweating on the glass.
+
+### Equipment — the Seawrack set (Tailoring)
+
+> ⭐ **The quarter's first crit/dodge/deflect debut, from the gear side** —
+> boots carry the game's first crafted dodge, gloves the first crafted
+> deflect. ⚠️ Keep both small and legible at 14px: one clean accent detail
+> each, not a build's worth of ornament.
+
+**Seawrack Hood** — *common · hat · +3 accuracy · Lv 16*
+`assets/items/stormcliff_coast/seawrack_hood.png`
+> A close-fitting hood of dark salt-stiffened fibre, empty and holding its
+> shape, edges crusted pale white with dried salt. Tight weave, a straight low
+> brow-line pulled taut across the front. ⭐ The brow-line is dead straight and
+> level — that is the accuracy.
+
+**Seawrack Robe** — *common · robe top · +15 max HP · Lv 16*
+`assets/items/stormcliff_coast/seawrack_robe.png`
+> A long woven overrobe of dark salt-cured fibre, laid flat, seen from the
+> front. Dense tight weave, visibly **doubled across the chest and shoulders**
+> with a stitched reinforcing line. Pale salt bloom along every hem, never
+> fully dry.
+
+**Seawrack Leggings** — *common · robe bottom · +10 max HP · Lv 16*
+`assets/items/stormcliff_coast/seawrack_leggings.png`
+> Woven trousers of dark salt-cured fibre, laid flat, legs together. Dense
+> weave, a broad doubled waistband, a crust of pale dried salt at both cuffs
+> where the tide has caught them again and again.
+
+**Seawrack Boots** — *common · boots · +3 max HP, +2 dodge · Lv 16*
+`assets/items/stormcliff_coast/seawrack_boots.png`
+> A pair of low woven boots in dark salt-cured fibre, standing side by side.
+> Thick ridged soles cut for wet rock, a wrapped ankle cord, both slightly
+> angled as if already mid-step. ⭐ **Light and unencumbered** — the dodge
+> stat wants a boot that looks ready to move, not to stand.
+
+**Seawrack Gloves** — *common · gloves · +3 max HP, 6% deflect chance /
+15% amount · Lv 16*
+`assets/items/stormcliff_coast/seawrack_gloves.png`
+> A pair of full-fingered woven gloves in dark salt-cured fibre, laid flat and
+> slightly overlapping. ⭐ **A hardened, slightly domed panel across each
+> palm and knuckle** — smooth, closed, nothing sharp — the surface the deflect
+> stat is glancing off of. Salt-stiff cuffs.
+
+### Equipment — the chase
+
+**Fulgurite Pendant** — *rare · neck · 8% crit, +10 crit damage · Lv 20*
+`assets/items/stormcliff_coast/fulgurite_pendant.png`
+> A pendant on a plaited cord: a single shard of fused dark glass, thumb-sized
+> and branching like frozen lightning, hung point-down. ⭐ **A hairline of live
+> white light runs the branching crack down its centre** — spiky and hot, a
+> point rather than a face, the same convention crit always draws to. The rest
+> of the glass is matte, near-black.
+
+**Uplight** — *epic · main hand · +6 dmg/cast, +4 accuracy, 12% crit, +15
+crit damage · Lv 22 · 1 socket*
+`assets/items/stormcliff_coast/uplight.png`
+> A short one-handed wand of fused dark glass, forearm-length, branching at
+> the tip like a root cast in lightning rather than growing toward it. ⚠️ Epic,
+> so it is doing something: a live white-blue light travels **up** the
+> branching tip toward the hand, never down — *the return stroke travels
+> upward*. One small empty socket cut into the grip, waiting. Light, quick,
+> obviously one-handed.
+
+---
+
+## ⚠️ Still to describe — the rest of Kinetic and two more quarters
+
+The **Primal quarter (52 items)** and **Stormcliff Coast (13 items)** are
+written.
 
 | Quarter | Zones | Items | Status |
 |---|---|---|---|
 | **Primal** 1–14 | 5 | 52 | ✅ described |
 | Kinetic 15–29 | 6 | 58 (target) | 1/6 zones described (Old Quarry, 9) |
+| Kinetic 15–29 | 6 | 15+❓ | 🔶 Windward Steppe described, 5 zones left |
+| Kinetic 15–29 | 6 | 58 | 🚧 1/6 zones — Stormcliff Coast (13) described |
 | Celestial 30–47 | 7 | ❓ | ⬜ no catalogue yet |
 | Ethereal 45–60 | 7 | ❓ | ⬜ no catalogue yet |
 
 ⭐ **The Primal quarter is the one that matters first** — it is the only content
 built, and it is the player's first impression. ⚠️ Unlike the bestiary, the
-later quarters have **no catalogue at all** yet, so there is nothing to describe
-rather than a described-later backlog: ITEMS §9b.8 covers Q1 only.
+later quarters (beyond Windward Steppe) have **no catalogue at all** yet, so
+there is nothing to describe rather than a described-later backlog: ITEMS
+§9b.8 covers Q1 only.
+later quarters beyond Kinetic have **no catalogue at all** yet, so there is
+nothing to describe rather than a described-later backlog: ITEMS §9b.8 covers
+Q1 only, KINETIC_CONTRACT §4 covers Q2.
 
 ### Adding an item
 
@@ -800,3 +1092,7 @@ rather than a described-later backlog: ITEMS §9b.8 covers Q1 only.
 `lib/game/items/catalogue/`. `test/item_icon_test.dart` asserts the catalogue
 total is 61, so an item added without an entry here fails the suite with a
 pointer to this file.
+total is 67 (52 Primal + 15 Windward Steppe), so an item added without an
+entry here fails the suite with a pointer to this file.
+total (65, with Stormcliff Coast landed), so an item added without an entry
+here fails the suite with a pointer to this file.

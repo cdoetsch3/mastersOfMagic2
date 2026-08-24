@@ -27,9 +27,16 @@ void main() {
   });
 
   test('every id any table references resolves in a catalogue', () {
+    // 📝 The cross-builder exemption set is empty again: `hardtack` (the one
+    // id ever in it) landed with old_quarry_items.dart at the C2a merge. The
+    // machinery stays for the NEXT parallel wave, where it will be needed for
+    // exactly one merge window again.
+    const crossBuilderIds = <String>{};
     final missing = <String>[];
     void check(String? id, String where) {
-      if (id != null && ItemCatalogue.tryById(id) == null) {
+      if (id != null &&
+          !crossBuilderIds.contains(id) &&
+          ItemCatalogue.tryById(id) == null) {
         missing.add('$where -> $id');
       }
     }

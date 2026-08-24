@@ -10,8 +10,10 @@ import 'catalogue/ashfall_vale_items.dart';
 import 'catalogue/cinderpeak_items.dart';
 import 'catalogue/glimmerbrook_items.dart';
 import 'catalogue/old_quarry_items.dart';
+import 'catalogue/stormcliff_coast_items.dart';
 import 'catalogue/thornmire_items.dart';
 import 'catalogue/whispering_woods_items.dart';
+import 'catalogue/windward_steppe_items.dart';
 import 'item_def.dart';
 import 'item_instance.dart';
 import 'item_naming.dart';
@@ -39,6 +41,8 @@ abstract final class ItemCatalogue {
     'thornmire': ThornmireItems.all,
     'ashfall_vale': AshfallValeItems.all,
     'old_quarry': OldQuarryItems.all,
+    'windward_steppe': WindwardSteppeItems.all,
+    'stormcliff_coast': StormcliffCoastItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists

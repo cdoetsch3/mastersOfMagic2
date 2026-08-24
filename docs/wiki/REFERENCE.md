@@ -16,7 +16,7 @@ the framework both live under.
 
 | Zones | Towns | Creatures | Items | Recipes | Gather nodes |
 |---|---|---|---|---|---|
-| 26 | 9 | 66 | 61 | 20 | 12 |
+| 26 | 9 | 88 | 89 | 20 | 16 |
 
 ## Contents
 
@@ -45,6 +45,23 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Birch Knot | `birch_knot` | 4 | offHand | common | 10 | ashfall_vale |
 | Birch Quarterstaff | `birch_quarterstaff` | 6 | mainHand | common | 10 | ashfall_vale |
 | Birch Wand | `birch_wand` | 1 | mainHand | common | 10 | ashfall_vale |
+| Seawrack Hood | `seawrack_hood` | 3 | hat | common | 16 | stormcliff_coast |
+| Uplight | `uplight` | 4 | mainHand | epic | 22 | stormcliff_coast |
+| Yew Knot | `yew_knot` | 5 | offHand | common | 20 | windward_steppe |
+| Yew Quarterstaff | `yew_quarterstaff` | 7 | mainHand | common | 20 | windward_steppe |
+| Yew Wand | `yew_wand` | 2 | mainHand | common | 20 | windward_steppe |
+| Leanstone Charm | `leanstone_charm` | 2 | ring | rare | 22 | windward_steppe |
+| The Long Lean | `the_long_lean` | 3 | robeTop | epic | 24 | windward_steppe |
+| Tussock Hood | `tussock_hood` | 4 | hat | common | 24 | windward_steppe |
+
+### `dodge`
+
+| Name | Id | Value | Slot | Rarity | Equip Lv | Zone |
+|---|---|---|---|---|---|---|
+| Seawrack Boots | `seawrack_boots` | 2 | boots | common | 16 | stormcliff_coast |
+| Leanstone Charm | `leanstone_charm` | 6 | ring | rare | 22 | windward_steppe |
+| The Long Lean | `the_long_lean` | 8 | robeTop | epic | 24 | windward_steppe |
+| Tussock Boots | `tussock_boots` | 3 | boots | common | 24 | windward_steppe |
 
 ### `critChance`
 
@@ -52,6 +69,8 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 |---|---|---|---|---|---|---|
 | Heartwood Staff | `heartwood_stave` | 5 | mainHand | epic | 5 | whispering_woods |
 | Cinder Loop | `cinder_loop` | 5 | ring | rare | 9 | cinderpeak_foothills |
+| Fulgurite Pendant | `fulgurite_pendant` | 8 | neck | rare | 20 | stormcliff_coast |
+| Uplight | `uplight` | 12 | mainHand | epic | 22 | stormcliff_coast |
 
 ### `critDamage`
 
@@ -59,6 +78,8 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 |---|---|---|---|---|---|---|
 | Heartwood Staff | `heartwood_stave` | 10 | mainHand | epic | 5 | whispering_woods |
 | Cinder Loop | `cinder_loop` | 5 | ring | rare | 9 | cinderpeak_foothills |
+| Fulgurite Pendant | `fulgurite_pendant` | 10 | neck | rare | 20 | stormcliff_coast |
+| Uplight | `uplight` | 15 | mainHand | epic | 22 | stormcliff_coast |
 
 ### `deflectChance`
 
@@ -66,6 +87,8 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 |---|---|---|---|---|---|---|
 | Overseer's Seal | `overseers_seal` | 12 | ring | rare | 18 | old_quarry |
 | The Given Weight | `the_given_weight` | 10 | neck | epic | 19 | old_quarry |
+| Seawrack Gloves | `seawrack_gloves` | 6 | gloves | common | 16 | stormcliff_coast |
+| Tussock Gloves | `tussock_gloves` | 8 | gloves | common | 24 | windward_steppe |
 
 ### `deflectAmount`
 
@@ -73,6 +96,8 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 |---|---|---|---|---|---|---|
 | Overseer's Seal | `overseers_seal` | 20 | ring | rare | 18 | old_quarry |
 | The Given Weight | `the_given_weight` | 25 | neck | epic | 19 | old_quarry |
+| Seawrack Gloves | `seawrack_gloves` | 15 | gloves | common | 16 | stormcliff_coast |
+| Tussock Gloves | `tussock_gloves` | 20 | gloves | common | 24 | windward_steppe |
 
 ### `maxHpBonus`
 
@@ -88,6 +113,15 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Bogflax Leggings | `bogflax_leggings` | 7 | robeBottom | common | 10 | thornmire |
 | Bogflax Robe | `bogflax_robe` | 10 | robeTop | common | 10 | thornmire |
 | The Given Weight | `the_given_weight` | 30 | neck | epic | 19 | old_quarry |
+| Seawrack Boots | `seawrack_boots` | 3 | boots | common | 16 | stormcliff_coast |
+| Seawrack Gloves | `seawrack_gloves` | 3 | gloves | common | 16 | stormcliff_coast |
+| Seawrack Leggings | `seawrack_leggings` | 10 | robeBottom | common | 16 | stormcliff_coast |
+| Seawrack Robe | `seawrack_robe` | 15 | robeTop | common | 16 | stormcliff_coast |
+| The Long Lean | `the_long_lean` | 24 | robeTop | epic | 24 | windward_steppe |
+| Tussock Boots | `tussock_boots` | 4 | boots | common | 24 | windward_steppe |
+| Tussock Gloves | `tussock_gloves` | 4 | gloves | common | 24 | windward_steppe |
+| Tussock Leggings | `tussock_leggings` | 14 | robeBottom | common | 24 | windward_steppe |
+| Tussock Robe | `tussock_robe` | 20 | robeTop | common | 24 | windward_steppe |
 
 ### `damagePerCast`
 
@@ -95,6 +129,8 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 |---|---|---|---|---|---|---|
 | Oak Wand | `oak_wand` | 2 | mainHand | common | 1 | whispering_woods |
 | Birch Wand | `birch_wand` | 3 | mainHand | common | 10 | ashfall_vale |
+| Uplight | `uplight` | 6 | mainHand | epic | 22 | stormcliff_coast |
+| Yew Wand | `yew_wand` | 4 | mainHand | common | 20 | windward_steppe |
 
 ### `damagePerCharge`
 
@@ -103,6 +139,7 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | Oak Quarterstaff | `oak_quarterstaff` | 1 | mainHand | common | 1 | whispering_woods |
 | Heartwood Staff | `heartwood_stave` | 3 | mainHand | epic | 5 | whispering_woods |
 | Birch Quarterstaff | `birch_quarterstaff` | 2 | mainHand | common | 10 | ashfall_vale |
+| Yew Quarterstaff | `yew_quarterstaff` | 3 | mainHand | common | 20 | windward_steppe |
 
 ### `shieldStrengthPercent`
 
@@ -128,10 +165,6 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 |---|---|---|---|---|---|---|
 | Fawnhide Belt | `fawnhide_belt` | 1 | belt | common | 4 | glimmerbrook |
 | Tuskhide Belt | `tuskhide_belt` | 2 | belt | common | 11 | cinderpeak_foothills |
-
-### No item grants
-
-`dodge`
 
 
 ## Items by zone
@@ -221,11 +254,49 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `geo_crystal` | Geo Crystal | mote |  | uncommon | 1 |  | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course` |
 | `geo_dust` | Geo Dust | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; +5 more (see content.json) |
 | `geo_shard` | Geo Shard | mote |  | common | 1 |  | drop: `quarry_golem`; drop: `chiselback`; drop: `gravelswarm`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; +4 more (see content.json) |
-| `hardtack` | Hardtack | consumable |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +1 more (see content.json) |
+| `hardtack` | Hardtack | consumable |  | common | 1 |  | drop: `quarry_golem`; drop: `tailings_drudge`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +10 more (see content.json) |
 | `quarry_jasper` | Quarry Jasper | material |  | uncommon | 1 |  | gather: `oq_jasper_face`; drop: `chiselback`; drop: `plumbline_sentry`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; +2 more (see content.json) |
 | `tin_ore` | Tin Ore | material |  | common | 1 |  | gather: `oq_tin_seam`; drop: `quarry_golem`; drop: `tailings_drudge`; drop: `gravelswarm`; drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; +3 more (see content.json) |
 | `overseers_seal` | Overseer's Seal | equipment | ring | rare | 18 | deflectChance +12, deflectAmount +20 | drop: `obsidian_golem`; drop: `earth_titan`; drop: `deadweight`; drop: `the_overseer`; drop: `mountain_heart`; drop: `the_empty_course` |
 | `the_given_weight` | The Given Weight | equipment | neck | epic | 19 | deflectChance +10, deflectAmount +25, maxHpBonus +30 | drop: `mountain_heart`; drop: `the_empty_course` |
+
+### Stormcliff Coast (`stormcliff_coast`) — 13 items
+
+| Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
+|---|---|---|---|---|---|---|---|
+| `electro_crystal` | Electro Crystal | mote |  | uncommon | 1 |  | drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman`; drop: `storm_lord`; drop: `the_return_stroke` |
+| `electro_dust` | Electro Dust | mote |  | common | 1 |  | drop: `stormcliff_tidecaller`; drop: `fulgurite_crawler`; drop: `sparkwing`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; +5 more (see content.json) |
+| `electro_shard` | Electro Shard | mote |  | common | 1 |  | drop: `fulgurite_crawler`; drop: `sparkwing`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; drop: `the_long_line`; +4 more (see content.json) |
+| `saltwort` | Saltwort | material |  | common | 1 |  | gather: `sc_saltwort_ledge`; drop: `stormcliff_tidecaller`; drop: `sparkwing`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman`; +2 more (see content.json) |
+| `saltwort_draught` | Saltwort Draught | beltable |  | common | 1 |  | drop: `fulgurite_crawler`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman` |
+| `seawrack_fibre` | Seawrack Fibre | material |  | common | 1 |  | gather: `sc_wrackline`; drop: `fulgurite_crawler`; drop: `static_shoal`; drop: `groundling`; drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; +3 more (see content.json) |
+| `seawrack_boots` | Seawrack Boots | equipment | boots | common | 16 | dodge +2, maxHpBonus +3 | drop |
+| `seawrack_gloves` | Seawrack Gloves | equipment | gloves | common | 16 | deflectChance +6, deflectAmount +15, maxHpBonus +3 | drop |
+| `seawrack_hood` | Seawrack Hood | equipment | hat | common | 16 | accuracyBonus +3 | drop |
+| `seawrack_leggings` | Seawrack Leggings | equipment | robeBottom | common | 16 | maxHpBonus +10 | drop |
+| `seawrack_robe` | Seawrack Robe | equipment | robeTop | common | 16 | maxHpBonus +15 | drop |
+| `fulgurite_pendant` | Fulgurite Pendant | equipment | neck | rare | 20 | critChance +8, critDamage +10 | drop: `brinecharge`; drop: `the_long_line`; drop: `voltgeist`; drop: `storm_shaman`; drop: `storm_lord`; drop: `the_return_stroke` |
+| `uplight` | Uplight | equipment | mainHand | epic | 22 | accuracyBonus +4, critChance +12, critDamage +15, damagePerCast +6 | drop: `storm_lord`; drop: `the_return_stroke` |
+
+### Windward Steppe (`windward_steppe`) — 15 items
+
+| Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |
+|---|---|---|---|---|---|---|---|
+| `aero_crystal` | Aero Crystal | mote |  | uncommon | 1 |  | drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; drop: `the_unbroken_blow`; drop: `tempest_monarch` |
+| `aero_dust` | Aero Dust | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `tumblehusk`; drop: `kitewing`; drop: `old_lean`; +5 more (see content.json) |
+| `aero_shard` | Aero Shard | mote |  | common | 1 |  | drop: `steppe_harrier`; drop: `leanstone`; drop: `chaff`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; +4 more (see content.json) |
+| `tussock_flax` | Tussock Flax | material |  | common | 1 |  | gather: `ws_tussock_swale`; drop: `steppe_harrier`; drop: `chaff`; drop: `tumblehusk`; drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; +3 more (see content.json) |
+| `yew_log` | Yew Log | material |  | common | 1 |  | gather: `ws_yew_break`; drop: `leanstone`; drop: `kitewing`; drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; +2 more (see content.json) |
+| `yew_knot` | Yew Knot | equipment | offHand | common | 20 | accuracyBonus +5 | drop |
+| `yew_quarterstaff` | Yew Quarterstaff | equipment | mainHand | common | 20 | accuracyBonus +7, damagePerCharge +3 | drop |
+| `yew_wand` | Yew Wand | equipment | mainHand | common | 20 | accuracyBonus +2, damagePerCast +4 | drop |
+| `leanstone_charm` | Leanstone Charm | equipment | ring | rare | 22 | accuracyBonus +2, dodge +6 | drop: `old_lean`; drop: `sky_titan`; drop: `gale_serpent`; drop: `wind_wraith`; drop: `the_unbroken_blow`; drop: `tempest_monarch` |
+| `the_long_lean` | The Long Lean | equipment | robeTop | epic | 24 | accuracyBonus +3, dodge +8, maxHpBonus +24 | drop: `the_unbroken_blow`; drop: `tempest_monarch` |
+| `tussock_boots` | Tussock Boots | equipment | boots | common | 24 | dodge +3, maxHpBonus +4 | drop |
+| `tussock_gloves` | Tussock Gloves | equipment | gloves | common | 24 | deflectChance +8, deflectAmount +20, maxHpBonus +4 | drop |
+| `tussock_hood` | Tussock Hood | equipment | hat | common | 24 | accuracyBonus +4 | drop |
+| `tussock_leggings` | Tussock Leggings | equipment | robeBottom | common | 24 | maxHpBonus +14 | drop |
+| `tussock_robe` | Tussock Robe | equipment | robeTop | common | 24 | maxHpBonus +20 | drop |
 
 
 ## Bestiary by zone
@@ -325,6 +396,38 @@ One table per `ItemModifiers` field: every item that carries it, so "what alread
 | `the_overseer` | The Overseer | Mini-boss | Hexer | geo | 15-19 | ×1.6 | ×0.75 | Tin Ore, Quarry Jasper, Hardtack, Overseer's Seal |
 | `mountain_heart` | Mountain Heart | Boss | Juggernaut | geo | 15-19 | ×3.6 | ×1.4 | Tin Ore, Quarry Jasper, Overseer's Seal, The Given Weight |
 | `the_empty_course` | The Empty Course | Boss | Tyrant | geo | 15-19 | ×2.6 | ×1.7 | Tin Ore, Quarry Jasper, Overseer's Seal, The Given Weight |
+
+### Stormcliff Coast (`stormcliff_coast`) — 11 creatures
+
+| Id | Name | Rank | Archetype | Element | Level | HP scale | Power scale | Notable drops |
+|---|---|---|---|---|---|---|---|---|
+| `fulgurite_crawler` | Fulgurite Crawler | Wild | Sentinel | electro | 17-22 | ×1.25 | ×0.7 | Seawrack Fibre, Electro Shard, Electro Dust, Saltwort Draught |
+| `groundling` | Groundling | Wild | Skirmisher | electro | 17-22 | ×0.7 | ×1.15 | Seawrack Fibre, Electro Shard, Electro Dust, Hardtack |
+| `sparkwing` | Sparkwing | Wild | Glasswing | electro | 17-22 | ×0.5 | ×1.7 | Saltwort, Electro Shard, Electro Dust |
+| `static_shoal` | Static Shoal | Wild | Lasher | electro | 17-22 | ×0.85 | ×1.0 | Seawrack Fibre, Electro Shard, Electro Dust |
+| `stormcliff_tidecaller` | Stormcliff Tidecaller | Wild | Adept | electro | 17-22 | ×1.0 | ×0.9 | Saltwort, Hardtack |
+| `brinecharge` | Brinecharge | Mini-boss | Champion | electro | 17-22 | ×1.7 | ×1.2 | Seawrack Fibre, Saltwort, Saltwort Draught, Fulgurite Pendant |
+| `storm_shaman` | Storm Shaman | Mini-boss | Hexer | electro | 17-22 | ×1.6 | ×0.75 | Seawrack Fibre, Saltwort, Saltwort Draught, Fulgurite Pendant |
+| `the_long_line` | The Long Line | Mini-boss | Redoubt | electro | 17-22 | ×2.2 | ×0.85 | Seawrack Fibre, Saltwort, Saltwort Draught, Fulgurite Pendant |
+| `voltgeist` | Voltgeist | Mini-boss | Executioner | electro | 17-22 | ×1.2 | ×1.9 | Seawrack Fibre, Saltwort, Saltwort Draught, Fulgurite Pendant |
+| `storm_lord` | Storm Lord | Boss | Tyrant | electro | 17-22 | ×2.6 | ×1.7 | Seawrack Fibre, Saltwort, Fulgurite Pendant, Uplight |
+| `the_return_stroke` | The Return Stroke | Boss | Aspect | electro | 17-22 | ×2.6 | ×1.5 | Seawrack Fibre, Saltwort, Fulgurite Pendant, Uplight |
+
+### Windward Steppe (`windward_steppe`) — 11 creatures
+
+| Id | Name | Rank | Archetype | Element | Level | HP scale | Power scale | Notable drops |
+|---|---|---|---|---|---|---|---|---|
+| `chaff` | Chaff | Wild | Lasher | aero | 19-24 | ×0.85 | ×1.0 | Tussock Flax, Aero Shard, Aero Dust |
+| `kitewing` | Kitewing | Wild | Glasswing | aero | 19-24 | ×0.5 | ×1.7 | Yew Log, Aero Shard, Aero Dust, Hardtack |
+| `leanstone` | Leanstone | Wild | Sentinel | aero | 19-24 | ×1.25 | ×0.7 | Yew Log, Aero Shard, Aero Dust, Hardtack |
+| `steppe_harrier` | Steppe Harrier | Wild | Skirmisher | aero | 19-24 | ×0.7 | ×1.15 | Tussock Flax, Aero Shard, Aero Dust |
+| `tumblehusk` | Tumblehusk | Wild | Drudge | aero | 19-24 | ×0.8 | ×0.7 | Tussock Flax, Hardtack |
+| `gale_serpent` | Gale Serpent | Mini-boss | Executioner | aero | 19-24 | ×1.2 | ×1.9 | Yew Log, Tussock Flax, Hardtack, Leanstone Charm |
+| `old_lean` | Old Lean | Mini-boss | Champion | aero | 19-24 | ×1.7 | ×1.2 | Yew Log, Tussock Flax, Hardtack, Leanstone Charm |
+| `sky_titan` | Sky Titan | Mini-boss | Redoubt | aero | 19-24 | ×2.2 | ×0.85 | Yew Log, Tussock Flax, Hardtack, Leanstone Charm |
+| `wind_wraith` | Wind Wraith | Mini-boss | Hexer | aero | 19-24 | ×1.6 | ×0.75 | Yew Log, Tussock Flax, Hardtack, Leanstone Charm |
+| `tempest_monarch` | Tempest Monarch | Boss | Tyrant | aero | 19-24 | ×2.6 | ×1.7 | Yew Log, Tussock Flax, Leanstone Charm, The Long Lean |
+| `the_unbroken_blow` | The Unbroken Blow | Boss | Juggernaut | aero | 19-24 | ×3.6 | ×1.4 | Yew Log, Tussock Flax, Leanstone Charm, The Long Lean |
 
 
 ## Recipes by skill

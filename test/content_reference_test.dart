@@ -93,66 +93,53 @@ void main() {
       );
     });
 
-    test('a field no item carries lists no table and no zero-valued rows', () {
-      // ⭐ Nothing in the current catalogue grants dodge — that lane debuts on
-      // gear later in the Kinetic quarter (KINETIC_CONTRACT §2.5, Aero
-      // jewelry and the Aero epic). A mutant that drops the `getter(m) != 0`
-      // filter would list EVERY piece of equipment under EVERY field —
-      // including this one — each row reading a modifier value of 0.
-      //
-      // ⚠️ **deflectChance and deflectAmount are no longer empty fields.**
-      // Old Quarry's Overseer's Seal and The Given Weight are the game's
-      // first deflection sources (KINETIC_CONTRACT §2.2/§4.1) — see the
-      // populated-field checks below instead.
-      expect(
-        markdown,
-        isNot(contains('### `dodge`')),
-        reason:
-            'no item grants dodge; a `### `dodge`` header means the '
-            'zero-value filter broke and equipment with dodge: 0 leaked in',
-      );
-      final noGrants = section('### No item grants');
-      expect(noGrants, contains('`dodge`'));
+    test('dodge and deflect now have tables — Stormcliff Coast\'s debut, '
+        'and no zero-valued rows leak in', () {
+      // ⭐ **Updated for KINETIC_CONTRACT §2.5.** Nothing in the Primal
+      // catalogue granted dodge, deflectChance or deflectAmount — Stormcliff
+      // Coast's Seawrack set is the game's first crafted source of both
+      // (`seawrack_boots` for dodge, `seawrack_gloves` for deflect). A mutant
+      // that drops the `getter(m) != 0` filter would still list every OTHER
+      // piece of equipment under these fields too, each row reading 0.
+      final dodgeSection = section('### `dodge`');
+      expect(dodgeSection, contains('`seawrack_boots`'));
+      final deflectChanceSection = section('### `deflectChance`');
+      expect(deflectChanceSection, contains('`seawrack_gloves`'));
+      final deflectAmountSection = section('### `deflectAmount`');
+      expect(deflectAmountSection, contains('`seawrack_gloves`'));
+      for (final s in [dodgeSection, deflectChanceSection, deflectAmountSection]) {
+        final rows = s
+            .split('\n')
+            .where((l) => l.startsWith('| ') && l.contains('`'))
+            .skip(1);
+        for (final row in rows) {
+          final cells = row.split('|').map((c) => c.trim()).toList();
+          expect(cells[3], isNot('0'), reason: 'row "$row" leaks a 0 value');
+        }
+      }
+      // ⭐ Every one of the 13 `ItemModifiers` fields now has at least one
+      // grantor (dodge/deflect were the last two), so the whole "No item
+      // grants" heading disappears rather than listing an empty set.
+      expect(markdown, isNot(contains('### No item grants')));
     });
 
     test('a populated field never lists a row with value 0', () {
       // Same mutant, phrased the other way: within a table that DOES exist,
       // no row's Value column may read 0 — every listed item must be there
       // because it actually carries the stat.
-      void checkNoZeroRows(String heading) {
-        final s = section(heading);
-        final rows = s
-            .split('\n')
-            .where((l) => l.startsWith('| ') && l.contains('`'))
-            .skip(1); // header separator row
-        for (final row in rows) {
-          final cells = row.split('|').map((c) => c.trim()).toList();
-          // cells: ['', Name, Id, Value, Slot, Rarity, EquipLv, Zone, '']
-          expect(
-            cells[3],
-            isNot('0'),
-            reason: 'row "$row" claims $heading but lists value 0',
-          );
-        }
-      }
-
-      checkNoZeroRows('### `maxHpBonus`');
-      // ⭐ Old Quarry's Overseer's Seal and The Given Weight are the game's
-      // first deflection sources (KINETIC_CONTRACT §2.2/§4.1).
-      checkNoZeroRows('### `deflectChance`');
-      checkNoZeroRows('### `deflectAmount`');
-    });
-
-    test('deflection is populated, and both Old Quarry uniques are listed',
-        () {
-      // ⭐ The pairing rule (KINETIC_CONTRACT §2.1) — deflectChance is inert
-      // without deflectAmount and vice versa, so both tables must exist and
-      // both must carry both items.
-      final chance = section('### `deflectChance`');
-      final amount = section('### `deflectAmount`');
-      for (final id in ['overseers_seal', 'the_given_weight']) {
-        expect(chance, contains('`$id`'));
-        expect(amount, contains('`$id`'));
+      final s = section('### `maxHpBonus`');
+      final rows = s
+          .split('\n')
+          .where((l) => l.startsWith('| ') && l.contains('`'))
+          .skip(1); // header separator row
+      for (final row in rows) {
+        final cells = row.split('|').map((c) => c.trim()).toList();
+        // cells: ['', Name, Id, Value, Slot, Rarity, EquipLv, Zone, '']
+        expect(
+          cells[3],
+          isNot('0'),
+          reason: 'row "$row" claims maxHpBonus but lists value 0',
+        );
       }
     });
 

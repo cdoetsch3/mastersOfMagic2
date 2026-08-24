@@ -36,6 +36,12 @@ import 'package:mom_engine/mom_engine.dart';
 /// ⚠️ Written out rather than derived from `Bestiary.all`, so that a zone
 /// whose bestiary is deleted or renamed fails here instead of quietly
 /// shrinking every "for every zone" loop below to four.
+///
+/// 🚧 **Kinetic builder note:** this list is meant to be "every zone with a
+/// described roster," not strictly Primal — Stormcliff Coast is added here as
+/// the first Kinetic zone lands. Old Quarry and Windward Steppe are being
+/// authored in parallel worktrees and will need the same addition; the merge
+/// coordinator should reconcile the three additions into one list.
 const _primalZones = <String>[
   'whispering_woods',
   'glimmerbrook',
@@ -43,6 +49,8 @@ const _primalZones = <String>[
   'thornmire',
   'ashfall_vale',
   'old_quarry',
+  'stormcliff_coast',
+  'windward_steppe',
 ];
 
 /// The one zone whose art has actually shipped.
@@ -139,11 +147,11 @@ void main() {
       }
       expect(
         Bestiary.all.length,
-        66,
-        reason: 'the whole Primal quarter is 5 x 11, plus Old Quarry (the '
-            'Kinetic quarter\'s first zone) at 11 more; a new zone landing in '
-            'Bestiary.all needs its own pubspec directory and description '
-            'section before its art can load',
+        88,
+        reason: 'the Primal quarter (5 x 11 = 55) plus the three Kinetic '
+            'pure zones (3 x 11); a zone landing in Bestiary.all needs '
+            'its own pubspec directory and description section before its '
+            'art can load',
       );
     });
 
@@ -332,8 +340,8 @@ void main() {
           .toList();
       expect(
         noGrid.length,
-        55,
-        reason: 'five zones x 11 have no pixel grid — if this number moves, '
+        77,
+        reason: 'seven zones x 11 have no pixel grid — if this number moves, '
             'either a roster changed or a zone grew grids, and the loop below '
             'is no longer testing what it says it is',
       );
@@ -381,7 +389,7 @@ void main() {
         findsOneWidget,
         reason: 'the Listening Fawn has a hand-placed grid and no loadable '
             'PNG in the test bundle — it must reach the grid, not the plain '
-            'silhouette that the other 44 creatures get',
+            'silhouette that the other 55 creatures get',
       );
       expect(
         silhouetteOf(fawn),
@@ -482,7 +490,7 @@ void main() {
     test('the parser still finds the entries it is anchored on', () {
       expect(
         described.length,
-        66,
+        88,
         reason: 'the entry format changed (or the file moved) and the coverage '
             'check below has quietly become a comparison of two empty sets — '
             'entries are `**Name** — *rank · archetype · element*`',

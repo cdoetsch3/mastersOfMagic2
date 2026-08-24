@@ -297,6 +297,72 @@ abstract final class GatherNodes {
         'Red banding in a cut face, squarer than anything nature makes.',
   );
 
+  // ---- Windward Steppe (Aero, band 19–24, KINETIC_CONTRACT §6) ----------
+
+  /// ⭐ The only trees on the steppe (see `windward_steppe_items.dart`'s
+  /// `yewLog` lore) — the same wood ladder note the catalogue makes.
+  static const yewBreak = GatherNodeDef(
+    id: 'ws_yew_break',
+    zoneId: 'windward_steppe',
+    skill: GatherSkill.felling,
+    yieldsDefId: 'yew_log',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.releaseTiming, 'chop', reps: 3),
+    xp: 45,
+    flavor:
+        'The only trees on the steppe, and every one of them leaning the '
+        'same way.',
+  );
+
+  static const tussockSwale = GatherNodeDef(
+    id: 'ws_tussock_swale',
+    zoneId: 'windward_steppe',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'tussock_flax',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.rateDrag, 'draw', reps: 2),
+    xp: 45,
+    flavor: 'A dip where the wind passes over rather than through.',
+  );
+
+  // ---- Stormcliff Coast (Electro, band 17–22) ----------------------------
+  //
+  // ⭐ Pure zone, two world-held materials (KINETIC_CONTRACT §3.1, §6):
+  // Seawrack Fibre off the tideline, Saltwort off the spray-line. Neither is
+  // a hide or a mote, so both get a node — unlike Old Quarry's Tuskhide.
+
+  static const wrackline = GatherNodeDef(
+    id: 'sc_wrackline',
+    zoneId: 'stormcliff_coast',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'seawrack_fibre',
+    min: 2,
+    max: 4,
+    // rateDrag: long fibre comes out at ONE speed or it snaps, same contract
+    // as Thornmire's retting.
+    step: GestureStep(GestureEngine.rateDrag, 'draw'),
+    xp: 41,
+    flavor:
+        'The tideline\'s own rope, laid out and salt-cured by the weather. '
+        'Draw it steadily and it comes free in lengths.',
+  );
+
+  static const saltwortLedge = GatherNodeDef(
+    id: 'sc_saltwort_ledge',
+    zoneId: 'stormcliff_coast',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'saltwort',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.trace, 'pick', complexity: 2),
+    xp: 41,
+    flavor:
+        'It grows where the spray reaches and nowhere the spray does not — a '
+        'ledge you can find with your eyes shut, once you know the smell.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -312,6 +378,10 @@ abstract final class GatherNodes {
     charcoalBurn,
     oqTinSeam,
     oqJasperFace,
+    yewBreak,
+    tussockSwale,
+    wrackline,
+    saltwortLedge,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

@@ -35,11 +35,14 @@ import artgen  # noqa: E402
 
 ROOT = artgen.ROOT
 
-# The whole Primal quarter plus Old Quarry (the Kinetic quarter's first
-# zone), and the numbers every other check hangs off.
-EXPECTED_CREATURES = 66
-EXPECTED_ICONS = 61
-EXPECTED_BACKDROPS = 6
+# The whole Primal quarter plus whatever Kinetic has landed so far, and the
+# numbers every other check hangs off. 📝 **Local truth for this builder**:
+# Stormcliff Coast (11 creatures / 13 icons / 1 backdrop) is the only Kinetic
+# zone present in this worktree — the merge coordinator recomputes these once
+# Old Quarry and Windward Steppe land alongside it.
+EXPECTED_CREATURES = 55 + 33  # Primal + three Kinetic pure zones
+EXPECTED_ICONS = 52 + 37  # + Old Quarry 9, Stormcliff 13, Windward 15
+EXPECTED_BACKDROPS = 5 + 3
 ICONS_PER_ZONE = {
     "whispering_woods": 18,
     "glimmerbrook": 9,
@@ -47,6 +50,8 @@ ICONS_PER_ZONE = {
     "thornmire": 9,
     "ashfall_vale": 8,
     "old_quarry": 9,
+    "stormcliff_coast": 13,
+    "windward_steppe": 15,
 }
 
 ONE_PIXEL_PNG = base64.b64decode(
@@ -111,7 +116,7 @@ class ParseTest(unittest.TestCase):
         self.assertEqual(
             len(creatures),
             EXPECTED_CREATURES,
-            "docs/BESTIARY_ART.md must yield 6 zones x 11 creatures — a lower "
+            "docs/BESTIARY_ART.md must yield 5 zones x 11 creatures — a lower "
             "number means the `**Name** — *meta*` anchor moved and artgen is "
             "silently skipping art nobody will notice is missing",
         )

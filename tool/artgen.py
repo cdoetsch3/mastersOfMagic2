@@ -92,18 +92,22 @@ ZONES = [
     "thornmire",
     "ashfall_vale",
     "old_quarry",
+    "stormcliff_coast",
+    "windward_steppe",
 ]
 
 # ⭐ The palette a zone's creatures are locked to by `pixelate.py`. Hybrid
 # zones use their LEAD element, so the generated art and the silhouette
 # fallback agree about what you are fighting (IMPLEMENTATION_PLAN, Art row).
 ZONE_ELEMENT = {
+    "old_quarry": "geo",
+    "windward_steppe": "aero",
     "whispering_woods": "flora",
     "glimmerbrook": "aqua",
     "cinderpeak_foothills": "pyro",
     "thornmire": "flora",
     "ashfall_vale": "pyro",
-    "old_quarry": "geo",
+    "stormcliff_coast": "electro",
 }
 
 KINDS = ("creature", "icon", "backdrop")
