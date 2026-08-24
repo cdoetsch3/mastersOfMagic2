@@ -31,9 +31,16 @@ posture**, because those are what a generator gets wrong when left to guess.
 ⭐ **A house style, so the set looks like one bestiary:** a naturalist's field
 plate — creature isolated on a plain flat pure-white background (nothing else
 behind it: no ground texture, no gradient, no vignette — white keys out
-cleanly in the cutout step), full body, side-on or
-three-quarter, even light, no scenery, no action pose, no text. That framing
+cleanly in the cutout step), full body, in profile or three-quarter view and
+**always facing the RIGHT edge of the image**: the head points right, the eyes
+look right, the feet would carry it rightward off the picture. Never facing
+the viewer head-on, never facing left, never looking back over its shoulder.
+Even light, no scenery, no action pose, no text. That framing
 also matches the game's own voice: these are observations, not portraits.
+⚠️ **Right-facing is a hard technical requirement, not taste**: the game
+mirrors every enemy sprite at render time so it faces the hero across the
+arena — a source drawn facing left gets flipped into facing AWAY from the
+fight. One canonical direction in, one correct fight out.
 
 ⚠️ **No in-game bitmaps.** Every visual in the game is a `CustomPainter`
 (README §4). Generated images are **concept reference** for painter recipes —
@@ -158,7 +165,8 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > living plants — the proportions right, the posture right, the stillness
 > wrong. Face smooth and featureless, grass and small white flowers where hair
 > would be. ⭐ **Unsettling because it is nearly correct**, not because it is
-> monstrous. Arms at its sides. Standing, facing the viewer.
+> monstrous. Arms at its sides. Standing in profile, body and smooth face
+> turned toward the right edge of the image.
 
 ### Arena backdrop
 

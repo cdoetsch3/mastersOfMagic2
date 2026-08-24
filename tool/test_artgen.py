@@ -734,11 +734,17 @@ class GenerateOneTest(unittest.TestCase):
 
     def test_a_rejected_asset_whose_raw_is_gone_keeps_the_feedback(self):
         # ⚠️ art/source/ is gitignored, so a fresh clone has no raw to edit.
+        # ⚠️ Relocated to a guaranteed-absent path: the REAL source path may
+        # exist on a machine where the maintainer has generated this zone,
+        # and this test must not read the developer's disk (it failed the
+        # first time real Glimmerbrook raws appeared).
         asset = self.src.by_id("chill_eel")
         self.ledger.record_generated(asset, model="m", now="T0")
         self.ledger.reject("chill_eel", feedback="too warm", now="T1")
         gen = Recorder()
-        artgen.generate_one(asset, gen, self.ledger)
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = pathlib.Path(tmp) / "never_written.png"
+            artgen.generate_one(_relocated(asset, missing), gen, self.ledger)
         self.assertEqual(gen.mode, "generate")
         self.assertIn("too warm", gen.prompt)
         self.assertNotIn("Revise the attached image", gen.prompt)
