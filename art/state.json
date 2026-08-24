@@ -92,6 +92,32 @@
       "processed": true,
       "updated": "2026-08-19T18:22:12+00:00"
     },
+    "brook_naiad": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/brook_naiad.png",
+      "source": "art/source/glimmerbrook/brook_naiad.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:89b995f8edd221be",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
+    },
+    "chill_eel": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/chill_eel.png",
+      "source": "art/source/glimmerbrook/chill_eel.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:cb1ddd06e6c8181b",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
+    },
     "elderroot": {
       "kind": "creature",
       "zone": "whispering_woods",
@@ -156,6 +182,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-08-19T18:22:12+00:00"
+    },
+    "frostgleam_naiad": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/frostgleam_naiad.png",
+      "source": "art/source/glimmerbrook/frostgleam_naiad.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:075c1ad7e6d4d292",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
+    },
+    "glassfleck_wisp": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/glassfleck_wisp.png",
+      "source": "art/source/glimmerbrook/glassfleck_wisp.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:0640fb4e7768494b",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
     },
     "heartwood": {
       "kind": "creature",
@@ -287,6 +339,19 @@
       "processed": true,
       "updated": "2026-08-19T18:22:12+00:00"
     },
+    "pale_coil": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/pale_coil.png",
+      "source": "art/source/glimmerbrook/pale_coil.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9f414546b13fd93e",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
+    },
     "proof_of_the_woods": {
       "kind": "icon",
       "zone": "whispering_woods",
@@ -313,6 +378,32 @@
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
     },
+    "shiverfish_shoal": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/shiverfish_shoal.png",
+      "source": "art/source/glimmerbrook/shiverfish_shoal.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:fee6fb2c8f1d7f90",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
+    },
+    "siltback_crawler": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/siltback_crawler.png",
+      "source": "art/source/glimmerbrook/siltback_crawler.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:5e4e6df424cd3811",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
+    },
     "sporecap_mantle": {
       "kind": "icon",
       "zone": "whispering_woods",
@@ -338,6 +429,45 @@
       "processed": true,
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
+    },
+    "stillwater": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/stillwater.png",
+      "source": "art/source/glimmerbrook/stillwater.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:107d57bd04aa73b2",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
+    },
+    "the_cold_below": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/the_cold_below.png",
+      "source": "art/source/glimmerbrook/the_cold_below.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:e536840194fa31f4",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
+    },
+    "the_held_breath": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/the_held_breath.png",
+      "source": "art/source/glimmerbrook/the_held_breath.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:49a8e6c73d9f3f3c",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
     },
     "the_murmur": {
       "kind": "creature",
@@ -377,6 +507,19 @@
       "processed": true,
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
+    },
+    "weirkeeper": {
+      "kind": "creature",
+      "zone": "glimmerbrook",
+      "target": "assets/creatures/glimmerbrook/weirkeeper.png",
+      "source": "art/source/glimmerbrook/weirkeeper.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4b419440f4040711",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-08-19T18:43:59+00:00"
     }
   }
 }
