@@ -160,11 +160,15 @@ void main() {
       expect(s.deflectAmount, 30);
     });
 
-    test('Executioner — acc +8, crit 12/+40', () {
+    test('Executioner — acc +8, crit TRIMMED to 8/+25 (ruling 2026-08-20)', () {
+      // ⚠️ Deviates from §2.3's 12/+40 on purpose: the balance probe read
+      // Old Quarry's minis at 47% crafted vs ~75% everywhere else, and the
+      // entry band meets crit at Bruiser strength. Kills the mutant that
+      // quietly restores the full Executioner block here.
       final s = OldQuarryBestiary.deadweight.combatStats;
       expect(s.accuracyBonus, 8);
-      expect(s.critChance, 12);
-      expect(s.critDamage, 40);
+      expect(s.critChance, 8);
+      expect(s.critDamage, 25);
     });
 
     test('Hexer — acc +8, dodge 10', () {
@@ -173,10 +177,13 @@ void main() {
       expect(s.dodge, 10);
     });
 
-    test('Juggernaut — deflect 25/35', () {
+    test('Juggernaut — deflect HALVED to 12/18 (ruling 2026-08-20)', () {
+      // ⚠️ Deviates from §2.3's 25/35 on purpose: 1 crafted win in 500 at
+      // the probe. The zone that teaches deflection must not be locked by
+      // it; The Slow Stone keeps the full block at the quarter ceiling.
       final s = OldQuarryBestiary.mountainHeart.combatStats;
-      expect(s.deflectChance, 25);
-      expect(s.deflectAmount, 35);
+      expect(s.deflectChance, 12);
+      expect(s.deflectAmount, 18);
     });
 
     test('Tyrant — acc +5, dodge 5, crit 10/+15, deflect 10/15', () {

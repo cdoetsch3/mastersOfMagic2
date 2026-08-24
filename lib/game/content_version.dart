@@ -21,7 +21,10 @@ import 'firestore_rest.dart';
 /// (ITEMS §10.1).
 abstract final class ContentVersion {
   /// The content version this build resolves against. Starts at 1.
-  static const int current = 1;
+  /// 📝 v2 (2026-08-20): the Kinetic quarter — and, decisively for PvP, the
+  /// belt wire carries consumable DEF IDS ('U|saltwort_draught'), which a v1
+  /// client cannot resolve. The gate exists for exactly this deploy.
+  static const int current = 2;
 
   /// The server's copy. ⭐ Public-read, no auth (see `firestore.rules`), so
   /// the check can run at boot rather than waiting on sign-in — a desynced

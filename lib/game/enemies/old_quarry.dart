@@ -347,8 +347,11 @@ abstract final class OldQuarryBestiary {
         'a person would.',
     combatStats: EnemyCombatStats(
       accuracyBonus: 8,
-      critChance: 12,
-      critDamage: 40,
+      // ⚠️ TRIMMED from the §2.3 Executioner row (12/+40) by the same
+      // 2026-08-20 ruling as Mountain Heart — the entry band meets crit
+      // at Bruiser strength (8/+25); later Executioners keep 12/+40.
+      critChance: 8,
+      critDamage: 25,
     ),
     moves: [
       Spell(
@@ -428,7 +431,11 @@ abstract final class OldQuarryBestiary {
         'The mass the quarry gave up, wearing its own crater like a chest '
         'cavity. Whatever was carried out of this mountain, it remembers '
         'carrying it.',
-    combatStats: EnemyCombatStats(deflectChance: 25, deflectAmount: 35),
+    // ⚠️ HALVED from the §2.3 Juggernaut row (25/35) by ruling 2026-08-20:
+    // the balance probe measured 1 crafted win in 500 — an entry-band boss
+    // teaching deflection must not also wield it at full strength. The Slow
+    // Stone (Molten Deep, quarter ceiling) keeps the full block.
+    combatStats: EnemyCombatStats(deflectChance: 12, deflectAmount: 18),
     moves: [
       Spell(
         id: 'oq_grindon',

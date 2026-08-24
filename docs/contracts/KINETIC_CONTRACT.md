@@ -1548,6 +1548,15 @@ hybrids.
 
 ---
 
+## 8b. Post-probe amendment (Christian, 2026-08-20)
+
+The balance probe (tool/balance_probe_test.dart) measured Old Quarry as the
+quarter's outlier: minis 47% crafted (band norm ~70–81%), Mountain Heart 0.2%.
+Ruled: **Mountain Heart's deflect halves to 12/18** and **Deadweight's crit
+trims to 8/+25** (Bruiser strength). Zone-local deviations from §2.3 —
+the archetype rows stand everywhere else; The Slow Stone keeps the full
+Juggernaut block at the quarter ceiling. Re-measured: see the commit.
+
 ## 9. Fast-follow (Q2.1)
 
 - **Antidote + offensive potion** — needs `ItemEffect` vocabulary the engine
