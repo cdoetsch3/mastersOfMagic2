@@ -451,7 +451,14 @@ class _PotionBrain implements DuelAi {
 /// down mid-animation and fails on a pending timer rather than on its subject.
 Future<void> _settle(WidgetTester tester) async {
   await tester.pump();
-  for (var i = 0; i < 8; i++) {
+  // ⚠️ 18s, not 8: the arena paces its battle log with ~1.5s reading timers
+  // (_awaitMessageRead), and one tapped potion can queue drink + enemy action
+  // + hit/crit/status lines — a chain whose worst case OVERRAN the old 8s
+  // drain, leaving a pending timer at teardown ('A Timer is still pending…',
+  // the intermittent failure this suite carried for a day). 18s covers twice
+  // the longest realistic chain; the arena never settles fully (it bobs), so
+  // bounded pumps it stays.
+  for (var i = 0; i < 18; i++) {
     await tester.pump(const Duration(seconds: 1));
   }
 }
