@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../game/economy/shop_catalogue.dart';
 import '../../game/game_state.dart';
 import '../../game/items/carrying.dart';
 import '../../game/items/equipping.dart';
@@ -13,6 +14,7 @@ import '../../ui/item_display.dart';
 import '../../ui/item_icon.dart';
 import '../craft_screen.dart';
 import '../home_shell.dart';
+import '../shop_screen.dart';
 
 /// The backpack, and — when the player is standing in a town — that town's
 /// Storeroom beside it.
@@ -92,7 +94,28 @@ class InventoryTab extends StatelessWidget {
                 ),
               const SizedBox(height: 16),
               if (inTown) ...[
-                SectionLabel('${here.name} Storeroom — ${room.itemCount}'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SectionLabel(
+                        '${here.name} Storeroom — ${room.itemCount}',
+                      ),
+                    ),
+                    // ⭐ The same door as the Storeroom, per the designer's
+                    // ruling — OPEN towns only (§14b.2); a closed town shows
+                    // no button at all, just the season line below.
+                    if (ShopCatalogue.isOpen(here.id))
+                      TextButton.icon(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => ShopScreen(townId: here.id),
+                          ),
+                        ),
+                        icon: const Icon(Icons.storefront, size: 16),
+                        label: const Text('Shop'),
+                      ),
+                  ],
+                ),
                 _StoreroomList(game: game, town: here.id, room: room),
                 const SizedBox(height: 8),
                 const Text(
@@ -100,6 +123,20 @@ class InventoryTab extends StatelessWidget {
                   'Storerooms are per city. What you leave here stays here.',
                   style: TextStyle(color: AppColors.textFaint, fontSize: 11.5),
                 ),
+                // ⭐ "closed towns surface the season line if anything" —
+                // the shop door simply is not offered above, and this is
+                // the one line explaining why.
+                if (!ShopCatalogue.isOpen(here.id))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      'Shop: ${ShopCatalogue.closedFlavor}',
+                      style: const TextStyle(
+                        color: AppColors.textFaint,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ),
               ] else
                 const GamePanel(
                   child: Text(

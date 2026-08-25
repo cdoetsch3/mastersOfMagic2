@@ -6,6 +6,10 @@ import 'package:mom_engine/mom_engine.dart';
 import 'active_trip.dart';
 import 'adventure.dart';
 import 'crafting/craft_quality.dart';
+import 'economy/economy_config.dart';
+import 'economy/shop_catalogue.dart';
+import 'economy/shop_pricing.dart';
+import 'economy/shop_state.dart';
 import 'enemies/bestiary.dart';
 import 'enemies/loot.dart';
 import 'items/carrying.dart';
@@ -925,6 +929,357 @@ class GameState extends ChangeNotifier {
     return ok;
   }
 
+  // ---- Shop (ECONOMY_CONTRACT.md) -----------------------------------------
+  //
+  // ⚠️ **Clock-free below this line, by design.** The screen computes `today`
+  // once, via `ShopState.epochDayOf(DateTime.now())`, at the moment it opens
+  // — every method here takes that `int` rather than reaching for the clock
+  // itself, so a fixed-date test can drive an entire shop session without
+  // faking `DateTime.now()` anywhere.
+  //
+  // ⚠️ **In-town trades move goods directly shop⇄Storeroom, never the
+  // backpack** (§14b's build-wave addition) — the backpack is what carries
+  // goods *between* towns; it plays no part in a purchase or a sale made
+  // while standing in the shop that offers it.
+  //
+  // ⭐ **Basket settle, not per-line trades** (designer's ruling): a shop
+  // session accumulates buy/sell quantities in memory only — [priceShopBasket]
+  // and [shopBasketBlockReason] are pure reads a screen can call on every
+  // build, and [settleShopBasket] is the ONE mutation that commits the whole
+  // basket atomically. Nothing here debits gold, moves stock, or touches the
+  // Storeroom/backpack a line at a time.
+
+  /// §5.1's category-default equilibrium (`E`) — `zone-native materials 60 ·
+  /// imported materials 20 · consumables 30` — read off
+  /// [ShopCatalogue.categoryFor]. ⚠️ **This is the "config sibling" role**
+  /// `config/economy`'s `equilibriumOverrides` (§7) will one day fill;
+  /// `config/economy` does not exist as shipped code yet, so this is the
+  /// compiled default the contract names, not a stand-in for a real seam.
+  int shopEquilibriumFor(String townId, String itemId) =>
+      EconomyConfig.current.equilibriumOverrides[itemId] ??
+      switch (ShopCatalogue.categoryFor(townId, itemId)) {
+        ShopItemCategory.nativeMaterial => EconomyConfig.equilibriumNative,
+        ShopItemCategory.importedMaterial => EconomyConfig.equilibriumImported,
+        ShopItemCategory.consumable => EconomyConfig.equilibriumConsumable,
+      };
+
+  /// [ShopCatalogue.locationModFor], with `config/economy`'s per-cell
+  /// override (§7: key `townId.itemId`, value in PERCENT — -25 → ×0.75)
+  /// consulted first. ⭐ The one seam every price reads its location factor
+  /// through, so a live-tuned cell reaches every quote at once.
+  double shopLocationModFor(String townId, String itemId) {
+    final pct = EconomyConfig.current.locationModOverrides['$townId.$itemId'];
+    if (pct != null) return 1 + pct / 100;
+    return ShopCatalogue.locationModFor(townId, itemId);
+  }
+
+  /// [townId]'s live `eventMod` map for [today] (§6.2) — deterministic, so
+  /// this is cheap to recompute per quote rather than cache.
+  Map<String, double> shopEventsFor(String townId, int today) =>
+      ShopState.eventsFor(
+        shopId: townId,
+        today: today,
+        candidateItemIds: ShopCatalogue.stockFor(townId),
+        itemsPerDay: EconomyConfig.current.eventItemsPerShopPerDay.round(),
+        magnitudePercent: EconomyConfig.current.eventMagnitudePercent,
+      );
+
+  /// Resolves [townId]'s nightly catch-up against [today] and persists it.
+  /// ⭐ **Call once, when the Shop screen opens, before quoting any price** —
+  /// every price below reads `profile.shopStock[townId]`, and an unresolved
+  /// town reads as stale (or, on a first visit, entirely absent). A no-op on
+  /// a closed town (§14b.2 — nothing to resolve).
+  Future<void> resolveShop(String townId, int today) async {
+    if (!ShopCatalogue.isOpen(townId)) return;
+    final resolved = ShopState.resolve(
+      state: profile.shopStock[townId],
+      today: today,
+      itemIds: ShopCatalogue.stockFor(townId),
+      equilibriumOf: (id) => shopEquilibriumFor(townId, id),
+      resupplyRate: EconomyConfig.current.resupplyRate,
+    );
+    await _mutate(() => profile.shopStock[townId] = resolved);
+  }
+
+  /// ⭐ **The one basket-pricing walk** (build brief's "BASKET PRICING"):
+  /// every line is recomputed marginally from [townId]'s *persisted* stock —
+  /// [buy]/[sellStacks]/[sellInstances] are proposals, never read from or
+  /// written to `profile` — walking the basket in a fixed order: items
+  /// sorted by id, and within one item, its buy line prices before its sell
+  /// line. ⚠️ **That per-item order is load-bearing** whenever the same item
+  /// is both bought and sold in one basket (buying more oak while also
+  /// selling old oak): the sell walk starts from the stock the buy walk left
+  /// behind, so "buy 5 then sell 5 of the same item" reads as what it is — a
+  /// round trip through both spreads — rather than two trades priced as if
+  /// neither happened.
+  ///
+  /// ⭐ **The single source of truth for both the rows' numbers and the
+  /// settle bar's net** — a screen never prices a line itself, so what a row
+  /// displays and what [settleShopBasket] charges cannot drift apart (the
+  /// mutant this whole seam exists to kill).
+  ShopBasketQuote priceShopBasket({
+    required String townId,
+    required int today,
+    required Map<String, int> buy,
+    required Map<String, int> sellStacks,
+    required Set<String> sellInstances,
+  }) {
+    final state = profile.shopStock[townId];
+    final stocked = ShopCatalogue.stockFor(townId).toSet();
+    final events = shopEventsFor(townId, today);
+    final ids = {...buy.keys, ...sellStacks.keys}.toList()..sort();
+    final buyGoldOf = <String, int>{};
+    final sellGoldOf = <String, int>{};
+    for (final id in ids) {
+      final def = ItemCatalogue.tryById(id);
+      if (def == null || !stocked.contains(id)) continue;
+      final equilibrium = shopEquilibriumFor(townId, id);
+      var stock = state?.stockOf(id) ?? equilibrium;
+      final locationMod = shopLocationModFor(townId, id);
+      final eventMod = events[id] ?? 1.0;
+      final buyQty = buy[id] ?? 0;
+      if (buyQty > 0) {
+        final q = ShopPricing.buyQuote(
+          n: buyQty,
+          base: def.value,
+          equilibrium: equilibrium,
+          stock: stock,
+          locationMod: locationMod,
+          eventMod: eventMod,
+        );
+        buyGoldOf[id] = q.totalGold;
+        stock = q.newStock;
+      }
+      final sellQty = sellStacks[id] ?? 0;
+      if (sellQty > 0) {
+        sellGoldOf[id] = ShopPricing.sellQuote(
+          n: sellQty,
+          base: def.value,
+          equilibrium: equilibrium,
+          stock: stock,
+          locationMod: locationMod,
+          eventMod: eventMod,
+        ).totalGold;
+      }
+    }
+    // ⚠️ A sell of something this shop does NOT stock never entered the loop
+    // above (it is filtered out by `!stocked.contains(id)`) — priced here
+    // instead, flat, with no stock walk at all (§2.4, ruling 3's pure sink).
+    for (final entry in sellStacks.entries) {
+      if (entry.value <= 0 || stocked.contains(entry.key)) continue;
+      final def = ItemCatalogue.tryById(entry.key);
+      if (def == null) continue;
+      sellGoldOf[entry.key] = ShopPricing.vendorPrice(def.value) * entry.value;
+    }
+    final instanceGoldOf = <String, int>{};
+    for (final instId in sellInstances) {
+      final defId = profile.itemInstances[instId]?.defId;
+      final def = defId == null ? null : ItemCatalogue.tryById(defId);
+      if (def != null) instanceGoldOf[instId] = ShopPricing.vendorPrice(def.value);
+    }
+    return ShopBasketQuote(
+      buyGoldOf: buyGoldOf,
+      sellGoldOf: sellGoldOf,
+      instanceGoldOf: instanceGoldOf,
+    );
+  }
+
+  /// Why [settleShopBasket] would refuse this basket right now, or `null` if
+  /// it would succeed — a pure read so the settle bar can grey its own
+  /// button without staging a trade. ⚠️ **Checked again, identically, inside
+  /// [settleShopBasket] itself** — a screen that trusted only its own cached
+  /// read could race a stock change between a render and the tap that
+  /// follows it.
+  String? shopBasketBlockReason({
+    required String townId,
+    required int today,
+    required Map<String, int> buy,
+    required Map<String, int> sellStacks,
+    required Set<String> sellInstances,
+  }) {
+    if (buy.isEmpty && sellStacks.isEmpty && sellInstances.isEmpty) {
+      return null;
+    }
+    final state = profile.shopStock[townId];
+    final stocked = ShopCatalogue.stockFor(townId).toSet();
+    for (final entry in buy.entries) {
+      if (entry.value <= 0) continue;
+      if (!stocked.contains(entry.key)) return 'Not stocked here.';
+      final equilibrium = shopEquilibriumFor(townId, entry.key);
+      final stock = state?.stockOf(entry.key) ?? equilibrium;
+      if (entry.value > stock) return 'Not enough in stock.';
+    }
+    final room = profile.storerooms[townId] ?? const Storeroom();
+    final pack = profile.backpack;
+    for (final entry in sellStacks.entries) {
+      if (entry.value <= 0) continue;
+      final def = ItemCatalogue.tryById(entry.key);
+      if (def == null) return 'Unknown item.';
+      if (def.tradability == Tradability.bound) {
+        return 'Bound — cannot be sold.';
+      }
+      final available = (room.stacks[entry.key] ?? 0) + pack.countOf(entry.key);
+      if (entry.value > available) return 'You do not have that many.';
+    }
+    for (final instId in sellInstances) {
+      final defId = profile.itemInstances[instId]?.defId;
+      final def = defId == null ? null : ItemCatalogue.tryById(defId);
+      if (def == null) return 'Unknown item.';
+      if (def.tradability == Tradability.bound) {
+        return 'Bound — cannot be sold.';
+      }
+    }
+    final quote = priceShopBasket(
+      townId: townId,
+      today: today,
+      buy: buy,
+      sellStacks: sellStacks,
+      sellInstances: sellInstances,
+    );
+    if (profile.gold + quote.net < 0) return 'Not enough gold.';
+    return null;
+  }
+
+  /// ⭐ **The one atomic settle.** Commits every buy and sell line in the
+  /// basket in a single [_mutate] — one gold delta, one set of stock writes,
+  /// one Storeroom/backpack shuffle, one save — never a line at a time.
+  /// Refuses (via [shopBasketBlockReason], re-checked here so nothing can
+  /// slip between a stale render and this call) rather than partially
+  /// filling: a basket that could not fully settle changes nothing.
+  ///
+  /// ⭐ **Charges exactly [priceShopBasket]'s [ShopBasketQuote.net]** — this
+  /// method never re-derives gold by any other arithmetic, so the number the
+  /// settle bar showed is the number that lands on `profile.gold`.
+  Future<ShopSettleOutcome> settleShopBasket({
+    required String townId,
+    required int today,
+    required Map<String, int> buy,
+    required Map<String, int> sellStacks,
+    required Set<String> sellInstances,
+  }) async {
+    if (!ShopCatalogue.isOpen(townId)) {
+      return const ShopSettleOutcome.refused(
+        "This town's shop is closed this season.",
+      );
+    }
+    if (buy.isEmpty && sellStacks.isEmpty && sellInstances.isEmpty) {
+      return const ShopSettleOutcome.refused('Nothing to settle.');
+    }
+    final reason = shopBasketBlockReason(
+      townId: townId,
+      today: today,
+      buy: buy,
+      sellStacks: sellStacks,
+      sellInstances: sellInstances,
+    );
+    if (reason != null) return ShopSettleOutcome.refused(reason);
+
+    final quote = priceShopBasket(
+      townId: townId,
+      today: today,
+      buy: buy,
+      sellStacks: sellStacks,
+      sellInstances: sellInstances,
+    );
+    final stocked = ShopCatalogue.stockFor(townId).toSet();
+    final events = shopEventsFor(townId, today);
+
+    await _mutate(() {
+      final state = profile.shopStock[townId];
+      final nextStock = {...?state?.stock};
+      var room = profile.storerooms[townId] ?? const Storeroom();
+      var pack = profile.backpack;
+
+      // ⭐ Same fixed order as [priceShopBasket]'s walk (id-sorted,
+      // buy-then-sell per item) — replaying stock in any other order here
+      // would leave the shelf at a count the quote above never actually
+      // priced.
+      final ids = {...buy.keys, ...sellStacks.keys}.toList()..sort();
+      for (final id in ids) {
+        final def = ItemCatalogue.tryById(id);
+        if (def == null) continue;
+        final isStocked = stocked.contains(id);
+        final equilibrium = shopEquilibriumFor(townId, id);
+        var stock = state?.stockOf(id) ?? equilibrium;
+        final locationMod = shopLocationModFor(townId, id);
+        final eventMod = events[id] ?? 1.0;
+        var stockChanged = false;
+
+        final buyQty = buy[id] ?? 0;
+        if (buyQty > 0 && isStocked) {
+          final q = ShopPricing.buyQuote(
+            n: buyQty,
+            base: def.value,
+            equilibrium: equilibrium,
+            stock: stock,
+            locationMod: locationMod,
+            eventMod: eventMod,
+          );
+          stock = q.newStock;
+          stockChanged = true;
+          for (var i = 0; i < buyQty; i++) {
+            room = room.withDeposited(InventorySlot(defId: id));
+          }
+        }
+
+        final sellQty = sellStacks[id] ?? 0;
+        if (sellQty > 0) {
+          if (isStocked) {
+            final q = ShopPricing.sellQuote(
+              n: sellQty,
+              base: def.value,
+              equilibrium: equilibrium,
+              stock: stock,
+              locationMod: locationMod,
+              eventMod: eventMod,
+            );
+            stock = q.newStock;
+            stockChanged = true;
+          }
+          final roomHave = room.stacks[id] ?? 0;
+          final fromRoom = sellQty < roomHave ? sellQty : roomHave;
+          for (var i = 0; i < fromRoom; i++) {
+            room = room.withWithdrawn(InventorySlot(defId: id)).room;
+          }
+          for (var i = 0; i < sellQty - fromRoom; i++) {
+            pack = pack.withRemovedFirst(id);
+          }
+        }
+
+        if (stockChanged) nextStock[id] = stock;
+      }
+
+      for (final instId in sellInstances) {
+        final defId = profile.itemInstances[instId]?.defId;
+        if (defId == null) continue;
+        if (room.instanceIds.contains(instId)) {
+          room = room
+              .withWithdrawn(InventorySlot(defId: defId, instanceId: instId))
+              .room;
+        } else {
+          final packIndex = pack.slots.indexWhere(
+            (s) => s?.instanceId == instId,
+          );
+          if (packIndex >= 0) pack = pack.withRemovedAt(packIndex);
+        }
+        profile.itemInstances.remove(instId);
+      }
+
+      profile.gold += quote.net;
+      profile.storerooms[townId] = room;
+      profile.backpack = pack;
+      profile.shopStock[townId] = TownShopState(
+        stock: nextStock,
+        lastResetDay: state?.lastResetDay ?? today,
+      );
+    });
+    return ShopSettleOutcome.ok(
+      net: quote.net,
+      buyGold: quote.buyGold,
+      sellGold: quote.sellGold,
+    );
+  }
+
   // ---- Belt --------------------------------------------------------------
 
   /// How many things this character can carry into a duel, right now.
@@ -1135,6 +1490,73 @@ class GameStateScope extends InheritedNotifier<GameState> {
             as GameStateScope?;
     return scope!.notifier!;
   }
+}
+
+/// A snapshot of what a pending shop basket would cost/earn, computed
+/// **purely** from persisted stock — nothing in [GameState.priceShopBasket]
+/// reads or writes `profile`. ⭐ **The single source of truth for both the
+/// Buy/Sell rows' numbers and the settle bar's net.**
+class ShopBasketQuote {
+  /// Gold cost per pending buy line, keyed by item id. Absent = no pending
+  /// buy for that item.
+  final Map<String, int> buyGoldOf;
+
+  /// Gold earned per pending sell line (fungible stacks — the marginal walk
+  /// when the shop stocks the item, the flat vendor sink when it does not),
+  /// keyed by item id.
+  final Map<String, int> sellGoldOf;
+
+  /// Gold earned per sold gear instance, keyed by instance id — always
+  /// [ShopPricing.vendorPrice] (§2.4 ruling 3: gear is never shop stock).
+  final Map<String, int> instanceGoldOf;
+
+  const ShopBasketQuote({
+    required this.buyGoldOf,
+    required this.sellGoldOf,
+    required this.instanceGoldOf,
+  });
+
+  int get buyGold => buyGoldOf.values.fold(0, (a, b) => a + b);
+
+  int get sellGold =>
+      sellGoldOf.values.fold(0, (a, b) => a + b) +
+      instanceGoldOf.values.fold(0, (a, b) => a + b);
+
+  /// What Settle would charge to `profile.gold` — positive banks gold,
+  /// negative spends it.
+  int get net => sellGold - buyGold;
+
+  static const empty = ShopBasketQuote(
+    buyGoldOf: {},
+    sellGoldOf: {},
+    instanceGoldOf: {},
+  );
+}
+
+/// What settling a shop basket produced.
+class ShopSettleOutcome {
+  /// Player-facing reason nothing happened, or null on success.
+  final String? refusal;
+
+  /// The gold delta actually applied to `profile.gold` — matches
+  /// [ShopBasketQuote.net] exactly (⭐ the invariant [GameState
+  /// .settleShopBasket] exists to keep).
+  final int net;
+  final int buyGold;
+  final int sellGold;
+
+  const ShopSettleOutcome.refused(this.refusal)
+    : net = 0,
+      buyGold = 0,
+      sellGold = 0;
+
+  const ShopSettleOutcome.ok({
+    required this.net,
+    required this.buyGold,
+    required this.sellGold,
+  }) : refusal = null;
+
+  bool get succeeded => refusal == null;
 }
 
 /// What a craft attempt produced.

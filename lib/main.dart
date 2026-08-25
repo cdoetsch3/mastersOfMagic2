@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'game/auth_service.dart';
 import 'game/content_version.dart';
+import 'game/economy/economy_config.dart';
 import 'game/game_state.dart';
 import 'game/profile_storage.dart';
 import 'screens/content_gate_screen.dart';
@@ -58,6 +59,12 @@ class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
   @override
   void initState() {
     super.initState();
+    // ⭐ Kicked off beside the content-version gate, but — unlike it — never
+    // awaited by anything: `EconomyConfig.current` stays at the compiled
+    // defaults until this resolves, and shop code just reads whatever's
+    // there. See `EconomyConfig`'s doc comment for why this one must never
+    // hold the boot spinner the way `_gate` does.
+    EconomyConfig.fetchAndCache();
     // Once the profile is loaded, keep its storage backend in sync with the
     // signed-in user (local while a guest, Firestore once authenticated).
     _future.then((gs) {
