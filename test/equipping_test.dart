@@ -8,6 +8,8 @@ import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
+import 'package:masters_of_magic_2/screens/tabs/inventory_tab.dart';
+import 'package:masters_of_magic_2/ui/app_theme.dart';
 import 'package:masters_of_magic_2/game/items/catalogue/ashfall_vale_items.dart';
 import 'package:masters_of_magic_2/game/items/catalogue/cinderpeak_items.dart';
 import 'package:masters_of_magic_2/game/items/catalogue/whispering_woods_items.dart';
@@ -485,6 +487,52 @@ void main() {
       expect(game.equipmentTotals.damagePerCast, 3,
           reason: '2 × 1.40 = 2.8 → 3; an unscaled duel is quality that '
               'changes the tooltip and nothing else');
+    });
+  });
+
+  group('statTotals — Format 1 structure (ruling 2026-08-25)', () {
+    test('a based stat carries label, big total, base and signed bonus', () {
+      final lines = Equipping.statTotals(
+        const ItemModifiers(accuracyBonus: 8),
+        level: 1,
+      );
+      expect(lines.single.label, 'Accuracy');
+      expect(lines.single.total, '88%');
+      expect(lines.single.base, Equipping.baseHitPercent,
+          reason: 'the muted 80 inside the parenthesis');
+      expect(lines.single.bonus, 8);
+    });
+
+    test('⭐ a NEGATIVE bonus flows through intact — stat-trading gear is '
+        'planned', () {
+      final lines = Equipping.statTotals(
+        const ItemModifiers(accuracyBonus: -4),
+        level: 1,
+      );
+      expect(lines.single.total, '76%',
+          reason: 'the total honestly shrinks — 80 base minus 4');
+      expect(lines.single.bonus, -4,
+          reason: '⚠️ the mutant this kills: an abs() anywhere in the seam, '
+              'which would print a stat LOSS as a gain');
+    });
+
+    test('base-less stats print the bonus AS the total, no parenthesis data',
+        () {
+      final lines = Equipping.statTotals(
+        const ItemModifiers(damagePerCharge: 3),
+        level: 1,
+      );
+      expect(lines.single.total, '+3');
+      expect(lines.single.base, isNull,
+          reason: 'no baseline exists, so a parenthesis would be the bonus '
+              'wearing a disguise');
+    });
+
+    test('bonusColour: green gives, red takes', () {
+      expect(bonusColour(5), AppColors.green);
+      expect(bonusColour(-5), AppColors.ember,
+          reason: 'the one function that decides how every future negative '
+              'reads — pinned before any item uses it');
     });
   });
 }

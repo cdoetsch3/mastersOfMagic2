@@ -75,21 +75,25 @@ void main() {
     expect(find.text('BELT'), findsOneWidget);
   });
 
-  testWidgets('⚠️ with no belt worn there are no slots, and it says so', (
+  testWidgets('⚠️ with no belt worn there is no bay at all', (
     tester,
   ) async {
-    // The 2026-08-17 ruling: Carrying.baseBeltSlots is 0, so a fresh character
-    // gets a hint where the empty boxes used to be.
+    // Option A (2026-08-25): the belt wearable is a grid chip; the bay of
+    // loaded slots only exists once a belt grants some. A beltless fresh
+    // character gets ONE quiet 'BELT — Empty' chip, not a lecture.
     final game = GameState(_Mem(), PlayerProfile.newPlayer());
     await _pump(tester, game);
-    expect(find.textContaining('No belt'), findsOneWidget);
     expect(
       find.textContaining('Belt — '),
       findsNothing,
-      reason: '"Belt — 0/0" beside "No belt" says it twice',
+      reason: 'no belt, no bay — the chip in the grid is the whole story',
     );
-    // ⚠️ The rule that makes the belt a decision rather than a tax.
-    expect(find.textContaining('spends your turn'), findsOneWidget);
+    expect(
+      find.textContaining('spends your turn'),
+      findsNothing,
+      reason: 'the turn cost is taught on the duel rail where it is paid, '
+          'not lectured here (Option A ruling)',
+    );
   });
 
   testWidgets('wearing a belt is what grants the slots', (tester) async {
@@ -105,7 +109,6 @@ void main() {
       findsOneWidget,
       reason: 'the Tuskhide Belt grants two, and nothing else does',
     );
-    expect(find.textContaining('No belt'), findsNothing);
   });
 
   testWidgets('⚠️ the belt bay fits a phone', (tester) async {
@@ -137,7 +140,19 @@ void main() {
     );
     game.profile.equipped[EquipSlot.robeTop] = 'r';
     await _pump(tester, game);
-    expect(find.text('Max health 106 (+6)'), findsOneWidget);
+    // Format 1 (2026-08-25): label · big total · (base +bonus), three
+    // widgets now instead of one string.
+    expect(find.text('Max health'), findsOneWidget);
+    expect(
+      find.textContaining('106'),
+      findsOneWidget,
+      reason: 'the TOTAL leads — 100 base at level 1 plus the robe\'s 6',
+    );
+    expect(
+      find.textContaining('(100 '),
+      findsOneWidget,
+      reason: 'the base rides muted inside the parenthesis',
+    );
     expect(
       find.text('+6 max health'),
       findsNothing,

@@ -122,29 +122,129 @@ abstract final class Equipping {
   /// "from equipment", and a full stat sheet listing everything gear does *not*
   /// touch would bury the four lines that matter.
   static List<String> describeTotals(ItemModifiers m, {required int level}) => [
+    for (final l in statTotals(m, level: level))
+      l.base != null
+          ? '${l.label} ${l.total} (${l.bonus >= 0 ? '+' : ''}${l.bonus})'
+          : l.label == 'Deflect amount'
+          ? '${l.bonus}% deflected'
+          : _legacyBonusLine(l),
+  ];
+
+  /// The old `+N stat` grammar, kept so [describeTotals]'s strings do not
+  /// shift under the tests and dialogs that read them.
+  static String _legacyBonusLine(GearStatLine l) => switch (l.label) {
+    'Damage per cast' => '+${l.bonus} damage per cast',
+    'Damage per charge' => '+${l.bonus} damage per charge spent',
+    'Shield strength' => '+${l.bonus}% shield strength',
+    'Healing received' => '+${l.bonus}% healing received',
+    'Regrow' => 'Regrow ${l.bonus}% health each turn',
+    'Belt slots' => '+${l.bonus} belt slots',
+    _ => '${l.label} ${l.total}',
+  };
+
+  /// [describeTotals]'s data, structured (ruling 2026-08-25, Format 1): the
+  /// panel renders `label  TOTAL (base +bonus)` with the total large, the
+  /// base muted and the bonus coloured by SIGN — green for a gift, red for a
+  /// trade-away. ⚠️ [bonus] may be NEGATIVE by design: stat-lowering gear is
+  /// planned, and this seam is why it will need zero UI work.
+  ///
+  /// [base] is null for the pure-gear stats (nothing else grants them — a
+  /// "total" would be the bonus in disguise, so the panel prints the bonus
+  /// AS the total and no parenthesis). Base-zero stats (crit: §9b.8, crits
+  /// exist only through gear) keep a parenthesis but hide the pointless 0.
+  static List<GearStatLine> statTotals(ItemModifiers m, {required int level}) => [
     if (m.maxHpBonus != 0)
-      'Max health ${MageState.scaledMaxHp(level) + m.maxHpBonus} '
-          '(+${m.maxHpBonus})',
-    if (m.damagePerCast != 0) '+${m.damagePerCast} damage per cast',
-    if (m.damagePerCharge != 0) '+${m.damagePerCharge} damage per charge spent',
+      (
+        label: 'Max health',
+        total: '${MageState.scaledMaxHp(level) + m.maxHpBonus}',
+        base: MageState.scaledMaxHp(level),
+        bonus: m.maxHpBonus,
+      ),
     if (m.accuracyBonus != 0)
-      'Accuracy ${baseHitPercent + m.accuracyBonus}% (+${m.accuracyBonus})',
-    // ⭐ Base zero, and that is the point of the line: crits exist ONLY through
-    // gear (§9b.8), so the total IS the bonus — printed in total form anyway so
-    // the panel reads as one sheet rather than two grammars.
-    if (m.critChance != 0) 'Crit chance ${m.critChance}% (+${m.critChance})',
+      (
+        label: 'Accuracy',
+        total: '${baseHitPercent + m.accuracyBonus}%',
+        base: baseHitPercent,
+        bonus: m.accuracyBonus,
+      ),
+    if (m.critChance != 0)
+      (
+        label: 'Crit chance',
+        total: '${m.critChance}%',
+        base: 0,
+        bonus: m.critChance,
+      ),
     if (m.critDamage != 0)
-      'Crit damage ${baseCritDamagePercent + m.critDamage}% '
-          '(+${m.critDamage})',
-    if (m.dodge != 0) 'Dodge ${m.dodge}% (+${m.dodge})',
+      (
+        label: 'Crit damage',
+        total: '${baseCritDamagePercent + m.critDamage}%',
+        base: baseCritDamagePercent,
+        bonus: m.critDamage,
+      ),
+    if (m.dodge != 0)
+      (label: 'Dodge', total: '${m.dodge}%', base: 0, bonus: m.dodge),
     if (m.deflectChance != 0)
-      'Deflect chance ${m.deflectChance}% (+${m.deflectChance})',
-    if (m.deflectAmount != 0) '${m.deflectAmount}% deflected',
+      (
+        label: 'Deflect chance',
+        total: '${m.deflectChance}%',
+        base: 0,
+        bonus: m.deflectChance,
+      ),
+    if (m.deflectAmount != 0)
+      (
+        label: 'Deflect amount',
+        total: '${m.deflectAmount}%',
+        base: null,
+        bonus: m.deflectAmount,
+      ),
+    if (m.damagePerCast != 0)
+      (
+        label: 'Damage per cast',
+        total: '${m.damagePerCast >= 0 ? '+' : ''}${m.damagePerCast}',
+        base: null,
+        bonus: m.damagePerCast,
+      ),
+    if (m.damagePerCharge != 0)
+      (
+        label: 'Damage per charge',
+        total: '${m.damagePerCharge >= 0 ? '+' : ''}${m.damagePerCharge}',
+        base: null,
+        bonus: m.damagePerCharge,
+      ),
     if (m.shieldStrengthPercent != 0)
-      '+${m.shieldStrengthPercent}% shield strength',
+      (
+        label: 'Shield strength',
+        total:
+            '${m.shieldStrengthPercent >= 0 ? '+' : ''}'
+            '${m.shieldStrengthPercent}%',
+        base: null,
+        bonus: m.shieldStrengthPercent,
+      ),
     if (m.healingReceivedPercent != 0)
-      '+${m.healingReceivedPercent}% healing received',
-    if (m.regrowPercent != 0) 'Regrow ${m.regrowPercent}% health each turn',
-    if (m.beltSlots != 0) '+${m.beltSlots} belt slots',
+      (
+        label: 'Healing received',
+        total:
+            '${m.healingReceivedPercent >= 0 ? '+' : ''}'
+            '${m.healingReceivedPercent}%',
+        base: null,
+        bonus: m.healingReceivedPercent,
+      ),
+    if (m.regrowPercent != 0)
+      (
+        label: 'Regrow',
+        total: '${m.regrowPercent}%/turn',
+        base: null,
+        bonus: m.regrowPercent,
+      ),
+    if (m.beltSlots != 0)
+      (
+        label: 'Belt slots',
+        total: '${m.beltSlots >= 0 ? '+' : ''}${m.beltSlots}',
+        base: null,
+        bonus: m.beltSlots,
+      ),
   ];
 }
+
+/// One stat line for the "From equipment" panel — see [Equipping.statTotals].
+typedef GearStatLine = ({String label, String total, int? base, int bonus});

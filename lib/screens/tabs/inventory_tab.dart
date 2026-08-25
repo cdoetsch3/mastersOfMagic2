@@ -182,33 +182,91 @@ class _PaperDoll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final armour = EquipSlot.values.where((s) => s.carriesSet);
+    final rest = EquipSlot.values.where((s) => !s.carriesSet);
     return GamePanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ⭐ Option A (ruling 2026-08-25): slots grouped by category with
+          // labelled headers — and the old unexplained link icon replaced by
+          // something EARNED: a matching-set counter, live before set
+          // bonuses exist, as a collection cue (ITEMS §3.2's five set slots).
+          Text(
+            _armourHeader(game),
+            style: const TextStyle(
+              color: AppColors.textFaint,
+              fontSize: 10,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 5),
           Wrap(
             spacing: 6,
             runSpacing: 6,
             children: [
-              for (final slot in EquipSlot.values)
-                // ⭐ Every slot but the belt. The belt is drawn below, welded
-                // to the slots it grants — see [_BeltBay].
-                if (slot != EquipSlot.belt)
-                  _EquipSlotChip(
-                    label: _labels[slot] ?? slot.name,
-                    instanceId: game.profile.equipped[slot],
-                    game: game,
-                    // ⭐ The five armour slots are the set slots (ITEMS §3.2);
-                    // marking them is what makes "3+2" legible later.
-                    carriesSet: slot.carriesSet,
-                  ),
+              for (final slot in armour)
+                _EquipSlotChip(
+                  label: _labels[slot] ?? slot.name,
+                  slot: slot,
+                  instanceId: game.profile.equipped[slot],
+                  game: game,
+                ),
             ],
           ),
-          const Divider(color: AppColors.borderDim, height: 22),
-          _BeltBay(game: game, label: _labels[EquipSlot.belt]!),
+          const SizedBox(height: 10),
+          const Text(
+            'WEAPONS & ACCESSORIES',
+            style: TextStyle(
+              color: AppColors.textFaint,
+              fontSize: 10,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              // ⭐ The belt is one of these chips now — its LOADED slots keep
+              // their own bay below, but the wearable itself lives in the
+              // grid like every other slot (the old two-line lecture is gone).
+              for (final slot in rest)
+                _EquipSlotChip(
+                  label: _labels[slot] ?? slot.name,
+                  slot: slot,
+                  instanceId: game.profile.equipped[slot],
+                  game: game,
+                ),
+            ],
+          ),
+          if (game.beltCapacity > 0 || game.profile.belt.loaded.isNotEmpty) ...[
+            const Divider(color: AppColors.borderDim, height: 22),
+            _BeltBay(game: game),
+          ],
         ],
       ),
     );
+  }
+
+  /// 'ARMOR · BINDWEED 3/5' when worn set pieces share a material, 'ARMOR'
+  /// otherwise. Counts by [EquipmentDef.material] — the set field until sets
+  /// are real (Phase 8).
+  String _armourHeader(GameState game) {
+    final materials = <String, int>{};
+    for (final slot in EquipSlot.values.where((s) => s.carriesSet)) {
+      final inst = game.profile.itemInstances[game.profile.equipped[slot]];
+      final def = inst == null ? null : ItemCatalogue.tryById(inst.defId);
+      if (def is EquipmentDef) {
+        materials[def.material] = (materials[def.material] ?? 0) + 1;
+      }
+    }
+    final best = materials.entries.fold<MapEntry<String, int>?>(
+      null,
+      (a, e) => a == null || e.value > a.value ? e : a,
+    );
+    if (best == null || best.value < 2) return 'ARMOR';
+    return 'ARMOR · ${best.key.toUpperCase()} ${best.value}/5';
   }
 }
 
@@ -220,11 +278,15 @@ class _PaperDoll extends StatelessWidget {
 /// beside "No belt" explains itself, where an empty chip in a grid of ten and
 /// a row of slot boxes twenty pixels lower did not. Wearing a Tuskhide Belt
 /// fills the chip and grows the row beside it, in the same movement.
+/// The loaded belt slots — shown only while a belt is worn (or an
+/// over-capacity leftover exists); the wearable itself is a grid chip now.
+/// ⭐ The old two-line lecture is gone (Option A ruling): an empty belt slot
+/// grid explains carrying, and the turn cost is taught where it is paid —
+/// on the duel's belt rail.
 class _BeltBay extends StatelessWidget {
   final GameState game;
-  final String label;
 
-  const _BeltBay({required this.game, required this.label});
+  const _BeltBay({required this.game});
 
   @override
   Widget build(BuildContext context) {
@@ -238,61 +300,24 @@ class _BeltBay extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _EquipSlotChip(
-          label: label,
-          instanceId: game.profile.equipped[EquipSlot.belt],
-          game: game,
-          carriesSet: EquipSlot.belt.carriesSet,
+        const Icon(Icons.science, color: AppColors.teal, size: 16),
+        const SizedBox(width: 8),
+        Text(
+          'Belt — ${loaded.length}/$capacity',
+          style: const TextStyle(color: AppColors.text, fontSize: 13),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Wrap(
+            spacing: 6,
+            runSpacing: 6,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.science, color: AppColors.teal, size: 18),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      // ⚠️ "Belt — 0/0" beside a "No belt" hint says the same
-                      // thing twice in two grammars; the bare word is enough.
-                      capacity == 0 && loaded.isEmpty
-                          ? 'Belt'
-                          : 'Belt — ${loaded.length}/$capacity',
-                      style: const TextStyle(
-                        color: AppColors.text,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              if (boxes == 0)
-                const Text(
-                  'No belt — wear one to carry potions into a duel.',
-                  style: TextStyle(color: AppColors.textFaint, fontSize: 11.5),
-                )
-              else
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    for (var i = 0; i < boxes; i++)
-                      _BeltSlot(
-                        defId: i < loaded.length ? loaded[i] : null,
-                        game: game,
-                        overCapacity: i >= capacity,
-                      ),
-                  ],
+              for (var i = 0; i < boxes; i++)
+                _BeltSlot(
+                  defId: i < loaded.length ? loaded[i] : null,
+                  game: game,
+                  overCapacity: i >= capacity,
                 ),
-              const SizedBox(height: 6),
-              const Text(
-                // ⚠️ The rule that makes the belt a decision rather than a tax.
-                'What you can reach mid-duel. Using one spends your turn.',
-                style: TextStyle(color: AppColors.textFaint, fontSize: 11.5),
-              ),
             ],
           ),
         ),
@@ -303,16 +328,30 @@ class _BeltBay extends StatelessWidget {
 
 class _EquipSlotChip extends StatelessWidget {
   final String label;
+  final EquipSlot slot;
   final String? instanceId;
   final GameState game;
-  final bool carriesSet;
 
   const _EquipSlotChip({
     required this.label,
+    required this.slot,
     required this.instanceId,
     required this.game,
-    required this.carriesSet,
   });
+
+  /// Backpack indices whose instance would fill [slot] — what an empty
+  /// chip's tap offers.
+  List<int> _candidates() => [
+    for (var i = 0; i < game.profile.backpack.slots.length; i++)
+      if (game.profile.backpack.slots[i]?.instanceId != null &&
+          (ItemCatalogue.tryById(game.profile.backpack.slots[i]!.defId)
+                  is EquipmentDef) &&
+          (ItemCatalogue.tryById(game.profile.backpack.slots[i]!.defId)!
+                      as EquipmentDef)
+                  .slot ==
+              slot)
+        i,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -322,32 +361,65 @@ class _EquipSlotChip extends StatelessWidget {
     final def = inst == null ? null : ItemCatalogue.tryById(inst.defId);
     final filled = def != null;
     final colour = filled ? rarityColour(def.rarity) : AppColors.borderDim;
+    final candidates = filled ? const <int>[] : _candidates();
+    // ⭐ Ruling 2026-08-25 (Option A): rarity moved OFF the border and onto a
+    // left-edge stripe — a coloured border on two cards in a grey grid read
+    // as selection state, a stripe reads as a property. Empty slots dim and
+    // become ACTIONABLE: '＋ Equip' when the pack holds a candidate.
+    // ⚠️ The stripe is an inner clipped element, NOT a fat left BorderSide:
+    // Flutter refuses a borderRadius on a non-uniform Border (found by the
+    // suite the moment the first belt test wore one).
     final chip = Container(
       width: 104,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.bg,
+        color: filled ? AppColors.bg : Colors.transparent,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: colour, width: filled ? 1.5 : 1),
+        border: Border.all(color: AppColors.borderDim),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(5),
+        // ⚠️ IntrinsicHeight: `stretch` needs a bounded height for the
+        // stripe to fill, and a Wrap gives its children none.
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (filled) Container(width: 3, color: colour),
               Expanded(
-                child: Text(
-                  label.toUpperCase(),
-                  style: const TextStyle(
-                    color: AppColors.textFaint,
-                    fontSize: 9,
-                    letterSpacing: 0.8,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
                   ),
+                  child: _chipBody(filled, def, inst, candidates, colour),
                 ),
               ),
-              if (carriesSet)
-                const Icon(Icons.link, size: 10, color: AppColors.textFaint),
             ],
+          ),
+        ),
+      ),
+    );
+    return _wrapTap(context, chip, def, inst, candidates);
+  }
+
+  Widget _chipBody(
+    bool filled,
+    ItemDef? def,
+    ItemInstance? inst,
+    List<int> candidates,
+    Color colour,
+  ) {
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              color: filled ? AppColors.textFaint : AppColors.textFaint
+                  .withValues(alpha: 0.6),
+              fontSize: 9,
+              letterSpacing: 0.8,
+            ),
           ),
           const SizedBox(height: 2),
           Row(
@@ -358,18 +430,30 @@ class _EquipSlotChip extends StatelessWidget {
               // empty slot has no item and therefore never asks for one.
               if (filled)
                 ItemIcon(
-                  defId: def.id,
+                  defId: def!.id,
                   size: 18,
                   gap: 6,
                   fallback: const SizedBox.shrink(),
                 ),
               Expanded(
                 child: Text(
-                  filled ? ItemCatalogue.displayName(def, inst) : 'Empty',
+                  filled
+                      ? ItemCatalogue.displayName(def!, inst)
+                      : candidates.isEmpty
+                      ? 'Empty'
+                      : slot == EquipSlot.belt && candidates.length == 1
+                      ? '＋ ${ItemCatalogue.displayName(ItemCatalogue.byId(game.profile.backpack.slots[candidates.first]!.defId))}'
+                      : '＋ Equip',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: filled ? colour : AppColors.textFaint,
+                    color: filled
+                        ? colour
+                        : candidates.isEmpty
+                        ? AppColors.textFaint
+                        : slot == EquipSlot.belt
+                        ? AppColors.gold
+                        : AppColors.textDim,
                     fontSize: 11,
                   ),
                 ),
@@ -377,24 +461,79 @@ class _EquipSlotChip extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-    if (def is! EquipmentDef) return chip;
-    final slot = def.slot;
+      );
+  }
+
+  Widget _wrapTap(
+    BuildContext context,
+    Widget chip,
+    ItemDef? def,
+    ItemInstance? inst,
+    List<int> candidates,
+  ) {
+    if (def is EquipmentDef) {
+      return InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: () => showItemDialog(
+          context,
+          def: def,
+          instance: inst,
+          actions: [
+            (
+              label: 'Unequip',
+              run: () => GameStateScope.read(context).unequip(slot),
+            ),
+          ],
+        ),
+        child: chip,
+      );
+    }
+    if (candidates.isEmpty) return chip;
     return InkWell(
       borderRadius: BorderRadius.circular(6),
-      onTap: () => showItemDialog(
-        context,
-        def: def,
-        instance: inst,
-        actions: [
-          (
-            label: 'Unequip',
-            run: () => GameStateScope.read(context).unequip(slot),
-          ),
-        ],
-      ),
+      onTap: () => _pickCandidate(context, candidates),
       child: chip,
+    );
+  }
+
+  /// One candidate equips immediately; several open a picker sheet.
+  Future<void> _pickCandidate(BuildContext context, List<int> indices) async {
+    final gs = GameStateScope.read(context);
+    if (indices.length == 1) {
+      await gs.equipFromBackpack(indices.first);
+      return;
+    }
+    if (!context.mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.panel,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(12),
+          children: [
+            for (final i in indices)
+              ListTile(
+                dense: true,
+                title: Text(
+                  ItemCatalogue.displayName(
+                    ItemCatalogue.byId(gs.profile.backpack.slots[i]!.defId),
+                    gs.profile.itemInstances[gs
+                        .profile
+                        .backpack
+                        .slots[i]!
+                        .instanceId],
+                  ),
+                  style: const TextStyle(color: AppColors.text, fontSize: 13),
+                ),
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await gs.equipFromBackpack(i);
+                },
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -413,23 +552,24 @@ class _GearTotals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lines = Equipping.describeTotals(
+    final lines = Equipping.statTotals(
       game.equipmentTotals,
       level: game.profile.level,
     );
+    final pieces = game.profile.equipped.values.whereType<String>().length;
     return GamePanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'FROM EQUIPMENT',
-            style: TextStyle(
+          Text(
+            'FROM EQUIPMENT${pieces > 0 ? ' · $pieces PIECE${pieces == 1 ? '' : 'S'}' : ''}',
+            style: const TextStyle(
               color: AppColors.textFaint,
               fontSize: 10,
               letterSpacing: 1,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           if (lines.isEmpty)
             const Text(
               'Nothing you are wearing changes your stats yet.',
@@ -437,10 +577,79 @@ class _GearTotals extends StatelessWidget {
             )
           else
             for (final line in lines)
-              Text(
-                line,
-                style: const TextStyle(color: AppColors.teal, fontSize: 12.5),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 3),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        line.label,
+                        style: const TextStyle(
+                          color: AppColors.textDim,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                    _StatNumbers(line: line),
+                  ],
+                ),
               ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The colour a gear bonus wears: green when it gives, red when it takes.
+/// ⭐ Public-shaped on purpose (ruling 2026-08-25): stat-LOWERING equipment
+/// is planned, and this is the one function that decides how a negative
+/// reads everywhere it will ever appear.
+Color bonusColour(int bonus) => bonus < 0 ? AppColors.ember : AppColors.green;
+
+/// Format 1 (ruling 2026-08-25): `TOTAL (base +bonus)` — total large, base
+/// muted, bonus coloured by sign via [bonusColour]. Base-less stats print
+/// the total alone; base-ZERO stats keep the parenthesis but hide the 0.
+class _StatNumbers extends StatelessWidget {
+  final GearStatLine line;
+  const _StatNumbers({required this.line});
+
+  @override
+  Widget build(BuildContext context) {
+    final signed = '${line.bonus >= 0 ? '+' : '−'}${line.bonus.abs()}';
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: line.total,
+            style: const TextStyle(
+              color: AppColors.text,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (line.base != null) ...[
+            TextSpan(
+              text: line.base! > 0 ? '  (${line.base} ' : '  (',
+              style: const TextStyle(
+                color: AppColors.textFaint,
+                fontSize: 11.5,
+              ),
+            ),
+            TextSpan(
+              text: signed,
+              style: TextStyle(
+                color: bonusColour(line.bonus),
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const TextSpan(
+              text: ')',
+              style: TextStyle(color: AppColors.textFaint, fontSize: 11.5),
+            ),
+          ],
         ],
       ),
     );
