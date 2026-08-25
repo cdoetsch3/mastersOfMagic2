@@ -669,7 +669,25 @@ identically with an empty modifier bundle (proving zero regression).
 
 ---
 
-# Phase 9 — Economy: motes, skills, crafting, enchanting
+# Phase 9 — 🟡 SHOPS SHIPPED — Economy: motes, skills, crafting, enchanting
+
+✅ **2026-08-25: the NPC shop economy is built** from
+`docs/contracts/ECONOMY_CONTRACT.md` (all decisions ruled): personal
+per-character shops, one per town (5 open, 4 closed until their quarters),
+materials+consumables stock, clamped power-curve pricing with PER-UNIT
+MARGINAL trades and a ±10% spread, nightly UTC resets, deterministic daily
+events, `config/economy` live tunables (fail-open per field, PvE-only by
+guardrail), all 29 material values authored under the value-conservation
+invariant (tested across 41 recipes), and the tabbed-stall + basket-settle
+shop screen (one atomic Settle charging exactly the displayed net). The
+greedy-bot probe (tool/economy_probe_test.dart, 1,000 optimal player-days)
+found NO profitable exploit: round-trips never profit, the batch-pricing
+mutant demonstrably would. 📝 Open tuning debts it measured: hauling pays
+0.02× honest income (travel time is still the 10s placeholder; revisit with
+Phase 5b), the 2,400g/day ceiling undercounts loot sales, and two §10
+assertions (Standard-EV, 36% haul ceiling) remain unimplemented.
+Still unbuilt from this phase: mote-ladder refinement UI, neutral→element
+conversion, enchanting, backpack expansion pouches, the player market.
 
 Per ITEMS §6, §6a, §6b, §6c. Largely independent of Phases 10–11.
 
