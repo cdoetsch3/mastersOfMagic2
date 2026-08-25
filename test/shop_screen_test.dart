@@ -710,7 +710,7 @@ void main() {
       );
       expect(find.textContaining('Selling 3 items +'), findsOneWidget);
 
-      await tester.tap(find.textContaining('tap to review'));
+      await tester.tap(find.text('Review'));
       await tester.pumpAndSettle();
       expect(find.textContaining('Buy 2 × Oak Log'), findsOneWidget);
       await tester.tap(find.byIcon(Icons.close).first);

@@ -472,6 +472,80 @@ class _TierChip extends StatelessWidget {
   return ('Exotic +25%', const Color(0xFFD05252));
 }
 
+/// The QTY/PRICE column header (ruling 2026-08-25: the two numbers Christian
+/// called critical stopped being subline whispers and became COLUMNS).
+class _ColumnHeader extends StatelessWidget {
+  final String qtyLabel;
+  const _ColumnHeader({required this.qtyLabel});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(24, 0, 118, 4),
+    child: Row(
+      children: [
+        const Expanded(child: _HeaderText('ITEM')),
+        SizedBox(width: 52, child: _HeaderText(qtyLabel, right: true)),
+        const SizedBox(width: 10),
+        const SizedBox(width: 58, child: _HeaderText('PRICE', right: true)),
+      ],
+    ),
+  );
+}
+
+class _HeaderText extends StatelessWidget {
+  final String label;
+  final bool right;
+  const _HeaderText(this.label, {this.right = false});
+
+  @override
+  Widget build(BuildContext context) => Text(
+    label,
+    textAlign: right ? TextAlign.right : TextAlign.left,
+    style: const TextStyle(
+      color: AppColors.textFaint,
+      fontSize: 10,
+      letterSpacing: 0.6,
+      fontWeight: FontWeight.w600,
+    ),
+  );
+}
+
+/// The QTY column: what remains AFTER the pending basket — live, so
+/// selecting 3 of 6 reads '3' the moment the stepper moves (the ruling's
+/// 'update as the user updates'). Bare number, no ×.
+class _QtyCell extends StatelessWidget {
+  final int remaining;
+  const _QtyCell({required this.remaining});
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 52,
+    child: Text(
+      '$remaining',
+      textAlign: TextAlign.right,
+      style: const TextStyle(color: AppColors.text, fontSize: 14),
+    ),
+  );
+}
+
+/// The PRICE column: the row's headline number, gold (or the event's colour
+/// when a spike/sale is live).
+class _PriceCell extends StatelessWidget {
+  final int unit;
+  final Color colour;
+  const _PriceCell({required this.unit, this.colour = AppColors.gold});
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 58,
+    child: Text(
+      '${unit}g',
+      textAlign: TextAlign.right,
+      style: TextStyle(color: colour, fontSize: 16, fontWeight: FontWeight.w600),
+    ),
+  );
+}
+
 /// The reserved icon slot (UI pass, point 7): a dim square with the item's
 /// initial, replaced by the real PNG when the art lands — names align either
 /// way, and an icon-less shelf stops looking ragged.
@@ -704,13 +778,11 @@ class _PriceLine extends StatelessWidget {
   final int? preEventUnit;
   final int? nextUnit;
   final bool spike;
-  final String suffix;
   const _PriceLine({
     required this.unit,
     required this.preEventUnit,
     required this.nextUnit,
     required this.spike,
-    this.suffix = '',
   });
 
   @override
@@ -738,7 +810,6 @@ class _PriceLine extends StatelessWidget {
               text: ' · next ${nextUnit}g',
               style: const TextStyle(color: AppColors.textFaint),
             ),
-          if (suffix.isNotEmpty) TextSpan(text: suffix),
         ],
       ),
       style: const TextStyle(color: AppColors.textDim, fontSize: 11.5),
@@ -805,6 +876,7 @@ class _BuyList extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
       children: [
+        const _ColumnHeader(qtyLabel: 'STOCK'),
         for (final id in items)
           _BuyRow(
             game: game,
@@ -879,6 +951,14 @@ class _BuyRow extends StatelessWidget {
     // agree with what settling would actually accept.
     final max = stock < 0 ? 0 : stock;
 
+    final eventColour = eventMod == 1.0
+        ? AppColors.gold
+        : eventMod > 1.0
+        ? AppColors.ember
+        : AppColors.teal;
+    final hasSubline =
+        preEvent != null || nextUnit != null || eventMod != 1.0;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: GamePanel(
@@ -911,22 +991,28 @@ class _BuyRow extends StatelessWidget {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 2),
-                  _PriceLine(
-                    unit: unit,
-                    preEventUnit: preEvent,
-                    nextUnit: nextUnit,
-                    spike: eventMod > 1.0,
-                    suffix: ' · stock $stock',
-                  ),
+                  if (hasSubline) ...[
+                    const SizedBox(height: 2),
+                    _PriceLine(
+                      unit: unit,
+                      preEventUnit: preEvent,
+                      nextUnit: nextUnit,
+                      spike: eventMod > 1.0,
+                    ),
+                  ],
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            // ⭐ Chip BEFORE stepper (ruling 2026-08-25): the chip appears and
-            // grows when quantity climbs, and anything that appears must do
-            // so on the side AWAY from the buttons being pressed — a control
-            // that moves under a repeated click is disorienting by rule.
+            // ⭐ QTY then PRICE (ruling 2026-08-25): the two critical numbers
+            // as aligned columns. QTY is stock REMAINING after the pending
+            // basket, live — buying 5 of 60 reads 55 as the stepper moves.
+            _QtyCell(remaining: stock - qty),
+            const SizedBox(width: 10),
+            _PriceCell(unit: unit, colour: eventColour),
+            const SizedBox(width: 10),
+            // ⭐ Chip BEFORE stepper (press-stability rule): appearing/growing
+            // things live on the side AWAY from the buttons being pressed.
             if (qty > 0 && total != null) ...[
               _GoldChip(gold: total!, qty: qty),
               const SizedBox(width: 8),
@@ -1015,6 +1101,7 @@ class _SellList extends StatelessWidget {
       children: [
         if (stackIds.isNotEmpty) ...[
           const SectionLabel('Materials & consumables'),
+          const _ColumnHeader(qtyLabel: 'HAVE'),
           for (final id in stackIds)
             _SellStackRow(
               game: game,
@@ -1112,6 +1199,14 @@ class _SellStackRow extends StatelessWidget {
       unit = ShopPricing.vendorPrice(def.value);
     }
 
+    final eventColour = !stocked || eventMod == 1.0
+        ? AppColors.gold
+        : spike
+        ? AppColors.ember
+        : AppColors.teal;
+    final hasSubline =
+        bound || !stocked || preEvent != null || nextUnit != null;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: GamePanel(
@@ -1146,33 +1241,43 @@ class _SellStackRow extends StatelessWidget {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 2),
-                  if (bound)
-                    const Text(
-                      'Bound — cannot be sold.',
-                      style: TextStyle(color: AppColors.textDim, fontSize: 11.5),
-                    )
-                  else if (stocked)
-                    _PriceLine(
-                      unit: unit,
-                      preEventUnit: preEvent,
-                      nextUnit: nextUnit,
-                      spike: spike,
-                      suffix: ' · have $available',
-                    )
-                  else
-                    Text(
-                      '${unit}g each · vendor (flat) · have $available',
-                      style: const TextStyle(
-                        color: AppColors.textDim,
-                        fontSize: 11.5,
+                  if (hasSubline) ...[
+                    const SizedBox(height: 2),
+                    if (bound)
+                      const Text(
+                        'Bound — cannot be sold.',
+                        style: TextStyle(
+                          color: AppColors.textDim,
+                          fontSize: 11.5,
+                        ),
+                      )
+                    else if (stocked)
+                      _PriceLine(
+                        unit: unit,
+                        preEventUnit: preEvent,
+                        nextUnit: nextUnit,
+                        spike: spike,
+                      )
+                    else
+                      const Text(
+                        'vendor (flat)',
+                        style: TextStyle(
+                          color: AppColors.textDim,
+                          fontSize: 11.5,
+                        ),
                       ),
-                    ),
+                  ],
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            // ⭐ Chip before stepper — same press-stability rule as the buy row.
+            // ⭐ QTY then PRICE — QTY is what you'd have LEFT after this
+            // basket, live (selling 3 of 6 reads 3 as the stepper moves).
+            _QtyCell(remaining: available - qty),
+            const SizedBox(width: 10),
+            _PriceCell(unit: unit, colour: eventColour),
+            const SizedBox(width: 10),
+            // ⭐ Chip before stepper — press-stability rule.
             if (qty > 0 && total != null) ...[
               _GoldChip(gold: total!, qty: qty),
               const SizedBox(width: 8),
@@ -1303,20 +1408,52 @@ class _SettleBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(
-            onTap: onReviewBasket,
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: summary),
-                  const TextSpan(
-                    text: '  ·  tap to review',
-                    style: TextStyle(color: AppColors.textFaint),
-                  ),
-                ],
+          // ⭐ Ruling 2026-08-25: the summary is load-bearing information,
+          // not a footnote — full text colour at 14px, and the review
+          // affordance is a REAL bordered control, not whispered grey text.
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  summary,
+                  style: const TextStyle(color: AppColors.text, fontSize: 14),
+                ),
               ),
-              style: const TextStyle(color: AppColors.textDim, fontSize: 12),
-            ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: onReviewBasket,
+                borderRadius: BorderRadius.circular(7),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.border),
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Review',
+                        style: TextStyle(
+                          color: AppColors.text,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(width: 2),
+                      Icon(
+                        Icons.chevron_right,
+                        size: 15,
+                        color: AppColors.textDim,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Row(
