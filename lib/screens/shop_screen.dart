@@ -923,16 +923,20 @@ class _BuyRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
+            // ⭐ Chip BEFORE stepper (ruling 2026-08-25): the chip appears and
+            // grows when quantity climbs, and anything that appears must do
+            // so on the side AWAY from the buttons being pressed — a control
+            // that moves under a repeated click is disorienting by rule.
+            if (qty > 0 && total != null) ...[
+              _GoldChip(gold: total!, qty: qty),
+              const SizedBox(width: 8),
+            ],
             _QtyControl(
               value: qty,
               min: 0,
               max: max,
               onChanged: max <= 0 ? null : onQtyChanged,
             ),
-            if (qty > 0 && total != null) ...[
-              const SizedBox(width: 8),
-              _GoldChip(gold: total!, qty: qty),
-            ],
           ],
         ),
       ),
@@ -1168,16 +1172,17 @@ class _SellStackRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
+            // ⭐ Chip before stepper — same press-stability rule as the buy row.
+            if (qty > 0 && total != null) ...[
+              _GoldChip(gold: total!, qty: qty),
+              const SizedBox(width: 8),
+            ],
             _QtyControl(
               value: qty,
               min: 0,
               max: max,
               onChanged: bound || max <= 0 ? null : onQtyChanged,
             ),
-            if (qty > 0 && total != null) ...[
-              const SizedBox(width: 8),
-              _GoldChip(gold: total!, qty: qty),
-            ],
           ],
         ),
       ),
