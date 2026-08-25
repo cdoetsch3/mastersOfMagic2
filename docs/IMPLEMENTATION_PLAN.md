@@ -644,6 +644,13 @@ refinement ladder is an exchange between tiers of abundance, *not* a
 
 # Phase 8 — Items: data model and the modifier vocabulary
 
+📝 **Revisit at this phase (ruled 2026-08-25):** the equip panel's
+hidden-zero rule — it prints only non-zero stat lines. Correct while most
+stats are rare, but sets/sockets/enchants make the full sheet the likely
+right answer; the candidate middle path is always-show the six combat-roll
+stats (accuracy, crit ×2, dodge, deflect ×2), hide the rest until non-zero.
+One filter in `Equipping.statTotals`'s caller.
+
 📝 **Now also carries gem sockets** (ITEMS §6d): 0–3 slots rolled per drop, gems
 cut from a stone + Crystal/Core/Heart, universal and per-element families. ⚠️ A
 **third multiplicative power axis** on top of set bonuses and enchants — §2.1's
