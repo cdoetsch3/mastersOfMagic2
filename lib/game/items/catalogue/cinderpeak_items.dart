@@ -14,6 +14,7 @@ abstract final class CinderpeakItems {
   // ---- materials ------------------------------------------------------
 
   /// ⏳ Banks for Q2. ⚠️ No Q1 recipe consumes it — by ruling, not omission.
+  /// `value: 7` — ECONOMY_CONTRACT §8.2.
   static const copperOre = MaterialDef(
     id: 'copper_ore',
     properName: 'Copper Ore',
@@ -23,9 +24,10 @@ abstract final class CinderpeakItems {
         'does not say what the hurry is.',
     skill: CraftSkill.metalworking,
     tier: 2,
+    value: 7,
   );
 
-  /// The tier-2 hide.
+  /// The tier-2 hide. `value: 46` — ECONOMY_CONTRACT §8.2.
   static const tuskhide = MaterialDef(
     id: 'tuskhide',
     properName: 'Tuskhide',
@@ -35,6 +37,7 @@ abstract final class CinderpeakItems {
         'through embers on purpose.',
     skill: CraftSkill.tailoring,
     tier: 2,
+    value: 46,
   );
 
   // ---- motes ----------------------------------------------------------

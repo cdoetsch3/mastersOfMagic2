@@ -15,6 +15,7 @@ abstract final class WindwardSteppeItems {
   // ---- materials ------------------------------------------------------
 
   /// ✅ §9b.6 — the wood ladder's tier-3 log; Yew equips at 20.
+  /// `value: 58` — ECONOMY_CONTRACT §8.2.
   static const yewLog = MaterialDef(
     id: 'yew_log',
     properName: 'Yew Log',
@@ -25,8 +26,10 @@ abstract final class WindwardSteppeItems {
         'you the whole way through.',
     skill: CraftSkill.woodcarving,
     tier: 3,
+    value: 58,
   );
 
+  /// `value: 37` — ECONOMY_CONTRACT §8.2.
   static const tussockFlax = MaterialDef(
     id: 'tussock_flax',
     properName: 'Tussock Flax',
@@ -37,6 +40,7 @@ abstract final class WindwardSteppeItems {
         'stripped and dried.',
     skill: CraftSkill.tailoring,
     tier: 4,
+    value: 37,
   );
 
   // ---- motes ----------------------------------------------------------

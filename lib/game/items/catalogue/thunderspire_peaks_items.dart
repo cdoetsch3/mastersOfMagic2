@@ -25,6 +25,7 @@ abstract final class ThunderspirePeaksItems {
   // ---- materials ------------------------------------------------------
 
   /// ✅ §9b.6 — the wood ladder's tier-4 log; Rowan equips at 25.
+  /// `value: 120` — ECONOMY_CONTRACT §8.2.
   static const rowanLog = MaterialDef(
     id: 'rowan_log',
     properName: 'Rowan Log',
@@ -36,8 +37,10 @@ abstract final class ThunderspirePeaksItems {
         'up.',
     skill: CraftSkill.woodcarving,
     tier: 4,
+    value: 120,
   );
 
+  /// `value: 12` — ECONOMY_CONTRACT §8.2.
   static const ironOre = MaterialDef(
     id: 'iron_ore',
     properName: 'Iron Ore',
@@ -48,10 +51,12 @@ abstract final class ThunderspirePeaksItems {
         'next one will find it again.',
     skill: CraftSkill.metalworking,
     tier: 4,
+    value: 12,
   );
 
   /// ⏳ Banks until Enchanting unlocks at Meridian, L36 — seeding Q3 exactly
   /// on schedule, the only Kinetic material that banks for that reason alone.
+  /// `value: 20` — ECONOMY_CONTRACT §8.2 (no recipe consumer yet).
   static const humQuartz = MaterialDef(
     id: 'hum_quartz',
     properName: 'Hum Quartz',
@@ -62,12 +67,17 @@ abstract final class ThunderspirePeaksItems {
         'held somewhere inside the crystal rather than in the air.',
     skill: CraftSkill.enchanting,
     tier: 4,
+    value: 20,
   );
 
   // ---- intermediate goods -----------------------------------------------
 
   /// ⭐ Metalworking's tier-4 output, feeding the Rowan weapon recipes
-  /// (§5.1) exactly as Bronze fed the Yew ones.
+  /// (§5.1) exactly as Bronze fed the Yew ones. `value: 52` — ECONOMY_CONTRACT
+  /// §8.2. ⚠️ Never shop stock (§14b.3); vendorable, never on a shelf. ⚠️ Its
+  /// own recipe (`craft_iron_ingot`: iron_ore×3 + charcoal×2 = 50) sits
+  /// **under** this value — the same documented, contract-blessed boundary
+  /// case as Bronze Ingot (§8.6). See `test/value_conservation_test.dart`.
   static const ironIngot = MaterialDef(
     id: 'iron_ingot',
     properName: 'Iron Ingot',
@@ -77,6 +87,7 @@ abstract final class ThunderspirePeaksItems {
         'edge than the rock it was cut from ever promised.',
     skill: CraftSkill.metalworking,
     tier: 4,
+    value: 52,
   );
 
   // ---- equipment: Woodcarving, Rowan (§9b.6, §2.5) -----------------------

@@ -31,6 +31,7 @@ abstract final class TheMoltenDeepItems {
 
   /// ⏳ Banks until Jewelry unlocks at Rimeholt, L45 — Q2 only *finds* jewel
   /// materials this quarter, per ruling (§8.1).
+  /// `value: 20` — ECONOMY_CONTRACT §8.2 (no recipe consumer yet).
   static const obsidian = MaterialDef(
     id: 'obsidian',
     properName: 'Obsidian',
@@ -41,10 +42,12 @@ abstract final class TheMoltenDeepItems {
         'looks.',
     skill: CraftSkill.jewelry,
     tier: 4,
+    value: 20,
   );
 
   /// ⏳ Banks until the offensive-potion vocabulary ships (§8.5, §9
-  /// Fast-follow).
+  /// Fast-follow). `value: 15` — ECONOMY_CONTRACT §8.2 (no recipe consumer
+  /// yet).
   static const firesalt = MaterialDef(
     id: 'firesalt',
     properName: 'Firesalt',
@@ -55,9 +58,16 @@ abstract final class TheMoltenDeepItems {
         'after it is pocketed.',
     skill: CraftSkill.potionsAndAlchemy,
     tier: 5,
+    value: 15,
   );
 
-  /// ⚠️ **Kill-only, no node** — a hide (§3.1/§6).
+  /// ⚠️ **Kill-only, no node** — a hide (§3.1/§6). ⭐ `value: 190` —
+  /// ECONOMY_CONTRACT §8.2/§8.5: looks wildly out of step with `firesalt`
+  /// (15) at the same tier, but it is not a mistake — this hide feeds only
+  /// `emberhide_belt` (Standard 380, the top belt in the game), and it is
+  /// kill-only, same scarcity class as `rimepelt`/`tuskhide`. A hide priced
+  /// to conserve against an already-high, already-shipped belt value is the
+  /// formula working correctly, not a formula artifact.
   static const emberhide = MaterialDef(
     id: 'emberhide',
     properName: 'Emberhide',
@@ -67,6 +77,7 @@ abstract final class TheMoltenDeepItems {
         'the black in a scatter of hairline cracks whenever it flexes.',
     skill: CraftSkill.tailoring,
     tier: 5,
+    value: 190,
   );
 
   // ---- equipment ------------------------------------------------------

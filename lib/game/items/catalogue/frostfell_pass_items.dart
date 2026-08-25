@@ -27,6 +27,12 @@ import '../item_def.dart';
 abstract final class FrostfellPassItems {
   // ---- materials ------------------------------------------------------
 
+  /// ⭐ `value: 95` — ECONOMY_CONTRACT §8.2/§8.4/§14b.1's correction (was the
+  /// shipped 12): `craft_rimepelt_belt` (rimepelt×2 + tussock_flax×1) at the
+  /// old value was the audit's **worst offender** — Σ=61 against Standard
+  /// 220, a risk-free buy-craft-vendor loop nearly four times over, in an
+  /// already-authored material. At 95, the same recipe's Σ=227 lands inside
+  /// [220, 264].
   static const rimepelt = MaterialDef(
     id: 'rimepelt',
     properName: 'Rimepelt',
@@ -37,11 +43,12 @@ abstract final class FrostfellPassItems {
         'the warmth.',
     skill: CraftSkill.tailoring,
     tier: 4,
-    value: 12,
+    value: 95,
   );
 
   /// ⏳ Banks until the Antidote ships (§8.5, §9 fast-follow) — no
-  /// `ItemEffect` vocabulary exists yet to spend it against.
+  /// `ItemEffect` vocabulary exists yet to spend it against. `value: 11` kept
+  /// as shipped — ECONOMY_CONTRACT §8.2 (no recipe consumer, ground truth).
   static const hoarlichen = MaterialDef(
     id: 'hoarlichen',
     properName: 'Hoarlichen',
@@ -56,7 +63,8 @@ abstract final class FrostfellPassItems {
   );
 
   /// ⏳ Banks until Jewelry opens at Rimeholt (L45, §8.1) — the Q1-ore-before-
-  /// Metalworking pattern, one skill later.
+  /// Metalworking pattern, one skill later. `value: 26` kept as shipped —
+  /// ECONOMY_CONTRACT §8.2 (no recipe consumer, ground truth).
   static const everice = MaterialDef(
     id: 'everice',
     properName: 'Everice',

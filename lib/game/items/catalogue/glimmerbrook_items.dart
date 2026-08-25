@@ -15,6 +15,7 @@ abstract final class GlimmerbrookItems {
 
   /// ⭐ Leather. Belts are a Tailoring product (ITEMS §10.3d), and this is
   /// where the line starts.
+  /// `value: 17` — ECONOMY_CONTRACT §8.2.
   static const fawnhide = MaterialDef(
     id: 'fawnhide',
     properName: 'Fawnhide',
@@ -24,9 +25,11 @@ abstract final class GlimmerbrookItems {
         'the water. Nobody in Hearthwood will say where they get it.',
     skill: CraftSkill.tailoring,
     tier: 1,
+    value: 17,
   );
 
   /// The Draught herb (§9b.8's potion grammar: ingredient = magnitude).
+  /// `value: 7` — ECONOMY_CONTRACT §8.2.
   static const sapwort = MaterialDef(
     id: 'sapwort',
     properName: 'Sapwort',
@@ -36,6 +39,7 @@ abstract final class GlimmerbrookItems {
         'of neither.',
     skill: CraftSkill.potionsAndAlchemy,
     tier: 1,
+    value: 7,
   );
 
   // ---- motes ----------------------------------------------------------

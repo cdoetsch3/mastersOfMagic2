@@ -20,6 +20,7 @@ import '../item_def.dart';
 abstract final class StormcliffCoastItems {
   // ---- materials ------------------------------------------------------
 
+  /// `value: 30` — ECONOMY_CONTRACT §8.2.
   static const seawrackFibre = MaterialDef(
     id: 'seawrack_fibre',
     properName: 'Seawrack Fibre',
@@ -29,8 +30,10 @@ abstract final class StormcliffCoastItems {
         'by the weather before anyone gets to it. Stiff until it is worked.',
     skill: CraftSkill.tailoring,
     tier: 3,
+    value: 30,
   );
 
+  /// `value: 16` — ECONOMY_CONTRACT §8.2.
   static const saltwort = MaterialDef(
     id: 'saltwort',
     properName: 'Saltwort',
@@ -40,6 +43,7 @@ abstract final class StormcliffCoastItems {
         'nowhere the spray does not. Bites back the way the ocean does.',
     skill: CraftSkill.potionsAndAlchemy,
     tier: 3,
+    value: 16,
   );
 
   // ---- motes ----------------------------------------------------------
@@ -94,6 +98,11 @@ abstract final class StormcliffCoastItems {
 
   // ---- equipment: the Seawrack set (Tailoring) -------------------------
 
+  /// ⚠️ **Boundary, not broken**: `craft_seawrack_hood` (seawrack_fibre×2 =
+  /// 60) prices Σ(inputs) exactly equal to this Standard value —
+  /// ECONOMY_CONTRACT §8.6's own audit blesses it ("seawrack_hood
+  /// (60=Standard)"), so the conservation test's `<` bound is a documented
+  /// exemption here, not a gap.
   static const seawrackHood = EquipmentDef(
     id: 'seawrack_hood',
     rarity: Rarity.common,
@@ -107,6 +116,10 @@ abstract final class StormcliffCoastItems {
     value: 60,
   );
 
+  /// ⭐ `value: 135` — ECONOMY_CONTRACT §8.6/§14b.1's correction (was 95): the
+  /// shipped value made this a 🔴 major conservation violation (Σ(inputs)=150
+  /// against Ornate=114); the corrected value fits Standard 135 < Σ < Ornate
+  /// 162.
   static const seawrackRobe = EquipmentDef(
     id: 'seawrack_robe',
     rarity: Rarity.common,
@@ -117,9 +130,13 @@ abstract final class StormcliffCoastItems {
     modifiers: ItemModifiers(maxHpBonus: 15),
     salvage: [SalvageYield('seawrack_fibre', 2, 4)],
     equipLevel: 16,
-    value: 95,
+    value: 135,
   );
 
+  /// ⭐ `value: 105` — ECONOMY_CONTRACT §8.6/§14b.1's correction (was 78):
+  /// same 🔴 major-violation family as the robe (Σ(inputs)=120 against
+  /// Ornate=93.6 at the old value); corrected value fits Standard 105 < Σ <
+  /// Ornate 126.
   static const seawrackLeggings = EquipmentDef(
     id: 'seawrack_leggings',
     rarity: Rarity.common,
@@ -130,7 +147,7 @@ abstract final class StormcliffCoastItems {
     modifiers: ItemModifiers(maxHpBonus: 10),
     salvage: [SalvageYield('seawrack_fibre', 1, 3)],
     equipLevel: 16,
-    value: 78,
+    value: 105,
   );
 
   /// ⭐ **The game's first crafted dodge** (§2.5) — two points, small enough

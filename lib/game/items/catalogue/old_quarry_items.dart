@@ -22,6 +22,7 @@ import '../item_def.dart';
 abstract final class OldQuarryItems {
   // ---- materials ------------------------------------------------------
 
+  /// `value: 9` — ECONOMY_CONTRACT §8.2.
   static const tinOre = MaterialDef(
     id: 'tin_ore',
     properName: 'Tin Ore',
@@ -31,10 +32,12 @@ abstract final class OldQuarryItems {
         'enough that the diggers barely bent down to pick it up.',
     skill: CraftSkill.metalworking,
     tier: 3,
+    value: 9,
   );
 
   /// ⏳ Banks until Jewelry unlocks at Rimeholt, L45 — Q2 only *finds* jewel
-  /// materials this quarter, per ruling.
+  /// materials this quarter, per ruling. `value: 15` — ECONOMY_CONTRACT §8.2
+  /// (no recipe consumer yet).
   static const quarryJasper = MaterialDef(
     id: 'quarry_jasper',
     properName: 'Quarry Jasper',
@@ -44,6 +47,7 @@ abstract final class OldQuarryItems {
         'anything the mountain grows on its own.',
     skill: CraftSkill.jewelry,
     tier: 3,
+    value: 15,
   );
 
   // ---- motes ------------------------------------------------------------
@@ -102,6 +106,13 @@ abstract final class OldQuarryItems {
   /// Vale) banked with no Q1 recipe; Tin is the missing half, and this is the
   /// first Kinetic recipe a player meets: copper + tin + charcoal → Bronze,
   /// at Forgeholm, the moment Metalworking opens at 15.
+  /// `value: 32` — ECONOMY_CONTRACT §8.2. ⚠️ Never shop stock (§14b.3 — "no
+  /// ingots stocked, smelting is Metalworking's reason to exist");
+  /// vendorable, never on a shelf. ⚠️ Its own recipe (`craft_bronze_ingot`:
+  /// copper_ore×2 + tin_ore×1 + charcoal×1 = 30) sits **under** this value —
+  /// a documented, contract-blessed boundary case (§8.6: "Σ=output, zero
+  /// headroom"), not a clean pass. See `test/value_conservation_test.dart`'s
+  /// exemption list.
   static const bronzeIngot = MaterialDef(
     id: 'bronze_ingot',
     properName: 'Bronze Ingot',
@@ -111,6 +122,7 @@ abstract final class OldQuarryItems {
         'neither, holding an edge better than either one alone.',
     skill: CraftSkill.metalworking,
     tier: 3,
+    value: 32,
   );
 
   // ---- equipment ------------------------------------------------------

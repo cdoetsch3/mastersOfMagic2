@@ -11,6 +11,7 @@ abstract final class ThornmireItems {
   // ---- materials ------------------------------------------------------
 
   /// The tier-2 fibre — the Bogflax set and the Tuskhide Belt's thread.
+  /// `value: 28` — ECONOMY_CONTRACT §8.2.
   static const bogflaxFibre = MaterialDef(
     id: 'bogflax_fibre',
     properName: 'Bogflax Fibre',
@@ -20,9 +21,12 @@ abstract final class ThornmireItems {
         'never quite burns either.',
     skill: CraftSkill.tailoring,
     tier: 2,
+    value: 28,
   );
 
   /// ⏳ Banks for Q2's Antidote (§9b.8). Grows in the fen it is named for.
+  /// `value: 8` — ECONOMY_CONTRACT §8.2 (no recipe consumer yet; priced by
+  /// tier/rarity parity with its zone-mates, not by conservation).
   static const fenroot = MaterialDef(
     id: 'fenroot',
     properName: 'Fenroot',
@@ -33,9 +37,11 @@ abstract final class ThornmireItems {
         'windows open.',
     skill: CraftSkill.potionsAndAlchemy,
     tier: 2,
+    value: 8,
   );
 
   /// ⏳ Banks for Jewelry (§9b.8) — the classic fossil gem, found in bog oak.
+  /// `value: 14` — ECONOMY_CONTRACT §8.2 (no recipe consumer yet).
   static const amber = MaterialDef(
     id: 'amber',
     properName: 'Amber',
@@ -45,6 +51,7 @@ abstract final class ThornmireItems {
         'there is a wing in it.',
     skill: CraftSkill.jewelry,
     tier: 2,
+    value: 14,
   );
 
   // ---- equipment: the Bogflax set (Tailoring, §9b.8) -------------------
@@ -62,6 +69,12 @@ abstract final class ThornmireItems {
     value: 55,
   );
 
+  /// ⭐ `value: 120` — ECONOMY_CONTRACT §8.6/§14b.1's correction (was 85): the
+  /// shipped value made this a 🔴 major conservation violation (Σ(inputs)=140
+  /// against Ornate=102); the corrected value fits Standard 120 < Σ < Ornate
+  /// 144. ⭐ This and its Leggings/Seawrack siblings are the recurring
+  /// pattern §8.6 names: the highest-material-count Tailoring pieces (robe,
+  /// leggings) are the ones a flat per-unit material price overshoots.
   static const bogflaxRobe = EquipmentDef(
     id: 'bogflax_robe',
     rarity: Rarity.common,
@@ -72,9 +85,12 @@ abstract final class ThornmireItems {
     modifiers: ItemModifiers(maxHpBonus: 10),
     salvage: [SalvageYield('bogflax_fibre', 2, 4)],
     equipLevel: 10,
-    value: 85,
+    value: 120,
   );
 
+  /// ⭐ `value: 95` — ECONOMY_CONTRACT §8.6/§14b.1's correction (was 70): same
+  /// 🔴 major-violation family as the robe (Σ(inputs)=112 against Ornate=84
+  /// at the old value); corrected value fits Standard 95 < Σ < Ornate 114.
   static const bogflaxLeggings = EquipmentDef(
     id: 'bogflax_leggings',
     rarity: Rarity.common,
@@ -85,7 +101,7 @@ abstract final class ThornmireItems {
     modifiers: ItemModifiers(maxHpBonus: 7),
     salvage: [SalvageYield('bogflax_fibre', 1, 3)],
     equipLevel: 10,
-    value: 70,
+    value: 95,
   );
 
   static const bogflaxBoots = EquipmentDef(

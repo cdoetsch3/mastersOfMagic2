@@ -15,6 +15,9 @@ abstract final class WhisperingWoodsItems {
   // ---- materials ------------------------------------------------------
 
   /// ✅ The zone's assigned wood (ITEMS §9b.6, wood ladder tier 1).
+  /// ⭐ `value: 13` — ECONOMY_CONTRACT §8.2/§14b.1, conservation-derived (NOT
+  /// the 25 the §5.2 worked table illustrates; §8.3 names the conflict and
+  /// §14b.1 rules 13 as the shipped number).
   static const oakLog = MaterialDef(
     id: 'oak_log',
     properName: 'Oak Log',
@@ -24,10 +27,11 @@ abstract final class WhisperingWoodsItems {
         'because the smoke gets into anything dried indoors.',
     skill: CraftSkill.woodcarving,
     tier: 1,
+    value: 13,
   );
 
   /// ⭐ Foraged fibre — the Tailoring input, and what a starter belt is woven
-  /// from (ITEMS §6a.1).
+  /// from (ITEMS §6a.1). `value: 10` — ECONOMY_CONTRACT §8.2.
   static const bindweedFibre = MaterialDef(
     id: 'bindweed_fibre',
     properName: 'Bindweed Fibre',
@@ -37,6 +41,7 @@ abstract final class WhisperingWoodsItems {
         'it before it notices.',
     skill: CraftSkill.tailoring,
     tier: 1,
+    value: 10,
   );
   // ---- motes ----------------------------------------------------------
 

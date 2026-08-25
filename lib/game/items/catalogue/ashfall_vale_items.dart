@@ -11,6 +11,7 @@ abstract final class AshfallValeItems {
   // ---- materials ------------------------------------------------------
 
   /// ✅ The wood ladder's tier 2 (ITEMS §9b.6).
+  /// `value: 38` — ECONOMY_CONTRACT §8.2.
   static const birchLog = MaterialDef(
     id: 'birch_log',
     properName: 'Birch Log',
@@ -20,9 +21,11 @@ abstract final class AshfallValeItems {
         'The vale is a plantation nobody planted.',
     skill: CraftSkill.woodcarving,
     tier: 2,
+    value: 38,
   );
 
   /// The Tonic herb (§9b.8: form = mechanic, ingredient = magnitude).
+  /// `value: 13` — ECONOMY_CONTRACT §8.2.
   static const brookmint = MaterialDef(
     id: 'brookmint',
     properName: 'Brookmint',
@@ -32,10 +35,12 @@ abstract final class AshfallValeItems {
         'cut through the ash, greener than anything around it.',
     skill: CraftSkill.potionsAndAlchemy,
     tier: 2,
+    value: 13,
   );
 
   /// ⏳ Banks for Q2 (§9b.8): Forgeholm's furnaces eat charcoal, and the
-  /// burned vale is where charcoal comes from. No Q1 recipe uses it.
+  /// burned vale is where charcoal comes from. Consumed by `craft_bronze_ingot`
+  /// and `craft_iron_ingot` (Kinetic). `value: 7` — ECONOMY_CONTRACT §8.2.
   static const charcoal = MaterialDef(
     id: 'charcoal',
     properName: 'Charcoal',
@@ -45,6 +50,7 @@ abstract final class AshfallValeItems {
         'was not already burned.',
     skill: CraftSkill.metalworking,
     tier: 2,
+    value: 7,
   );
 
   // ---- consumables ----------------------------------------------------
