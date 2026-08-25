@@ -581,6 +581,8 @@ void main() {
       final navKey = GlobalKey<NavigatorState>();
       await tester.binding.setSurfaceSize(const Size(900, 4000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.binding.setSurfaceSize(const Size(900, 4000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
       await tester.pumpWidget(
         GameStateScope(
           state: game,
@@ -590,9 +592,12 @@ void main() {
       navKey.currentState!.push(
         MaterialPageRoute<void>(builder: (_) => const ShopScreen(townId: _townId)),
       );
-      await tester.pump();
-      await tester.pump();
-      await tester.pump();
+      // ⚠️ pumpAndSettle, not counted pumps: the push TRANSITION must finish
+      // before tapping — mid-slide the whole page is translated and a tap at
+      // the stepper's laid-out position hits nothing (found the day the
+      // stepper moved to the row's right edge). The shop has no perpetual
+      // animations, so settling terminates.
+      await tester.pumpAndSettle();
 
       final baselineGold = game.profile.gold;
       final baselineStock = Map.of(game.profile.shopStock[_townId]!.stock);
@@ -607,6 +612,115 @@ void main() {
       expect(game.profile.gold, baselineGold);
       expect(game.profile.shopStock[_townId]!.stock, baselineStock);
       expect(game.profile.storerooms[_townId]!.stacks, baselineRoom);
+    });
+  });
+
+  group('the 2026-08-25 UI pass', () {
+    testWidgets("the total chip reads 'N for Xg' and the subline shows the "
+        'next marginal price', (tester) async {
+      final game = _game(_MemStorage());
+      await _pump(tester, game);
+      // 20, not a handful: the next-unit note only appears once rounding
+      // actually MOVES the marginal price (5 oak leaves 11g → 11g, hidden
+      // on purpose — showing 'next 11g' beside '11g each' would be noise).
+      await _tapStepper(tester, _oak, Icons.add, times: 20);
+
+      final quote = game.priceShopBasket(
+        townId: _townId,
+        today: ShopState.epochDayOf(game.now()),
+        buy: const {_oak: 20},
+        sellStacks: const {},
+        sellInstances: const {},
+      );
+      expect(
+        find.text('20 for ${quote.buyGoldOf[_oak]}g'),
+        findsOneWidget,
+        reason: "⭐ point 2: '3g each' × 5 ≠ total is the marginal walk — the "
+            "chip must SAY 'N for Xg' or the mismatch reads as a bug",
+      );
+      expect(
+        find.textContaining('· next '),
+        findsWidgets,
+        reason: '⚠️ the mutant this kills: a chip that explains the total but '
+            'hides where the NEXT unit is priced',
+      );
+    });
+
+    test('tierOf maps all five multipliers to five distinct labelled colours',
+        () {
+      final tiers = [
+        ShopCatalogue.nativeMod,
+        ShopCatalogue.regionalMod,
+        ShopCatalogue.baselineMod,
+        ShopCatalogue.oneTierMod,
+        ShopCatalogue.exoticMod,
+      ].map(tierOf).toList();
+      expect(tiers.map((t) => t.$1).toSet().length, 5,
+          reason: 'five tiers, five words — the colour-blind half of point 3');
+      expect(tiers.map((t) => t.$2).toSet().length, 5,
+          reason: 'five DISTINCT colours — the ruled bright-green→red code');
+      expect(tiers.first.$1, contains('Native'));
+      expect(tiers.last.$1, contains('Exotic'));
+    });
+
+    testWidgets('tapping the quantity edits it in place, clamped to stock',
+        (tester) async {
+      final game = _game(_MemStorage());
+      await _pump(tester, game);
+      await _tapStepper(tester, _oak, Icons.add);
+      await tester.tap(
+        find.descendant(of: _rowFor(_oak), matching: find.text('1')),
+      );
+      await tester.pump();
+      await tester.enterText(
+        find.descendant(of: _rowFor(_oak), matching: find.byType(TextField)),
+        '999',
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      final stock =
+          game.profile.shopStock[_townId]!.stockOf(_oak);
+      expect(
+        find.text('$stock for '
+            '${game.priceShopBasket(townId: _townId, today: ShopState.epochDayOf(game.now()), buy: {_oak: stock}, sellStacks: const {}, sellInstances: const {}).buyGoldOf[_oak]}g'),
+        findsOneWidget,
+        reason: '⚠️ the mutant this kills: an in-place edit that trusts raw '
+            'input — 999 must clamp to the stock ceiling, not overbuy it',
+      );
+    });
+
+    testWidgets('the settle summary speaks in counts, and the basket review '
+        'prunes lines', (tester) async {
+      final game = _game(
+        _MemStorage(),
+        storeroomStacks: const {'sapwort': 4},
+      );
+      await _pump(tester, game);
+      await _tapStepper(tester, _oak, Icons.add, times: 2);
+      await tester.tap(find.text('Sell').first);
+      await tester.pump();
+      await _tapStepper(tester, 'sapwort', Icons.add, times: 3);
+
+      expect(
+        find.textContaining('Buying 2 items −'),
+        findsOneWidget,
+        reason: "point 5: 'buy 2 2 kinds' read like a typo; counts + signed "
+            'gold do not',
+      );
+      expect(find.textContaining('Selling 3 items +'), findsOneWidget);
+
+      await tester.tap(find.textContaining('tap to review'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Buy 2 × Oak Log'), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.close).first);
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('Buying 2 items'),
+        findsNothing,
+        reason: '⚠️ the mutant this kills: a review sheet whose remove button '
+            'repaints the sheet but never reaches the basket',
+      );
     });
   });
 }

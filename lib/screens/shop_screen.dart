@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../game/economy/shop_catalogue.dart';
@@ -214,6 +216,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 summary: _summary(quote),
                 blockReason: blockReason,
                 onSettle: blockReason == null ? _settle : null,
+                onReviewBasket: _openBasketReview,
               ),
           ],
         ),
@@ -221,42 +224,90 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
-  /// 'buy 5 oak (57g) · sell 10 bindweed (76g)' — named when a direction is
-  /// exactly one kind, otherwise a plain count so the line never overflows.
+  /// 'Buying 6 items −24g · Selling 7 items +105g' — the designer's ruled
+  /// wording (2026-08-25 UI pass, point 5): counts and signed gold, never
+  /// the old 'buy 6 2 kinds' shorthand that read like a typo.
   String _summary(ShopBasketQuote quote) {
     final parts = <String>[];
-    final buyIds = _buy.keys.where((id) => (_buy[id] ?? 0) > 0).toList();
-    if (buyIds.isNotEmpty) {
-      final n = buyIds.fold<int>(0, (a, id) => a + _buy[id]!);
-      final label = buyIds.length == 1
-          ? _lower(buyIds.first)
-          : '${buyIds.length} kinds';
-      parts.add('buy $n $label (${quote.buyGold}g)');
+    final buyN = _buy.values.fold<int>(0, (a, v) => a + v);
+    if (buyN > 0) {
+      parts.add('Buying $buyN item${buyN == 1 ? '' : 's'} −${quote.buyGold}g');
     }
-    final sellKinds =
-        _sellStacks.keys.where((id) => (_sellStacks[id] ?? 0) > 0).length +
+    final sellN =
+        _sellStacks.values.fold<int>(0, (a, v) => a + v) +
         _sellInstances.length;
-    if (sellKinds > 0) {
-      final n =
-          _sellStacks.values.fold<int>(0, (a, v) => a + v) +
-          _sellInstances.length;
-      final onlyStack =
-          _sellInstances.isEmpty &&
-          _sellStacks.keys.where((id) => (_sellStacks[id] ?? 0) > 0).length ==
-              1;
-      final label = onlyStack
-          ? _lower(
-              _sellStacks.keys.firstWhere((id) => (_sellStacks[id] ?? 0) > 0),
-            )
-          : '$sellKinds kinds';
-      parts.add('sell $n $label (${quote.sellGold}g)');
+    if (sellN > 0) {
+      parts.add(
+        'Selling $sellN item${sellN == 1 ? '' : 's'} +${quote.sellGold}g',
+      );
     }
     return parts.join(' · ');
   }
 
-  String _lower(String itemId) {
+  /// The basket review sheet (UI pass, point 5): every pending line with a
+  /// remove control, so the basket can be pruned without hunting both tabs.
+  /// Reads the live maps through a [StatefulBuilder] so removals repaint the
+  /// sheet AND the screen; pops itself when the last line goes.
+  void _openBasketReview() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.panel,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) {
+          void both(VoidCallback edit) {
+            setState(edit);
+            setSheetState(() {});
+            if (_basketEmpty) Navigator.of(sheetContext).pop();
+          }
+
+          final game = GameStateScope.read(context);
+          final lines = <Widget>[
+            for (final e in _buy.entries)
+              _BasketLine(
+                label: 'Buy ${e.value} × ${_name(e.key)}',
+                onRemove: () => both(() => _buy.remove(e.key)),
+              ),
+            for (final e in _sellStacks.entries)
+              _BasketLine(
+                label: 'Sell ${e.value} × ${_name(e.key)}',
+                onRemove: () => both(() => _sellStacks.remove(e.key)),
+              ),
+            for (final id in _sellInstances)
+              _BasketLine(
+                label:
+                    'Sell ${_name(game.profile.itemInstances[id]?.defId ?? id)}',
+                onRemove: () => both(() => _sellInstances.remove(id)),
+              ),
+          ];
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Basket',
+                    style: TextStyle(
+                      color: AppColors.gold,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ...lines,
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _name(String itemId) {
     final def = ItemCatalogue.tryById(itemId);
-    return def == null ? itemId : ItemCatalogue.displayName(def).toLowerCase();
+    return def == null ? itemId : ItemCatalogue.displayName(def);
   }
 
   Future<void> _settle() async {
@@ -323,9 +374,8 @@ class _GoldPill extends StatelessWidget {
   );
 }
 
-/// ⚠️ Hand-rolled rather than a stock chip — matches `CraftScreen._Chip`'s
-/// bordered teal-on-panel shape exactly, so a Buy/Sell toggle reads as the
-/// same control family as every other filter pill in the app.
+/// ⚠️ Gold when lit, not teal (UI pass, point 8): on a screen whose every
+/// accent is gold, the old teal pill was the one off-palette element.
 class _TabChip extends StatelessWidget {
   final String label;
   final bool on;
@@ -341,8 +391,8 @@ class _TabChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
         decoration: BoxDecoration(
-          color: on ? AppColors.teal : Colors.transparent,
-          border: Border.all(color: on ? AppColors.teal : AppColors.border),
+          color: on ? AppColors.gold : Colors.transparent,
+          border: Border.all(color: on ? AppColors.gold : AppColors.border),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -379,18 +429,88 @@ class _EventChip extends StatelessWidget {
   }
 }
 
-/// The location-modifier note shown as a row's muted subline — §4.1's
-/// five-row rule, read back in words rather than a bare multiplier.
-String locationModLabel(double mod) {
-  if (mod == ShopCatalogue.nativeMod) return 'native (−25%)';
-  if (mod == ShopCatalogue.regionalMod) return 'regional (−10%)';
-  if (mod == ShopCatalogue.baselineMod) return 'standard';
-  if (mod == ShopCatalogue.oneTierMod) return 'imported (+10%)';
-  return 'exotic (+25%)';
+/// The five location tiers as a colour-coded chip (UI pass, point 3):
+/// bright green → red is the ruled colour code, and the WORD rides along for
+/// colour-blind players. One of exactly five per §4.1, so the mapping is a
+/// closed switch, not a formula.
+class _TierChip extends StatelessWidget {
+  final double mod;
+  const _TierChip({required this.mod});
+
+  @override
+  Widget build(BuildContext context) {
+    final (label, colour) = tierOf(mod);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: colour.withValues(alpha: 0.14),
+        border: Border.all(color: colour),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: colour, fontSize: 10, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
 }
 
-/// A `-`/count/`+` quantity control, bounded to `[min, max]`.
-class _QtyStepper extends StatelessWidget {
+/// (label, colour) for a location-mod multiplier — the ruled five-step code.
+(String, Color) tierOf(double mod) {
+  if (mod == ShopCatalogue.nativeMod) {
+    return ('Native −25%', const Color(0xFF45D06E));
+  }
+  if (mod == ShopCatalogue.regionalMod) {
+    return ('Regional −10%', const Color(0xFFA3CF45));
+  }
+  if (mod == ShopCatalogue.baselineMod) {
+    return ('Standard', const Color(0xFFD0BD45));
+  }
+  if (mod == ShopCatalogue.oneTierMod) {
+    return ('Imported +10%', const Color(0xFFD08C45));
+  }
+  return ('Exotic +25%', const Color(0xFFD05252));
+}
+
+/// The reserved icon slot (UI pass, point 7): a dim square with the item's
+/// initial, replaced by the real PNG when the art lands — names align either
+/// way, and an icon-less shelf stops looking ragged.
+class _ItemGlyph extends StatelessWidget {
+  final String defId;
+  final String name;
+  const _ItemGlyph({required this.defId, required this.name});
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 26,
+    height: 26,
+    child: ItemIcon(
+      defId: defId,
+      size: 26,
+      gap: 0,
+      fallback: Container(
+        decoration: BoxDecoration(
+          color: AppColors.panelHi,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Center(
+          child: Text(
+            name.isEmpty ? '?' : name[0],
+            style: const TextStyle(
+              color: AppColors.textDim,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/// `-`/count/`+`, with the UI-pass point-8 ergonomics: hold either button to
+/// auto-repeat (accelerating), tap the number to edit it in place.
+class _QtyControl extends StatefulWidget {
   final int value;
   final int min;
   final int max;
@@ -398,7 +518,7 @@ class _QtyStepper extends StatelessWidget {
   /// Null disables the whole control — e.g. an out-of-stock item.
   final ValueChanged<int>? onChanged;
 
-  const _QtyStepper({
+  const _QtyControl({
     required this.value,
     required this.min,
     required this.max,
@@ -406,63 +526,156 @@ class _QtyStepper extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      _StepButton(
-        icon: Icons.remove,
-        onTap: onChanged == null || value <= min
-            ? null
-            : () => onChanged!(value - 1),
-      ),
-      SizedBox(
-        width: 26,
-        child: Text(
-          '$value',
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.text, fontSize: 13),
+  State<_QtyControl> createState() => _QtyControlState();
+}
+
+class _QtyControlState extends State<_QtyControl> {
+  Timer? _repeat;
+  var _held = 0;
+  var _editing = false;
+  late final TextEditingController _text = TextEditingController();
+
+  @override
+  void dispose() {
+    _repeat?.cancel();
+    _text.dispose();
+    super.dispose();
+  }
+
+  void _bump(int dir) {
+    final v = (widget.value + dir).clamp(widget.min, widget.max);
+    if (v != widget.value) widget.onChanged?.call(v);
+  }
+
+  /// ⭐ Accelerating hold-to-repeat: ~7 steps/s for the first second, then
+  /// ~18/s — fast enough to reach any stock ceiling in a couple of seconds
+  /// without a separate 'max' control.
+  void _startRepeat(int dir) {
+    _held = 0;
+    _repeat = Timer.periodic(const Duration(milliseconds: 140), (t) {
+      _held++;
+      _bump(dir);
+      if (_held == 7) {
+        t.cancel();
+        _repeat = Timer.periodic(
+          const Duration(milliseconds: 55),
+          (_) => _bump(dir),
+        );
+      }
+    });
+  }
+
+  void _stopRepeat() {
+    _repeat?.cancel();
+    _repeat = null;
+  }
+
+  void _commitEdit() {
+    final parsed = int.tryParse(_text.text.trim());
+    setState(() => _editing = false);
+    if (parsed == null) return;
+    final v = parsed.clamp(widget.min, widget.max);
+    if (v != widget.value) widget.onChanged?.call(v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = widget.onChanged != null;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _StepButton(
+          icon: Icons.remove,
+          onTap: !enabled || widget.value <= widget.min ? null : () => _bump(-1),
+          onHoldStart: !enabled ? null : () => _startRepeat(-1),
+          onHoldEnd: _stopRepeat,
         ),
-      ),
-      _StepButton(
-        icon: Icons.add,
-        onTap: onChanged == null || value >= max
-            ? null
-            : () => onChanged!(value + 1),
-      ),
-    ],
-  );
+        SizedBox(
+          width: 34,
+          child: _editing
+              ? TextField(
+                  controller: _text,
+                  autofocus: true,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppColors.text, fontSize: 13),
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(vertical: 4),
+                  ),
+                  onSubmitted: (_) => _commitEdit(),
+                  onTapOutside: (_) => _commitEdit(),
+                )
+              : InkWell(
+                  onTap: !enabled
+                      ? null
+                      : () => setState(() {
+                          _text.text = '${widget.value}';
+                          _editing = true;
+                        }),
+                  child: Text(
+                    '${widget.value}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppColors.text, fontSize: 13),
+                  ),
+                ),
+        ),
+        _StepButton(
+          icon: Icons.add,
+          onTap: !enabled || widget.value >= widget.max ? null : () => _bump(1),
+          onHoldStart: !enabled ? null : () => _startRepeat(1),
+          onHoldEnd: _stopRepeat,
+        ),
+      ],
+    );
+  }
 }
 
 class _StepButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
-  const _StepButton({required this.icon, required this.onTap});
+  final VoidCallback? onHoldStart;
+  final VoidCallback? onHoldEnd;
+  const _StepButton({
+    required this.icon,
+    required this.onTap,
+    this.onHoldStart,
+    this.onHoldEnd,
+  });
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.circular(6),
-    child: Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: onTap == null ? AppColors.borderDim : AppColors.border,
+  Widget build(BuildContext context) => GestureDetector(
+    onLongPressStart: onTap == null ? null : (_) => onHoldStart?.call(),
+    onLongPressEnd: (_) => onHoldEnd?.call(),
+    onLongPressCancel: onHoldEnd,
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: onTap == null ? AppColors.borderDim : AppColors.border,
+          ),
+          borderRadius: BorderRadius.circular(6),
         ),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Icon(
-        icon,
-        size: 14,
-        color: onTap == null ? AppColors.textFaint : AppColors.text,
+        child: Icon(
+          icon,
+          size: 14,
+          color: onTap == null ? AppColors.textFaint : AppColors.text,
+        ),
       ),
     ),
   );
 }
 
-/// A gold-chip total — shown on a row only once its basket quantity is > 0.
+/// A gold-chip total — 'N for Xg' once a row's quantity is > 0, so the
+/// marginal walk explains itself instead of contradicting the unit price
+/// (UI pass, point 2 — the '3g each but 5 for 16g' trap).
 class _GoldChip extends StatelessWidget {
   final int gold;
-  const _GoldChip({required this.gold});
+  final int qty;
+  const _GoldChip({required this.gold, required this.qty});
 
   @override
   Widget build(BuildContext context) => Container(
@@ -473,13 +686,86 @@ class _GoldChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
     ),
     child: Text(
-      '${gold}g',
+      qty > 1 ? '$qty for ${gold}g' : '${gold}g',
       style: const TextStyle(
         color: AppColors.gold,
         fontSize: 12.5,
         fontWeight: FontWeight.w700,
       ),
     ),
+  );
+}
+
+/// The price fragment of a row subline: strikethrough base → event price
+/// when an event is live (UI pass, point 6), '· next Ng' once the marginal
+/// walk has moved past the sticker price (point 2).
+class _PriceLine extends StatelessWidget {
+  final int unit;
+  final int? preEventUnit;
+  final int? nextUnit;
+  final bool spike;
+  final String suffix;
+  const _PriceLine({
+    required this.unit,
+    required this.preEventUnit,
+    required this.nextUnit,
+    required this.spike,
+    this.suffix = '',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final eventColour = spike ? AppColors.ember : AppColors.teal;
+    return Text.rich(
+      TextSpan(
+        children: [
+          if (preEventUnit != null && preEventUnit != unit) ...[
+            TextSpan(
+              text: '${preEventUnit}g ',
+              style: const TextStyle(
+                color: AppColors.textFaint,
+                decoration: TextDecoration.lineThrough,
+              ),
+            ),
+            TextSpan(
+              text: '${unit}g each',
+              style: TextStyle(color: eventColour),
+            ),
+          ] else
+            TextSpan(text: '${unit}g each'),
+          if (nextUnit != null && nextUnit != unit)
+            TextSpan(
+              text: ' · next ${nextUnit}g',
+              style: const TextStyle(color: AppColors.textFaint),
+            ),
+          if (suffix.isNotEmpty) TextSpan(text: suffix),
+        ],
+      ),
+      style: const TextStyle(color: AppColors.textDim, fontSize: 11.5),
+    );
+  }
+}
+
+class _BasketLine extends StatelessWidget {
+  final String label;
+  final VoidCallback onRemove;
+  const _BasketLine({required this.label, required this.onRemove});
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: Text(
+          label,
+          style: const TextStyle(color: AppColors.text, fontSize: 13),
+        ),
+      ),
+      IconButton(
+        icon: const Icon(Icons.close, size: 16, color: AppColors.textDim),
+        onPressed: onRemove,
+        tooltip: 'Remove from basket',
+      ),
+    ],
   );
 }
 
@@ -534,6 +820,9 @@ class _BuyList extends StatelessWidget {
   }
 }
 
+/// One SINGLE-LINE shelf row (UI pass, point 1 — the old card spent ~220px
+/// on ~40px of information): glyph · name+chips over a price subline ·
+/// stepper · total, everything on one visual line.
 class _BuyRow extends StatelessWidget {
   final GameState game;
   final String townId;
@@ -567,15 +856,23 @@ class _BuyRow extends StatelessWidget {
     final stock = state?.stockOf(itemId) ?? equilibrium;
     final locationMod = game.shopLocationModFor(townId, itemId);
     final eventMod = game.shopEventsFor(townId, today)[itemId] ?? 1.0;
-    final unit = ShopPricing.roundGold(
+    int unitAt(int atStock, {double event = 1.0}) => ShopPricing.roundGold(
       ShopPricing.buyPrice(
         base: def.value,
         equilibrium: equilibrium,
-        stock: stock,
+        stock: atStock,
         locationMod: locationMod,
-        eventMod: eventMod,
+        eventMod: event,
       ),
     );
+    final unit = unitAt(stock, event: eventMod);
+    // ⭐ Point 2: the NEXT unit's marginal price — the walk's convention
+    // prices unit i at the stock left after i−1 units, so with [qty] pending
+    // the next one costs the price at `stock − qty`.
+    final nextUnit = qty > 0 && qty < stock
+        ? unitAt(stock - qty, event: eventMod)
+        : null;
+    final preEvent = eventMod != 1.0 ? unitAt(stock) : null;
     // ⚠️ Bounded to persisted stock — the basket-pricing walk always prices
     // a buy line against `profile.shopStock` as it stands right now (see
     // `GameState.priceShopBasket`'s doc), so the stepper's ceiling must
@@ -583,66 +880,59 @@ class _BuyRow extends StatelessWidget {
     final max = stock < 0 ? 0 : stock;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: GamePanel(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              children: [
-                ItemIcon(
-                  defId: itemId,
-                  size: 18,
-                  gap: 8,
-                  fallback: const SizedBox.shrink(),
-                ),
-                Expanded(
-                  child: Text(
-                    name,
-                    style: TextStyle(
-                      color: rarityColour(def.rarity),
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600,
-                    ),
+            _ItemGlyph(defId: itemId, name: name),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: rarityColour(def.rarity),
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      _TierChip(mod: locationMod),
+                      if (eventMod != 1.0) ...[
+                        const SizedBox(width: 4),
+                        _EventChip(eventMod: eventMod),
+                      ],
+                    ],
                   ),
-                ),
-                Text(
-                  'Stock $stock',
-                  style: const TextStyle(color: AppColors.textDim, fontSize: 11.5),
-                ),
-              ],
-            ),
-            const SizedBox(height: 3),
-            Row(
-              children: [
-                Text(
-                  locationModLabel(locationMod),
-                  style: const TextStyle(color: AppColors.textFaint, fontSize: 11),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '${unit}g each',
-                  style: const TextStyle(color: AppColors.textDim, fontSize: 12),
-                ),
-                if (eventMod != 1.0) ...[
-                  const SizedBox(width: 6),
-                  _EventChip(eventMod: eventMod),
+                  const SizedBox(height: 2),
+                  _PriceLine(
+                    unit: unit,
+                    preEventUnit: preEvent,
+                    nextUnit: nextUnit,
+                    spike: eventMod > 1.0,
+                    suffix: ' · stock $stock',
+                  ),
                 ],
-              ],
+              ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                _QtyStepper(
-                  value: qty,
-                  min: 0,
-                  max: max,
-                  onChanged: max <= 0 ? null : onQtyChanged,
-                ),
-                const Spacer(),
-                if (qty > 0 && total != null) _GoldChip(gold: total!),
-              ],
+            const SizedBox(width: 8),
+            _QtyControl(
+              value: qty,
+              min: 0,
+              max: max,
+              onChanged: max <= 0 ? null : onQtyChanged,
             ),
+            if (qty > 0 && total != null) ...[
+              const SizedBox(width: 8),
+              _GoldChip(gold: total!, qty: qty),
+            ],
           ],
         ),
       ),
@@ -788,77 +1078,106 @@ class _SellStackRow extends StatelessWidget {
     final max = available < 0 ? 0 : available;
 
     int unit;
+    int? nextUnit;
+    int? preEvent;
+    var spike = false;
+    double locationMod = 1.0;
+    double eventMod = 1.0;
     if (stocked) {
       final state = game.profile.shopStock[townId];
       final equilibrium = game.shopEquilibriumFor(townId, itemId);
       final stock = state?.stockOf(itemId) ?? equilibrium;
-      final locationMod = game.shopLocationModFor(townId, itemId);
-      final eventMod = game.shopEventsFor(townId, today)[itemId] ?? 1.0;
-      unit = ShopPricing.roundGold(
+      locationMod = game.shopLocationModFor(townId, itemId);
+      eventMod = game.shopEventsFor(townId, today)[itemId] ?? 1.0;
+      spike = eventMod > 1.0;
+      int unitAt(int atStock, {double event = 1.0}) => ShopPricing.roundGold(
         ShopPricing.sellPrice(
           base: def.value,
           equilibrium: equilibrium,
-          stock: stock,
+          stock: atStock,
           locationMod: locationMod,
-          eventMod: eventMod,
+          eventMod: event,
         ),
       );
+      unit = unitAt(stock, event: eventMod);
+      // Selling FLOODS stock, so the next unit prices at `stock + qty` —
+      // the mirror of the buy row's `stock − qty`.
+      nextUnit = qty > 0 ? unitAt(stock + qty, event: eventMod) : null;
+      preEvent = eventMod != 1.0 ? unitAt(stock) : null;
     } else {
       unit = ShopPricing.vendorPrice(def.value);
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: GamePanel(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              children: [
-                ItemIcon(
-                  defId: itemId,
-                  size: 18,
-                  gap: 8,
-                  fallback: const SizedBox.shrink(),
-                ),
-                Expanded(
-                  child: Text(
-                    name,
-                    style: TextStyle(
-                      color: rarityColour(def.rarity),
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600,
-                    ),
+            _ItemGlyph(defId: itemId, name: name),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: rarityColour(def.rarity),
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if (stocked) ...[
+                        const SizedBox(width: 6),
+                        _TierChip(mod: locationMod),
+                      ],
+                      if (eventMod != 1.0) ...[
+                        const SizedBox(width: 4),
+                        _EventChip(eventMod: eventMod),
+                      ],
+                    ],
                   ),
-                ),
-                Text(
-                  'Have $available',
-                  style: const TextStyle(color: AppColors.textDim, fontSize: 11.5),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  if (bound)
+                    const Text(
+                      'Bound — cannot be sold.',
+                      style: TextStyle(color: AppColors.textDim, fontSize: 11.5),
+                    )
+                  else if (stocked)
+                    _PriceLine(
+                      unit: unit,
+                      preEventUnit: preEvent,
+                      nextUnit: nextUnit,
+                      spike: spike,
+                      suffix: ' · have $available',
+                    )
+                  else
+                    Text(
+                      '${unit}g each · vendor (flat) · have $available',
+                      style: const TextStyle(
+                        color: AppColors.textDim,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                ],
+              ),
             ),
-            const SizedBox(height: 3),
-            Text(
-              bound
-                  ? 'Bound — cannot be sold.'
-                  : stocked
-                  ? '${unit}g each'
-                  : '${unit}g each · vendor (flat)',
-              style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+            const SizedBox(width: 8),
+            _QtyControl(
+              value: qty,
+              min: 0,
+              max: max,
+              onChanged: bound || max <= 0 ? null : onQtyChanged,
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                _QtyStepper(
-                  value: qty,
-                  min: 0,
-                  max: max,
-                  onChanged: bound || max <= 0 ? null : onQtyChanged,
-                ),
-                const Spacer(),
-                if (qty > 0 && total != null) _GoldChip(gold: total!),
-              ],
-            ),
+            if (qty > 0 && total != null) ...[
+              const SizedBox(width: 8),
+              _GoldChip(gold: total!, qty: qty),
+            ],
           ],
         ),
       ),
@@ -896,16 +1215,12 @@ class _SellInstanceRow extends StatelessWidget {
     final unit = def == null ? 0 : ShopPricing.vendorPrice(def.value);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: GamePanel(
         child: Row(
           children: [
-            ItemIcon(
-              defId: defId,
-              size: 18,
-              gap: 8,
-              fallback: const SizedBox.shrink(),
-            ),
+            _ItemGlyph(defId: defId, name: name),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -920,14 +1235,14 @@ class _SellInstanceRow extends StatelessWidget {
                   ),
                   Text(
                     bound ? 'Bound — cannot be sold.' : '${unit}g · vendor (flat)',
-                    style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+                    style: const TextStyle(color: AppColors.textDim, fontSize: 11.5),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
             if (selected && !bound && total != null) ...[
-              _GoldChip(gold: total!),
+              _GoldChip(gold: total!, qty: 1),
               const SizedBox(width: 8),
             ],
             OutlinedButton(
@@ -951,18 +1266,22 @@ class _SellInstanceRow extends StatelessWidget {
 
 /// The persistent bottom bar (build brief's "TRANSACTION MODEL"): visible
 /// whenever the basket is non-empty, summarising both directions and
-/// charging exactly [ShopBasketQuote.net] when [onSettle] fires.
+/// charging exactly [ShopBasketQuote.net] when [onSettle] fires. ⭐ The
+/// summary line is TAPPABLE (UI pass, point 5) — it opens the basket review
+/// sheet, the only place the whole basket is visible at once.
 class _SettleBar extends StatelessWidget {
   final ShopBasketQuote quote;
   final String summary;
   final String? blockReason;
   final VoidCallback? onSettle;
+  final VoidCallback onReviewBasket;
 
   const _SettleBar({
     required this.quote,
     required this.summary,
     required this.blockReason,
     required this.onSettle,
+    required this.onReviewBasket,
   });
 
   @override
@@ -979,9 +1298,20 @@ class _SettleBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            summary,
-            style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+          InkWell(
+            onTap: onReviewBasket,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: summary),
+                  const TextSpan(
+                    text: '  ·  tap to review',
+                    style: TextStyle(color: AppColors.textFaint),
+                  ),
+                ],
+              ),
+              style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+            ),
           ),
           const SizedBox(height: 8),
           Row(
