@@ -633,10 +633,13 @@ void main() {
         sellInstances: const {},
       );
       expect(
-        find.text('20 for ${quote.buyGoldOf[_oak]}g'),
+        find.descendant(
+          of: _rowFor(_oak),
+          matching: find.text('${quote.buyGoldOf[_oak]}g'),
+        ),
         findsOneWidget,
-        reason: "⭐ point 2: '3g each' × 5 ≠ total is the marginal walk — the "
-            "chip must SAY 'N for Xg' or the mismatch reads as a bug",
+        reason: '⭐ the TOTAL column must show the marginal-walk total from '
+            'the one shared quote — a per-row recompute is the mutant',
       );
       expect(
         find.textContaining('· next '),
@@ -682,8 +685,12 @@ void main() {
       final stock =
           game.profile.shopStock[_townId]!.stockOf(_oak);
       expect(
-        find.text('$stock for '
-            '${game.priceShopBasket(townId: _townId, today: ShopState.epochDayOf(game.now()), buy: {_oak: stock}, sellStacks: const {}, sellInstances: const {}).buyGoldOf[_oak]}g'),
+        find.descendant(
+          of: _rowFor(_oak),
+          matching: find.text(
+            '${game.priceShopBasket(townId: _townId, today: ShopState.epochDayOf(game.now()), buy: {_oak: stock}, sellStacks: const {}, sellInstances: const {}).buyGoldOf[_oak]}g',
+          ),
+        ),
         findsOneWidget,
         reason: '⚠️ the mutant this kills: an in-place edit that trusts raw '
             'input — 999 must clamp to the stock ceiling, not overbuy it',

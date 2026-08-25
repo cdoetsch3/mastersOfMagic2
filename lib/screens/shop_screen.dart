@@ -487,6 +487,8 @@ class _ColumnHeader extends StatelessWidget {
         SizedBox(width: 52, child: _HeaderText(qtyLabel, right: true)),
         const SizedBox(width: 10),
         const SizedBox(width: 58, child: _HeaderText('PRICE', right: true)),
+        const SizedBox(width: 10),
+        const SizedBox(width: 74, child: _HeaderText('TOTAL', right: true)),
       ],
     ),
   );
@@ -542,6 +544,31 @@ class _PriceCell extends StatelessWidget {
       '${unit}g',
       textAlign: TextAlign.right,
       style: TextStyle(color: colour, fontSize: 16, fontWeight: FontWeight.w600),
+    ),
+  );
+}
+
+/// The TOTAL column (ruling 2026-08-25, round 2): an ALWAYS-RESERVED cell,
+/// blank until a quantity exists — the first total chip design was inserted
+/// between the columns and shoved that row's whole grid out of alignment
+/// ('well now THIS is awkward'). A fixed column can appear without moving a
+/// single pixel of anything else, and under a TOTAL header the number needs
+/// no 'N for' label.
+class _TotalCell extends StatelessWidget {
+  final int? gold;
+  const _TotalCell({required this.gold});
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 74,
+    child: Text(
+      gold == null ? '' : '${gold}g',
+      textAlign: TextAlign.right,
+      style: const TextStyle(
+        color: AppColors.gold,
+        fontSize: 15,
+        fontWeight: FontWeight.w700,
+      ),
     ),
   );
 }
@@ -941,10 +968,14 @@ class _BuyRow extends StatelessWidget {
     // ⭐ Point 2: the NEXT unit's marginal price — the walk's convention
     // prices unit i at the stock left after i−1 units, so with [qty] pending
     // the next one costs the price at `stock − qty`.
-    final nextUnit = qty > 0 && qty < stock
+    // Null when it ROUNDS EQUAL to the sticker — 'next 11g' under '11g' was
+    // the redundant mutter Christian's screenshot caught.
+    final rawNext = qty > 0 && qty < stock
         ? unitAt(stock - qty, event: eventMod)
         : null;
-    final preEvent = eventMod != 1.0 ? unitAt(stock) : null;
+    final nextUnit = rawNext == unit ? null : rawNext;
+    final rawPre = eventMod != 1.0 ? unitAt(stock) : null;
+    final preEvent = rawPre == unit ? null : rawPre;
     // ⚠️ Bounded to persisted stock — the basket-pricing walk always prices
     // a buy line against `profile.shopStock` as it stands right now (see
     // `GameState.priceShopBasket`'s doc), so the stepper's ceiling must
@@ -956,8 +987,7 @@ class _BuyRow extends StatelessWidget {
         : eventMod > 1.0
         ? AppColors.ember
         : AppColors.teal;
-    final hasSubline =
-        preEvent != null || nextUnit != null || eventMod != 1.0;
+    final hasSubline = preEvent != null || nextUnit != null;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -1011,12 +1041,8 @@ class _BuyRow extends StatelessWidget {
             const SizedBox(width: 10),
             _PriceCell(unit: unit, colour: eventColour),
             const SizedBox(width: 10),
-            // ⭐ Chip BEFORE stepper (press-stability rule): appearing/growing
-            // things live on the side AWAY from the buttons being pressed.
-            if (qty > 0 && total != null) ...[
-              _GoldChip(gold: total!, qty: qty),
-              const SizedBox(width: 8),
-            ],
+            _TotalCell(gold: qty > 0 ? total : null),
+            const SizedBox(width: 10),
             _QtyControl(
               value: qty,
               min: 0,
@@ -1192,9 +1218,12 @@ class _SellStackRow extends StatelessWidget {
       );
       unit = unitAt(stock, event: eventMod);
       // Selling FLOODS stock, so the next unit prices at `stock + qty` —
-      // the mirror of the buy row's `stock − qty`.
-      nextUnit = qty > 0 ? unitAt(stock + qty, event: eventMod) : null;
-      preEvent = eventMod != 1.0 ? unitAt(stock) : null;
+      // the mirror of the buy row's `stock − qty`. Null when it rounds
+      // equal to the sticker, same as the buy row.
+      final rawNext = qty > 0 ? unitAt(stock + qty, event: eventMod) : null;
+      nextUnit = rawNext == unit ? null : rawNext;
+      final rawPre = eventMod != 1.0 ? unitAt(stock) : null;
+      preEvent = rawPre == unit ? null : rawPre;
     } else {
       unit = ShopPricing.vendorPrice(def.value);
     }
@@ -1277,11 +1306,8 @@ class _SellStackRow extends StatelessWidget {
             const SizedBox(width: 10),
             _PriceCell(unit: unit, colour: eventColour),
             const SizedBox(width: 10),
-            // ⭐ Chip before stepper — press-stability rule.
-            if (qty > 0 && total != null) ...[
-              _GoldChip(gold: total!, qty: qty),
-              const SizedBox(width: 8),
-            ],
+            _TotalCell(gold: qty > 0 ? total : null),
+            const SizedBox(width: 10),
             _QtyControl(
               value: qty,
               min: 0,
