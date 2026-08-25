@@ -797,53 +797,6 @@ class _GoldChip extends StatelessWidget {
   );
 }
 
-/// The price fragment of a row subline: strikethrough base → event price
-/// when an event is live (UI pass, point 6), '· next Ng' once the marginal
-/// walk has moved past the sticker price (point 2).
-class _PriceLine extends StatelessWidget {
-  final int unit;
-  final int? preEventUnit;
-  final int? nextUnit;
-  final bool spike;
-  const _PriceLine({
-    required this.unit,
-    required this.preEventUnit,
-    required this.nextUnit,
-    required this.spike,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final eventColour = spike ? AppColors.ember : AppColors.teal;
-    return Text.rich(
-      TextSpan(
-        children: [
-          if (preEventUnit != null && preEventUnit != unit) ...[
-            TextSpan(
-              text: '${preEventUnit}g ',
-              style: const TextStyle(
-                color: AppColors.textFaint,
-                decoration: TextDecoration.lineThrough,
-              ),
-            ),
-            TextSpan(
-              text: '${unit}g each',
-              style: TextStyle(color: eventColour),
-            ),
-          ] else
-            TextSpan(text: '${unit}g each'),
-          if (nextUnit != null && nextUnit != unit)
-            TextSpan(
-              text: ' · next ${nextUnit}g',
-              style: const TextStyle(color: AppColors.textFaint),
-            ),
-        ],
-      ),
-      style: const TextStyle(color: AppColors.textDim, fontSize: 11.5),
-    );
-  }
-}
-
 class _BasketLine extends StatelessWidget {
   final String label;
   final VoidCallback onRemove;
@@ -964,18 +917,16 @@ class _BuyRow extends StatelessWidget {
         eventMod: event,
       ),
     );
-    final unit = unitAt(stock, event: eventMod);
+    // ⭐ Ruling 2026-08-25 round 3: PRICE is the NEXT unit's price, live —
+    // buying drains stock, so the (qty+1)th unit prices at stock − qty. At
+    // qty 0 this IS the sticker price, and as the stepper climbs the column
+    // answers the only question that matters mid-purchase: what does one
+    // MORE cost?
+    final unit = unitAt(stock - qty, event: eventMod);
     // ⭐ Point 2: the NEXT unit's marginal price — the walk's convention
     // prices unit i at the stock left after i−1 units, so with [qty] pending
     // the next one costs the price at `stock − qty`.
-    // Null when it ROUNDS EQUAL to the sticker — 'next 11g' under '11g' was
-    // the redundant mutter Christian's screenshot caught.
-    final rawNext = qty > 0 && qty < stock
-        ? unitAt(stock - qty, event: eventMod)
-        : null;
-    final nextUnit = rawNext == unit ? null : rawNext;
-    final rawPre = eventMod != 1.0 ? unitAt(stock) : null;
-    final preEvent = rawPre == unit ? null : rawPre;
+
     // ⚠️ Bounded to persisted stock — the basket-pricing walk always prices
     // a buy line against `profile.shopStock` as it stands right now (see
     // `GameState.priceShopBasket`'s doc), so the stepper's ceiling must
@@ -987,7 +938,6 @@ class _BuyRow extends StatelessWidget {
         : eventMod > 1.0
         ? AppColors.ember
         : AppColors.teal;
-    final hasSubline = preEvent != null || nextUnit != null;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -1021,15 +971,6 @@ class _BuyRow extends StatelessWidget {
                       ],
                     ],
                   ),
-                  if (hasSubline) ...[
-                    const SizedBox(height: 2),
-                    _PriceLine(
-                      unit: unit,
-                      preEventUnit: preEvent,
-                      nextUnit: nextUnit,
-                      spike: eventMod > 1.0,
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -1195,9 +1136,6 @@ class _SellStackRow extends StatelessWidget {
     final max = available < 0 ? 0 : available;
 
     int unit;
-    int? nextUnit;
-    int? preEvent;
-    var spike = false;
     double locationMod = 1.0;
     double eventMod = 1.0;
     if (stocked) {
@@ -1206,7 +1144,6 @@ class _SellStackRow extends StatelessWidget {
       final stock = state?.stockOf(itemId) ?? equilibrium;
       locationMod = game.shopLocationModFor(townId, itemId);
       eventMod = game.shopEventsFor(townId, today)[itemId] ?? 1.0;
-      spike = eventMod > 1.0;
       int unitAt(int atStock, {double event = 1.0}) => ShopPricing.roundGold(
         ShopPricing.sellPrice(
           base: def.value,
@@ -1216,25 +1153,20 @@ class _SellStackRow extends StatelessWidget {
           eventMod: event,
         ),
       );
-      unit = unitAt(stock, event: eventMod);
-      // Selling FLOODS stock, so the next unit prices at `stock + qty` —
-      // the mirror of the buy row's `stock − qty`. Null when it rounds
-      // equal to the sticker, same as the buy row.
-      final rawNext = qty > 0 ? unitAt(stock + qty, event: eventMod) : null;
-      nextUnit = rawNext == unit ? null : rawNext;
-      final rawPre = eventMod != 1.0 ? unitAt(stock) : null;
-      preEvent = rawPre == unit ? null : rawPre;
+      // ⭐ Ruling 2026-08-25 round 3: PRICE is the NEXT unit's price, live —
+      // selling floods stock, so the (qty+1)th unit prices at stock + qty.
+      // At qty 0 this IS the sticker price.
+      unit = unitAt(stock + qty, event: eventMod);
     } else {
       unit = ShopPricing.vendorPrice(def.value);
     }
 
     final eventColour = !stocked || eventMod == 1.0
         ? AppColors.gold
-        : spike
+        : eventMod > 1.0
         ? AppColors.ember
         : AppColors.teal;
-    final hasSubline =
-        bound || !stocked || preEvent != null || nextUnit != null;
+    final hasSubline = bound || !stocked;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -1279,13 +1211,6 @@ class _SellStackRow extends StatelessWidget {
                           color: AppColors.textDim,
                           fontSize: 11.5,
                         ),
-                      )
-                    else if (stocked)
-                      _PriceLine(
-                        unit: unit,
-                        preEventUnit: preEvent,
-                        nextUnit: nextUnit,
-                        spike: spike,
                       )
                     else
                       const Text(

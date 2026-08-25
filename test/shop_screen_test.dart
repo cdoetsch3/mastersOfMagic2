@@ -616,8 +616,8 @@ void main() {
   });
 
   group('the 2026-08-25 UI pass', () {
-    testWidgets("the total chip reads 'N for Xg' and the subline shows the "
-        'next marginal price', (tester) async {
+    testWidgets('the TOTAL column carries the quote and PRICE shows the '
+        'NEXT unit, live', (tester) async {
       final game = _game(_MemStorage());
       await _pump(tester, game);
       // 20, not a handful: the next-unit note only appears once rounding
@@ -641,11 +641,29 @@ void main() {
         reason: '⭐ the TOTAL column must show the marginal-walk total from '
             'the one shared quote — a per-row recompute is the mutant',
       );
+      // ⭐ Round-3 ruling: the PRICE column shows the (qty+1)th unit's
+      // marginal price — with 20 pending, the column must read the price at
+      // stock − 20, not the sticker.
+      final game2 = GameStateScope.of(
+        tester.element(find.byType(ShopScreen)),
+      );
+      final stock = game2.profile.shopStock[_townId]!.stockOf(_oak);
+      final expectedNext = ShopPricing.roundGold(
+        ShopPricing.buyPrice(
+          base: ItemCatalogue.byId(_oak).value,
+          equilibrium: game2.shopEquilibriumFor(_townId, _oak),
+          stock: stock - 20,
+          locationMod: game2.shopLocationModFor(_townId, _oak),
+        ),
+      );
       expect(
-        find.textContaining('· next '),
-        findsWidgets,
-        reason: '⚠️ the mutant this kills: a chip that explains the total but '
-            'hides where the NEXT unit is priced',
+        find.descendant(
+          of: _rowFor(_oak),
+          matching: find.text('${expectedNext}g'),
+        ),
+        findsOneWidget,
+        reason: '⚠️ the mutant this kills: a PRICE column frozen at the '
+            'sticker while the marginal walk moves on without it',
       );
     });
 
