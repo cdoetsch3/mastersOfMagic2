@@ -47,6 +47,10 @@ abstract final class WhisperingWoodsItems {
 
   static const floraDust = MoteDef(
     id: 'flora_dust',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 2,
     properName: 'Flora Dust',
     rarity: Rarity.common,
     lore: 'What a growing thing leaves when it is unmade faster than it grew.',
@@ -56,6 +60,10 @@ abstract final class WhisperingWoodsItems {
 
   static const floraShard = MoteDef(
     id: 'flora_shard',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 25,
     properName: 'Flora Shard',
     rarity: Rarity.common,
     lore: 'Dust that settled somewhere it was not disturbed.',
@@ -67,6 +75,10 @@ abstract final class WhisperingWoodsItems {
   /// is the first place the mote ladder is felt (ITEMS §8).
   static const floraCrystal = MoteDef(
     id: 'flora_crystal',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 150,
     properName: 'Flora Crystal',
     rarity: Rarity.uncommon,
     lore: 'It is warm, and it does not stop being warm.',

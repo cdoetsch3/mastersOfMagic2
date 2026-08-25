@@ -54,6 +54,10 @@ abstract final class GlimmerbrookItems {
 
   static const aquaDust = MoteDef(
     id: 'aqua_dust',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 2,
     properName: 'Aqua Dust',
     rarity: Rarity.common,
     lore: 'What water leaves when it is broken faster than it can close.',
@@ -63,6 +67,10 @@ abstract final class GlimmerbrookItems {
 
   static const aquaShard = MoteDef(
     id: 'aqua_shard',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 25,
     properName: 'Aqua Shard',
     rarity: Rarity.common,
     lore: 'Dust that stood in one place long enough to set.',
@@ -75,6 +83,10 @@ abstract final class GlimmerbrookItems {
   /// different elements, and the pair reads as a set.
   static const aquaCrystal = MoteDef(
     id: 'aqua_crystal',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 150,
     properName: 'Aqua Crystal',
     rarity: Rarity.uncommon,
     lore: 'It is cold, and it does not stop being cold.',

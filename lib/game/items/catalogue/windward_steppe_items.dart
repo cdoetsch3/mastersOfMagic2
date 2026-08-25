@@ -52,6 +52,10 @@ abstract final class WindwardSteppeItems {
 
   static const aeroDust = MoteDef(
     id: 'aero_dust',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 2,
     properName: 'Aero Dust',
     rarity: Rarity.common,
     lore: 'What a moving thing leaves when the wind gets there first.',
@@ -61,6 +65,10 @@ abstract final class WindwardSteppeItems {
 
   static const aeroShard = MoteDef(
     id: 'aero_shard',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 25,
     properName: 'Aero Shard',
     rarity: Rarity.common,
     lore: 'Dust that caught on something and stopped moving, briefly.',
@@ -74,6 +82,10 @@ abstract final class WindwardSteppeItems {
   /// reads as one object in every element rather than unrelated rocks.
   static const aeroCrystal = MoteDef(
     id: 'aero_crystal',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 150,
     properName: 'Aero Crystal',
     rarity: Rarity.uncommon,
     lore: 'It is moving, and it does not stop.',

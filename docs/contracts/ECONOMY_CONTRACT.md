@@ -853,6 +853,19 @@ trades move goods directly shop⇄Storeroom (no backpack constraint locally);
 HAULING between towns rides the 20-slot backpack — carry capacity is the
 arbitrage governor until Phase 5b mounts add cargo.
 
+## 14c. ✅ Mote ruling (Christian, 2026-08-25)
+
+Motes are **regular tradable items with one vendor value per TIER, uniform
+across all elements**: Dust 2g · Shard 25g · Crystal 150g (Core 900g when it
+ships). Deliberately LOSSY against §6.1's refinement ladder at every rung
+(25 < 50×2, 150 < 20×25, 900 < 12×150) so refine-and-vendor never profits —
+pinned by test. **Sell-only at NPC shops**: vendorable, never stocked — the
+gather-node ruling ("a mote node would uncouple Enchanting from fighting")
+generalizes to an NPC shelf; player-to-player trade is exempt because it is
+zero-sum in motes. ⚠️ **Hearts are the one exception**: craft-only (§6.0) is
+load-bearing, so Hearts get no value, no vendor path, and Bound tradability
+when they ship. The player market inherits all of this unchanged.
+
 ## 14. Decisions needed (superseded — see 14b)
 
 ⚠️ **Four items. Each is a genuine gap this contract cannot close by

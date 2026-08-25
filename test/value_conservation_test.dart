@@ -435,4 +435,44 @@ void main() {
       );
     });
   });
+
+  group('motes vendor by tier, never by element, never from a shelf '
+      '(ruling 2026-08-25)', () {
+    test('one value per tier, uniform across every element', () {
+      final motes = ItemCatalogue.all.whereType<MoteDef>().toList();
+      expect(motes.length, 18, reason: '6 elements × 3 shipped tiers');
+      const perTier = {MoteTier.dust: 2, MoteTier.shard: 25, MoteTier.crystal: 150};
+      for (final m in motes) {
+        expect(m.value, perTier[m.tier],
+            reason: '${m.id}: aqua dust and pyro dust are the SAME 2g — the '
+                'ruling is per-tier, and a per-element drift here is the '
+                'mutant this kills');
+      }
+    });
+
+    test('⭐ the vendor ladder is LOSSY against refinement, every rung', () {
+      // Dust →50→ Shard →20→ Crystal (§6.1). If a rung ever vendors for
+      // more than its conversion cost, refine-and-vendor mints gold.
+      expect(25, lessThan(50 * 2),
+          reason: 'a Shard must vendor under its 50-Dust cost');
+      expect(150, lessThan(20 * 25),
+          reason: 'a Crystal must vendor under its 20-Shard cost');
+      // 📝 When Cores (900g proposed) and Hearts arrive: 900 < 12×150, and
+      // Hearts get NO value at all — craft-only (§6.0) means unvendorable,
+      // untradeable, the one mote-family exception, already ruled.
+    });
+
+    test('no town ever stocks a mote — sell-only is structural', () {
+      // ⭐ The gather-node ruling generalized: an NPC shelf of motes would
+      // uncouple Enchanting from fighting exactly as a mote node would.
+      for (final town in World.locations.where((l) => l.isTown)) {
+        for (final id in ShopCatalogue.stockFor(town.id)) {
+          expect(ItemCatalogue.byId(id) is MoteDef, isFalse,
+              reason: '${town.id} stocks $id — motes are vendorable, never '
+                  'stockable (the mutant: MoteDef sneaking into '
+                  '_isStockableKind)');
+        }
+      }
+    });
+  });
 }

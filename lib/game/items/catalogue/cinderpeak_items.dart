@@ -49,6 +49,10 @@ abstract final class CinderpeakItems {
 
   static const pyroDust = MoteDef(
     id: 'pyro_dust',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 2,
     properName: 'Pyro Dust',
     rarity: Rarity.common,
     lore: 'What a burning thing leaves when it is put out before it finished.',
@@ -58,6 +62,10 @@ abstract final class CinderpeakItems {
 
   static const pyroShard = MoteDef(
     id: 'pyro_shard',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 25,
     properName: 'Pyro Shard',
     rarity: Rarity.common,
     lore: 'Dust that banked itself and went on quietly burning.',
@@ -71,6 +79,10 @@ abstract final class CinderpeakItems {
   /// object in three elements rather than three unrelated rocks.
   static const pyroCrystal = MoteDef(
     id: 'pyro_crystal',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 150,
     properName: 'Pyro Crystal',
     rarity: Rarity.uncommon,
     lore: 'It is hot, and it does not cool.',

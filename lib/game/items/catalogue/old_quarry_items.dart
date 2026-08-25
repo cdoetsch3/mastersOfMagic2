@@ -57,6 +57,10 @@ abstract final class OldQuarryItems {
 
   static const geoDust = MoteDef(
     id: 'geo_dust',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 2,
     properName: 'Geo Dust',
     rarity: Rarity.common,
     lore: 'What breaks off a standing stone before the stone itself gives way.',
@@ -66,6 +70,10 @@ abstract final class OldQuarryItems {
 
   static const geoShard = MoteDef(
     id: 'geo_shard',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 25,
     properName: 'Geo Shard',
     rarity: Rarity.common,
     lore: 'Dust that held its shape long enough to grow edges.',
@@ -79,6 +87,10 @@ abstract final class OldQuarryItems {
   /// elements.
   static const geoCrystal = MoteDef(
     id: 'geo_crystal',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 150,
     properName: 'Geo Crystal',
     rarity: Rarity.uncommon,
     lore: 'It is heavy, and it does not get lighter.',

@@ -53,6 +53,10 @@ abstract final class StormcliffCoastItems {
 
   static const electroDust = MoteDef(
     id: 'electro_dust',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 2,
     properName: 'Electro Dust',
     rarity: Rarity.common,
     lore: 'What a struck thing leaves after the light is already gone.',
@@ -62,6 +66,10 @@ abstract final class StormcliffCoastItems {
 
   static const electroShard = MoteDef(
     id: 'electro_shard',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 25,
     properName: 'Electro Shard',
     rarity: Rarity.common,
     lore: 'Dust that held its charge a moment longer than the rest.',
@@ -74,6 +82,10 @@ abstract final class StormcliffCoastItems {
   /// same shape, so the ladder reads as one object in nine elements.
   static const electroCrystal = MoteDef(
     id: 'electro_crystal',
+    // ⭐ Ruled 2026-08-25: one vendor value per TIER, uniform across all
+    // elements, LOSSY against the refinement ladder (a Shard vendors for
+    // less than its 50 Dust cost) so refine-and-vendor can never profit.
+    value: 150,
     properName: 'Electro Crystal',
     rarity: Rarity.uncommon,
     lore: 'It is live, and it does not discharge.',
