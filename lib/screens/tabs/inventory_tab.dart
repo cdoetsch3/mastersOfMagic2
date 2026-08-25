@@ -576,30 +576,70 @@ class _GearTotals extends StatelessWidget {
               style: TextStyle(color: AppColors.textDim, fontSize: 12),
             )
           else
-            for (final line in lines)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 3),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
+            // ⭐ Two columns (ruling 2026-08-25, round 2): numbers stay close
+            // to their labels instead of a screen-wide gap — and every TOTAL
+            // right-aligns on its column edge because the parenthesis moved
+            // IN FRONT of it ('(167 +12) 179'), the reversal the designer
+            // pre-approved for exactly this alignment. One column on narrow
+            // screens rather than two cramped ones.
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final twoCol = constraints.maxWidth >= 430;
+                if (!twoCol) {
+                  return Column(
+                    children: [for (final l in lines) _StatRow(line: l)],
+                  );
+                }
+                final half = (lines.length + 1) ~/ 2;
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Text(
-                        line.label,
-                        style: const TextStyle(
-                          color: AppColors.textDim,
-                          fontSize: 12.5,
-                        ),
+                      child: Column(
+                        children: [
+                          for (final l in lines.take(half)) _StatRow(line: l),
+                        ],
                       ),
                     ),
-                    _StatNumbers(line: line),
+                    const SizedBox(width: 28),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          for (final l in lines.skip(half)) _StatRow(line: l),
+                        ],
+                      ),
+                    ),
                   ],
-                ),
-              ),
+                );
+              },
+            ),
         ],
       ),
     );
   }
+}
+
+class _StatRow extends StatelessWidget {
+  final GearStatLine line;
+  const _StatRow({required this.line});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 3),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Expanded(
+          child: Text(
+            line.label,
+            style: const TextStyle(color: AppColors.textDim, fontSize: 12.5),
+          ),
+        ),
+        _StatNumbers(line: line),
+      ],
+    ),
+  );
 }
 
 /// The colour a gear bonus wears: green when it gives, red when it takes.
@@ -617,21 +657,16 @@ class _StatNumbers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ⭐ Parenthesis BEFORE the total — '(167 +12) 179' — so the big number
+    // is always the LAST thing on the line and every total in a column
+    // right-aligns on the same edge (ruling 2026-08-25, round 2).
     final signed = '${line.bonus >= 0 ? '+' : '−'}${line.bonus.abs()}';
     return Text.rich(
       TextSpan(
         children: [
-          TextSpan(
-            text: line.total,
-            style: const TextStyle(
-              color: AppColors.text,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
           if (line.base != null) ...[
             TextSpan(
-              text: line.base! > 0 ? '  (${line.base} ' : '  (',
+              text: line.base! > 0 ? '(${line.base} ' : '(',
               style: const TextStyle(
                 color: AppColors.textFaint,
                 fontSize: 11.5,
@@ -646,10 +681,18 @@ class _StatNumbers extends StatelessWidget {
               ),
             ),
             const TextSpan(
-              text: ')',
+              text: ')  ',
               style: TextStyle(color: AppColors.textFaint, fontSize: 11.5),
             ),
           ],
+          TextSpan(
+            text: line.total,
+            style: const TextStyle(
+              color: AppColors.text,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
