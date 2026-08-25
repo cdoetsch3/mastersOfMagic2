@@ -636,10 +636,20 @@ class _QtyControlState extends State<_QtyControl> {
   var _editing = false;
   late final TextEditingController _text = TextEditingController();
 
+  /// ⭐ Ruling 2026-08-25: the edit commits when the control is LEFT — any
+  /// loss of focus (tab away, click a stepper, click another row) — not
+  /// only on Enter. A focus listener is the one seam that catches every way
+  /// out; onTapOutside alone missed non-tap departures.
+  late final FocusNode _focus = FocusNode()
+    ..addListener(() {
+      if (!_focus.hasFocus && _editing) _commitEdit();
+    });
+
   @override
   void dispose() {
     _repeat?.cancel();
     _text.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
@@ -696,6 +706,7 @@ class _QtyControlState extends State<_QtyControl> {
           child: _editing
               ? TextField(
                   controller: _text,
+                  focusNode: _focus,
                   autofocus: true,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
@@ -705,7 +716,10 @@ class _QtyControlState extends State<_QtyControl> {
                     contentPadding: EdgeInsets.symmetric(vertical: 4),
                   ),
                   onSubmitted: (_) => _commitEdit(),
-                  onTapOutside: (_) => _commitEdit(),
+                  // Route taps-outside through UNFOCUS rather than a direct
+                  // commit, so the focus listener stays the single committing
+                  // seam (a direct call here raced it and double-committed).
+                  onTapOutside: (_) => _focus.unfocus(),
                 )
               : InkWell(
                   onTap: !enabled

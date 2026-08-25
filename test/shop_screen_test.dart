@@ -715,6 +715,44 @@ void main() {
       );
     });
 
+    testWidgets('leaving the quantity field commits it — no Enter required',
+        (tester) async {
+      final game = _game(_MemStorage());
+      await _pump(tester, game);
+      await _tapStepper(tester, _oak, Icons.add);
+      await tester.tap(
+        find.descendant(of: _rowFor(_oak), matching: find.text('1')),
+      );
+      await tester.pump();
+      await tester.enterText(
+        find.descendant(of: _rowFor(_oak), matching: find.byType(TextField)),
+        '7',
+      );
+      // ⭐ The ruling: LEAVE the control, never press Enter. Unfocus is the
+      // canonical departure every exit path (tab, tap elsewhere) reduces to.
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+
+      final quote = game.priceShopBasket(
+        townId: _townId,
+        today: ShopState.epochDayOf(game.now()),
+        buy: const {_oak: 7},
+        sellStacks: const {},
+        sellInstances: const {},
+      );
+      expect(
+        find.descendant(
+          of: _rowFor(_oak),
+          matching: find.text('${quote.buyGoldOf[_oak]}g'),
+        ),
+        findsOneWidget,
+        reason: '⚠️ the mutant this kills: a commit wired only to '
+            'onSubmitted — typing 7 and clicking away must not quietly '
+            'revert to 1',
+      );
+      expect(find.textContaining('Buying 7 items'), findsOneWidget);
+    });
+
     testWidgets('the settle summary speaks in counts, and the basket review '
         'prunes lines', (tester) async {
       final game = _game(
