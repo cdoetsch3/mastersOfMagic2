@@ -7,11 +7,13 @@ import '../../game/game_state.dart';
 import '../../game/travel.dart';
 import '../../game/adventure.dart';
 import '../../game/adventure_launcher.dart';
+import '../../game/economy/shop_catalogue.dart';
 import '../../game/enemies/bestiary.dart';
 import '../../game/world.dart';
 import '../../ui/app_theme.dart';
 import '../../ui/travel_progress_card.dart';
 import '../home_shell.dart';
+import '../shop_screen.dart';
 import '../world_map_screen.dart';
 
 /// Where the player is in the world, what they can do here, and where they can
@@ -86,13 +88,29 @@ class _MapTabState extends State<MapTab> {
     final here = game.profile.location;
     return [
       if (here.isTown) ...[
-        _ActionTile(
-          icon: Icons.store,
-          color: AppColors.gold,
-          title: 'Merchant',
-          subtitle: 'Buy and sell goods',
-          onTap: () => _comingSoon(context, 'The merchant'),
-        ),
+        // ⭐ The Phase-2 placeholder finally pays off: open towns go to the
+        // real shop (ECONOMY_CONTRACT); closed towns say why they cannot
+        // (§14b.2), which beats a coming-soon dialog that is no longer true.
+        if (ShopCatalogue.isOpen(here.id))
+          _ActionTile(
+            icon: Icons.store,
+            color: AppColors.gold,
+            title: 'Merchant',
+            subtitle: 'Buy and sell goods',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => ShopScreen(townId: here.id),
+              ),
+            ),
+          )
+        else
+          _ActionTile(
+            icon: Icons.store,
+            color: AppColors.gold,
+            title: 'Merchant',
+            subtitle: ShopCatalogue.closedFlavor,
+            onTap: () => _shopClosed(context),
+          ),
         _ActionTile(
           icon: Icons.auto_stories,
           color: AppColors.sky,
@@ -134,28 +152,13 @@ class _MapTabState extends State<MapTab> {
     ];
   }
 
-  void _comingSoon(BuildContext context, String what) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.panel,
-        title: Text(
-          '$what is coming soon',
-          style: const TextStyle(color: AppColors.text, fontSize: 17),
-        ),
-        content: const Text(
-          'Shops arrive with the item and crafting update (Phase 2).',
-          style: TextStyle(color: AppColors.textDim),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Got it'),
-          ),
-        ],
-      ),
+
+  void _shopClosed(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(ShopCatalogue.closedFlavor)),
     );
   }
+
 }
 
 class _CurrentLocationCard extends StatelessWidget {
