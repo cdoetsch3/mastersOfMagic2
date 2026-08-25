@@ -73,7 +73,7 @@ void main() {
   group('checkContentVersion — reading the server document', () {
     test('reads config/content and compares its version field', () async {
       final asked = <String>[];
-      final decision = await checkContentVersion(
+      final decision = await checkContentVersion(enforce: true, 
         read: reader({'version': 4}, asked: asked),
         clientVersion: 4,
       );
@@ -87,7 +87,7 @@ void main() {
 
     test('a differing server version blocks', () async {
       expect(
-        await checkContentVersion(
+        await checkContentVersion(enforce: true, 
           read: reader({'version': 5}),
           clientVersion: 4,
         ),
@@ -98,7 +98,7 @@ void main() {
 
     test('⚠️ a thrown fetch (offline, rules, 500) passes', () async {
       expect(
-        await checkContentVersion(
+        await checkContentVersion(enforce: true, 
           read: reader(null, throws: Exception('offline')),
           clientVersion: 4,
         ),
@@ -110,7 +110,7 @@ void main() {
 
     test('⚠️ a fetch that never returns passes once the timeout elapses', () async {
       expect(
-        await checkContentVersion(
+        await checkContentVersion(enforce: true, 
           read: reader({'version': 99}, delay: const Duration(seconds: 30)),
           clientVersion: 4,
           timeout: const Duration(milliseconds: 20),
@@ -123,7 +123,7 @@ void main() {
 
     test('⚠️ a missing document passes — the server may not be seeded yet', () async {
       expect(
-        await checkContentVersion(read: reader(null), clientVersion: 4),
+        await checkContentVersion(enforce: true, read: reader(null), clientVersion: 4),
         ContentGateDecision.pass,
         reason: 'FirestoreRest.get returns null for a 404; treating an absent '
             'doc as version 0 would gate everyone before the first deploy',
@@ -132,12 +132,12 @@ void main() {
 
     test('⚠️ a missing or non-numeric field passes rather than gating', () async {
       expect(
-        await checkContentVersion(read: reader({}), clientVersion: 4),
+        await checkContentVersion(enforce: true, read: reader({}), clientVersion: 4),
         ContentGateDecision.pass,
         reason: 'a doc without the field must not read as a mismatch',
       );
       expect(
-        await checkContentVersion(
+        await checkContentVersion(enforce: true, 
           read: reader({'version': 'four'}),
           clientVersion: 4,
         ),
@@ -153,7 +153,7 @@ void main() {
       // integer. An `is int` narrowing would read that as "unknown", fail open,
       // and silently switch the gate off for every player.
       expect(
-        await checkContentVersion(
+        await checkContentVersion(enforce: true, 
           read: reader({'version': 5.0}),
           clientVersion: 4,
         ),
@@ -162,7 +162,7 @@ void main() {
             'floor and wave every stale client through',
       );
       expect(
-        await checkContentVersion(
+        await checkContentVersion(enforce: true, 
           read: reader({'version': 4.0}),
           clientVersion: 4,
         ),
@@ -174,7 +174,7 @@ void main() {
 
     test('the shipped default compares against ContentVersion.current', () async {
       expect(
-        await checkContentVersion(
+        await checkContentVersion(enforce: true, 
           read: reader({'version': ContentVersion.current}),
         ),
         ContentGateDecision.pass,
@@ -182,7 +182,7 @@ void main() {
             'not to a literal that drifts when the constant is bumped',
       );
       expect(
-        await checkContentVersion(
+        await checkContentVersion(enforce: true, 
           read: reader({'version': ContentVersion.current + 1}),
         ),
         ContentGateDecision.blocked,
@@ -252,6 +252,36 @@ void main() {
       );
       await tester.pump();
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('the gate is a release-build feature', () {
+    test('debug/profile (enforce: false) passes WITHOUT touching the network',
+        () async {
+      var reads = 0;
+      final decision = await checkContentVersion(
+        enforce: false,
+        read: (_) async {
+          reads++;
+          return {'version': 999};
+        },
+      );
+      expect(decision, ContentGateDecision.pass,
+          reason: '⭐ a developer running a bumped build locally must not be '
+              'gated by their own safety feature — the 2026-08-25 lockout');
+      expect(reads, 0,
+          reason: '⚠️ the mutant this kills: skipping only the DECISION but '
+              'still fetching — a needless boot-time network call in debug');
+    });
+
+    test('the default matches the build mode (kReleaseMode)', () async {
+      // In `flutter test` kReleaseMode is false, so the undecorated call
+      // passes even against a wildly mismatched server doc.
+      final decision =
+          await checkContentVersion(read: (_) async => {'version': 999});
+      expect(decision, ContentGateDecision.pass,
+          reason: 'enforce defaults to kReleaseMode — false here, true in a '
+              'release build; a hardcoded true would re-gate local dev');
     });
   });
 }

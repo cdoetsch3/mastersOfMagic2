@@ -207,6 +207,11 @@ CLI happens to be authenticated to a different Firebase project.
 
 #### The content-version gate
 
+📝 **The gate only enforces in RELEASE builds** — `flutter run` and debug
+builds always pass without fetching, so you can test a bumped-but-undeployed
+version locally against the production doc. The deployed site is a release
+build and always enforces.
+
 ⭐ **Did this release change anything a duel resolves against** — item stats,
 spell tables, engine tuning, drop tables, prices, the duel wire protocol? Then
 it is a two-step release:

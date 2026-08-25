@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import 'firestore_rest.dart';
 
 /// The version of everything a duel resolves *against*.
@@ -82,11 +84,19 @@ typedef ContentDocReader = Future<Map<String, dynamic>?> Function(String path);
 /// ⚠️ Every failure path — exception, timeout, missing document, missing or
 /// non-numeric field — collapses to [ContentGateDecision.pass]. See the
 /// fail-open note on [contentGateDecision].
+/// ⭐ **Release builds only** ([enforce] defaults to [kReleaseMode]): a
+/// `flutter run` / debug / profile build passes WITHOUT fetching, so a
+/// developer can test a bumped-but-undeployed version locally against the
+/// production doc without being gated by their own safety feature (found the
+/// hard way, 2026-08-25). Production is unaffected — a release build always
+/// enforces. Tests pass `enforce: true` explicitly.
 Future<ContentGateDecision> checkContentVersion({
   ContentDocReader read = FirestoreRest.get,
   int clientVersion = ContentVersion.current,
   Duration timeout = ContentVersion.fetchTimeout,
+  bool enforce = kReleaseMode,
 }) async {
+  if (!enforce) return ContentGateDecision.pass;
   int? serverVersion;
   try {
     final fields = await read(ContentVersion.docPath).timeout(timeout);
