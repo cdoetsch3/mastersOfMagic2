@@ -245,33 +245,6 @@ Keep `pubspec.yaml`'s `version:` in sync with `lib/game/app_version.dart`, and
 bump it every release — otherwise `version.json` cannot tell you which build is
 live.
 
-#### Economy config (`config/economy`)
-
-📝 **Optional.** Unlike `config/content`, nothing requires this document to
-exist — an absent doc, an absent field, or a field of the wrong type all fall
-back to `EconomyConfig`'s compiled defaults (`lib/game/economy/economy_config.dart`),
-per-field, silently. There is no gate and no redeploy step; write the doc
-whenever you want to tune the shop economy live, skip it otherwise.
-
-```sh
-curl -X PATCH \
-  "https://firestore.googleapis.com/v1/projects/mastersofmagic2/databases/(default)/documents/config/economy?updateMask.fieldPaths=resupplyRate" \
-  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-  -H "Content-Type: application/json" \
-  -d '{"fields":{"resupplyRate":{"doubleValue":0.5}}}'
-```
-
-(The same PATCH creates the document the first time. Add more field paths to
-`updateMask.fieldPaths`, comma-separated, to set more than one field per call.)
-
-⚠️ **This is the game's first server-tunable *gameplay* data, and it is
-fetched non-blocking** — the client boots and shows shops with the compiled
-defaults immediately, then swaps in the live doc's values once the fetch
-resolves (no spinner waits on it, unlike the content-version gate above). It
-is legal to tune live only because shops are PvE-personal
-(`docs/contracts/ECONOMY_CONTRACT.md` §7): nothing duel-resolved may ever read
-this document.
-
 ---
 
 ## 6. For AI agents specifically

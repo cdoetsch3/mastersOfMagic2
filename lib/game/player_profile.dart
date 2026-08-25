@@ -1,5 +1,6 @@
 import 'package:mom_engine/mom_engine.dart';
 
+import 'economy/shop_state.dart';
 import 'items/inventory.dart';
 import 'items/item_def.dart';
 import 'items/item_instance.dart';
@@ -211,6 +212,17 @@ class PlayerProfile {
   /// in Hearthwood; moving it means carrying it there yourself.
   Map<String, Storeroom> storerooms;
 
+  /// Per-character general shop state, keyed by **town id** (ECONOMY
+  /// CONTRACT §11.1), mirroring [storerooms]' shape exactly.
+  ///
+  /// ⚠️ **One per town, never a shared pool** — same reasoning as
+  /// [storerooms] (ECONOMY CONTRACT §1): stock is client-authoritative
+  /// personal state, not a document two clients could race. A town this
+  /// character has never visited has no entry at all; `ShopState.resolve`
+  /// treats that absence as "reset fresh from equilibrium," the same way an
+  /// absent [storerooms] entry reads as "nothing stored here yet."
+  Map<String, TownShopState> shopStock;
+
   /// Every non-fungible item this character owns, by instance id.
   ///
   /// ⭐ **One pool; containers hold ids.** A staff moved from the backpack to a
@@ -249,6 +261,7 @@ class PlayerProfile {
     Backpack? backpack,
     Belt? belt,
     Map<String, Storeroom>? storerooms,
+    Map<String, TownShopState>? shopStock,
     Map<String, ItemInstance>? itemInstances,
     Map<EquipSlot, String>? equipped,
     this.gender = PlayerGender.unspecified,
@@ -262,6 +275,7 @@ class PlayerProfile {
        backpack = backpack ?? Backpack.empty(),
        belt = belt ?? const Belt(),
        storerooms = storerooms ?? {},
+       shopStock = shopStock ?? {},
        itemInstances = itemInstances ?? {},
        equipped = equipped ?? {};
 
@@ -333,6 +347,10 @@ class PlayerProfile {
       for (final e in storerooms.entries)
         if (!e.value.isEmpty) e.key: e.value.toJson(),
     },
+    'shopStock': {
+      for (final e in shopStock.entries)
+        if (!e.value.isEmpty) e.key: e.value.toJson(),
+    },
     'itemInstances': {
       for (final e in itemInstances.entries) e.key: e.value.toJson(),
     },
@@ -395,6 +413,17 @@ class PlayerProfile {
             (k, v) => MapEntry(
               World.canonicalId(k as String),
               Storeroom.fromJson(v as Map<String, dynamic>?),
+            ),
+          ) ??
+          {},
+      // Absent on saves from before shops existed — an old character reads
+      // as "has visited no town's shop yet," which ShopState.resolve already
+      // treats identically to a town whose entry is simply missing.
+      shopStock:
+          (json['shopStock'] as Map?)?.map(
+            (k, v) => MapEntry(
+              World.canonicalId(k as String),
+              TownShopState.fromJson(v as Map<String, dynamic>?),
             ),
           ) ??
           {},
