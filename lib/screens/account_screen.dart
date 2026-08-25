@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../game/app_version.dart';
+import '../game/content_version.dart';
 import '../game/auth_service.dart';
 import '../game/game_state.dart';
 import '../ui/app_theme.dart';
@@ -412,7 +413,7 @@ class _AboutPanel extends StatelessWidget {
             ),
           ),
           Text(
-            'v$appVersion ($appBuild)',
+            'v$appVersion · release ${ContentVersion.current}',
             style: const TextStyle(color: AppColors.textFaint, fontSize: 12),
           ),
         ],

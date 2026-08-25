@@ -246,9 +246,15 @@ Verify what actually shipped:
 curl -s https://mastersofmagic2.web.app/version.json
 ```
 
-Keep `pubspec.yaml`'s `version:` in sync with `lib/game/app_version.dart`, and
-bump it every release — otherwise `version.json` cannot tell you which build is
-live.
+⭐ **One release, one number** (2026-08-25): the build number after the `+`
+in `pubspec.yaml`'s `version:` IS `ContentVersion.current` — the number the
+login gate compares, the number you write to `config/content`, and the
+number the About panel shows (`v0.13.0 · release 2`). Every release bumps it,
+UI-only releases included (the gate doubles as auto-refresh). The release
+checklist is therefore: bump `ContentVersion.current`, mirror it in
+`pubspec.yaml`'s `+N` (and `appVersion` if the semver moved), deploy hosting,
+then raise `config/content.version` to the same number.
+`test/version_sync_test.dart` fails the suite if the numbers ever drift.
 
 #### Economy config (`config/economy`)
 
