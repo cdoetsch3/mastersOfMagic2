@@ -832,7 +832,28 @@ introduces is the schema's own `TownShopState` class and the
 
 ---
 
-## 14. Decisions needed
+## 14b. ✅ ALL FOUR RULED (Christian, 2026-08-25) — plus two confirmations
+
+1. **Material values are AUDIT-DERIVED** — the conservation invariant governs;
+   `oak_log = 13` (the 25 in the worked table was an illustration, kept there
+   as an illustration). §8's proposed values incl. the four Tailoring
+   robe/leggings corrections are hereby the authored values.
+2. **The four content-empty towns are CLOSED at launch** ("the caravans
+   haven't come this season") — no import placeholder shelves; each opens
+   with its quarter.
+3. **Ingots are NOT stocked** — smelting is Metalworking's reason to exist.
+   Vendorable, never on a shelf.
+4. **Flat 30g/win STANDS** — the anti-inflation ruling survives; the
+   greedy-bot probe and playtest own any future revision, with §9's
+   2,400g/day ceiling as the probe's assertion.
+✅ Also confirmed: the MECHANICALLY-DERIVED location modifiers (§4's
+travel-graph rule) — no hand-filled 306-cell table.
+📝 Build-wave addition (coordinator, follows from shipped systems): in-town
+trades move goods directly shop⇄Storeroom (no backpack constraint locally);
+HAULING between towns rides the 20-slot backpack — carry capacity is the
+arbitrage governor until Phase 5b mounts add cargo.
+
+## 14. Decisions needed (superseded — see 14b)
 
 ⚠️ **Four items. Each is a genuine gap this contract cannot close by
 re-reading more code** — either the content doesn't exist yet, or two
