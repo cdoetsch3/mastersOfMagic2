@@ -1041,11 +1041,29 @@ spellbook already obeys this — Volley, Barrage, Rampart). 📝 A draft #13
 Drain** tier IS that spell, three costs deep — check the book before banking.
 
 📝 Numbers are first-pass placeholders; the SHAPE and the counter-web are the
-design. Engine note: everything rides existing machinery (`TurnStatus` for
-timed grants — RegrowStatus is the precedent) EXCEPT that no status yet
-modifies the six MageState combat stats; that one seam (a stat-buff
-TurnStatus, apply on gain / revert on expiry) is the single new engine
-primitive the whole bank needs.
+design.
+
+⭐ **Buffs ARE statuses — full citizens, not riders** (Christian's call,
+2026-08-26). Every GRANT below is an ordinary `TurnStatus` with a chip, which
+buys the whole existing machinery at once: the HUD pip system and its
+documented-or-build-fails test, Absolution's purge, the §5.3 cleanse web, and
+lockstep serialization — none of it new plumbing. Two consequences become
+design law:
+
+- **Polarity.** Every status — these AND the element statuses — declares
+  buff / debuff / neutral, so "strip enemy buffs" and "cleanse own debuffs"
+  have exact meanings. Photosynthesis is a buff someone can strip; Ignite is
+  a debuff Scour eats; Waterlogged is a debuff; Arcane Knowledge a buff. The
+  classification pass over the shipped statuses is part of this work.
+- **Derive, never mutate.** The engine primitive is NOT apply-on-gain /
+  revert-on-expiry (two buffs expiring out of order makes revert bookkeeping
+  fragile) — it is DERIVATION: effective stat = base + gear + Σ(active
+  status contributions), recomputed at each roll. Statuses just exist; the
+  math reads them. This is the single new engine seam the bank needs.
+
+📝 Status-first also RESOLVES former open decision #2: stacking is the status
+system's own grammar (same status refreshes, never stacks — the Tonic rule),
+inherited rather than legislated.
 
 ### GRANT — a stat, for a while
 
@@ -1084,24 +1102,26 @@ primitive the whole bank needs.
 | 16 | **Wither** | 2 · aux | Target's healing received −60%, 3 turns (HoTs, Regrow, potions, the Sap/Leech/Drain line — everything). THE anti-heal: Photosynthesis turtling and PvP belt-chugging both needed a predator. ⚠️ Also the first spell that touches the potion lane — spec that deliberately. |
 | 17 | **Scour** | 1 · aux | Burn out your own DoTs: take one tick of each NOW, remove them all. The DoT counter with a cost — not a free wash. |
 | 18 | **Composure** | 2 · aux | 3 turns: critical hits against you resolve as normal hits. The direct crit counter — refusing to be impressed. |
+| 19 | **Dispel** | 3 · aux | Strip the target's BUFFS (polarity: buff — stat grants, Photosynthesis, Bastion's stance…). The meta-leash the GRANT category needed: every stat had an answer, but the *strategy* of stacking grants had none. Born directly from the buffs-are-statuses ruling. |
 
 ### The counter-web, at a glance
 
 dodge (#1/#2) ⟶ beaten by #9, softened by #7 · deflect (#3/#8) ⟶ pierced
 by #10, broken by #11 · crit (#4/#5/#6/#12) ⟶ blanked by #18, soaked by #3 ·
 HoT (#13, Photosynthesis, potions) ⟶ starved by #16 · DoT (#14, Ignite) ⟶
-burned out by #17 · accuracy debuffs (#15, Blind) ⟶ cleansed by #7.
+burned out by #17 · accuracy debuffs (#15, Blind) ⟶ cleansed by #7 ·
+buff-stacking as a strategy ⟶ stripped wholesale by #19.
 ⭐ Every mechanic has at least one answer that is not "win faster," and every
 answer has a cost — the §7 principle, extended.
 
 ### Open decisions before any of this builds
 
 1. **Player dodge/deflect caps** — enemies cap dodge at 10; spells hand players 25–40. PvP needs a ruling (cap, diminishing stacking with gear, or spell-exclusive windows).
-2. **Stacking grammar** — spell-status + gear stat: additive (current gear math) is the default; confirm, and confirm same-status refresh-not-stack everywhere (the Tonic precedent).
-3. **The one engine primitive** — the stat-buff TurnStatus (apply on gain, revert on expiry, lockstep-safe). Everything above waits on it.
+2. ~~Stacking grammar~~ — RESOLVED by the buffs-are-statuses ruling: the status system's refresh-not-stack grammar is inherited, and gear+status remains additive through derivation.
+3. **The one engine primitive** — stat DERIVATION (effective = base + gear + Σ active statuses, recomputed per roll) plus the polarity field on every status, shipped and classified. Everything above waits on these two.
 4. **HUD** — each grant needs a status pip; the twelve-motion animation system expects entries (the build-fails-if-undocumented test will enforce this, correctly).
 5. **AI awareness** — LadderAi is still effect-blind; these spells widen the gap between what players and enemies can do with the same kit. The Phase-6 fork, now sharper.
-6. **Loadout pressure** — 18 new spells against a 10-spell loadout cap is the POINT (§5.7), but tier-pairs (#1/#2, #4+#5/#6, #13's) should probably be one loadout slot that upgrades, not two slots — needs a ruling.
+6. **Loadout pressure** — 19 new spells against a 10-spell loadout cap is the POINT (§5.7), but tier-pairs (#1/#2, #4+#5/#6, #13's) should probably be one loadout slot that upgrades, not two slots — needs a ruling.
 
 ---
 

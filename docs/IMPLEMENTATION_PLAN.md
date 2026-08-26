@@ -1146,7 +1146,7 @@ stats; ✅ the login content-version gate is live and seeded):
   `no-cache`. If a stale build is ever served after a deploy, the suspect is
   one of those entry points silently gaining a long cache lifetime.
 
-- **TYPE_EFFECTS §7a** — the banked spell designs. ⚠️ The ORIGINAL 16 were never committed and are lost (verified against full git history, 2026-08-25); §7a now holds the REBUILT bank — 18 combat-stat-generation spells (one-word names, element-agnostic) designed 2026-08-26, with the counter-web and the open decisions that gate building them.
+- **TYPE_EFFECTS §7a** — the banked spell designs. ⚠️ The ORIGINAL 16 were never committed and are lost (verified against full git history, 2026-08-25); §7a now holds the REBUILT bank — 19 combat-stat-generation spells (one-word names, element-agnostic, buffs-are-statuses with polarity + stat derivation as the two engine seams) designed 2026-08-26, with the counter-web and the open decisions that gate building them.
 - **Phase 7 of the original type-effects build** — making the AI aware of
   statuses. Overlaps Phase 6 item 3 above; decide there.
 - **Shield duration types** (permanent vs decaying) and **2nd/3rd shield
