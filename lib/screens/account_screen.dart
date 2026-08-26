@@ -360,6 +360,23 @@ class _AccountView extends StatelessWidget {
           ),
         ],
         const SizedBox(height: 16),
+        // ⭐ The playtester's do-over (Christian, 2026-08-25): a real reset
+        // beats hand-editing DB values. Above Change password by ruling;
+        // irreversible, and the dialog says so before anything happens.
+        Builder(
+          builder: (context) => OutlinedButton.icon(
+            onPressed: () => confirmCharacterReset(context),
+            icon: const Icon(Icons.restart_alt, size: 18, color: AppColors.ember),
+            label: const Text(
+              'Character reset',
+              style: TextStyle(color: AppColors.ember),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.ember),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
         Builder(
           builder: (context) => OutlinedButton.icon(
             onPressed: () => Navigator.of(context).push(
@@ -383,6 +400,52 @@ class _AccountView extends StatelessWidget {
       ],
     );
   }
+}
+
+/// The one irreversible button on this screen, so the dialog does the
+/// (public rather than file-private so the test can drive the REAL dialog —
+/// slowing-down: plain words, a red confirm, and no way to mistake it for
+/// anything gentler. ⭐ Runs through [GameState.resetProfile] — the same
+/// fresh-character path a new player gets, name kept, everything else gone.
+Future<void> confirmCharacterReset(BuildContext context) async {
+  final game = GameStateScope.read(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      backgroundColor: AppColors.panel,
+      title: const Text(
+        'Reset your character?',
+        style: TextStyle(color: AppColors.text, fontSize: 17),
+      ),
+      content: const Text(
+        'This resets your character to the very beginning: all levels and '
+        'skill XP return to zero, and every item — equipped, carried, '
+        'belted, and stored — is gone. Your name is kept.\n\n'
+        'There is no way to undo this.',
+        style: TextStyle(color: AppColors.textDim, fontSize: 13),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: const Text('Keep my character'),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.ember,
+            foregroundColor: AppColors.bg,
+          ),
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: const Text('Reset — no undo'),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true) return;
+  await game.resetProfile();
+  messenger.showSnackBar(
+    const SnackBar(content: Text('Character reset — a fresh start.')),
+  );
 }
 
 class _AboutPanel extends StatelessWidget {
