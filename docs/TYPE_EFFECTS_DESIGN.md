@@ -1070,10 +1070,12 @@ the ENEMY (debuff granters, enemy-status surgery) move to a new
 self-targeting), still faster than a real attack. Your debuff lands before
 their attack resolves; their self-stance lands before your debuff does.
 
-⚠️ Consistency flag from the review: shipped **Discharge** (wipes enemy
-charge) and **Overload** (damage per enemy charge) sit at prio 7 but target
-the enemy — candidates to reclassify to 8. Changes shipped ordering
-interactions (Quicken/Jolt races), so it's a ruling, not a cleanup.
+✅ Shipped-spell reclassification RULED 2026-08-26: **Discharge → prio 8
+aux-offense** (hurts the enemy, deals no damage) and **Overload → prio 9
+standard attack** (it's damage — it belongs with the attacks). ⭐ These are
+the bank's only two changes to shipped spells; the code edit lands with
+the build batch, and the balance sim should re-run after (Overload moving
+to 9 changes its race against shields and Quicken).
 
 **Hit-chance floor** — instead of capping dodge or accuracy separately,
 clamp the OUTPUT: after spell accuracy + caster accuracy − target dodge at
@@ -1107,19 +1109,17 @@ fraction caps at **90%**. There is always a sliver that lands.
 | Spell | Cost · prio | Grants |
 |---|---|---|
 | **Murk** | 1 · aux-off | Murk −15 accuracy, 10 turns |
-| **Befog** 📝 | 3 · aux-off | Murk −25 accuracy, 20 turns |
+| **Miasma** | 3 · aux-off | Murk −25 accuracy, 20 turns |
 
-📝 *Befog rename pending — candidates on the table: Shroud, Pall, Gloam,
-Miasma, Smokescreen.*
+✅ *Miasma picked over "Befog", 2026-08-26.*
 
 **Keen** — crit chance, `+N%`.
 | Spell | Cost · prio | Grants |
 |---|---|---|
 | **Keen** | 2 · aux | Keen +15% crit chance, 12 turns |
-| **Wicked Grin** 📝 | 4 · aux | Keen +25% crit chance, 30 turns |
+| **Ardent** | 4 · aux | Keen +25% crit chance, 30 turns |
 
-📝 *Wicked Grin rename pending (two words with no whimsy license claimed) —
-candidates: Ruthless, Cutthroat, Vicious, Malice, Sinister.*
+✅ *Ardent picked over "Wicked Grin", 2026-08-26.*
 
 **Heavyhand** — crit damage, `+N`.
 | Spell | Cost · prio | Grants |
@@ -1147,20 +1147,23 @@ the set wants a −70–80% price point later.)*
 | **Wither** | 2 · aux-off | Wither −50% healing received, 10 turns |
 
 **Blight** — binary debuff: the target's heals deal DAMAGE instead of
-healing. Applies to HoTs, consumables, Photosynthesis, and ⚠️ *(note
-truncated — presumed lifesteal (Sap/Leech/Drain); NEEDS the ruling)*.
+healing. Applies to HoTs, consumables, Photosynthesis, AND lifesteal
+(Sap/Leech/Drain — the drain still damages you; its heal-back bites its
+caster). ✅ *Target list completed by ruling, 2026-08-26.*
 | Spell | Cost · prio | Grants |
 |---|---|---|
 | **Blight** | 4 · aux-off | Blight, 20 turns |
 
-⚠️ Two edges to rule before build: (a) **Wither × Blight ordering** — if
-Wither reduces first and Blight inverts what's left, stacking your own two
-debuffs makes Blight WEAKER (an anti-synergy players will call a bug);
-proposal: Blight supersedes Wither entirely while both are up. (b) Against
-an opponent with nothing ticking, Blight is pure denial (they simply don't
-heal) — its teeth only show against already-running HoTs and forced ticks
-(Photosynthesis can't be switched off). That's good punish design, but it
-means the AI must not cast heals into it.
+✅ **Wither × Blight ordering ruled: Blight SUPERSEDES Wither entirely
+while both are up** (Wither-reduces-then-Blight-inverts would make your
+own second debuff weaken your first — an anti-synergy players would file
+as a bug). ⭐ Build requirement: a mutation-verified test case for exactly
+this — Wither+Blight on the same target must invert the FULL heal, not
+the Wither-reduced heal. Remaining note: against an opponent with nothing
+ticking, Blight is pure denial (they simply don't heal) — its teeth only
+show against running HoTs and forced ticks (Photosynthesis can't be
+switched off, lifesteal riders can't be unbundled from their damage). The
+AI must know not to cast heals into it.
 
 **Reflect** — deflected damage is returned to the attacker. *(New
 2026-08-26.)* The first status with a hard dependency: a dead slot without
@@ -1169,15 +1172,16 @@ a Divert-family source under it (spell, gear, or enemy innate).
 |---|---|---|
 | **Reflect** | 4 · aux | Reflect, 25 turns |
 
-📝 Magnitude open: proposal is 100% of the deflected amount comes back
+✅ Magnitude ruled 2026-08-26: **100% of the deflected amount** comes back
 (with Divert 20/40 that's an expected 8% of incoming damage returned per
 hit — modest until the deflect stat grows; at the 90/90 caps it's 81%,
 which is why the caps exist).
 
-**Stalwart** — own shield strength, `+N%`.
+**Steadfast** — own shield strength, `+N%`. *(Renamed from "Stalwart",
+2026-08-26.)*
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Stalwart** | 3 · aux | Stalwart +25% shield strength, 25 turns |
+| **Steadfast** | 3 · aux | Steadfast +25% shield strength, 25 turns |
 
 **Composure** — binary: incoming crits resolve as normal hits.
 | Spell | Cost · prio | Grants |
@@ -1188,6 +1192,17 @@ which is why the caps exist).
 | Spell | Cost · prio | Grants |
 |---|---|---|
 | **Bloodlust** | 5 · aux | Keen +20% AND Heavyhand +40, 12 turns — the all-in window, overriding both existing instances |
+
+**Deathwish** 📝 — binary: your attacks ALWAYS crit while your own health
+is below 15%. *(New 2026-08-26, Christian's spec — drafted as "Bloodlust",
+which collided with the existing set above; Bloodlust keeps its name by
+ruling. **Deathwish** is provisional; alternatives: Berserk, Defiance,
+Spite, Cornered. NEEDS the pick.)* The desperation stance — cast it
+healthy as insurance, or bleeding as a gambit. Blanked by the target's
+Composure like every other crit.
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Deathwish** 📝 | 3 · aux | Deathwish, 10 turns |
 
 ### NEXT-ATTACK BUFFS — the Phase pattern ✅ (ruled 2026-08-26)
 
@@ -1206,43 +1221,67 @@ each:
 priced; as riders they combo with ANY attack in the book (Unerring +
 Cataclysm is the payoff fantasy) and Phase proves the pattern ships.
 
-### ATTACKS — true offense (prio 9) with a rider
+### ATTACKS — true offense (prio 9)
+
+*(Shatter re-ruled OUT of this section 2026-08-26 — it deals no damage
+now; see INSTANTS. Execute retuned same round. Rend and Torment are NEW:
+the bank's spell-lane DoTs, added by ruling because Scour and Fester had
+exactly one DoT to feed on — Ignite — which needs Pyro in the loadout AND
+a proc. Element-agnostic, each its own status, all DoTs stack
+concurrently; recasting one refreshes it, law 5.)*
 
 | Spell | Cost | Effect |
 |---|---|---|
-| **Shatter** | 4 | Damage; the target's Divert-family status BREAKS (removed), reduced or not. Patience meets a hammer. |
-| **Execute** | 5 | Guaranteed crit below 35% HP; otherwise ordinary. The finisher that makes Heavyhand worth holding. |
+| **Rend** | 2 | 10–13 damage + **Rend** status: 5 damage/turn for 3 turns. The quick bleed — fully paid out in 3 turns (~26 total vs Blast's ~23; the delay is the price of the surplus). |
+| **Torment** | 3 | 8–10 damage + **Torment** status: 4 damage/turn for 9 turns. The long burn (~45 total vs Surge's ~35) — big surplus, long exposure to the duel ending first. Scour is how you collect early. |
+| **Execute** | 4 | 31–39 damage (the 3-cost band — the rider is the discount); **100% crit when the target is below 30% HP**. The finisher that makes Heavyhand worth holding. |
 
-📝 Both need damage bands. Proposal: the rider discounts one cost tier —
-Shatter at the Surge band (31–39), Execute at the Ruin band (44–53).
-📝 Also open: should these convert to next-attack buffs too? Kept as
-attacks for now — a break and a finisher read as HITS, and Execute's
-<35%-HP condition wants to be checked at impact, not at buff time.
+📝 Rend/Torment numbers are provisional pending the Fester
+average/best-case pass (see Fester note below) and a balance-sim run.
 
 ### INSTANTS — status surgery, no duration
 
 | Spell | Cost · prio | Effect |
 |---|---|---|
-| **Fester** | 2 · aux-off | Small hit; every DoT status on the target gains +4 ticks — feeds on whatever is burning. |
-| **Scour** ⚠️ | 1 · aux | *(Note #7 truncated mid-spec — prior draft stands until re-ruled: take one tick of each of your own DoTs NOW; remove them all. The fragment "1 spell offensive aux that causes…" suggests a flip to enemy-targeting, possibly detonate-a-tick; NEEDS the rest of the sentence.)* |
+| **Fester** | 2 · aux-off | Small hit; every DoT status on the target gains +4 ticks — feeds on whatever is burning. ⚠️ *Numbers under review — see the EV note below.* |
+| **Scour** | 1 · aux-off | ✅ *(Re-ruled 2026-08-26 — flipped from self-cleanse to detonator.)* Every DoT on the ENEMY resolves all its remaining ticks NOW as one combined hit; the DoT statuses are consumed. The collection agency for Rend/Torment/Fester patience. |
+| **Shatter** | 5 · aux-off | ✅ *(Re-ruled 2026-08-26.)* No damage. Clears ALL of the target's shields, Barrier, and Divert-family status. THE turtle counter — priced at 5 deliberately, so a turtle smart enough to bring Discharge can keep Shatter off the table by wiping the charge climb. |
 | **Dispel** | 4 · aux-off | Strip the target's buffs (polarity: buff, all strippable lanes). The meta-leash on stance-stacking itself. |
-| **Meditate** | 2 · aux | *(New 2026-08-26.)* Every buff you have gains +5 turns. Fester's mirror — one feeds your DoTs on them, one feeds your stances. |
+| **Meditate** | 2 · aux | Every **turn-timed** buff you have gains +5 turns. ✅ *Boundary ruled 2026-08-26: touches only buffs on a turn timer — next-attack riders (Phase/Pierce/Unerring/Empower) and other untimed buffs are exempt, or a 2c spell starts banking Empowers.* Fester's mirror — one feeds your DoTs on them, one feeds your stances. |
+
+⚠️ **Fester EV note (analysis for the pending ruling):** with one DoT
+running, +4 ticks buys ~16–20 delayed damage for 2c — below Blast's rate.
+With Rend AND Torment up it's ~36 for 2c — the best damage-per-charge in
+the book, still delayed. The spike is **Fester → Scour** (3c total): the
+added ticks stop being delayed at all. Full line Rend→Torment→Fester→Scour
+= 8 charge for ~105 damage over 4 turns vs ~96 for Surge+Surge+Blast in 3.
+Swingy but not degenerate at current numbers; revisit after sim.
+
+⚠️ **New counter-web hole, needs a ruling:** old Scour was the DoT
+*cleanse* (take a tick, clear your own). Flipped to a detonator, NOTHING
+in any lane removes DoTs from yourself — Rend/Torment/Fester stacks have
+no answer but outlasting them. Options: a new small self-cleanse spell
+(the old Scour spec wants a new name), fold cleanse into an existing
+defensive spell, or rule that DoTs being unanswerable is intended.
 
 ### The counter-web, at a glance
 
 Lightfoot ⟶ Unerring, softened by Truesight · Divert ⟶ Pierce, broken by
 Shatter, punished-in-reverse by Reflect (attacking into a deflect stance
-now costs blood, not just damage) · Keen/Heavyhand/Execute ⟶ blanked by
-Composure, soaked by Divert · Mending/Photosynthesis/potions ⟶ taxed by
-Wither, inverted by Blight · DoTs/Fester ⟶ burned out by Scour ·
+now costs blood, not just damage) · turtling itself (shields + Barrier +
+Divert) ⟶ Shatter, which Discharge in turn answers by starving the 5c ·
+Keen/Heavyhand/Execute/Deathwish ⟶ blanked by Composure, soaked by Divert ·
+Mending/Photosynthesis/potions/lifesteal ⟶ taxed by Wither, inverted by
+Blight · Rend/Torment/Fester patience ⟶ collected early by Scour ·
 Murk/Blind ⟶ cleansed by Truesight · stance-stacking + Meditate ⟶ stripped
 by Dispel (Meditate raises the stakes of the stance game; Dispel is why it
 isn't free). ⭐ Every mechanic has an answer that is not "win faster," and
-every answer costs something.
+every answer costs something — ⚠️ except DoTs on YOU, since Scour flipped
+sides (see the hole flagged above).
 
-📝 28 spells in the bank (rev 2 added Reflect and Meditate) — slightly
-larger than the shipped book of 25, still the right order of magnitude
-for a generation.
+📝 31 spells in the bank (rev 2 added Reflect + Meditate; rev 3 added
+Rend, Torment, and Deathwish) — larger than the shipped book of 25, still
+the right order of magnitude for a generation.
 
 ### Unlock placements 📝 DRAFT (needs red-pen — PROGRESSION §4 holds the shipped table)
 
@@ -1252,15 +1291,18 @@ with Kinetic (L15), where dodge/deflect/crit gear and enemies live; the
 empty L45 bucket gets a resident. Unlock enforcement is currently OFF for
 playtesting — this is the schedule for when it turns on.
 
+*(Draft revised for the rev-3 list — 31 spells. Christian red-pens this
+AFTER the spell list itself is final, by ruling 2026-08-26.)*
+
 | Level | New spells (+n) | Why here |
 |---|---|---|
 | **10** | Glance, Mend (+2) | First taste: a sliver of deflect, the first HoT — one new idea each. |
-| **15** | Lightfoot, Truesight, Murk (+3) | The accuracy/dodge triangle opens WITH Tier 2, where the stats debut on gear and enemies. |
-| **20** | Keen, Heavyhand, Stalwart, Wither (+4) | The crit lane arrives as a pair; Wither lands after Mend so sustain has a predator. |
-| **25** | Divert, Hawkeye, Befog, Composure, Fester (+5) | Tier-2 price points; Composure answers the L20 crit lane; Fester feeds on elements' DoTs. |
-| **30** | Unerring, Pierce, Scour, Meditate (+4) | The answer package — Pierce and Unerring join their shipped sibling Phase, which already unlocks at L30. |
-| **35** | Twinkle Toes, Wicked Grin, Overkill, Renewal, Shatter (+5) | The long-stance generation, beside the existing L35 utility spike. |
-| **40** | Bloodlust, Execute, Blight, Dispel (+4) | The 5c cap opens; the hard counters (Blight, Dispel) arrive once stances are the meta. |
+| **15** | Lightfoot, Truesight, Murk, Rend (+4) | The accuracy/dodge triangle opens WITH Tier 2; Rend gives every loadout its first intentional DoT. |
+| **20** | Keen, Heavyhand, Steadfast, Wither, Torment (+5) | The crit lane arrives as a pair; Wither lands after Mend so sustain has a predator; the long burn joins the quick one. |
+| **25** | Divert, Hawkeye, Miasma, Composure, Fester (+5) | Tier-2 price points; Composure answers the L20 crit lane; Fester arrives with two DoTs already unlockable to feed it. |
+| **30** | Unerring, Pierce, Scour, Meditate, Deathwish (+5) | The answer package — Pierce and Unerring join their shipped sibling Phase (already L30); Scour after both DoTs exist; Deathwish once duels are long enough to get desperate. |
+| **35** | Twinkle Toes, Ardent, Overkill, Renewal, Execute (+5) | The long-stance generation, beside the existing L35 utility spike; Execute lands with the matured crit lane. |
+| **40** | Bloodlust, Shatter, Blight, Dispel (+4) | The 5c cap opens (Bloodlust, Shatter); the hard counters (Blight, Dispel) arrive once stances are the meta. |
 | **45** | Reflect (+1) | Ethereal's opening gift — the L45 bucket is no longer empty. |
 
 ### Open decisions before any of this builds
@@ -1275,22 +1317,38 @@ EV heuristics — a DoT's value is its total remaining damage times a
 time-discount; crit stances are expected-damage-boost minus a volatility
 discount; every status gets a number so LadderAi can compare unlike things.
 
+✅ *Also resolved 2026-08-26 (rev 3):* Scour = enemy-DoT detonator ·
+Blight's list complete (lifesteal in) + supersedes Wither · Miasma, Ardent,
+Steadfast picked · Reflect = 100% · Shatter = 5c no-damage turtle-breaker ·
+Execute = 4c at the 3c band, crit <30% · Discharge → 8, Overload → 9.
+
 Still open:
-1. **Scour's real spec** — note #7 arrived truncated ("a 1 spell offensive
-   aux that causes…"); prior self-cleanse draft stands in the table until
-   the sentence finishes.
-2. **Blight's full target list** — note #10 truncated after
-   "Photosynthesis, and"; lifesteal (Sap/Leech/Drain) presumed, unruled.
-   Plus the Wither × Blight ordering edge (supersede vs stack).
-3. **Renames** — Befog and Wicked Grin candidates listed at their sets.
-4. **Reflect magnitude** — 100% of deflected amount proposed.
-5. **Shatter/Execute damage bands** — one-tier discount proposed
-   (Surge/Ruin bands); and whether they too become next-attack buffs.
-6. **Wither's empty tier-2 slot** — does the set want a −70–80% price
+1. **The Deathwish name** — the new low-health crit spell was specced as
+   "Bloodlust" but that name was taken by the 5c double-stance, which
+   keeps it; Deathwish is provisional (alternatives at the set).
+2. **Fester's numbers** — 2c/+4 held pending the average/best-case think
+   now that Rend and Torment exist (EV note above has the math).
+3. **The DoT self-cleanse hole** — Scour flipped sides; nothing removes
+   DoTs from yourself now. New spell, fold into a defensive spell, or
+   intended?
+4. **Wither's empty tier-2 slot** — does the set want a −70–80% price
    point now that Blight left?
-7. **Discharge/Overload lane** — reclassify shipped prio-7 enemy-targeting
-   auxes to aux-offense 8, or grandfather them?
-8. **Unlock draft above** — needs the red-pen pass.
+5. **Rend/Torment damage bands** — provisional until a balance-sim run.
+6. **Unlock draft above** — red-pen AFTER the spell list is final (ruled).
+
+⭐ **Build-time test ledger** (mutation-verified, per convention — grows as
+rulings land):
+- Wither + Blight on one target inverts the FULL heal (supersede, not
+  stack).
+- Meditate extends turn-timed buffs only; a pending Empower/Phase/Pierce/
+  Unerring rider gains nothing.
+- Final hit chance floors at 10% under max dodge + max accuracy debuff;
+  Unerring alone crosses it.
+- Deflect activation and deflected fraction each cap at 90%.
+- Scour's combined hit equals the sum of all remaining ticks and consumes
+  the statuses; Reflect returns exactly the deflected amount.
+- Deathwish crits fire only below 15% own HP, and Composure still blanks
+  them.
 
 ---
 
