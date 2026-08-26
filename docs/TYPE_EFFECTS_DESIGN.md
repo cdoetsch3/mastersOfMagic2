@@ -1065,23 +1065,45 @@ design law:
 system's own grammar (same status refreshes, never stacks — the Tonic rule),
 inherited rather than legislated.
 
-⭐ **One status per stat AXIS; spells are price points** (Christian's
-follow-up, 2026-08-26). There is exactly ONE Dodge status (one chip), one
-Deflect, one Crit… — magnitude and duration are DATA inside the status,
-never separate statuses per spell. Any number of spells can target an axis
-as different (magnitude, duration, cost) tuples with no new HUD entry,
-animation, or interaction rule per spell. **Collision rule: LAST CAST WINS,
-wholesale** — recasting the same spell refreshes (the Tonic rule as a
-special case); a different same-axis spell replaces the chip's magnitude AND
-duration together. Rejected on the record: same-axis stacking (magnitudes
-sum into the cap crisis; durations sum into invisible math) and best-of-both
-merging (cheap-long + strong-short would fuse into a strong-long nobody
-priced — any 'keep the better parts' rule manufactures an undesigned
-spell). Cross-AXIS chips coexist freely — that is the buff-stacking
-strategy, and Dispel (#19) is its leash. ⚠️ Duration philosophy still open:
-the bank's 2–3-turn windows are TACTICAL buffs; 10–25-turn spells would be
-whole-fight STANCES in ~20–35-turn duels — two different games, choose
-before numbers freeze.
+⭐ **THE GENERAL PATTERN: axes and lanes** (Christian's follow-up,
+2026-08-26 — dodge was the worked example; this is the law for everything).
+
+**An AXIS is one lever on the rules**: a stat (dodge, deflect, crit chance,
+crit damage, accuracy, healing-received), an over-time channel (HoT, and
+DoT-shaping like Fester's), or a named special rule (Composure's
+crits-are-normal, Bastion's while-shielded stance — binary axes, duration
+only). **Within one lane, an axis owns exactly ONE status — one chip** —
+whose magnitude and duration are data inside it, never separate statuses per
+spell. Spells targeting the same axis are PRICE POINTS: any number of
+(magnitude, duration, cost) tuples, zero new statuses, HUD entries,
+animations, or interaction rules per spell.
+
+**Collision within an axis: LAST CAST WINS, wholesale** — recasting the same
+spell refreshes (the Tonic rule as a special case); a different same-axis
+spell replaces magnitude AND duration together. Rejected on the record:
+same-axis stacking (magnitudes sum into the cap crisis; durations sum into
+invisible math) and best-of-both merging (cheap-long + strong-short would
+fuse into a strong-long nobody priced — any "keep the better parts" rule
+manufactures an undesigned spell).
+
+**A LANE is who is paying.** Three lanes exist: the SPELL lane (a turn + a
+loadout slot), the ITEM lane (gold + a belt slot — Tonic, Regrow-bearing
+gear), and the ELEMENT lane (identity procs — Photosynthesis, Ignite,
+Blind). ⭐ The one-status-per-axis rule binds WITHIN a lane; ACROSS lanes,
+statuses coexist and sum through derivation — Mend + a Tonic +
+Photosynthesis all tick, Obscure + Blind both drag accuracy — because each
+lane charges a different currency, and paying twice may earn twice. Gear's
+permanent stats are the zeroth lane, always additive underneath.
+
+**Debuffs follow the pattern symmetrically** (Obscure owns the spell-lane
+accuracy-debuff axis; an element's Blind is its own lane) — and polarity
+decides what Dispel strips (enemy buffs, all lanes' strippable ones) versus
+what cleanse clears (own debuffs). Cross-AXIS coexistence stays free — that
+is the buff-stacking strategy, and Dispel (#19) is its leash.
+
+⚠️ Duration philosophy still open: the bank's 2–3-turn windows are TACTICAL
+buffs; 10–25-turn spells would be whole-fight STANCES in ~20–35-turn duels —
+two different games, choose before numbers freeze.
 
 ### GRANT — a stat, for a while
 
