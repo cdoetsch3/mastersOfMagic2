@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../game/economy/quality_value.dart';
 import '../game/economy/shop_catalogue.dart';
 import '../game/economy/shop_pricing.dart';
 import '../game/economy/shop_state.dart';
@@ -1786,7 +1787,9 @@ class _SellInstanceRow extends StatelessWidget {
     final instance = game.profile.itemInstances[instanceId];
     final name = def == null ? defId : ItemCatalogue.displayName(def, instance);
     final bound = def?.tradability == Tradability.bound;
-    final unit = def == null ? 0 : ShopPricing.vendorPrice(def.value);
+    // ⭐ §14d ruling 1: the SAME seam `priceShopBasket` settles through, so the
+    // sticker and the payout are one computation, not two that agree by luck.
+    final unit = def == null ? 0 : instanceVendorPrice(def, instance);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),

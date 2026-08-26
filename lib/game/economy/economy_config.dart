@@ -57,14 +57,42 @@ class EconomyConfig {
   static const double defaultEventMagnitudePercent = 20;
   static const double defaultEventItemsPerShopPerDay = 2;
 
-  /// ✅ Equilibrium-stock category defaults (§5.1): zone-native materials,
-  /// imported materials, consumables. ⚠️ These are compiled constants, **not**
-  /// part of `config/economy`'s schema — the contract (§7) only exposes
-  /// per-item overrides ([equilibriumOverrides]) as server-tunable; the
-  /// bucket-level defaults themselves are not.
+  /// ✅ Equilibrium-stock category defaults (§5.1, re-cut by §14d ruling 2 on
+  /// 2026-08-26): zone-native materials, imported materials,
+  /// **consumable-ingredient materials**, consumables. ⚠️ These are compiled
+  /// constants, **not** part of `config/economy`'s schema — the contract (§7)
+  /// only exposes per-item overrides ([equilibriumOverrides]) as
+  /// server-tunable; the bucket-level defaults themselves are not.
+  ///
+  /// ⭐ **Gear materials are unmoved; the consumable lane got much scarcer.**
+  /// 60/20 are exactly what they were. The two new numbers are the ruling: a
+  /// potion shelf and the herb shelf feeding it are what a player actually
+  /// drains in a session, and at the old flat E=30 they refilled like a lumber
+  /// yard and never moved on price.
   static const int equilibriumNative = 60;
   static const int equilibriumImported = 20;
-  static const int equilibriumConsumable = 30;
+
+  /// ⭐ §14d ruling 2: a `MaterialDef` feeding any consumable recipe, derived
+  /// from `RecipeBook` by `ShopItemCategory.consumableIngredient`. Scarcer than
+  /// an *imported* gear material, deliberately — herbs are picked, not shipped.
+  static const int equilibriumConsumableIngredient = 10;
+
+  /// ⚠️ **Was 30 until §14d ruling 2.** Any fixture or worked example still
+  /// carrying 30 for a consumable is stale, not merely differently-tuned.
+  /// 🔴 **OPEN — this number breaks §10's round-trip invariant.** See §14d.2's
+  /// "Unresolved" note in `ECONOMY_CONTRACT.md` and the reproduction at
+  /// `tool/economy_probe_test.dart`'s round-tripper assertion. Shipped at the
+  /// ruled 6 pending Christian's call; do not "fix" it by editing this line
+  /// without reading that note first.
+  /// 🟡 PROVISIONAL 9, not the ruled ~6 (coordinator, 2026-08-26): the
+  /// economy probe PROVED E ≤ 8 opens a repeatable round-trip gold faucet —
+  /// §3.1's ×2.5 clamp stops binding and the marginal gradient beats the
+  /// 1.10/0.90 spread at low stock (contract §14d.2/14d.3 has the sweep).
+  /// 9 is the closest clean value to the ruling that also keeps the four
+  /// buckets DISTINCT and consumables scarcest — verified against the deep
+  /// probe (round-tripper max day: exactly 0g). The designer's final pick:
+  /// accept 9, or keep ~6 by redesigning the §3.1 clamp/spread.
+  static const int equilibriumConsumable = 9;
 
   /// The all-compiled-defaults config, used whenever the server doc is
   /// missing, unreachable, or fails to parse.

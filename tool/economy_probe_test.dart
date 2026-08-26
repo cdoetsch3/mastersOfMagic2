@@ -57,6 +57,7 @@ import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/adventure.dart' show commonsPerSectionFor;
 import 'package:masters_of_magic_2/game/crafting/craft_quality.dart';
+import 'package:masters_of_magic_2/game/economy/economy_config.dart';
 import 'package:masters_of_magic_2/game/economy/shop_catalogue.dart';
 import 'package:masters_of_magic_2/game/economy/shop_pricing.dart';
 import 'package:masters_of_magic_2/game/economy/shop_state.dart';
@@ -81,12 +82,20 @@ final List<String> openTowns = [
 ];
 
 /// §5.1's category → E lookup, read through [ShopCatalogue.categoryFor] so
-/// the native/imported/consumable judgment itself is never re-derived here.
+/// the native/imported/ingredient/consumable judgment itself is never
+/// re-derived here.
+///
+/// ⚠️ **The numbers come from [EconomyConfig], not from literals.** They used
+/// to be hand-typed here, and §14d ruling 2's re-cut (consumables 30 → 6, plus
+/// the new ingredient bucket at 10) is exactly the edit that would have left
+/// this probe silently modelling an economy the game no longer runs.
 int equilibriumOf(String town, String item) =>
     switch (ShopCatalogue.categoryFor(town, item)) {
-      ShopItemCategory.nativeMaterial => 60,
-      ShopItemCategory.importedMaterial => 20,
-      ShopItemCategory.consumable => 30,
+      ShopItemCategory.nativeMaterial => EconomyConfig.equilibriumNative,
+      ShopItemCategory.importedMaterial => EconomyConfig.equilibriumImported,
+      ShopItemCategory.consumableIngredient =>
+        EconomyConfig.equilibriumConsumableIngredient,
+      ShopItemCategory.consumable => EconomyConfig.equilibriumConsumable,
     };
 
 int baseValueOf(String item) => ItemCatalogue.byId(item).value;
@@ -841,6 +850,32 @@ void main() {
       }
 
       // ---- HARD assertions (§10) -----------------------------------
+      //
+      // 🔴 **KNOWN FAILING as of §14d ruling 2 (2026-08-26) — deliberately
+      // NOT relaxed.** Dropping consumables to E=6 makes this assertion fail
+      // (~+1g per same-day round trip on `pennycross/hardtack`, +5g across a
+      // 5-day run). The cause is structural, not a rounding artefact:
+      //
+      //   §3.1 clamps the scarcity multiplier at 2.5, and that ceiling is what
+      //   FLATTENS the curve at low stock. It binds only while `E / stock >
+      //   6.25`. At E=60 every shelf below 9 units is pinned flat at 2.5, so a
+      //   buy-then-sell-back pair sees the same multiplier both ways and the
+      //   10%/-10% spread is all that is left — a guaranteed loss, which is
+      //   the invariant. At E=6 the clamp NEVER binds, the low-stock curve
+      //   keeps its full gradient, and one unit of stock movement changes the
+      //   price by `sqrt(s / (s-1))`. That exceeds the spread ratio
+      //   `1.10 / 0.90 = 1.222` for any stock ≤ 3 — so buying one unit off a
+      //   nearly-empty shelf and selling it straight back is positive-EV, and
+      //   a bot can repeat it forever.
+      //
+      // Swept thresholds (see the report): E ≤ 8 exploitable, E ≥ 10 clean.
+      // Ruling 2's OTHER new number, consumable-ingredient E=10, sits just
+      // inside the safe band and does not trip this.
+      //
+      // ⚠️ Fixing this is a DESIGNER call, not a probe edit — either the
+      // consumable E moves to ≥10, or §3.1's clamp/spread changes. Relaxing
+      // this expectation to a tolerance would convert a gold faucet into a
+      // green tick, which is precisely what §10 exists to prevent.
       final roundTrip = _runRoundTripper(days);
       expect(
         roundTrip.total,

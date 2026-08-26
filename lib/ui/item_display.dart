@@ -19,29 +19,11 @@ import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
 import '../game/items/item_naming.dart';
+import '../game/economy/quality_value.dart';
 import 'app_banner.dart';
 import 'app_theme.dart';
 import 'item_icon.dart';
 
-/// What one of these is WORTH before any shop's location/stock walk touches
-/// it — [ItemDef.value], scaled by an instance's quality when it carries one.
-///
-/// ⚠️ **Computed here on purpose, for now.** Nothing in `lib/game/economy/`
-/// or `item_def.dart` scales *value* by quality today ([ItemModifiers
-/// .scaledBy] scales STATS); the economy work's `qualityValue` seam does not
-/// exist on main yet. This is deliberately the *same* integer round-half-
-/// away-from-zero `scaledBy` uses — which is also what
-/// `ShopPricing.roundGold` means by rounding — so the day that seam lands,
-/// this function is a delete rather than a number that has to be re-argued.
-///
-/// ⭐ Null and [Quality.standard] both return [base] untouched, the same
-/// "null IS Standard" reading [ItemModifiers.scaledBy] documents: an instance
-/// minted before quality existed must keep exactly the worth it always had.
-int qualityScaledValue(int base, Quality? quality) {
-  if (quality == null || quality == Quality.standard) return base;
-  final pct = quality.statPercent;
-  return (base * pct + (base < 0 ? -50 : 50)) ~/ 100;
-}
 
 /// One dialog for every item interaction — what it is, what it does, and
 /// what you can do with it here. [actions] whose `run` returns a refusal
@@ -76,7 +58,7 @@ Future<void> showItemDialog(
   // the shelf to find out. ⚠️ Value 0 (every [KeyDef] — quest gates are worth
   // nothing by construction) prints NO line: 'Value: 0g' reads as a bug
   // report, not as "this is not merchandise".
-  final scaledValue = qualityScaledValue(def.value, instance?.quality);
+  final scaledValue = qualityValue(def, instance);
   await showDialog<void>(
     context: context,
     builder: (dialogContext) => AlertDialog(

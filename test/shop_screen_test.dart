@@ -134,6 +134,18 @@ GameState _game(
 
 Finder _rowFor(String itemId) => find.widgetWithText(GamePanel, _name(itemId));
 
+/// The row for a gear instance carrying [quality] — ⚠️ **its composed name,
+/// not the def's.** `ItemCatalogue.displayName` prefixes the quality tier
+/// ("Master Tuskhide Belt"), so [_rowFor] matches nothing for a qualified
+/// piece and every descendant assertion under it would pass vacuously.
+Finder _rowForInstance(String defId, Quality quality) => find.widgetWithText(
+  GamePanel,
+  ItemCatalogue.displayName(
+    ItemCatalogue.byId(defId),
+    ItemInstance(instanceId: 'x', defId: defId, quality: quality),
+  ),
+);
+
 Future<void> _pump(WidgetTester tester, GameState game) async {
   await tester.binding.setSurfaceSize(const Size(900, 4000));
   addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -463,6 +475,114 @@ void main() {
         isFalse,
         reason: 'gear never enters the stock map at all',
       );
+    });
+
+    testWidgets(
+      '⭐ §14d.1: quality scales the price, and the ROW and SETTLE agree',
+      (tester) async {
+        // ⚠️ **The two-computations mutant, killed end to end.** The Shop
+        // screen renders this row's price and `priceShopBasket` computes what
+        // Settle pays; before §14d.1 those were two independent
+        // `vendorPrice(def.value)` expressions. This test walks the real UI:
+        // it reads the number the row PRINTS, watches the settle bar, and then
+        // checks the gold that actually moved. A change that teaches only one
+        // of the three about quality fails here, whichever one it is.
+        final storage = _MemStorage();
+        final game = _game(
+          storage,
+          storeroomInstanceIds: ['inst-master'],
+          instances: {
+            'inst-master': const ItemInstance(
+              instanceId: 'inst-master',
+              defId: _belt,
+              quality: Quality.master,
+            ),
+          },
+        );
+        await _pump(tester, game);
+        await _switchToSell(tester);
+
+        // ⚠️ A qualified piece renders under its COMPOSED name ("Master
+        // Tuskhide Belt"), not the bare def name — find the row the way the
+        // screen names it, or the finder silently matches nothing and every
+        // assertion below becomes vacuous.
+        final row = _rowForInstance(_belt, Quality.master);
+        final base = ItemCatalogue.byId(_belt).value;
+        final expected = ShopPricing.vendorPrice((base * 140 + 50) ~/ 100);
+        expect(
+          expected,
+          greaterThan(ShopPricing.vendorPrice(base)),
+          reason: 'the fixture must actually exercise the ladder — a Master '
+              'piece that priced like a Standard one would make the rest of '
+              'this test vacuous',
+        );
+
+        expect(
+          find.descendant(
+            of: row,
+            matching: find.text('${expected}g · vendor (flat)'),
+          ),
+          findsOneWidget,
+          reason: 'the ROW must print the quality-scaled price — a display '
+              'path still reading def.value shows ${ShopPricing.vendorPrice(base)}g',
+        );
+
+        await tester.tap(
+          find.descendant(of: row, matching: find.text('Sell')),
+        );
+        await tester.pump();
+
+        expect(
+          _displayedNet(tester),
+          expected,
+          reason: 'the SETTLE BAR must quote the same number the row showed',
+        );
+
+        await tester.tap(find.textContaining('Settle '));
+        await tester.pump();
+        await tester.pump();
+
+        expect(
+          game.profile.gold,
+          1000 + expected,
+          reason: 'the gold that MOVED must equal the number displayed — a '
+              'settle that recomputed without quality pays less than the '
+              'player was shown, which is the whole point of the one seam',
+        );
+      },
+    );
+
+    testWidgets('a Rough piece is worth strictly less than a Master one', (
+      tester,
+    ) async {
+      // Kills a seam that scales in the right direction for one rung only, or
+      // that reads `quality != null` as a flat bonus.
+      final storage = _MemStorage();
+      final game = _game(
+        storage,
+        storeroomInstanceIds: ['inst-rough'],
+        instances: {
+          'inst-rough': const ItemInstance(
+            instanceId: 'inst-rough',
+            defId: _belt,
+            quality: Quality.rough,
+          ),
+        },
+      );
+      await _pump(tester, game);
+      await _switchToSell(tester);
+
+      final base = ItemCatalogue.byId(_belt).value;
+      final rough = ShopPricing.vendorPrice((base * 80 + 50) ~/ 100);
+      expect(
+        find.descendant(
+          of: _rowForInstance(_belt, Quality.rough),
+          matching: find.text('${rough}g · vendor (flat)'),
+        ),
+        findsOneWidget,
+        reason: 'Rough must price BELOW the plain vendor price, not above it',
+      );
+      expect(rough, lessThan(ShopPricing.vendorPrice(base)));
     });
   });
 

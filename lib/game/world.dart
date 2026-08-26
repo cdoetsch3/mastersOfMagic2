@@ -354,11 +354,15 @@ abstract final class World {
           '— under the path, out toward the edges, somewhere you cannot walk '
           'to — and settles there. You did not kill anything. You '
           'interrupted something, and it noticed you doing it.',
-      edges: [
-        TravelEdge('hearthwood', 3),
-        TravelEdge('thornmire', 3),
-        TravelEdge('ashfall_vale', 3),
-      ],
+      // ⚠️ **No road from here to Ashfall Vale** (ruling, Christian
+      // 2026-08-26). The vale is downwind of the *cone*, so the way in is the
+      // Cinderpeak Foothills and nothing else; the woods only ever bordered it
+      // on the map, never on the ground. Removing it also makes the vale the
+      // level-10-14 zone it is billed as, instead of a one-hop step off a
+      // level-1-5 wood.
+      // ⭐ Both sides were edited together — see `ashfall_vale` below, and
+      // `test/world_test.dart`'s bidirectionality + reachability guards.
+      edges: [TravelEdge('hearthwood', 3), TravelEdge('thornmire', 3)],
     ),
     GameLocation(
       id: 'glimmerbrook',
@@ -437,10 +441,14 @@ abstract final class World {
           'charcoal drawing of itself. New shoots are already pushing up '
           'through it. Fire came through here, and something is arguing about '
           'whether it won.',
-      edges: [
-        TravelEdge('whispering_woods', 3),
-        TravelEdge('cinderpeak_foothills', 3),
-      ],
+      // ⚠️ **One road in, and it is the Foothills** (ruling, Christian
+      // 2026-08-26 — the Whispering Woods edge removed, both sides). This
+      // leaves the vale a leaf on the graph: reachable only as
+      // `hearthwood → cinderpeak_foothills → ashfall_vale`, which is the
+      // climb the zone's level band assumes you made.
+      // ⚠️ A future edit that drops this last edge STRANDS the vale —
+      // `test/world_test.dart`'s reachability guard is what catches that.
+      edges: [TravelEdge('cinderpeak_foothills', 3)],
     ),
     GameLocation(
       id: 'pennycross',

@@ -69,14 +69,63 @@ void main() {
       );
     });
 
-    test('E category defaults are native 60 / imported 20 / consumables 30', () {
-      // ✅ §5.1: "zone-native materials 60, imported materials 20,
-      // consumables 30". These are compiled constants, not part of
-      // config/economy's schema (only per-item overrides are server-tunable
-      // per §7) — this pins the values a shop builder reads directly.
-      expect(EconomyConfig.equilibriumNative, 60);
-      expect(EconomyConfig.equilibriumImported, 20);
-      expect(EconomyConfig.equilibriumConsumable, 30);
+    test(
+      'E category defaults are native 60 / imported 20 / '
+      'consumable-ingredient 10 / consumables 9 (provisional, §14d.3)',
+      () {
+        // ✅ §5.1 as re-cut by §14d ruling 2 (Christian, 2026-08-26): the two
+        // GEAR-material buckets are untouched at 60/20; the consumable lane is
+        // the whole edit — a new ingredient bucket at 10, and consumables
+        // themselves dropped 30 → 6.
+        // These are compiled constants, not part of config/economy's schema
+        // (only per-item overrides are server-tunable per §7) — this pins the
+        // values a shop builder reads directly.
+        expect(
+          EconomyConfig.equilibriumNative,
+          60,
+          reason: 'gear materials were explicitly NOT re-tuned by §14d.2',
+        );
+        expect(
+          EconomyConfig.equilibriumImported,
+          20,
+          reason: 'gear materials were explicitly NOT re-tuned by §14d.2',
+        );
+        expect(
+          EconomyConfig.equilibriumConsumableIngredient,
+          10,
+          reason: 'the herb shelf is scarcer than an imported gear material — '
+              'herbs are picked, not shipped',
+        );
+        expect(
+          EconomyConfig.equilibriumConsumable,
+          9,
+          reason: 'a potion shelf is the scarcest thing a town sells — 9 is '
+              'the §14d.3 provisional (the ruled ~6 opens the round-trip '
+              'faucet; E ≤ 8 exploitable, and 10 would collide with the '
+              'ingredient bucket)',
+        );
+      },
+    );
+
+    test('the four E buckets are strictly ordered, scarcest last', () {
+      // ⭐ Not decoration: `ShopCatalogue.categoryFor` resolves an item that
+      // fits two buckets by returning the SCARCER one, and it does that by
+      // ordering its `if`s rather than by comparing numbers. That trick is
+      // only correct while the constants stay in this order, so the ordering
+      // is pinned here, next to the numbers, where a future re-tune will see
+      // it. Re-tuning consumables above imports without touching
+      // `categoryFor` would silently invert the ruling.
+      expect(
+        [
+          EconomyConfig.equilibriumNative,
+          EconomyConfig.equilibriumImported,
+          EconomyConfig.equilibriumConsumableIngredient,
+          EconomyConfig.equilibriumConsumable,
+        ],
+        [60, 20, 10, 9],
+        reason: 'native > imported > consumable-ingredient > consumable, '
+            'strictly decreasing — the precedence `categoryFor` encodes',
+      );
     });
   });
 

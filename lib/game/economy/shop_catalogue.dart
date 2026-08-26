@@ -25,6 +25,8 @@ library;
 
 import '../items/item_catalogue.dart';
 import '../items/item_def.dart';
+import '../items/recipe_book.dart';
+import '../items/recipe_def.dart';
 import '../world.dart';
 
 /// Whether a town's shop is trading.
@@ -34,22 +36,43 @@ import '../world.dart';
 /// Decision 2 debated and Christian resolved against option (c).
 enum ShopStatus { open, closedThisSeason }
 
-/// §5.1's three E-category buckets, exposed so the (separately-owned)
-/// pricing engine can look up `E` without re-deriving "is this native here."
+/// §5.1's E-category buckets, exposed so the (separately-owned) pricing engine
+/// can look up `E` without re-deriving "is this native here."
 ///
-/// ⚠️ **Consumable outranks native/imported.** A `ConsumableDef`/`BeltableDef`
-/// is always [consumable] (E=30) regardless of which zone it's native to —
-/// §5.1 states the three buckets are exhaustive and consumables are their own
-/// bucket, not "a native or imported material that happens to be edible."
+/// ⭐ **§14d ruling 2 (Christian, 2026-08-26) added a fourth bucket** and
+/// re-cut the numbers: native materials 60 · imported materials 20 ·
+/// **consumable-ingredient materials 10** · consumables 6. Consumables and the
+/// herbs they are brewed from are the shelves a player actually drains, and
+/// the old flat E=30 made a potion shelf behave like a lumber yard.
+///
+/// ⚠️ **The buckets are ordered, and the order is SCARCER WINS** — precedence
+/// is exactly ascending E, so [consumable] (6) outranks [consumableIngredient]
+/// (10), which outranks [importedMaterial] (20), which outranks
+/// [nativeMaterial] (60). That is what settles the one genuinely ambiguous
+/// case: a material feeding *both* a gear recipe and a consumable recipe is a
+/// [consumableIngredient], not a native/imported material.
+///
+/// ⭐ **Why scarcer wins, and not "gear wins" or an average.** A material under
+/// two kinds of demand is under MORE pressure than one under either alone, so
+/// the tighter equilibrium is the honest reading of it. It is also the only
+/// *monotone* rule: adding a recipe to the game can then only ever tighten a
+/// shelf, never loosen one — so a content edit cannot silently make an
+/// existing material cheaper and more plentiful somewhere nobody was looking.
 enum ShopItemCategory {
   /// A `MaterialDef` native to this town (one of its adjacent, shipped
-  /// zones, §2.1/§4.1). E = 60.
+  /// zones, §2.1/§4.1), feeding no consumable recipe. E = 60.
   nativeMaterial,
 
-  /// A `MaterialDef` not native to this town. E = 20.
+  /// A `MaterialDef` not native to this town, feeding no consumable recipe.
+  /// E = 20.
   importedMaterial,
 
-  /// A `ConsumableDef` or `BeltableDef`, any town. E = 30.
+  /// ⭐ §14d ruling 2: a `MaterialDef` that is an input to **any** recipe whose
+  /// output is a consumable — derived from [RecipeBook], never hand-listed.
+  /// E = 10, and it outranks native/imported at every town.
+  consumableIngredient,
+
+  /// A `ConsumableDef` or `BeltableDef`, any town. E = 6.
   consumable,
 }
 
@@ -175,12 +198,62 @@ abstract final class ShopCatalogue {
     return [...nativeStockFor(townId), ...?_imports[townId]];
   }
 
+  // ---- §14d.2: consumable ingredients, derived from RecipeBook -----------
+
+  static bool _isConsumableKind(ItemDef? def) =>
+      def is ConsumableDef || def is BeltableDef;
+
+  /// ⭐ **Every material that any consumable is brewed from** (§14d ruling 2),
+  /// computed by walking [RecipeBook.all], keeping the recipes whose *output*
+  /// is a consumable, and collecting their input ids.
+  ///
+  /// ⚠️ **Mechanical, never a hand list — this is the whole point of the
+  /// ruling.** A hand-maintained set would be correct exactly until the next
+  /// potion recipe shipped, and would then be wrong *silently*: the new herb
+  /// would price as an ordinary native material at E=60 and nobody would see a
+  /// failing test. Because this reads [RecipeBook], adding one consumable
+  /// recipe reclassifies its inputs with no edit to this file at all — and
+  /// `shop_catalogue_test.dart` pins that behaviour with a synthetic recipe so
+  /// a future refactor back to a literal set fails loudly.
+  ///
+  /// ⚠️ Filtered to `MaterialDef` because that is what the ruling names. A
+  /// consumable used as an input to another consumable does not need to appear
+  /// here anyway — it is already [ShopItemCategory.consumable], whose E of 6 is
+  /// lower still, and "scarcer wins" therefore gives it the same answer.
+  ///
+  /// `static final`, not `const`: it resolves ids through [ItemCatalogue],
+  /// which is itself a derived (`static final`) map.
+  static final Set<String> consumableIngredientIds =
+      consumableIngredientsIn(RecipeBook.all);
+
+  /// [consumableIngredientIds]'s rule, over an arbitrary recipe list.
+  ///
+  /// ⭐ **Parameterised solely so a test can hand it a recipe the game does not
+  /// ship.** That is the mutant-killer the ruling asked for: a test appends one
+  /// synthetic potion recipe taking `oak_log` — a pure *gear* material today —
+  /// and asserts `oak_log` comes back as an ingredient. A hand-written literal
+  /// set cannot pass that test no matter what ids it contains, so the
+  /// derivation cannot be quietly replaced by a list later.
+  static Set<String> consumableIngredientsIn(List<RecipeDef> recipes) => {
+    for (final recipe in recipes)
+      if (_isConsumableKind(ItemCatalogue.tryById(recipe.outputId)))
+        for (final input in recipe.inputs)
+          if (ItemCatalogue.tryById(input.defId) is MaterialDef) input.defId,
+  };
+
   // ---- §5.1 category, for the (separately-owned) pricing engine ----------
 
+  /// ⚠️ **The checks below run in ascending-E order, and that order IS the
+  /// tie-break rule** (see [ShopItemCategory]): consumable 6, then
+  /// consumable-ingredient 10, then native 60 / imported 20. A material that
+  /// feeds both a gear recipe and a potion recipe reaches the
+  /// [ShopItemCategory.consumableIngredient] return before the native/imported
+  /// question is ever asked — scarcer wins, monotonically.
   static ShopItemCategory categoryFor(String townId, String itemId) {
     final def = ItemCatalogue.byId(itemId);
-    if (def is ConsumableDef || def is BeltableDef) {
-      return ShopItemCategory.consumable;
+    if (_isConsumableKind(def)) return ShopItemCategory.consumable;
+    if (consumableIngredientIds.contains(itemId)) {
+      return ShopItemCategory.consumableIngredient;
     }
     return nativeZonesOf(townId).contains(ItemCatalogue.zoneOf(itemId))
         ? ShopItemCategory.nativeMaterial

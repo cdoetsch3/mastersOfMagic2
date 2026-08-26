@@ -7,6 +7,7 @@ import 'active_trip.dart';
 import 'adventure.dart';
 import 'crafting/craft_quality.dart';
 import 'economy/economy_config.dart';
+import 'economy/quality_value.dart';
 import 'economy/shop_catalogue.dart';
 import 'economy/shop_pricing.dart';
 import 'economy/shop_state.dart';
@@ -950,8 +951,10 @@ class GameState extends ChangeNotifier {
   // Storeroom/backpack a line at a time.
 
   /// §5.1's category-default equilibrium (`E`) — `zone-native materials 60 ·
-  /// imported materials 20 · consumables 30` — read off
-  /// [ShopCatalogue.categoryFor]. ⚠️ **This is the "config sibling" role**
+  /// imported materials 20 · consumable-ingredient materials 10 ·
+  /// consumables 6` (§14d ruling 2, Christian 2026-08-26) — read off
+  /// [ShopCatalogue.categoryFor], which owns the "scarcer wins" precedence
+  /// between the buckets. ⚠️ **This is the "config sibling" role**
   /// `config/economy`'s `equilibriumOverrides` (§7) will one day fill;
   /// `config/economy` does not exist as shipped code yet, so this is the
   /// compiled default the contract names, not a stand-in for a real seam.
@@ -960,6 +963,8 @@ class GameState extends ChangeNotifier {
       switch (ShopCatalogue.categoryFor(townId, itemId)) {
         ShopItemCategory.nativeMaterial => EconomyConfig.equilibriumNative,
         ShopItemCategory.importedMaterial => EconomyConfig.equilibriumImported,
+        ShopItemCategory.consumableIngredient =>
+          EconomyConfig.equilibriumConsumableIngredient,
         ShopItemCategory.consumable => EconomyConfig.equilibriumConsumable,
       };
 
@@ -1071,11 +1076,17 @@ class GameState extends ChangeNotifier {
       if (def == null) continue;
       sellGoldOf[entry.key] = ShopPricing.vendorPrice(def.value) * entry.value;
     }
+    // ⭐ §14d ruling 1: gear prices off its QUALITY-scaled value, through the
+    // one [instanceVendorPrice] seam the Shop screen's gear row also calls —
+    // so what a row shows and what this settle charges cannot disagree.
     final instanceGoldOf = <String, int>{};
     for (final instId in sellInstances) {
-      final defId = profile.itemInstances[instId]?.defId;
+      final instance = profile.itemInstances[instId];
+      final defId = instance?.defId;
       final def = defId == null ? null : ItemCatalogue.tryById(defId);
-      if (def != null) instanceGoldOf[instId] = ShopPricing.vendorPrice(def.value);
+      if (def != null) {
+        instanceGoldOf[instId] = instanceVendorPrice(def, instance);
+      }
     }
     return ShopBasketQuote(
       buyGoldOf: buyGoldOf,

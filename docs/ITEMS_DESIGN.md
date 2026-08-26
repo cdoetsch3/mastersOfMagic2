@@ -2202,6 +2202,42 @@ settle.
 
 ## Changelog
 
+**Rev — 2026-08-26 (quality reaches the price tag; potions get their own
+shelf).** Three designer rulings, all recorded in full as
+[ECONOMY_CONTRACT §14d](contracts/ECONOMY_CONTRACT.md). ⭐ **Quality now scales
+an item's NPC value**, on the *same* ×0.8/1.0/1.2/1.4 ladder as its stats and
+reading the *same* `Quality.statPercent` getter `ItemModifiers.scaledBy` uses —
+one seam, `qualityValue(def, instance)` in
+`lib/game/economy/quality_value.dart`, so a retune of the ladder is one edit
+and stats and prices can never sit on different rungs. A Master `tuskhide_belt`
+vendors at 92g where a Rough one fetches 53g. ⚠️ **Null quality reads as
+Standard ×1.00**, exactly as `scaledBy` already does — dropped gear rolls an
+aspect rather than a quality, and every instance minted before the 2026-08-18
+ruling has no field at all, so no item in any existing save moves by a coin.
+⭐ **The seam is consumed everywhere gear is priced**: the shop's gear row and
+`priceShopBasket`'s instance walk were two independent
+`vendorPrice(def.value)` expressions and are now one call, which makes "the row
+showed one number and Settle paid another" unrepresentable rather than merely
+unlikely — pinned by a widget test that reads what the row prints, what the
+settle bar quotes, and what gold actually moves. 📝 On the future player market
+this same function anchors each listing, because **quality makes items distinct
+listings** — a Master wand and a Rough wand must never stack into one order
+book. ⭐ **Consumable ingredients became their own equilibrium bucket**
+(E=10, against gear materials' unchanged 60/20 and consumables re-cut 30 → 6):
+a `MaterialDef` feeding any recipe whose output is drinkable, ⚠️ **derived by
+walking `RecipeBook`, never hand-listed** — today `brookmint`, `saltwort`,
+`sapwort`, and tomorrow whatever the next potion recipe takes, with no edit to
+the economy at all. A material pulling double duty takes the **lower** E, since
+that is the only rule under which adding a recipe can tighten a shelf but never
+loosen one. 🔴 **Left unresolved on purpose**: consumables at E=6 break the
+anti-exploit probe's round-trip invariant (§3.1's ×2.5 clamp stops flattening
+the low-stock curve below E≈19, which turns buy-and-sell-back into a repeatable
++1g faucet), and the assertion is left *failing* rather than relaxed — see
+§14d.2 for the two ways out. 📝 **Whispering Woods no longer roads to Ashfall
+Vale**; the vale hangs off Cinderpeak Foothills alone, and a before/after dump
+of all nine shelves and all 9 × 118 location-modifier cells confirms nothing
+but the graph moved.
+
 **Rev — 2026-08-19 (the icons get generated).** `tool/artgen.py`: one command
 per zone that turns [ITEM_ART.md](ITEM_ART.md) and
 [BESTIARY_ART.md](BESTIARY_ART.md) into actual PNGs. It enumerates every

@@ -344,11 +344,18 @@ paying off a second time, at the seam where Jewelry finally opens.
 
 ### 5.1 Category defaults
 
-✅ Ruled: **zone-native materials 60 · imported materials 20 · consumables
-30**, with 📝 per-item overrides. "Zone-native" here means native to *this
-shop's* town (§4.2), independent of the item's own catalogue-file zone — an
-imported material is `E=20` everywhere it is sold as an import, `E=60` at
-its native town.
+✅ Ruled: **zone-native materials 60 · imported materials 20 ·
+consumable-ingredient materials 10 · consumables 6**, with 📝 per-item
+overrides. "Zone-native" here means native to *this shop's* town (§4.2),
+independent of the item's own catalogue-file zone — an imported material is
+`E=20` everywhere it is sold as an import, `E=60` at its native town.
+
+⚠️ **Re-cut by §14d.2 (Christian, 2026-08-26)**, which added the
+consumable-ingredient bucket and dropped consumables 30 → 6. Read §14d.2
+before using these numbers: it defines "consumable ingredient" (derived from
+`RecipeBook`, never hand-listed), the scarcer-wins precedence between the four
+buckets, and 🔴 an **unresolved conflict** — E=6 breaks §10's round-trip
+invariant, and is shipped pending a decision.
 
 ### 5.2 Worked price tables — 3 representative items
 
@@ -388,7 +395,13 @@ table because it is what the game currently ships):
 | 500 | 0.400 | 4.80 | 5.28 | 4.32 |
 
 **`saltwort_draught`** — consumable, `E = 30` (native at Galehaven),
-`base = 30` ✅ shipped, unchanged:
+`base = 30` ✅ shipped, unchanged.
+
+⚠️ **STALE as of §14d.2**: the consumable E is now **6**, so every row below
+is computed against a number the game no longer uses. Deliberately left
+un-recomputed while §14d.2's 🔴 unresolved E=6 conflict is open — recomputing
+this table twice is worse than pointing at that note. The *shape* of the curve
+is still illustrative; the cells are not.
 
 | Stock | Multiplier | Price | Buy | Sell |
 |---|---|---|---|---|
@@ -853,6 +866,17 @@ trades move goods directly shop⇄Storeroom (no backpack constraint locally);
 HAULING between towns rides the 20-slot backpack — carry capacity is the
 arbitrage governor until Phase 5b mounts add cargo.
 
+## 14d.3 🟡 Coordinator's provisional (2026-08-26): consumable E = 9
+
+Shipped at 9, not the ruled ~6: §14d.2's sweep proves E ≤ 8 opens the
+round-trip faucet (the ×2.5 clamp stops binding; the marginal gradient beats
+the 1.10/0.90 spread at stock ≤ 3). 9 verified clean against the deep probe
+(round-tripper's best day: exactly 0g), and — unlike 10 — keeps the four E
+buckets distinct with consumables scarcest, preserving the ruling's shape.
+No exploit ships; the probe's hard assertions stay enforced. AWAITING the
+designer's final pick: accept 9, or keep ~6 by redesigning §3.1's
+clamp/spread (wider blast radius, every §5.2 table moves).
+
 ## 14e. ✅ Storage amendment (Christian, 2026-08-26) — §11.2–11.3 OVERRIDDEN
 
 §11 argued shopStock belongs ON the character document (bounded by content,
@@ -877,6 +901,196 @@ generalizes to an NPC shelf; player-to-player trade is exempt because it is
 zero-sum in motes. ⚠️ **Hearts are the one exception**: craft-only (§6.0) is
 load-bearing, so Hearts get no value, no vendor path, and Bound tradability
 when they ship. The player market inherits all of this unchanged.
+
+## 14d. ✅ THREE RULED (Christian, 2026-08-26) — quality pricing, a fourth E bucket, one road closed
+
+### 14d.1 — Quality scales an item's NPC price
+
+✅ **Ruled and built.** A crafted item's gold value rides the *same*
+×0.8 / ×1.0 / ×1.2 / ×1.4 ladder as its stats — this contract had already
+said so (§8's crafted-value discussion); it is now executable rather than
+aspirational.
+
+The seam is `lib/game/economy/quality_value.dart`:
+
+```dart
+int qualityValue(ItemDef def, ItemInstance? instance);
+int instanceVendorPrice(ItemDef def, ItemInstance? instance);
+```
+
+- The multiplier is read from `Quality.statPercent` — the *same getter*
+  `ItemModifiers.scaledBy` uses. ⭐ Deliberately not a second copy of
+  `80/100/120/140` in the economy layer: retuning the ladder is one edit, and
+  stats and prices cannot end up on different rungs.
+- Integer arithmetic, `(v * pct + 50) ~/ 100`, round-half-away-from-zero,
+  matching both `ShopPricing.roundGold`'s rule and `scaledBy`'s
+  implementation.
+- ⭐ **Null quality = Standard = ×1.00.** Dropped gear rolls an *aspect*, not
+  a quality, and every instance minted before the 2026-08-18 stat ruling has
+  no field at all. Both keep exactly the gold they have always been worth —
+  no player's existing inventory moves by a coin.
+- ⚠️ **One seam, consumed everywhere gear is priced.** Both
+  `GameState.priceShopBasket`'s instance walk (which `settleShopBasket`
+  charges from) and `shop_screen.dart`'s gear row now call
+  `instanceVendorPrice`. They were previously two independent
+  `ShopPricing.vendorPrice(def.value)` expressions — a display and a settle
+  free to disagree the moment one of them learned about quality. That mutant
+  is now unrepresentable, and is pinned end-to-end by a widget test that reads
+  the number the row *prints*, the number the settle bar *quotes*, and the
+  gold that actually *moves*.
+
+Worked example, `tuskhide_belt` (`base = 110`, vendor sink ×0.6):
+
+| Quality | Value | Vendor price |
+|---|---|---|
+| Rough | 88 | 53 |
+| Standard / null | 110 | 66 |
+| Ornate | 132 | 79 |
+| Master | 154 | 92 |
+
+📝 **On the future player market, quality makes items DISTINCT listings.** A
+Master Oak Wand and a Rough Oak Wand are not one row with one price and must
+never stack into a single order book. `qualityValue` is the function that
+market will anchor each listing from — which is why it returns a *value*
+rather than a finished vendor price: the 0.6 sink is one consumer of it, not
+its definition.
+
+### 14d.2 — A fourth E bucket: consumable ingredients
+
+✅ **Ruled.** §5.1's category defaults become:
+
+| Bucket | E | Change |
+|---|---|---|
+| zone-native gear material | 60 | unchanged |
+| imported gear material | 20 | unchanged |
+| **consumable-ingredient material** | **10** | new bucket |
+| consumable | **6** | was 30 |
+
+The gear half of the economy is deliberately untouched. The consumable lane
+is the whole edit: potions and the herbs they are brewed from are what a
+player actually drains in a session, and at a flat E=30 they refilled like a
+lumber yard and never moved on price.
+
+**"Consumable ingredient" is derived MECHANICALLY, never hand-listed.** It is
+any `MaterialDef` that is an input to any recipe whose output is a
+`ConsumableDef`/`BeltableDef`, computed by walking `RecipeBook.all`
+(`ShopCatalogue.consumableIngredientsIn`). The shipped set today is exactly:
+
+```
+brookmint · saltwort · sapwort
+```
+
+⚠️ A hand-written set would be correct exactly until the next potion recipe
+shipped, and would then be wrong *silently* — the new herb would price as an
+ordinary native material at E=60 and no test would fail. The derivation is
+pinned by a test that appends one synthetic potion recipe taking `oak_log` (a
+pure gear material) and asserts `oak_log` comes back reclassified. A literal
+set cannot pass that test, whatever ids it contains.
+
+**The both-uses tie-break: SCARCER WINS.** A material feeding both a gear
+recipe and a consumable recipe takes the **lower** E — i.e. it is a
+consumable ingredient. Two reasons, and the second is the load-bearing one:
+
+1. A material under two kinds of demand is under *more* pressure than one
+   under either alone, so the tighter equilibrium is the honest reading.
+2. ⭐ It is the only **monotone** rule. Adding a recipe can then only ever
+   *tighten* a shelf, never loosen one — so a content edit cannot silently
+   make an existing material cheaper and more plentiful somewhere nobody was
+   looking. "Gear wins" and "average the two" both fail this.
+
+Implemented as precedence rather than arithmetic: `ShopCatalogue.categoryFor`
+asks its questions in **ascending-E order** (consumable 6 → ingredient 10 →
+native 60 / imported 20), so the scarcer bucket returns first. ⚠️ That trick
+is only correct while the constants keep that order, which is pinned by its
+own test next to the numbers. 📝 The tie-break is currently *vacuous* in
+shipped content — none of the three herbs feeds a gear recipe — so the
+synthetic-recipe test is the only thing exercising it. That is on purpose.
+
+`EconomyConfig` keeps all four as compiled constants
+(`equilibriumConsumableIngredient` is the new one); per-item
+`equilibriumOverrides` from `config/economy` still win over every category
+default, including this one.
+
+#### 🔴 UNRESOLVED — E=6 breaks §10's round-trip invariant
+
+⚠️ **This needs a decision before the shop ships.** With consumables at E=6,
+`tool/economy_probe_test.dart`'s first §10 hard assertion — *"round-tripping
+must never net positive"* — **fails**: buying one `hardtack` off a
+nearly-empty Pennycross shelf and selling it straight back the same day nets
+about **+1g**, repeatable indefinitely. A bot scales that into a gold faucet.
+
+The cause is structural, not rounding noise:
+
+> §3.1 clamps the scarcity multiplier at **2.5**, and that ceiling is what
+> *flattens* the curve at low stock. It binds only while `E / stock > 6.25`.
+> At E=60 every shelf below 9 units is pinned flat at 2.5, so a
+> buy-then-sell-back pair sees the *same* multiplier both ways and the
+> 1.10/0.90 spread is all that remains — a guaranteed loss, which is exactly
+> the invariant. **At E=6 the clamp never binds at all**, the low-stock curve
+> keeps its full gradient, and one unit of stock movement moves the price by
+> `sqrt(s / (s−1))`. That exceeds the spread ratio `1.10 / 0.90 = 1.222` for
+> any stock ≤ 3.
+
+Swept thresholds: **E ≤ 8 exploitable · E ≥ 10 clean.** Ruling 14d.2's other
+new number, consumable-ingredient E=10, sits just inside the safe band and
+does not trip it — verified by re-running the probe with only the consumable
+bucket restored to 30, which passes.
+
+Two ways out, both designer calls, neither taken here:
+
+- **(a)** Move the consumable E to ≥ 10. Cheapest; keeps §3 untouched; costs
+  some of the scarcity the ruling was reaching for.
+- **(b)** Change §3.1's clamp or spread so the invariant holds at any E — e.g.
+  floor the effective stock at 1 in the multiplier, or widen the spread. Wider
+  blast radius: §3 is a different owner's contract and every worked table in
+  §5.2 would move.
+
+⚠️ Shipped at the ruled 6, with the probe assertion **left failing and NOT
+relaxed** — turning a gold faucet into a green tick is precisely what §10
+exists to prevent. `EconomyConfig.equilibriumConsumable` carries a 🔴 marker
+pointing here.
+
+📝 §5.1's one-line default list is updated in place. §5.2's
+`saltwort_draught` worked table still shows `E = 30` and is **stale** — it is
+deliberately left un-recomputed while the number above is under review, since
+recomputing it twice is worse than pointing at this note.
+
+### 14d.3 — Whispering Woods loses its road to Ashfall Vale
+
+✅ **Ruled and removed**, both directions (the edge is stored per-side in
+`lib/game/world.dart`; removing one side and not the other is the classic
+half-edit — `world_test.dart`'s bidirectionality guard catches it, and a new
+test names this specific pair).
+
+**Ashfall Vale remains reachable.** It is now a leaf on the graph, one road
+in: `hearthwood → cinderpeak_foothills → ashfall_vale`. ⚠️ Dropping that last
+edge would strand it; `world_test.dart`'s existing "every location is
+reachable on foot from Hearthwood" BFS is the guard, and it is the
+mutant-killer for any future edge edit. A new test additionally pins the
+specific surviving route, so a rewiring has to say so out loud.
+
+**Ripple check — what actually moved: nothing but the graph.** Every town's
+shelf, every native/regional set, and all 9 × 118 location-modifier cells were
+dumped before and after; the diff is the two edge lists and nothing else.
+
+- ⭐ **Hearthwood's shelf did not move** (the shelf most likely to). Hearthwood
+  borders the **Foothills**, not the vale — the vale was never one of its
+  native zones, so `nativeZonesOf('hearthwood')` is unchanged at
+  `{cinderpeak_foothills, glimmerbrook, thornmire, whispering_woods}`.
+- **No location-mod tier moved.** Ashfall Vale materials (`birch_log`,
+  `brookmint`) stay **regional ×0.90** at Hearthwood: the vale used to reach
+  Hearthwood two ways (through the woods *and* through the Foothills) and now
+  reaches it one way, but either is a 2-hop zone→zone walk, so §4.1 row 2 still
+  applies.
+- Hearthwood's curated `_imports` (`birch_log`, `brookmint`) are unaffected —
+  imports are a curatorial list, not a graph fact.
+- No town is native to Ashfall Vale (it borders no town), so no other shelf
+  could have moved.
+- The economy probe's hauler still routes; no test pinned the removed
+  adjacency.
+
+Both shelf-stability facts are now pinned by assertions, so if a *later* edge
+edit does move a shelf, those tests say which one.
 
 ## 14. Decisions needed (superseded — see 14b)
 
@@ -944,6 +1158,18 @@ revise before the shop ships, not a discovery during balance testing.
 ---
 
 ## Changelog
+
+**2026-08-26 — §14d, three rulings (Christian).** (1) Quality scales an
+item's NPC price through one new seam, `qualityValue` /
+`instanceVendorPrice`, consumed by both the shop display and the basket
+settle so they cannot disagree; null quality reads as Standard, so no
+existing instance moves. (2) A fourth E bucket, consumable ingredients at 10,
+derived mechanically from `RecipeBook` (`brookmint`, `saltwort`, `sapwort`),
+with consumables re-cut 30 → 6 and a scarcer-wins tie-break — 🔴 E=6 is
+shipped with §10's round-trip invariant **failing**, awaiting a decision
+(§14d.2). (3) The Whispering Woods ↔ Ashfall Vale road removed both ways; the
+vale stays reachable via Cinderpeak Foothills, and a before/after dump
+confirms **no shelf and no location modifier moved**.
 
 **2026-08-25 — first draft.** Written against Q1+Q2 shipped content (11
 built zones, 110 items, 41 recipes). All thirteen 2026-08-24/25 rulings
