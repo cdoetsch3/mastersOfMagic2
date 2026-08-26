@@ -45,6 +45,29 @@ String _name(String defId) => ItemCatalogue.displayName(ItemCatalogue.byId(defId
 DateTime _atEpochDay(int day) =>
     DateTime.utc(1970, 1, 1).add(Duration(days: day));
 
+/// A day whose Hearthwood daily events touch NONE of [itemIds] — derived,
+/// not hardcoded, same reasoning as the event tests' probed days.
+///
+/// ⚠️ Exists because three tests here once ran on the WALL CLOCK: they
+/// passed for days, then UTC midnight rolled the deterministic event seed
+/// onto oak and bindweed and their hand-computed expectations (no eventMod)
+/// went stale overnight — a date-sensitive test suite for a shop whose
+/// whole design is date-determinism. Every hand-computed expectation now
+/// pins a derived quiet day.
+DateTime _quietDayFor(List<String> itemIds) {
+  for (var day = 19000; day < 19400; day++) {
+    final events = ShopState.eventsFor(
+      shopId: _townId,
+      today: day,
+      candidateItemIds: ShopCatalogue.stockFor(_townId),
+    );
+    if (itemIds.every((id) => (events[id] ?? 1.0) == 1.0)) {
+      return _atEpochDay(day);
+    }
+  }
+  throw StateError('no quiet day in 400 — the event hash changed radically');
+}
+
 /// ⭐ Derived, not hardcoded: probed once (see the build notes) that day
 /// 19004 is a day `oak_log` draws Hearthwood's daily event (+20%, a spike)
 /// and 19000 is a day it does not — but re-deriving here means a change to
@@ -200,7 +223,14 @@ void main() {
       'at once',
       (tester) async {
         final storage = _MemStorage();
-        final game = _game(storage, gold: 1000, storeroomStacks: {_bindweed: 20});
+        final game = _game(
+          storage,
+          gold: 1000,
+          storeroomStacks: {_bindweed: 20},
+          // ⭐ Pinned quiet day: the expectations below omit eventMod on
+          // purpose, so the fixture must guarantee no event touches them.
+          now: _quietDayFor(const [_oak, _bindweed]),
+        );
         await _pump(tester, game);
 
         await _tapStepper(tester, _oak, Icons.add, times: 5);
@@ -293,7 +323,11 @@ void main() {
       tester,
     ) async {
       final storage = _MemStorage();
-      final game = _game(storage, storeroomStacks: {_bindweed: 20});
+      final game = _game(
+        storage,
+        storeroomStacks: {_bindweed: 20},
+        now: _quietDayFor(const [_bindweed]),
+      );
       await _pump(tester, game);
 
       await _switchToSell(tester);
@@ -618,7 +652,10 @@ void main() {
   group('the 2026-08-25 UI pass', () {
     testWidgets('the TOTAL column carries the quote and PRICE shows the '
         'NEXT unit, live', (tester) async {
-      final game = _game(_MemStorage());
+      final game = _game(
+        _MemStorage(),
+        now: _quietDayFor(const [_oak]),
+      );
       await _pump(tester, game);
       // 20, not a handful: the next-unit note only appears once rounding
       // actually MOVES the marginal price (5 oak leaves 11g → 11g, hidden
