@@ -112,8 +112,15 @@ class LoadoutPreset {
   );
 }
 
-/// The player's persistent save. One-to-one with a future Firestore document
-/// at `players/{uid}` — every field serializes to a plain JSON value.
+/// The player's persistent save — every field serializes to a plain JSON
+/// value.
+///
+/// ⭐ **Still one whole object in memory, even though the cloud now stores it
+/// in pieces.** `users/{uid}/characters/{cid}` holds most of it, `lastSeenAt`
+/// lives on the account document, and the two per-town maps became one
+/// document each; `ProfileDocuments` does the cutting and the reassembly, and
+/// nothing above the storage layer knows. Local guest saves are still the one
+/// blob this `toJson` produces.
 class PlayerProfile {
   String name;
   int xp;

@@ -15,7 +15,30 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Each player owns exactly their own profile document.
+    // Each user owns exactly their own account document, and everything
+    // underneath it: the character list, and each character's per-town
+    // storeroom and shop-stock documents (lib/game/profile_documents.dart).
+    //
+    // The recursive wildcard is deliberate. Every document below users/{uid}
+    // is that user's own save by construction — the achievements progress/
+    // subcollection is coming next — and a rule per level would be a rule to
+    // forget to add. Ownership is decided once, at the top.
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      // characters/{cid}, and below it storerooms/{townId} and
+      // shopStock/{townId}. A nested match does NOT inherit the parent's
+      // allow, so this states the same owner check for the descendants.
+      match /{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // ⚠️ The PRE-RESTRUCTURE profile document. Kept during the transition:
+    // the client reads it once, on the first sign-in after the upgrade, to
+    // convert it into users/{uid} — and it is never written again, so it
+    // survives as a dead backup. Remove this block only once no build that
+    // writes it can still sign in (see lib/game/content_version.dart).
     match /players/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }

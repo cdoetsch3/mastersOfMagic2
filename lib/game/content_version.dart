@@ -26,6 +26,16 @@ abstract final class ContentVersion {
   /// 📝 v2 (2026-08-20): the Kinetic quarter — and, decisively for PvP, the
   /// belt wire carries consumable DEF IDS ('U|saltwort_draught'), which a v1
   /// client cannot resolve. The gate exists for exactly this deploy.
+  ///
+  /// ⚠️ **THE NEXT BUMP CARRIES A STORAGE MIGRATION, and it is not optional.**
+  /// The save moved from `players/{uid}` to `users/{uid}` plus a
+  /// `characters/{cid}` subcollection (2026-08-26; see
+  /// `lib/game/profile_documents.dart`). A client from before that change
+  /// still reads and *writes* the legacy document, so while both builds can
+  /// sign in, one account has two live saves and whichever build the player
+  /// last opened silently discards the other's progress. The gate is the only
+  /// thing that stops that split brain — this restructure must not reach
+  /// players except in a version-gated release.
   static const int current = 2;
 
   /// The server's copy. ⭐ Public-read, no auth (see `firestore.rules`), so

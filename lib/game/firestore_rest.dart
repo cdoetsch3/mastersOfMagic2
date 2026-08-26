@@ -84,6 +84,42 @@ class FirestoreRest {
     await http.delete(Uri.parse('$_base/$path'), headers: await _headers());
   }
 
+  /// Lists every document in a collection, by id. A collection that has never
+  /// been written returns an empty map rather than throwing — in Firestore a
+  /// collection has no existence apart from its documents.
+  ///
+  /// ⭐ Needed because [query] cannot reach a *sub*collection: its structured
+  /// query runs from the database root, so it never sees
+  /// `users/{uid}/characters/{cid}/storerooms`. This is the plain List
+  /// Documents endpoint, which takes the full parent path.
+  ///
+  /// ⚠️ **Single page, deliberately.** [_listPageSize] is far above the only
+  /// two collections this is used for — one document per town, and towns are
+  /// fixed at nine by `World.townIds` — so paging would be untested code
+  /// guarding a bound that content, not players, controls.
+  static Future<Map<String, Map<String, dynamic>>> list(
+    String collectionPath,
+  ) async {
+    final res = await http.get(
+      Uri.parse('$_base/$collectionPath?pageSize=$_listPageSize'),
+      headers: await _headers(),
+    );
+    if (res.statusCode == 404) return {};
+    if (res.statusCode != 200) {
+      throw FirestoreRestException(res.statusCode, res.body);
+    }
+    final body = jsonDecode(res.body) as Map<String, dynamic>;
+    final docs = body['documents'] as List<dynamic>? ?? [];
+    return {
+      for (final d in docs.cast<Map<String, dynamic>>())
+        (d['name'] as String).split('/').last: decodeFields(
+          d['fields'] as Map<String, dynamic>? ?? {},
+        ),
+    };
+  }
+
+  static const int _listPageSize = 300;
+
   /// Runs a simple single-collection query with an optional equality filter
   /// and ordering. Returns each match as (id, fields).
   static Future<List<({String id, Map<String, dynamic> data})>> query(

@@ -853,6 +853,18 @@ trades move goods directly shop⇄Storeroom (no backpack constraint locally);
 HAULING between towns rides the 20-slot backpack — carry capacity is the
 arbitrage governor until Phase 5b mounts add cargo.
 
+## 14e. ✅ Storage amendment (Christian, 2026-08-26) — §11.2–11.3 OVERRIDDEN
+
+§11 argued shopStock belongs ON the character document (bounded by content,
+~2.5 KB). The 2026-08-26 Users/Characters restructure moves it — and the
+storerooms — to per-town subcollection documents under
+`users/{uid}/characters/{cid}/`. The §11 size argument was sound; what it
+did not weigh was WRITE AMPLIFICATION: every mutation rewrote every town's
+map through the whole profile document, where per-town docs write only what
+changed. Item instances stay on the character doc (identity, not location).
+§11's prose is superseded by this note; the schema of each town doc is
+unchanged.
+
 ## 14c. ✅ Mote ruling (Christian, 2026-08-25)
 
 Motes are **regular tradable items with one vendor value per TIER, uniform
