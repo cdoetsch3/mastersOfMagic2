@@ -1016,152 +1016,155 @@ actions over the charged-nuke drama the game is built around.
 
 ## 7a. Banked spells — the combat-stat generation 📝 (designed 2026-08-26, not built)
 
-⚠️ **This section is the REBUILT bank.** The plan doc referenced a "§7a — 16
-banked spell ideas" that was never committed anywhere in this repository's
-history (verified against every version of this file, 2026-08-25). The
-originals are lost; these are their replacements, designed in session with
-Christian. **The lesson is the section itself: designs live in committed
-markdown or they do not live.**
+⚠️ **This section is the REBUILT bank** — the plan doc's original "§7a — 16
+banked spell ideas" was never committed and is lost (verified against full
+git history, 2026-08-25). These are the replacements, designed in session.
+**The lesson is the section itself: designs live in committed markdown or
+they do not live.**
 
-⭐ **The brief:** the Kinetic quarter shipped six combat stats (accuracy,
-dodge, crit chance/damage, deflect chance/amount) plus DoT/HoT machinery —
-and TODAY ONLY GEAR AND ENEMIES touch any of them. The 26 shipped spells
-predate the whole vocabulary. This bank gives spells three jobs: **GRANT** a
-stat as a timed status, **EXPLOIT** a stat with attack riders, and
-**COUNTER** each mechanic so nothing new is oppressive.
+⭐ **The brief:** the Kinetic quarter shipped six combat stats plus DoT/HoT
+machinery, and only gear and enemies touch any of them. This bank gives
+spells three jobs: **GRANT** a stat as a status, **EXPLOIT** a stat with
+attack riders, and **COUNTER** every mechanic so nothing is oppressive.
 
-⚠️ **Two rules from the first drafts, kept where they were learned:**
-spells are **ELEMENT-AGNOSTIC** like every spell in the game (the cast pairs
-a spell with whichever element is charged; elements keep their identity
-through STATUSES, not spell ownership — the DoT/HoT entries therefore act on
-*whatever* over-time statuses are in play, never one element's by name), and
-names are **ONE WORD** unless there is a very specific reason (the shipped
-spellbook already obeys this — Volley, Barrage, Rampart). 📝 A draft #13
-(lifesteal-as-spell) was deleted on discovering the shipped **Sap / Leech /
-Drain** tier IS that spell, three costs deep — check the book before banking.
+### The laws (each learned on a draft, kept where learned)
 
-📝 Numbers are first-pass placeholders; the SHAPE and the counter-web are the
-design.
+1. **Element-agnostic** — spells belong to no element; the cast pairs a
+   spell with whatever is charged. Elements keep identity through STATUSES.
+   Over-time spells therefore act on *whatever* over-time statuses exist,
+   never one element's by name.
+2. **Check the book before banking** — a draft lifesteal spell duplicated
+   the shipped Sap/Leech/Drain tier. (Likewise: `Empower` already ships as
+   a damage buff — fold its semantics into this framework rather than
+   designing beside it.)
+3. **Buffs ARE statuses** — ordinary `TurnStatus` chips inheriting the pip
+   HUD, purge/cleanse web, and lockstep serialization. Polarity
+   (buff/debuff/neutral) on every status, shipped ones included. Engine
+   math is DERIVATION, never mutate-and-revert: effective = base + gear +
+   Σ(active statuses), recomputed per roll.
+4. **Axes and lanes** — an axis is one lever on the rules; a lane is who
+   is paying (spell / item / element, gear underneath). DEFAULT: one
+   status per axis per lane — but ⚠️ deliberately KEPT OPEN: some spells
+   may add a second spell-lane status on an axis (see Bloodlust) as
+   refinement continues. Across lanes, statuses coexist and sum: different
+   currencies may pay twice; the same currency may not, except where a
+   spell explicitly says so.
+5. **Collision: casting a granter of status S REPLACES the existing S** —
+   magnitude and duration together, last cast wins; same-spell recast is a
+   refresh. Stacking and best-of-both merging rejected (cap crisis;
+   invisible math; "keep the better parts" manufactures unpriced spells).
+6. **Naming** — a status is NEVER named after its mechanic ("Accuracy" is
+   illegal); it carries a flavor name, which one signature spell may share
+   (the spell Truesight grants the status Truesight). Names are short and
+   may be playful; whimsy is a very specific reason ("Twinkle Toes").
+7. **Durations are STANCES, ruled by example** — 10–30 turns against
+   ~20–35-turn duels: a buff is a fight-shaping commitment, not a
+   2–3-turn tactical blink.
 
-⭐ **Buffs ARE statuses — full citizens, not riders** (Christian's call,
-2026-08-26). Every GRANT below is an ordinary `TurnStatus` with a chip, which
-buys the whole existing machinery at once: the HUD pip system and its
-documented-or-build-fails test, Absolution's purge, the §5.3 cleanse web, and
-lockstep serialization — none of it new plumbing. Two consequences become
-design law:
+### STATUS SETS — one named status per axis, 1–3 spells as price points
 
-- **Polarity.** Every status — these AND the element statuses — declares
-  buff / debuff / neutral, so "strip enemy buffs" and "cleanse own debuffs"
-  have exact meanings. Photosynthesis is a buff someone can strip; Ignite is
-  a debuff Scour eats; Waterlogged is a debuff; Arcane Knowledge a buff. The
-  classification pass over the shipped statuses is part of this work.
-- **Derive, never mutate.** The engine primitive is NOT apply-on-gain /
-  revert-on-expiry (two buffs expiring out of order makes revert bookkeeping
-  fragile) — it is DERIVATION: effective stat = base + gear + Σ(active
-  status contributions), recomputed at each roll. Statuses just exist; the
-  math reads them. This is the single new engine seam the bank needs.
+**Lightfoot** — dodge, `+N`. *(Christian's worked example, verbatim.)*
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Lightfoot** | 2 · aux | Lightfoot +15 dodge, 10 turns |
+| **Twinkle Toes** | 4 · aux | Lightfoot +20 dodge, 30 turns |
 
-📝 Status-first also RESOLVES former open decision #2: stacking is the status
-system's own grammar (same status refreshes, never stacks — the Tonic rule),
-inherited rather than legislated.
+**Divert** — deflection, always a PAIR `(activation %, damage deflected %)`.
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Glance** | 1 · aux | Divert 10/20, 10 turns |
+| **Divert** | 3 · aux | Divert 20/40, 15 turns |
 
-⭐ **THE GENERAL PATTERN: axes and lanes** (Christian's follow-up,
-2026-08-26 — dodge was the worked example; this is the law for everything).
+**Truesight** — own accuracy, `+N`; every granter also cleanses Blind on cast.
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Truesight** | 1 · aux | Truesight +20 accuracy, 10 turns |
+| **Hawkeye** | 3 · aux | Truesight +35 accuracy, 25 turns |
 
-**An AXIS is one lever on the rules**: a stat (dodge, deflect, crit chance,
-crit damage, accuracy, healing-received), an over-time channel (HoT, and
-DoT-shaping like Fester's), or a named special rule (Composure's
-crits-are-normal, Bastion's while-shielded stance — binary axes, duration
-only). **Within one lane, an axis owns exactly ONE status — one chip** —
-whose magnitude and duration are data inside it, never separate statuses per
-spell. Spells targeting the same axis are PRICE POINTS: any number of
-(magnitude, duration, cost) tuples, zero new statuses, HUD entries,
-animations, or interaction rules per spell.
+**Murk** — enemy accuracy, `−N` (debuff; stacks with the element lane's Blind).
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Murk** | 1 · aux | Murk −15 accuracy, 10 turns |
+| **Befog** | 3 · aux | Murk −25 accuracy, 20 turns |
 
-**Collision within an axis: LAST CAST WINS, wholesale** — recasting the same
-spell refreshes (the Tonic rule as a special case); a different same-axis
-spell replaces magnitude AND duration together. Rejected on the record:
-same-axis stacking (magnitudes sum into the cap crisis; durations sum into
-invisible math) and best-of-both merging (cheap-long + strong-short would
-fuse into a strong-long nobody priced — any "keep the better parts" rule
-manufactures an undesigned spell).
+**Keen** — crit chance, `+N%`.
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Keen** | 2 · aux | Keen +15% crit chance, 12 turns |
+| **Wicked Grin** | 4 · aux | Keen +25% crit chance, 30 turns |
 
-**A LANE is who is paying.** Three lanes exist: the SPELL lane (a turn + a
-loadout slot), the ITEM lane (gold + a belt slot — Tonic, Regrow-bearing
-gear), and the ELEMENT lane (identity procs — Photosynthesis, Ignite,
-Blind). ⭐ The one-status-per-axis rule binds WITHIN a lane; ACROSS lanes,
-statuses coexist and sum through derivation — Mend + a Tonic +
-Photosynthesis all tick, Obscure + Blind both drag accuracy — because each
-lane charges a different currency, and paying twice may earn twice. Gear's
-permanent stats are the zeroth lane, always additive underneath.
+**Heavyhand** — crit damage, `+N`.
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Heavyhand** | 2 · aux | Heavyhand +30 crit damage, 12 turns |
+| **Overkill** | 4 · aux | Heavyhand +50 crit damage, 30 turns |
 
-**Debuffs follow the pattern symmetrically** (Obscure owns the spell-lane
-accuracy-debuff axis; an element's Blind is its own lane) — and polarity
-decides what Dispel strips (enemy buffs, all lanes' strippable ones) versus
-what cleanse clears (own debuffs). Cross-AXIS coexistence stays free — that
-is the buff-stacking strategy, and Dispel (#19) is its leash.
+**Mending** — heal over time, `N% max HP/turn` (spell lane; a Tonic and
+Photosynthesis are other lanes and tick alongside).
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Mend** | 2 | Mending 6%/turn, 6 turns |
+| **Renewal** | 4 | Mending 9%/turn, 15 turns |
 
-⚠️ Duration philosophy still open: the bank's 2–3-turn windows are TACTICAL
-buffs; 10–25-turn spells would be whole-fight STANCES in ~20–35-turn duels —
-two different games, choose before numbers freeze.
+**Wither** — enemy healing received, `−N%` (debuff; the anti-heal predator —
+HoTs, Regrow, potions, the Drain line, everything. ⚠️ First spell touching
+the potion lane; spec deliberately).
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Wither** | 2 · aux | Wither −50% healing received, 10 turns |
+| **Blight** | 4 · aux | Wither −80% healing received, 20 turns |
 
-### GRANT — a stat, for a while
+**Stalwart** — own shield strength, `+N%`.
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Stalwart** | 2 · aux | Stalwart +25% shield strength, 15 turns |
 
-| # | Spell | Cost · prio | Effect |
-|---|---|---|---|
-| 1 | **Sidestep** | 2 | +25 dodge, 2 turns. The player's first dodge access. ⚠️ Opens the PLAYER dodge-cap question — enemies cap at 10 (ENEMIES §2.5); an uncapped 25 in PvP needs a ruling before build. |
-| 2 | **Untouchable** | 4 | Tier of #1: +40 dodge, 2 turns. The commit version; same cap caveat, louder. |
-| 3 | **Brace** | 2 | Deflect 40/30, 2 turns. The turtle stance for any caster — and the soft CRIT counter (a deflected crit is a reduced crit). |
-| 4 | **Hone** | 1 | +15 crit chance, 2 turns. Cheap and fast — the crit build's ignition. |
-| 5 | **Savagery** | 2 | +40 crit damage, 3 turns. Pairs with #4: one spell supplies the chance, the other the payoff — two loadout decisions, not one. |
-| 6 | **Bloodlust** | 4 | Tier of #4+#5: +20 crit chance AND +50 crit damage, 2 turns — the all-in window. |
-| 7 | **Truesight** | 1 | +30 accuracy, 3 turns, and cleanses Blind on cast. The answer to Blind, Obscure (#15), and dodge stacking. |
-| 8 | **Bastion** | 3 | Shield, and WHILE that shield holds: deflect 25/25. Shield-deflect synergy — cracking the shield ends the stance. |
+**Composure** — binary: incoming crits resolve as normal hits.
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Composure** | 2 · aux | Composure, 12 turns |
 
-### EXPLOIT — attacks that ride the new rolls
+**Bloodlust** — the kept-open clause in action: one spell, TWO statuses.
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Bloodlust** | 5 · aux | Keen +20% AND Heavyhand +40, 8 turns — the all-in window, overriding both existing instances |
 
-| # | Spell | Cost · prio | Effect |
-|---|---|---|---|
-| 9 | **Unerring** | 3 | Damage that CANNOT miss and ignores dodge (deflect still applies). The hard dodge counter. |
-| 10 | **Pierce** | 3 | Damage that ignores deflect entirely (dodge still applies). The turtle answer — and PvE's counter to Quarry Sentinels. |
-| 11 | **Shatter** | 4 | Damage; if the target holds a deflect status, it BREAKS (status removed) whether or not this hit was reduced. The counter-counter: patience meets a hammer. |
-| 12 | **Execute** | 5 | Guaranteed crit against a target below 35% HP; otherwise an ordinary hit. Big-spell drama with a readable threshold — the finisher that makes crit damage worth stacking. |
+### EXPLOIT — attacks that ride the new rolls (no statuses granted)
 
-### DoT / HoT — the ticking game (element-agnostic by rule)
+| Spell | Cost | Effect |
+|---|---|---|
+| **Unerring** | 3 | Damage that cannot miss and ignores dodge (deflect still applies). The Lightfoot answer. |
+| **Pierce** | 3 | Damage ignoring deflection entirely (dodge still applies). The Divert answer — and PvE's Quarry-Sentinel counter. |
+| **Shatter** | 4 | Damage; the target's Divert-family status BREAKS (removed), reduced or not. Patience meets a hammer. |
+| **Execute** | 5 | Guaranteed crit below 35% HP; otherwise ordinary. The finisher that makes Heavyhand worth holding. |
 
-| # | Spell | Cost · prio | Effect |
-|---|---|---|---|
-| 13 | **Mend** | 2 | HoT: 8% max HP/turn × 3, refresh-not-stack (the Tonic rule). A HoT without Photosynthesis's streak leash. Tier: **Renewal** (c5): 12% × 4 and cleanses own DoTs on apply. |
-| 14 | **Fester** | 3 | Small up-front hit, then every damage-over-time status the target suffers gains +2 ticks. Feeds on WHATEVER DoTs are in play — worthless alone, brutal in a DoT build; punished by Scour (#17). |
-| 15 | **Obscure** | 1 | Enemy −25 accuracy, 2 turns. Blind's spell-shaped cousin (stacks the evasion-tank fantasy with #1/#3); answered by Truesight (#7) and Unerring (#9). |
+### INSTANTS — status surgery, no duration
 
-### COUNTER — every new toy gets a leash
-
-| # | Spell | Cost · prio | Effect |
-|---|---|---|---|
-| 16 | **Wither** | 2 · aux | Target's healing received −60%, 3 turns (HoTs, Regrow, potions, the Sap/Leech/Drain line — everything). THE anti-heal: Photosynthesis turtling and PvP belt-chugging both needed a predator. ⚠️ Also the first spell that touches the potion lane — spec that deliberately. |
-| 17 | **Scour** | 1 · aux | Burn out your own DoTs: take one tick of each NOW, remove them all. The DoT counter with a cost — not a free wash. |
-| 18 | **Composure** | 2 · aux | 3 turns: critical hits against you resolve as normal hits. The direct crit counter — refusing to be impressed. |
-| 19 | **Dispel** | 3 · aux | Strip the target's BUFFS (polarity: buff — stat grants, Photosynthesis, Bastion's stance…). The meta-leash the GRANT category needed: every stat had an answer, but the *strategy* of stacking grants had none. Born directly from the buffs-are-statuses ruling. |
+| Spell | Cost · prio | Effect |
+|---|---|---|
+| **Fester** | 3 | Small hit; every DoT status on the target gains +2 ticks — feeds on whatever is burning. |
+| **Scour** | 1 · aux | Take one tick of each of your DoTs NOW; remove them all. Cleansing with a cost. |
+| **Dispel** | 3 · aux | Strip the target's buffs (polarity: buff, all strippable lanes). The meta-leash on stance-stacking itself. |
 
 ### The counter-web, at a glance
 
-dodge (#1/#2) ⟶ beaten by #9, softened by #7 · deflect (#3/#8) ⟶ pierced
-by #10, broken by #11 · crit (#4/#5/#6/#12) ⟶ blanked by #18, soaked by #3 ·
-HoT (#13, Photosynthesis, potions) ⟶ starved by #16 · DoT (#14, Ignite) ⟶
-burned out by #17 · accuracy debuffs (#15, Blind) ⟶ cleansed by #7 ·
-buff-stacking as a strategy ⟶ stripped wholesale by #19.
-⭐ Every mechanic has at least one answer that is not "win faster," and every
-answer has a cost — the §7 principle, extended.
+Lightfoot ⟶ Unerring, softened by Truesight · Divert ⟶ Pierce, broken by
+Shatter · Keen/Heavyhand/Execute ⟶ blanked by Composure, soaked by Divert ·
+Mending/Photosynthesis/potions ⟶ starved by Wither · DoTs/Fester ⟶ burned
+out by Scour · Murk/Blind ⟶ cleansed by Truesight · stance-stacking itself
+⟶ stripped by Dispel. ⭐ Every mechanic has an answer that is not "win
+faster," and every answer costs something.
+
+📝 26 spells in the bank — the same size as the shipped book, which feels
+like the right order of magnitude for a generation.
 
 ### Open decisions before any of this builds
 
-1. **Player dodge/deflect caps** — enemies cap dodge at 10; spells hand players 25–40. PvP needs a ruling (cap, diminishing stacking with gear, or spell-exclusive windows).
-2. ~~Stacking grammar~~ — RESOLVED by the buffs-are-statuses ruling: the status system's refresh-not-stack grammar is inherited, and gear+status remains additive through derivation.
-3. **The one engine primitive** — stat DERIVATION (effective = base + gear + Σ active statuses, recomputed per roll) plus the polarity field on every status, shipped and classified. Everything above waits on these two.
-4. **HUD** — each grant needs a status pip; the twelve-motion animation system expects entries (the build-fails-if-undocumented test will enforce this, correctly).
-5. **AI awareness** — LadderAi is still effect-blind; these spells widen the gap between what players and enemies can do with the same kit. The Phase-6 fork, now sharper.
-6. **Loadout pressure** — 19 new spells against a 10-spell loadout cap is the POINT (§5.7), but tier-pairs (#1/#2, #4+#5/#6, #13's) should probably be one loadout slot that upgrades, not two slots — needs a ruling.
+1. **Player dodge/deflect caps** — enemies cap dodge at 10 (ENEMIES §2.5); Lightfoot hands players 15–20 plus gear. PvP needs the ruling.
+2. **The two engine seams** — stat derivation, and polarity on every status (with the classification pass over shipped statuses).
+3. **HUD** — every status set needs a pip + animation entry (the build-fails-if-undocumented test will enforce it, correctly).
+4. **AI awareness** — LadderAi is effect-blind; this bank widens the player-enemy gap. The Phase-6 fork, sharper again.
+5. **Loadout pressure** — 26 spells vs the 10-slot cap is the point (§5.7), but set-siblings (Lightfoot/Twinkle Toes) as separate slots vs one upgrading slot still needs a ruling.
 
 ---
 
