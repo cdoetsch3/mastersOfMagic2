@@ -4,9 +4,12 @@
 /// Workbench, the backpack, the paper doll and the loot picker all open THIS
 /// dialog, so an item reads identically wherever it is met. Stats come from
 /// the same writers the duel uses (`Equipping.describe`, `effect.describe`),
-/// so no screen can disagree with the game. ✅ The name line grows a sprite
-/// when item icons exist (CONTENT_CHECKLIST col 15b) — wired, and a no-op
-/// until `assets/items/` has PNGs in it (see [ItemIcon]).
+/// so no screen can disagree with the game. ⭐ Since 2026-08-26 the Shop's own
+/// rows open this dialog too, which is why the body carries a **Value** line:
+/// the one dialog is now met most often from a screen made of prices.
+/// ✅ The name line grows a sprite when item icons exist (CONTENT_CHECKLIST
+/// col 15b) — wired, and a no-op until `assets/items/` has PNGs in it (see
+/// [ItemIcon]).
 library;
 
 import 'package:flutter/material.dart';
@@ -15,9 +18,30 @@ import '../game/items/equipping.dart';
 import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
+import '../game/items/item_naming.dart';
 import 'app_banner.dart';
 import 'app_theme.dart';
 import 'item_icon.dart';
+
+/// What one of these is WORTH before any shop's location/stock walk touches
+/// it — [ItemDef.value], scaled by an instance's quality when it carries one.
+///
+/// ⚠️ **Computed here on purpose, for now.** Nothing in `lib/game/economy/`
+/// or `item_def.dart` scales *value* by quality today ([ItemModifiers
+/// .scaledBy] scales STATS); the economy work's `qualityValue` seam does not
+/// exist on main yet. This is deliberately the *same* integer round-half-
+/// away-from-zero `scaledBy` uses — which is also what
+/// `ShopPricing.roundGold` means by rounding — so the day that seam lands,
+/// this function is a delete rather than a number that has to be re-argued.
+///
+/// ⭐ Null and [Quality.standard] both return [base] untouched, the same
+/// "null IS Standard" reading [ItemModifiers.scaledBy] documents: an instance
+/// minted before quality existed must keep exactly the worth it always had.
+int qualityScaledValue(int base, Quality? quality) {
+  if (quality == null || quality == Quality.standard) return base;
+  final pct = quality.statPercent;
+  return (base * pct + (base < 0 ? -50 : 50)) ~/ 100;
+}
 
 /// One dialog for every item interaction — what it is, what it does, and
 /// what you can do with it here. [actions] whose `run` returns a refusal
@@ -46,6 +70,13 @@ Future<void> showItemDialog(
   // ⚠️ Captured BEFORE the dialog, because the refusal is reported after it
   // pops — at which point `dialogContext` is gone.
   final banner = appBannerOf(context);
+  // ⭐ **The worth line** (ruling 2026-08-26 #2): the shop is not the only
+  // place an item's price matters, and a tooltip that describes what a thing
+  // DOES while staying silent about what it is WORTH sends the player back to
+  // the shelf to find out. ⚠️ Value 0 (every [KeyDef] — quest gates are worth
+  // nothing by construction) prints NO line: 'Value: 0g' reads as a bug
+  // report, not as "this is not merchandise".
+  final scaledValue = qualityScaledValue(def.value, instance?.quality);
   await showDialog<void>(
     context: context,
     builder: (dialogContext) => AlertDialog(
@@ -84,6 +115,23 @@ Future<void> showItemDialog(
               line,
               style: const TextStyle(color: AppColors.teal, fontSize: 13),
             ),
+          // ⭐ Below the stats, above the lore — the same descending ladder
+          // the rest of this dialog reads in: what it is, what it does, what
+          // it is worth, then the flavour nobody needs. ⚠️ The quality-scaled
+          // figure only rides along when it actually DIFFERS: a Standard
+          // instance printing 'Value: 13g (Standard 13g)' teaches the player
+          // that quality moves worth by restating the same number, which is
+          // the opposite of what it would mean.
+          if (def.value > 0) ...[
+            const SizedBox(height: 6),
+            Text(
+              scaledValue == def.value
+                  ? 'Value: ${def.value}g'
+                  : 'Value: ${def.value}g '
+                        '(${qualityWord(instance!.quality!)} ${scaledValue}g)',
+              style: const TextStyle(color: AppColors.gold, fontSize: 12.5),
+            ),
+          ],
           // ⚠️ The reason is text in the body, not only a tooltip on the dead
           // button — there is no hover on a phone, and a greyed button whose
           // reason cannot be reached is worse than no button.

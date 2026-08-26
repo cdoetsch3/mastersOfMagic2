@@ -7,6 +7,11 @@
 /// kills — a stepper that debits gold on tap, a settle that charges a
 /// different number than it showed, a sell that skips the Storeroom, a
 /// basket that survives leaving the screen, a bound item that sells anyway.
+///
+/// ⭐ The 2026-08-26 UX pass adds three more: the item tooltip opening from a
+/// row without touching the basket, the tooltip's Value line (and its silence
+/// at value 0), and the filter/sort band — including the layout-stability
+/// assertions that are this screen's own house rule written as a test.
 library;
 
 import 'package:flutter/material.dart';
@@ -17,6 +22,7 @@ import 'package:masters_of_magic_2/game/economy/shop_state.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
+import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
@@ -38,6 +44,9 @@ import 'package:masters_of_magic_2/ui/app_theme.dart';
 const _townId = 'hearthwood';
 const _oak = 'oak_log';
 const _bindweed = 'bindweed_fibre';
+const _sapwort = 'sapwort'; // MaterialDef, value 7 — cheaper than oak.
+const _ration = 'foragers_ration'; // ConsumableDef, value 4.
+const _draught = 'sapwort_draught'; // BeltableDef, value 12.
 const _belt = 'tuskhide_belt'; // EquipmentDef, tradeable, value 110.
 const _boundKey = 'proof_of_the_woods'; // KeyDef — always Tradability.bound.
 
@@ -158,6 +167,38 @@ Future<void> _tapStepper(
 Future<void> _switchToSell(WidgetTester tester) async {
   await tester.tap(find.text('Sell').first);
   await tester.pump();
+}
+
+// ---- 2026-08-26 UX pass helpers ---------------------------------------
+
+/// Taps a row's LEFT/info region the way a player does — on the item's NAME,
+/// never on a stepper, a quantity or a Sell toggle. ⭐ Deliberately not a
+/// `byType(_InfoTap)` reach-in: the ruling is about where a finger lands.
+Future<void> _tapRowInfo(WidgetTester tester, Finder row, String label) async {
+  await tester.tap(find.descendant(of: row, matching: find.text(label)));
+  await tester.pumpAndSettle();
+}
+
+Future<void> _closeItemDialog(WidgetTester tester) async {
+  await tester.tap(find.widgetWithText(TextButton, 'Close'));
+  await tester.pumpAndSettle();
+}
+
+/// The vertical position of a row, for order assertions — reading the LAID
+/// OUT shelf rather than any list the screen keeps privately.
+double _rowY(WidgetTester tester, String itemId) =>
+    tester.getTopLeft(_rowFor(itemId)).dy;
+
+Future<void> _tapChip(WidgetTester tester, String label) async {
+  await tester.tap(find.text(label));
+  await tester.pump();
+}
+
+Future<void> _chooseSort(WidgetTester tester, String label) async {
+  await tester.tap(find.byIcon(Icons.sort));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(label).last);
+  await tester.pumpAndSettle();
 }
 
 /// Parses 'Settle +10g' / 'Settle -3g' off the settle bar's own button —
@@ -899,6 +940,400 @@ void main() {
             'repaints the sheet but never reaches the basket',
       );
     });
+  });
+
+  // ---- the 2026-08-26 UX pass -----------------------------------------
+
+  group('the item tooltip opens FROM the shop', () {
+    testWidgets('⭐ tapping a Buy row\'s name opens THAT item, with its worth',
+        (tester) async {
+      final game = _game(_MemStorage());
+      await _pump(tester, game);
+
+      await _tapRowInfo(tester, _rowFor(_oak), _name(_oak));
+
+      final dialog = find.byType(AlertDialog);
+      expect(dialog, findsOneWidget);
+      expect(
+        find.descendant(of: dialog, matching: find.text(_name(_oak))),
+        findsOneWidget,
+        reason: '⚠️ the mutant this kills: a row whose tap opens the tooltip '
+            'for whatever item the LIST happened to hand it last',
+      );
+      expect(
+        find.descendant(
+          of: dialog,
+          matching: find.text('Value: ${ItemCatalogue.byId(_oak).value}g'),
+        ),
+        findsOneWidget,
+        reason: 'ruling #2: the base value off the catalogue, not a shop '
+            'quote — the tooltip is met from six screens, only one of which '
+            'has a shelf behind it',
+      );
+    });
+
+    testWidgets('a Sell row opens it too, gear instance and all', (
+      tester,
+    ) async {
+      final game = _game(
+        _MemStorage(),
+        storeroomStacks: {_bindweed: 5},
+        storeroomInstanceIds: ['inst-belt'],
+        instances: {
+          'inst-belt': const ItemInstance(instanceId: 'inst-belt', defId: _belt),
+        },
+      );
+      await _pump(tester, game);
+      await _switchToSell(tester);
+
+      await _tapRowInfo(tester, _rowFor(_bindweed), _name(_bindweed));
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text(_name(_bindweed)),
+        ),
+        findsOneWidget,
+      );
+      await _closeItemDialog(tester);
+
+      await _tapRowInfo(tester, _rowFor(_belt), _name(_belt));
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text(_name(_belt)),
+        ),
+        findsOneWidget,
+        reason: 'ruling #1 names BOTH tabs — a Sell shelf you cannot inspect '
+            'is the shelf you most need to inspect before parting with it',
+      );
+    });
+
+    testWidgets(
+      '⭐ the basket is EXACTLY as it was after the dialog is dismissed',
+      (tester) async {
+        final storage = _MemStorage();
+        final game = _game(storage, gold: 1000);
+        await _pump(tester, game);
+
+        await _tapStepper(tester, _oak, Icons.add, times: 3);
+        final netBefore = _displayedNet(tester);
+        final savesBefore = storage.saveCount;
+
+        await _tapRowInfo(tester, _rowFor(_oak), _name(_oak));
+        await _closeItemDialog(tester);
+
+        expect(
+          find.textContaining('Buying 3 items'),
+          findsOneWidget,
+          reason: '⚠️ the mutant this kills: an info tap that also reaches the '
+              'basket — clearing it, or bumping the row it opened',
+        );
+        expect(_displayedNet(tester), netBefore);
+        expect(game.profile.gold, 1000, reason: 'looking is never spending');
+        expect(
+          storage.saveCount,
+          savesBefore,
+          reason: 'opening a tooltip must not write to disk at all',
+        );
+      },
+    );
+
+    testWidgets(
+      '⚠️ a row tap is INERT while its quantity is being edited in place',
+      (tester) async {
+        final game = _game(_MemStorage());
+        await _pump(tester, game);
+        await _tapStepper(tester, _oak, Icons.add);
+
+        // Open the in-place editor, exactly as the UI-pass test does.
+        // ⚠️ pumpAndSettle, not a counted pump: the field's `autofocus` has
+        // to actually LAND before this test means anything — an unfocused
+        // TextField wires no `onTapOutside`, so the tap below would prove the
+        // guard while the commit path it races was never armed.
+        await tester.tap(
+          find.descendant(of: _rowFor(_oak), matching: find.text('1')),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(TextField), findsOneWidget);
+
+        await _tapRowInfo(tester, _rowFor(_oak), _name(_oak));
+        expect(
+          find.byType(AlertDialog),
+          findsNothing,
+          reason: '⚠️ the mutant this kills: an info tap guarded by a check '
+              'INSIDE its handler — the field unfocuses on the pointer-down '
+              'that precedes the tap, so by then the guard sees nothing to '
+              'guard and the dialog lands on top of a half-typed quantity',
+        );
+        expect(
+          find.byType(TextField),
+          findsNothing,
+          reason: 'that tap did its real job and only that job: it LEFT the '
+              'field, which is how this screen commits an inline edit',
+        );
+        expect(find.textContaining('Buying 1 item'), findsOneWidget);
+
+        // ⭐ And the door is not wedged shut — the NEXT tap opens it.
+        await _tapRowInfo(tester, _rowFor(_oak), _name(_oak));
+        expect(find.byType(AlertDialog), findsOneWidget);
+      },
+    );
+  });
+
+  group('the tooltip shows what an item is worth', () {
+    testWidgets('⭐ an item worth nothing shows NO value line', (tester) async {
+      expect(
+        ItemCatalogue.byId(_boundKey).value,
+        0,
+        reason: 'this fixture only means what it says while a quest key is '
+            'worth nothing (KeyDef fixes value at 0)',
+      );
+      final game = _game(_MemStorage(), storeroomStacks: {_boundKey: 1});
+      await _pump(tester, game);
+      await _switchToSell(tester);
+
+      await _tapRowInfo(tester, _rowFor(_boundKey), _name(_boundKey));
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(
+        find.textContaining('Value:'),
+        findsNothing,
+        reason: "⚠️ the mutant this kills: an unconditional line — 'Value: 0g' "
+            'reads as a bug report, not as "this is not merchandise"',
+      );
+    });
+
+    testWidgets(
+      '⭐ an Ornate instance shows the quality-scaled worth beside the base',
+      (tester) async {
+        final base = ItemCatalogue.byId(_belt).value;
+        // Derived from the ladder itself (80/100/120/140), not from the
+        // screen's helper — this must fail if the helper starts disagreeing
+        // with the ruling's percentages.
+        final scaled = (base * Quality.ornate.statPercent / 100).round();
+        expect(scaled, isNot(base), reason: 'Ornate must actually MOVE 110g');
+
+        final game = _game(
+          _MemStorage(),
+          storeroomInstanceIds: ['inst-ornate', 'inst-plain'],
+          instances: {
+            'inst-ornate': const ItemInstance(
+              instanceId: 'inst-ornate',
+              defId: _belt,
+              quality: Quality.ornate,
+            ),
+            'inst-plain': const ItemInstance(
+              instanceId: 'inst-plain',
+              defId: _belt,
+            ),
+          },
+        );
+        await _pump(tester, game);
+        await _switchToSell(tester);
+
+        final ornateName = ItemCatalogue.displayName(
+          ItemCatalogue.byId(_belt),
+          game.profile.itemInstances['inst-ornate'],
+        );
+        await _tapRowInfo(
+          tester,
+          find.widgetWithText(GamePanel, ornateName),
+          ornateName,
+        );
+        expect(
+          find.text('Value: ${base}g (Ornate ${scaled}g)'),
+          findsOneWidget,
+          reason: '⚠️ the mutant this kills: a value line that quotes the '
+              "DEFINITION while the row beside it is a roll that isn't the "
+              'definition — the exact disagreement item_display.dart exists '
+              'to prevent for stats',
+        );
+        await _closeItemDialog(tester);
+
+        // ⭐ …and the un-rolled twin says the number ONCE.
+        await _tapRowInfo(tester, _rowFor(_belt), _name(_belt));
+        expect(find.text('Value: ${base}g'), findsOneWidget);
+        expect(
+          find.textContaining('Value: ${base}g ('),
+          findsNothing,
+          reason: '⚠️ the mutant this kills: a parenthetical that always '
+              "rides along — 'Value: 110g (Standard 110g)' teaches that "
+              'quality moves worth by restating the same number',
+        );
+      },
+    );
+  });
+
+  group('filter chips and the sort control', () {
+    testWidgets('⭐ a filter narrows the shelf to its kind', (tester) async {
+      final game = _game(_MemStorage());
+      await _pump(tester, game);
+
+      expect(_rowFor(_oak), findsOneWidget);
+      await _tapChip(tester, 'Consumables');
+
+      expect(_rowFor(_ration), findsOneWidget);
+      expect(
+        _rowFor(_draught),
+        findsOneWidget,
+        reason: 'both consumable KINDS answer one chip — a belt-legal '
+            'draught and a plain ration are one shelf to a shopper',
+      );
+      expect(
+        _rowFor(_oak),
+        findsNothing,
+        reason: '⚠️ the mutant this kills: a chip row that lights up and '
+            'filters nothing',
+      );
+
+      await _tapChip(tester, 'All');
+      expect(_rowFor(_oak), findsOneWidget, reason: 'All puts it all back');
+    });
+
+    testWidgets('the Sell tab filters gear apart from stacks', (tester) async {
+      final game = _game(
+        _MemStorage(),
+        storeroomStacks: {_bindweed: 5},
+        storeroomInstanceIds: ['inst-belt'],
+        instances: {
+          'inst-belt': const ItemInstance(instanceId: 'inst-belt', defId: _belt),
+        },
+      );
+      await _pump(tester, game);
+      await _switchToSell(tester);
+
+      await _tapChip(tester, 'Gear');
+      expect(_rowFor(_belt), findsOneWidget);
+      expect(_rowFor(_bindweed), findsNothing);
+
+      await _tapChip(tester, 'Materials');
+      expect(_rowFor(_bindweed), findsOneWidget);
+      expect(
+        _rowFor(_belt),
+        findsNothing,
+        reason: 'the Gear chip and the Materials chip must partition the '
+            'shelf, not overlap on it',
+      );
+    });
+
+    testWidgets('⭐ sorting by price reorders — WITHIN the current filter', (
+      tester,
+    ) async {
+      final game = _game(
+        _MemStorage(),
+        // Pinned quiet day: the order asserted below is the plain
+        // location-modified sticker order, with no daily event on either row.
+        now: _quietDayFor(const [_oak, _sapwort]),
+      );
+      await _pump(tester, game);
+      await _tapChip(tester, 'Materials');
+
+      expect(
+        _rowY(tester, _oak),
+        lessThan(_rowY(tester, _sapwort)),
+        reason: "the default IS the shelf's own catalogue order — oak_log is "
+            'authored before sapwort',
+      );
+
+      await _chooseSort(tester, 'Price');
+
+      expect(
+        _rowY(tester, _sapwort),
+        lessThan(_rowY(tester, _oak)),
+        reason: '⚠️ the mutant this kills: a sort control that repaints its '
+            'own label and leaves the shelf exactly as it found it (sapwort '
+            'is 7g base to oak_log\'s 13g — ascending puts it first)',
+      );
+      expect(
+        _rowFor(_ration),
+        findsNothing,
+        reason: '⚠️ the mutant this kills: a sort that re-reads the whole '
+            'catalogue and quietly serves the filter back with it',
+      );
+    });
+
+    testWidgets('sorting by Have puts the deepest pile first', (tester) async {
+      final game = _game(
+        _MemStorage(),
+        storeroomStacks: {_bindweed: 2, _sapwort: 40},
+      );
+      await _pump(tester, game);
+      await _switchToSell(tester);
+
+      expect(
+        _rowY(tester, _bindweed),
+        lessThan(_rowY(tester, _sapwort)),
+        reason: "the Sell default IS alphabetical — Bindweed before Sapwort",
+      );
+
+      await _chooseSort(tester, 'Have');
+
+      expect(
+        _rowY(tester, _sapwort),
+        lessThan(_rowY(tester, _bindweed)),
+        reason: '⚠️ the mutant this kills: a quantity sort that ascends like '
+            'the other two — "how many have I got" is asked by a player '
+            'looking for the deep pile, never the last two of something',
+      );
+    });
+
+    testWidgets('a filter matching nothing says so, quietly', (tester) async {
+      final game = _game(_MemStorage(), storeroomStacks: {_bindweed: 5});
+      await _pump(tester, game);
+      await _switchToSell(tester);
+
+      await _tapChip(tester, 'Gear');
+      expect(
+        find.text('Nothing here matches this filter.'),
+        findsOneWidget,
+        reason: '⚠️ the mutant this kills: silence — an empty shelf that does '
+            'not name the filter reads as "you own no gear at all"',
+      );
+      expect(
+        find.textContaining('Storeroom and pack are empty'),
+        findsNothing,
+        reason: 'the empty-pockets line is a DIFFERENT fact, and it is false '
+            'here',
+      );
+    });
+
+    testWidgets(
+      '⭐ the controls hold their positions across filter and sort changes',
+      (tester) async {
+        final game = _game(_MemStorage());
+        await _pump(tester, game);
+
+        double headerY() => tester.getTopLeft(find.text('ITEM')).dy;
+        Rect tabRect() => tester.getRect(find.text('Buy'));
+        Rect sortRect() => tester.getRect(find.byIcon(Icons.sort));
+
+        final header = headerY();
+        final tab = tabRect();
+        final sort = sortRect();
+
+        await _tapChip(tester, 'Consumables');
+        expect(
+          headerY(),
+          header,
+          reason: '⚠️ the mutant this kills: a Wrap that grows a second chip '
+              'line and shoves the whole shelf down',
+        );
+        expect(tabRect(), tab);
+        expect(sortRect(), sort);
+
+        // ⭐ The press-stability rule at its sharpest: the control whose LABEL
+        // just changed from 'Default order' to 'Price' must not have moved.
+        await _chooseSort(tester, 'Price');
+        expect(
+          sortRect(),
+          sort,
+          reason: '⚠️ the mutant this kills: a sort button sized to its own '
+              'label, which walks out from under the finger that pressed it',
+        );
+        expect(headerY(), header);
+        expect(tabRect(), tab);
+      },
+    );
   });
 }
 

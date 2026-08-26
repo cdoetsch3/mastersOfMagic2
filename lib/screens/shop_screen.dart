@@ -37,6 +37,21 @@ import '../ui/item_icon.dart';
 /// screen uses). Every price on this screen is quoted against that `int`
 /// rather than the wall clock, so a test can pin "today" by injecting
 /// `GameState`'s own `now`.
+///
+/// ⭐ **Rows open the item tooltip** (ruling 2026-08-26 #1): tapping a row's
+/// LEFT/info region — glyph and name — opens [showItemDialog], the same
+/// dialog the Ledger and the Workbench open, so the shelf stops being the one
+/// place an item cannot be inspected. ⚠️ The right-hand controls (stepper,
+/// quantity, Sell toggle) keep their own gestures untouched, and the info tap
+/// is INERT while an inline quantity edit owns the keyboard (see [_InfoTap]).
+///
+/// ⭐ **Filter chips and a sort control on both tabs** (ruling 2026-08-26 #3),
+/// borrowing the Workbench's chip idiom. ⚠️ Both live in a FIXED-HEIGHT band
+/// above the column header, and the sort control sits in a fixed-width box:
+/// this screen's press-stability rule is that pressing a control must never
+/// move it, and a sort button that resizes to fit 'Default order' vs 'Price'
+/// would walk out from under the finger that just pressed it. State is
+/// per-visit by ruling — nothing here is persisted.
 class ShopScreen extends StatefulWidget {
   final String townId;
   const ShopScreen({super.key, required this.townId});
@@ -47,9 +62,93 @@ class ShopScreen extends StatefulWidget {
 
 enum _ShopTab { buy, sell }
 
+/// The shelf's kind filter (ruling 2026-08-26 #3).
+///
+/// ⭐ **A partition, not three hand-picked buckets.** `All` is exactly
+/// `materials ∪ consumables ∪ gear` because [materials] is the CATCH-ALL leg —
+/// motes, components, gems, tools and quest keys all land there rather than
+/// nowhere. The Workbench learned this the hard way: a filter that can leave
+/// a row unreachable from every chip teaches the player the content does not
+/// exist (see `craft_screen.dart`'s buried-belt ⚠️).
+///
+/// ⚠️ `Gear` is offered on the Sell tab only — the shop shelves materials and
+/// consumables and never equipment (`ShopCatalogue._isStockableKind`), so a
+/// Gear chip on Buy could only ever show an empty list.
+enum _ShopFilter {
+  all('All'),
+  materials('Materials'),
+  consumables('Consumables'),
+  gear('Gear');
+
+  final String label;
+  const _ShopFilter(this.label);
+
+  /// ⚠️ Kind, never id lists: authoring a new consumable must join the
+  /// Consumables chip on its own, the same reasoning that computes town stock
+  /// instead of typing it out.
+  bool accepts(ItemDef def) => switch (this) {
+    _ShopFilter.all => true,
+    // Both consumable kinds at once — [ConsumableDef] and the belt-legal
+    // [BeltableDef] are one shelf to a shopper, however sharply the duel
+    // rules separate them.
+    _ShopFilter.consumables => def is Usable,
+    // ⭐ Tools ride with gear: non-fungible, quality-rolled, one row each —
+    // everything a player means by "my equipment" except the slot.
+    _ShopFilter.gear => def is EquipmentDef || def is ToolDef,
+    _ShopFilter.materials =>
+      def is! Usable && def is! EquipmentDef && def is! ToolDef,
+  };
+}
+
+/// How the shelf is ordered (ruling 2026-08-26 #3).
+///
+/// ⭐ [standard] is a real, re-selectable member rather than an implicit
+/// starting state: the shelf's own order is information (the catalogue order
+/// on Buy is the shopkeeper's arrangement), and a player who sorts by price
+/// must be able to get back to it without leaving the screen.
+enum _ShopSort {
+  standard('Default order'),
+  name('Name'),
+  price('Price'),
+
+  /// Stock on Buy, Have on Sell — one member, two names, because it is one
+  /// question ("how many are there?") asked of two different piles.
+  quantity('');
+
+  final String label;
+  const _ShopSort(this.label);
+
+  String labelFor(String quantityLabel) =>
+      this == _ShopSort.quantity ? quantityLabel : label;
+}
+
+/// ⚠️ **File-global, and safe because focus is.** Exactly one inline quantity
+/// edit can own the keyboard at a time, so one flag is the whole truth — and
+/// threading a bool down through two list widgets and three row widgets would
+/// buy nothing but five more parameters. Reset by whoever set it, and by the
+/// screen at both ends of its life so a mid-edit teardown cannot leave every
+/// row's tooltip wedged shut.
+final ValueNotifier<bool> _inlineEditing = ValueNotifier<bool>(false);
+
 class _ShopScreenState extends State<ShopScreen> {
   late final int _today;
   var _tab = _ShopTab.buy;
+
+  /// ⭐ **Per tab, not shared.** Gear exists only on Sell; a single shared
+  /// filter would have to silently rewrite itself on every tab switch, and a
+  /// filter the player did not choose is worse than one they have to set
+  /// twice. ⚠️ Per-visit by ruling — plain fields, never persisted.
+  var _buyFilter = _ShopFilter.all;
+  var _sellFilter = _ShopFilter.all;
+  var _buySort = _ShopSort.standard;
+  var _sellSort = _ShopSort.standard;
+
+  static const _buyFilters = [
+    _ShopFilter.all,
+    _ShopFilter.materials,
+    _ShopFilter.consumables,
+  ];
+  static const _sellFilters = _ShopFilter.values;
 
   /// Pending buy quantities, keyed by item id. Zero-valued entries are
   /// pruned immediately (see [_setBuy]) so `.isEmpty` is a reliable "basket
@@ -67,8 +166,18 @@ class _ShopScreenState extends State<ShopScreen> {
       _buy.isEmpty && _sellStacks.isEmpty && _sellInstances.isEmpty;
 
   @override
+  void dispose() {
+    // ⚠️ Belt and braces for [_inlineEditing]: a route popped mid-edit tears
+    // the `_QtyControl` down, and a flag left true would make the NEXT visit's
+    // rows silently untappable.
+    _inlineEditing.value = false;
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
+    _inlineEditing.value = false;
     // ⭐ Reads [GameState.now] — the same injectable clock every other
     // GameState-driven screen already uses — rather than `DateTime.now()`
     // directly, so a test can pin "today" by constructing `GameState(...,
@@ -190,6 +299,29 @@ class _ShopScreenState extends State<ShopScreen> {
                 ],
               ),
             ),
+            // ⭐ Outside the ListView on purpose: the band is chrome, not a
+            // row. Scrolling the shelf must never scroll the controls that
+            // decide what the shelf contains.
+            _ShopToolbar(
+              filters: _tab == _ShopTab.buy ? _buyFilters : _sellFilters,
+              filter: _tab == _ShopTab.buy ? _buyFilter : _sellFilter,
+              onFilter: (f) => setState(() {
+                if (_tab == _ShopTab.buy) {
+                  _buyFilter = f;
+                } else {
+                  _sellFilter = f;
+                }
+              }),
+              sort: _tab == _ShopTab.buy ? _buySort : _sellSort,
+              onSort: (s) => setState(() {
+                if (_tab == _ShopTab.buy) {
+                  _buySort = s;
+                } else {
+                  _sellSort = s;
+                }
+              }),
+              quantityLabel: _tab == _ShopTab.buy ? 'Stock' : 'Have',
+            ),
             Expanded(
               child: _tab == _ShopTab.buy
                   ? _BuyList(
@@ -199,6 +331,8 @@ class _ShopScreenState extends State<ShopScreen> {
                       qty: _buy,
                       quote: quote,
                       onQtyChanged: _setBuy,
+                      filter: _buyFilter,
+                      sort: _buySort,
                     )
                   : _SellList(
                       game: game,
@@ -209,6 +343,8 @@ class _ShopScreenState extends State<ShopScreen> {
                       onStackQtyChanged: _setSellStack,
                       selectedInstances: _sellInstances,
                       onInstanceToggled: _toggleSellInstance,
+                      filter: _sellFilter,
+                      sort: _sellSort,
                     ),
             ),
             if (!_basketEmpty)
@@ -413,6 +549,277 @@ class _TabChip extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The filter chips and the sort control, above the column header.
+///
+/// ⭐ **Fixed height, always** — [height] is spent whether three chips or four
+/// sit in it, so switching tabs, changing a filter or picking a sort never
+/// moves the column header or the first row by a pixel. The screen's own
+/// press-stability rule ("pressing a button must never move that button")
+/// only holds if the band it sits in cannot resize.
+///
+/// ⚠️ A [Row], not a [Wrap]: a Wrap is exactly the thing that would grow a
+/// second line and shove the shelf down. Four chips plus the sort box fit the
+/// narrowest phone this game targets; a fifth would need a horizontal
+/// scroller here, never a taller band.
+class _ShopToolbar extends StatelessWidget {
+  static const double height = 38;
+
+  /// ⚠️ Fixed, and wide enough for the LONGEST label — 'Default order'. A box
+  /// that shrank to fit 'Name' would slide the button out from under the
+  /// finger that had just chosen it.
+  static const double _sortWidth = 116;
+
+  final List<_ShopFilter> filters;
+  final _ShopFilter filter;
+  final ValueChanged<_ShopFilter> onFilter;
+  final _ShopSort sort;
+  final ValueChanged<_ShopSort> onSort;
+
+  /// 'Stock' on Buy, 'Have' on Sell — matched to the column the sort orders
+  /// by, so the control names the header it acts on.
+  final String quantityLabel;
+
+  const _ShopToolbar({
+    required this.filters,
+    required this.filter,
+    required this.onFilter,
+    required this.sort,
+    required this.onSort,
+    required this.quantityLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: height,
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+      child: Row(
+        children: [
+          for (final f in filters) ...[
+            _Chip(
+              label: f.label,
+              on: filter == f,
+              onTap: () => onFilter(f),
+            ),
+            const SizedBox(width: 6),
+          ],
+          const Spacer(),
+          SizedBox(
+            width: _sortWidth,
+            child: PopupMenuButton<_ShopSort>(
+              initialValue: sort,
+              tooltip: 'Sort the shelf',
+              color: AppColors.panel,
+              padding: EdgeInsets.zero,
+              onSelected: onSort,
+              itemBuilder: (_) => [
+                for (final s in _ShopSort.values)
+                  PopupMenuItem(
+                    value: s,
+                    child: Text(
+                      s.labelFor(quantityLabel),
+                      style: const TextStyle(color: AppColors.text),
+                    ),
+                  ),
+              ],
+              child: Row(
+                children: [
+                  const Icon(Icons.sort, size: 15, color: AppColors.teal),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: Text(
+                      sort.labelFor(quantityLabel),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(
+                        color: AppColors.teal,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+/// ⚠️ Hand-rolled rather than [FilterChip], and deliberately the SAME shape
+/// lit or unlit — the Workbench's `_Chip` with this screen's gold accent. A
+/// chip that grew a check mark when selected would move the chip beside it,
+/// which is the press-stability rule broken by decoration.
+class _Chip extends StatelessWidget {
+  final String label;
+  final bool on;
+  final VoidCallback onTap;
+  const _Chip({required this.label, required this.on, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = on ? AppColors.bg : AppColors.textDim;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: on ? AppColors.gold : Colors.transparent,
+          border: Border.all(color: on ? AppColors.gold : AppColors.border),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(label, style: TextStyle(color: fg, fontSize: 11.5)),
+      ),
+    );
+  }
+}
+
+/// The quiet one-liner a filter that matches nothing owes the player.
+///
+/// ⚠️ It must confess the FILTER is why, not just that the list is empty —
+/// silence here reads as "this shop has none of these", which is a different
+/// and wrong fact.
+class _NoMatches extends StatelessWidget {
+  const _NoMatches();
+
+  @override
+  Widget build(BuildContext context) => const Center(
+    child: Padding(
+      padding: EdgeInsets.all(28),
+      child: Text(
+        'Nothing here matches this filter.',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: AppColors.textDim, fontSize: 13),
+      ),
+    ),
+  );
+}
+
+/// A row's LEFT/info region — glyph and name — as the item tooltip's door
+/// (ruling 2026-08-26 #1).
+///
+/// ⚠️ **The callback goes NULL while an inline quantity edit is open**, which
+/// is strictly stronger than testing a flag inside the handler: the editing
+/// [TextField]'s own `onTapOutside` unfocuses on the pointer DOWN event, so by
+/// the time a tap resolves the edit has already committed and closed, and a
+/// handler-side check would find nothing to guard against and wave the dialog
+/// through. A null `onTap` never enters the gesture arena at pointer-down at
+/// all, so the tap that leaves a quantity field only leaves it — exactly the
+/// ruling's "a row tap cannot fire while inline quantity-editing is focused".
+class _InfoTap extends StatelessWidget {
+  final VoidCallback onTap;
+  final Widget child;
+  const _InfoTap({required this.onTap, required this.child});
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+    valueListenable: _inlineEditing,
+    child: child,
+    builder: (context, editing, child) => GestureDetector(
+      // Opaque so the whole info column answers, including the gap between a
+      // short name and the QTY column — a tap target the width of the word
+      // 'Amber' is not a tap target.
+      behavior: HitTestBehavior.opaque,
+      onTap: editing ? null : onTap,
+      child: child,
+    ),
+  );
+}
+
+// ---- prices, written once ---------------------------------------------
+//
+// ⭐ The sort has to know what a row costs BEFORE the row is built, and a
+// second copy of the marginal walk is how a shelf sorted by price ends up
+// disagreeing with the prices printed on it. These are the one writer; the
+// rows read them too.
+
+/// What the shelf holds right now — persisted stock, or equilibrium on a town
+/// whose nightly resolve has not landed yet.
+int _shelfStock(GameState game, String townId, String itemId) =>
+    game.profile.shopStock[townId]?.stockOf(itemId) ??
+    game.shopEquilibriumFor(townId, itemId);
+
+/// The BUY price of the ([pending] + 1)th unit — the number the PRICE column
+/// shows (ruling 2026-08-25 round 3: buying drains stock, so the next unit
+/// prices at `stock − pending`; at pending 0 this IS the sticker price).
+int _buyUnitPrice(
+  GameState game,
+  String townId,
+  int today,
+  ItemDef def, {
+  int pending = 0,
+}) => ShopPricing.roundGold(
+  ShopPricing.buyPrice(
+    base: def.value,
+    equilibrium: game.shopEquilibriumFor(townId, def.id),
+    stock: _shelfStock(game, townId, def.id) - pending,
+    locationMod: game.shopLocationModFor(townId, def.id),
+    eventMod: game.shopEventsFor(townId, today)[def.id] ?? 1.0,
+  ),
+);
+
+/// The SELL price of the ([pending] + 1)th unit. ⚠️ An item this town does
+/// not shelve has no walk at all — it hits the flat vendor sink (§14b.3), and
+/// that is the number both the row and the sort must use.
+int _sellUnitPrice(
+  GameState game,
+  String townId,
+  int today,
+  ItemDef def, {
+  int pending = 0,
+}) {
+  if (!ShopCatalogue.stockFor(townId).contains(def.id)) {
+    return ShopPricing.vendorPrice(def.value);
+  }
+  return ShopPricing.roundGold(
+    ShopPricing.sellPrice(
+      base: def.value,
+      equilibrium: game.shopEquilibriumFor(townId, def.id),
+      // Selling FLOODS the shelf, so the next unit prices at `stock +
+      // pending` — the mirror of the buy walk above.
+      stock: _shelfStock(game, townId, def.id) + pending,
+      locationMod: game.shopLocationModFor(townId, def.id),
+      eventMod: game.shopEventsFor(townId, today)[def.id] ?? 1.0,
+    ),
+  );
+}
+
+/// Re-orders [rows] in place for [sort]. ⭐ One comparator for both tabs and
+/// all three sections, so 'Price' can never mean ascending on one shelf and
+/// descending on another.
+///
+/// ⚠️ **Every order tie-breaks on NAME** (the Workbench's own rule): sorting
+/// by price and back again must not shuffle rows the player had just learned
+/// the position of, and Hearthwood alone ships two 6g materials and two 38g
+/// ones. [_ShopSort.standard] returns untouched — the shelf's given order IS
+/// the answer there, catalogue order on Buy and alphabetical on Sell.
+void _sortShelf<T>(
+  List<T> rows,
+  _ShopSort sort, {
+  required String Function(T) nameOf,
+  required int Function(T) priceOf,
+  required int Function(T) quantityOf,
+}) {
+  if (sort == _ShopSort.standard) return;
+  int byName(T a, T b) => nameOf(a).compareTo(nameOf(b));
+  rows.sort(switch (sort) {
+    _ShopSort.standard => byName, // unreachable — guarded above.
+    _ShopSort.name => byName,
+    _ShopSort.price => (a, b) {
+      final c = priceOf(a).compareTo(priceOf(b));
+      return c != 0 ? c : byName(a, b);
+    },
+    // ⭐ DESCENDING, alone among the three: "how many are there" is asked by
+    // a player looking for the deep pile, never the empty shelf.
+    _ShopSort.quantity => (a, b) {
+      final c = quantityOf(b).compareTo(quantityOf(a));
+      return c != 0 ? c : byName(a, b);
+    },
+  });
 }
 
 /// Spike/sale chip — shown only when `eventMod != 1.0` (§6.2).
@@ -659,6 +1066,10 @@ class _QtyControlState extends State<_QtyControl> {
   @override
   void dispose() {
     _repeat?.cancel();
+    // ⚠️ Torn down mid-edit (the route pops, the filter drops this row) the
+    // commit never runs, so the flag has to be released here or every row's
+    // tooltip stays shut for the rest of the session.
+    if (_editing) _inlineEditing.value = false;
     _text.dispose();
     _focus.dispose();
     super.dispose();
@@ -694,6 +1105,7 @@ class _QtyControlState extends State<_QtyControl> {
 
   void _commitEdit() {
     final parsed = int.tryParse(_text.text.trim());
+    _inlineEditing.value = false;
     setState(() => _editing = false);
     if (parsed == null) return;
     final v = parsed.clamp(widget.min, widget.max);
@@ -735,10 +1147,16 @@ class _QtyControlState extends State<_QtyControl> {
               : InkWell(
                   onTap: !enabled
                       ? null
-                      : () => setState(() {
-                          _text.text = '${widget.value}';
-                          _editing = true;
-                        }),
+                      : () {
+                          // ⭐ Raised BEFORE the rebuild: the row's [_InfoTap]
+                          // listens to this flag, so the tooltip's door is
+                          // shut for as long as the keyboard is borrowed.
+                          _inlineEditing.value = true;
+                          setState(() {
+                            _text.text = '${widget.value}';
+                            _editing = true;
+                          });
+                        },
                   child: Text(
                     '${widget.value}',
                     textAlign: TextAlign.center,
@@ -854,20 +1272,24 @@ class _BuyList extends StatelessWidget {
   final Map<String, int> qty;
   final ShopBasketQuote quote;
   final void Function(String itemId, int value) onQtyChanged;
+  final _ShopFilter filter;
+  final _ShopSort sort;
 
   const _BuyList({
     required this.game,
     required this.townId,
     required this.today,
-    required this.qty,
     required this.quote,
+    required this.qty,
     required this.onQtyChanged,
+    required this.filter,
+    required this.sort,
   });
 
   @override
   Widget build(BuildContext context) {
-    final items = ShopCatalogue.stockFor(townId);
-    if (items.isEmpty) {
+    final shelf = ShopCatalogue.stockFor(townId);
+    if (shelf.isEmpty) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(28),
@@ -878,6 +1300,29 @@ class _BuyList extends StatelessWidget {
         ),
       );
     }
+
+    // ⭐ Filter FIRST, then sort what survived — the ruling's "sort applies
+    // within the current filter". ⚠️ The mutant this ordering kills is the
+    // one that re-reads the catalogue when a sort is chosen and quietly
+    // serves the whole shelf back, filter and all.
+    final items = [
+      for (final id in shelf)
+        if (ItemCatalogue.tryById(id) case final def? when filter.accepts(def))
+          id,
+    ];
+    if (items.isEmpty) return const _NoMatches();
+    _sortShelf(
+      items,
+      sort,
+      nameOf: (id) => ItemCatalogue.displayName(ItemCatalogue.byId(id)),
+      // ⚠️ The sticker price (pending 0), never the row's live marginal
+      // price: an order that re-shuffled itself as the player worked a
+      // stepper would move the row out from under them mid-purchase.
+      priceOf: (id) =>
+          _buyUnitPrice(game, townId, today, ItemCatalogue.byId(id)),
+      quantityOf: (id) => _shelfStock(game, townId, id),
+    );
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
       children: [
@@ -928,29 +1373,17 @@ class _BuyRow extends StatelessWidget {
     final def = ItemCatalogue.tryById(itemId);
     if (def == null) return const SizedBox.shrink();
     final name = ItemCatalogue.displayName(def);
-    final state = game.profile.shopStock[townId];
-    final equilibrium = game.shopEquilibriumFor(townId, itemId);
-    final stock = state?.stockOf(itemId) ?? equilibrium;
+    final stock = _shelfStock(game, townId, itemId);
     final locationMod = game.shopLocationModFor(townId, itemId);
     final eventMod = game.shopEventsFor(townId, today)[itemId] ?? 1.0;
-    int unitAt(int atStock, {double event = 1.0}) => ShopPricing.roundGold(
-      ShopPricing.buyPrice(
-        base: def.value,
-        equilibrium: equilibrium,
-        stock: atStock,
-        locationMod: locationMod,
-        eventMod: event,
-      ),
-    );
     // ⭐ Ruling 2026-08-25 round 3: PRICE is the NEXT unit's price, live —
     // buying drains stock, so the (qty+1)th unit prices at stock − qty. At
     // qty 0 this IS the sticker price, and as the stepper climbs the column
     // answers the only question that matters mid-purchase: what does one
-    // MORE cost?
-    final unit = unitAt(stock - qty, event: eventMod);
-    // ⭐ Point 2: the NEXT unit's marginal price — the walk's convention
-    // prices unit i at the stock left after i−1 units, so with [qty] pending
-    // the next one costs the price at `stock − qty`.
+    // MORE cost? ⚠️ Through [_buyUnitPrice], the same writer the price SORT
+    // reads — a private copy of the walk here is how a shelf ordered by price
+    // starts disagreeing with the prices printed on it.
+    final unit = _buyUnitPrice(game, townId, today, def, pending: qty);
 
     // ⚠️ Bounded to persisted stock — the basket-pricing walk always prices
     // a buy line against `profile.shopStock` as it stands right now (see
@@ -969,34 +1402,42 @@ class _BuyRow extends StatelessWidget {
       child: GamePanel(
         child: Row(
           children: [
-            _ItemGlyph(defId: itemId, name: name),
-            const SizedBox(width: 10),
+            // ⭐ Ruling 2026-08-26 #1: the glyph-and-name half of the row is
+            // the tooltip's door. Everything right of here keeps its own
+            // gestures — the stepper is not a way to inspect an item, and
+            // inspecting one is not a way to buy it.
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          name,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: rarityColour(def.rarity),
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w600,
+              child: _InfoTap(
+                onTap: () => showItemDialog(context, def: def),
+                child: Row(
+                  children: [
+                    _ItemGlyph(defId: itemId, name: name),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              name,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: rarityColour(def.rarity),
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 6),
+                          _TierChip(mod: locationMod),
+                          if (eventMod != 1.0) ...[
+                            const SizedBox(width: 4),
+                            _EventChip(eventMod: eventMod),
+                          ],
+                        ],
                       ),
-                      const SizedBox(width: 6),
-                      _TierChip(mod: locationMod),
-                      if (eventMod != 1.0) ...[
-                        const SizedBox(width: 4),
-                        _EventChip(eventMod: eventMod),
-                      ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -1033,6 +1474,8 @@ class _SellList extends StatelessWidget {
   final void Function(String itemId, int value) onStackQtyChanged;
   final Set<String> selectedInstances;
   final ValueChanged<String> onInstanceToggled;
+  final _ShopFilter filter;
+  final _ShopSort sort;
 
   const _SellList({
     required this.game,
@@ -1043,6 +1486,8 @@ class _SellList extends StatelessWidget {
     required this.onStackQtyChanged,
     required this.selectedInstances,
     required this.onInstanceToggled,
+    required this.filter,
+    required this.sort,
   });
 
   @override
@@ -1088,13 +1533,58 @@ class _SellList extends StatelessWidget {
       );
     }
 
+    // ⚠️ The empty-pockets line above is checked BEFORE filtering: "you own
+    // nothing" and "you own nothing of THIS kind" are different facts, and
+    // the player is owed whichever one is true.
+    //
+    // ⭐ Both sections filter through the same predicate — Gear lands on the
+    // instance rows because instances are what gear IS here (one row per
+    // item, quality and all), so the chip needs no second rule.
+    final shownStacks = [
+      for (final id in stackIds)
+        if (filter.accepts(ItemCatalogue.byId(id))) id,
+    ];
+    final shownInstances = [
+      for (final e in instances)
+        if (ItemCatalogue.tryById(e.$2) case final def? when filter.accepts(def))
+          e,
+    ];
+    if (shownStacks.isEmpty && shownInstances.isEmpty) {
+      return const _NoMatches();
+    }
+    _sortShelf(
+      shownStacks,
+      sort,
+      nameOf: (id) => ItemCatalogue.displayName(ItemCatalogue.byId(id)),
+      priceOf: (id) =>
+          _sellUnitPrice(game, townId, today, ItemCatalogue.byId(id)),
+      quantityOf: (id) =>
+          (room.stacks[id] ?? 0) + pack.countOf(id),
+    );
+    _sortShelf(
+      shownInstances,
+      sort,
+      // ⭐ The INSTANCE's name — 'Ornate Tuskhide Belt', not 'Tuskhide Belt' —
+      // so an alphabetical gear shelf reads the way its rows are labelled.
+      nameOf: (e) => ItemCatalogue.displayName(
+        ItemCatalogue.byId(e.$2),
+        game.profile.itemInstances[e.$1],
+      ),
+      priceOf: (e) =>
+          ShopPricing.vendorPrice(ItemCatalogue.byId(e.$2).value),
+      // ⚠️ One instance is one unit by construction, so the quantity sort has
+      // nothing to say here and falls straight through to the name tie-break
+      // rather than pretending to an order it does not have.
+      quantityOf: (_) => 1,
+    );
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
       children: [
-        if (stackIds.isNotEmpty) ...[
+        if (shownStacks.isNotEmpty) ...[
           const SectionLabel('Materials & consumables'),
           const _ColumnHeader(qtyLabel: 'HAVE'),
-          for (final id in stackIds)
+          for (final id in shownStacks)
             _SellStackRow(
               game: game,
               townId: townId,
@@ -1107,9 +1597,9 @@ class _SellList extends StatelessWidget {
             ),
           const SizedBox(height: 8),
         ],
-        if (instances.isNotEmpty) ...[
+        if (shownInstances.isNotEmpty) ...[
           const SectionLabel('Gear'),
-          for (final e in instances)
+          for (final e in shownInstances)
             _SellInstanceRow(
               game: game,
               instanceId: e.$1,
@@ -1160,31 +1650,18 @@ class _SellStackRow extends StatelessWidget {
     final stocked = ShopCatalogue.stockFor(townId).contains(itemId);
     final max = available < 0 ? 0 : available;
 
-    int unit;
     double locationMod = 1.0;
     double eventMod = 1.0;
     if (stocked) {
-      final state = game.profile.shopStock[townId];
-      final equilibrium = game.shopEquilibriumFor(townId, itemId);
-      final stock = state?.stockOf(itemId) ?? equilibrium;
       locationMod = game.shopLocationModFor(townId, itemId);
       eventMod = game.shopEventsFor(townId, today)[itemId] ?? 1.0;
-      int unitAt(int atStock, {double event = 1.0}) => ShopPricing.roundGold(
-        ShopPricing.sellPrice(
-          base: def.value,
-          equilibrium: equilibrium,
-          stock: atStock,
-          locationMod: locationMod,
-          eventMod: event,
-        ),
-      );
-      // ⭐ Ruling 2026-08-25 round 3: PRICE is the NEXT unit's price, live —
-      // selling floods stock, so the (qty+1)th unit prices at stock + qty.
-      // At qty 0 this IS the sticker price.
-      unit = unitAt(stock + qty, event: eventMod);
-    } else {
-      unit = ShopPricing.vendorPrice(def.value);
     }
+    // ⭐ Ruling 2026-08-25 round 3: PRICE is the NEXT unit's price, live —
+    // selling floods stock, so the (qty+1)th unit prices at stock + qty. At
+    // qty 0 this IS the sticker price, and an unstocked item skips the walk
+    // for the flat vendor sink. ⚠️ Through [_sellUnitPrice], the one writer
+    // the price sort reads too.
+    final unit = _sellUnitPrice(game, townId, today, def, pending: qty);
 
     final eventColour = !stocked || eventMod == 1.0
         ? AppColors.gold
@@ -1198,55 +1675,66 @@ class _SellStackRow extends StatelessWidget {
       child: GamePanel(
         child: Row(
           children: [
-            _ItemGlyph(defId: itemId, name: name),
-            const SizedBox(width: 10),
+            // ⭐ Ruling 2026-08-26 #1 — the info half opens the tooltip; the
+            // stepper on the right keeps its own gestures untouched.
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          name,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: rarityColour(def.rarity),
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w600,
+              child: _InfoTap(
+                onTap: () => showItemDialog(context, def: def),
+                child: Row(
+                  children: [
+                    _ItemGlyph(defId: itemId, name: name),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  name,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: rarityColour(def.rarity),
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              if (stocked) ...[
+                                const SizedBox(width: 6),
+                                _TierChip(mod: locationMod),
+                              ],
+                              if (eventMod != 1.0) ...[
+                                const SizedBox(width: 4),
+                                _EventChip(eventMod: eventMod),
+                              ],
+                            ],
                           ),
-                        ),
+                          if (hasSubline) ...[
+                            const SizedBox(height: 2),
+                            if (bound)
+                              const Text(
+                                'Bound — cannot be sold.',
+                                style: TextStyle(
+                                  color: AppColors.textDim,
+                                  fontSize: 11.5,
+                                ),
+                              )
+                            else
+                              const Text(
+                                'vendor (flat)',
+                                style: TextStyle(
+                                  color: AppColors.textDim,
+                                  fontSize: 11.5,
+                                ),
+                              ),
+                          ],
+                        ],
                       ),
-                      if (stocked) ...[
-                        const SizedBox(width: 6),
-                        _TierChip(mod: locationMod),
-                      ],
-                      if (eventMod != 1.0) ...[
-                        const SizedBox(width: 4),
-                        _EventChip(eventMod: eventMod),
-                      ],
-                    ],
-                  ),
-                  if (hasSubline) ...[
-                    const SizedBox(height: 2),
-                    if (bound)
-                      const Text(
-                        'Bound — cannot be sold.',
-                        style: TextStyle(
-                          color: AppColors.textDim,
-                          fontSize: 11.5,
-                        ),
-                      )
-                    else
-                      const Text(
-                        'vendor (flat)',
-                        style: TextStyle(
-                          color: AppColors.textDim,
-                          fontSize: 11.5,
-                        ),
-                      ),
+                    ),
                   ],
-                ],
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -1305,25 +1793,52 @@ class _SellInstanceRow extends StatelessWidget {
       child: GamePanel(
         child: Row(
           children: [
-            _ItemGlyph(defId: defId, name: name),
-            const SizedBox(width: 10),
+            // ⭐ Ruling 2026-08-26 #1 — and this is the one row that has an
+            // INSTANCE to hand, so the tooltip gets it: quality-scaled stats
+            // and a quality-scaled worth, not the definition's baseline.
+            // ⚠️ Inert when the def is unknown; a dialog for an item this
+            // build cannot name is a crash waiting for a save migration.
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      color: def == null ? AppColors.text : rarityColour(def.rarity),
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600,
+              child: _InfoTap(
+                onTap: def == null
+                    ? () {}
+                    : () => showItemDialog(
+                        context,
+                        def: def,
+                        instance: instance,
+                      ),
+                child: Row(
+                  children: [
+                    _ItemGlyph(defId: defId, name: name),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: TextStyle(
+                              color: def == null
+                                  ? AppColors.text
+                                  : rarityColour(def.rarity),
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            bound
+                                ? 'Bound — cannot be sold.'
+                                : '${unit}g · vendor (flat)',
+                            style: const TextStyle(
+                              color: AppColors.textDim,
+                              fontSize: 11.5,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Text(
-                    bound ? 'Bound — cannot be sold.' : '${unit}g · vendor (flat)',
-                    style: const TextStyle(color: AppColors.textDim, fontSize: 11.5),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 8),
