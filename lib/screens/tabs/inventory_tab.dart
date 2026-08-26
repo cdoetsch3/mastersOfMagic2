@@ -9,6 +9,7 @@ import '../../game/items/item_catalogue.dart';
 import '../../game/items/item_def.dart';
 import '../../game/items/item_instance.dart';
 import '../../game/world.dart';
+import '../../ui/app_banner.dart';
 import '../../ui/app_theme.dart';
 import '../../ui/item_display.dart';
 import '../../ui/item_icon.dart';
@@ -66,18 +67,14 @@ class InventoryTab extends StatelessWidget {
                   // Deposits the whole pack; equipped gear is never touched.
                   if (inTown && game.profile.backpack.used > 0)
                     TextButton.icon(
-                      onPressed: () async {
-                        final moved = await game.depositAll(here.id);
-                        if (context.mounted && moved > 0) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Stowed $moved item'
-                                  '${moved == 1 ? '' : 's'} in '
-                                  '${here.name}.'),
-                            ),
-                          );
-                        }
-                      },
+                      // ⭐ **Says nothing, on purpose** (notice ruling,
+                      // 2026-08-26). Deposit-all empties the whole pack: the
+                      // grid below clears, the "Backpack — n/24" count above
+                      // drops to 0, and the button removes itself because
+                      // `used > 0` stopped being true. A notice reporting a
+                      // count the screen just finished showing three ways is
+                      // the redundant-confirmation case the rule deletes.
+                      onPressed: () => game.depositAll(here.id),
                       icon: const Icon(Icons.arrow_downward, size: 16),
                       label: const Text('Deposit all'),
                     ),
@@ -1076,9 +1073,7 @@ class _StoreroomListState extends State<_StoreroomList> {
                   ? () async {
                       final no = await game.equipFromStoreroom(e.instanceId!);
                       if (no != null && context.mounted) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text(no)));
+                        showAppBanner(context, no, color: AppColors.ember);
                       }
                     }
                   : null,
@@ -1106,14 +1101,14 @@ class _StoreroomListState extends State<_StoreroomList> {
     );
     if (!mounted || moved == 0) return;
     final all = moved >= e.count;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          all
-              ? 'Took all $moved ${e.label}.'
-              : 'Took $moved of ${e.count} ${e.label} — your pack is full.',
-        ),
-      ),
+    // ⭐ Banner rather than REMOVE: the counts do move on screen, but the
+    // REASON a bulk take stopped at 3 of 40 appears nowhere else, and that is
+    // the half of the message worth reading.
+    showAppBanner(
+      context,
+      all
+          ? 'Took all $moved ${e.label}.'
+          : 'Took $moved of ${e.count} ${e.label} — your pack is full.',
     );
   }
 

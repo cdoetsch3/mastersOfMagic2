@@ -15,6 +15,7 @@ import '../game/items/equipping.dart';
 import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
+import 'app_banner.dart';
 import 'app_theme.dart';
 import 'item_icon.dart';
 
@@ -42,7 +43,9 @@ Future<void> showItemDialog(
   final lines = def is EquipmentDef
       ? Equipping.describe(Equipping.modifiersOf(def, instance))
       : (def is Usable ? [(def as Usable).effect.describe] : const <String>[]);
-  final messenger = ScaffoldMessenger.of(context);
+  // ⚠️ Captured BEFORE the dialog, because the refusal is reported after it
+  // pops — at which point `dialogContext` is gone.
+  final banner = appBannerOf(context);
   await showDialog<void>(
     context: context,
     builder: (dialogContext) => AlertDialog(
@@ -120,7 +123,7 @@ Future<void> showItemDialog(
               // ⚠️ A refusal the player never sees is a button that looks
               // broken. Every rule speaks here.
               if (no != null) {
-                messenger.showSnackBar(SnackBar(content: Text(no)));
+                banner.show(no, color: AppColors.ember);
               }
             },
             child: Text(a.label),

@@ -10,6 +10,7 @@ import '../game/duel_launcher.dart';
 import '../game/game_state.dart';
 import '../game/loadout.dart';
 import '../game/matchmaking.dart';
+import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
 import 'account_screen.dart';
 
@@ -113,17 +114,13 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     }
   }
 
-  void _showStandInNote(AiPersona persona) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: AppColors.panel,
-        content: Text(
-          'No mages answered the call — ${persona.name} steps in!',
-          style: const TextStyle(color: AppColors.text),
-        ),
-      ),
-    );
-  }
+  /// ⭐ Banner: nothing on the duel screen that follows says the opponent is
+  /// a stand-in rather than the human the player queued for. Raised in the
+  /// root overlay, so it survives the push into the duel.
+  void _showStandInNote(AiPersona persona) => showAppBanner(
+    context,
+    'No mages answered the call — ${persona.name} steps in!',
+  );
 
   Future<void> _hostRoom() async {
     final id = _identity();
@@ -282,15 +279,9 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         InkWell(
           onTap: () {
             Clipboard.setData(ClipboardData(text: _roomCode!));
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                backgroundColor: AppColors.panel,
-                content: Text(
-                  'Code copied',
-                  style: TextStyle(color: AppColors.text),
-                ),
-              ),
-            );
+            // ⭐ Banner: the clipboard is invisible. Without a notice a tap
+            // on the code does nothing observable at all.
+            showAppBanner(context, 'Code copied');
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),

@@ -8,6 +8,7 @@ import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/screens/tabs/inventory_tab.dart';
+import 'package:masters_of_magic_2/ui/app_banner.dart';
 
 /// ⚠️ A ListView only builds what fits. The default 800x600 test viewport
 /// leaves the Storeroom below the fold, so it never renders and assertions
@@ -54,6 +55,52 @@ void main() {
     expect(find.text('×4'), findsOneWidget);
     // ⚠️ The per-city rule, stated where a player will actually read it.
     expect(find.textContaining('per city'), findsOneWidget);
+  });
+
+  testWidgets('⭐ Deposit all says nothing because the SCREEN says it', (
+    tester,
+  ) async {
+    // ⭐ Its "Stowed 3 items in Hearthwood." notice was REMOVED under the
+    // notice ruling (2026-08-26) as redundant confirmation. This is the
+    // outcome assert that replaces it: the three things the screen shows
+    // instead have to actually show it, or the removal was a silent bug.
+    final game = GameState(_Mem(), PlayerProfile.newPlayer());
+    game.profile.backpack = Backpack.of([
+      for (var i = 0; i < 3; i++) const InventorySlot(defId: 'oak_log'),
+    ]);
+    await _pump(tester, game);
+    expect(find.textContaining('BACKPACK — 3/20'), findsOneWidget);
+
+    await tester.tap(find.text('Deposit all'));
+    await tester.pumpAndSettle();
+
+    expect(
+      game.profile.storerooms['hearthwood']!.stacks['oak_log'],
+      3,
+      reason: 'the deposit itself still has to happen',
+    );
+    expect(
+      find.textContaining('BACKPACK — 0/20'),
+      findsOneWidget,
+      reason: '⭐ evidence #1 the notice was redundant: the header counts down',
+    );
+    expect(
+      find.text('Deposit all'),
+      findsNothing,
+      reason: '⭐ evidence #2: with nothing left to move the button removes '
+          'itself, which is a louder "it worked" than any sentence',
+    );
+    expect(
+      find.text('×3'),
+      findsOneWidget,
+      reason: '⭐ evidence #3: the Storeroom below now holds the three logs',
+    );
+    expect(
+      find.byType(AppBanner),
+      findsNothing,
+      reason: 'REMOVE means removed — not quietly re-added as a banner',
+    );
+    expect(find.byType(SnackBar), findsNothing);
   });
 
   testWidgets('outside a town there is no Storeroom to use', (tester) async {
@@ -247,7 +294,16 @@ void main() {
     await tester.tap(find.text('Take all'));
     await tester.pumpAndSettle();
     expect(game.profile.backpack.countOf('oak_log'), 6);
+    // ⭐ The report moved to a top banner (notice ruling, 2026-08-26) — it
+    // still speaks, it just no longer lands on the Storeroom's own buttons.
+    expect(find.byType(AppBanner), findsOneWidget);
     expect(find.textContaining('Took all 6'), findsOneWidget);
+    expect(
+      find.byType(SnackBar),
+      findsNothing,
+      reason: '⚠️ the whole ruling: no notice may occupy the bottom of this '
+          'screen, where Take / Take all live',
+    );
   });
 
   testWidgets('⭐ Take all moving only part of a stack still reports it', (
@@ -264,7 +320,11 @@ void main() {
     await tester.tap(find.text('Take all'));
     await tester.pumpAndSettle();
     expect(game.profile.backpack.countOf('oak_log'), 3);
+    // ⭐ BANNER rather than REMOVE: the counts do move on screen, but "3 of
+    // 40, because your pack is full" is the half nothing else states.
+    expect(find.byType(AppBanner), findsOneWidget);
     expect(find.textContaining('Took 3 of 40'), findsOneWidget);
+    expect(find.byType(SnackBar), findsNothing);
   });
 
   testWidgets('a single stored item offers Take, but not Take all', (

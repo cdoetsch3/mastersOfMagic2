@@ -4,6 +4,7 @@ import '../game/app_version.dart';
 import '../game/content_version.dart';
 import '../game/auth_service.dart';
 import '../game/game_state.dart';
+import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
 import 'password_screens.dart';
 import 'home_shell.dart';
@@ -409,7 +410,9 @@ class _AccountView extends StatelessWidget {
 /// fresh-character path a new player gets, name kept, everything else gone.
 Future<void> confirmCharacterReset(BuildContext context) async {
   final game = GameStateScope.read(context);
-  final messenger = ScaffoldMessenger.of(context);
+  // ⚠️ Captured before the confirm dialog — the notice is raised after it
+  // pops, and after an await on [GameState.resetProfile].
+  final banner = appBannerOf(context);
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (dialogContext) => AlertDialog(
@@ -443,9 +446,10 @@ Future<void> confirmCharacterReset(BuildContext context) async {
   );
   if (confirmed != true) return;
   await game.resetProfile();
-  messenger.showSnackBar(
-    const SnackBar(content: Text('Character reset — a fresh start.')),
-  );
+  // ⭐ Banner, never removed: the Account screen shows no levels, no XP and no
+  // items, so NOTHING on it changes when a character is wiped. Without this
+  // line the most irreversible button in the game confirms itself in silence.
+  banner.show('Character reset — a fresh start.', color: AppColors.ember);
 }
 
 class _AboutPanel extends StatelessWidget {

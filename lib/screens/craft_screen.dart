@@ -6,6 +6,7 @@ import '../game/items/item_def.dart';
 import '../game/items/recipe_book.dart';
 import '../game/items/recipe_def.dart';
 import '../game/skills.dart';
+import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
 import '../ui/item_display.dart';
 import 'crafting_act_screen.dart';
@@ -489,12 +490,21 @@ class _RecipeCard extends StatelessWidget {
   }
 
   Future<void> _craft(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final banner = appBannerOf(context);
     final outcome = await game.craft(recipe);
     // ⚠️ Both halves speak: a silent success reads as a dead button, and a
     // silent refusal reads as a broken one.
+    //
+    // ⚠️ **Checked against the notice ruling (2026-08-26): the refusal is NOT
+    // removed.** The Workbench does show shortfalls inline — an uncraftable
+    // recipe's button is disabled and reads "Missing Oak Log, Copper Ore" —
+    // which makes this branch near-unreachable, needing the materials to
+    // vanish between the frame that built the button and the tap. Near-
+    // unreachable is not unreachable, and when it fires the inline text is
+    // the STALE half. A failure the screen contradicts is exactly what the
+    // rule says never to delete, so it stays, as a banner.
     if (!outcome.succeeded) {
-      messenger.showSnackBar(SnackBar(content: Text(outcome.refusal!)));
+      banner.show(outcome.refusal!, color: AppColors.ember);
       return;
     }
     final def = ItemCatalogue.tryById(outcome.defId!);
@@ -505,16 +515,15 @@ class _RecipeCard extends StatelessWidget {
     final name = def == null
         ? outcome.defId!
         : ItemCatalogue.displayName(def, outcome.instance);
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          outcome.leveledTo != null
-              ? 'Crafted $name — ${Skills.displayName(outcome.skillKey!)} '
-                    'is now level ${outcome.leveledTo}!'
-              : 'Crafted $name · +${outcome.xp} '
-                    '${Skills.displayName(outcome.skillKey!)} XP',
-        ),
-      ),
+    // ⭐ Banner: the rolled NAME is the payoff of a craft and appears nowhere
+    // else on this screen — the item lands in a backpack a tab away.
+    banner.show(
+      outcome.leveledTo != null
+          ? 'Crafted $name — ${Skills.displayName(outcome.skillKey!)} '
+                'is now level ${outcome.leveledTo}!'
+          : 'Crafted $name · +${outcome.xp} '
+                '${Skills.displayName(outcome.skillKey!)} XP',
+      color: outcome.leveledTo != null ? AppColors.gold : null,
     );
   }
 }

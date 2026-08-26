@@ -8,6 +8,7 @@ import '../game/game_state.dart';
 import '../game/world.dart';
 import '../game/travel.dart';
 import '../game/world_map_geometry.dart';
+import 'app_banner.dart';
 import 'app_theme.dart';
 import 'map_camera.dart';
 import 'world_map_painter.dart';
@@ -235,14 +236,18 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
       await widget.game.travelTo(loc.id);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: AppColors.panelHi,
-          content: Text(
-            'Could not save your travel to ${loc.name}. Check your connection.',
-            style: const TextStyle(color: AppColors.text),
-          ),
-        ),
+      // ⚠️ **A modal, not a banner** (notice ruling, 2026-08-26). The map
+      // has already redrawn you at the destination — the failure is invisible
+      // BY CONSTRUCTION, and the cost of missing it is finding yourself back
+      // where you started on next launch. This is exactly the "could be
+      // missed at a cost" case the escalation exists for.
+      await showAppAlert(
+        context,
+        title: 'Your travel was not saved',
+        message:
+            'Could not save your travel to ${loc.name}. Check your '
+            'connection — until it saves, this journey may not survive '
+            'closing the game.',
       );
     }
   }

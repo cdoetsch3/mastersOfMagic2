@@ -22,6 +22,7 @@ import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/screens/shop_screen.dart';
 import 'package:masters_of_magic_2/screens/tabs/inventory_tab.dart';
+import 'package:masters_of_magic_2/ui/app_banner.dart';
 import 'package:masters_of_magic_2/ui/app_theme.dart';
 
 // ---- fixtures ---------------------------------------------------------
@@ -288,7 +289,18 @@ void main() {
 
         // The basket clears and the bar disappears.
         expect(find.textContaining('Settle '), findsNothing);
+        // ⭐ **The one notice that survived the REMOVE rule here** (notice
+        // ruling, 2026-08-26). Gold and stock both move on screen, but the
+        // NET across a mixed basket is arithmetic nothing states — so it
+        // stays, as a TOP banner, off the settle bar it used to cover.
+        expect(find.byType(AppBanner), findsOneWidget);
         expect(find.text('Settled — netted ${shown}g.'), findsOneWidget);
+        expect(
+          find.byType(SnackBar),
+          findsNothing,
+          reason: '⚠️ this screen is the ruling\'s worst case — the Settle '
+              'bar lives at the bottom, exactly where a SnackBar lands',
+        );
       },
     );
 
@@ -518,6 +530,71 @@ void main() {
       expect(outcome.succeeded, isFalse);
       expect(outcome.refusal, 'Not enough in stock.');
       expect(game.profile.gold, 1000, reason: 'a refused settle charges nothing');
+    });
+
+    testWidgets('⭐ a basket refused mid-settle STOPS the player with a dialog', (
+      tester,
+    ) async {
+      // ⭐ The DIALOG case of the notice ruling (2026-08-26) — the only kind
+      // of refusal the designer let escalate past a banner. Everywhere else a
+      // missed notice costs one tap to retry; here the player staged a whole
+      // basket across two tabs, the basket SURVIVES the refusal, and a notice
+      // they blink past leaves them re-tapping a Settle button that silently
+      // does nothing.
+      final storage = _MemStorage();
+      final game = _game(storage);
+      await _pump(tester, game);
+
+      await _tapStepper(tester, _oak, Icons.add, times: 5);
+
+      // ⚠️ The shelf moves WITHOUT `notifyListeners`, which is the whole
+      // point: the Settle button is still enabled from the last frame, so
+      // this is the one path that reaches the refusal branch through the UI
+      // rather than by calling the engine directly.
+      final before = game.profile.shopStock[_townId]!;
+      game.profile.shopStock[_townId] = TownShopState(
+        stock: {...before.stock, _oak: 2},
+        lastResetDay: before.lastResetDay,
+      );
+
+      await tester.tap(find.textContaining('Settle '));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byType(AlertDialog),
+        findsOneWidget,
+        reason: '⭐ THE dialog case — a banner here could be missed at the '
+            'cost of the whole basket',
+      );
+      expect(find.text('The trade did not go through'), findsOneWidget);
+      expect(
+        find.text('Not enough in stock.'),
+        findsWidgets,
+        reason: 'the engine\'s own words, not a paraphrase',
+      );
+      expect(
+        find.byType(AppBanner),
+        findsNothing,
+        reason: '⚠️ escalation REPLACES the banner — a refusal worth stopping '
+            'for must not merely flash past instead',
+      );
+      expect(find.byType(SnackBar), findsNothing);
+
+      await tester.tap(find.text('Right'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(
+        game.profile.gold,
+        1000,
+        reason: 'a refused settle charges nothing',
+      );
+      expect(
+        find.textContaining('Settle '),
+        findsOneWidget,
+        reason: '⭐ the basket survives the refusal — which is exactly why '
+            'the player is owed a reason they cannot miss',
+      );
     });
   });
 

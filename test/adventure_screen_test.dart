@@ -21,6 +21,7 @@ import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:masters_of_magic_2/screens/adventure_screen.dart';
+import 'package:masters_of_magic_2/ui/app_banner.dart';
 
 final _woods = World.byId('whispering_woods');
 
@@ -202,11 +203,21 @@ void main() {
         isTrue,
         reason: 'a claimed staff with no instance behind it is a nameless husk',
       );
+      // ⭐ The receipt moved to a top banner (notice ruling, 2026-08-26). It
+      // still names what the choice cost — but this screen's gathering nodes
+      // and belt live along the BOTTOM, which is what the old SnackBar was
+      // covering when it did.
       expect(
         find.textContaining('left behind: Oak Log'),
         findsOneWidget,
         reason: 'the confirmation has to name what the choice cost',
       );
+      expect(
+        find.byType(AppBanner),
+        findsOneWidget,
+        reason: 'it is a banner now, not a SnackBar over the action row',
+      );
+      expect(find.byType(SnackBar), findsNothing);
       expect(
         find.textContaining('Taking'),
         findsNothing,

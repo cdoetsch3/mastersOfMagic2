@@ -10,6 +10,7 @@ import '../game/items/inventory.dart';
 import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
 import '../game/world.dart';
+import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
 import '../ui/item_display.dart';
 import '../ui/item_icon.dart';
@@ -311,7 +312,6 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Future<void> _settle() async {
-    final messenger = ScaffoldMessenger.of(context);
     final game = GameStateScope.read(context);
     final outcome = await game.settleShopBasket(
       townId: widget.townId,
@@ -320,8 +320,19 @@ class _ShopScreenState extends State<ShopScreen> {
       sellStacks: _sellStacks,
       sellInstances: _sellInstances,
     );
+    if (!mounted) return;
+    // ⚠️ **A refusal here is the one that earns a modal** (notice ruling,
+    // 2026-08-26). The player staged a whole basket across two tabs; the
+    // basket SURVIVES the refusal, so a notice they blink past leaves them
+    // staring at a Settle button that did nothing with no idea why. Every
+    // other refusal in the game costs one tap to retry — this one costs the
+    // basket's worth of them.
     if (!outcome.succeeded) {
-      messenger.showSnackBar(SnackBar(content: Text(outcome.refusal!)));
+      await showAppAlert(
+        context,
+        title: 'The trade did not go through',
+        message: outcome.refusal!,
+      );
       return;
     }
     setState(() {
@@ -329,15 +340,15 @@ class _ShopScreenState extends State<ShopScreen> {
       _sellStacks.clear();
       _sellInstances.clear();
     });
+    // ⭐ **The one survivor of the REMOVE rule on this screen.** Gold and
+    // stock both update on screen, so by the letter of the rule this notice
+    // is redundant — but the NET is arithmetic across a mixed basket that
+    // nothing on screen states, and re-deriving "did I come out ahead?" from
+    // a gold pill means remembering what it read a second ago.
     final net = outcome.net;
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          net >= 0
-              ? 'Settled — netted ${net}g.'
-              : 'Settled — spent ${-net}g.',
-        ),
-      ),
+    showAppBanner(
+      context,
+      net >= 0 ? 'Settled — netted ${net}g.' : 'Settled — spent ${-net}g.',
     );
   }
 }

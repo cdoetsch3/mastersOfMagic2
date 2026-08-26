@@ -10,6 +10,7 @@ import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
 import '../game/opponent_driver.dart';
 import '../game/world.dart';
+import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
 import 'duel_screen.dart';
 import 'level_up_screen.dart';
@@ -189,24 +190,22 @@ class _AdventureScreenState extends State<AdventureScreen> {
     final out = await game.gatherNode();
     if (!mounted) return;
     setState(() => _busy = false);
-    final messenger = ScaffoldMessenger.of(context);
     if (!out.succeeded) {
-      messenger.showSnackBar(SnackBar(content: Text(out.refusal!)));
+      _say(out.refusal!, color: AppColors.ember);
       return;
     }
     final def = ItemCatalogue.tryById(out.defId!);
     final name = def == null ? out.defId! : ItemCatalogue.displayName(def);
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          out.leveledTo != null
-              ? 'Gathered ${out.amount} × $name — '
-                    '${Skills.displayName(out.skillKey!)} is now '
-                    'level ${out.leveledTo}!'
-              : 'Gathered ${out.amount} × $name · +${out.xp} '
-                    '${Skills.displayName(out.skillKey!)} XP',
-        ),
-      ),
+    // ⭐ Banner: the node's own tile dims, but WHAT came out of it and the XP
+    // it paid are nowhere on this screen.
+    _say(
+      out.leveledTo != null
+          ? 'Gathered ${out.amount} × $name — '
+                '${Skills.displayName(out.skillKey!)} is now '
+                'level ${out.leveledTo}!'
+          : 'Gathered ${out.amount} × $name · +${out.xp} '
+                '${Skills.displayName(out.skillKey!)} XP',
+      color: out.leveledTo != null ? AppColors.gold : null,
     );
   }
 
@@ -243,12 +242,12 @@ class _AdventureScreenState extends State<AdventureScreen> {
     );
   }
 
-  void _say(String message) => ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      backgroundColor: AppColors.panel,
-      content: Text(message, style: const TextStyle(color: AppColors.text)),
-    ),
-  );
+  /// ⭐ **Every notice on this screen is a top banner** (notice ruling,
+  /// 2026-08-26) — and this screen is why the ruling exists. Gathering nodes,
+  /// the loot picker and the belt all sit along the BOTTOM here, so the old
+  /// SnackBar landed squarely on the buttons the player was mid-reach for.
+  void _say(String message, {Color? color}) =>
+      showAppBanner(context, message, color: color);
 }
 
 class _Progress extends StatelessWidget {

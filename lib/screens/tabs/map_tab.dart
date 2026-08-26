@@ -10,6 +10,7 @@ import '../../game/adventure_launcher.dart';
 import '../../game/economy/shop_catalogue.dart';
 import '../../game/enemies/bestiary.dart';
 import '../../game/world.dart';
+import '../../ui/app_banner.dart';
 import '../../ui/app_theme.dart';
 import '../../ui/travel_progress_card.dart';
 import '../home_shell.dart';
@@ -153,11 +154,10 @@ class _MapTabState extends State<MapTab> {
   }
 
 
-  void _shopClosed(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(ShopCatalogue.closedFlavor)),
-    );
-  }
+  /// ⭐ Banner: a tap on a closed shop's tile otherwise does nothing at all,
+  /// which reads as a broken tile rather than a shut door.
+  void _shopClosed(BuildContext context) =>
+      showAppBanner(context, ShopCatalogue.closedFlavor);
 
 }
 

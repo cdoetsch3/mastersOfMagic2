@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../game/auth_service.dart';
+import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
 
 /// Sends a password-reset email.
@@ -231,9 +232,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       _error = error;
     });
     if (error == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Password changed.')));
+      // ⭐ Banner, not removed: this screen pops on success, so the only
+      // evidence the change landed is the notice itself. Raised in the ROOT
+      // overlay, so it outlives the pop.
+      showAppBanner(context, 'Password changed.');
       Navigator.of(context).pop();
     }
   }
