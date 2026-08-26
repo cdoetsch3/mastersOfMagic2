@@ -1024,14 +1024,19 @@ Christian. **The lesson is the section itself: designs live in committed
 markdown or they do not live.**
 
 ⭐ **The brief:** the Kinetic quarter shipped six combat stats (accuracy,
-dodge, crit chance/damage, deflect chance/amount) plus DoT/HoT machinery
-(Ignite, Photosynthesis, Regrow, the Tonic's HealOverTime) — and TODAY ONLY
-GEAR AND ENEMIES touch any of them. The 26 shipped spells predate the whole
-vocabulary. This bank gives spells three jobs: **GRANT** a stat as a timed
-status, **EXPLOIT** a stat with attack riders, and **COUNTER** each mechanic
-so nothing new is oppressive. Element identities are kept strict: Aero=dodge,
-Geo=deflect, Electro=crit tempo, Pyro=crit damage + DoT, Solar=accuracy,
-Flora=HoT, Umbra=anti-heal + lifesteal, Sanctus=protection + cleanse.
+dodge, crit chance/damage, deflect chance/amount) plus DoT/HoT machinery —
+and TODAY ONLY GEAR AND ENEMIES touch any of them. The 26 shipped spells
+predate the whole vocabulary. This bank gives spells three jobs: **GRANT** a
+stat as a timed status, **EXPLOIT** a stat with attack riders, and
+**COUNTER** each mechanic so nothing new is oppressive.
+
+⚠️ **Spells are ELEMENT-AGNOSTIC, like every spell in the game** (Christian's
+correction, 2026-08-26, on this bank's first draft, which had wrongly mapped
+spells to elements): a spell pairs with whichever element the caster charges,
+and elements keep their identity through their STATUSES, not through spell
+ownership. Consequence for the DoT/HoT entries: they operate on *whatever*
+damage- or heal-over-time statuses are in play — Ignite, Photosynthesis,
+Regrow, a Tonic — never on one element's status by name.
 
 📝 Numbers are first-pass placeholders in the house tradition; the SHAPE and
 the counter-web are the design. Engine note: everything below rides existing
@@ -1043,42 +1048,42 @@ needs.
 
 ### GRANT — a stat, for a while
 
-| # | Spell | El · cost · prio | Effect |
+| # | Spell | Cost · prio | Effect |
 |---|---|---|---|
-| 1 | **Zephyr Step** | Aero · 2 | +25 dodge, 2 turns. The player's first dodge access. ⚠️ Opens the PLAYER dodge-cap question — enemies cap at 10 (ENEMIES §2.5); an uncapped 25 in PvP needs its own ruling before build. |
-| 2 | **Wind Walk** | Aero · 4 | Tier of #1: +40 dodge 2 turns AND Tailwind. The commit version; same cap caveat, louder. |
-| 3 | **The Patient Mountain** | Geo · 2 | Deflect 40/30, 2 turns. Geo's turtle identity handed to the player — and the soft CRIT counter (a deflected crit is a reduced crit). |
-| 4 | **Storm's Edge** | Electro · 1 | +15 crit chance, 2 turns. Cheap, fast, Electro tempo — the crit build's ignition. |
-| 5 | **Keen Ember** | Pyro · 2 | +40 crit damage, 3 turns. Pairs cross-element with #4: Electro supplies the chance, Pyro the payoff. |
-| 6 | **Immolating Focus** | Pyro · 4 | Tier of #5: +20 crit chance AND +50 crit damage, 2 turns — the all-in crit window. |
-| 7 | **True Sight** | Solar · 1 | +30 accuracy 3 turns and cleanses Blind on cast. Solar precision; the ANSWER to Blind, Dust Veil (#16), and dodge stacking. |
-| 8 | **The Answering Wall** | Sanctus · 3 | Shield, and WHILE that shield holds: deflect 25/25. Sanctus protection; shield-deflect synergy — cracking the shield ends the stance. |
+| 1 | **Sidestep** | 2 | +25 dodge, 2 turns. The player's first dodge access. ⚠️ Opens the PLAYER dodge-cap question — enemies cap at 10 (ENEMIES §2.5); an uncapped 25 in PvP needs its own ruling before build. |
+| 2 | **Untouchable** | 4 | Tier of #1: +40 dodge, 2 turns. The commit version; same cap caveat, louder. |
+| 3 | **Brace** | 2 | Deflect 40/30, 2 turns. The turtle stance handed to any caster — and the soft CRIT counter (a deflected crit is a reduced crit). |
+| 4 | **Keen Edge** | 1 | +15 crit chance, 2 turns. Cheap and fast — the crit build's ignition. |
+| 5 | **Heavy Blows** | 2 | +40 crit damage, 3 turns. Pairs with #4: one spell supplies the chance, the other the payoff — two loadout decisions, not one. |
+| 6 | **Killer Instinct** | 4 | Tier of #4+#5: +20 crit chance AND +50 crit damage, 2 turns — the all-in crit window. |
+| 7 | **True Sight** | 1 | +30 accuracy, 3 turns, and cleanses Blind on cast. The answer to Blind, Obscure (#16), and dodge stacking. |
+| 8 | **The Answering Wall** | 3 | Shield, and WHILE that shield holds: deflect 25/25. Shield-deflect synergy — cracking the shield ends the stance. |
 
 ### EXPLOIT — attacks that ride the new rolls
 
-| # | Spell | El · cost · prio | Effect |
+| # | Spell | Cost · prio | Effect |
 |---|---|---|---|
-| 9 | **The Falling Sun** | Solar · 3 | Damage that CANNOT miss and ignores dodge (deflect still applies). The hard dodge counter; light arrives. |
-| 10 | **The Shortest Path** | Electro · 3 | Damage that ignores deflect entirely (dodge still applies). The Geo-turtle answer — current takes the shortest path — and PvE's counter to Quarry Sentinels. |
-| 11 | **Shatter** | Geo · 4 | Damage; if the target holds a deflect status, it BREAKS (status removed) whether or not this hit was reduced. The counter-counter: patience meets a hammer. |
-| 12 | **Coup de Grâce** | Umbra · 5 | Guaranteed crit against a target below 35% HP; otherwise an ordinary hit. Big-spell drama with a readable threshold — the finisher that makes crit damage worth stacking. |
-| 13 | **The Drinking Root** | Umbra · 3 | Damage + heal for 50% dealt (the shipped lifesteal rate, as a spell). Umbra's sustain identity; interacts with healing-received bonuses AND with Mortify (#15) symmetry. |
+| 9 | **The Unerring Blow** | 3 | Damage that CANNOT miss and ignores dodge (deflect still applies). The hard dodge counter. |
+| 10 | **The Shortest Path** | 3 | Damage that ignores deflect entirely (dodge still applies). The turtle answer — and PvE's counter to Quarry Sentinels. |
+| 11 | **Shatter** | 4 | Damage; if the target holds a deflect status, it BREAKS (status removed) whether or not this hit was reduced. The counter-counter: patience meets a hammer. |
+| 12 | **Coup de Grâce** | 5 | Guaranteed crit against a target below 35% HP; otherwise an ordinary hit. Big-spell drama with a readable threshold — the finisher that makes crit damage worth stacking. |
+| 13 | **Leech** | 3 | Damage + heal for 50% dealt (the shipped lifesteal rate, as a spell). Interacts with healing-received bonuses AND with Grievous Wound (#17) symmetry. |
 
-### DoT / HoT — the ticking game
+### DoT / HoT — the ticking game (element-agnostic by rule)
 
-| # | Spell | El · cost · prio | Effect |
+| # | Spell | Cost · prio | Effect |
 |---|---|---|---|
-| 14 | **Slow Sap** | Flora · 2 | HoT: 8% max HP/turn × 3, refresh-not-stack (the Tonic rule). Flora's first spell HoT — Photosynthesis without the streak leash. Tier: **Heartwood's Gift** (c5): 12% × 4 and cleanses own DoTs on apply. |
-| 15 | **The Patient Coal** | Pyro · 3 | Small up-front hit, then Ignite extended to 4 ticks. The DoT build's anchor; profits from long fights, punished by Cauterize (#18). |
-| 16 | **Dust Veil** | Geo · 1 | Enemy −25 accuracy, 2 turns. Blind's earthbound cousin (stacks the evasion-tank fantasy with #1/#3); answered by True Sight (#7) and The Falling Sun (#9). |
+| 14 | **Mend** | 2 | HoT: 8% max HP/turn × 3, refresh-not-stack (the Tonic rule). A HoT without Photosynthesis's streak leash. Tier: **Renewal** (c5): 12% × 4 and cleanses own DoTs on apply. |
+| 15 | **Fester** | 3 | Small up-front hit, then every damage-over-time status the target suffers gains +2 ticks. Feeds on WHATEVER DoTs are in play — worthless alone, brutal in a DoT build; punished by Scour (#18). |
+| 16 | **Obscure** | 1 | Enemy −25 accuracy, 2 turns. Blind's spell-shaped cousin (stacks the evasion-tank fantasy with #1/#3); answered by True Sight (#7) and The Unerring Blow (#9). |
 
 ### COUNTER — every new toy gets a leash
 
-| # | Spell | El · cost · prio | Effect |
+| # | Spell | Cost · prio | Effect |
 |---|---|---|---|
-| 17 | **Grave Chill** | Umbra · 2 · aux | Target's healing received −60%, 3 turns (HoTs, Regrow, potions, Drinking Root — everything). THE anti-heal: Photosynthesis turtling and PvP belt-chugging both needed a predator. ⚠️ Also the first spell that interacts with the potion lane — spec that deliberately. |
-| 18 | **Cauterize** | Pyro · 1 · aux | Burn out your own DoTs: take one tick of each NOW, remove them all. The DoT counter with a cost — cleansing fire, not a free wash. |
-| 19 | **Unremarkable Stone** | Geo · 2 · aux | 3 turns: critical hits against you resolve as normal hits. The direct crit counter, on the element whose whole identity is refusing to be impressed. |
+| 17 | **Grievous Wound** | 2 · aux | Target's healing received −60%, 3 turns (HoTs, Regrow, potions, Leech — everything). THE anti-heal: Photosynthesis turtling and PvP belt-chugging both needed a predator. ⚠️ Also the first spell that interacts with the potion lane — spec that deliberately. |
+| 18 | **Scour** | 1 · aux | Burn out your own DoTs: take one tick of each NOW, remove them all. The DoT counter with a cost — not a free wash. |
+| 19 | **Composure** | 2 · aux | 3 turns: critical hits against you resolve as normal hits. The direct crit counter — refusing to be impressed. |
 
 ### The counter-web, at a glance
 
@@ -1096,7 +1101,7 @@ answer has a cost — the §7 principle, extended.
 3. **The one engine primitive** — the stat-buff TurnStatus (apply on gain, revert on expiry, lockstep-safe). Everything above waits on it.
 4. **HUD** — each grant needs a status pip; the twelve-motion animation system expects entries (the build-fails-if-undocumented test will enforce this, correctly).
 5. **AI awareness** — LadderAi is still effect-blind; these spells widen the gap between what players and enemies can do with the same kit. The Phase-6 fork, now sharper.
-6. **Loadout pressure** — 19 new spells against a 10-spell loadout cap is the POINT (§5.7), but tier-pairs (#1/#2, #5/#6, #14's) should probably be one loadout slot that upgrades, not two slots — needs a ruling.
+6. **Loadout pressure** — 19 new spells against a 10-spell loadout cap is the POINT (§5.7), but tier-pairs (#1/#2, #4+#5/#6, #14's) should probably be one loadout slot that upgrades, not two slots — needs a ruling.
 
 ---
 
