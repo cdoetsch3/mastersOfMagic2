@@ -678,6 +678,15 @@ identically with an empty modifier bundle (proving zero regression).
 
 # Phase 9 — 🟡 SHOPS SHIPPED — Economy: motes, skills, crafting, enchanting
 
+📝 2026-08-26 batch: quality now prices the till (qualityValue seam, one
+ladder shared with stats); consumable-ingredient E bucket (mechanically
+derived) at 10; consumables at the 🟡 §14d.3 provisional E=9 (the ruled ~6
+proved a round-trip faucet — designer pick open); shop sort/filter + in-shop
+tooltips with worth lines; WW↔Ashfall edge removed (no shelf moved);
+SnackBars abolished for top-center banners + two dialogs; the Users/
+Characters storage restructure (see the deferred-section note) ships with
+release 3 + its rules deploy.
+
 ✅ **2026-08-25: the NPC shop economy is built** from
 `docs/contracts/ECONOMY_CONTRACT.md` (all decisions ruled): personal
 per-character shops, one per town (5 open, 4 closed until their quarters),
@@ -1104,7 +1113,10 @@ stats; ✅ the login content-version gate is live and seeded):
   encounter, not that you beat it), per-element **charge counts** are not
   tracked, and neither is lifetime gold earned. All are worth adding
   regardless of achievements.
-  ⚠️ Also surfaces an unmade architectural decision — **character vs
+  ✅ **The character-vs-account split is BUILT (2026-08-26)**: users/{uid}
+  + characters/main + per-town storeroom/shopStock subcollection docs,
+  auto-migration on sign-in, legacy players/ kept as dead backup. Alternate
+  modes now have their foundation. ⚠️ Was: an unmade decision — **character vs
   account**. `PlayerProfile` is currently both. Progress and achievements are
   ruled **character-level**, and the alternate modes in GAME_DESIGN §5
   (permadeath, no-trading) depend on the split. Cheapest to do before more
