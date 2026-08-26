@@ -1061,6 +1061,28 @@ attack riders, and **COUNTER** every mechanic so nothing is oppressive.
    ~20–35-turn duels: a buff is a fight-shaping commitment, not a
    2–3-turn tactical blink.
 
+### Priority lanes & global clamps ✅ (ruled 2026-08-26)
+
+**Aux splits into two lanes.** The shipped ladder is shields **3** · quick
+attacks **5** · aux **7** · offense **9**. Ruling: aux spells that target
+the ENEMY (debuff granters, enemy-status surgery) move to a new
+**aux-offense** lane at priority **8** — slower than **aux-defense** (7,
+self-targeting), still faster than a real attack. Your debuff lands before
+their attack resolves; their self-stance lands before your debuff does.
+
+⚠️ Consistency flag from the review: shipped **Discharge** (wipes enemy
+charge) and **Overload** (damage per enemy charge) sit at prio 7 but target
+the enemy — candidates to reclassify to 8. Changes shipped ordering
+interactions (Quicken/Jolt races), so it's a ruling, not a cleanup.
+
+**Hit-chance floor** — instead of capping dodge or accuracy separately,
+clamp the OUTPUT: after spell accuracy + caster accuracy − target dodge at
+time of resolution, final hit chance floors at **10%** (ceiling 100%; only
+Unerring literally cannot miss). No component caps needed for players.
+
+**Deflect clamps** — activation chance caps at **90%**, and the deflected
+fraction caps at **90%**. There is always a sliver that lands.
+
 ### STATUS SETS — one named status per axis, 1–3 spells as price points
 
 **Lightfoot** — dodge, `+N`. *(Christian's worked example, verbatim.)*
@@ -1084,14 +1106,20 @@ attack riders, and **COUNTER** every mechanic so nothing is oppressive.
 **Murk** — enemy accuracy, `−N` (debuff; stacks with the element lane's Blind).
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Murk** | 1 · aux | Murk −15 accuracy, 10 turns |
-| **Befog** | 3 · aux | Murk −25 accuracy, 20 turns |
+| **Murk** | 1 · aux-off | Murk −15 accuracy, 10 turns |
+| **Befog** 📝 | 3 · aux-off | Murk −25 accuracy, 20 turns |
+
+📝 *Befog rename pending — candidates on the table: Shroud, Pall, Gloam,
+Miasma, Smokescreen.*
 
 **Keen** — crit chance, `+N%`.
 | Spell | Cost · prio | Grants |
 |---|---|---|
 | **Keen** | 2 · aux | Keen +15% crit chance, 12 turns |
-| **Wicked Grin** | 4 · aux | Keen +25% crit chance, 30 turns |
+| **Wicked Grin** 📝 | 4 · aux | Keen +25% crit chance, 30 turns |
+
+📝 *Wicked Grin rename pending (two words with no whimsy license claimed) —
+candidates: Ruthless, Cutthroat, Vicious, Malice, Sinister.*
 
 **Heavyhand** — crit damage, `+N`.
 | Spell | Cost · prio | Grants |
@@ -1100,71 +1128,169 @@ attack riders, and **COUNTER** every mechanic so nothing is oppressive.
 | **Overkill** | 4 · aux | Heavyhand +50 crit damage, 30 turns |
 
 **Mending** — heal over time, `N% max HP/turn` (spell lane; a Tonic and
-Photosynthesis are other lanes and tick alongside).
+Photosynthesis are other lanes and tick alongside). *(Retuned 2026-08-26 —
+the first draft's Renewal healed 135% of max HP over its life, which is not
+a spell, it's a resurrection on layaway. Now 18% and 50% totals, sitting
+just under the equivalent-cost shields.)*
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Mend** | 2 | Mending 6%/turn, 6 turns |
-| **Renewal** | 4 | Mending 9%/turn, 15 turns |
+| **Mend** | 2 | Mending 3%/turn, 6 turns (18% total) |
+| **Renewal** | 4 | Mending 5%/turn, 10 turns (50% total) |
 
-**Wither** — enemy healing received, `−N%` (debuff; the anti-heal predator —
+**Wither** — enemy healing received, `−N%` (debuff; the anti-heal tax —
 HoTs, Regrow, potions, the Drain line, everything. ⚠️ First spell touching
-the potion lane; spec deliberately).
+the potion lane; spec deliberately). *(Blight promoted out of this set
+2026-08-26 — Wither is a solo spell for now; 📝 the tier-2 slot is open if
+the set wants a −70–80% price point later.)*
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Wither** | 2 · aux | Wither −50% healing received, 10 turns |
-| **Blight** | 4 · aux | Wither −80% healing received, 20 turns |
+| **Wither** | 2 · aux-off | Wither −50% healing received, 10 turns |
+
+**Blight** — binary debuff: the target's heals deal DAMAGE instead of
+healing. Applies to HoTs, consumables, Photosynthesis, and ⚠️ *(note
+truncated — presumed lifesteal (Sap/Leech/Drain); NEEDS the ruling)*.
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Blight** | 4 · aux-off | Blight, 20 turns |
+
+⚠️ Two edges to rule before build: (a) **Wither × Blight ordering** — if
+Wither reduces first and Blight inverts what's left, stacking your own two
+debuffs makes Blight WEAKER (an anti-synergy players will call a bug);
+proposal: Blight supersedes Wither entirely while both are up. (b) Against
+an opponent with nothing ticking, Blight is pure denial (they simply don't
+heal) — its teeth only show against already-running HoTs and forced ticks
+(Photosynthesis can't be switched off). That's good punish design, but it
+means the AI must not cast heals into it.
+
+**Reflect** — deflected damage is returned to the attacker. *(New
+2026-08-26.)* The first status with a hard dependency: a dead slot without
+a Divert-family source under it (spell, gear, or enemy innate).
+| Spell | Cost · prio | Grants |
+|---|---|---|
+| **Reflect** | 4 · aux | Reflect, 25 turns |
+
+📝 Magnitude open: proposal is 100% of the deflected amount comes back
+(with Divert 20/40 that's an expected 8% of incoming damage returned per
+hit — modest until the deflect stat grows; at the 90/90 caps it's 81%,
+which is why the caps exist).
 
 **Stalwart** — own shield strength, `+N%`.
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Stalwart** | 2 · aux | Stalwart +25% shield strength, 15 turns |
+| **Stalwart** | 3 · aux | Stalwart +25% shield strength, 25 turns |
 
 **Composure** — binary: incoming crits resolve as normal hits.
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Composure** | 2 · aux | Composure, 12 turns |
+| **Composure** | 2 · aux | Composure, 25 turns |
 
 **Bloodlust** — the kept-open clause in action: one spell, TWO statuses.
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Bloodlust** | 5 · aux | Keen +20% AND Heavyhand +40, 8 turns — the all-in window, overriding both existing instances |
+| **Bloodlust** | 5 · aux | Keen +20% AND Heavyhand +40, 12 turns — the all-in window, overriding both existing instances |
 
-### EXPLOIT — attacks that ride the new rolls (no statuses granted)
+### NEXT-ATTACK BUFFS — the Phase pattern ✅ (ruled 2026-08-26)
+
+Shipped **Phase** (3c, aux) already IS this shape: a self-buff making the
+next offensive attack ignore shields. Unerring and Pierce were drafted as
+attacks; re-ruled to join Phase as siblings — one clean trio, one bypass
+each:
+
+| Spell | Cost · prio | Next offensive attack... |
+|---|---|---|
+| **Phase** *(shipped)* | 3 · aux | ...ignores shields/Barrier |
+| **Pierce** | 3 · aux | ...cannot be deflected (Divert never rolls) |
+| **Unerring** | 3 · aux | ...cannot miss — ignores dodge and accuracy debuffs |
+
+⭐ Why buffs, not attacks: as attacks they needed damage bands nobody had
+priced; as riders they combo with ANY attack in the book (Unerring +
+Cataclysm is the payoff fantasy) and Phase proves the pattern ships.
+
+### ATTACKS — true offense (prio 9) with a rider
 
 | Spell | Cost | Effect |
 |---|---|---|
-| **Unerring** | 3 | Damage that cannot miss and ignores dodge (deflect still applies). The Lightfoot answer. |
-| **Pierce** | 3 | Damage ignoring deflection entirely (dodge still applies). The Divert answer — and PvE's Quarry-Sentinel counter. |
 | **Shatter** | 4 | Damage; the target's Divert-family status BREAKS (removed), reduced or not. Patience meets a hammer. |
 | **Execute** | 5 | Guaranteed crit below 35% HP; otherwise ordinary. The finisher that makes Heavyhand worth holding. |
+
+📝 Both need damage bands. Proposal: the rider discounts one cost tier —
+Shatter at the Surge band (31–39), Execute at the Ruin band (44–53).
+📝 Also open: should these convert to next-attack buffs too? Kept as
+attacks for now — a break and a finisher read as HITS, and Execute's
+<35%-HP condition wants to be checked at impact, not at buff time.
 
 ### INSTANTS — status surgery, no duration
 
 | Spell | Cost · prio | Effect |
 |---|---|---|
-| **Fester** | 3 | Small hit; every DoT status on the target gains +2 ticks — feeds on whatever is burning. |
-| **Scour** | 1 · aux | Take one tick of each of your DoTs NOW; remove them all. Cleansing with a cost. |
-| **Dispel** | 3 · aux | Strip the target's buffs (polarity: buff, all strippable lanes). The meta-leash on stance-stacking itself. |
+| **Fester** | 2 · aux-off | Small hit; every DoT status on the target gains +4 ticks — feeds on whatever is burning. |
+| **Scour** ⚠️ | 1 · aux | *(Note #7 truncated mid-spec — prior draft stands until re-ruled: take one tick of each of your own DoTs NOW; remove them all. The fragment "1 spell offensive aux that causes…" suggests a flip to enemy-targeting, possibly detonate-a-tick; NEEDS the rest of the sentence.)* |
+| **Dispel** | 4 · aux-off | Strip the target's buffs (polarity: buff, all strippable lanes). The meta-leash on stance-stacking itself. |
+| **Meditate** | 2 · aux | *(New 2026-08-26.)* Every buff you have gains +5 turns. Fester's mirror — one feeds your DoTs on them, one feeds your stances. |
 
 ### The counter-web, at a glance
 
 Lightfoot ⟶ Unerring, softened by Truesight · Divert ⟶ Pierce, broken by
-Shatter · Keen/Heavyhand/Execute ⟶ blanked by Composure, soaked by Divert ·
-Mending/Photosynthesis/potions ⟶ starved by Wither · DoTs/Fester ⟶ burned
-out by Scour · Murk/Blind ⟶ cleansed by Truesight · stance-stacking itself
-⟶ stripped by Dispel. ⭐ Every mechanic has an answer that is not "win
-faster," and every answer costs something.
+Shatter, punished-in-reverse by Reflect (attacking into a deflect stance
+now costs blood, not just damage) · Keen/Heavyhand/Execute ⟶ blanked by
+Composure, soaked by Divert · Mending/Photosynthesis/potions ⟶ taxed by
+Wither, inverted by Blight · DoTs/Fester ⟶ burned out by Scour ·
+Murk/Blind ⟶ cleansed by Truesight · stance-stacking + Meditate ⟶ stripped
+by Dispel (Meditate raises the stakes of the stance game; Dispel is why it
+isn't free). ⭐ Every mechanic has an answer that is not "win faster," and
+every answer costs something.
 
-📝 26 spells in the bank — the same size as the shipped book, which feels
-like the right order of magnitude for a generation.
+📝 28 spells in the bank (rev 2 added Reflect and Meditate) — slightly
+larger than the shipped book of 25, still the right order of magnitude
+for a generation.
+
+### Unlock placements 📝 DRAFT (needs red-pen — PROGRESSION §4 holds the shipped table)
+
+Principles: nothing before its charge cap (4c ≥ L20, 5c ≥ L40, per the cap
+schedule); no counter before the thing it counters; the stat game opens
+with Kinetic (L15), where dodge/deflect/crit gear and enemies live; the
+empty L45 bucket gets a resident. Unlock enforcement is currently OFF for
+playtesting — this is the schedule for when it turns on.
+
+| Level | New spells (+n) | Why here |
+|---|---|---|
+| **10** | Glance, Mend (+2) | First taste: a sliver of deflect, the first HoT — one new idea each. |
+| **15** | Lightfoot, Truesight, Murk (+3) | The accuracy/dodge triangle opens WITH Tier 2, where the stats debut on gear and enemies. |
+| **20** | Keen, Heavyhand, Stalwart, Wither (+4) | The crit lane arrives as a pair; Wither lands after Mend so sustain has a predator. |
+| **25** | Divert, Hawkeye, Befog, Composure, Fester (+5) | Tier-2 price points; Composure answers the L20 crit lane; Fester feeds on elements' DoTs. |
+| **30** | Unerring, Pierce, Scour, Meditate (+4) | The answer package — Pierce and Unerring join their shipped sibling Phase, which already unlocks at L30. |
+| **35** | Twinkle Toes, Wicked Grin, Overkill, Renewal, Shatter (+5) | The long-stance generation, beside the existing L35 utility spike. |
+| **40** | Bloodlust, Execute, Blight, Dispel (+4) | The 5c cap opens; the hard counters (Blight, Dispel) arrive once stances are the meta. |
+| **45** | Reflect (+1) | Ethereal's opening gift — the L45 bucket is no longer empty. |
 
 ### Open decisions before any of this builds
 
-1. **Player dodge/deflect caps** — enemies cap dodge at 10 (ENEMIES §2.5); Lightfoot hands players 15–20 plus gear. PvP needs the ruling.
-2. **The two engine seams** — stat derivation, and polarity on every status (with the classification pass over shipped statuses).
-3. **HUD** — every status set needs a pip + animation entry (the build-fails-if-undocumented test will enforce it, correctly).
-4. **AI awareness** — LadderAi is effect-blind; this bank widens the player-enemy gap. The Phase-6 fork, sharper again.
-5. **Loadout pressure** — 26 spells vs the 10-slot cap is the point (§5.7), but set-siblings (Lightfoot/Twinkle Toes) as separate slots vs one upgrading slot still needs a ruling.
+✅ *Resolved 2026-08-26:* dodge/deflect caps → replaced by the OUTPUT
+clamps above (10% hit floor, 90/90 deflect) — no per-stat player caps.
+HUD → follow the existing pip conventions, one entry per status set.
+Loadout → 10 slots stands; set-siblings compete for slots like everything
+else — the squeeze is the design. Engine seams → deferred to the
+implementation phase by ruling. AI awareness → direction ruled: poker-style
+EV heuristics — a DoT's value is its total remaining damage times a
+time-discount; crit stances are expected-damage-boost minus a volatility
+discount; every status gets a number so LadderAi can compare unlike things.
+
+Still open:
+1. **Scour's real spec** — note #7 arrived truncated ("a 1 spell offensive
+   aux that causes…"); prior self-cleanse draft stands in the table until
+   the sentence finishes.
+2. **Blight's full target list** — note #10 truncated after
+   "Photosynthesis, and"; lifesteal (Sap/Leech/Drain) presumed, unruled.
+   Plus the Wither × Blight ordering edge (supersede vs stack).
+3. **Renames** — Befog and Wicked Grin candidates listed at their sets.
+4. **Reflect magnitude** — 100% of deflected amount proposed.
+5. **Shatter/Execute damage bands** — one-tier discount proposed
+   (Surge/Ruin bands); and whether they too become next-attack buffs.
+6. **Wither's empty tier-2 slot** — does the set want a −70–80% price
+   point now that Blight left?
+7. **Discharge/Overload lane** — reclassify shipped prio-7 enemy-targeting
+   auxes to aux-offense 8, or grandfather them?
+8. **Unlock draft above** — needs the red-pen pass.
 
 ---
 
