@@ -1140,11 +1140,14 @@ just under the equivalent-cost shields.)*
 **Wither** — enemy healing received, `−N%` (debuff; the anti-heal tax —
 HoTs, Regrow, potions, the Drain line, everything. ⚠️ First spell touching
 the potion lane; spec deliberately). *(Blight promoted out of this set
-2026-08-26 — Wither is a solo spell for now; 📝 the tier-2 slot is open if
-the set wants a −70–80% price point later.)*
+2026-08-26; ✅ a proper tier 2 approved same day at 4c/30 turns — and
+✅ ruled: **the Wither status is ALWAYS −50%** — the tier 2 buys triple
+the DURATION, never more depth. 📝 The name Atrophy is a provisional
+fill: alternatives Rot, Decay, Canker.)*
 | Spell | Cost · prio | Grants |
 |---|---|---|
 | **Wither** | 2 · aux-off | Wither −50% healing received, 10 turns |
+| **Atrophy** 📝 | 4 · aux-off | Wither −50% healing received, 30 turns |
 
 **Blight** — binary debuff: the target's heals deal DAMAGE instead of
 healing. Applies to HoTs, consumables, Photosynthesis, AND lifesteal
@@ -1258,21 +1261,21 @@ turns vs ~93 for Surge+Surge+Blast in 3. Designer's read: "a unique way
 to play" — and a Pyro loadout can sneak Ignite in as a third DoT to
 really get cooking. Swingy by design; sim still gets a vote on the bands.
 
-**Cleanse & Purify** 📝 *(proposed 2026-08-26, filling the hole Scour's
-defection opened — nothing removed your own DoTs/debuffs in the spell
-lane. Sanctus note: once the polarity pass classifies Agony/Torment/
-Blight/Murk as debuffs, Absolution's random-debuff purge and Grace's
-prevention cover them FOR FREE — the element lane's answer already
-exists; these are the element-agnostic price points beside it.)*
+**Cleanse & Purify** ✅ *(proposed and APPROVED 2026-08-26, filling the
+hole Scour's defection opened — nothing removed your own DoTs/debuffs in
+the spell lane. Sanctus note: once the polarity pass classifies Agony/
+Torment/Blight/Murk as debuffs, Absolution's random-debuff purge and
+Grace's prevention cover them FOR FREE — the element lane's answer
+already exists; these are the element-agnostic price points beside it.)*
 | Spell | Cost · prio | Effect |
 |---|---|---|
-| **Cleanse** 📝 | 2 · aux | Remove ONE debuff of your choice from yourself (DoT statuses included). |
-| **Purify** 📝 | 5 · aux | Remove ALL debuffs from yourself. The full reset — and at 5c, Discharge-starvation applies, same as Shatter. |
+| **Cleanse** | 2 · aux | Remove ONE debuff of your choice from yourself (DoT statuses included). |
+| **Purify** | 5 · aux | Remove ALL debuffs from yourself. The full reset — and at 5c, Discharge-starvation applies, same as Shatter. |
 
-⚠️ Trade math to accept before ✅: Cleanse answers Blight (4c) for 2c —
-fine, because Blight is pure denial once answered; but cheap debuffs win
-the attrition war (Murk 1c re-applies for less than Cleanse removes it),
-so Cleanse is for the big commitments, not the chip. Purify at 5c vs
+⭐ Trade math accepted with the approval: Cleanse answers Blight (4c) for
+2c — fine, because Blight is pure denial once answered; but cheap debuffs
+win the attrition war (Murk 1c re-applies for less than Cleanse removes
+it), so Cleanse is for the big commitments, not the chip. Purify at 5c vs
 Dispel at 4c is intentional asymmetry: Dispel is tempo-offense, Purify is
 recovery. Cleanse's "of your choice" needs a small pick-a-status UI at
 build time.
@@ -1286,15 +1289,15 @@ Divert) ⟶ Shatter, which Discharge in turn answers by starving the 5c ·
 Keen/Heavyhand/Execute/Death Wish ⟶ blanked by Composure, soaked by Divert ·
 Mending/Photosynthesis/potions/lifesteal ⟶ taxed by Wither, inverted by
 Blight · Agony/Torment/Fester patience ⟶ collected early by Scour, shed
-by Cleanse/Purify 📝 · Murk/Blind ⟶ cleansed by Truesight · stance-stacking
+by Cleanse/Purify · Murk/Blind ⟶ cleansed by Truesight · stance-stacking
 + Meditate ⟶ stripped by Dispel (Meditate raises the stakes of the stance
 game; Dispel is why it isn't free). ⭐ Every mechanic has an answer that is
 not "win faster," and every answer costs something.
 
-📝 33 spells in the bank (rev 2 added Reflect + Meditate; rev 3 added
-Agony, Torment, and Death Wish; rev 4 proposed Cleanse + Purify) — larger
-than the shipped book of 25, still the right order of magnitude for a
-generation.
+📝 34 spells in the bank (rev 2 added Reflect + Meditate; rev 3 added
+Agony, Torment, and Death Wish; rev 4 added Cleanse + Purify; rev 5 gave
+Wither its tier 2, Atrophy 📝) — larger than the shipped book of 25,
+still the right order of magnitude for a generation.
 
 ### Unlock placements 📝 DRAFT (needs red-pen — PROGRESSION §4 holds the shipped table)
 
@@ -1304,7 +1307,7 @@ with Kinetic (L15), where dodge/deflect/crit gear and enemies live; the
 empty L45 bucket gets a resident. Unlock enforcement is currently OFF for
 playtesting — this is the schedule for when it turns on.
 
-*(Draft revised for the rev-4 list — 33 spells. Christian red-pens this
+*(Draft revised for the rev-5 list — 34 spells. Christian red-pens this
 AFTER the spell list itself is final, by ruling 2026-08-26.)*
 
 | Level | New spells (+n) | Why here |
@@ -1314,7 +1317,7 @@ AFTER the spell list itself is final, by ruling 2026-08-26.)*
 | **20** | Keen, Heavyhand, Steadfast, Wither, Torment (+5) | The crit lane arrives as a pair; Wither lands after Mend so sustain has a predator; the long burn joins the quick one. |
 | **25** | Divert, Hawkeye, Miasma, Composure, Fester, Cleanse (+6) | Tier-2 price points; Composure answers the L20 crit lane; Fester arrives with two DoTs already unlockable to feed it; Cleanse once there's enough to cleanse. |
 | **30** | Unerring, Pierce, Scour, Meditate, Death Wish (+5) | The answer package — Pierce and Unerring join their shipped sibling Phase (already L30); Scour after both DoTs exist; Death Wish once duels are long enough to get desperate. |
-| **35** | Twinkle Toes, Ardent, Overkill, Renewal, Execute (+5) | The long-stance generation, beside the existing L35 utility spike; Execute lands with the matured crit lane. |
+| **35** | Twinkle Toes, Ardent, Overkill, Renewal, Execute, Atrophy (+6) | The long-stance generation, beside the existing L35 utility spike; Execute lands with the matured crit lane; Atrophy once Renewal-scale sustain exists to tax. |
 | **40** | Bloodlust, Shatter, Purify, Blight, Dispel (+5) | The 5c cap opens (Bloodlust, Shatter, Purify); the hard counters (Blight, Dispel) arrive once stances are the meta. |
 | **45** | Reflect (+1) | Ethereal's opening gift — the L45 bucket is no longer empty. |
 
@@ -1339,15 +1342,17 @@ Execute = 4c at the 3c band, crit <30% · Discharge → 8, Overload → 9.
 whimsy license) and dropped to 2c · Fester 2c/+4 confirmed against the EV
 math · Rend renamed Agony at 6/turn · Torment confirmed as-is.
 
+✅ *Also resolved 2026-08-26 (rev 5):* Cleanse & Purify APPROVED, trade
+math and all · Wither gets its tier 2 at 4c/30 turns.
+
+✅ *And the follow-up ruling:* the Wither status is always −50% — Atrophy
+buys duration (30t vs 10t), never depth.
+
 Still open:
-1. **Cleanse & Purify** 📝 — proposed to fill the self-cleanse hole
-   (specs and trade math at their table); need the ✅, plus the
-   Sanctus-polarity note confirms Absolution/Grace cover the new debuffs
-   for free once classification lands.
-2. **Wither's empty tier-2 slot** — does the set want a −70–80% price
-   point now that Blight left?
-3. **Agony/Torment damage bands** — provisional until a balance-sim run.
-4. **Unlock draft above** — red-pen AFTER the spell list is final (ruled).
+1. **Atrophy's name** 📝 — provisional fill for the approved 4c/30t
+   Wither tier 2 (alternatives at the set).
+2. **Agony/Torment damage bands** — provisional until a balance-sim run.
+3. **Unlock draft above** — red-pen AFTER the spell list is final (ruled).
 
 ⭐ **Build-time test ledger** (mutation-verified, per convention — grows as
 rulings land):
