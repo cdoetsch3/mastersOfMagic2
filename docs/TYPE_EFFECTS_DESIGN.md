@@ -1234,46 +1234,66 @@ concurrently; recasting one refreshes it, law 5.)*
 
 | Spell | Cost | Effect |
 |---|---|---|
-| **Agony** | 2 | 10–13 damage + **Agony** status: 6 damage/turn for 3 turns. The quick bleed — fully paid out in 3 turns (~29.5 total vs Blast's ~23; the delay is the price of the surplus). *(✅ Renamed from "Rend" and ticked up from 5/turn "to make sure it's worth the wait", 2026-08-26.)* |
-| **Torment** | 3 | 8–10 damage + **Torment** status: 4 damage/turn for 9 turns. The long burn (~45 total vs Surge's ~35) — big surplus, long exposure to the duel ending first. Scour is how you collect early. |
+| **Agony** | 2 | 10–13 damage + **Agony** status: 7 damage/turn for 3 turns. The quick bleed — fully paid out in 3 turns (~32.5 total vs Blast's ~23; the delay is the price of the surplus). *(✅ Renamed from "Rend"; tick settled at 7 via the +1/+1 ruling 2026-08-28 — the +2 version made it an every-loadout auto-include.)* |
+| **Torment** | 3 | 8–10 damage + **Torment** status: 5 damage/turn for 9 turns. The long burn (~54 total vs Surge's ~35) — big surplus, long exposure to the duel ending first, and the fat target Cleanse exists to answer. Scour is how you collect early. *(✅ Tick settled at 5 via the +1/+1 ruling 2026-08-28.)* |
 | **Execute** | 4 | 31–39 damage (the 3-cost band — the rider is the discount); **100% crit when the target is below 30% HP**. The finisher that makes Heavyhand worth holding. |
 
-📝 Agony/Torment damage bands are provisional pending a balance-sim run
-(the Fester average/best-case pass is ✅ done and confirmed — see below).
+✅ Agony/Torment ticks RULED at 7/5 (2026-08-28, the "+1/+1" call — the
+tempo crunch is in the EV note below); the balance sim validates at build
+time rather than gating the design.
+
+✅ **Tick-resolution ruling (2026-08-28): a DoT tick is just DAMAGE** —
+it resolves through the same pipeline as an attack's damage: shield
+first, and Divert can deflect it (Reflect returns what it deflects).
+But ticks are still not HITS (Rev 2 law stands): no accuracy/dodge roll
+— they cannot miss — no crits, and no on-hit procs. Scour's detonation
+is one combined damage packet through this same pipeline. Balance
+consequence, accepted: shields and deflect stances soak DoT pressure,
+which is exactly the turtle-vs-bleed texture the counter-web wants.
 
 ### INSTANTS — status surgery, no duration
 
 | Spell | Cost · prio | Effect |
 |---|---|---|
-| **Fester** | 2 · aux-off | Small hit; every DoT status on the target gains +4 ticks — feeds on whatever is burning. ✅ *2c/+4 CONFIRMED after the EV pass below.* |
+| **Fester** | 1 · aux-off | Small hit; every DoT status on the target gains +3 ticks — feeds on whatever is burning. ✅ *LOCKED at 1c/+3 by ruling 2026-08-28 (from 2c/+4): the 2-turn cycle is what lets Fester land inside Agony's 3-tick window — see the EV note.* |
 | **Scour** | 1 · aux-off | ✅ *(Re-ruled 2026-08-26 — flipped from self-cleanse to detonator.)* Every DoT on the ENEMY resolves all its remaining ticks NOW as one combined hit; the DoT statuses are consumed. The collection agency for Agony/Torment/Fester patience. |
 | **Shatter** | 5 · aux-off | ✅ *(Re-ruled 2026-08-26.)* No damage. Clears ALL of the target's shields, Barrier, and Divert-family status. THE turtle counter — priced at 5 deliberately, so a turtle smart enough to bring Discharge can keep Shatter off the table by wiping the charge climb. |
 | **Dispel** | 4 · aux-off | Strip the target's buffs (polarity: buff, all strippable lanes). The meta-leash on stance-stacking itself. |
 | **Meditate** | 2 · aux | Every **turn-timed** buff you have gains +5 turns. ✅ *Boundary ruled 2026-08-26: touches only buffs on a turn timer — next-attack riders (Phase/Pierce/Unerring/Empower) and other untimed buffs are exempt, or a 2c spell starts banking Empowers.* Fester's mirror — one feeds your DoTs on them, one feeds your stances. |
 
-✅ **Fester EV note (2c/+4 confirmed 2026-08-26; RECALIBRATED 2026-08-28
-after a designer correction — each charge takes a TURN, plus a turn to
-cast, so the metric is damage per TURN, not per charge):**
+✅ **DoT-archetype EV note (FINAL 2026-08-28, three rounds of designer
+recalibration deep — the metric is damage per TURN, since every charge
+takes a turn and the cast takes one more):**
 
-- The full line Agony→Torment→Fester→Scour is 8 charge + 4 casts =
-  **12 turns**, not the 4 the first pass implied.
-- Attack baselines per turn (cost+1 turns per cycle): Cataclysm ~10.9 ·
-  Ruin ~9.7 · Surge ~8.75 · Blast ~7.7.
-- **Sequencing truth: Fester almost never catches Agony.** Agony's
-  3-tick window closes in 3 turns; Fester needs 2 charge turns + a cast
-  after Agony lands. Even pre-banking at cap, one Fester catches EITHER
-  a fresh Agony (+24) OR Torment (+16) — never both. Torment is Fester's
-  true partner; Agony is the tempo-filler. The "+40 for one Fester" case
-  needs a live Ignite — which the line can legitimately fish for by
-  paying its casts with Pyro charge (10% proc per charge spent).
-- Honest line total: ~95 damage over 12 turns ≈ **8/turn** — Surge
-  tempo, BELOW Ruin/Cataclysm cycling. What keeps it viable: ticks land
-  during your own charge turns, the damage arrives smoothly instead of
-  in bursts, and Scour converts the back-loaded tail into now.
+- Attack baselines per invested turn (cost+1 turns per cycle):
+  Cataclysm ~10.9 · Ruin ~9.7 · Surge ~8.75 · Blast ~7.7 · Bolt ~6.25.
+- **Fester at 1c/+3 fits inside Agony's window** — cast Agony, charge,
+  cast Fester: 2-turn cycle vs the 3-tick life. (At the old 2c it
+  arrived exactly as Agony died; that, not generosity, is why 1c is the
+  locked cost.) Marginals per cast: on Torment **10/turn** (Ruin par),
+  on fresh Agony **13/turn** (the narrow timing-window jackpot), both
+  at once ~20/turn for the one cast after a full banked opener.
+- **The dream line** (bank 5 → Torment → Agony → Fester catches both →
+  Scour collects) ≈ 127 damage by turn 11 ≈ **11.6/turn — just above
+  Cataclysm cycling**, from L20–30 spells, gated by a 5-turn bank,
+  perfect sequencing, back-loading, and Cleanse/Purify exposure. That
+  is the intended ceiling: the dedicated archetype narrowly beats the
+  generic nuke plan and only while unanswered. (The +2/+2 tick draft
+  hit 13.2/turn — 21% OVER Cataclysm — and made Agony a universal
+  auto-include at 11.8/turn solo; +1/+1 was chosen instead.)
+- Solo pieces: Agony ~10.8/turn invested with a 2-turn tail; Torment
+  ~13.5 raw, ~10 after discounting duel-end and Cleanse risk across
+  its 9-turn exposure.
+- Fester-only spam sustains ~7.5/turn (net +1 tick inventory per
+  cycle keeps Torment immortal but feeble) — below Ruin, ended by one
+  Cleanse. Not degenerate.
 
-⭐ Verdict after recalibration: tempo-PAR with utility, not degenerate —
-Fester's 2c/+4 is justified and arguably necessary. Designer's read
-stands: "a unique way to play." Sim still gets a vote at build time.
+⚠️ **PvE watch item:** campaign enemies and LadderAi never cleanse, so
+the line's ceiling goes unanswered in PvE. Watch DoT-line dominance in
+campaign playtests; the AI-awareness EV work should teach enemies with
+cleanse-shaped tools to use them, and enemy design may want the
+occasional cleanser. Designer's read stands: "a unique way to play."
+Sim validates the bands at build time.
 
 **Cleanse & Purify** ✅ *(proposed and APPROVED 2026-08-26, filling the
 hole Scour's defection opened — nothing removed your own DoTs/debuffs in
@@ -1367,6 +1387,12 @@ Agony/Torment bands approved · unlock order and roster approved with no
 notes · Fester tempo math recalibrated to turns-not-charges (designer
 correction; see the EV note).
 
+✅ *Resolved 2026-08-28 (rev 7 — post-close tuning):* Fester LOCKED at
+1c/+3 · Agony/Torment ticks settled at 7/5 (the "+1/+1" call — the
++2/+2 draft overshot once the cheap Fester stacked under it) · ruled:
+DoT ticks are DAMAGE (shield-first, deflectable) but never HITS (no
+miss, no crit, no procs).
+
 **✅ NONE STILL OPEN — the bank is DESIGN-FINAL: 34 spells, ruled and
 placed.** What remains is build-phase work, in order: version bump to 4
 opens the batch (standing rule) → the two engine seams (stat derivation;
@@ -1394,6 +1420,13 @@ rulings land):
   damage (the rider is a debuff; the damage isn't).
 - Cleanse removes exactly the chosen debuff, DoT statuses included;
   Purify removes all debuffs and nothing else (buffs and neutrals stay).
+- A DoT tick resolves shield-first, and Divert can deflect it (Reflect
+  returns the deflected portion) — but a tick never misses, never
+  crits, and triggers no on-hit effects.
+- Scour's detonation resolves as ONE combined damage packet through the
+  same shield/deflect pipeline (one Divert roll, not one per DoT).
+- Fester cast on the turn of Agony's final tick still catches it (aux-
+  offense prio 8 resolves before the end-phase tick expires the status).
 
 ---
 
