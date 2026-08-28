@@ -235,7 +235,88 @@ abstract final class StatusCatalog {
       lingers: true,
     ),
 
+    // ---- Banked STAT STANCES (TYPE_EFFECTS §7a) -------------------------
+    // ⭐ One entry per SET, never per spell: Lightfoot and Twinkle Toes are two
+    // prices for the status below, so the guide describes the stance once and
+    // the numbers belong to whichever cast is running. Each description says
+    // that casting the other price point replaces it, because "last cast wins"
+    // is the rule players most need told (§7a law 5).
+    StatusInfo(
+      id: 'lightfoot',
+      name: 'Lightfoot',
+      description:
+          'Attacks against you are less likely to land. How much dodge, and '
+          'for how long, is set by the spell that granted it — casting either '
+          'Lightfoot spell replaces the other outright. No attack can ever be '
+          'driven below a 10% chance to hit you.',
+      trigger: 'Casting Lightfoot or Twinkle Toes.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'divert',
+      name: 'Divert',
+      description:
+          'Incoming hits sometimes glance off you. It carries two numbers: how '
+          'often a deflection fires, and how much of the hit it removes — each '
+          'capped at 90%, so there is always a sliver that lands. Casting '
+          'either Divert spell replaces the other outright.',
+      trigger: 'Casting Glance or Divert.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'truesight',
+      name: 'Truesight',
+      description:
+          'Your spells are more accurate for as long as it lasts, and the cast '
+          'that grants it clears a Blind on the spot. It does not stop the '
+          'next one: a fresh Blind lands on you as normal. Casting either '
+          'Truesight spell replaces the other outright.',
+      trigger: 'Casting Truesight or Hawkeye.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'keen',
+      name: 'Keen',
+      description:
+          'Your attacks crit more often. Worth nothing against an opponent '
+          "holding Composure, which resolves your crits as ordinary hits. "
+          'Casting either Keen spell replaces the other outright.',
+      trigger: 'Casting Keen or Ardent.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'heavyhand',
+      name: 'Heavyhand',
+      description:
+          'Your crits hit harder, on top of the 50% extra a crit already '
+          'deals. It does nothing at all until something is critting, so it '
+          'wants crit chance beside it. Casting either Heavyhand spell '
+          'replaces the other outright.',
+      trigger: 'Casting Heavyhand or Overkill.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+
     // ---- Moments: things that happen, rather than conditions ------------
+    StatusInfo(
+      id: 'blindLifted',
+      name: 'Blind lifted',
+      description:
+          'The clarity burns the Blind away — your spells stop missing for it.',
+      trigger: 'Casting Truesight or Hawkeye while Blinded.',
+      kind: StatusKind.moment,
+      element: null,
+      lingers: false,
+    ),
     StatusInfo(
       id: 'absolutionRising',
       name: 'Absolution rising',

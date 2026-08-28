@@ -1,3 +1,4 @@
+import 'bank_stances.dart';
 import 'spell.dart';
 
 /// The starter spell catalog.
@@ -143,6 +144,102 @@ abstract final class Spellbook {
       id: 'hallow', name: 'Hallow', chargeCost: 1, priority: 7,
       effect: HallowEffect());
 
+  // ======================================================================
+  // ⬇⬇ BANKED STAT STANCES — TYPE_EFFECTS §7a "STATUS SETS" ⬇⬇
+  // Ten self-targeting aux spells, five sets, two price points each. Every
+  // one grants a status through the derivation seam; none of them touches a
+  // base stat. See bank_stances.dart for the statuses and the replace rule.
+  //
+  // ⚠️ **Deliberately NOT in [all] yet** — see the note above that list.
+  // ======================================================================
+
+  /// **Lightfoot** — dodge. The cheap stance and the long one.
+  static const lightfoot = Spell(
+      id: 'lightfoot', name: 'Lightfoot', chargeCost: 2,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(
+          statusId: 'lightfoot', grant: LightfootStatus.lightfoot));
+  static const twinkleToes = Spell(
+      id: 'twinkleToes', name: 'Twinkle Toes', chargeCost: 4,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(
+          statusId: 'lightfoot', grant: LightfootStatus.twinkleToes));
+
+  /// **Divert** — the deflect pair (activation %, damage deflected %).
+  static const glance = Spell(
+      id: 'glance', name: 'Glance', chargeCost: 1,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(statusId: 'divert', grant: DivertStatus.glance));
+  static const divert = Spell(
+      id: 'divert', name: 'Divert', chargeCost: 3,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(statusId: 'divert', grant: DivertStatus.divert));
+
+  /// **Truesight** — own accuracy. ⭐ Both granters also cleanse Blind on cast
+  /// (§7a): the element lane's blinder gets an element-agnostic answer, and it
+  /// costs one charge.
+  static const _cleansesBlind =
+      (statusId: 'blind', momentId: blindLiftedStatusId);
+  static const truesight = Spell(
+      id: 'truesight', name: 'Truesight', chargeCost: 1,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(
+          statusId: 'truesight',
+          grant: TruesightStatus.truesight,
+          cleanses: _cleansesBlind));
+  static const hawkeye = Spell(
+      id: 'hawkeye', name: 'Hawkeye', chargeCost: 3,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(
+          statusId: 'truesight',
+          grant: TruesightStatus.hawkeye,
+          cleanses: _cleansesBlind));
+
+  /// **Keen** — crit chance.
+  static const keen = Spell(
+      id: 'keen', name: 'Keen', chargeCost: 2,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(statusId: 'keen', grant: KeenStatus.keen));
+  static const ardent = Spell(
+      id: 'ardent', name: 'Ardent', chargeCost: 4,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(statusId: 'keen', grant: KeenStatus.ardent));
+
+  /// **Heavyhand** — crit damage.
+  static const heavyhand = Spell(
+      id: 'heavyhand', name: 'Heavyhand', chargeCost: 2,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(
+          statusId: 'heavyhand', grant: HeavyhandStatus.heavyhand));
+  static const overkill = Spell(
+      id: 'overkill', name: 'Overkill', chargeCost: 4,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(
+          statusId: 'heavyhand', grant: HeavyhandStatus.overkill));
+
+  /// The ten stat stances, in set order (cheap price point first).
+  ///
+  /// ⚠️ **A separate list, not [all] — a deliberate gate, not an oversight.**
+  /// Everything in [all] is a spell the APP ships: `tooltip_consistency_test`
+  /// requires a description and an icon in `lib/game/element_style.dart` for
+  /// every entry, and the loadout, shop and spellbook screens read it. Those
+  /// are the app lane's to write, and the unlock table (§7a's draft) is still
+  /// unruled. Promoting the bank is therefore one line — fold this list into
+  /// [all] — taken once the player-facing copy lands, and until then the
+  /// engine is fully built and testable without half-describing ten spells to
+  /// players.
+  static const List<Spell> stances = [
+    lightfoot, twinkleToes,
+    glance, divert,
+    truesight, hawkeye,
+    keen, ardent,
+    heavyhand, overkill,
+  ];
+  // ⬆⬆ END BANKED STAT STANCES ⬆⬆
+
+  /// The spells the game ships to players. ⚠️ See [stances]: the banked
+  /// generation is built but not yet listed here, because everything in this
+  /// list needs app-side copy the engine lane does not own.
   static const List<Spell> all = [
     flick, bolt, blast, surge, ruin, cataclysm,
     jolt,

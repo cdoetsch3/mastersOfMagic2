@@ -74,7 +74,19 @@ const Map<String, StatusFx> statusFx = {
   'quicken': StatusFx(AppColors.sky, StatusMotion.streak),
   'phase': StatusFx(AppColors.gem, StatusMotion.ghost),
 
+  // ---- Banked stat stances (TYPE_EFFECTS §7a) --------------------------
+  // ⚠️ Placeholders in the HUD lane's sense — a colour and a motion each, so
+  // the catalogue stays covered and no stance falls back to the generic
+  // pulse. The HUD lane owns how these finally read; the pairs only have to
+  // be distinct from each other and from everything above.
+  'lightfoot': StatusFx(Color(0xFF7FE0C0), StatusMotion.streak),
+  'divert': StatusFx(Color(0xFF9AA9C4), StatusMotion.scatter),
+  'truesight': StatusFx(Color(0xFF6FD3E8), StatusMotion.align),
+  'keen': StatusFx(Color(0xFFE0553E), StatusMotion.crack),
+  'heavyhand': StatusFx(Color(0xFFC77A2E), StatusMotion.chevron),
+
   // ---- Moments ---------------------------------------------------------
+  'blindLifted': StatusFx(Color(0xFF6FD3E8), StatusMotion.scatter),
   'absolutionRising': StatusFx(Color(0xFFF2E7C9), StatusMotion.rise),
   'absolution': StatusFx(Color(0xFFF2E7C9), StatusMotion.bloom),
   'graceConsumed': StatusFx(Color(0xFFF2E7C9), StatusMotion.scatter),

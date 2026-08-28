@@ -42,7 +42,17 @@ String _numbers(Spell spell) => switch (spell.effect) {
   HasteEffect() => 'Haste',
   DischargeEffect() => 'All',
   HallowEffect() => 'Grace',
+  // A banked stat stance (TYPE_EFFECTS §7a): the headline is the COMMITMENT,
+  // because that is what separates a set's two price points — the magnitudes
+  // are close, the clocks are not. ⚠️ [SpellEffect] is sealed, so this arm is
+  // not optional.
+  StanceEffect(:final grant) => '${_stanceTurns(grant())} turns',
 };
+
+/// Turns on the stance [granted] would land — 0 for a grant that is not one of
+/// the timed stances (nothing in the bank, but the type allows it).
+int _stanceTurns(TurnStatus granted) =>
+    granted is StatStanceStatus ? granted.turnsLeft : 0;
 
 /// The qualifier beside the figure — carries the prose, and is free to wrap.
 String _numbersLabel(Spell spell) => switch (spell.effect) {
@@ -64,7 +74,26 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
   HasteEffect() => 'seized — you win same-speed ties',
   DischargeEffect() => "of the enemy's charge, wiped",
   HallowEffect() => 'banked — it blocks the next debuff applied to you',
+  final StanceEffect stance => _stanceLabel(stance),
 };
+
+/// The prose beside a stance's headline: which status it grants, at what
+/// numbers, what the cast also clears, and — the rule players most need told —
+/// that the set's other price point would replace it (§7a law 5).
+String _stanceLabel(StanceEffect effect) {
+  final granted = effect.grant();
+  final name = _statusName(effect.statusId);
+  final numbers = granted is StatStanceStatus ? ': ${granted.grantLine}' : '';
+  final cleanses = effect.cleanses;
+  final cleared = cleanses == null
+      ? ''
+      : ', and the cast clears ${_statusName(cleanses.statusId)}';
+  return 'of $name$numbers$cleared. Casting either spell of the set '
+      'replaces the other';
+}
+
+String _statusName(String statusId) =>
+    StatusCatalog.byId(statusId)?.name ?? statusId;
 
 List<String> _systemsRules(Spell spell) {
   final isDamaging =

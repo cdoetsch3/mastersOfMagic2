@@ -164,6 +164,12 @@ String spellTooltip(Spell spell) {
     OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
       "$minPerCharge-$maxPerCharge damage per point of the enemy's charge",
     HallowEffect() => 'Grants Grace — blocks the next debuff on you',
+    // The banked stat stances (TYPE_EFFECTS §7a). ⚠️ [SpellEffect] is sealed,
+    // so this arm is not optional — it is what a new effect type costs.
+    StanceEffect(:final grant, :final cleanses) => _stanceDetail(
+      grant(),
+      cleanses,
+    ),
   };
   final haste = spell.grantsHaste && spell.effect is! HasteEffect
       ? '\nAlso seizes Haste'
@@ -172,6 +178,26 @@ String spellTooltip(Spell spell) {
       'Cost $cost · Priority ${spell.priority} (${priorityLabel(spell.priority)})\n'
       '$detail$haste\n'
       '${spellDescriptions[spell.id] ?? ''}';
+}
+
+/// The tooltip line for a banked stat stance: its numbers and its clock, read
+/// off the status the cast would actually grant, plus any cleanse rider.
+///
+/// ⭐ Built from the granted status rather than retyped, so a retuned stance
+/// cannot leave the tooltip quoting last week's numbers — the drift this file's
+/// tests exist to catch.
+String _stanceDetail(
+  TurnStatus granted,
+  ({String statusId, String momentId})? cleanses,
+) {
+  final numbers = granted is StatStanceStatus
+      ? '${granted.grantLine} for ${granted.turnsLeft} turns'
+      : 'Grants ${StatusCatalog.byId(granted.id)?.name ?? granted.id}';
+  final cleanse = cleanses == null
+      ? ''
+      : ', and clears '
+            '${StatusCatalog.byId(cleanses.statusId)?.name ?? cleanses.statusId}';
+  return '$numbers$cleanse';
 }
 
 /// One-line flavor/description per spell id, for tooltips.

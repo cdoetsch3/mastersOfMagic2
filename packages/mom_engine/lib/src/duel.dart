@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'action.dart';
+import 'bank_stances.dart';
 import 'combat_stats.dart';
 import 'element.dart';
 import 'element_status.dart';
@@ -752,6 +753,18 @@ class DuelEngine {
         final drained = _drainCharge(target, _drainableCharge(target));
         target.element = null;
         events.add(ChargeDrainedEvent(target, drained));
+      case final StanceEffect stance:
+        // ⭐ The banked stat stances (§7a). All the rules — replace-on-cast,
+        // the Truesight set's Blind cleanse, the log line — live in
+        // `bank_stances.dart`, because they are the same rules for all ten
+        // spells and splitting them across a switch arm is how they drift.
+        //
+        // ⚠️ `add` one at a time, never `addAll`: the event list here is the
+        // frame RECORDER, and it snapshots both mages inside `add`. A bulk
+        // append would leave the stance's pip missing from its own frame.
+        for (final e in applyStance(caster, stance)) {
+          events.add(e);
+        }
       case HallowEffect():
         // Grace doesn't stack past one, so casting Hallow while already warded
         // is a wasted turn — say so rather than logging a fresh success.

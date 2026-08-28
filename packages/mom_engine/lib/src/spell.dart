@@ -5,6 +5,8 @@
 /// the turn — see [SpellPriority] for the named ladder.
 library;
 
+import 'status.dart';
+
 /// The priority ladder, named. Lower acts first; 1–10 is the whole range.
 ///
 /// ⭐ **Aux splits into two lanes** (TYPE_EFFECTS §7a, ruled 2026-08-26). The
@@ -192,6 +194,43 @@ class DischargeEffect extends SpellEffect {
 /// (Hallow — element-neutral, TYPE_EFFECTS §4c.4). Max 1, persists until used.
 class HallowEffect extends SpellEffect {
   const HallowEffect();
+}
+
+/// Grants the caster one banked **stat stance** — a named status that
+/// contributes to a [CombatStat] for a fixed number of turns
+/// (TYPE_EFFECTS_DESIGN.md §7a "STATUS SETS"). The status classes and the
+/// landing logic live in `bank_stances.dart`; this is only the seam the spell
+/// table and the engine's effect switch meet across.
+///
+/// ⭐ **[statusId] is the collision key, and it is what makes the set a set.**
+/// Two spells sharing a [statusId] are two price points on ONE status, so
+/// casting either replaces whatever the other left behind — law 5, and the
+/// reason this carries an id rather than letting each spell own a status.
+///
+/// ⚠️ [grant] builds a FRESH status per cast rather than the effect holding an
+/// instance: a `const` [Spell] holding a mutable status would share one
+/// ticking clock across every mage in every duel in the process.
+class StanceEffect extends SpellEffect {
+  /// The id of the status this grants — see the class doc.
+  final String statusId;
+
+  /// Builds the status this cast lands. A `const` tear-off, one per price
+  /// point (e.g. `LightfootStatus.twinkleToes`).
+  final TurnStatus Function() grant;
+
+  /// A status this cast also strips, and the moment logged when it does —
+  /// `(statusId: 'blind', momentId: 'blindLifted')` for the Truesight set.
+  ///
+  /// ⚠️ One record rather than two nullable fields, because the pair must
+  /// travel together: a cleanse with no moment id logs nothing and a moment id
+  /// with nothing to cleanse fires on empty air.
+  final ({String statusId, String momentId})? cleanses;
+
+  const StanceEffect({
+    required this.statusId,
+    required this.grant,
+    this.cleanses,
+  });
 }
 
 /// A full attack (respects shields, benefits from Empower/Phase) whose damage

@@ -1,3 +1,4 @@
+import 'bank_stances.dart';
 import 'element.dart';
 import 'element_status.dart';
 import 'item_status.dart';
@@ -28,6 +29,16 @@ class StatusView {
   /// multiplier. 0 when the status has no such figure.
   final int magnitude;
 
+  /// The status's SECOND headline number, for the one status that has two:
+  /// Divert's deflected fraction, where [magnitude] is its activation chance
+  /// (TYPE_EFFECTS §7a — the deflect pair is one status carrying two numbers).
+  /// 0 for everything else.
+  ///
+  /// ⚠️ A second field rather than a second `StatusView`: the pair is one
+  /// status, one pip and one clock, and two views would let the HUD draw it as
+  /// two stances that could be stripped apart.
+  final int secondaryMagnitude;
+
   /// The element a streak is building in (only set on the `streak` entry).
   final MagicElement? element;
 
@@ -36,6 +47,7 @@ class StatusView {
     this.stacks = 0,
     this.turnsLeft = 0,
     this.magnitude = 0,
+    this.secondaryMagnitude = 0,
     this.element,
   });
 }
@@ -90,6 +102,33 @@ class StatusSnapshot {
               id: 'healOverTime',
               turnsLeft: turnsLeft,
               magnitude: percentPerTurn));
+
+        // The banked stat stances (§7a). Each carries its own magnitude
+        // because the SET is one status at two price points — the pip must
+        // show which one is running, or Lightfoot and Twinkle Toes are
+        // indistinguishable on the HUD.
+        case LightfootStatus(:final dodge, :final turnsLeft):
+          out.add(StatusView(
+              id: 'lightfoot', turnsLeft: turnsLeft, magnitude: dodge));
+        case DivertStatus(
+            :final activationPercent,
+            :final deflectedPercent,
+            :final turnsLeft
+          ):
+          out.add(StatusView(
+              id: 'divert',
+              turnsLeft: turnsLeft,
+              magnitude: activationPercent,
+              secondaryMagnitude: deflectedPercent));
+        case TruesightStatus(:final accuracy, :final turnsLeft):
+          out.add(StatusView(
+              id: 'truesight', turnsLeft: turnsLeft, magnitude: accuracy));
+        case KeenStatus(:final critChance, :final turnsLeft):
+          out.add(StatusView(
+              id: 'keen', turnsLeft: turnsLeft, magnitude: critChance));
+        case HeavyhandStatus(:final critDamage, :final turnsLeft):
+          out.add(StatusView(
+              id: 'heavyhand', turnsLeft: turnsLeft, magnitude: critDamage));
       }
     }
 
