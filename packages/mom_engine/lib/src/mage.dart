@@ -201,6 +201,24 @@ class MageState {
   int get effectiveDeflectAmount =>
       deflectAmount + statusContributionTo(CombatStat.deflectAmount);
 
+  /// `gear + Σ(active statuses)` shield strength percent — the figure a shield
+  /// is rolled against at the moment it is RAISED (Steadfast, §7a).
+  ///
+  /// ⚠️ Read once per shield, not per hit, and that is deliberate: a shield's
+  /// strength is a pool the engine banks and then spends down, so the bonus
+  /// belongs to the roll that fills it. See [SteadfastStatus] for the argument
+  /// — the short version is that re-deriving a *running balance* every hit
+  /// would shrink a half-spent shield when the buff falls off.
+  int get effectiveShieldStrengthPercent {
+    var sum = shieldStrengthPercent;
+    for (final s in statuses) {
+      if (s is ShieldStrengthModifier) {
+        sum += (s as ShieldStrengthModifier).shieldStrengthContribution;
+      }
+    }
+    return sum;
+  }
+
   /// Active statuses of one polarity, in application order (fixed, so a
   /// lockstep random pick from it is identical on both clients). The hook
   /// Dispel (buffs), Cleanse/Purify (debuffs) and Absolution (a random debuff)

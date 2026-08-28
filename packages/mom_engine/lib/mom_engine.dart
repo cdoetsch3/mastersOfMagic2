@@ -5,6 +5,7 @@
 library;
 
 export 'src/action.dart';
+export 'src/bank_specials.dart';
 export 'src/ai.dart';
 export 'src/bank_dots.dart';
 export 'src/bank_stances.dart';

@@ -1,3 +1,4 @@
+import 'bank_specials.dart';
 import 'bank_stances.dart';
 import 'bank_dots.dart';
 import 'element.dart';
@@ -146,6 +147,23 @@ class StatusSnapshot {
               magnitude: healingReceivedPercent));
         case BlightStatus(:final turnsLeft):
           out.add(StatusView(id: 'blight', turnsLeft: turnsLeft));
+
+        // The banked SPECIAL stances (§7a). ⚠️ Keen and Heavyhand are covered
+        // above: Bloodlust grants the stat lane's classes, not copies.
+        case SteadfastStatus(:final percent, :final turnsLeft):
+          out.add(StatusView(
+              id: 'steadfast', turnsLeft: turnsLeft, magnitude: percent));
+        case ComposureStatus(:final turnsLeft):
+          out.add(StatusView(id: 'composure', turnsLeft: turnsLeft));
+        case DeathWishStatus(:final turnsLeft):
+          out.add(StatusView(id: 'deathWish', turnsLeft: turnsLeft));
+        case ReflectStatus(:final turnsLeft):
+          out.add(StatusView(id: 'reflect', turnsLeft: turnsLeft));
+        case MendingStatus(:final percentPerTurn, :final turnsLeft):
+          out.add(StatusView(
+              id: 'mending',
+              turnsLeft: turnsLeft,
+              magnitude: percentPerTurn));
       }
     }
 

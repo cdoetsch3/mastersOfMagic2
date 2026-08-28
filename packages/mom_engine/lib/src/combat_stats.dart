@@ -56,6 +56,20 @@ abstract interface class StatModifier {
   int contributionTo(CombatStat stat);
 }
 
+/// A [TurnStatus] that makes the shields its holder RAISES stronger — the
+/// Steadfast lane (§7a).
+///
+/// ⚠️ **Deliberately not a [CombatStat].** Shield strength is a percent
+/// multiplier on a rolled pool, applied once at the moment a shield goes up;
+/// [CombatStat] promises a signed sum re-read at every roll. Folding the two
+/// together would have to pick one semantic and lie about the other. Same seam,
+/// same derivation rule, its own interface — and `MageState`'s
+/// `effectiveShieldStrengthPercent` is where gear and statuses meet.
+abstract interface class ShieldStrengthModifier {
+  /// Percent added to the strength of a shield raised while this is active.
+  int get shieldStrengthContribution;
+}
+
 /// The global output clamps (ruled 2026-08-26).
 ///
 /// ⭐ **Clamp the OUTPUT, not the components.** The alternative — capping dodge

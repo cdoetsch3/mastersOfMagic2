@@ -42,17 +42,26 @@ String _numbers(Spell spell) => switch (spell.effect) {
   HasteEffect() => 'Haste',
   DischargeEffect() => 'All',
   HallowEffect() => 'Grace',
-  // A banked stat stance (TYPE_EFFECTS §7a): the headline is the COMMITMENT,
+  // A banked stance (TYPE_EFFECTS §7a): the headline is the COMMITMENT,
   // because that is what separates a set's two price points — the magnitudes
   // are close, the clocks are not. ⚠️ [SpellEffect] is sealed, so this arm is
   // not optional.
-  StanceEffect(:final grant) => '${_stanceTurns(grant())} turns',
+  StanceEffect(:final grants) => '${_stanceTurns(grants)} turns',
 };
 
-/// Turns on the stance [granted] would land — 0 for a grant that is not one of
-/// the timed stances (nothing in the bank, but the type allows it).
-int _stanceTurns(TurnStatus granted) =>
-    granted is StatStanceStatus ? granted.turnsLeft : 0;
+/// Turns the stance [grants] would land for — 0 for a grant that cannot
+/// describe itself (nothing in the bank, but the type allows it).
+///
+/// ⚠️ The LONGEST of them, for the one spell that grants more than one
+/// (Bloodlust). Its two grants share a clock today; the max is what keeps the
+/// headline honest if they ever stop.
+int _stanceTurns(List<StanceGrant> grants) => grants.fold(0, (longest, g) {
+  final granted = g.build();
+  final turns = granted is StanceDescribing
+      ? (granted as StanceDescribing).turnsLeft
+      : 0;
+  return turns > longest ? turns : longest;
+});
 
 /// The qualifier beside the figure — carries the prose, and is free to wrap.
 String _numbersLabel(Spell spell) => switch (spell.effect) {
@@ -81,15 +90,19 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
 /// numbers, what the cast also clears, and — the rule players most need told —
 /// that the set's other price point would replace it (§7a law 5).
 String _stanceLabel(StanceEffect effect) {
-  final granted = effect.grant();
-  final name = _statusName(effect.statusId);
-  final numbers = granted is StatStanceStatus ? ': ${granted.grantLine}' : '';
+  final each = effect.grants.map((g) {
+    final granted = g.build();
+    final numbers = granted is StanceDescribing
+        ? ': ${(granted as StanceDescribing).grantLine}'
+        : '';
+    return '${_statusName(g.statusId)}$numbers';
+  }).join(', and ');
   final cleanses = effect.cleanses;
   final cleared = cleanses == null
       ? ''
       : ', and the cast clears ${_statusName(cleanses.statusId)}';
-  return 'of $name$numbers$cleared. Casting either spell of the set '
-      'replaces the other';
+  return 'of $each$cleared. Casting another granter of the same stance '
+      'replaces it';
 }
 
 String _statusName(String statusId) =>

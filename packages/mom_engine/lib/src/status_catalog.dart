@@ -368,6 +368,70 @@ abstract final class StatusCatalog {
       lingers: true,
     ),
 
+    // ---- Banked SPECIAL STANCES & SUSTAIN (TYPE_EFFECTS §7a) ------------
+    // The half of the bank that changes a rule rather than a number. ⚠️ Keen
+    // and Heavyhand are NOT here: Bloodlust grants the stat lane's statuses at
+    // its own price point, so they are catalogued once, above.
+    StatusInfo(
+      id: 'steadfast',
+      name: 'Steadfast',
+      description:
+          'Shields you raise are 25% stronger for 25 turns. The bonus is baked '
+          'in when the shield goes up, so a wall already standing keeps its '
+          'full strength after this runs out.',
+      trigger: 'Casting Steadfast.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'composure',
+      name: 'Composure',
+      description:
+          'Critical hits against you land as ordinary hits for 25 turns — no '
+          'bonus damage, however the attacker earned the crit.',
+      trigger: 'Casting Composure.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'deathWish',
+      name: 'Death Wish',
+      description:
+          'For 10 turns, every attack you land is a critical hit while your '
+          'own health is below 15% of maximum. Their Composure still blanks '
+          'them.',
+      trigger: 'Casting Death Wish.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'reflect',
+      name: 'Reflect',
+      description:
+          'For 25 turns, damage you deflect is dealt straight back to whoever '
+          'sent it — their shields first. Worth nothing without a deflect '
+          'chance underneath it, and the return can never bounce again.',
+      trigger: 'Casting Reflect.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'mending',
+      name: 'Mending',
+      description:
+          'Heals a share of your maximum health at the end of every turn: 3% '
+          'for 6 turns from Mend, 5% for 10 from Renewal. Only one at a time — '
+          'the newer cast replaces the older entirely.',
+      trigger: 'Casting Mend or Renewal.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+
     // ---- Moments: things that happen, rather than conditions ------------
     StatusInfo(
       id: 'fester',

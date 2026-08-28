@@ -35,6 +35,26 @@ import 'spell.dart';
 import 'status.dart';
 import 'status_catalog.dart';
 
+/// A stance that can state its own numbers and its own clock.
+///
+/// ⭐ **The seam the log and the tooltips read**, implemented by both banked
+/// stance families — the stat stances below and the special stances in
+/// `bank_specials.dart`. It exists so [applyStance] and the app's two switch
+/// arms describe a stance by asking the object that will actually feed the
+/// rolls, rather than by a parallel table of numbers that goes stale the first
+/// time the bank is retuned.
+///
+/// ⚠️ Not folded into [TurnStatus]: an Ignite or a Creeping Dark has no "grant
+/// line", and a base-class getter every element status had to stub would be a
+/// worse lie than a small interface the stances opt into.
+abstract interface class StanceDescribing {
+  /// The stance's numbers in the player's words — '+15 dodge'.
+  String get grantLine;
+
+  /// Turns of life left.
+  int get turnsLeft;
+}
+
 /// A self-granted stance that moves one or more [CombatStat]s for a fixed
 /// number of turns and does nothing else — no ticks, no ops, no stacks.
 ///
@@ -47,8 +67,10 @@ import 'status_catalog.dart';
 /// skip — was rejected for stances: paying 2 charge for a defensive commitment
 /// that cannot answer the attack landing behind it in the same turn reads as
 /// the spell not working.
-abstract class StatStanceStatus extends TurnStatus implements StatModifier {
+abstract class StatStanceStatus extends TurnStatus
+    implements StatModifier, StanceDescribing {
   /// Turns of life left, decremented once per end phase.
+  @override
   int turnsLeft;
 
   StatStanceStatus(this.turnsLeft);
@@ -69,6 +91,7 @@ abstract class StatStanceStatus extends TurnStatus implements StatModifier {
   /// The stance's numbers in the player's words — '+15 dodge'. Used to build
   /// the log line, so the number a player is told is read off the object that
   /// will actually be feeding the rolls.
+  @override
   String get grantLine;
 }
 
@@ -244,6 +267,11 @@ const String blindLiftedStatusId = 'blindLifted';
 /// Lands [effect] on [caster] and returns the events for it — the whole of
 /// law 5, in one place.
 ///
+/// ⭐ **The one landing path for the whole banked generation** — the stat
+/// stances above and the special stances in `bank_specials.dart` both come
+/// through here, because law 5 is one rule and a second copy of it is a second
+/// thing to get wrong.
+///
 /// Order is load-bearing: the **cleanse runs first**, so a Truesight cast into
 /// a Blind reads as one clean beat in the log (Blind lifted, then the stance),
 /// and so a future cleanse that ever targets the stance's own set could not
@@ -251,9 +279,10 @@ const String blindLiftedStatusId = 'blindLifted';
 ///
 /// ⚠️ **Removal by ID, not by runtime type.** The set is identified by the
 /// thing law 5 keys on — the status id — so a second class ever granting
-/// `lightfoot` (a gear-lane stance, an enemy innate) collides with the spell
-/// lane exactly as the law says it should, rather than sitting invisibly
-/// beside it and summing.
+/// `keen` (Bloodlust, a gear-lane stance, an enemy innate) collides with the
+/// spell that granted it first exactly as the law says it should, rather than
+/// sitting invisibly beside it and summing. Bloodlust is the live case: its
+/// +20% Keen overrides a standing Ardent's +25%, burst over floor.
 List<DuelEvent> applyStance(MageState caster, StanceEffect effect) {
   final events = <DuelEvent>[];
 
@@ -266,20 +295,31 @@ List<DuelEvent> applyStance(MageState caster, StanceEffect effect) {
         statusId: cleanse.momentId));
   }
 
-  // Law 5: the granter REPLACES the set's existing status outright. A refresh
-  // of the same spell is the same operation — a fresh instance at full
-  // duration — which is why there is no separate refresh path to drift.
-  caster.statuses.removeWhere((s) => s.id == effect.statusId);
-  final granted = effect.grant();
-  caster.statuses.add(granted);
-
-  final line = granted is StatStanceStatus
-      ? '${_nameOf(effect.statusId)} — ${granted.grantLine}, '
-          '${granted.turnsLeft} turns'
-      : _nameOf(effect.statusId);
-  events.add(BuffAppliedEvent(caster, line, statusId: effect.statusId));
+  // Law 5, once per grant: the granter REPLACES that id's existing status
+  // outright. A refresh of the same spell is the same operation — a fresh
+  // instance at full duration — which is why there is no separate refresh path
+  // to drift. ⚠️ Per grant, not per spell: Bloodlust replaces Keen and
+  // Heavyhand independently, so a standing Overkill survives a Bloodlust that
+  // somehow granted only Keen.
+  for (final grant in effect.grants) {
+    caster.statuses.removeWhere((s) => s.id == grant.statusId);
+    final granted = grant.build();
+    caster.statuses.add(granted);
+    events.add(
+        BuffAppliedEvent(caster, stanceLine(grant.statusId, granted),
+            statusId: grant.statusId));
+  }
   return events;
 }
+
+/// The log/tooltip line for a landed stance: its catalogued name, its own
+/// numbers, and its clock. Falls back to the bare name for a grant that cannot
+/// describe itself (nothing in the bank, but the type allows it).
+String stanceLine(String statusId, TurnStatus granted) =>
+    granted is StanceDescribing
+        ? '${_nameOf(statusId)} — ${(granted as StanceDescribing).grantLine}, '
+            '${(granted as StanceDescribing).turnsLeft} turns'
+        : _nameOf(statusId);
 
 /// The catalogued player-facing name for [statusId] — read from the catalogue
 /// rather than retyped, so the log and the guide can never call one status two

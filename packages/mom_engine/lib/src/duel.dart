@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'action.dart';
 import 'bank_dots.dart';
+import 'bank_specials.dart';
 import 'bank_stances.dart';
 import 'combat_stats.dart';
 import 'element.dart';
@@ -733,9 +734,14 @@ class DuelEngine {
         // would quietly stop being a strategy as the game went on.
         // ⭐ Gear's shield strength % (ITEMS §9b.8) rides the same line as
         // the level scale. Elemental shields only — Barrier is points.
+        // ⭐ Steadfast (§7a) rides the same line as gear's shield strength %,
+        // through the derived `effectiveShieldStrengthPercent` — into the ROLL,
+        // once. That is what makes the ledger entry true: the pool this
+        // produces is a pool, so the stance expiring later cannot reach back
+        // into a shield that is already standing (or half spent).
         final strength = (_roll(minStrength, maxStrength) *
                 caster.levelScale *
-                (1 + caster.shieldStrengthPercent / 100))
+                (1 + caster.effectiveShieldStrengthPercent / 100))
             .round();
         caster.shield = ActiveShield.elemental(cast.element, strength);
         events.add(ShieldRaisedEvent(caster,
@@ -788,10 +794,12 @@ class DuelEngine {
         target.element = null;
         events.add(ChargeDrainedEvent(target, drained));
       case final StanceEffect stance:
-        // ⭐ The banked stat stances (§7a). All the rules — replace-on-cast,
-        // the Truesight set's Blind cleanse, the log line — live in
-        // `bank_stances.dart`, because they are the same rules for all ten
-        // spells and splitting them across a switch arm is how they drift.
+        // ⭐ **The one arm for the whole banked generation** — the stat stances
+        // and the special stances alike (§7a). All the rules — replace-on-cast
+        // per granted id, the Truesight set's Blind cleanse, Bloodlust's two
+        // grants, the log line — live in `bank_stances.dart`'s [applyStance],
+        // because they are the same rules for every stance in the book and
+        // splitting them across switch arms is how they drift.
         //
         // ⚠️ `add` one at a time, never `addAll`: the event list here is the
         // frame RECORDER, and it snapshots both mages inside `add`. A bulk
@@ -881,9 +889,18 @@ class DuelEngine {
       // crit has no global clamp — Execute and Death Wish are *meant* to reach
       // a guaranteed crit, and Composure is the counter, not a cap.
       final critChance = caster.effectiveCritChance;
-      var crit = false;
-      if (critChance > 0 && rng.nextInt(100) < critChance) {
-        crit = true;
+      // ⭐ Death Wish (§7a): while the ATTACKER'S OWN health is below 15% of
+      // max, this is a crit with no roll at all. The short-circuit is load-
+      // bearing for lockstep as well as for taste — a guaranteed crit must not
+      // draw an RNG value a client without the stance would never draw.
+      var crit = attacksAlwaysCrit(caster) ||
+          (critChance > 0 && rng.nextInt(100) < critChance);
+      // ⭐ Composure (§7a): the DEFENDER'S rule beats the attacker's. Whatever
+      // earned the crit — Keen, Execute's threshold, a Death Wish gambit — it
+      // resolves as a normal hit here: no multiplier, and the event reports it
+      // as the ordinary hit it became.
+      if (crit && blanksIncomingCrits(target)) crit = false;
+      if (crit) {
         perHit = (perHit * (100 + caster.effectiveCritDamage) / 100).round();
       }
 
@@ -906,6 +923,8 @@ class DuelEngine {
           crit: crit,
           deflected: r.deflected,
           bypassedShield: bypassedShield));
+
+      _maybeReflect(target, r.deflected, events);
     }
     if (lifesteal > 0 && totalToHp > 0) {
       // ⭐ [totalToHp] is health actually REMOVED, not damage aimed at health
@@ -1283,6 +1302,7 @@ class DuelEngine {
           shieldBroken: r.broken,
           barrierPopped: r.barrierPopped,
           deflected: r.deflected));
+      _maybeReflect(target, r.deflected, e);
     }
     final dots = target.statuses.whereType<DamageOverTime>().toList();
     for (final dot in dots) {
@@ -1326,6 +1346,7 @@ class DuelEngine {
         shieldBroken: r.broken,
         barrierPopped: r.barrierPopped,
         deflected: r.deflected));
+    _maybeReflect(target, r.deflected, e);
   }
 
   /// **Dispel**: strips every strippable buff-polarity status, plus the
@@ -1467,6 +1488,32 @@ class DuelEngine {
       multiplierPercent: r.multiplierPercent,
       barrierPopped: r.barrierPopped
     );
+  }
+
+  /// ⭐ Reflect (§7a): 100% of what a deflect REMOVED goes back to the sender.
+  /// Called after EVERY deflect-capable [_damagePacket] site — attacks, DoT
+  /// ticks, Fester's hit and Scour's packet alike, per the tick ruling
+  /// ("Reflect returns what it deflects"). The sender is always the
+  /// deflector's opponent: every hostile packet in a duel originates there.
+  ///
+  /// The return is DAMAGE, not a hit — routed through the raw damage door, so
+  /// it meets the sender's shield first and nothing else: no accuracy roll,
+  /// no crit, no procs. ⚠️ **And it cannot be re-reflected**, structurally
+  /// rather than by a condition: [_applyOneHit] never rolls deflection, so a
+  /// return never becomes a deflect and there is no second bounce.
+  void _maybeReflect(
+      MageState deflector, int deflected, List<DuelEvent> events) {
+    if (deflected <= 0) return;
+    final returned = reflectedAmount(deflector, deflected);
+    if (returned <= 0) return;
+    final sender = identical(deflector, mage1) ? mage2 : mage1;
+    final back = _applyOneHit(sender, returned, null, false);
+    events.add(EffectDamageEvent(sender, 'Reflect',
+        toShield: back.toShield,
+        toHp: back.toHp,
+        shieldMultiplierPercent: back.multiplierPercent,
+        shieldBroken: back.broken,
+        barrierPopped: back.barrierPopped));
   }
 
   /// Applies one [amount] of damage to [target], resolving shields and counter
@@ -1619,6 +1666,7 @@ class DuelEngine {
             shieldBroken: r.broken,
             barrierPopped: r.barrierPopped,
             deflected: r.deflected));
+        _maybeReflect(holder, r.deflected, events);
       case StatusPurge():
         _resolveAbsolution(holder, events);
     }

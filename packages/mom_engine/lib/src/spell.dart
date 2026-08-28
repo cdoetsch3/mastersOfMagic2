@@ -196,41 +196,64 @@ class HallowEffect extends SpellEffect {
   const HallowEffect();
 }
 
-/// Grants the caster one banked **stat stance** — a named status that
-/// contributes to a [CombatStat] for a fixed number of turns
-/// (TYPE_EFFECTS_DESIGN.md §7a "STATUS SETS"). The status classes and the
-/// landing logic live in `bank_stances.dart`; this is only the seam the spell
-/// table and the engine's effect switch meet across.
+/// One status a [StanceEffect] lands on its caster.
 ///
-/// ⭐ **[statusId] is the collision key, and it is what makes the set a set.**
-/// Two spells sharing a [statusId] are two price points on ONE status, so
-/// casting either replaces whatever the other left behind — law 5, and the
+/// ⭐ **[statusId] is the collision key, and it is what makes a set a set.**
+/// Two spells granting the same [statusId] are two price points on ONE status,
+/// so casting either replaces whatever the other left behind — law 5, and the
 /// reason this carries an id rather than letting each spell own a status.
 ///
-/// ⚠️ [grant] builds a FRESH status per cast rather than the effect holding an
-/// instance: a `const` [Spell] holding a mutable status would share one
-/// ticking clock across every mage in every duel in the process.
-class StanceEffect extends SpellEffect {
-  /// The id of the status this grants — see the class doc.
+/// ⚠️ [build] makes a FRESH status per cast rather than the grant holding an
+/// instance: a `const` [Spell] holding a mutable status would share one ticking
+/// clock across every mage in every duel in the process.
+class StanceGrant {
+  /// The id of the status this lands — see the class doc.
   final String statusId;
 
   /// Builds the status this cast lands. A `const` tear-off, one per price
   /// point (e.g. `LightfootStatus.twinkleToes`).
-  final TurnStatus Function() grant;
+  final TurnStatus Function() build;
+
+  const StanceGrant(this.statusId, this.build);
+}
+
+/// Grants the caster one or more banked **stances** — named statuses held for a
+/// fixed number of turns (TYPE_EFFECTS_DESIGN.md §7a). The status classes and
+/// the landing logic live in `bank_stances.dart` (`applyStance`) and
+/// `bank_specials.dart`; this is only the seam the spell table and the engine's
+/// effect switch meet across.
+///
+/// ⭐ **One effect for the whole banked generation, unified 2026-08-28.** Two
+/// lanes built this shape independently — the stat stances needed a cleanse
+/// rider (Truesight and Hawkeye clear Blind on cast), the special stances
+/// needed more than one grant (Bloodlust is §7a's licensed exception to
+/// one-status-per-axis: Keen AND Heavyhand from a single 5-charge cast). Both
+/// needs are structural, neither subsumes the other, and two near-identical
+/// sealed effect types would have cost every switch in the codebase a second
+/// arm that meant almost the same thing. A list plus an optional rider covers
+/// both, and the single-grant case — nearly every spell in the bank — is still
+/// one line.
+///
+/// ⚠️ Grants land in list order, after the cleanse. Order matters only for the
+/// log, but the log is what a player reads to learn the rule.
+class StanceEffect extends SpellEffect {
+  /// The statuses this cast lands, in order.
+  final List<StanceGrant> grants;
 
   /// A status this cast also strips, and the moment logged when it does —
   /// `(statusId: 'blind', momentId: 'blindLifted')` for the Truesight set.
+  ///
+  /// ⭐ The cleanse lives on the SPELL, not on the status it accompanies: it is
+  /// a thing the cast does once, and a mage Blinded a turn later is Blind again
+  /// with their Truesight still running. On the status it would quietly become
+  /// a Blind immunity, which is a different spell.
   ///
   /// ⚠️ One record rather than two nullable fields, because the pair must
   /// travel together: a cleanse with no moment id logs nothing and a moment id
   /// with nothing to cleanse fires on empty air.
   final ({String statusId, String momentId})? cleanses;
 
-  const StanceEffect({
-    required this.statusId,
-    required this.grant,
-    this.cleanses,
-  });
+  const StanceEffect(this.grants, {this.cleanses});
 }
 
 /// A full attack (respects shields, benefits from Empower/Phase) whose damage

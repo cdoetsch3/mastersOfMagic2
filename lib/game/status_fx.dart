@@ -102,6 +102,18 @@ const Map<String, StatusFx> statusFx = {
   'dispel': StatusFx(Color(0xFFBDB6D4), StatusMotion.scatter),
   'shatter': StatusFx(Color(0xFF9AA9C4), StatusMotion.crack),
   'blindLifted': StatusFx(Color(0xFF6FD3E8), StatusMotion.scatter),
+
+  // ---- Banked SPECIAL stances & sustain (TYPE_EFFECTS §7a) -------------
+  // ⚠️ Placeholders in the same sense as the stat stances above — distinct
+  // (colour, motion) pairs so the catalogue stays covered and nothing falls
+  // back to the generic pulse. The HUD lane owns how these finally read.
+  // Keen and Heavyhand are not here: Bloodlust grants the stat lane's
+  // statuses, which are already covered.
+  'steadfast': StatusFx(Color(0xFF7FA8D9), StatusMotion.converge),
+  'composure': StatusFx(Color(0xFFBFD9CF), StatusMotion.align),
+  'deathWish': StatusFx(Color(0xFF8E1F2F), StatusMotion.rise),
+  'reflect': StatusFx(Color(0xFF9FE8DC), StatusMotion.scatter),
+  'mending': StatusFx(Color(0xFF77C97A), StatusMotion.orbit),
   'absolutionRising': StatusFx(Color(0xFFF2E7C9), StatusMotion.rise),
   'absolution': StatusFx(Color(0xFFF2E7C9), StatusMotion.bloom),
   'graceConsumed': StatusFx(Color(0xFFF2E7C9), StatusMotion.scatter),

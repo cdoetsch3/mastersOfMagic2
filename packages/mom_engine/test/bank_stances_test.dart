@@ -133,9 +133,10 @@ void main() {
       sets.forEach((statusId, spellIds) {
         for (final id in spellIds) {
           final spell = Spellbook.stances.firstWhere((s) => s.id == id);
-          expect((spell.effect as StanceEffect).statusId, statusId,
-              reason: "⚠️ $id must grant '$statusId' — a set's price points "
-                  'share ONE status or they are not a set');
+          final grants = (spell.effect as StanceEffect).grants;
+          expect(grants.single.statusId, statusId,
+              reason: "⚠️ $id must grant '$statusId', and only it — a set's "
+                  'price points share ONE status or they are not a set');
         }
       });
     });
@@ -152,8 +153,8 @@ void main() {
     test('a cast builds a FRESH status, never a shared instance', () {
       // ⚠️ THE mutant: a const Spell holding one mutable status object. Every
       // mage in every duel in the process would then share one clock.
-      final effect = Spellbook.lightfoot.effect as StanceEffect;
-      expect(effect.grant(), isNot(same(effect.grant())));
+      final grant = (Spellbook.lightfoot.effect as StanceEffect).grants.single;
+      expect(grant.build(), isNot(same(grant.build())));
     });
   });
 
@@ -460,10 +461,12 @@ void main() {
 
     test('the runtime status agrees with its catalogue entry, id by id', () {
       for (final spell in Spellbook.stances) {
-        final status = (spell.effect as StanceEffect).grant();
-        expect(StatusCatalog.polarityOf(status.id), status.polarity,
-            reason: "⚠️ '${status.id}' must read the same in the catalogue as "
-                'it does in the engine');
+        for (final grant in (spell.effect as StanceEffect).grants) {
+          final status = grant.build();
+          expect(StatusCatalog.polarityOf(status.id), status.polarity,
+              reason: "⚠️ '${status.id}' must read the same in the catalogue "
+                  'as it does in the engine');
+        }
       }
     });
 
@@ -471,11 +474,18 @@ void main() {
       // The same scrape `status_catalog_test` runs over duel.dart — the rules
       // for these spells live in their own file, so the guard has to follow
       // them there or ten spells could ship with no player-facing text.
+      //
+      // ⚠️ Two spellings since the two banked lanes' effects were unified: the
+      // named `statusId:`/`momentId:` of a cleanse rider, and the positional
+      // first argument of a [StanceGrant]. Missing the second would have let
+      // the whole spell table slip past this guard silently — which is exactly
+      // what it did the moment the shape changed.
       final src = File('lib/src/bank_stances.dart').readAsStringSync() +
           File('lib/src/spellbook.dart').readAsStringSync();
-      final emitted = RegExp(r"(?:statusId|momentId):\s*'([a-zA-Z]+)'")
+      final emitted = RegExp(
+              r"(?:statusId|momentId):\s*'([a-zA-Z]+)'|StanceGrant\('([a-zA-Z]+)'")
           .allMatches(src)
-          .map((m) => m.group(1)!)
+          .map((m) => m.group(1) ?? m.group(2)!)
           .toSet()
         // The one id that reaches an event through a named constant rather
         // than a literal, so the scrape cannot see it.

@@ -1,4 +1,5 @@
 import 'bank_dots.dart';
+import 'bank_specials.dart';
 import 'bank_stances.dart';
 import 'spell.dart';
 
@@ -159,22 +160,22 @@ abstract final class Spellbook {
       id: 'lightfoot', name: 'Lightfoot', chargeCost: 2,
       priority: SpellPriority.auxDefense,
       effect: StanceEffect(
-          statusId: 'lightfoot', grant: LightfootStatus.lightfoot));
+          [StanceGrant('lightfoot', LightfootStatus.lightfoot)]));
   static const twinkleToes = Spell(
       id: 'twinkleToes', name: 'Twinkle Toes', chargeCost: 4,
       priority: SpellPriority.auxDefense,
       effect: StanceEffect(
-          statusId: 'lightfoot', grant: LightfootStatus.twinkleToes));
+          [StanceGrant('lightfoot', LightfootStatus.twinkleToes)]));
 
   /// **Divert** — the deflect pair (activation %, damage deflected %).
   static const glance = Spell(
       id: 'glance', name: 'Glance', chargeCost: 1,
       priority: SpellPriority.auxDefense,
-      effect: StanceEffect(statusId: 'divert', grant: DivertStatus.glance));
+      effect: StanceEffect([StanceGrant('divert', DivertStatus.glance)]));
   static const divert = Spell(
       id: 'divert', name: 'Divert', chargeCost: 3,
       priority: SpellPriority.auxDefense,
-      effect: StanceEffect(statusId: 'divert', grant: DivertStatus.divert));
+      effect: StanceEffect([StanceGrant('divert', DivertStatus.divert)]));
 
   /// **Truesight** — own accuracy. ⭐ Both granters also cleanse Blind on cast
   /// (§7a): the element lane's blinder gets an element-agnostic answer, and it
@@ -185,38 +186,36 @@ abstract final class Spellbook {
       id: 'truesight', name: 'Truesight', chargeCost: 1,
       priority: SpellPriority.auxDefense,
       effect: StanceEffect(
-          statusId: 'truesight',
-          grant: TruesightStatus.truesight,
+          [StanceGrant('truesight', TruesightStatus.truesight)],
           cleanses: _cleansesBlind));
   static const hawkeye = Spell(
       id: 'hawkeye', name: 'Hawkeye', chargeCost: 3,
       priority: SpellPriority.auxDefense,
       effect: StanceEffect(
-          statusId: 'truesight',
-          grant: TruesightStatus.hawkeye,
+          [StanceGrant('truesight', TruesightStatus.hawkeye)],
           cleanses: _cleansesBlind));
 
   /// **Keen** — crit chance.
   static const keen = Spell(
       id: 'keen', name: 'Keen', chargeCost: 2,
       priority: SpellPriority.auxDefense,
-      effect: StanceEffect(statusId: 'keen', grant: KeenStatus.keen));
+      effect: StanceEffect([StanceGrant('keen', KeenStatus.keen)]));
   static const ardent = Spell(
       id: 'ardent', name: 'Ardent', chargeCost: 4,
       priority: SpellPriority.auxDefense,
-      effect: StanceEffect(statusId: 'keen', grant: KeenStatus.ardent));
+      effect: StanceEffect([StanceGrant('keen', KeenStatus.ardent)]));
 
   /// **Heavyhand** — crit damage.
   static const heavyhand = Spell(
       id: 'heavyhand', name: 'Heavyhand', chargeCost: 2,
       priority: SpellPriority.auxDefense,
       effect: StanceEffect(
-          statusId: 'heavyhand', grant: HeavyhandStatus.heavyhand));
+          [StanceGrant('heavyhand', HeavyhandStatus.heavyhand)]));
   static const overkill = Spell(
       id: 'overkill', name: 'Overkill', chargeCost: 4,
       priority: SpellPriority.auxDefense,
       effect: StanceEffect(
-          statusId: 'heavyhand', grant: HeavyhandStatus.overkill));
+          [StanceGrant('heavyhand', HeavyhandStatus.overkill)]));
 
   /// The ten stat stances, in set order (cheap price point first).
   ///
@@ -341,9 +340,87 @@ abstract final class Spellbook {
   ];
   // ⬆⬆ END BANKED DoT / DEBUFF SUITE ⬆⬆
 
-  /// The spells the game ships to players. ⚠️ See [stances] and [bankDots]:
-  /// the banked generations are built but not yet listed here, because
-  /// everything in this list needs app-side copy the engine lane does not own.
+  // ======================================================================
+  // ⬇⬇ BANKED SPECIAL STANCES & SUSTAIN — TYPE_EFFECTS §7a ⬇⬇
+  // Seven self-targeting aux spells whose statuses change a RULE rather than
+  // a number — plus Bloodlust, which grants the stat lane's Keen and
+  // Heavyhand at its own price point. See bank_specials.dart.
+  //
+  // ⚠️ **Deliberately NOT in [all] yet** — same gate as [stances]: everything
+  // in `all` owes the app a description and an icon, and those are the app
+  // lane's to write.
+  // ======================================================================
+
+  /// **Steadfast** — shields you raise are 25% stronger. ⭐ At GAIN time (see
+  /// [SteadfastStatus]): a shield already standing when this expires keeps
+  /// every point it was rolled with.
+  static const steadfast = Spell(
+      id: 'steadfast', name: 'Steadfast', chargeCost: 3,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(
+          [StanceGrant('steadfast', SteadfastStatus.steadfast)]));
+
+  /// **Composure** — incoming crits resolve as normal hits. §7a's answer to
+  /// the whole crit lane: Keen, Heavyhand, Execute and Death Wish all break on
+  /// it, which is why it is only 2 charge.
+  static const composure = Spell(
+      id: 'composure', name: 'Composure', chargeCost: 2,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(
+          [StanceGrant('composure', ComposureStatus.composure)]));
+
+  /// **Bloodlust** — ⭐ §7a's licensed exception to one-status-per-axis: one
+  /// spell, TWO statuses. Twelve turns of +20% crit chance and +40 crit
+  /// damage, and because law 5 applies per status it OVERRIDES a standing
+  /// Ardent or Overkill rather than adding to them. The exception buys a
+  /// burst window, not a floor.
+  static const bloodlust = Spell(
+      id: 'bloodlust', name: 'Bloodlust', chargeCost: 5,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect([
+        StanceGrant('keen', bloodlustKeen),
+        StanceGrant('heavyhand', bloodlustHeavyhand),
+      ]));
+
+  /// **Death Wish** — every attack crits while you are under 15% health. Cast
+  /// healthy as insurance or bleeding as a gambit, and blanked by the target's
+  /// Composure like every other crit.
+  static const deathWish = Spell(
+      id: 'deathWish', name: 'Death Wish', chargeCost: 2,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect(
+          [StanceGrant('deathWish', DeathWishStatus.deathWish)]));
+
+  /// **Reflect** — damage you deflect is returned to its sender, in full.
+  /// ⚠️ A dead slot with no Divert-family deflect underneath it; that
+  /// dependency is the price of the payoff.
+  static const reflect = Spell(
+      id: 'reflect', name: 'Reflect', chargeCost: 4,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect([StanceGrant('reflect', ReflectStatus.reflect)]));
+
+  /// **Mending** — the spell lane's heal over time, two price points. 18% of
+  /// max health across 6 turns, 50% across 10.
+  static const mend = Spell(
+      id: 'mend', name: 'Mend', chargeCost: 2,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect([StanceGrant('mending', MendingStatus.mend)]));
+  static const renewal = Spell(
+      id: 'renewal', name: 'Renewal', chargeCost: 4,
+      priority: SpellPriority.auxDefense,
+      effect: StanceEffect([StanceGrant('mending', MendingStatus.renewal)]));
+
+  /// The seven special stances, held apart from [all] on the same gate as
+  /// [stances].
+  static const List<Spell> bankSpecials = [
+    steadfast, composure, bloodlust, deathWish, reflect, mend, renewal,
+  ];
+  // ⬆⬆ END BANKED SPECIAL STANCES & SUSTAIN ⬆⬆
+
+  /// The spells the game ships to players. ⚠️ See [stances], [bankSpecials]
+  /// and [bankDots]: the banked generations are built but not yet listed
+  /// here, because everything in this list needs app-side copy the engine
+  /// lane does not own.
   static const List<Spell> all = [
     flick, bolt, blast, surge, ruin, cataclysm,
     jolt,
@@ -357,7 +434,9 @@ abstract final class Spellbook {
   /// Every spell the engine can resolve — the shipped book plus every banked
   /// lane. ⚠️ Lookup only ([byId], netcode): it is deliberately NOT what an AI
   /// draws from, and not what the app offers a player.
-  static const List<Spell> everything = [...all, ...stances, ...bankDots];
+  static const List<Spell> everything = [
+    ...all, ...stances, ...bankSpecials, ...bankDots,
+  ];
 
   static Spell byId(String id) => everything.firstWhere((s) => s.id == id);
 }

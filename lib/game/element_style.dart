@@ -164,10 +164,11 @@ String spellTooltip(Spell spell) {
     OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
       "$minPerCharge-$maxPerCharge damage per point of the enemy's charge",
     HallowEffect() => 'Grants Grace — blocks the next debuff on you',
-    // The banked stat stances (TYPE_EFFECTS §7a). ⚠️ [SpellEffect] is sealed,
+    // The banked stances (TYPE_EFFECTS §7a) — stat and special alike, one arm
+    // since the two lanes' effects were unified. ⚠️ [SpellEffect] is sealed,
     // so this arm is not optional — it is what a new effect type costs.
-    StanceEffect(:final grant, :final cleanses) => _stanceDetail(
-      grant(),
+    StanceEffect(:final grants, :final cleanses) => _stanceDetail(
+      grants,
       cleanses,
     ),
   };
@@ -180,19 +181,27 @@ String spellTooltip(Spell spell) {
       '${spellDescriptions[spell.id] ?? ''}';
 }
 
-/// The tooltip line for a banked stat stance: its numbers and its clock, read
-/// off the status the cast would actually grant, plus any cleanse rider.
+/// The tooltip line for a banked stance: each granted status's numbers and its
+/// clock, read off the statuses the cast would actually land, plus any cleanse
+/// rider.
 ///
-/// ⭐ Built from the granted status rather than retyped, so a retuned stance
+/// ⭐ Built from the granted statuses rather than retyped, so a retuned stance
 /// cannot leave the tooltip quoting last week's numbers — the drift this file's
 /// tests exist to catch.
+///
+/// ⚠️ Plural because Bloodlust grants two (§7a's licensed exception); every
+/// other spell in the bank grants one and reads exactly as it did.
 String _stanceDetail(
-  TurnStatus granted,
+  List<StanceGrant> grants,
   ({String statusId, String momentId})? cleanses,
 ) {
-  final numbers = granted is StatStanceStatus
-      ? '${granted.grantLine} for ${granted.turnsLeft} turns'
-      : 'Grants ${StatusCatalog.byId(granted.id)?.name ?? granted.id}';
+  final numbers = grants.map((g) {
+    final granted = g.build();
+    return granted is StanceDescribing
+        ? '${(granted as StanceDescribing).grantLine} for '
+              '${(granted as StanceDescribing).turnsLeft} turns'
+        : 'Grants ${StatusCatalog.byId(granted.id)?.name ?? granted.id}';
+  }).join(', and ');
   final cleanse = cleanses == null
       ? ''
       : ', and clears '
