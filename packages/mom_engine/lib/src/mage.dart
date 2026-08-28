@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'combat_stats.dart';
 import 'element.dart';
 import 'element_tuning.dart';
 import 'status.dart';
@@ -112,6 +113,13 @@ class MageState {
   // relevant chance being > 0, so a mage with default stats consumes no extra
   // RNG — the whole point is that turning these on is what changes a duel,
   // never leaving them off.
+  //
+  // ⚠️ **These fields are the BASE + GEAR figure and nothing else.** They are
+  // written once, when the mage is built (a player from their equipment, an
+  // enemy from its archetype's EnemyCombatStats), and never again. Statuses do
+  // NOT write here — they contribute through [StatModifier], and the engine
+  // reads the `effective*` getters below, which recompute the sum at every
+  // roll. See combat_stats.dart for why mutate-and-revert was rejected.
 
   /// Flat accuracy bonus (from gear), added to a spell's own accuracy. Percent.
   int accuracyBonus = 0;
@@ -152,6 +160,57 @@ class MageState {
   /// enforced where stats are granted — the engine only clamps to [0,100] so
   /// damage can't go negative.
   int deflectAmount = 0;
+
+  // ---- The derivation seam (TYPE_EFFECTS §7a law 3) ---------------------
+
+  /// The signed sum of every active status's contribution to [stat].
+  ///
+  /// 0 today: no shipped status implements [StatModifier]. That is the correct
+  /// state for this landing — the seam is provably inert until the banked
+  /// stat-granting spells (Lightfoot, Divert, Truesight, Murk, Keen,
+  /// Heavyhand…) arrive and start returning numbers from it.
+  int statusContributionTo(CombatStat stat) {
+    var sum = 0;
+    for (final s in statuses) {
+      if (s is StatModifier) sum += (s as StatModifier).contributionTo(stat);
+    }
+    return sum;
+  }
+
+  /// `base + gear + Σ(active statuses)`, recomputed on the spot. The engine
+  /// reads these — never the stored fields — for every roll that matters.
+  ///
+  /// ⚠️ Unclamped by design: [CombatClamps] applies to the *assembled output*
+  /// of a roll (hit chance, deflect activation, deflected fraction), not to a
+  /// component. A stat clamped here would silently make a grant worthless and
+  /// no test would ever see the difference.
+  int get effectiveAccuracyBonus =>
+      accuracyBonus + statusContributionTo(CombatStat.accuracy);
+
+  int get effectiveDodge => dodge + statusContributionTo(CombatStat.dodge);
+
+  int get effectiveCritChance =>
+      critChance + statusContributionTo(CombatStat.critChance);
+
+  int get effectiveCritDamage =>
+      critDamage + statusContributionTo(CombatStat.critDamage);
+
+  int get effectiveDeflectChance =>
+      deflectChance + statusContributionTo(CombatStat.deflectActivation);
+
+  int get effectiveDeflectAmount =>
+      deflectAmount + statusContributionTo(CombatStat.deflectAmount);
+
+  /// Active statuses of one polarity, in application order (fixed, so a
+  /// lockstep random pick from it is identical on both clients). The hook
+  /// Dispel (buffs), Cleanse/Purify (debuffs) and Absolution (a random debuff)
+  /// query — none of them names a status.
+  ///
+  /// ⚠️ [TurnStatus]es only. The field-backed statuses (Waterlogged, Stagger,
+  /// Grace, Haste, Empower, Quicken, Phase) are not in this list; a spell that
+  /// must cover them adds them explicitly, as `_resolveAbsolution` does.
+  Iterable<TurnStatus> statusesWithPolarity(StatusPolarity p) =>
+      statuses.where((s) => s.polarity == p);
 
   /// The mage's character level. Drives [levelScale]; 1 is the baseline every
   /// balance figure in the design docs was measured at.

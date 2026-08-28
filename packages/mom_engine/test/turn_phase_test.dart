@@ -15,6 +15,9 @@ class _Burn extends TurnStatus {
   _Burn(this.amount, this.turnsLeft, {this.element, this.bypass = false});
 
   @override
+  StatusPolarity get polarity => StatusPolarity.debuff;
+
+  @override
   String get id => 'burn';
 
   @override
@@ -36,6 +39,9 @@ class _Regen extends TurnStatus {
   _Regen(this.amount);
 
   @override
+  StatusPolarity get polarity => StatusPolarity.buff;
+
+  @override
   String get id => 'regen';
 
   @override
@@ -53,6 +59,9 @@ class _StartStrike extends TurnStatus {
   final int amount;
   bool _spent = false;
   _StartStrike(this.amount);
+
+  @override
+  StatusPolarity get polarity => StatusPolarity.debuff;
 
   @override
   String get id => 'startStrike';

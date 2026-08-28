@@ -73,11 +73,30 @@ abstract interface class Blinding {
   double get missChance;
 }
 
-/// Marker for statuses that are **bad for their holder** — the pool Sanctus's
-/// Absolution purges from, and (by prevention) the things Grace blocks. Only
-/// lingering afflictions implement it; self-buffs (Photosynthesis, Creeping
-/// Dark, Arcane Knowledge, Astral Alignment) never do. TYPE_EFFECTS §4c.1.
-abstract interface class Debuff {}
+/// Whether a status is good for its holder, bad for them, or neither.
+///
+/// ⭐ **The hook the whole counter-web hangs off** (TYPE_EFFECTS §7a law 3).
+/// Dispel strips [buff]s, Cleanse and Purify remove [debuff]s, Absolution
+/// purges a random [debuff], and Grace blocks the next [debuff] to land. None
+/// of those spells knows what a Lightfoot or an Agony *is* — they ask polarity
+/// and act, which is why a new status joins the web for free.
+///
+/// ⚠️ It replaced a bare `Debuff` marker interface. A marker could only say
+/// "bad"; the third state has to be sayable, because "neither" is a real answer
+/// (see [PendingAbsolutionStatus]) and a status that silently defaults to
+/// strippable is a balance bug nobody sees until a Dispel eats it.
+enum StatusPolarity {
+  /// Good for whoever holds it. Dispel's pool.
+  buff,
+
+  /// Bad for whoever holds it. Cleanse/Purify/Absolution's pool; Grace
+  /// prevents these.
+  debuff,
+
+  /// Neither — scaffolding, markers, and bookkeeping that no polarity-driven
+  /// spell should be able to touch in either direction.
+  neutral,
+}
 
 /// A persistent status on a mage, resolved each turn's start and end phases.
 ///
@@ -89,6 +108,14 @@ abstract interface class Debuff {}
 abstract class TurnStatus {
   /// Stable id; also used to find/refresh an existing status of the same kind.
   String get id;
+
+  /// Good for the holder, bad for them, or neither — see [StatusPolarity].
+  ///
+  /// ⚠️ **Abstract on purpose, with no default.** A default of `neutral` would
+  /// let every future status opt out of the counter-web by forgetting a line,
+  /// and the failure mode is silent: Dispel and Purify would simply never find
+  /// it. Making the compiler ask the question is the cheapest possible guard.
+  StatusPolarity get polarity;
 
   /// Operations to perform in [phase] this turn, evaluated against the
   /// holder's current state. Empty for phases this status ignores.

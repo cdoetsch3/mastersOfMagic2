@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'action.dart';
+import 'combat_stats.dart';
 import 'element.dart';
 import 'element_status.dart';
 import 'element_tuning.dart';
@@ -81,7 +82,8 @@ class _RecordingEvents extends ListBase<DuelEvent> {
 ///
 /// Both sides submit an action; [resolveTurn] resolves them together. Every
 /// action carries a **priority** (1 acts first): instant 1, shields 3,
-/// channel 4, quick attacks 5, aux 7, regular 9. Equal-priority collisions are
+/// channel 4, quick attacks 5, aux-defense 7, aux-offense 8, regular 9 — see
+/// [SpellPriority] for the named ladder. Equal-priority collisions are
 /// broken by the **Haste** token — the holder's spell resolves first, so a
 /// lethal hit lands before the opponent can fire back. When nobody holds
 /// Haste, equal priorities resolve simultaneously and can trade kills (a draw).
@@ -105,7 +107,7 @@ class DuelEngine {
 
   int turnNumber = 0;
 
-  static const int channelPriority = 4;
+  static const int channelPriority = SpellPriority.channel;
 
   /// Sudden death (TYPE_EFFECTS_DESIGN.md §8): after [fatigueThreshold] turns,
   /// both mages take escalating **unblockable** damage at end of turn, growing
@@ -577,24 +579,35 @@ class DuelEngine {
     }
 
     // Precedence step 3 — Hit roll: a single unified accuracy check (§5.2).
-    //   hitChance = spellAccuracy − baseMiss + gearAccuracy − targetDodge − blind
+    //   hitChance = clamp(spellAccuracy − baseMiss + accuracy − dodge − blind,
+    //                     10, 100)
     // ⭐ Every harmful cast now carries ElementTuning.baseMissPercent (ITEMS
     // §9b.8: base hit is 80%, gear closes the gap) — so accuracy gear does
     // something against everyone, not only dodge builds. Blind is folded in
     // as a flat −50. ⚠️ Astral slips Solar (§4b): exempt from dodge and
     // Blind, but NOT from the base — "slips evasion" must not silently
     // become "25% more accurate than every other element".
-    // Miss ⇒ no effect, charge still spent (post-resolution sweep), no streak.
+    //
+    // ⭐ Accuracy and dodge are read through the `effective*` getters, so a
+    // Truesight/Murk/Lightfoot status is summed in at the moment of resolution
+    // — which is what "at time of resolution" in §7a means: a debuff landing
+    // at priority 8 changes the priority-9 attack that follows it, same turn.
+    //
+    // ⭐ The clamp is on the OUTPUT (§7a, ruled 2026-08-26): the floor of 10%
+    // is the guarantee that stacked evasion can never make you unhittable, and
+    // it is applied to the whole assembled expression, not to dodge or
+    // accuracy separately. Miss ⇒ no effect, charge still spent
+    // (post-resolution sweep), no streak.
     if (spell.isHarmful) {
       final slips = cast.element == MagicElement.astral;
       final blindPenalty =
           slips ? 0 : (caster.missChance * 100).round(); // 50 if blinded
-      final dodge = slips ? 0 : cast.target.dodge;
-      final hitChance = spell.accuracy -
+      final dodge = slips ? 0 : cast.target.effectiveDodge;
+      final hitChance = CombatClamps.hitChance(spell.accuracy -
           baseMissPercent +
-          caster.accuracyBonus -
+          caster.effectiveAccuracyBonus -
           dodge -
-          blindPenalty;
+          blindPenalty);
       final missPercent = 100 - hitChance;
       if (missPercent > 0 && rng.nextDouble() * 100 < missPercent) {
         // ⭐ Tag the cause: only a real Blind window says "blinded" (§9b.8).
@@ -817,10 +830,14 @@ class DuelEngine {
 
       // Crit (§5.2 step 4/5, per hit). Guarded on chance > 0 so a no-crit
       // build rolls nothing. The bonus is a multiplier atop the damage mods.
+      // Both figures are derived per hit (Keen and Heavyhand contribute here);
+      // crit has no global clamp — Execute and Death Wish are *meant* to reach
+      // a guaranteed crit, and Composure is the counter, not a cap.
+      final critChance = caster.effectiveCritChance;
       var crit = false;
-      if (caster.critChance > 0 && rng.nextInt(100) < caster.critChance) {
+      if (critChance > 0 && rng.nextInt(100) < critChance) {
         crit = true;
-        perHit = (perHit * (100 + caster.critDamage) / 100).round();
+        perHit = (perHit * (100 + caster.effectiveCritDamage) / 100).round();
       }
 
       // Ignite reads the attack's full output, so a crit burns harder — count
@@ -830,9 +847,20 @@ class DuelEngine {
 
       // Deflection (§5.2 step 6, defender side, per hit). Pure reduction — the
       // deflected portion is removed, not reflected. Also chance-guarded.
+      //
+      // ⭐ BOTH halves of the Divert pair are clamped at 90 on the assembled
+      // output (§7a, ruled 2026-08-26): deflection never becomes a certainty,
+      // and a deflected hit is never erased. "There is always a sliver that
+      // lands" is what keeps a full turtle beatable — and it is also what
+      // prices Reflect, which returns 100% of whatever this removes.
+      final deflectChance =
+          CombatClamps.deflectActivation(target.effectiveDeflectChance);
       var deflected = 0;
-      if (target.deflectChance > 0 && rng.nextInt(100) < target.deflectChance) {
-        deflected = (perHit * target.deflectAmount.clamp(0, 100) / 100).round();
+      if (deflectChance > 0 && rng.nextInt(100) < deflectChance) {
+        deflected = (perHit *
+                CombatClamps.deflectFraction(target.effectiveDeflectAmount) /
+                100)
+            .round();
         perHit -= deflected;
       }
 
@@ -1319,7 +1347,8 @@ class DuelEngine {
   /// Resolves Absolution for [holder] (Sanctus, §4c). Two parts, both
   /// unconditional on the purge outcome:
   ///  1. **Sanctus → Umbra:** strip 5 Creeping Dark from the opponent.
-  ///  2. **Self:** remove one random [Debuff]; if there is none, bank Grace.
+  ///  2. **Self:** remove one random [StatusPolarity.debuff]; if there is none,
+  ///     bank Grace.
   void _resolveAbsolution(MageState holder, List<DuelEvent> events) {
     final opponent = identical(holder, mage1) ? mage2 : mage1;
     final dark = _statusOf<CreepingDarkStatus>(opponent);
@@ -1332,12 +1361,18 @@ class DuelEngine {
           statusId: 'darkSeared'));
     }
 
-    // The removable-debuff pool is every lingering [Debuff] status PLUS the
-    // two field-debuffs (Waterlogged, Stagger) — which aren't statuses but are
-    // still afflictions the doc's purge list names (§4c.1). Built in a fixed
-    // order so the shared-seed pick is identical on both lockstep clients.
+    // The removable-debuff pool is every lingering debuff-polarity status PLUS
+    // the two field-debuffs (Waterlogged, Stagger) — which aren't statuses but
+    // are still afflictions the doc's purge list names (§4c.1). Built in a
+    // fixed order so the shared-seed pick is identical on both lockstep
+    // clients.
+    //
+    // ⭐ Asks polarity, not a marker interface (§7a law 3), which is why the
+    // banked debuffs — Agony, Torment, Murk, Blight, Wither — join this pool
+    // for free the moment they exist. Their catalogue entries and their
+    // `polarity` getters are the entire integration.
     final removable = <({String label, void Function() clear})>[
-      for (final s in holder.statuses.whereType<Debuff>().cast<TurnStatus>())
+      for (final s in holder.statusesWithPolarity(StatusPolarity.debuff))
         (label: s.id, clear: () => holder.statuses.remove(s)),
       if (holder.priorityPenalty > 0)
         (label: 'Waterlogged', clear: () => holder.priorityPenalty = 0),

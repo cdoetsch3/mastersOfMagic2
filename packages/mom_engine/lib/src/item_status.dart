@@ -19,6 +19,15 @@ class RegrowStatus extends TurnStatus {
 
   RegrowStatus(this.percentPerTurn);
 
+  /// ⚠️ Genuinely ambiguous, ruled **buff**: polarity answers "is this good for
+  /// the holder", and it plainly is. Whether Dispel may strip a status the
+  /// wearer's *gear* is generating is a separate question — a lane question,
+  /// for the Dispel spell to answer when it lands — and encoding "unstrippable"
+  /// as `neutral` here would also hide it from every future spell that reads
+  /// polarity for a non-strip reason.
+  @override
+  StatusPolarity get polarity => StatusPolarity.buff;
+
   @override
   String get id => 'regrow';
 
@@ -54,6 +63,9 @@ class HealOverTimeStatus extends TurnStatus {
     required this.turnsLeft,
     this.source = 'Tonic',
   });
+
+  @override
+  StatusPolarity get polarity => StatusPolarity.buff;
 
   @override
   String get id => 'healOverTime';

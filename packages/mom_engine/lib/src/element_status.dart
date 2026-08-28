@@ -12,11 +12,14 @@ import 'status.dart';
 /// end-phase damage band (E8). Regular damage: hits the shield first, with
 /// Pyro counter math. Re-proccing refreshes the window (new value, new clock);
 /// it never stacks.
-class IgniteStatus extends TurnStatus implements Debuff {
+class IgniteStatus extends TurnStatus {
   int perTick;
   int turnsLeft;
 
   IgniteStatus(this.perTick) : turnsLeft = 3;
+
+  @override
+  StatusPolarity get polarity => StatusPolarity.debuff;
 
   /// Re-proc: a fresh 3-tick clock at the new attack's value.
   void refresh(int newPerTick) {
@@ -71,6 +74,9 @@ class PhotosynthesisStatus extends TurnStatus {
   static const int healPercent = ElementTuning.photosynthesisHealPercent;
 
   @override
+  StatusPolarity get polarity => StatusPolarity.buff;
+
+  @override
   String get id => 'photosynthesis';
 
   /// Whether [holder]'s Flora streak currently sustains the effect.
@@ -98,9 +104,12 @@ class PhotosynthesisStatus extends TurnStatus {
 /// refreshes the window. Astral spells are exempt (checked at the miss gate,
 /// §4b table). While present it also **eclipses** the holder's moon to New
 /// (the engine reads its presence — TYPE_EFFECTS §4b.3).
-class BlindStatus extends TurnStatus implements Blinding, Debuff {
+class BlindStatus extends TurnStatus implements Blinding {
   int turnsLeft = 3;
   bool _justApplied = true;
+
+  @override
+  StatusPolarity get polarity => StatusPolarity.debuff;
 
   /// Re-proc: a fresh 3-turn window starting next turn.
   void refresh() {
@@ -154,6 +163,14 @@ class CreepingDarkStatus extends TurnStatus {
   bool get dusk => stacks >= duskThreshold;
   bool get midnight => stacks >= midnightThreshold;
 
+  /// ⚠️ Genuinely ambiguous, ruled **buff**: it does nothing *to* its holder at
+  /// all — the entire effect is hiding the board from the OPPONENT — so the
+  /// only honest reading of "good for whoever holds it" is yes. (Absolution
+  /// already treats it that way: it strips the opponent's stacks as a separate,
+  /// explicit step rather than through the debuff purge.)
+  @override
+  StatusPolarity get polarity => StatusPolarity.buff;
+
   @override
   String get id => 'creepingDark';
 
@@ -190,6 +207,9 @@ class ArcaneKnowledgeStatus extends TurnStatus {
   int get bonusPercent => stacks * percentPerStack;
 
   @override
+  StatusPolarity get polarity => StatusPolarity.buff;
+
+  @override
   String get id => 'arcaneKnowledge';
 
   @override
@@ -206,8 +226,9 @@ class ArcaneKnowledgeStatus extends TurnStatus {
 /// to share it; it is streak-gated now and no longer decays.) Each stack
 /// routes **1%** of every attack's damage straight
 /// to health, bypassing the shield (applied in the engine's `_attack`, not as
-/// a StatusOp), so a maxed Alignment pierces **20%**. Not a [Debuff] — it's
-/// the caster's own buff, so Absolution never touches it.
+/// a StatusOp), so a maxed Alignment pierces **20%**. Polarity is
+/// [StatusPolarity.buff] — it's the caster's own, so Absolution never touches
+/// it.
 class AstralAlignmentStatus extends TurnStatus {
   static const int maxStacks = ElementTuning.alignmentMaxStacks;
 
@@ -225,6 +246,9 @@ class AstralAlignmentStatus extends TurnStatus {
 
   /// The percent of an attack that bypasses the shield to health (0–20).
   int get piercePercent => stacks * percentPerStack;
+
+  @override
+  StatusPolarity get polarity => StatusPolarity.buff;
 
   @override
   String get id => 'astralAlignment';
@@ -245,6 +269,14 @@ class AstralAlignmentStatus extends TurnStatus {
 /// turn's bookkeeping. The purge itself (random debuff → else Grace) plus the
 /// opponent's Creeping-Dark strip are handled by the engine. TYPE_EFFECTS §4c.
 class PendingAbsolutionStatus extends TurnStatus {
+  /// ⚠️ Genuinely ambiguous, ruled **neutral**: the Absolution it schedules is
+  /// certainly good for the holder, but this is a one-turn scheduler, not a
+  /// condition. Calling it a buff would put it in Dispel's pool, letting a 4c
+  /// spell cancel a three-cast Sanctus ritual as an invisible side effect
+  /// nobody priced — and it self-expires the same turn regardless.
+  @override
+  StatusPolarity get polarity => StatusPolarity.neutral;
+
   @override
   String get id => 'pendingAbsolution';
 

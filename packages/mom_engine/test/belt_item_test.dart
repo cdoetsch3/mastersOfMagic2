@@ -126,15 +126,23 @@ void main() {
       );
     });
 
+    // ⚠️ DEFLAKED 2026-08-28 (pre-existing; unrelated to the §7a work that
+    // found it). This asserted `alice.hp < 100` after a full-health Alice drank
+    // a 20%-of-max Draught into a Blast — and Blast rolls 20–26, so on the ~1
+    // roll in 7 that came up exactly 20 the potion healed the damage back to
+    // 100 and the test failed. The potion landing AFTER the attack is the
+    // documented ruling, so the fix is the assertion, not the engine: read the
+    // damage event, which cannot be masked by a heal.
     test('the opponent still acts against a drinker', () {
       bruno.charge = 2;
       bruno.element = MagicElement.aqua;
       alice.hp = 100;
-      duel.resolveTurn(_drink(_draught), CastAction(Spellbook.blast));
+      final r =
+          duel.resolveTurn(_drink(_draught), CastAction(Spellbook.blast));
       expect(
-        alice.hp,
-        lessThan(100),
-        reason: 'Blast lands: drinking defends nothing',
+        r.events.whereType<DamageEvent>().single.toHp,
+        inInclusiveRange(20, 26),
+        reason: 'Blast lands in full: drinking defends nothing',
       );
     });
 

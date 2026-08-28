@@ -86,8 +86,9 @@ abstract final class Spellbook {
       id: 'barrier', name: 'Barrier', chargeCost: 2, priority: 3,
       effect: BarrierEffect());
 
-  // Aux (priority 7) — investments: casting ends your cycle, so the buff
-  // pays off in a future cycle.
+  // Aux-DEFENSE (priority 7, [SpellPriority.auxDefense]) — self-targeting
+  // investments: casting ends your cycle, so the buff pays off in a future
+  // one. Enemy-targeting aux lives one rung slower, at 8 (see Discharge).
   static const empower = Spell(
       id: 'empower', name: 'Empower', chargeCost: 3, priority: 7,
       effect: EmpowerEffect(2));
@@ -103,23 +104,36 @@ abstract final class Spellbook {
       id: 'hasty', name: 'Hasty', chargeCost: 0, priority: 7,
       grantsHaste: true, effect: HasteEffect());
 
-  // Charge control: wipes all of the opponent's charge (no damage). At
-  // priority 7 it beats the priority-9 attacks — Barrage and Overload both
-  // fizzle against a well-timed Discharge.
+  // Charge control: wipes all of the opponent's charge (no damage). Still
+  // beats the priority-9 attacks — Barrage and Overload both fizzle against a
+  // well-timed Discharge.
+  //
+  // ⭐ Priority 8, the aux-OFFENSE lane (ruling, 2026-08-26 — TYPE_EFFECTS
+  // §7a). It points at the enemy and deals no damage, which is the exact
+  // definition of the new lane; sitting at 7 gave it the timing of a
+  // self-buff. What actually changes: an opponent's self-targeting aux — a
+  // Hasty, a Hallow, an Empower, a stance from the banked generation — now
+  // resolves BEFORE the Discharge that would have raced it. Their commitment
+  // lands; your interference lands after. Attacks are untouched.
   static const discharge = Spell(
-      id: 'discharge', name: 'Discharge', chargeCost: 2, priority: 7,
+      id: 'discharge', name: 'Discharge', chargeCost: 2,
+      priority: SpellPriority.auxOffense,
       effect: DischargeEffect());
 
   // Punish: ~7-11 damage per point of the ENEMY's charge (a full attack —
   // respects shields, benefits from Empower/Phase).
   //
-  // ⭐ Priority 9, the regular-attack slot (ruling, 2026-07-28). It is an
-  // offensive spell and belongs on the same clock as one; sitting at 7 gave it
-  // a quick-spell's timing on a full attack's payload. At 9 it reads the
-  // board *after* the turn's shields and quick attacks have landed, so
-  // punishing a charge bar means punishing one its owner chose to keep.
+  // ⭐ Priority 9, the regular-attack slot (ruling, 2026-07-28, re-affirmed by
+  // TYPE_EFFECTS §7a's "Overload → 9" 2026-08-26 — it had already moved off 7
+  // by then, so §7a's reclassification is a no-op here and the spell's timing
+  // is unchanged). It is an offensive spell and belongs on the same clock as
+  // one; sitting at 7 gave it a quick-spell's timing on a full attack's
+  // payload. At 9 it reads the board *after* the turn's shields and quick
+  // attacks have landed, so punishing a charge bar means punishing one its
+  // owner chose to keep.
   static const overload = Spell(
-      id: 'overload', name: 'Overload', chargeCost: 2, priority: 9,
+      id: 'overload', name: 'Overload', chargeCost: 2,
+      priority: SpellPriority.attack,
       effect: OverloadEffect(7, 11));
 
   // Status defence: banks Grace (blocks the next debuff). Element-neutral, so

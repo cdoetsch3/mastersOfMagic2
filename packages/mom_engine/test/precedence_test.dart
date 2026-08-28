@@ -24,6 +24,9 @@ class _Blind extends TurnStatus implements Blinding {
   _Blind(this.missChance, this.turnsLeft);
 
   @override
+  StatusPolarity get polarity => StatusPolarity.debuff;
+
+  @override
   String get id => 'blind';
 
   @override
@@ -125,11 +128,20 @@ void main() {
   });
 
   group('miss (Blind)', () {
-    test('a guaranteed miss makes a harmful spell do nothing but spend charge',
+    // ⚠️ UPDATED 2026-08-28 for the §7a 10% hit floor. A 1.0 blinder used to
+    // make the miss arithmetically certain, so this test could run on the
+    // shared unseeded engine. It can't any more: the floor leaves a 10%
+    // sliver even at −100 accuracy, and on the default RNG this test would
+    // have flaked one run in ten. The miss is now driven deterministically by
+    // [_AlwaysMiss]; what the test proves — that a missed harmful cast does
+    // nothing, still spends the charge, and advances no streak — is unchanged.
+    test('a rolled miss makes a harmful spell do nothing but spend charge',
         () {
       charge(alice, MagicElement.geo, 2);
-      alice.statuses.add(_Blind(1.0, 3)); // 100% miss
-      final r = duel.resolveTurn(
+      alice.statuses.add(_Blind(1.0, 3)); // 100% blind → the floored 90% miss
+      final blinded = DuelEngine(alice, bruno,
+          rng: _AlwaysMiss(), elementEffects: false, baseMissPercent: 0);
+      final r = blinded.resolveTurn(
           CastAction(Spellbook.blast), const ForfeitAction());
       final miss = r.events.whereType<SpellMissedEvent>().single;
       expect(bruno.hp, 100, reason: 'Blast missed');
@@ -152,12 +164,15 @@ void main() {
       expect(miss.blinded, isFalse, reason: 'no Blind, so no "blinded" blame');
     });
 
-    test('a guaranteed miss also nullifies Discharge (harmful, non-damaging)',
-        () {
+    // ⚠️ Same update, same reason: deterministic miss instead of an
+    // arithmetically-certain one, now that the 10% floor exists.
+    test('a rolled miss also nullifies Discharge (harmful, non-damaging)', () {
       charge(alice, MagicElement.geo, 3);
       charge(bruno, MagicElement.aqua, 4);
       alice.statuses.add(_Blind(1.0, 3));
-      duel.resolveTurn(
+      final blinded = DuelEngine(alice, bruno,
+          rng: _AlwaysMiss(), elementEffects: false, baseMissPercent: 0);
+      blinded.resolveTurn(
           CastAction(Spellbook.discharge), const ForfeitAction());
       expect(bruno.charge, 4, reason: 'a missed Discharge wipes nothing');
     });

@@ -1,4 +1,5 @@
 import 'element.dart';
+import 'status.dart';
 
 /// Whether a status helps its holder, hurts them, or is a moment rather than a
 /// lasting condition.
@@ -38,6 +39,32 @@ class StatusInfo {
   /// one-shot moments.
   final bool lingers;
 
+  /// Explicit polarity, when the [kind] derivation below is wrong for this
+  /// entry. Almost always null — see [polarity].
+  final StatusPolarity? polarityOverride;
+
+  /// Good for the holder, bad for them, or neither (TYPE_EFFECTS §7a law 3).
+  ///
+  /// ⭐ **This is where the field-backed statuses get classified.** Waterlogged,
+  /// Stagger, Grace, Haste, Empower, Quicken and Phase are plain fields on
+  /// [MageState], not [TurnStatus] objects, so the catalogue is the *only*
+  /// place they can carry a polarity — and Dispel, Cleanse and Purify all need
+  /// to know that Empower is strippable and Stagger is cleansable.
+  ///
+  /// Derived from [kind] rather than duplicated, because the two agree by
+  /// construction for every shipped entry and a hand-copied second field would
+  /// only ever drift. Moments map to [StatusPolarity.neutral]: a moment is a
+  /// flash in the log, not a condition — there is nothing there to strip.
+  /// [polarityOverride] exists for the case [StatusKind] cannot express, a
+  /// *lasting* status that is neither good nor bad.
+  StatusPolarity get polarity =>
+      polarityOverride ??
+      switch (kind) {
+        StatusKind.buff => StatusPolarity.buff,
+        StatusKind.debuff => StatusPolarity.debuff,
+        StatusKind.moment => StatusPolarity.neutral,
+      };
+
   const StatusInfo({
     required this.id,
     required this.name,
@@ -46,6 +73,7 @@ class StatusInfo {
     required this.kind,
     required this.element,
     required this.lingers,
+    this.polarityOverride,
   });
 }
 
@@ -310,6 +338,20 @@ abstract final class StatusCatalog {
   };
 
   static StatusInfo? byId(String id) => _byId[id];
+
+  /// The polarity of [id], or null when nothing by that id is catalogued.
+  ///
+  /// The lookup Dispel/Cleanse/Purify use for the **field-backed** statuses
+  /// (Waterlogged, Stagger, Grace, Haste, Empower, Quicken, Phase). A
+  /// [TurnStatus] answers for itself — ask `status.polarity` there instead, so
+  /// the runtime object stays the authority on the runtime object.
+  static StatusPolarity? polarityOf(String id) => _byId[id]?.polarity;
+
+  /// Lasting conditions of one polarity — Dispel's and Purify's target lists,
+  /// in catalogue order (which is fixed, so a lockstep pick is identical on
+  /// both clients).
+  static Iterable<StatusInfo> lastingWithPolarity(StatusPolarity p) =>
+      lasting.where((s) => s.polarity == p);
 
   /// Lasting conditions only — the ones that show as HUD pips.
   static Iterable<StatusInfo> get lasting => all.where((s) => s.lingers);

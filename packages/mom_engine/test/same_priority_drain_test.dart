@@ -72,14 +72,24 @@ void main() {
         reason: '1 charge remained, and Bolt costs 1');
   });
 
+  // ⚠️ UPDATED 2026-08-28 for the aux-lane split (§7a): Discharge moved from
+  // priority 7 to 8, so it no longer collides with Hasty (7) — which is the
+  // POINT of the ruling, and is covered by its own test below. The collision
+  // this file exists to guard is a same-priority one, so the partner becomes a
+  // stand-in cast at Discharge's new rung. Pairing two Discharges instead
+  // would have been a weaker test: both would drain, and neither would prove
+  // the drain reached a bar its owner had already committed to something else.
   test('a same-priority Discharge empties a committed bar and fizzles it', () {
     final you = mage('You', MagicElement.electro, 2);
     final wick = mage('Wick', MagicElement.umbra, 4);
 
-    // Discharge is priority 7; give Wick a priority-7 cast so they collide.
+    // A harmless aux-offense-lane cast, so Wick collides with Discharge at 8.
+    const decoy = Spell(
+        id: 'decoy', name: 'Decoy', chargeCost: 1,
+        priority: SpellPriority.auxOffense, effect: HallowEffect());
     final r = DuelEngine(you, wick, rng: Random(1), baseMissPercent: 0)
         .resolveTurn(CastAction(Spellbook.discharge),
-            CastAction(Spellbook.hasty, MagicElement.umbra));
+            CastAction(decoy, MagicElement.umbra));
 
     final drained = r.events.whereType<ChargeDrainedEvent>();
     expect(drained, isNotEmpty, reason: 'Discharge must take the committed bar');

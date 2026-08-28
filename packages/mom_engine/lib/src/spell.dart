@@ -2,9 +2,51 @@
 ///
 /// Spells are element-agnostic: a spell takes on the element the caster is
 /// currently charged with. Priority is 1–10; lower priority acts earlier in
-/// the turn (1 = instant attacks, 3 = shields, 4 = channel, 5 = quick attacks,
-/// 7 = aux/other defensive, 9 = regular spells).
+/// the turn — see [SpellPriority] for the named ladder.
 library;
+
+/// The priority ladder, named. Lower acts first; 1–10 is the whole range.
+///
+/// ⭐ **Aux splits into two lanes** (TYPE_EFFECTS §7a, ruled 2026-08-26). The
+/// shipped ladder had one aux rung at 7 for everything that wasn't a shield or
+/// an attack. It now splits by *who you are pointing at*:
+///
+///  - [auxDefense] (7) — you act on yourself. Stances, next-attack riders,
+///    cleanses, initiative.
+///  - [auxOffense] (8) — you act on the ENEMY without dealing damage. Debuff
+///    granters, enemy-status surgery, charge control.
+///
+/// The consequence, and the reason for the split: **your debuff lands before
+/// their attack resolves, and their self-stance lands before your debuff
+/// does.** Committing to a stance is rewarded over reacting to one, and a
+/// debuff still beats the attack it is meant to blunt.
+///
+/// ⚠️ These are constants, not an enum, because [Spell.priority] is an `int`
+/// that Quicken overrides to 2 and Waterlogged raises by 10 — the ladder is a
+/// number line with named rungs, not a closed set.
+abstract final class SpellPriority {
+  /// Instants and a Quickened attack (2) — ahead of shields.
+  static const int instant = 1;
+
+  static const int shield = 3;
+
+  static const int channel = 4;
+
+  /// Quick attacks: beat aux and regular spells, but not shields.
+  static const int quick = 5;
+
+  /// Self-targeting aux: Empower, Quicken, Phase, Hasty, Hallow — and the
+  /// banked stances (Lightfoot, Truesight, Keen, Composure, Meditate…).
+  static const int auxDefense = 7;
+
+  /// Enemy-targeting aux that deals no damage: Discharge — and the banked
+  /// debuff granters and status surgery (Murk, Wither, Blight, Dispel,
+  /// Fester, Scour, Shatter).
+  static const int auxOffense = 8;
+
+  /// Regular attacks, including Overload.
+  static const int attack = 9;
+}
 
 class Spell {
   final String id;

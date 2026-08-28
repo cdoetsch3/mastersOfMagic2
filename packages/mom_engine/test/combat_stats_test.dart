@@ -170,13 +170,23 @@ void main() {
       expect(alice.hp, 100, reason: 'nothing is bounced back to the attacker');
     });
 
-    test('deflectAmount is clamped to 100 — damage never goes negative', () {
+    // ⚠️ UPDATED 2026-08-28 with the §7a "Deflect clamps" ruling. This test
+    // used to be 'deflectAmount is clamped to 100 — damage never goes
+    // negative' and expected hp 100 (the whole hit erased). The ruling
+    // replaced the [0,100] safety clamp with a hard 90% cap on the deflected
+    // fraction, so the assertion moves from "all of it" to "90% of it, and a
+    // sliver lands". The old expectation is not deleted — it is superseded:
+    // its purpose (damage never goes negative) is still covered, because 90%
+    // of a positive number is still less than it.
+    test('the deflected fraction caps at 90% — a sliver always lands', () {
       bruno
         ..deflectChance = 100
-        ..deflectAmount = 120; // engine clamps to 100 (50% player cap is gear)
+        ..deflectAmount = 120; // ruled cap: 90
       final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
       cast(duel, dmg(20), MagicElement.pyro);
-      expect(bruno.hp, 100, reason: 'all removed, not negative');
+      expect(bruno.hp, 98,
+          reason: '⚠️ kills the old clamp-to-100 (hp 100, hit erased) and the '
+              'unclamped read (hp 100 too, at 120%); 90% of 20 is 18, so 2 lands');
     });
   });
 
