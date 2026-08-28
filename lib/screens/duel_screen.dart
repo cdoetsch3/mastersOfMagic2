@@ -19,6 +19,7 @@ import '../game/progression.dart';
 import '../game/items/item_catalogue.dart';
 import '../game/enemies/enemy_def.dart';
 import '../ui/app_theme.dart';
+import '../ui/charge_dots.dart';
 import '../ui/creature_art.dart';
 import '../ui/item_display.dart' show rarityColour;
 import '../ui/item_icon.dart';
@@ -1566,66 +1567,93 @@ class _DuelScreenState extends State<DuelScreen>
           child: InkWell(
             onTap: usable ? () => _submit(c.castAction(spell)) : null,
             borderRadius: BorderRadius.circular(10),
-            child: Container(
-              height: 46,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1836),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFF373060)),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    spellIcons[spell.id] ?? Icons.auto_fix_high,
-                    size: 19,
-                    color: elementColor,
+            // ⭐ The Stack sits OUTSIDE the tab body rather than inside it.
+            // Wrapping the inner Row would hand it loose constraints and let
+            // the name, the caption and the key chip re-centre themselves;
+            // this way the Container keeps the exact tight box it always had,
+            // and the Stack — whose only non-positioned child IS that
+            // Container — measures identically. Adding the dots therefore
+            // moves nothing, on any tab, at any cost.
+            child: Stack(
+              children: [
+                Container(
+                  height: 46,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E1836),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFF373060)),
                   ),
-                  const SizedBox(width: 7),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          spell.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFFECE7F8),
-                            fontSize: 11.5,
-                          ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        spellIcons[spell.id] ?? Icons.auto_fix_high,
+                        size: 19,
+                        color: elementColor,
+                      ),
+                      const SizedBox(width: 7),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              spell.name,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFFECE7F8),
+                                fontSize: 11.5,
+                              ),
+                            ),
+                            Text(
+                              spell.xCost
+                                  ? 'cost X'
+                                  : 'cost ${spell.chargeCost}',
+                              style: const TextStyle(
+                                color: Color(0xFF9C93C4),
+                                fontSize: 9,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          spell.xCost ? 'cost X' : 'cost ${spell.chargeCost}',
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF141021),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: const Color(0xFF443A6A)),
+                        ),
+                        child: Text(
+                          _spellKeyLabels[slot],
                           style: const TextStyle(
                             color: Color(0xFF9C93C4),
-                            fontSize: 9,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF141021),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: const Color(0xFF443A6A)),
-                    ),
-                    child: Text(
-                      _spellKeyLabels[slot],
-                      style: const TextStyle(
-                        color: Color(0xFF9C93C4),
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.bold,
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                // The price, in the corner, in the duel's own pip language.
+                // ⚠️ top:3, not 4. The name's text box starts 8.5px down and
+                // the pips are 4.5 tall, so 4 makes them share an edge with
+                // it; 3 leaves a real gap. The key chip is centred in the
+                // 46px band below, so the two never meet vertically either.
+                // Reserved even for Flick, so nothing shifts.
+                Positioned(
+                  top: 3,
+                  right: 6,
+                  child: ChargeDots(
+                    cost: spell.chargeCost,
+                    variable: spell.xCost,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
