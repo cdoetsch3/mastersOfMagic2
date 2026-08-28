@@ -254,6 +254,27 @@ on your charge cap.*
 - Preset validation (≥1 element, ≥1 offensive spell) is satisfiable from L1:
   Flick and Bolt are both offensive.
 
+### 4.2 Banked-bank placements ✅ (approved 2026-08-28 — designed, NOT built)
+
+The 34-spell combat-stat bank (TYPE_EFFECTS_DESIGN §7a) is design-final
+with these placements, approved with no notes. Specs live in §7a — this
+is the unlock mirror. Unlock enforcement remains OFF for playtesting;
+this is the schedule for when it turns on.
+
+| Level | Bank spells added |
+|---|---|
+| **10** | Glance, Mend |
+| **15** | Lightfoot, Truesight, Murk, Agony |
+| **20** | Keen, Heavyhand, Steadfast, Wither, Torment |
+| **25** | Divert, Hawkeye, Miasma, Composure, Fester, Cleanse |
+| **30** | Unerring, Pierce, Scour, Meditate, Death Wish |
+| **35** | Twinkle Toes, Ardent, Overkill, Renewal, Execute, Atrophy |
+| **40** | Bloodlust, Shatter, Purify, Blight, Dispel |
+| **45** | Reflect |
+
+📝 When the bank builds, fold these rows into the §4 master table and
+retire this mirror.
+
 ---
 
 ## 5. Open questions
@@ -269,6 +290,12 @@ on your charge cap.*
 ---
 
 ## Changelog
+
+**Rev 4** — §4.2 added: unlock placements for the 34-spell combat-stat
+bank (TYPE_EFFECTS §7a), approved 2026-08-28 with no notes. Two spells
+per new idea at L10 up through Reflect filling the empty L45 bucket;
+counters never unlock before what they counter; charge-cap gates hold.
+Mirror only — specs stay in §7a; fold into §4 when built.
 
 **Rev 3** — Slot growth settled: **5 at L1 → 15 at L50** on an explicit
 ten-step schedule (L3/6/10/15/20/26/32/38/44/50), replacing the "+1 per 5

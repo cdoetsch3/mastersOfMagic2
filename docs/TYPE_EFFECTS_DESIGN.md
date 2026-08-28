@@ -1014,7 +1014,7 @@ actions over the charged-nuke drama the game is built around.
 
 ---
 
-## 7a. Banked spells — the combat-stat generation 📝 (designed 2026-08-26, not built)
+## 7a. Banked spells — the combat-stat generation ✅ (design FINAL 2026-08-28, not built)
 
 ⚠️ **This section is the REBUILT bank** — the plan doc's original "§7a — 16
 banked spell ideas" was never committed and is lost (verified against full
@@ -1142,12 +1142,12 @@ HoTs, Regrow, potions, the Drain line, everything. ⚠️ First spell touching
 the potion lane; spec deliberately). *(Blight promoted out of this set
 2026-08-26; ✅ a proper tier 2 approved same day at 4c/30 turns — and
 ✅ ruled: **the Wither status is ALWAYS −50%** — the tier 2 buys triple
-the DURATION, never more depth. 📝 The name Atrophy is a provisional
-fill: alternatives Rot, Decay, Canker.)*
+the DURATION, never more depth. ✅ Atrophy confirmed as the name,
+2026-08-28.)*
 | Spell | Cost · prio | Grants |
 |---|---|---|
 | **Wither** | 2 · aux-off | Wither −50% healing received, 10 turns |
-| **Atrophy** 📝 | 4 · aux-off | Wither −50% healing received, 30 turns |
+| **Atrophy** | 4 · aux-off | Wither −50% healing received, 30 turns |
 
 **Blight** — binary debuff: the target's heals deal DAMAGE instead of
 healing. Applies to HoTs, consumables, Photosynthesis, AND lifesteal
@@ -1251,15 +1251,29 @@ concurrently; recasting one refreshes it, law 5.)*
 | **Dispel** | 4 · aux-off | Strip the target's buffs (polarity: buff, all strippable lanes). The meta-leash on stance-stacking itself. |
 | **Meditate** | 2 · aux | Every **turn-timed** buff you have gains +5 turns. ✅ *Boundary ruled 2026-08-26: touches only buffs on a turn timer — next-attack riders (Phase/Pierce/Unerring/Empower) and other untimed buffs are exempt, or a 2c spell starts banking Empowers.* Fester's mirror — one feeds your DoTs on them, one feeds your stances. |
 
-✅ **Fester EV note (analysis CONFIRMED by ruling 2026-08-26 — 2c/+4
-stands):** with one DoT running, +4 ticks buys ~16–24 delayed damage for
-2c — around Blast's rate at best. With Agony AND Torment up it's ~40 for
-2c — the best damage-per-charge in the book, still delayed. The spike is
-**Fester → Scour** (3c total): the added ticks stop being delayed at all.
-Full line Agony→Torment→Fester→Scour = 8 charge for ~120 damage over 4
-turns vs ~93 for Surge+Surge+Blast in 3. Designer's read: "a unique way
-to play" — and a Pyro loadout can sneak Ignite in as a third DoT to
-really get cooking. Swingy by design; sim still gets a vote on the bands.
+✅ **Fester EV note (2c/+4 confirmed 2026-08-26; RECALIBRATED 2026-08-28
+after a designer correction — each charge takes a TURN, plus a turn to
+cast, so the metric is damage per TURN, not per charge):**
+
+- The full line Agony→Torment→Fester→Scour is 8 charge + 4 casts =
+  **12 turns**, not the 4 the first pass implied.
+- Attack baselines per turn (cost+1 turns per cycle): Cataclysm ~10.9 ·
+  Ruin ~9.7 · Surge ~8.75 · Blast ~7.7.
+- **Sequencing truth: Fester almost never catches Agony.** Agony's
+  3-tick window closes in 3 turns; Fester needs 2 charge turns + a cast
+  after Agony lands. Even pre-banking at cap, one Fester catches EITHER
+  a fresh Agony (+24) OR Torment (+16) — never both. Torment is Fester's
+  true partner; Agony is the tempo-filler. The "+40 for one Fester" case
+  needs a live Ignite — which the line can legitimately fish for by
+  paying its casts with Pyro charge (10% proc per charge spent).
+- Honest line total: ~95 damage over 12 turns ≈ **8/turn** — Surge
+  tempo, BELOW Ruin/Cataclysm cycling. What keeps it viable: ticks land
+  during your own charge turns, the damage arrives smoothly instead of
+  in bursts, and Scour converts the back-loaded tail into now.
+
+⭐ Verdict after recalibration: tempo-PAR with utility, not degenerate —
+Fester's 2c/+4 is justified and arguably necessary. Designer's read
+stands: "a unique way to play." Sim still gets a vote at build time.
 
 **Cleanse & Purify** ✅ *(proposed and APPROVED 2026-08-26, filling the
 hole Scour's defection opened — nothing removed your own DoTs/debuffs in
@@ -1299,7 +1313,7 @@ Agony, Torment, and Death Wish; rev 4 added Cleanse + Purify; rev 5 gave
 Wither its tier 2, Atrophy 📝) — larger than the shipped book of 25,
 still the right order of magnitude for a generation.
 
-### Unlock placements 📝 DRAFT (needs red-pen — PROGRESSION §4 holds the shipped table)
+### Unlock placements ✅ APPROVED 2026-08-28 ("no notes" — PROGRESSION §4 holds the shipped table; §4.2 there mirrors this)
 
 Principles: nothing before its charge cap (4c ≥ L20, 5c ≥ L40, per the cap
 schedule); no counter before the thing it counters; the stat game opens
@@ -1307,8 +1321,8 @@ with Kinetic (L15), where dodge/deflect/crit gear and enemies live; the
 empty L45 bucket gets a resident. Unlock enforcement is currently OFF for
 playtesting — this is the schedule for when it turns on.
 
-*(Draft revised for the rev-5 list — 34 spells. Christian red-pens this
-AFTER the spell list itself is final, by ruling 2026-08-26.)*
+*(Approved against the rev-5 list — 34 spells, unlock order and roster
+both, 2026-08-28.)*
 
 | Level | New spells (+n) | Why here |
 |---|---|---|
@@ -1321,7 +1335,7 @@ AFTER the spell list itself is final, by ruling 2026-08-26.)*
 | **40** | Bloodlust, Shatter, Purify, Blight, Dispel (+5) | The 5c cap opens (Bloodlust, Shatter, Purify); the hard counters (Blight, Dispel) arrive once stances are the meta. |
 | **45** | Reflect (+1) | Ethereal's opening gift — the L45 bucket is no longer empty. |
 
-### Open decisions before any of this builds
+### Decision trail (all resolved — kept where learned)
 
 ✅ *Resolved 2026-08-26:* dodge/deflect caps → replaced by the OUTPUT
 clamps above (10% hit floor, 90/90 deflect) — no per-stat player caps.
@@ -1348,11 +1362,18 @@ math and all · Wither gets its tier 2 at 4c/30 turns.
 ✅ *And the follow-up ruling:* the Wither status is always −50% — Atrophy
 buys duration (30t vs 10t), never depth.
 
-Still open:
-1. **Atrophy's name** 📝 — provisional fill for the approved 4c/30t
-   Wither tier 2 (alternatives at the set).
-2. **Agony/Torment damage bands** — provisional until a balance-sim run.
-3. **Unlock draft above** — red-pen AFTER the spell list is final (ruled).
+✅ *Resolved 2026-08-28 (rev 6 — the closing round):* Atrophy confirmed ·
+Agony/Torment bands approved · unlock order and roster approved with no
+notes · Fester tempo math recalibrated to turns-not-charges (designer
+correction; see the EV note).
+
+**✅ NONE STILL OPEN — the bank is DESIGN-FINAL: 34 spells, ruled and
+placed.** What remains is build-phase work, in order: version bump to 4
+opens the batch (standing rule) → the two engine seams (stat derivation;
+polarity + classification pass over shipped statuses) → statuses + spells
+against the test ledger above → Discharge/Overload reclassification →
+HUD pips per set → LadderAi EV heuristics → balance-sim run validating
+Agony/Torment bands and the DoT-line tempo.
 
 ⭐ **Build-time test ledger** (mutation-verified, per convention — grows as
 rulings land):
