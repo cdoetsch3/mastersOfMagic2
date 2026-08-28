@@ -14,4 +14,4 @@
 /// constants — the suite fails on any drift, which is what "keep in sync
 /// with pubspec" comments never achieved (0.12.0/26 vs 0.13.0+27 vs
 /// content 2 is how it looked the day the test was written).
-const String appVersion = '0.13.0';
+const String appVersion = '0.14.0';
