@@ -176,6 +176,8 @@ class StatusSnapshot {
     }
     if (m.quickenPriority != null) out.add(const StatusView(id: 'quicken'));
     if (m.phaseNext) out.add(const StatusView(id: 'phase'));
+    if (m.pierceNext) out.add(const StatusView(id: 'pierce'));
+    if (m.unerringNext) out.add(const StatusView(id: 'unerring'));
     if (m.priorityPenalty > 0) out.add(const StatusView(id: 'waterlogged'));
     if (m.nextOffensiveDamageScale < 1.0) {
       out.add(const StatusView(id: 'stagger'));

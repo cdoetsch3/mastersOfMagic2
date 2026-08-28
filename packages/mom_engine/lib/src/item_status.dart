@@ -19,6 +19,10 @@ class RegrowStatus extends TurnStatus {
 
   RegrowStatus(this.percentPerTurn);
 
+  // ⚠️ Deliberately NOT [TurnTimed]: it has no clock to extend. Meditate must
+  // find nothing here — a worn item's heal is already permanent, and "+5 turns"
+  // on a thing that never ends is either a no-op or a bug.
+
   /// ⚠️ Genuinely ambiguous, ruled **buff**: polarity answers "is this good for
   /// the holder", and it plainly is. Whether Dispel may strip a status the
   /// wearer's *gear* is generating is a separate question — a lane question,
@@ -49,13 +53,14 @@ class RegrowStatus extends TurnStatus {
 /// 📝 Nothing in the duel APPLIES this yet: using a belt item as a turn
 /// action is unbuilt. The primitive ships first so the belt work lands on a
 /// tested tick instead of inventing one under UI pressure.
-class HealOverTimeStatus extends TurnStatus {
+class HealOverTimeStatus extends TurnStatus implements TurnTimed {
   /// Percent of max HP restored at the end of each remaining turn.
   final int percentPerTurn;
 
   /// What granted it — the log line says the item's name, not "a status".
   final String source;
 
+  @override
   int turnsLeft;
 
   HealOverTimeStatus({
@@ -66,6 +71,9 @@ class HealOverTimeStatus extends TurnStatus {
 
   @override
   StatusPolarity get polarity => StatusPolarity.buff;
+
+  @override
+  void extendTurns(int turns) => turnsLeft += turns;
 
   @override
   String get id => 'healOverTime';

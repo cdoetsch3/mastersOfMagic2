@@ -37,16 +37,34 @@ typedef ConsumableLookup = ConsumableEffect? Function(String defId);
 /// same move always produces the same commitment hash.
 ///   channel: `C|<element>`
 ///   cast:    `S|<spellId>|<element>`
+///   cast+:   `S|<spellId>|<element>|<statusId>`  (Cleanse's chosen debuff)
 ///   item:    `U|<defId>`
 /// `<element>` is the element name, or empty for null (continuing a cycle).
+///
+/// ⭐ The status segment is **appended only when there is one**, never emitted
+/// empty. That keeps every move the game has ever encoded byte-identical to
+/// what it encoded before — a cast without a choice hashes exactly as it did,
+/// so no commitment, replay or stored fixture shifts under the feature.
 String encodeAction(MageAction action) {
   return switch (action) {
     ForfeitAction() => 'F',
     ChargeAction(:final element) => 'C|${element?.name ?? ''}',
-    CastAction(:final spell, :final element) =>
-      'S|${spell.id}|${element?.name ?? ''}',
+    CastAction(:final spell, :final element, :final statusChoice) =>
+      'S|${spell.id}|${element?.name ?? ''}${_statusSegment(statusChoice)}',
     UseItemAction(:final itemId) => 'U|$itemId',
   };
+}
+
+/// The optional 4th cast segment. ⚠️ `|` is the field separator, so a status id
+/// containing one would silently re-shape the move on the way back in; ids are
+/// engine-controlled identifiers, and this is the assertion that keeps them so.
+String _statusSegment(String? statusChoice) {
+  if (statusChoice == null) return '';
+  if (statusChoice.isEmpty || statusChoice.contains('|')) {
+    throw ArgumentError.value(
+        statusChoice, 'statusChoice', 'must be a non-empty id without "|"');
+  }
+  return '|$statusChoice';
 }
 
 /// Inverse of [encodeAction]. Throws [FormatException] on malformed input.
@@ -64,6 +82,10 @@ MageAction decodeAction(String wire, {ConsumableLookup? consumables}) {
       return ChargeAction(elem(parts[1]));
     case 'S' when parts.length == 3:
       return CastAction(Spellbook.byId(parts[1]), elem(parts[2]));
+    // A cast that names the status it is aimed at (Cleanse). Length is the
+    // discriminator, so old three-part casts keep decoding unchanged.
+    case 'S' when parts.length == 4 && parts[3].isNotEmpty:
+      return CastAction(Spellbook.byId(parts[1]), elem(parts[2]), parts[3]);
     case 'U' when parts.length == 2:
       final effect = consumables?.call(parts[1]);
       // ⚠️ An unresolvable item is a FormatException, never a silently inert

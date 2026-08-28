@@ -142,6 +142,27 @@ abstract interface class HealingModifier {
 /// as a bug rather than as a combo.
 abstract interface class HealInverting {}
 
+/// A status whose life is measured in **turns**, as opposed to stacks (Creeping
+/// Dark), a streak (Photosynthesis), or "until consumed" (the next-attack
+/// riders, which are not statuses at all).
+///
+/// ⭐ The seam the §7a **duration surgery** works through: **Meditate** adds
+/// turns to the [StatusPolarity.buff] half, **Fester** to the debuff half.
+/// Anything not on a turn timer is untouchable by either.
+///
+/// ⚠️ A marker, deliberately, rather than "does it happen to have a `turnsLeft`
+/// field". Meditate's ruled boundary (2026-08-26) is that next-attack riders
+/// and other untimed buffs gain NOTHING — and the way to make that boundary
+/// enforceable rather than remembered is to make having a clock something a
+/// status has to *say*. Polarity answers "whose side is it on"; this answers
+/// "is there a clock to move at all". Meditate needs both, and so does Fester.
+abstract interface class TurnTimed {
+  int get turnsLeft;
+
+  /// Adds [turns] to the clock. Never shortens it — both callers are gifts.
+  void extendTurns(int turns);
+}
+
 /// A persistent status on a mage, resolved each turn's start and end phases.
 ///
 /// Statuses are pure data + timing: they declare *what* they want to do via

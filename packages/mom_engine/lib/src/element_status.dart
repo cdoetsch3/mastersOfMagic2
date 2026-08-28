@@ -16,9 +16,11 @@ import 'status.dart';
 /// ⭐ Ignite is a [DamageOverTime] like every other burn (2026-08-28): Fester
 /// extends it and Scour collects it, and it says so through the interface
 /// rather than by name — which is what lets the spell lane's DoTs and this one
-/// feed the same machinery without either knowing the other exists.
-class IgniteStatus extends TurnStatus implements DamageOverTime {
+/// feed the same machinery without either knowing the other exists. It is
+/// also [TurnTimed] — on a clock, though not the holder's to Meditate.
+class IgniteStatus extends TurnStatus implements DamageOverTime, TurnTimed {
   int perTick;
+  @override
   int turnsLeft;
 
   IgniteStatus(this.perTick) : turnsLeft = 3;
@@ -34,6 +36,11 @@ class IgniteStatus extends TurnStatus implements DamageOverTime {
 
   @override
   void addTicks(int count) => turnsLeft += count;
+
+  /// ⚠️ [TurnTimed] + debuff is exactly the pair Fester feeds and Meditate must
+  /// not: a burn is on a clock, but it is not the holder's to extend.
+  @override
+  void extendTurns(int turns) => turnsLeft += turns;
 
   /// Re-proc: a fresh 3-tick clock at the new attack's value.
   void refresh(int newPerTick) {
@@ -118,12 +125,16 @@ class PhotosynthesisStatus extends TurnStatus {
 /// refreshes the window. Astral spells are exempt (checked at the miss gate,
 /// §4b table). While present it also **eclipses** the holder's moon to New
 /// (the engine reads its presence — TYPE_EFFECTS §4b.3).
-class BlindStatus extends TurnStatus implements Blinding {
+class BlindStatus extends TurnStatus implements Blinding, TurnTimed {
+  @override
   int turnsLeft = 3;
   bool _justApplied = true;
 
   @override
   StatusPolarity get polarity => StatusPolarity.debuff;
+
+  @override
+  void extendTurns(int turns) => turnsLeft += turns;
 
   /// Re-proc: a fresh 3-turn window starting next turn.
   void refresh() {

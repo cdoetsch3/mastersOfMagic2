@@ -74,6 +74,14 @@ const Map<String, StatusFx> statusFx = {
   'quicken': StatusFx(AppColors.sky, StatusMotion.streak),
   'phase': StatusFx(AppColors.gem, StatusMotion.ghost),
 
+  // ---- Banked next-attack riders (TYPE_EFFECTS §7a) --------------------
+  // ⚠️ HUD-lane placeholders, like the stances below: a colour and a motion
+  // each so the catalogue stays covered and neither rider falls back to the
+  // generic pulse. Kept in Phase's family (they are its siblings) while
+  // staying distinct from it and from each other.
+  'pierce': StatusFx(Color(0xFFB07CE0), StatusMotion.align),
+  'unerring': StatusFx(Color(0xFFD9E06B), StatusMotion.align),
+
   // ---- Banked stat stances (TYPE_EFFECTS §7a) --------------------------
   // ⚠️ Placeholders in the HUD lane's sense — a colour and a motion each, so
   // the catalogue stays covered and no stance falls back to the generic
@@ -114,6 +122,12 @@ const Map<String, StatusFx> statusFx = {
   'deathWish': StatusFx(Color(0xFF8E1F2F), StatusMotion.rise),
   'reflect': StatusFx(Color(0xFF9FE8DC), StatusMotion.scatter),
   'mending': StatusFx(Color(0xFF77C97A), StatusMotion.orbit),
+
+  // The bank's self-instants (§7a) — HUD-lane placeholders.
+  'cleansed': StatusFx(Color(0xFFA8E6CF), StatusMotion.scatter),
+  'cleanseEmpty': StatusFx(Color(0xFFBDB6D4), StatusMotion.dim),
+  'purified': StatusFx(Color(0xFFA8E6CF), StatusMotion.bloom),
+  'meditated': StatusFx(Color(0xFFC9B6F2), StatusMotion.converge),
   'absolutionRising': StatusFx(Color(0xFFF2E7C9), StatusMotion.rise),
   'absolution': StatusFx(Color(0xFFF2E7C9), StatusMotion.bloom),
   'graceConsumed': StatusFx(Color(0xFFF2E7C9), StatusMotion.scatter),

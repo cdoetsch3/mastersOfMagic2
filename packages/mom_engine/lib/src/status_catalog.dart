@@ -235,6 +235,36 @@ abstract final class StatusCatalog {
       lingers: true,
     ),
 
+    // ---- Banked NEXT-ATTACK RIDERS (TYPE_EFFECTS §7a) -------------------
+    // ⭐ Phase's two siblings, described in the same voice: one bypass each,
+    // and each waits for an ATTACK rather than a clock — which is also why
+    // Meditate cannot deepen them and Dispel's polarity sweep cannot find them.
+    StatusInfo(
+      id: 'pierce',
+      name: 'Pierce',
+      description:
+          'Your next offensive spell cannot be deflected — the enemy\'s Divert '
+          'does not even roll against it. Waits as long as it needs to: '
+          'shields and aux spells do not consume it.',
+      trigger: 'Casting Pierce.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'unerring',
+      name: 'Unerring',
+      description:
+          'Your next offensive spell cannot miss. Dodge, blindness and the '
+          'base miss chance all stop applying — it does not roll to hit at '
+          'all, which is the one thing in the game that beats a dodge stance '
+          'outright.',
+      trigger: 'Casting Unerring.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+
     // ---- Banked STAT STANCES (TYPE_EFFECTS §7a) -------------------------
     // ⭐ One entry per SET, never per spell: Lightfoot and Twinkle Toes are two
     // prices for the status below, so the guide describes the stance once and
@@ -433,6 +463,54 @@ abstract final class StatusCatalog {
     ),
 
     // ---- Moments: things that happen, rather than conditions ------------
+    // The bank's self-instants (§7a INSTANTS) report as moments: they change
+    // the board and leave nothing behind to carry.
+    StatusInfo(
+      id: 'cleansed',
+      name: 'Cleansed',
+      description:
+          'One debuff of your choosing has been lifted off you — a burn, a '
+          'blindness, whatever you named. Only one: Cleanse is for the big '
+          'commitments, not the chip.',
+      trigger: 'Casting Cleanse with at least one debuff on you.',
+      kind: StatusKind.moment,
+      element: null,
+      lingers: false,
+    ),
+    StatusInfo(
+      id: 'cleanseEmpty',
+      name: 'Nothing to cleanse',
+      description:
+          'The rite found no debuff to lift. The cast still resolved and the '
+          'charge is still spent — you simply had nothing wrong with you.',
+      trigger: 'Casting Cleanse or Purify while entirely clean.',
+      kind: StatusKind.moment,
+      element: null,
+      lingers: false,
+    ),
+    StatusInfo(
+      id: 'purified',
+      name: 'Purified',
+      description:
+          'Every debuff on you is gone at once. Your buffs and stances are '
+          'untouched — this undoes what was done TO you, not everything.',
+      trigger: 'Casting Purify with at least one debuff on you.',
+      kind: StatusKind.moment,
+      element: null,
+      lingers: false,
+    ),
+    StatusInfo(
+      id: 'meditated',
+      name: 'Meditated',
+      description:
+          'Every buff of yours that runs on a turn count gains five more '
+          'turns — your stances deepen. Next-attack riders wait for an attack '
+          'rather than a clock, so they gain nothing.',
+      trigger: 'Casting Meditate.',
+      kind: StatusKind.moment,
+      element: null,
+      lingers: false,
+    ),
     StatusInfo(
       id: 'fester',
       name: 'Fester',

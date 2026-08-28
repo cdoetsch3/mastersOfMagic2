@@ -68,12 +68,20 @@ abstract interface class StanceDescribing {
 /// that cannot answer the attack landing behind it in the same turn reads as
 /// the spell not working.
 abstract class StatStanceStatus extends TurnStatus
-    implements StatModifier, StanceDescribing {
+    implements StatModifier, StanceDescribing, TurnTimed {
   /// Turns of life left, decremented once per end phase.
   @override
   int turnsLeft;
 
   StatStanceStatus(this.turnsLeft);
+
+  /// ⭐ [TurnTimed] is what puts every stance on **Meditate**'s table (§7a): a
+  /// buff on a clock is precisely what Meditate feeds, and the stances are the
+  /// stance game Meditate exists to raise the stakes of. Nothing else about a
+  /// stance changes — the clock is still decremented once per end phase, and
+  /// Dispel still strips it whatever the clock says.
+  @override
+  void extendTurns(int turns) => turnsLeft += turns;
 
   /// ⭐ Every stance is a [StatusPolarity.buff] — which is what puts all ten
   /// spells in Dispel's target list for free, and keeps them out of Cleanse's,

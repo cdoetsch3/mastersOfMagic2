@@ -38,10 +38,19 @@ String _numbers(Spell spell) => switch (spell.effect) {
   // These headline figures are all short labels, so they all capitalise —
   // mixing 'Haste' with 'pierce' read as a bug.
   QuickenEffect() => 'Faster',
-  PhaseEffect() => 'Pierce',
+  // ⚠️ The headline for each rider is its own name, not a shared 'Pierce' —
+  // that label predated the spell actually called Pierce (§7a).
+  PhaseEffect(:final bypass) => switch (bypass) {
+    AttackBypass.shields => 'Phase',
+    AttackBypass.deflection => 'Pierce',
+    AttackBypass.evasion => 'Unerring',
+  },
   HasteEffect() => 'Haste',
   DischargeEffect() => 'All',
   HallowEffect() => 'Grace',
+  // The banked self-instants (§7a). Sealed switch: these arms are not optional.
+  CleanseEffect(:final all) => all ? 'All' : 'One',
+  MeditateEffect(:final bonusTurns) => '+$bonusTurns',
   // A banked stance (TYPE_EFFECTS §7a): the headline is the COMMITMENT,
   // because that is what separates a set's two price points — the magnitudes
   // are close, the clocks are not. ⚠️ [SpellEffect] is sealed, so this arm is
@@ -79,10 +88,21 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
   BarrierEffect() => 'of Barrier (max 3) — each point blocks one whole hit',
   EmpowerEffect() => 'damage on your next offensive spell',
   QuickenEffect() => 'your next offensive spell resolves sooner',
-  PhaseEffect() => 'your next offensive spell ignores shields',
+  PhaseEffect(:final bypass) => switch (bypass) {
+    AttackBypass.shields => 'your next offensive spell ignores shields',
+    AttackBypass.deflection =>
+      "banked — your next offensive spell cannot be deflected; the enemy's "
+          'Divert does not roll against it',
+    AttackBypass.evasion =>
+      'banked — your next offensive spell cannot miss, whatever the dodge',
+  },
   HasteEffect() => 'seized — you win same-speed ties',
   DischargeEffect() => "of the enemy's charge, wiped",
   HallowEffect() => 'banked — it blocks the next debuff applied to you',
+  CleanseEffect(:final all) => all
+      ? 'debuff removed from you at once — buffs and stances are untouched'
+      : 'debuff of your choice, removed from you',
+  MeditateEffect() => 'turns added to every buff of yours that runs on a clock',
   final StanceEffect stance => _stanceLabel(stance),
 };
 

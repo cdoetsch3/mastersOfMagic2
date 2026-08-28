@@ -417,10 +417,70 @@ abstract final class Spellbook {
   ];
   // ⬆⬆ END BANKED SPECIAL STANCES & SUSTAIN ⬆⬆
 
-  /// The spells the game ships to players. ⚠️ See [stances], [bankSpecials]
-  /// and [bankDots]: the banked generations are built but not yet listed
-  /// here, because everything in this list needs app-side copy the engine
-  /// lane does not own.
+  // ⬇⬇ BEGIN BANKED RIDERS, FINISHER & SELF-INSTANTS ⬇⬇
+  // TYPE_EFFECTS_DESIGN.md §7a — "NEXT-ATTACK BUFFS", "ATTACKS", "INSTANTS".
+
+  /// **Pierce** — the next offensive attack cannot be deflected.
+  ///
+  /// ⭐ Pierce and Unerring were drafted as attacks and re-ruled into riders
+  /// (2026-08-26): as attacks they needed damage bands nobody had priced; as
+  /// riders they combo with every attack in the book, and shipped Phase already
+  /// proved the pattern. One clean trio, one bypass each — all three at
+  /// [SpellPriority.auxDefense], all three self-targeting.
+  static const pierce = Spell(
+      id: 'pierce', name: 'Pierce', chargeCost: 3,
+      priority: SpellPriority.auxDefense,
+      effect: PhaseEffect(AttackBypass.deflection));
+  static const unerring = Spell(
+      id: 'unerring', name: 'Unerring', chargeCost: 3,
+      priority: SpellPriority.auxDefense,
+      effect: PhaseEffect(AttackBypass.evasion));
+
+  /// **Execute** — Surge's 3-cost damage band at 4 charge, plus a guaranteed
+  /// crit under 30% health. ⭐ The rider IS the discount, and it is what makes
+  /// holding a Heavyhand worth the slot.
+  static const execute = Spell(
+      id: 'execute', name: 'Execute', chargeCost: 4,
+      priority: SpellPriority.attack,
+      effect: DamageEffect(31, 39, executeBelowPercent: 30));
+
+  /// **Cleanse** / **Purify** / **Meditate** — status surgery on yourself, so
+  /// aux-DEFENSE (7) rather than the aux-offense rung the enemy-side instants
+  /// (Fester, Scour, Shatter, Dispel) will take.
+  ///
+  /// ⚠️ Purify at 5 is deliberately the wrong side of Dispel's 4: Dispel is
+  /// tempo-offense, Purify is recovery, and at 5 it also lives under
+  /// Discharge-starvation — the same tax Shatter pays.
+  static const cleanse = Spell(
+      id: 'cleanse', name: 'Cleanse', chargeCost: 2,
+      priority: SpellPriority.auxDefense,
+      effect: CleanseEffect());
+  static const purify = Spell(
+      id: 'purify', name: 'Purify', chargeCost: 5,
+      priority: SpellPriority.auxDefense,
+      effect: CleanseEffect(all: true));
+  static const meditate = Spell(
+      id: 'meditate', name: 'Meditate', chargeCost: 2,
+      priority: SpellPriority.auxDefense,
+      effect: MeditateEffect());
+
+  /// The riders, the finisher and the self-instants.
+  ///
+  /// ⚠️ **A separate list, not [all]** — the same gate [stances] documents, for
+  /// the same reason: `tooltip_consistency_test` requires a description and an
+  /// icon in `lib/game/element_style.dart` for every entry in [all], and that
+  /// copy is the app lane's to write. Promoting the bank is one line, taken
+  /// once the player-facing text lands. Everything here is fully live to the
+  /// engine and — via [byId] — to the wire.
+  static const List<Spell> bank = [
+    pierce, unerring, execute, cleanse, purify, meditate,
+  ];
+  // ⬆⬆ END BANKED RIDERS, FINISHER & SELF-INSTANTS ⬆⬆
+
+  /// The spells the game ships to players. ⚠️ See [stances], [bankSpecials],
+  /// [bankDots] and [bank]: the banked generations are built but not yet
+  /// listed here, because everything in this list needs app-side copy the
+  /// engine lane does not own.
   static const List<Spell> all = [
     flick, bolt, blast, surge, ruin, cataclysm,
     jolt,
@@ -435,8 +495,12 @@ abstract final class Spellbook {
   /// lane. ⚠️ Lookup only ([byId], netcode): it is deliberately NOT what an AI
   /// draws from, and not what the app offers a player.
   static const List<Spell> everything = [
-    ...all, ...stances, ...bankSpecials, ...bankDots,
+    ...all, ...stances, ...bankSpecials, ...bankDots, ...bank,
   ];
 
+  /// ⚠️ Resolves across [everything], not just [all]. This is what
+  /// `decodeAction` calls, and a banked spell that cannot be decoded is a
+  /// **desync**, not a missing tooltip — the parked lists are an app-side gate
+  /// on what players are shown, never a gate on what the wire can carry.
   static Spell byId(String id) => everything.firstWhere((s) => s.id == id);
 }

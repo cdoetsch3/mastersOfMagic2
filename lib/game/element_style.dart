@@ -158,12 +158,26 @@ String spellTooltip(Spell spell) {
     EmpowerEffect(:final multiplier) => 'Next offensive spell x$multiplier',
     QuickenEffect(:final priorityOverride) =>
       'Next offensive spell at priority $priorityOverride',
-    PhaseEffect() => 'Next offensive spell ignores shields and Barriers',
+    // The next-attack riders (TYPE_EFFECTS §7a) — one bypass each, so the line
+    // has to name WHICH, or Pierce and Unerring both read as Phase.
+    PhaseEffect(:final bypass) => switch (bypass) {
+      AttackBypass.shields =>
+        'Next offensive spell ignores shields and Barriers',
+      AttackBypass.deflection => 'Next offensive spell cannot be deflected',
+      AttackBypass.evasion => 'Next offensive spell cannot miss',
+    },
     HasteEffect() => 'Seizes Haste (wins same-priority ties)',
     DischargeEffect() => "Removes ALL of the enemy's charge",
     OverloadEffect(:final minPerCharge, :final maxPerCharge) =>
       "$minPerCharge-$maxPerCharge damage per point of the enemy's charge",
     HallowEffect() => 'Grants Grace — blocks the next debuff on you',
+    // The banked self-instants (§7a). ⚠️ [SpellEffect] is sealed, so these arms
+    // are not optional — they are what a new effect type costs.
+    CleanseEffect(:final all) => all
+        ? 'Removes every debuff on you'
+        : 'Removes one debuff of your choice',
+    MeditateEffect(:final bonusTurns) =>
+      'Every turn-timed buff you hold gains $bonusTurns turns',
     // The banked stances (TYPE_EFFECTS §7a) — stat and special alike, one arm
     // since the two lanes' effects were unified. ⚠️ [SpellEffect] is sealed,
     // so this arm is not optional — it is what a new effect type costs.

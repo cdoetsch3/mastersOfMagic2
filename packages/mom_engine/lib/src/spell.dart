@@ -119,12 +119,28 @@ class DamageEffect extends SpellEffect {
   final double lifesteal;
   final bool ignoresShields;
 
+  /// **Execute's finisher rider** (TYPE_EFFECTS §7a "ATTACKS"): while the
+  /// target sits *strictly below* this percentage of their max HP **at impact
+  /// time**, every hit of this spell is a guaranteed critical. 0 disables it,
+  /// which is every other spell in the book.
+  ///
+  /// ⭐ A field on the damage effect rather than an effect of its own: Execute
+  /// IS an attack — same band, same shields, same deflection — carrying one
+  /// extra clause. A parallel class would have duplicated [DamageEffect] whole
+  /// to add a single int.
+  ///
+  /// ⚠️ A guarantee on the ATTACKER's side, not a new kind of damage. It goes
+  /// through the ordinary crit door, so Heavyhand's crit damage rides it and
+  /// the defender's Composure will blank it exactly like any other crit.
+  final int executeBelowPercent;
+
   const DamageEffect(
     this.minAmount,
     this.maxAmount, {
     this.hits = 1,
     this.lifesteal = 0,
     this.ignoresShields = false,
+    this.executeBelowPercent = 0,
   });
 
   int get averageTotal => ((minAmount + maxAmount) * hits) ~/ 2;
@@ -174,9 +190,81 @@ class QuickenEffect extends SpellEffect {
   const QuickenEffect([this.priorityOverride = 2]);
 }
 
-/// Caster's next offensive spell ignores shields.
+/// The defensive layer a next-attack rider walks the caster's next offensive
+/// spell straight through — TYPE_EFFECTS §7a, "one clean trio, one bypass
+/// each".
+enum AttackBypass {
+  /// **Phase** (shipped): shields and Barriers.
+  shields,
+
+  /// **Pierce**: the target's Divert — deflection never even rolls.
+  deflection,
+
+  /// **Unerring**: the to-hit roll itself. Not "more accurate" — *unrolled*,
+  /// so dodge, accuracy debuffs and the base miss all stop existing for one
+  /// attack. ⚠️ This is the one thing in the game that gets past
+  /// [CombatClamps.hitChanceFloorPercent] from the other side: the floor
+  /// guarantees a defender is never unhittable, and Unerring guarantees an
+  /// attacker never misses. They do not contradict, because Unerring never
+  /// reaches the expression the floor clamps.
+  evasion,
+}
+
+/// Caster's next offensive spell ignores one defensive layer — [bypass].
+///
+/// ⭐ Shipped **Phase** already was this shape, so Pierce and Unerring join it
+/// as DATA rather than as new machinery (§7a: they were drafted as attacks and
+/// re-ruled into riders precisely because riders combo with any attack in the
+/// book — Unerring + Cataclysm is the payoff fantasy). All three persist until
+/// an offensive attack consumes them; shields, aux casts and channels walk past
+/// without spending them.
+///
+/// ⭐ Holding two riders at once is the intended combo, not a collision: law 5
+/// is about a granter replacing its own status, and these are three different
+/// bypasses. One attack spends every rider it is holding.
+///
+/// ⚠️ **The class keeps the name `PhaseEffect`.** Widening the member that
+/// already models the pattern beat adding two 95%-identical siblings, and it
+/// keeps the app's four sealed-switch arms as edits rather than additions.
+/// `NextAttackEffect` is the name it should carry whenever the HUD lane is
+/// touching those arms anyway.
 class PhaseEffect extends SpellEffect {
-  const PhaseEffect();
+  final AttackBypass bypass;
+
+  const PhaseEffect([this.bypass = AttackBypass.shields]);
+}
+
+/// Removes debuffs from the caster — **Cleanse** (one, of their choice) and
+/// **Purify** (all of them), TYPE_EFFECTS §7a "INSTANTS".
+///
+/// ⭐ One effect with a flag, not two classes: they are the same rite at two
+/// price points, differing only in how much they take. Which debuff a Cleanse
+/// takes is NOT here — it is a decision about a board that only exists at
+/// submission time, so it rides [CastAction.statusChoice] and the wire.
+///
+/// ⚠️ Neither grants a status. These are the counter-web's *subtraction* side:
+/// buffs and neutrals are never touched, and casting with nothing to remove is
+/// a legal, resolved, entirely wasted turn.
+class CleanseEffect extends SpellEffect {
+  /// False = Cleanse (exactly one). True = Purify (every debuff at once).
+  final bool all;
+
+  const CleanseEffect({this.all = false});
+}
+
+/// **Meditate** (§7a): every TURN-TIMED buff the caster holds gains
+/// [bonusTurns] turns.
+///
+/// ⚠️ **The boundary is the spell** (ruled 2026-08-26). It reaches a status
+/// only if that status is both a [StatusPolarity.buff] and [TurnTimed] — so the
+/// stat stances deepen, a running Tonic deepens, and the next-attack riders
+/// (Phase, Pierce, Unerring) and Empower gain nothing at all, because they have
+/// no clock to move. Without that second half a 2-charge spell starts banking
+/// Empowers.
+class MeditateEffect extends SpellEffect {
+  final int bonusTurns;
+
+  const MeditateEffect([this.bonusTurns = 5]);
 }
 
 /// Pure initiative spell: does nothing on resolve; its only effect is the

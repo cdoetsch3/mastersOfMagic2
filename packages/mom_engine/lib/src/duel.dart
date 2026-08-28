@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'action.dart';
 import 'bank_dots.dart';
+import 'bank_riders.dart';
 import 'bank_specials.dart';
 import 'bank_stances.dart';
 import 'combat_stats.dart';
@@ -612,8 +613,26 @@ class DuelEngine {
     // ⭐ **Aux-offense never rolls to hit** (§7a's priority-8 lane): it is
     // enemy-facing but it is not an attack, so dodge, accuracy and Blind — the
     // attack lane's currency — do not touch it. If the cast resolves, its
-    // statuses land, subject only to Grace.
-    if (spell.isHarmful && spell.effect is! AuxOffenseEffect) {
+    // statuses land, subject only to Grace. It also never CONSUMES an
+    // Unerring rider — the rider waits for a real offensive attack.
+    //
+    // ⭐ **Unerring (§7a) never enters this arithmetic.** It is not an accuracy
+    // bonus large enough to win — the roll simply does not happen. That is the
+    // only way the two guarantees can coexist: [CombatClamps.hitChance] floors
+    // the defender at 10% *because* it clamps this expression, and the doc's
+    // "only Unerring literally cannot miss" is true precisely because Unerring
+    // is on the other side of the clamp rather than inside it. It also spends
+    // no RNG, so the stream advances differently — deterministically — when a
+    // rider is up. Consumed here, before any damage effect asks for the other
+    // riders, because this is the only place it could ever matter. A fizzle
+    // returned above, so it is still unspent then: the rider waits, as Phase
+    // does.
+    if (spell.isHarmful &&
+        spell.effect is! AuxOffenseEffect &&
+        spell.isOffensive &&
+        caster.unerringNext) {
+      caster.unerringNext = false;
+    } else if (spell.isHarmful && spell.effect is! AuxOffenseEffect) {
       final slips = cast.element == MagicElement.astral;
       final blindPenalty =
           slips ? 0 : (caster.missChance * 100).round(); // 50 if blinded
@@ -660,9 +679,12 @@ class DuelEngine {
 
     // Damage modifiers in order: additive (Arcane Knowledge +5%/stack, Lunar
     // phase) then multipliers (Empower ×2, Stagger ×0.5).
-    double damageScale(({int multiplier, bool phase}) buffs) =>
+    // ⚠️ Takes the Empower multiplier alone, not the whole rider record: the
+    // other riders change what an attack *ignores*, never what it hits for, and
+    // widening the record has no business rippling through here.
+    double damageScale(int empowerMultiplier) =>
         (1 + (caster.bonusDamagePercent + lunarPercent) / 100) *
-        buffs.multiplier *
+        empowerMultiplier *
         staggerScale;
 
     var rawDamage = 0; // total pre-shield damage rolled (for Ignite)
@@ -673,17 +695,20 @@ class DuelEngine {
           :final maxAmount,
           :final hits,
           :final lifesteal,
-          :final ignoresShields
+          :final ignoresShields,
+          :final executeBelowPercent
         ):
         final buffs = caster.consumeOffensiveBuffs();
         rawDamage = _attack(
           cast,
           minPerHit: minAmount,
           maxPerHit: maxAmount,
-          scale: damageScale(buffs),
+          scale: damageScale(buffs.multiplier),
           hits: hits,
           lifesteal: lifesteal,
           ignoresShields: ignoresShields || buffs.phase,
+          noDeflect: buffs.pierce,
+          executeBelowPercent: executeBelowPercent,
           events: events,
         );
         // The DoT rider (Agony, Torment). Lands on any hit that resolved,
@@ -708,10 +733,11 @@ class DuelEngine {
           cast,
           minPerHit: minPerCharge,
           maxPerHit: maxPerCharge,
-          scale: damageScale(buffs),
+          scale: damageScale(buffs.multiplier),
           hits: charge,
           lifesteal: 0,
           ignoresShields: buffs.phase,
+          noDeflect: buffs.pierce,
           events: events,
         );
       case OverloadEffect(:final minPerCharge, :final maxPerCharge):
@@ -721,10 +747,11 @@ class DuelEngine {
           cast,
           minPerHit: base,
           maxPerHit: base,
-          scale: damageScale(buffs),
+          scale: damageScale(buffs.multiplier),
           hits: 1,
           lifesteal: 0,
           ignoresShields: buffs.phase,
+          noDeflect: buffs.pierce,
           events: events,
         );
       case ShieldEffect(:final minStrength, :final maxStrength):
@@ -765,11 +792,32 @@ class DuelEngine {
         events.add(BuffAppliedEvent(caster,
             'next offensive spell resolves at priority $priorityOverride',
             statusId: 'quicken'));
-      case PhaseEffect():
-        caster.phaseNext = true;
-        events.add(BuffAppliedEvent(
-            caster, 'next offensive spell ignores shields',
-            statusId: 'phase'));
+      case PhaseEffect(:final bypass):
+        // The next-attack riders — Phase, Pierce, Unerring (§7a). Recasting one
+        // refreshes a flag that is already true; holding two DIFFERENT riders
+        // is the intended combo, not a collision (law 5 governs a granter
+        // replacing its own status, and these are three separate bypasses).
+        switch (bypass) {
+          case AttackBypass.shields:
+            caster.phaseNext = true;
+            events.add(BuffAppliedEvent(
+                caster, 'next offensive spell ignores shields',
+                statusId: 'phase'));
+          case AttackBypass.deflection:
+            caster.pierceNext = true;
+            events.add(BuffAppliedEvent(
+                caster, 'next offensive spell cannot be deflected',
+                statusId: 'pierce'));
+          case AttackBypass.evasion:
+            caster.unerringNext = true;
+            events.add(BuffAppliedEvent(
+                caster, 'next offensive spell cannot miss',
+                statusId: 'unerring'));
+        }
+      case CleanseEffect(:final all):
+        _resolveCleanse(caster, all, cast.statusChoice, events);
+      case MeditateEffect(:final bonusTurns):
+        _resolveMeditate(caster, bonusTurns, events);
       case HasteEffect():
         // Initiative only; the grantsHaste flag does the work post-resolution.
         break;
@@ -843,6 +891,8 @@ class DuelEngine {
     required double lifesteal,
     required bool ignoresShields,
     required List<DuelEvent> events,
+    bool noDeflect = false,
+    int executeBelowPercent = 0,
   }) {
     // ⭐ Gear's flat damage (ITEMS §9b.8): per-cast plus per-charge-spent,
     // added ONCE — to the first hit — after the level scale, before crit and
@@ -888,18 +938,15 @@ class DuelEngine {
       // Both figures are derived per hit (Keen and Heavyhand contribute here);
       // crit has no global clamp — Execute and Death Wish are *meant* to reach
       // a guaranteed crit, and Composure is the counter, not a cap.
-      final critChance = caster.effectiveCritChance;
-      // ⭐ Death Wish (§7a): while the ATTACKER'S OWN health is below 15% of
-      // max, this is a crit with no roll at all. The short-circuit is load-
-      // bearing for lockstep as well as for taste — a guaranteed crit must not
-      // draw an RNG value a client without the stance would never draw.
-      var crit = attacksAlwaysCrit(caster) ||
-          (critChance > 0 && rng.nextInt(100) < critChance);
-      // ⭐ Composure (§7a): the DEFENDER'S rule beats the attacker's. Whatever
-      // earned the crit — Keen, Execute's threshold, a Death Wish gambit — it
-      // resolves as a normal hit here: no multiplier, and the event reports it
-      // as the ordinary hit it became.
-      if (crit && blanksIncomingCrits(target)) crit = false;
+      //
+      // ⚠️ **At impact time**: Execute reads the target's health as THIS hit
+      // meets it, so a multi-hit spell that drops them under the line executes
+      // from the next hit on, and a heal that resolved earlier this turn takes
+      // them back off it. Death Wish and Composure live inside [_rollsCrit],
+      // so every crit source shares one door and one counter.
+      final executes = executeBelowPercent > 0 &&
+          target.hp * 100 < target.maxHp * executeBelowPercent;
+      final crit = _rollsCrit(caster, target, guaranteed: executes);
       if (crit) {
         perHit = (perHit * (100 + caster.effectiveCritDamage) / 100).round();
       }
@@ -911,8 +958,20 @@ class DuelEngine {
 
       // Deflection, the Astral pierce split and the shields all live in the
       // shared damage path from here on — see [_damagePacket].
+      //
+      // ⭐ **Pierce (§7a) short-circuits the Divert roll before the chance is
+      // even read** (`canDeflect: false`), so Divert never *rolls* — not
+      // "rolls and is ignored". No RNG is drawn, so a Pierced attack's later
+      // damage rolls land where an unpierced one's would not, and the log has
+      // nothing to report as deflected. It is the deflect-side twin of what
+      // Unerring does to the hit roll, and like it, it sits outside the
+      // clamps rather than arguing with them: the 90% caps keep a *sliver*
+      // landing against Divert, and Pierce removes Divert from the question
+      // entirely for one attack.
       final r = _damagePacket(target, perHit, cast.element,
-          ignoresShields: ignoresShields, piercePercent: piercePct);
+          ignoresShields: ignoresShields,
+          piercePercent: piercePct,
+          canDeflect: !noDeflect);
       totalToHp += r.toHp;
       events.add(DamageEvent(target, spell,
           toShield: r.toShield,
@@ -944,6 +1003,55 @@ class DuelEngine {
     }
     _lastAttackToHp = totalToHp;
     return totalRaw;
+  }
+
+  /// Whether one hit lands as a critical (§5.2 step 4/5).
+  ///
+  /// ⭐ **The one door every crit walks through.** Execute's guaranteed crit
+  /// (§7a) is not a special case bolted onto the damage path — it arrives here
+  /// as [guaranteed] and comes out the same side as a rolled one, which is what
+  /// makes it inherit every rule that applies to crits: Heavyhand's contributed
+  /// crit damage rides it through [MageState.effectiveCritDamage], and the
+  /// defender's side of the table applies to it. Multiplying Execute's damage
+  /// where it is cast would have quietly exempted it from both.
+  ///
+  /// 📝 **Where Composure lands.** §7a's Composure blanks incoming crits, and
+  /// the ruling is that the defender's rule beats any attacker-side guarantee.
+  /// Its status is a parallel build lane; when it arrives, this is one early
+  /// `return false` on [target], and Execute, Keen, Death Wish and gear crit
+  /// all inherit it at once. That is the whole reason this is a method rather
+  /// than three lines inline — and why [target] is a parameter it does not yet
+  /// read.
+  ///
+  /// ⚠️ [guaranteed] short-circuits the roll, so a guaranteed crit spends no
+  /// RNG. Deterministic either way — both lockstep clients take the same branch
+  /// off the same board — but an Execute below the line and one above it do not
+  /// leave the stream in the same place.
+  ///
+  /// ⚠️ No clamp here, deliberately: crit is the one output §7a leaves
+  /// uncapped, because Execute and Death Wish are *meant* to reach certainty
+  /// and Composure is the counter rather than a ceiling.
+  bool _rollsCrit(MageState caster, MageState target,
+      {required bool guaranteed}) {
+    // ⭐ Death Wish (§7a): while the ATTACKER'S OWN health is below 15% of
+    // max, this is a crit with no roll at all. Like [guaranteed] (Execute),
+    // the short-circuit is load-bearing for lockstep as well as for taste —
+    // a guaranteed crit must not draw an RNG value a client without the
+    // stance would never draw.
+    var crit = guaranteed || attacksAlwaysCrit(caster);
+    if (!crit) {
+      // Derived per hit (Keen contributes here), and guarded on chance > 0 so
+      // a no-crit build rolls nothing.
+      final critChance = caster.effectiveCritChance;
+      crit = critChance > 0 && rng.nextInt(100) < critChance;
+    }
+    // ⭐ Composure (§7a): the DEFENDER'S rule beats the attacker's. Whatever
+    // earned the crit — Keen, Execute's threshold, a Death Wish gambit — it
+    // resolves as a normal hit: no multiplier, and the event reports the
+    // ordinary hit it became. Sitting HERE means every crit source shares
+    // the one counter, current and future alike.
+    if (crit && blanksIncomingCrits(target)) crit = false;
+    return crit;
   }
 
   // ---- Element on-cast effects (TYPE_EFFECTS_DESIGN.md §2–§4) ------------
@@ -1672,6 +1780,71 @@ class DuelEngine {
     }
   }
 
+  /// Resolves **Cleanse** ([all] false — exactly one debuff, the caster's
+  /// choice) or **Purify** ([all] true — every debuff at once), §7a INSTANTS.
+  ///
+  /// ⭐ **A rite that finds nothing to do is a legal, RESOLVED cast**, not an
+  /// error and not a fizzle: it advanced the element streak, it spent the
+  /// charge, and it says so in the log. That is already how casting Hallow
+  /// while warded behaves; a Cleanse into a clean board is the same shape — you
+  /// baited badly, which is a play, not a bug.
+  void _resolveCleanse(
+    MageState caster,
+    bool all,
+    String? statusChoice,
+    List<DuelEvent> events,
+  ) {
+    // ⚠️ Snapshotted BEFORE anything is removed — each entry closes over its
+    // own removal, and mutating the status list while walking it is how that
+    // goes wrong.
+    final pool = debuffsOn(caster);
+    if (pool.isEmpty) {
+      events.add(BuffAppliedEvent(
+          caster, all ? 'Nothing to purify' : 'Nothing to cleanse',
+          statusId: 'cleanseEmpty'));
+      return;
+    }
+    if (all) {
+      for (final d in pool) {
+        d.remove();
+      }
+      events.add(BuffAppliedEvent(
+          caster, 'Purified — ${pool.length} debuff(s) lifted',
+          statusId: 'purified'));
+      return;
+    }
+    // ⚠️ A named id that is no longer on the board falls through to the default
+    // rather than doing nothing: both clients agree either way, and a UI racing
+    // a debuff that expired between submission and resolution should still
+    // cleanse *something* rather than burn the turn on a technicality.
+    final chosen = (statusChoice == null
+            ? null
+            : pool.where((d) => d.id == statusChoice).firstOrNull) ??
+        defaultCleanseChoice(pool)!;
+    chosen.remove();
+    events.add(BuffAppliedEvent(caster, 'Cleansed — ${chosen.id}',
+        statusId: 'cleansed'));
+  }
+
+  /// Resolves **Meditate** (§7a): every turn-timed buff gains [bonusTurns].
+  ///
+  /// The boundary lives in [timedBuffsOn] — buffs on a clock, and nothing else.
+  /// The riders above have no clock and the burns are the wrong polarity, so
+  /// both are out by construction rather than by a check here.
+  void _resolveMeditate(
+      MageState caster, int bonusTurns, List<DuelEvent> events) {
+    final fed = timedBuffsOn(caster).toList();
+    for (final b in fed) {
+      b.extendTurns(bonusTurns);
+    }
+    events.add(BuffAppliedEvent(
+        caster,
+        fed.isEmpty
+            ? 'Meditated — no stance to deepen'
+            : 'Meditated — ${fed.length} stance(s) +$bonusTurns turns',
+        statusId: 'meditated'));
+  }
+
   /// Resolves Absolution for [holder] (Sanctus, §4c). Two parts, both
   /// unconditional on the purge outcome:
   ///  1. **Sanctus → Umbra:** strip 5 Creeping Dark from the opponent.
@@ -1699,14 +1872,12 @@ class DuelEngine {
     // banked debuffs — Agony, Torment, Murk, Blight, Wither — join this pool
     // for free the moment they exist. Their catalogue entries and their
     // `polarity` getters are the entire integration.
-    final removable = <({String label, void Function() clear})>[
-      for (final s in holder.statusesWithPolarity(StatusPolarity.debuff))
-        (label: s.id, clear: () => holder.statuses.remove(s)),
-      if (holder.priorityPenalty > 0)
-        (label: 'Waterlogged', clear: () => holder.priorityPenalty = 0),
-      if (holder.nextOffensiveDamageScale < 1.0)
-        (label: 'Stagger', clear: () => holder.nextOffensiveDamageScale = 1.0),
-    ];
+    //
+    // ⭐ Shared with Cleanse and Purify (see [debuffsOn]). Absolution owned this
+    // list first and inline; the bank's self-instants ask the identical
+    // question, and two spells quietly disagreeing about what a debuff *is* is
+    // a bug neither one's own tests could see.
+    final removable = debuffsOn(holder);
 
     if (removable.isEmpty) {
       // Nothing to purge → bank Grace instead, so Absolution is never a dead
@@ -1719,9 +1890,9 @@ class DuelEngine {
     } else {
       // Uniformly random, from the shared per-turn seed (§4c.1).
       final victim = removable[rng.nextInt(removable.length)];
-      victim.clear();
+      victim.remove();
       events.add(BuffAppliedEvent(
-          holder, 'Absolution — ${victim.label} purged',
+          holder, 'Absolution — ${victim.id} purged',
           statusId: 'absolution'));
     }
   }
@@ -1817,4 +1988,8 @@ class _Entry {
       action is CastAction ? (action as CastAction).spell : null;
 
   bool get isOffensive => spell?.isOffensive ?? false;
+
+  /// The status this cast named, if any — Cleanse's chosen debuff.
+  String? get statusChoice =>
+      action is CastAction ? (action as CastAction).statusChoice : null;
 }

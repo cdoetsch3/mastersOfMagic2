@@ -25,10 +25,32 @@ class CastAction extends MageAction {
   final Spell spell;
   final MagicElement? element;
 
-  const CastAction(this.spell, [this.element]);
+  /// The **status this cast is aimed at**, by id — Cleanse's "one debuff of
+  /// your choice" (TYPE_EFFECTS §7a INSTANTS).
+  ///
+  /// ⭐ It rides on the ACTION, not on the spell, because it is a decision the
+  /// player makes at submission time about a board that only exists then. That
+  /// puts it on the wire (`S|<spellId>|<element>|<statusId>`) and therefore
+  /// inside the commitment hash, which is the whole point: both lockstep
+  /// clients resolve the same removal, and nobody can change which debuff they
+  /// shed after seeing the reveal.
+  ///
+  /// ⚠️ Null is **legal and normal**, not an error path — it means "you pick",
+  /// and the engine then applies a documented deterministic default (the debuff
+  /// with the most turns left). The AI, and any UI that has not grown its
+  /// pick-a-status sheet yet, both ride that; both clients compute the
+  /// identical answer from the identical board rather than sending it.
+  ///
+  /// ⚠️ Ignored by every spell that isn't asking a question. A `statusChoice`
+  /// on a Bolt is inert, not invalid.
+  final String? statusChoice;
+
+  const CastAction(this.spell, [this.element, this.statusChoice]);
 
   @override
-  String toString() => 'cast ${spell.name}';
+  String toString() => statusChoice == null
+      ? 'cast ${spell.name}'
+      : 'cast ${spell.name} ($statusChoice)';
 }
 
 /// What drinking one belt consumable does, as **pure data** (ITEMS §10.3b).

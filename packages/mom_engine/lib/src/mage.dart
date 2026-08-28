@@ -55,7 +55,28 @@ class MageState {
   // Pending aux buffs, consumed by the next offensive spell cast.
   int? empowerMultiplier;
   int? quickenPriority;
+
+  // ---- The next-attack riders (TYPE_EFFECTS §7a) ------------------------
+  // ⭐ Three siblings, one bypass each, all on the Phase pattern: they wait as
+  // long as they need to — shields, aux casts and channels walk past without
+  // spending them — and the next OFFENSIVE attack consumes every one it holds.
+  //
+  // ⚠️ Plain fields rather than [TurnStatus]es, and that is load-bearing twice
+  // over: they have no clock, which is exactly why Meditate cannot reach them
+  // (§7a's ruled boundary), and they are not in [statuses], which is why
+  // Dispel's polarity sweep will not find them either.
+
+  /// **Phase**: the next offensive attack ignores shields and Barriers.
   bool phaseNext = false;
+
+  /// **Pierce**: the next offensive attack cannot be deflected — the target's
+  /// Divert never rolls against it.
+  bool pierceNext = false;
+
+  /// **Unerring**: the next offensive attack cannot miss. It does not raise the
+  /// hit chance past the clamp; it deletes the roll — see
+  /// `DuelEngine._resolveCast`.
+  bool unerringNext = false;
 
   /// The **Haste** initiative token. At most one mage holds it; it breaks
   /// same-priority ties (the holder's spell resolves first). Managed by the
@@ -349,10 +370,20 @@ class MageState {
   bool get isHealInverted => statuses.any((s) => s is HealInverting);
 
   /// Consumes and returns the pending offensive buffs.
-  ({int multiplier, bool phase}) consumeOffensiveBuffs() {
-    final result = (multiplier: empowerMultiplier ?? 1, phase: phaseNext);
+  ///
+  /// ⚠️ **Unerring is not in here.** It has to be spent at the hit roll, which
+  /// happens before any damage effect asks for these — see
+  /// `DuelEngine._resolveCast`. Everything else the attack needs is consumed
+  /// here, in one place, once per attack.
+  ({int multiplier, bool phase, bool pierce}) consumeOffensiveBuffs() {
+    final result = (
+      multiplier: empowerMultiplier ?? 1,
+      phase: phaseNext,
+      pierce: pierceNext,
+    );
     empowerMultiplier = null;
     phaseNext = false;
+    pierceNext = false;
     return result;
   }
 }
