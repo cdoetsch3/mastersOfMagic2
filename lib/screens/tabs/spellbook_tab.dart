@@ -5,6 +5,7 @@ import '../../game/element_style.dart';
 import '../../game/game_state.dart';
 import '../../game/player_profile.dart';
 import '../../game/progression.dart';
+import '../../game/spell_browser.dart';
 import '../../ui/app_theme.dart';
 import '../element_detail_dialog.dart';
 import '../gameplay_guide_screen.dart';
@@ -15,8 +16,28 @@ const _spellKeyLabels = 'QWERTASDFG';
 
 /// Manage the spell collection and loadout presets. Editing is gated to towns
 /// (1-player design rule); presets and spells unlock as the player levels.
-class SpellbookTab extends StatelessWidget {
+///
+/// ⭐ **The spell half is a browsable shelf, not a wall.** At rest the book
+/// is grouped under its four lane headers (see [SpellKind]); the toolbar
+/// sorts within those groups, and either filter flattens the sections into
+/// one list. All of that reasoning lives in `game/spell_browser.dart` — this
+/// file only paints it.
+class SpellbookTab extends StatefulWidget {
   const SpellbookTab({super.key});
+
+  @override
+  State<SpellbookTab> createState() => _SpellbookTabState();
+}
+
+class _SpellbookTabState extends State<SpellbookTab> {
+  /// ⚠️ Per-visit, plain fields, never persisted — the Shop's ruling for its
+  /// own shelf controls. A filter that outlives the visit is a filter the
+  /// player has to remember setting.
+  SpellKind? _kind; // null = All
+  var _cost = SpellCostFilter.any;
+  var _sort = SpellSort.book;
+
+  bool get _filtering => spellFilterActive(kind: _kind, cost: _cost);
 
   @override
   Widget build(BuildContext context) {
@@ -31,32 +52,113 @@ class SpellbookTab extends StatelessWidget {
         const PlayerHeader(title: 'Spellbook'),
         if (!canEdit) _lockBanner(),
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
-            children: [
-              _presetChips(context, game, p),
-              const SizedBox(height: 12),
-              _EditableName(preset: preset, canEdit: canEdit, game: game),
-              const SizedBox(height: 10),
-              _guideLink(context),
-              const SizedBox(height: 12),
-              // Two separate pools, each shown against its own cap.
-              SectionLabel(
-                'Elements  ·  ${preset.elementIds.length}/'
-                '${Progression.usableElementsAtLevel(p.level)}'
-                '   (tap ⓘ for details)',
+          // ⭐ **Slivers, so the toolbar can PIN.** The press-stability rule
+          // has a scrolling edge case a plain ListView cannot answer: filter
+          // the shelf while scrolled near the bottom and the list gets
+          // shorter, the scroll offset clamps, and every widget on screen —
+          // the chip just pressed included — slides. A pinned header can only
+          // be reached by scrolling past it, and once past it, it is nailed
+          // to the top of the viewport where clamping cannot move it.
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _presetChips(context, game, p),
+                      const SizedBox(height: 12),
+                      _EditableName(
+                        preset: preset,
+                        canEdit: canEdit,
+                        game: game,
+                      ),
+                      const SizedBox(height: 10),
+                      _guideLink(context),
+                      const SizedBox(height: 12),
+                      // Two separate pools, each shown against its own cap.
+                      SectionLabel(
+                        'Elements  ·  ${preset.elementIds.length}/'
+                        '${Progression.usableElementsAtLevel(p.level)}'
+                        '   (tap ⓘ for details)',
+                      ),
+                      _elementGrid(context, game, p, preset, canEdit),
+                      const SizedBox(height: 14),
+                      SectionLabel(
+                        'Spells  ·  ${preset.spellIds.length}/'
+                        '${Progression.usableSpellsAtLevel(p.level)}'
+                        '   (tap ⓘ for details)',
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              _elementGrid(context, game, p, preset, canEdit),
-              const SizedBox(height: 14),
-              SectionLabel(
-                'Spells  ·  ${preset.spellIds.length}/'
-                '${Progression.usableSpellsAtLevel(p.level)}'
-                '   (tap ⓘ for details)',
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _PinnedToolbar(
+                  child: _SpellToolbar(
+                    kind: _kind,
+                    onKind: (k) => setState(() => _kind = k),
+                    cost: _cost,
+                    onCost: (c) => setState(() => _cost = c),
+                    sort: _sort,
+                    onSort: (s) => setState(() => _sort = s),
+                  ),
+                ),
               ),
-              _spellGrid(context, game, p, preset, canEdit),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
+                sliver: SliverToBoxAdapter(
+                  child: _spellShelf(context, game, p, preset, canEdit),
+                ),
+              ),
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  /// The shelf below the toolbar: sections at rest, one flat list once either
+  /// filter is on.
+  Widget _spellShelf(
+    BuildContext context,
+    GameState game,
+    PlayerProfile p,
+    LoadoutPreset preset,
+    bool canEdit,
+  ) {
+    if (_filtering) {
+      final shown = filterSpells(
+        Spellbook.all,
+        kind: _kind,
+        cost: _cost,
+        sort: _sort,
+      );
+      if (shown.isEmpty) return const _NoMatches();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ⭐ The flattened shelf says how much of the book it is showing.
+          // With ~59 spells, "12 spells" without the total is a number the
+          // player cannot read anything into.
+          SectionLabel(
+            'Showing ${shown.length} of ${Spellbook.all.length} spells',
+          ),
+          _spellGrid(context, game, p, preset, shown, canEdit),
+        ],
+      );
+    }
+    final groups = groupSpells(Spellbook.all, sort: _sort);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final group in groups) ...[
+          SectionLabel('${group.kind.label}  ·  ${group.spells.length}'),
+          _spellGrid(context, game, p, preset, group.spells, canEdit),
+          const SizedBox(height: 12),
+        ],
       ],
     );
   }
@@ -275,11 +377,20 @@ class SpellbookTab extends StatelessWidget {
                     children: [
                       elementGlyph(element, size: 18),
                       const SizedBox(width: 6),
-                      Text(
-                        style.label,
-                        style: TextStyle(
-                          color: selected ? AppColors.text : AppColors.textDim,
-                          fontSize: 12.5,
+                      // ⚠️ Flexible, not bare: the tile is a fixed 104 wide,
+                      // so a long element name (or a player's larger system
+                      // text) overflowed the row rather than shortening.
+                      Flexible(
+                        child: Text(
+                          style.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: selected
+                                ? AppColors.text
+                                : AppColors.textDim,
+                            fontSize: 12.5,
+                          ),
                         ),
                       ),
                     ],
@@ -324,6 +435,7 @@ class SpellbookTab extends StatelessWidget {
     GameState game,
     PlayerProfile p,
     LoadoutPreset preset,
+    List<Spell> spells,
     bool canEdit,
   ) {
     return GridView(
@@ -338,7 +450,7 @@ class SpellbookTab extends StatelessWidget {
         crossAxisSpacing: 8,
       ),
       children: [
-        for (final spell in Spellbook.all)
+        for (final spell in spells)
           _spellTile(context, game, p, preset, spell, canEdit),
       ],
     );
@@ -537,4 +649,195 @@ class _EditableName extends StatelessWidget {
       );
     }
   }
+}
+
+/// The sort/filter band above the spell shelf — the Shop's toolbar
+/// conventions (`shop_screen.dart`'s `_ShopToolbar`) applied to a book:
+/// filter chips on the left, a fixed-width sort control on the right.
+///
+/// ⚠️ **Nothing here may move when it is pressed** (the standing law). Three
+/// separate things are doing that work:
+///  - the band is a FIXED [height], so a chip row can never grow one;
+///  - every chip is the same shape lit or unlit (see [_Chip]), so lighting
+///    one cannot shove its neighbours;
+///  - the sort control is a fixed [_sortWidth] wide enough for its LONGEST
+///    label, so choosing 'Charge cost' cannot slide the button out from under
+///    the finger that just chose it.
+///
+/// ⚠️ The chip rows scroll HORIZONTALLY rather than wrapping. A [Wrap] with
+/// two lines' worth of chips on a narrow phone is exactly the "inserted
+/// space" the law forbids — and the kind row grows a chip every time the
+/// engine grows a lane.
+class _SpellToolbar extends StatelessWidget {
+  static const double height = 74;
+  static const double _rowHeight = 30;
+  static const double _sortWidth = 124;
+
+  final SpellKind? kind;
+  final ValueChanged<SpellKind?> onKind;
+  final SpellCostFilter cost;
+  final ValueChanged<SpellCostFilter> onCost;
+  final SpellSort sort;
+  final ValueChanged<SpellSort> onSort;
+
+  const _SpellToolbar({
+    required this.kind,
+    required this.onKind,
+    required this.cost,
+    required this.onCost,
+    required this.sort,
+    required this.onSort,
+  });
+
+  @override
+  Widget build(BuildContext context) => Container(
+    height: height,
+    // ⚠️ Opaque, and the same ground the tab stands on: a pinned header the
+    // shelf scrolls THROUGH is unreadable.
+    color: AppColors.bg,
+    padding: const EdgeInsets.fromLTRB(14, 4, 14, 6),
+    child: Column(
+      children: [
+        SizedBox(
+          height: _rowHeight,
+          child: Row(
+            children: [
+              Expanded(
+                child: _chipRow([
+                  for (final k in <SpellKind?>[null, ...SpellKind.values])
+                    _Chip(
+                      label: spellKindFilterLabel(k),
+                      on: kind == k,
+                      onTap: () => onKind(k),
+                    ),
+                ]),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(width: _sortWidth, child: _sortControl()),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+        SizedBox(
+          height: _rowHeight,
+          child: _chipRow([
+            for (final c in SpellCostFilter.values)
+              _Chip(label: c.label, on: cost == c, onTap: () => onCost(c)),
+          ]),
+        ),
+      ],
+    ),
+  );
+
+  Widget _chipRow(List<Widget> chips) => SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Row(
+      children: [
+        for (final chip in chips) ...[chip, const SizedBox(width: 6)],
+      ],
+    ),
+  );
+
+  Widget _sortControl() => PopupMenuButton<SpellSort>(
+    initialValue: sort,
+    tooltip: 'Sort the book',
+    color: AppColors.panel,
+    padding: EdgeInsets.zero,
+    onSelected: onSort,
+    itemBuilder: (_) => [
+      for (final s in SpellSort.values)
+        PopupMenuItem(
+          value: s,
+          child: Text(s.label, style: const TextStyle(color: AppColors.text)),
+        ),
+    ],
+    child: Row(
+      children: [
+        const Icon(Icons.sort, size: 15, color: AppColors.teal),
+        const SizedBox(width: 5),
+        Expanded(
+          child: Text(
+            sort.label,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+            style: const TextStyle(color: AppColors.teal, fontSize: 11.5),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Pins [child] at its own fixed height. Min and max extent are equal by
+/// construction — this header never collapses, it only sticks.
+class _PinnedToolbar extends SliverPersistentHeaderDelegate {
+  final _SpellToolbar child;
+  const _PinnedToolbar({required this.child});
+
+  @override
+  double get minExtent => _SpellToolbar.height;
+
+  @override
+  double get maxExtent => _SpellToolbar.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlaps) =>
+      child;
+
+  @override
+  bool shouldRebuild(_PinnedToolbar oldDelegate) =>
+      oldDelegate.child.kind != child.kind ||
+      oldDelegate.child.cost != child.cost ||
+      oldDelegate.child.sort != child.sort;
+}
+
+/// ⚠️ Hand-rolled rather than [FilterChip], and deliberately the SAME shape
+/// lit or unlit — the Shop's `_Chip`, kept identical so the two screens'
+/// controls read as one game. A chip that grew a check mark when selected
+/// would move the chip beside it, which is the press-stability rule broken by
+/// decoration.
+class _Chip extends StatelessWidget {
+  final String label;
+  final bool on;
+  final VoidCallback onTap;
+  const _Chip({required this.label, required this.on, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = on ? AppColors.bg : AppColors.textDim;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: on ? AppColors.gold : Colors.transparent,
+          border: Border.all(color: on ? AppColors.gold : AppColors.border),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(label, style: TextStyle(color: fg, fontSize: 11.5)),
+      ),
+    );
+  }
+}
+
+/// The quiet one-liner a filter that matches nothing owes the player.
+///
+/// ⚠️ It must confess the FILTER is why — the same words the Shop uses.
+/// Silence here reads as "the book has no shields", which is a different and
+/// wrong fact.
+class _NoMatches extends StatelessWidget {
+  const _NoMatches();
+
+  @override
+  Widget build(BuildContext context) => const Padding(
+    padding: EdgeInsets.all(28),
+    child: Center(
+      child: Text(
+        'No spells match these filters.',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: AppColors.textDim, fontSize: 13),
+      ),
+    ),
+  );
 }
