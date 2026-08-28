@@ -85,7 +85,22 @@ const Map<String, StatusFx> statusFx = {
   'keen': StatusFx(Color(0xFFE0553E), StatusMotion.crack),
   'heavyhand': StatusFx(Color(0xFFC77A2E), StatusMotion.chevron),
 
+  // ---- Banked DoTs & debuffs (TYPE_EFFECTS §7a) ------------------------
+  // ⚠️ Placeholders, in the same sense as the stances above: one colour and
+  // one motion each so the catalogue stays covered and nothing falls back to
+  // the generic pulse. The HUD lane owns how these finally read — all that is
+  // asserted here is that no two lasting statuses look alike.
+  'agony': StatusFx(Color(0xFFB03A4A), StatusMotion.crack),
+  'torment': StatusFx(Color(0xFF7E2F52), StatusMotion.sink),
+  'murk': StatusFx(Color(0xFF5A6472), StatusMotion.converge),
+  'wither': StatusFx(Color(0xFF8A7B4E), StatusMotion.sink),
+  'blight': StatusFx(Color(0xFF6E8C3A), StatusMotion.rise),
+
   // ---- Moments ---------------------------------------------------------
+  'fester': StatusFx(Color(0xFF6E8C3A), StatusMotion.bloom),
+  'scour': StatusFx(Color(0xFFB03A4A), StatusMotion.bloom),
+  'dispel': StatusFx(Color(0xFFBDB6D4), StatusMotion.scatter),
+  'shatter': StatusFx(Color(0xFF9AA9C4), StatusMotion.crack),
   'blindLifted': StatusFx(Color(0xFF6FD3E8), StatusMotion.scatter),
   'absolutionRising': StatusFx(Color(0xFFF2E7C9), StatusMotion.rise),
   'absolution': StatusFx(Color(0xFFF2E7C9), StatusMotion.bloom),

@@ -1,3 +1,4 @@
+import 'bank_dots.dart';
 import 'bank_stances.dart';
 import 'spell.dart';
 
@@ -237,9 +238,112 @@ abstract final class Spellbook {
   ];
   // ⬆⬆ END BANKED STAT STANCES ⬆⬆
 
-  /// The spells the game ships to players. ⚠️ See [stances]: the banked
-  /// generation is built but not yet listed here, because everything in this
-  /// list needs app-side copy the engine lane does not own.
+  // =======================================================================
+  // BANK — DoT engine & debuff suite (TYPE_EFFECTS_DESIGN.md §7a)
+  // =======================================================================
+  // ⭐ One contiguous block, and a list of its own. These are built and tested
+  // but not yet in [all], because everything in [all] must carry player-facing
+  // copy — a description, an icon, a tooltip arm — that lives in the Flutter
+  // app and that `tooltip_consistency_test` enforces. The app lane folds the
+  // bank in when that copy exists, by making [all] `[...shipped, ...bankDots]`.
+  // [byId] already finds them, so netcode and the engine can address a bank
+  // spell today.
+  //
+  // Two lanes:
+  //  - **Attacks, [SpellPriority.attack]** — ordinary to-hit and crit rules on
+  //    the HIT; the DoT rider is a debuff, so Grace can eat the rider and
+  //    never the damage.
+  //  - **[SpellPriority.auxOffense]** — enemy-facing but not attacks: slower
+  //    than aux-defence, faster than a real attack, and no to-hit roll at all.
+
+  /// The quick bleed: fully paid out in three ticks, the first on the turn it
+  /// lands. ~10–13 up front plus 21 over time for 2 charge — a surplus over
+  /// Blast, and the delay is its price.
+  static const agony = Spell(
+      id: 'agony', name: 'Agony', chargeCost: 2,
+      priority: SpellPriority.attack,
+      effect: DotAttackEffect(10, 13,
+          dotId: 'agony', dotName: 'Agony', damagePerTick: 7, ticks: 3));
+
+  /// The long burn: 45 over nine turns behind a small hit. The biggest surplus
+  /// in the book and the longest exposure to the duel ending first — Scour is
+  /// how you collect early.
+  static const torment = Spell(
+      id: 'torment', name: 'Torment', chargeCost: 3,
+      priority: SpellPriority.attack,
+      effect: DotAttackEffect(8, 10,
+          dotId: 'torment', dotName: 'Torment', damagePerTick: 5, ticks: 9));
+
+  /// Feeds whatever is burning: +3 ticks to EVERY DoT on the target, Ignite
+  /// included, behind a small hit.
+  static const fester = Spell(
+      id: 'fester', name: 'Fester', chargeCost: 1,
+      priority: SpellPriority.auxOffense,
+      effect: FesterEffect(damage: 5, bonusTicks: 3));
+
+  /// The collection agency: every DoT resolves all its remaining ticks now, as
+  /// one packet, and is consumed.
+  static const scour = Spell(
+      id: 'scour', name: 'Scour', chargeCost: 1,
+      priority: SpellPriority.auxOffense,
+      effect: ScourEffect());
+
+  /// Murk set — the enemy's accuracy, taxed. Miasma is the tier-2 price point;
+  /// one status, last cast wins.
+  static const murk = Spell(
+      id: 'murk', name: 'Murk', chargeCost: 1,
+      priority: SpellPriority.auxOffense,
+      effect: DebuffGrantEffect(BankDebuff.murk, magnitude: -15, turns: 10));
+  static const miasma = Spell(
+      id: 'miasma', name: 'Miasma', chargeCost: 3,
+      priority: SpellPriority.auxOffense,
+      effect: DebuffGrantEffect(BankDebuff.murk, magnitude: -25, turns: 20));
+
+  /// Wither set — the anti-heal tax. ⭐ Ruled: the status is ALWAYS −50%;
+  /// Atrophy buys triple the DURATION, never more depth.
+  static const wither = Spell(
+      id: 'wither', name: 'Wither', chargeCost: 2,
+      priority: SpellPriority.auxOffense,
+      effect: DebuffGrantEffect(BankDebuff.wither,
+          magnitude: WitherStatus.witherPercent, turns: 10));
+  static const atrophy = Spell(
+      id: 'atrophy', name: 'Atrophy', chargeCost: 4,
+      priority: SpellPriority.auxOffense,
+      effect: DebuffGrantEffect(BankDebuff.wither,
+          magnitude: WitherStatus.witherPercent, turns: 30));
+
+  /// Binary: their heals become damage. Supersedes Wither while both are up.
+  static const blight = Spell(
+      id: 'blight', name: 'Blight', chargeCost: 4,
+      priority: SpellPriority.auxOffense,
+      effect: DebuffGrantEffect(BankDebuff.blight, turns: 20));
+
+  /// The meta-leash on stance-stacking: strips the target's buffs.
+  static const dispel = Spell(
+      id: 'dispel', name: 'Dispel', chargeCost: 4,
+      priority: SpellPriority.auxOffense,
+      effect: DispelEffect());
+
+  /// The turtle-breaker: no damage, but shields, Barrier and Divert all go.
+  /// Priced at 5 deliberately, so Discharge can keep it off the table.
+  static const shatter = Spell(
+      id: 'shatter', name: 'Shatter', chargeCost: 5,
+      priority: SpellPriority.auxOffense,
+      effect: ShatterEffect());
+
+  /// The banked DoT/debuff generation — see the block above.
+  static const List<Spell> bankDots = [
+    agony, torment,
+    fester, scour,
+    murk, miasma,
+    wither, atrophy, blight,
+    dispel, shatter,
+  ];
+  // ⬆⬆ END BANKED DoT / DEBUFF SUITE ⬆⬆
+
+  /// The spells the game ships to players. ⚠️ See [stances] and [bankDots]:
+  /// the banked generations are built but not yet listed here, because
+  /// everything in this list needs app-side copy the engine lane does not own.
   static const List<Spell> all = [
     flick, bolt, blast, surge, ruin, cataclysm,
     jolt,
@@ -250,5 +354,10 @@ abstract final class Spellbook {
     hasty, discharge, overload, hallow,
   ];
 
-  static Spell byId(String id) => all.firstWhere((s) => s.id == id);
+  /// Every spell the engine can resolve — the shipped book plus every banked
+  /// lane. ⚠️ Lookup only ([byId], netcode): it is deliberately NOT what an AI
+  /// draws from, and not what the app offers a player.
+  static const List<Spell> everything = [...all, ...stances, ...bankDots];
+
+  static Spell byId(String id) => everything.firstWhere((s) => s.id == id);
 }

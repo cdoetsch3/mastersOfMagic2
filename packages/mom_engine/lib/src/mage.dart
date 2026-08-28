@@ -285,15 +285,50 @@ class MageState {
     hp = (hp - amount).clamp(0, maxHp);
   }
 
-  void heal(int amount) {
-    // ⭐ The one door all healing walks through (ITEMS §9b.8) — callers that
-    // want the actual amount applied measure hp before and after, which is
-    // also what keeps their events truthful.
-    if (amount > 0 && healingReceivedPercent != 0) {
-      amount = (amount * (100 + healingReceivedPercent) / 100).round();
+  /// Heals [amount], and returns the **signed** change in health: positive for
+  /// health restored, NEGATIVE when Blight turned the heal into damage.
+  ///
+  /// ⭐ The one door all healing walks through (ITEMS §9b.8), which is exactly
+  /// why the anti-heal debuffs live here: Wither taxes and Blight inverts
+  /// potions, HoTs, Regrow, Photosynthesis and lifesteal alike, without any of
+  /// them knowing either exists. Callers read the return value (or measure hp
+  /// before and after) so their events stay truthful.
+  int heal(int amount) {
+    final before = hp;
+    if (amount > 0 && isHealInverted) {
+      // ⭐ **Blight supersedes Wither entirely** (ruled 2026-08-26): the FULL
+      // heal is inverted, not the Wither-reduced one — a player's second
+      // debuff must never weaken their first. At face value, too: healing
+      // received modifiers of either sign are simply not consulted, because
+      // this is no longer healing. It lands on health directly, as the heal it
+      // replaces would have.
+      takeHpDamage(amount);
+      return hp - before;
+    }
+    final percent = healingReceivedPercent + statusHealingPercent;
+    if (amount > 0 && percent != 0) {
+      amount = (amount * (100 + percent) / 100).round();
+      if (amount < 0) amount = 0; // a −150% tax heals nothing; it never bites
     }
     hp = (hp + amount).clamp(0, maxHp);
+    return hp - before;
   }
+
+  /// The healing-received modifier contributed by statuses (Wither = −50), in
+  /// percent points, summed with the gear stat of the same name. Derivation,
+  /// like every `effective*` getter above — recomputed at each heal.
+  int get statusHealingPercent {
+    var sum = 0;
+    for (final s in statuses) {
+      if (s is HealingModifier) {
+        sum += (s as HealingModifier).healingReceivedPercent;
+      }
+    }
+    return sum;
+  }
+
+  /// Whether any status inverts this mage's healing into damage (Blight).
+  bool get isHealInverted => statuses.any((s) => s is HealInverting);
 
   /// Consumes and returns the pending offensive buffs.
   ({int multiplier, bool phase}) consumeOffensiveBuffs() {

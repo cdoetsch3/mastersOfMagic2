@@ -12,7 +12,12 @@ import 'status.dart';
 /// end-phase damage band (E8). Regular damage: hits the shield first, with
 /// Pyro counter math. Re-proccing refreshes the window (new value, new clock);
 /// it never stacks.
-class IgniteStatus extends TurnStatus {
+///
+/// ⭐ Ignite is a [DamageOverTime] like every other burn (2026-08-28): Fester
+/// extends it and Scour collects it, and it says so through the interface
+/// rather than by name — which is what lets the spell lane's DoTs and this one
+/// feed the same machinery without either knowing the other exists.
+class IgniteStatus extends TurnStatus implements DamageOverTime {
   int perTick;
   int turnsLeft;
 
@@ -20,6 +25,15 @@ class IgniteStatus extends TurnStatus {
 
   @override
   StatusPolarity get polarity => StatusPolarity.debuff;
+
+  @override
+  int get ticksLeft => turnsLeft;
+
+  @override
+  int get damagePerTick => perTick;
+
+  @override
+  void addTicks(int count) => turnsLeft += count;
 
   /// Re-proc: a fresh 3-tick clock at the new attack's value.
   void refresh(int newPerTick) {
@@ -192,6 +206,14 @@ class CreepingDarkStatus extends TurnStatus {
 /// while under the opponent's Dusk or Midnight (Umbra corrupts Arcane). The
 /// engine mirrors stacks into [MageState.bonusDamagePercent].
 class ArcaneKnowledgeStatus extends TurnStatus {
+  /// ⚠️ **Never stripped.** "Permanent for the duel — it never decays, is
+  /// never cleared and is never consumed" (§4.3) predates Dispel and outranks
+  /// it: what you have learned is not a stance you are holding. (The engine
+  /// also mirrors the stacks into [MageState.bonusDamagePercent], so stripping
+  /// the status would not even remove the bonus — it would just desync it.)
+  @override
+  bool get strippable => false;
+
   static const int maxStacks = ElementTuning.arcaneKnowledgeMaxStacks;
   static const int percentPerStack =
       ElementTuning.arcaneKnowledgePercentPerStack;

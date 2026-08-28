@@ -98,6 +98,50 @@ enum StatusPolarity {
   neutral,
 }
 
+/// A status that damages its holder over time (Ignite, Agony, Torment, and
+/// whatever burns next).
+///
+/// ⭐ **Element-agnostic by law** (§7a law 1): Fester and Scour act on
+/// *DoT-ness* and never name a status, so a new burn joins the web the moment
+/// it implements this. Implementors keep their own clock — [ticksLeft] is
+/// authoritative and must be the same counter [TurnStatus.advanceAndCheckExpiry]
+/// winds down.
+abstract interface class DamageOverTime {
+  /// Ticks not yet paid out, including one for the turn now resolving.
+  int get ticksLeft;
+
+  /// Damage each remaining tick deals, pre-shield.
+  int get damagePerTick;
+
+  /// Extend the burn by [count] ticks (Fester).
+  void addTicks(int count);
+}
+
+extension DamageOverTimeTotal on DamageOverTime {
+  /// Everything this DoT still owes — what Scour collects, and the number an
+  /// EV-weighing AI should read.
+  int get remainingDamage => ticksLeft * damagePerTick;
+}
+
+/// A status that changes how much healing its holder RECEIVES, in percent
+/// points, summed with the gear stat of the same name (Wither = −50).
+///
+/// ⚠️ Deliberately NOT a [CombatStat] contribution: healing received is a
+/// percent multiplier applied inside [MageState.heal], not a term summed into
+/// a roll, and combat_stats.dart says so in as many words.
+abstract interface class HealingModifier {
+  int get healingReceivedPercent;
+}
+
+/// A status that turns its holder's healing into DAMAGE (Blight). Binary — the
+/// heal lands as damage at face value.
+///
+/// ⭐ **Supersedes [HealingModifier] entirely** while both are up (ruled
+/// 2026-08-26): the FULL heal is inverted, not the reduced one. Wither-then-
+/// Blight would make a player's second debuff weaken their first, which reads
+/// as a bug rather than as a combo.
+abstract interface class HealInverting {}
+
 /// A persistent status on a mage, resolved each turn's start and end phases.
 ///
 /// Statuses are pure data + timing: they declare *what* they want to do via
@@ -116,6 +160,15 @@ abstract class TurnStatus {
   /// and the failure mode is silent: Dispel and Purify would simply never find
   /// it. Making the compiler ask the question is the cheapest possible guard.
   StatusPolarity get polarity;
+
+  /// Whether a strip (Dispel) can take this off its holder.
+  ///
+  /// ⚠️ Defaults to true, unlike [polarity], because "strippable" is the rule
+  /// and the exemptions are the exception — and an exemption is never silent:
+  /// it is a ruling somebody wrote down (Arcane Knowledge is "never cleared"
+  /// by §4.3). A status that forgets this line is merely strippable, which is
+  /// the behaviour it would have wanted anyway.
+  bool get strippable => true;
 
   /// Operations to perform in [phase] this turn, evaluated against the
   /// holder's current state. Empty for phases this status ignores.

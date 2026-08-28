@@ -306,7 +306,114 @@ abstract final class StatusCatalog {
       lingers: true,
     ),
 
+    // ---- The bank: DoTs & debuffs (TYPE_EFFECTS §7a) --------------------
+    StatusInfo(
+      id: 'agony',
+      name: 'Agony',
+      description:
+          'Bleeds for 7 at the end of each of your next three turns, starting '
+          'with the one it lands on. Casting it again refreshes the bleed '
+          'rather than stacking it.',
+      trigger: 'Being hit by Agony — even a hit a shield soaks.',
+      kind: StatusKind.debuff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'torment',
+      name: 'Torment',
+      description:
+          'Bleeds for 5 at the end of each of your next nine turns. The long '
+          'burn: more damage in total than the quick one, and far longer for '
+          'the duel to end first.',
+      trigger: 'Being hit by Torment — even a hit a shield soaks.',
+      kind: StatusKind.debuff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'murk',
+      name: 'Murk',
+      description:
+          'Your own accuracy is cut while it lasts — 15 points from Murk, 25 '
+          'from Miasma. It stacks with Blind: they come from different '
+          'sources, so both apply.',
+      trigger: 'The enemy casting Murk or Miasma.',
+      kind: StatusKind.debuff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'wither',
+      name: 'Wither',
+      description:
+          'All healing you receive is halved — potions, heals over time, '
+          'Photosynthesis and lifesteal alike. Always −50%: Atrophy buys three '
+          'times the duration, never a deeper cut.',
+      trigger: 'The enemy casting Wither or Atrophy.',
+      kind: StatusKind.debuff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'blight',
+      name: 'Blight',
+      description:
+          'Your healing DAMAGES you instead — every potion, tick and lifesteal '
+          'heal-back. It overrides Wither entirely: the full heal is inverted, '
+          'not the halved one.',
+      trigger: 'The enemy casting Blight.',
+      kind: StatusKind.debuff,
+      element: null,
+      lingers: true,
+    ),
+
     // ---- Moments: things that happen, rather than conditions ------------
+    StatusInfo(
+      id: 'fester',
+      name: 'Fester',
+      description:
+          'Every burn on you lasts three ticks longer — whatever lit it. Cast '
+          'on the turn of a burn\'s last tick, it still catches it.',
+      trigger: 'The enemy casting Fester.',
+      kind: StatusKind.moment,
+      element: null,
+      lingers: false,
+    ),
+    StatusInfo(
+      id: 'scour',
+      name: 'Scour',
+      description:
+          'Every burn on you pays out all its remaining ticks at once, as a '
+          'single hit, and is consumed — one shield to get through, one chance '
+          'to deflect.',
+      trigger: 'The enemy casting Scour.',
+      kind: StatusKind.moment,
+      element: null,
+      lingers: false,
+    ),
+    StatusInfo(
+      id: 'dispel',
+      name: 'Dispel',
+      description:
+          'Strips your buffs — stances, pending riders and Grace. Arcane '
+          'Knowledge is never stripped, and Haste is not a stance.',
+      trigger: 'The enemy casting Dispel.',
+      kind: StatusKind.moment,
+      element: null,
+      lingers: false,
+    ),
+    StatusInfo(
+      id: 'shatter',
+      name: 'Shatter',
+      description:
+          'Your shield, every Barrier point and your Divert stance are gone at '
+          'once. It deals no damage — it just leaves you standing in the open.',
+      trigger: 'The enemy casting Shatter.',
+      kind: StatusKind.moment,
+      element: null,
+      lingers: false,
+    ),
     StatusInfo(
       id: 'blindLifted',
       name: 'Blind lifted',

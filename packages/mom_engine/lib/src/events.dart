@@ -261,6 +261,11 @@ class EffectDamageEvent extends DuelEvent {
   final bool shieldBroken;
   final bool barrierPopped;
 
+  /// Damage the defender's Deflection removed before this tick landed. ⭐ A
+  /// tick is DAMAGE (ruled 2026-08-28), so Divert answers it exactly as it
+  /// answers an attack — and the log has to be able to say so.
+  final int deflected;
+
   const EffectDamageEvent(
     this.target,
     this.source, {
@@ -269,6 +274,7 @@ class EffectDamageEvent extends DuelEvent {
     this.shieldMultiplierPercent = 100,
     this.shieldBroken = false,
     this.barrierPopped = false,
+    this.deflected = 0,
   });
 
   @override
@@ -278,6 +284,8 @@ class EffectDamageEvent extends DuelEvent {
       if (toShield > 0) '$toShield to shield${tag == null ? '' : ' ($tag)'}',
       if (toHp > 0) '$toHp damage',
       if (toShield == 0 && toHp == 0) 'no effect',
+      if (deflected > 0) '$deflected deflected',
+      if (barrierPopped) 'barrier shattered',
       if (shieldBroken) 'shield shattered',
     ];
     return '${target.name} suffers $source: ${parts.join(', ')}';

@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'action.dart';
+import 'bank_dots.dart';
 import 'bank_stances.dart';
 import 'combat_stats.dart';
 import 'element.dart';
@@ -455,17 +456,24 @@ class DuelEngine {
 
   void _drink(MageState mage, ConsumableEffect effect, List<DuelEvent> events) {
     var healed = 0;
+    var bite = 0;
     if (effect.healNowPercent > 0) {
       // ⭐ At least 1, matching ItemEffect.healFor and RegrowStatus — a potion
-      // that visibly does nothing reads as a bug. Measured before/after
-      // because [MageState.heal] scales by healing-received gear and caps at
-      // full: the event must report what actually landed.
+      // that visibly does nothing reads as a bug. The signed delta is what
+      // [MageState.heal] actually did: it scales by healing-received (gear and
+      // Wither), caps at full, and under Blight it BITES — so the event
+      // reports what landed rather than what the label promised.
       final amount = (mage.maxHp * effect.healNowPercent / 100).round();
-      final before = mage.hp;
-      mage.heal(amount < 1 ? 1 : amount);
-      healed = mage.hp - before;
+      final delta = mage.heal(amount < 1 ? 1 : amount);
+      healed = delta > 0 ? delta : 0;
+      bite = delta < 0 ? -delta : 0;
     }
     events.add(ItemUsedEvent(mage, effect.name, healed: healed));
+    // Blight: the potion is poison. Reported after the drink, because that is
+    // the order it happens in.
+    if (bite > 0) {
+      events.add(EffectDamageEvent(mage, 'Blight', toShield: 0, toHp: bite));
+    }
     if (effect.hotPercentPerTurn > 0 && effect.hotTurns > 0) {
       // ⚠️ Replaces rather than stacks. A second Tonic refreshes the first:
       // two identical pips ticking side by side is not a thing the HUD can
@@ -599,7 +607,12 @@ class DuelEngine {
     // it is applied to the whole assembled expression, not to dodge or
     // accuracy separately. Miss ⇒ no effect, charge still spent
     // (post-resolution sweep), no streak.
-    if (spell.isHarmful) {
+    //
+    // ⭐ **Aux-offense never rolls to hit** (§7a's priority-8 lane): it is
+    // enemy-facing but it is not an attack, so dodge, accuracy and Blind — the
+    // attack lane's currency — do not touch it. If the cast resolves, its
+    // statuses land, subject only to Grace.
+    if (spell.isHarmful && spell.effect is! AuxOffenseEffect) {
       final slips = cast.element == MagicElement.astral;
       final blindPenalty =
           slips ? 0 : (caster.missChance * 100).round(); // 50 if blinded
@@ -672,6 +685,14 @@ class DuelEngine {
           ignoresShields: ignoresShields || buffs.phase,
           events: events,
         );
+        // The DoT rider (Agony, Torment). Lands on any hit that resolved,
+        // fully-shielded ones included — Ignite's rule, and for the same
+        // reason: the burn is a consequence of the strike, not of the wound.
+        // ⚠️ The rider is a DEBUFF, so Grace eats it; the damage above is not,
+        // so Grace never touches that.
+        if (spell.effect case final DotAttackEffect dot) {
+          _applyBankDot(caster, cast.target, dot, events);
+        }
       case BarrageEffect(:final minPerCharge, :final maxPerCharge):
         final buffs = caster.consumeOffensiveBuffs();
         // What this cast actually paid. Still reflects an earlier-priority
@@ -746,6 +767,19 @@ class DuelEngine {
       case HasteEffect():
         // Initiative only; the grantsHaste flag does the work post-resolution.
         break;
+      // ---- The bank's aux-offense spells (§7a) --------------------------
+      // ⚠️ These cases MUST stay above [DischargeEffect]: they extend it (see
+      // bank_dots.dart for why), and a switch takes the first matching arm.
+      case final DebuffGrantEffect grant:
+        _applyBankDebuff(cast.target, grant, events);
+      case FesterEffect(:final damage, :final bonusTicks):
+        _fester(cast, damage, bonusTicks, events);
+      case ScourEffect():
+        _scour(cast, events);
+      case DispelEffect():
+        _dispel(cast.target, events);
+      case ShatterEffect():
+        _shatter(cast.target, events);
       case DischargeEffect():
         final target = cast.target;
         // Takes everything, including charge already committed to a cast of
@@ -858,39 +892,19 @@ class DuelEngine {
       // (that's mitigation of the strike, not a change to its force).
       totalRaw += perHit;
 
-      // Deflection (§5.2 step 6, defender side, per hit). Pure reduction — the
-      // deflected portion is removed, not reflected. Also chance-guarded.
-      //
-      // ⭐ BOTH halves of the Divert pair are clamped at 90 on the assembled
-      // output (§7a, ruled 2026-08-26): deflection never becomes a certainty,
-      // and a deflected hit is never erased. "There is always a sliver that
-      // lands" is what keeps a full turtle beatable — and it is also what
-      // prices Reflect, which returns 100% of whatever this removes.
-      final deflectChance =
-          CombatClamps.deflectActivation(target.effectiveDeflectChance);
-      var deflected = 0;
-      if (deflectChance > 0 && rng.nextInt(100) < deflectChance) {
-        deflected = (perHit *
-                CombatClamps.deflectFraction(target.effectiveDeflectAmount) /
-                100)
-            .round();
-        perHit -= deflected;
-      }
-
-      final pierce = piercePct > 0 ? (perHit * piercePct / 100).round() : 0;
-      final r = _applyOneHit(target, perHit - pierce, cast.element, ignoresShields);
-      // The pierced slice walks through [_takeHpDamage] too, so overkill on it
-      // is clamped exactly like the main portion.
-      final toHp = r.toHp + (pierce > 0 ? _takeHpDamage(target, pierce) : 0);
-      totalToHp += toHp;
+      // Deflection, the Astral pierce split and the shields all live in the
+      // shared damage path from here on — see [_damagePacket].
+      final r = _damagePacket(target, perHit, cast.element,
+          ignoresShields: ignoresShields, piercePercent: piercePct);
+      totalToHp += r.toHp;
       events.add(DamageEvent(target, spell,
           toShield: r.toShield,
-          toHp: toHp,
+          toHp: r.toHp,
           shieldMultiplierPercent: r.multiplierPercent,
           shieldBroken: r.broken,
           barrierPopped: r.barrierPopped,
           crit: crit,
-          deflected: deflected,
+          deflected: r.deflected,
           bypassedShield: bypassedShield));
     }
     if (lifesteal > 0 && totalToHp > 0) {
@@ -902,11 +916,12 @@ class DuelEngine {
       // the sum here is the true total loss across the whole attack. Damage a
       // shield or Barrier soaked never reaches this counter at all, so a
       // fully-blocked Drain heals exactly 0.
-      // Before/after, because heal() may scale the amount (healing received
-      // %) — the event must report what actually happened.
-      final before = cast.caster.hp;
-      cast.caster.heal((totalToHp * lifesteal).round());
-      events.add(HealedEvent(cast.caster, cast.caster.hp - before));
+      // ⚠️ Blight bites the DRAINER, not the drained: the damage above has
+      // already landed on the target, and the heal-back — which is this
+      // caster's healing — is what gets inverted. Lifesteal cannot be
+      // unbundled from its damage, which is exactly where Blight has teeth.
+      final delta = _heal(cast.caster, (totalToHp * lifesteal).round(), events);
+      if (delta >= 0) events.add(HealedEvent(cast.caster, delta));
     }
     _lastAttackToHp = totalToHp;
     return totalRaw;
@@ -1184,6 +1199,195 @@ class DuelEngine {
         statusId: 'ignite'));
   }
 
+  // ---- The bank: DoT engine & debuff suite (TYPE_EFFECTS §7a) -----------
+
+  /// Heals [mage] and reports a **Blight** inversion if that is what happened.
+  /// Returns the signed health delta — positive healed, negative bitten — so
+  /// each caller emits its own success event (a drink, a drain, a tick) while
+  /// the bite, which reads identically wherever it comes from, is reported
+  /// here once.
+  int _heal(MageState mage, int amount, List<DuelEvent> events) {
+    final delta = mage.heal(amount);
+    if (delta < 0) {
+      events.add(EffectDamageEvent(mage, 'Blight', toShield: 0, toHp: -delta));
+    }
+    return delta;
+  }
+
+  /// The bank's DoTs and its small hit scale with their caster exactly as
+  /// damage does — 4%/level compounding, plus an enemy archetype's power — or
+  /// a level-60 Agony would tick for a level-1's 7. Never below 1: a burn that
+  /// visibly does nothing reads as a bug.
+  int _scaledForCaster(MageState caster, int amount) {
+    final scaled = (amount * caster.levelScale * caster.powerScale).round();
+    return scaled < 1 ? 1 : scaled;
+  }
+
+  /// Applies a DoT rider (Agony, Torment) after its attack has landed.
+  ///
+  /// Replace, never stack (§7a law 5): a recast is a REFRESH — a fresh clock
+  /// at the new value, the same rule Ignite's re-proc follows. Different DoTs
+  /// coexist and tick side by side; only a same-id collision replaces.
+  void _applyBankDot(MageState caster, MageState target, DotAttackEffect dot,
+      List<DuelEvent> e) {
+    if (_graceBlocks(target, e)) return;
+    final perTick = _scaledForCaster(caster, dot.damagePerTick);
+    target.statuses.removeWhere((s) => s.id == dot.dotId);
+    target.statuses.add(BankDotStatus(
+      id: dot.dotId,
+      name: dot.dotName,
+      damagePerTick: perTick,
+      ticks: dot.ticks,
+    ));
+    e.add(BuffAppliedEvent(
+        target, '${dot.dotName} — $perTick/turn for ${dot.ticks} turns',
+        statusId: dot.dotId));
+  }
+
+  /// Applies Murk / Wither / Blight. Replace-on-cast: magnitude and duration
+  /// together, last cast wins — so Miasma over Murk is an upgrade, and Murk
+  /// over Miasma is a downgrade the caster chose.
+  void _applyBankDebuff(
+      MageState target, DebuffGrantEffect grant, List<DuelEvent> e) {
+    if (_graceBlocks(target, e)) return;
+    final status = grant.buildStatus();
+    target.statuses.removeWhere((s) => s.id == status.id);
+    target.statuses.add(status);
+    final description = switch (grant.debuff) {
+      BankDebuff.murk =>
+        'Murk — ${grant.magnitude} accuracy for ${grant.turns} turns',
+      BankDebuff.wither =>
+        'Wither — ${grant.magnitude}% healing received for ${grant.turns} turns',
+      BankDebuff.blight =>
+        'Blight — healing becomes damage for ${grant.turns} turns',
+    };
+    e.add(BuffAppliedEvent(target, description, statusId: status.id));
+  }
+
+  /// **Fester**: a small hit, then every DoT on the target gains ticks.
+  ///
+  /// ⭐ Iterates DoT-NESS, never a status by name (§7a law 1): Ignite is fed by
+  /// the same line as Agony, and so is whatever burns next. Casts resolve in
+  /// the main phase and ticks in the end phase, so a burn down to its LAST
+  /// tick is still catchable on that turn — the +3 lands before the
+  /// bookkeeping that would have expired it.
+  void _fester(_Entry cast, int damage, int bonusTicks, List<DuelEvent> e) {
+    final target = cast.target;
+    if (damage > 0) {
+      final r = _damagePacket(
+          target, _scaledForCaster(cast.caster, damage), cast.element);
+      e.add(DamageEvent(target, cast.spell!,
+          toShield: r.toShield,
+          toHp: r.toHp,
+          shieldMultiplierPercent: r.multiplierPercent,
+          shieldBroken: r.broken,
+          barrierPopped: r.barrierPopped,
+          deflected: r.deflected));
+    }
+    final dots = target.statuses.whereType<DamageOverTime>().toList();
+    for (final dot in dots) {
+      dot.addTicks(bonusTicks);
+    }
+    e.add(BuffAppliedEvent(
+        target,
+        dots.isEmpty
+            ? 'Nothing is festering'
+            : 'Festering — +$bonusTicks ticks on ${dots.length} burn'
+                '${dots.length == 1 ? '' : 's'}',
+        statusId: 'fester'));
+  }
+
+  /// **Scour**: every DoT on the target pays out all its remaining ticks NOW
+  /// and is consumed.
+  ///
+  /// ⭐ **One packet, not one per burn.** The whole sum meets the shield once
+  /// and rolls Divert once — the difference between a detonator and a machine
+  /// gun, and the reason it can break a shield that would have eaten each tick
+  /// separately. Element-agnostic (no counter maths): the bleed belongs to no
+  /// element, and Scour is only collecting it.
+  void _scour(_Entry cast, List<DuelEvent> e) {
+    final target = cast.target;
+    final dots = target.statuses.whereType<DamageOverTime>().toList();
+    final total = dots.fold(0, (sum, d) => sum + d.remainingDamage);
+    target.statuses.removeWhere((s) => s is DamageOverTime);
+    e.add(BuffAppliedEvent(
+        target,
+        dots.isEmpty
+            ? 'Nothing to scour'
+            : 'Scoured — ${dots.length} burn${dots.length == 1 ? '' : 's'} '
+                'collected for $total',
+        statusId: 'scour'));
+    if (total <= 0) return;
+    final r = _damagePacket(target, total, null);
+    e.add(DamageEvent(target, cast.spell!,
+        toShield: r.toShield,
+        toHp: r.toHp,
+        shieldMultiplierPercent: r.multiplierPercent,
+        shieldBroken: r.broken,
+        barrierPopped: r.barrierPopped,
+        deflected: r.deflected));
+  }
+
+  /// **Dispel**: strips every strippable buff-polarity status, plus the
+  /// pending next-attack riders the mage carries as fields (they are buffs
+  /// that merely predate the status framework — the catalogue says so).
+  ///
+  /// ⚠️ Two deliberate exemptions: **Arcane Knowledge**, which §4.3 rules is
+  /// never cleared, and the **Haste token**, which is the turn order's
+  /// property rather than a stance on a mage.
+  void _dispel(MageState target, List<DuelEvent> e) {
+    final stripped = <String>[];
+    target.statuses.removeWhere((s) {
+      final take = s.polarity == StatusPolarity.buff && s.strippable;
+      if (take) stripped.add(s.id);
+      return take;
+    });
+    if (target.empowerMultiplier != null) {
+      target.empowerMultiplier = null;
+      stripped.add('empower');
+    }
+    if (target.quickenPriority != null) {
+      target.quickenPriority = null;
+      stripped.add('quicken');
+    }
+    if (target.phaseNext) {
+      target.phaseNext = false;
+      stripped.add('phase');
+    }
+    if (target.hasGrace) {
+      // ⚠️ Grace is not *consumed as a block* here — Dispel applies no debuff,
+      // so there is nothing for it to absorb. It is simply one of the buffs.
+      target.hasGrace = false;
+      stripped.add('grace');
+    }
+    e.add(BuffAppliedEvent(
+        target,
+        stripped.isEmpty
+            ? 'Nothing to dispel'
+            : 'Dispelled — ${stripped.join(', ')}',
+        statusId: 'dispel'));
+  }
+
+  /// **Shatter**: no damage. The elemental shield, every Barrier point, and
+  /// the Divert family of statuses all go.
+  ///
+  /// ⚠️ Statuses only, for deflection: gear's deflect stats are not a stance
+  /// and cannot be shattered off someone's armour.
+  void _shatter(MageState target, List<DuelEvent> e) {
+    final had = target.shield != null ||
+        target.barrierPoints > 0 ||
+        target.statuses.any(isDivertFamily);
+    target.shield = null;
+    target.barrierPoints = 0;
+    target.statuses.removeWhere(isDivertFamily);
+    e.add(BuffAppliedEvent(
+        target,
+        had
+            ? 'Shattered — shields, Barrier and Divert are gone'
+            : 'Nothing to shatter',
+        statusId: 'shatter'));
+  }
+
   T? _statusOf<T extends TurnStatus>(MageState mage) {
     for (final s in mage.statuses) {
       if (s is T) return s;
@@ -1203,6 +1407,66 @@ class DuelEngine {
     final before = target.hp;
     target.takeHpDamage(amount);
     return before - target.hp;
+  }
+
+  /// ⭐ **The one path damage takes**, whatever fired it: a spell's hit, a DoT
+  /// tick, Scour's collected packet. Deflection first (the defender's Divert
+  /// statuses and gear, summed and clamped), then the Astral pierce split,
+  /// then shields — and the breakdown comes back whole so every caller's event
+  /// can tell the truth.
+  ///
+  /// ⭐ **A tick is DAMAGE** (ruled 2026-08-28). It resolves shield-first and
+  /// Divert can deflect it — but a tick is not a HIT: it never misses, never
+  /// crits and fires no on-hit proc, all of which live in [_attack], above
+  /// this line. Routing everything through here is also what lets a Reflect
+  /// status return the deflected amount from ONE place, without this method or
+  /// any DoT having to know Reflect exists.
+  ///
+  /// [piercePercent] splits a fraction straight to health (Astral Alignment);
+  /// [canDeflect] is for the Pierce rider, which denies the Divert roll.
+  ({
+    int deflected,
+    int toShield,
+    int toHp,
+    bool broken,
+    int multiplierPercent,
+    bool barrierPopped
+  }) _damagePacket(
+    MageState target,
+    int amount,
+    MagicElement? element, {
+    bool ignoresShields = false,
+    int piercePercent = 0,
+    bool canDeflect = true,
+  }) {
+    var remaining = amount;
+    var deflected = 0;
+    // ⭐ BOTH halves of the Divert pair are clamped at 90 on the assembled
+    // output (§7a): deflection never becomes a certainty, and a deflected hit
+    // is never erased. "There is always a sliver that lands."
+    final chance =
+        CombatClamps.deflectActivation(target.effectiveDeflectChance);
+    if (canDeflect && chance > 0 && rng.nextInt(100) < chance) {
+      deflected = (remaining *
+              CombatClamps.deflectFraction(target.effectiveDeflectAmount) /
+              100)
+          .round();
+      remaining -= deflected;
+    }
+    final pierce =
+        piercePercent > 0 ? (remaining * piercePercent / 100).round() : 0;
+    final r = _applyOneHit(target, remaining - pierce, element, ignoresShields);
+    // The pierced slice walks through [_takeHpDamage] too, so overkill on it
+    // is clamped exactly like the main portion.
+    final toHp = r.toHp + (pierce > 0 ? _takeHpDamage(target, pierce) : 0);
+    return (
+      deflected: deflected,
+      toShield: r.toShield,
+      toHp: toHp,
+      broken: r.broken,
+      multiplierPercent: r.multiplierPercent,
+      barrierPopped: r.barrierPopped
+    );
   }
 
   /// Applies one [amount] of damage to [target], resolving shields and counter
@@ -1336,22 +1600,25 @@ class DuelEngine {
   void _applyStatusOp(MageState holder, StatusOp op, List<DuelEvent> events) {
     switch (op) {
       case StatusHeal(:final amount, :final source):
-        final before = holder.hp;
-        holder.heal(amount);
-        events.add(EffectHealEvent(holder, source, holder.hp - before));
+        final delta = _heal(holder, amount, events);
+        if (delta >= 0) events.add(EffectHealEvent(holder, source, delta));
       case StatusDamage(
           :final amount,
           :final element,
           :final bypassShield,
           :final source
         ):
-        final r = _applyOneHit(holder, amount, element, bypassShield);
+        // ⭐ A tick is DAMAGE: the same path a spell's hit takes, so a shield
+        // eats it first and Divert can deflect it (ruled 2026-08-28).
+        final r = _damagePacket(holder, amount, element,
+            ignoresShields: bypassShield);
         events.add(EffectDamageEvent(holder, source,
             toShield: r.toShield,
             toHp: r.toHp,
             shieldMultiplierPercent: r.multiplierPercent,
             shieldBroken: r.broken,
-            barrierPopped: r.barrierPopped));
+            barrierPopped: r.barrierPopped,
+            deflected: r.deflected));
       case StatusPurge():
         _resolveAbsolution(holder, events);
     }

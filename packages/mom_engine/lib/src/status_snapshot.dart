@@ -1,4 +1,5 @@
 import 'bank_stances.dart';
+import 'bank_dots.dart';
 import 'element.dart';
 import 'element_status.dart';
 import 'item_status.dart';
@@ -129,6 +130,22 @@ class StatusSnapshot {
         case HeavyhandStatus(:final critDamage, :final turnsLeft):
           out.add(StatusView(
               id: 'heavyhand', turnsLeft: turnsLeft, magnitude: critDamage));
+        // The bank's DoTs and debuffs (§7a). One arm per SHAPE, not per spell:
+        // the DoT arm reads the status's own id, so Agony, Torment and the
+        // next burn all draw their pip without another case here.
+        case BankDotStatus(:final id, :final turnsLeft, :final damagePerTick):
+          out.add(StatusView(
+              id: id, turnsLeft: turnsLeft, magnitude: damagePerTick));
+        case MurkStatus(:final turnsLeft, :final accuracyPercent):
+          out.add(StatusView(
+              id: 'murk', turnsLeft: turnsLeft, magnitude: accuracyPercent));
+        case WitherStatus(:final turnsLeft, :final healingReceivedPercent):
+          out.add(StatusView(
+              id: 'wither',
+              turnsLeft: turnsLeft,
+              magnitude: healingReceivedPercent));
+        case BlightStatus(:final turnsLeft):
+          out.add(StatusView(id: 'blight', turnsLeft: turnsLeft));
       }
     }
 
