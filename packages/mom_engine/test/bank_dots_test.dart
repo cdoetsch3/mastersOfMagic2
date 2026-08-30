@@ -660,6 +660,21 @@ void main() {
           reason: 'so the status lands, subject only to Grace');
     });
 
+    test('⭐ shipped Discharge joins the no-roll lane (ruled 2026-08-29)', () {
+      bruno
+        ..dodge = 100 // any attack would miss outright
+        ..charge = 4;
+      final duel = engine(doubles: [0.01]);
+      final r = cast(duel, Spellbook.discharge);
+      expect(r.events.whereType<SpellMissedEvent>(), isEmpty,
+          reason: 'Discharge deals no damage, so it does not roll to hit — '
+              'the ruling that made it aux-offense finishes the job. Mutant '
+              'killed: the gate reading AuxOffenseEffect instead of its '
+              'parent DischargeEffect, which left the shipped spell rolling.');
+      expect(bruno.charge, 0,
+          reason: 'the wipe lands against a dodge no attack could beat');
+    });
+
     test('resolves after aux-defence and before the attacks', () {
       for (final s in [
         Spellbook.murk,

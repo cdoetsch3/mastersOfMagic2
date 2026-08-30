@@ -615,6 +615,10 @@ class DuelEngine {
     // attack lane's currency — do not touch it. If the cast resolves, its
     // statuses land, subject only to Grace. It also never CONSUMES an
     // Unerring rider — the rider waits for a real offensive attack.
+    // Shipped **Discharge** is exempted by the same door (ruled 2026-08-29:
+    // "it doesn't deal damage") — [AuxOffenseEffect] extends [DischargeEffect],
+    // so the parent type IS the no-roll lane; Overload, which deals damage,
+    // has its own effect class and still rolls.
     //
     // ⭐ **Unerring (§7a) never enters this arithmetic.** It is not an accuracy
     // bonus large enough to win — the roll simply does not happen. That is the
@@ -628,11 +632,11 @@ class DuelEngine {
     // returned above, so it is still unspent then: the rider waits, as Phase
     // does.
     if (spell.isHarmful &&
-        spell.effect is! AuxOffenseEffect &&
+        spell.effect is! DischargeEffect &&
         spell.isOffensive &&
         caster.unerringNext) {
       caster.unerringNext = false;
-    } else if (spell.isHarmful && spell.effect is! AuxOffenseEffect) {
+    } else if (spell.isHarmful && spell.effect is! DischargeEffect) {
       final slips = cast.element == MagicElement.astral;
       final blindPenalty =
           slips ? 0 : (caster.missChance * 100).round(); // 50 if blinded

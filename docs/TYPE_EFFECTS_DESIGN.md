@@ -1077,6 +1077,13 @@ the bank's only two changes to shipped spells; the code edit lands with
 the build batch, and the balance sim should re-run after (Overload moving
 to 9 changes its race against shields and Quicken).
 
+✅ Follow-up RULED 2026-08-29 (surfaced at build): **Discharge does not
+roll to hit** — "it doesn't deal damage." It fully joins the aux-offense
+no-roll lane: dodge, accuracy and Blind cannot touch it; the wipe lands
+if the cast resolves. Consequence, accepted: Blind can no longer fizzle
+a Discharge (the old pinned test said the opposite and was reversed with
+the ruling cited). Overload deals damage and still rolls.
+
 **Hit-chance floor** — instead of capping dodge or accuracy separately,
 clamp the OUTPUT: after spell accuracy + caster accuracy − target dodge at
 time of resolution, final hit chance floors at **10%** (ceiling 100%; only

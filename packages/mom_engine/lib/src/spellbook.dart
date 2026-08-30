@@ -491,12 +491,19 @@ abstract final class Spellbook {
     hasty, discharge, overload, hallow,
   ];
 
-  /// Every spell the engine can resolve — the shipped book plus every banked
-  /// lane. ⚠️ Lookup only ([byId], netcode): it is deliberately NOT what an AI
-  /// draws from, and not what the app offers a player.
-  static const List<Spell> everything = [
-    ...all, ...stances, ...bankSpecials, ...bankDots, ...bank,
+  /// ⭐ THE banked generation, one list — every §7a spell that is engine-live
+  /// but not yet player-visible. The four sublists ([stances], [bankSpecials],
+  /// [bankDots], [bank]) exist only because four build lanes wrote them; this
+  /// is the name everything else should reach for, and the single list the
+  /// app lane promotes into [all] when the player-facing copy lands.
+  static const List<Spell> banked = [
+    ...stances, ...bankSpecials, ...bankDots, ...bank,
   ];
+
+  /// Every spell the engine can resolve — the shipped book plus the banked
+  /// generation. ⚠️ Lookup only ([byId], netcode): it is deliberately NOT what
+  /// an AI draws from, and not what the app offers a player.
+  static const List<Spell> everything = [...all, ...banked];
 
   /// ⚠️ Resolves across [everything], not just [all]. This is what
   /// `decodeAction` calls, and a banked spell that cannot be decoded is a

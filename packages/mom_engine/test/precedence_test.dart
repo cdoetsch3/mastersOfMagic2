@@ -164,17 +164,26 @@ void main() {
       expect(miss.blinded, isFalse, reason: 'no Blind, so no "blinded" blame');
     });
 
-    // ⚠️ Same update, same reason: deterministic miss instead of an
-    // arithmetically-certain one, now that the 10% floor exists.
-    test('a rolled miss also nullifies Discharge (harmful, non-damaging)', () {
+    // ⚠️ REVERSED by ruling (2026-08-29): this test used to pin the OPPOSITE
+    // — "a rolled miss also nullifies Discharge". Discharge deals no damage,
+    // so it no longer rolls to hit at all: it joined the aux-offense no-roll
+    // lane (its effect class is the lane's parent type), and Blind, dodge and
+    // accuracy cannot touch it. The old expectation is superseded, not
+    // deleted — what it guarded (a nullified cast wipes nothing) still holds
+    // for spells that DO roll, covered by the Blast tests above.
+    test('Blind cannot nullify Discharge — it never rolls to hit (ruled)', () {
       charge(alice, MagicElement.geo, 3);
       charge(bruno, MagicElement.aqua, 4);
       alice.statuses.add(_Blind(1.0, 3));
       final blinded = DuelEngine(alice, bruno,
           rng: _AlwaysMiss(), elementEffects: false, baseMissPercent: 0);
-      blinded.resolveTurn(
+      final r = blinded.resolveTurn(
           CastAction(Spellbook.discharge), const ForfeitAction());
-      expect(bruno.charge, 4, reason: 'a missed Discharge wipes nothing');
+      expect(r.events.whereType<SpellMissedEvent>(), isEmpty,
+          reason: 'no roll happens, so nothing can miss — even a total Blind');
+      expect(bruno.charge, 0,
+          reason: 'the wipe lands regardless; Discharge resolves or it does '
+              'not, exactly like the bank\'s aux-offense spells');
     });
 
     test('a 0% blind never misses; defensive casts are never blinded', () {
