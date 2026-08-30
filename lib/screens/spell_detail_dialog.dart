@@ -25,6 +25,24 @@ Future<void> showSpellDetail(BuildContext context, Spell spell) {
 
 /// The headline figure — kept short so it never crowds the label beside it.
 String _numbers(Spell spell) => switch (spell.effect) {
+  // ⚠️ Subtype arms before their parents — the bank's effects extend shipped
+  // ones, and a sealed switch matches in order.
+  DotAttackEffect(
+    :final minAmount,
+    :final maxAmount,
+    :final damagePerTick,
+    :final ticks,
+  ) =>
+    '$minAmount–$maxAmount +$damagePerTick×$ticks',
+  DebuffGrantEffect(:final debuff, :final magnitude, :final turns) =>
+    switch (debuff) {
+      BankDebuff.blight => '$turns turns',
+      _ => '$magnitude${debuff == BankDebuff.wither ? '%' : ''}',
+    },
+  FesterEffect(:final bonusTicks) => '+$bonusTicks',
+  ScourEffect() => 'All ticks',
+  DispelEffect() => 'Buffs',
+  ShatterEffect() => 'Defences',
   DamageEffect(:final minAmount, :final maxAmount, :final hits) =>
     hits > 1 ? '$minAmount–$maxAmount ×$hits' : '$minAmount–$maxAmount',
   BarrageEffect(:final minPerCharge, :final maxPerCharge) =>
@@ -74,14 +92,41 @@ int _stanceTurns(List<StanceGrant> grants) => grants.fold(0, (longest, g) {
 
 /// The qualifier beside the figure — carries the prose, and is free to wrap.
 String _numbersLabel(Spell spell) => switch (spell.effect) {
-  DamageEffect(:final lifesteal) =>
-    lifesteal > 0
+  // ⚠️ Subtype arms before their parents, same as [_numbers].
+  DotAttackEffect(:final dotName, :final ticks) =>
+    'damage now, then the $dotName bleed at the end of each of your next '
+        '$ticks turns. Recasting refreshes it — burns never stack',
+  DebuffGrantEffect(:final debuff, :final turns) => switch (debuff) {
+    BankDebuff.murk => 'to their accuracy for $turns turns — stacks with '
+        'Blind, which is a different source',
+    BankDebuff.wither =>
+      'to all healing they receive for $turns turns — potions, heals over '
+          'time and lifesteal alike',
+    BankDebuff.blight =>
+      'of their heals landing as DAMAGE instead — and it overrides Wither '
+          'entirely while both are up',
+  },
+  FesterEffect(:final damage) =>
+    'ticks added to every burn on them, behind a $damage-damage hit — '
+        'Ignite included, and it catches a burn on its final tick',
+  ScourEffect() =>
+    'paid out at once as ONE hit — one shield to meet, one deflect roll — '
+        'and the burns are consumed',
+  DispelEffect() =>
+    'stripped from them — stances, pending riders and Grace alike. Arcane '
+        'Knowledge is never stripped',
+  ShatterEffect() =>
+    'destroyed at once: their shield, every Barrier point and their Divert '
+        'stance. Gear deflection survives; no damage is dealt',
+  DamageEffect(:final lifesteal, :final executeBelowPercent) =>
+    '${lifesteal > 0
         // 📝 "health they lose", not "damage that reaches their health" —
         // overkill pays nothing (playtest ruling), so a killing blow heals
         // for the sliver they had left, and the copy must not promise more.
         ? 'damage — heals you for ${(lifesteal * 100).round()}% of the '
               'health they actually lose'
-        : 'damage, rolled on cast',
+        : 'damage, rolled on cast'}'
+        '${executeBelowPercent > 0 ? ' — and always a crit while they are below $executeBelowPercent% health' : ''}',
   BarrageEffect() => 'damage, one hit per charge spent',
   OverloadEffect() => "damage per point of the enemy's charge",
   ShieldEffect() => 'shield in your element',

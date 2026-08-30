@@ -141,13 +141,17 @@ void main() {
       });
     });
 
-    test('the ids are free — nothing collides with the shipped book', () {
-      final shipped = Spellbook.all.map((s) => s.id).toSet();
-      for (final s in Spellbook.stances) {
-        expect(shipped, isNot(contains(s.id)), reason: s.id);
-      }
+    test('the ids are unique across the whole promoted book', () {
+      // ✅ REVERSED 2026-08-29: pre-promotion this pinned the stance ids OUT
+      // of Spellbook.all; with the bank promoted, `all` CONTAINS them, so
+      // the property worth pinning is global uniqueness — no id appears
+      // twice anywhere, which is what byId and the wire actually require.
+      final ids = Spellbook.all.map((s) => s.id).toList();
+      expect(ids.toSet().length, ids.length,
+          reason: 'a duplicated id makes byId ambiguous — a desync, '
+              'not a cosmetic collision');
       expect(Spellbook.stances.map((s) => s.id).toSet(), hasLength(10),
-          reason: 'and none of them collides with each other');
+          reason: 'and the lane still ships exactly its ten');
     });
 
     test('a cast builds a FRESH status, never a shared instance', () {

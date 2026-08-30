@@ -477,10 +477,11 @@ abstract final class Spellbook {
   ];
   // ⬆⬆ END BANKED RIDERS, FINISHER & SELF-INSTANTS ⬆⬆
 
-  /// The spells the game ships to players. ⚠️ See [stances], [bankSpecials],
-  /// [bankDots] and [bank]: the banked generations are built but not yet
-  /// listed here, because everything in this list needs app-side copy the
-  /// engine lane does not own.
+  /// The spells the game ships to players — the original book plus the
+  /// banked §7a generation. ✅ **The bank PROMOTED 2026-08-29**: every banked
+  /// spell now carries its description, icon and tooltip arms in the app
+  /// (`tooltip_consistency_test` is the gate that held this line closed
+  /// until they did).
   static const List<Spell> all = [
     flick, bolt, blast, surge, ruin, cataclysm,
     jolt,
@@ -489,21 +490,22 @@ abstract final class Spellbook {
     ward, aegis, bulwark, rampart, sanctuary, barrier,
     empower, quicken, phase,
     hasty, discharge, overload, hallow,
+    ...banked,
   ];
 
-  /// ⭐ THE banked generation, one list — every §7a spell that is engine-live
-  /// but not yet player-visible. The four sublists ([stances], [bankSpecials],
-  /// [bankDots], [bank]) exist only because four build lanes wrote them; this
-  /// is the name everything else should reach for, and the single list the
-  /// app lane promotes into [all] when the player-facing copy lands.
+  /// ⭐ THE banked generation, one list — every §7a spell, promoted into
+  /// [all] on 2026-08-29 once its player-facing copy landed. The four
+  /// sublists ([stances], [bankSpecials], [bankDots], [bank]) exist only
+  /// because four build lanes wrote them; this remains the name for "the new
+  /// generation" where the distinction matters (unlock tables, changelogs).
   static const List<Spell> banked = [
     ...stances, ...bankSpecials, ...bankDots, ...bank,
   ];
 
-  /// Every spell the engine can resolve — the shipped book plus the banked
-  /// generation. ⚠️ Lookup only ([byId], netcode): it is deliberately NOT what
-  /// an AI draws from, and not what the app offers a player.
-  static const List<Spell> everything = [...all, ...banked];
+  /// Every spell the engine can resolve. Since the bank's promotion this IS
+  /// [all] — kept as its own name because netcode and [byId] were written
+  /// against it, and because a future generation will park here first.
+  static const List<Spell> everything = all;
 
   /// ⚠️ Resolves across [everything], not just [all]. This is what
   /// `decodeAction` calls, and a banked spell that cannot be decoded is a

@@ -771,9 +771,15 @@ void main() {
           reason: 'the eleven spells of the DoT/debuff lane');
       expect(Spellbook.bankDots.map((s) => s.id).toSet().length, 11,
           reason: 'no id collides with another');
+      // ✅ REVERSED 2026-08-29: promotion put the lane INSIDE Spellbook.all,
+      // so the old not-in-all pin inverted. Uniqueness across the whole book
+      // is the survivor property (byId must never be ambiguous).
+      final ids = Spellbook.all.map((e) => e.id).toList();
+      expect(ids.toSet().length, ids.length,
+          reason: 'no id appears twice anywhere in the promoted book');
       for (final s in Spellbook.bankDots) {
-        expect(Spellbook.all.map((e) => e.id).contains(s.id), isFalse,
-            reason: '${s.id} must not collide with a shipped spell');
+        expect(ids, contains(s.id),
+            reason: '${s.id} was promoted with the bank');
       }
     });
 

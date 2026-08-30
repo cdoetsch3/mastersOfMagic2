@@ -648,10 +648,16 @@ void main() {
       }, reason: 'all six point at the caster except the finisher');
     });
 
-    test('no id collides across the shipped book and the other lane', () {
-      final taken = [...Spellbook.all, ...Spellbook.stances].map((s) => s.id);
+    test('no id collides anywhere in the promoted book', () {
+      // ✅ REVERSED 2026-08-29: `all` now CONTAINS the bank (promotion), so
+      // "not in all" became self-contradictory. The property that matters
+      // survives as global uniqueness.
+      final ids = Spellbook.all.map((s) => s.id).toList();
+      expect(ids.toSet().length, ids.length,
+          reason: 'a duplicated id makes byId ambiguous on the wire');
       for (final s in Spellbook.bank) {
-        expect(taken, isNot(contains(s.id)), reason: s.id);
+        expect(ids, contains(s.id),
+            reason: '${s.id} was promoted with the bank');
       }
     });
 

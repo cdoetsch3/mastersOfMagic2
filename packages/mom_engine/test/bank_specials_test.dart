@@ -83,17 +83,20 @@ void main() {
   // The block itself — prices, lane, and the wiring every status needs
   // ======================================================================
   group('the spells as banked', () {
-    test('the lane ships exactly its seven, held apart from the shipped book',
-        () {
+    test('the lane ships exactly its seven, PROMOTED into the book', () {
       expect(Spellbook.bankSpecials.map((s) => s.id).toSet(), {
         'steadfast', 'composure', 'bloodlust', 'deathWish', 'reflect',
         'mend', 'renewal',
       });
+      // ✅ REVERSED 2026-08-29: this used to pin the spells OUT of
+      // Spellbook.all, because everything in `all` owes the app a
+      // description and an icon. The copy landed and the bank promoted —
+      // the same gate, now holding the door open instead of shut
+      // (tooltip_consistency_test still enforces the debt).
       for (final s in Spellbook.bankSpecials) {
-        expect(Spellbook.all, isNot(contains(s)),
-            reason: '⚠️ ${s.id} is parked out of Spellbook.all on purpose — '
-                'everything in `all` owes the app a description and an icon, '
-                'and those are the HUD lane\'s to write, not this one\'s');
+        expect(Spellbook.all, contains(s),
+            reason: '${s.id} was promoted with the bank — parked lanes are '
+                'over; a spell missing from `all` now is a regression');
       }
     });
 

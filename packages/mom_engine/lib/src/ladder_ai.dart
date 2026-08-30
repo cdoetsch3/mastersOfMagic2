@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'action.dart';
 import 'ai.dart';
+import 'bank_dots.dart';
+import 'bank_specials.dart';
 import 'element.dart';
 import 'element_status.dart';
 import 'mage.dart';
@@ -133,8 +135,15 @@ class EnemyView {
 /// ⚠️ Compressed at the bottom on purpose. At 0.48 a level-2 brain blunders
 /// away half its habit and becomes indistinguishable from level 1's pure
 /// randomness — the rung stops meaning anything.
+// ⚠️ Re-spread at the bottom for the §7a bank (2026-08-29): the promoted
+// book made cheap-attack spam genuinely strong — a level-2 habit of
+// recasting Agony on cooldown collects every tick and out-damages level 3's
+// charge rhythm — so the competence gap between 2 and 3 shrank and the
+// gradient has to carry more of the spread. 2 rises toward (but not to) the
+// 0.48 collapse point; 4 drops a step so its deliberating body stays ahead
+// of the sharpened 3.
 const Map<int, double> _blunderRate = {
-  2: 0.32, 3: 0.26, 4: 0.21, 5: 0.17, 6: 0.13,
+  2: 0.44, 3: 0.27, 4: 0.18, 5: 0.17, 6: 0.13,
   7: 0.10, 8: 0.07, 9: 0.04, 10: 0.00,
 };
 
@@ -224,7 +233,10 @@ class LadderAi implements DuelAi {
     if (!_can(3)) {
       final attacks = affordable.where((sp) => sp.isOffensive).toList();
       if (attacks.isEmpty) return ChargeAction(elementArg());
-      attacks.sort((a, b) => a.chargeCost.compareTo(b.chargeCost));
+      attacks.sort((a, b) {
+        final c = a.chargeCost.compareTo(b.chargeCost);
+        return c != 0 ? c : a.id.compareTo(b.id);
+      });
       return CastAction(attacks.first, elementArg());
     }
 
@@ -232,13 +244,20 @@ class LadderAi implements DuelAi {
     // Uses the charge system on a rhythm anyone can read, and spends what it
     // built (≈7.1 damage/turn) — the strongest of the three beginner rungs.
     if (!_can(4)) {
-      const target = 3;
+      // ⭐ "A fixed number" — fixed PER LOADOUT, not per game. Charging to a
+      // flat 3 was tuned when almost every drawn kit held a 3-cost attack;
+      // with the §7a bank promoted, kits are utility-heavy and often cap out
+      // at a 1-cost Bolt — and charging to 3 to spend it on a Bolt is 3
+      // damage a turn, WORSE than level 2's cast-on-cooldown. The rhythm
+      // stays readable (same number every cycle); the number now fits the
+      // book it was dealt.
+      final target = min(3, _maxUsefulCharge(offensiveOnly: true));
       if (self.charge < target && self.charge < MageState.maxCharge) {
         return ChargeAction(elementArg());
       }
       final castable = affordable.where((s) => s.isOffensive).toList();
       if (castable.isEmpty) return ChargeAction(elementArg());
-      castable.sort((a, b) => b.chargeCost.compareTo(a.chargeCost));
+      _sortAttacks(castable, self, (s) => s.chargeCost);
       return CastAction(castable.first, elementArg());
     }
 
@@ -260,6 +279,17 @@ class LadderAi implements DuelAi {
       for (final s in affordable.where((s) => s.isOffensive)) {
         if (estimateDamage(s, self, enemy) >= effectiveHp) {
           return CastAction(s, elementArg());
+        }
+      }
+      // ⭐ Scour is a lethal too: the whole pending burn arrives NOW as one
+      // packet. Sees-statuses rungs only — and the packet respects the same
+      // walls as any damage, so a Barrier blanks the read entirely.
+      if (_can(7) && enemy.barrierPoints == 0) {
+        final burn = _pendingDot(enemy) - (enemy.shield?.remaining ?? 0);
+        if (burn >= seenHp) {
+          for (final s in affordable) {
+            if (s.effect is ScourEffect) return CastAction(s, elementArg());
+          }
         }
       }
     }
@@ -301,6 +331,29 @@ class LadderAi implements DuelAi {
       if (plan != null) return plan;
     }
 
+    // ---- Level 7+: the status game — EV-priced utility casts ----------
+    // ⭐ The designer's poker framing (ruled 2026-08-28): every status play
+    // gets a NUMBER so unlike things can be compared. A DoT is booked at 60%
+    // of its remaining face (time + Cleanse risk); Scour is worth the
+    // discount it removes; relief is worth what it cancels; a strip is worth
+    // ~8 a buff. Rungs below 7 cannot see statuses, so the whole block is
+    // theirs — the "sees statuses" competence finally cuts both ways.
+    // 📝 Stances other than Mending are booked at 0 for now — pricing a
+    // 25-turn Lightfoot needs opponent modelling this brain does not have;
+    // that is the next AI iteration, not this one.
+    if (_can(7)) {
+      final utility = _bestUtility(self, enemy, affordable);
+      if (utility != null) {
+        final bestAttack = affordable.where((s) => s.isOffensive).fold<int>(
+            0, (m, s) => max(m, _score(s, self, enemy)));
+        // The floor of 11 stops dithering: a 6-point strip is never worth a
+        // turn that could charge toward a Surge.
+        if (utility.ev > max(bestAttack, 11)) {
+          return CastAction(utility.spell, elementArg());
+        }
+      }
+    }
+
     // ---- Level 4: shield when threatened -----------------------------
     // ⭐ Core play, deliberately available early. Higher rungs do it more
     // reliably rather than exclusively.
@@ -319,15 +372,19 @@ class LadderAi implements DuelAi {
     // enemy shield, and refuse to feed a shield that halves the hit.
     if (_can(5)) {
       attacks = attacks.where((s) => _score(s, self, enemy) > 0).toList();
-      attacks.sort((a, b) =>
-          _score(b, self, enemy).compareTo(_score(a, self, enemy)));
+      _sortAttacks(attacks, self, (s) => _score(s, self, enemy));
     } else {
       // Level 4: sensible, but shield-blind — sorts on raw size, so it will
       // happily swing into a resistance it cannot see.
-      attacks.sort((a, b) => b.chargeCost.compareTo(a.chargeCost));
+      _sortAttacks(attacks, self, (s) => s.chargeCost);
     }
 
-    final canCharge = self.charge < MageState.maxCharge;
+    // ⭐ "Stop wasting charge" — level 4's defining competence — extends to
+    // the TOP end with the bank promoted: a kit whose biggest cast costs 2
+    // gains nothing from a 5th point of charge, and a rung that builds to
+    // full anyway is spending three turns to Bolt. Build only to the most
+    // this loadout can actually spend.
+    final canCharge = self.charge < _maxUsefulCharge();
 
     // Level 4: stop wasting charge — never spend a full cycle on a cheap
     // spell. This is the single competence that separates 4 from 3.
@@ -383,6 +440,22 @@ class LadderAi implements DuelAi {
 
   // ---- helpers -------------------------------------------------------
 
+  /// The most charge THIS loadout can usefully hold — the cost of its most
+  /// expensive spell, or the full cap when an X-cost spell (Barrage) can
+  /// always spend more. Clamped to 1..max.
+  ///
+  /// ⚠️ [offensiveOnly] for level 3, which never casts anything else — a
+  /// Composure in the kit must not talk it into over-charging for a Bolt.
+  /// Levels 4+ count every spell: the big shield is worth building toward.
+  int _maxUsefulCharge({bool offensiveOnly = false}) {
+    var most = 1;
+    for (final s in spells) {
+      if (offensiveOnly && !s.isOffensive) continue;
+      most = max(most, s.xCost ? MageState.maxCharge : s.chargeCost);
+    }
+    return min(most, MageState.maxCharge);
+  }
+
   List<Spell> _affordable(MageState self) => [
         for (final s in spells)
           if (s.xCost ? self.charge >= 1 : s.chargeCost <= self.charge) s,
@@ -416,7 +489,26 @@ class LadderAi implements DuelAi {
   /// the duel for it. That is the Sporecap Shambler bug, and it can bite any
   /// intelligence-5+ creature whose whole kit is damage.
   int _score(Spell sp, MageState self, MageState enemy) {
-    final through = estimateDamage(sp, self, enemy);
+    var through = estimateDamage(sp, self, enemy);
+    // ⭐ A DoT attack's ticks are future money — the designer's poker framing
+    // (EV with a time discount). Valued at 60% of face: the duel can end
+    // first, and Cleanse can delete the tail. ⚠️ **Sees-statuses rungs
+    // only**: below 7 a brain cannot read the clock, so it prices the hit
+    // alone — and that same blindness is what stops it Torment-spamming,
+    // because sight also brings the REFRESH-WASTE subtraction: recasting a
+    // running burn replaces it (§7a law 5), forfeiting every tick still
+    // owed. Booking ticks without booking the waste made a Torment-spamming
+    // rung measurably weaker than a Surge-spamming one.
+    final e = sp.effect;
+    if (_can(7) && e is DotAttackEffect) {
+      var dotValue = e.damagePerTick * e.ticks * 6 ~/ 10;
+      for (final s in enemy.statuses) {
+        if (s.id == e.dotId && s is DamageOverTime) {
+          dotValue -= (s as DamageOverTime).remainingDamage;
+        }
+      }
+      if (dotValue > 0) through += dotValue;
+    }
     if (through > 0) return through;
     if (!sp.isOffensive) return 0;
 
@@ -459,6 +551,10 @@ class LadderAi implements DuelAi {
 
   int _rawDamage(Spell sp, MageState self) {
     final e = sp.effect;
+    // 📝 A DoT attack deliberately falls into the DamageEffect arm — raw is
+    // the SIGHTLESS valuation (the hit alone). Only [_score]'s sees-statuses
+    // booking prices the ticks, because pricing a clock you cannot read is
+    // how level 3 briefly became a Torment-spammer.
     if (e is DamageEffect) {
       return (e.minAmount + e.maxAmount) * e.hits ~/ 2;
     }
@@ -468,14 +564,114 @@ class LadderAi implements DuelAi {
     return 0;
   }
 
+  /// Deterministic composite order for attack lists: primary key first, raw
+  /// damage second, id last. ⚠️ The tiebreak is not cosmetic — `sort` is
+  /// unstable, and with the bank promoted, Torment ties Surge on cost: an
+  /// unbroken tie let low rungs coin-flip between a 35-damage cast and an
+  /// 8-damage one, which is how the ladder stopped climbing.
+  void _sortAttacks(
+      List<Spell> attacks, MageState self, int Function(Spell) primary) {
+    attacks.sort((a, b) {
+      final p = primary(b).compareTo(primary(a));
+      if (p != 0) return p;
+      final raw = _rawDamage(b, self).compareTo(_rawDamage(a, self));
+      if (raw != 0) return raw;
+      return a.id.compareTo(b.id);
+    });
+  }
+
   /// Damage already scheduled against [m] by its own statuses — the part of a
   /// health bar that is already spent. Level 8+ only.
   int _pendingDot(MageState m) {
     var total = 0;
     for (final s in m.statuses) {
-      if (s is IgniteStatus) total += s.perTick * s.turnsLeft;
+      // ⭐ Via the DamageOverTime seam, not by name (§7a law 1): Ignite,
+      // Agony, Torment and whatever burns next are all "damage already on
+      // the clock" to a rung that can see statuses.
+      if (s is DamageOverTime) total += (s as DamageOverTime).remainingDamage;
     }
     return total;
+  }
+
+  /// The best EV-positive utility cast on the board, or null when nothing
+  /// prices above zero. Level 7+ only — every valuation here reads statuses.
+  ({Spell spell, int ev})? _bestUtility(
+      MageState self, MageState enemy, List<Spell> affordable) {
+    ({Spell spell, int ev})? best;
+    void consider(Spell sp, int ev) {
+      if (ev <= 0) return;
+      if (best == null || ev > best!.ev) best = (spell: sp, ev: ev);
+    }
+
+    final enemyDots = [
+      for (final s in enemy.statuses)
+        if (s is DamageOverTime) s as DamageOverTime,
+    ];
+    final ownDots = [
+      for (final s in self.statuses)
+        if (s is DamageOverTime) s as DamageOverTime,
+    ];
+
+    for (final sp in affordable) {
+      switch (sp.effect) {
+        case ScourEffect():
+          // Acceleration: the tail becomes NOW — worth the 40% discount the
+          // booking above withheld. A Barrier eats the whole packet; a
+          // shield eats its remainder first.
+          var face = enemyDots.fold(0, (t, d) => t + d.remainingDamage);
+          if (enemy.barrierPoints > 0) face = 0;
+          consider(sp, (face - (enemy.shield?.remaining ?? 0)) * 4 ~/ 10);
+        case FesterEffect(:final bonusTicks):
+          final perTurn = enemyDots.fold(0, (t, d) => t + d.damagePerTick);
+          consider(sp, bonusTicks * perTurn * 6 ~/ 10);
+        case ShatterEffect():
+          consider(
+              sp,
+              (enemy.shield?.remaining ?? 0) * 8 ~/ 10 +
+                  enemy.barrierPoints * 12 +
+                  (enemy.statuses.any(isDivertFamily) ? 10 : 0));
+        case DispelEffect():
+          var count = enemy.statuses
+              .where(
+                  (s) => s.polarity == StatusPolarity.buff && s.strippable)
+              .length;
+          if (enemy.empowerMultiplier != null) count++;
+          if (enemy.hasGrace) count++;
+          consider(sp, count * 8);
+        case CleanseEffect(:final all):
+          final dotRelief = ownDots.fold(0, (t, d) => t + d.remainingDamage);
+          final others = self
+              .statusesWithPolarity(StatusPolarity.debuff)
+              .where((s) => s is! DamageOverTime)
+              .length;
+          if (all) {
+            // Purify's full rite wants a real mess to justify 5 charge.
+            if (ownDots.length + others >= 2) {
+              consider(sp, dotRelief * 8 ~/ 10 + others * 8);
+            }
+          } else {
+            consider(sp, max(dotRelief * 8 ~/ 10, others > 0 ? 8 : 0));
+          }
+        case StanceEffect(:final grants):
+          // Mending is the one stance with a bookable number today: healing
+          // is worth 60% of what it can actually restore, and only when
+          // hurt enough for it to matter.
+          for (final g in grants) {
+            if (g.statusId != 'mending') continue;
+            final granted = g.build();
+            if (granted is MendingStatus &&
+                self.hp * 100 < self.maxHp * 60) {
+              final total =
+                  granted.percentPerTurn * granted.turnsLeft * self.maxHp ~/
+                      100;
+              consider(sp, min(total, self.maxHp - self.hp) * 6 ~/ 10);
+            }
+          }
+        default:
+          break;
+      }
+    }
+    return best;
   }
 
   Spell? _defensive(List<Spell> affordable) {

@@ -134,22 +134,92 @@ const Map<String, IconData> spellIcons = {
   'discharge': Icons.power_off,
   'overload': Icons.electric_bolt,
   'hallow': Icons.verified_user,
+
+  // ---- The banked generation (TYPE_EFFECTS §7a) ------------------------
+  // Stat stances
+  'lightfoot': Icons.directions_run,
+  'twinkleToes': Icons.directions_walk,
+  'glance': Icons.redo,
+  'divert': Icons.alt_route,
+  'truesight': Icons.visibility,
+  'hawkeye': Icons.remove_red_eye,
+  'keen': Icons.center_focus_strong,
+  'ardent': Icons.flash_on,
+  'heavyhand': Icons.fitness_center,
+  'overkill': Icons.sports_mma,
+  // Special stances & sustain
+  'steadfast': Icons.security,
+  'composure': Icons.self_improvement,
+  'bloodlust': Icons.bloodtype,
+  'deathWish': Icons.heart_broken,
+  'reflect': Icons.flip,
+  'mend': Icons.healing,
+  'renewal': Icons.spa,
+  // DoTs & debuffs
+  'agony': Icons.content_cut,
+  'torment': Icons.hourglass_top,
+  'fester': Icons.bug_report,
+  'scour': Icons.waves,
+  'murk': Icons.blur_circular,
+  'miasma': Icons.cloud,
+  'wither': Icons.trending_down,
+  'atrophy': Icons.hourglass_bottom,
+  'blight': Icons.dangerous,
+  'dispel': Icons.block,
+  'shatter': Icons.broken_image,
+  // Riders, finisher, cleansers
+  'pierce': Icons.double_arrow,
+  'unerring': Icons.gps_fixed,
+  'execute': Icons.gavel,
+  'cleanse': Icons.cleaning_services,
+  'purify': Icons.auto_fix_high,
+  'meditate': Icons.psychology,
 };
 
 /// Multi-line tooltip text for a spell: cost, priority, effect, flavor.
 String spellTooltip(Spell spell) {
   final cost = spell.xCost ? 'X (all charge)' : '${spell.chargeCost}';
   final detail = switch (spell.effect) {
+    // ⚠️ Subtype arms FIRST — a sealed switch matches in order, and the bank's
+    // effects extend shipped ones (DotAttackEffect is a DamageEffect, the
+    // aux-offense family are DischargeEffects). Parent-first would read Agony
+    // as a plain hit and Fester as a charge wipe.
+    DotAttackEffect(
+      :final minAmount,
+      :final maxAmount,
+      :final damagePerTick,
+      :final ticks,
+      :final dotName,
+    ) =>
+      '$minAmount-$maxAmount damage, then $dotName bleeds $damagePerTick/turn '
+          'for $ticks turns',
+    DebuffGrantEffect(:final debuff, :final magnitude, :final turns) =>
+      switch (debuff) {
+        BankDebuff.murk => '$magnitude enemy accuracy for $turns turns',
+        BankDebuff.wither =>
+          'Healing they receive $magnitude% for $turns turns',
+        BankDebuff.blight =>
+          'Their heals deal damage instead, for $turns turns',
+      },
+    FesterEffect(:final damage, :final bonusTicks) =>
+      '$damage damage; every burn on them gains $bonusTicks more ticks',
+    ScourEffect() =>
+      'Every burn on them pays out all remaining ticks NOW, as one hit',
+    DispelEffect() => "Strips the enemy's buffs",
+    ShatterEffect() =>
+      'No damage. Destroys their shield, Barriers and Divert stance',
     DamageEffect(
       :final minAmount,
       :final maxAmount,
       :final hits,
       :final lifesteal,
+      :final executeBelowPercent,
     ) =>
       '${hits > 1 ? '$hits hits of ' : ''}$minAmount-$maxAmount damage'
           // 📝 "health lost", not "health damage": overkill and shielded
           // damage both heal nothing (playtest ruling).
-          '${lifesteal > 0 ? ', heals for ${(lifesteal * 100).round()}% of the health lost' : ''}',
+          '${lifesteal > 0 ? ', heals for ${(lifesteal * 100).round()}% of the health lost' : ''}'
+          '${executeBelowPercent > 0 ? ', always crits below $executeBelowPercent% health' : ''}',
     BarrageEffect(:final minPerCharge, :final maxPerCharge) =>
       'One hit per charge spent, each $minPerCharge-$maxPerCharge damage',
     ShieldEffect(:final minStrength, :final maxStrength) =>
@@ -255,4 +325,40 @@ const Map<String, String> spellDescriptions = {
   'discharge': "Strip the enemy's stored charge. Fizzles a same-turn Barrage.",
   'overload': "Detonate the enemy's own charge — brutal against a full mage.",
   'hallow': 'Ward yourself: the next debuff that lands on you is blocked.',
+
+  // ---- The banked generation (TYPE_EFFECTS §7a) ------------------------
+  'lightfoot': 'Move like a rumor. The cheap way to start dodging.',
+  'twinkleToes': 'Commit to the dance — a whole duel of not being there.',
+  'glance': 'A sliver of deflection. Sometimes the hit just... slides.',
+  'divert': 'The proper deflect stance: more often, and more of it.',
+  'truesight': 'See them clearly — and burn any Blind off your eyes.',
+  'hawkeye': 'Nothing escapes you for a long, long while.',
+  'keen': 'An edge on every strike. Crits come looking for you.',
+  'ardent': 'The long burn of focus — a duel-length appetite for crits.',
+  'heavyhand': 'When they land, they LAND.',
+  'overkill': 'Why win by a little? The heaviest crits, for ages.',
+  'steadfast': 'Every wall you raise is a quarter stronger while this holds.',
+  'composure': 'Their lucky hits are just... hits. Crits mean nothing to you.',
+  'bloodlust': 'The all-in window: crit often AND crit hard, briefly.',
+  'deathWish': 'Below 15% health, every blow you land is a crit. Live there.',
+  'reflect': 'What you deflect comes back to them — every point of it.',
+  'mend': 'A short, steady knitting of wounds.',
+  'renewal': 'The long healing — half your health back, given time.',
+  'agony': 'A quick bleed: pays out fast, hurts the whole way.',
+  'torment': 'The slow knife. Nine turns of it — unless they Cleanse.',
+  'fester': 'Feed whatever burns on them. Every wound runs longer.',
+  'scour': 'Collect early: every bleed pays out at once, as one blow.',
+  'murk': 'A thin haze over their aim.',
+  'miasma': 'A rolling fog they cannot see through, for twenty turns.',
+  'wither': 'Half of every heal they drink, gone.',
+  'atrophy': 'The same rot, three times the patience.',
+  'blight': 'Their medicine is poison now. Every heal wounds them instead.',
+  'dispel': 'Strip their stances bare. The answer to a stacked mage.',
+  'shatter': 'Turtle-breaker: shield, Barriers and Divert, all gone at once.',
+  'pierce': 'Your next attack cannot be turned aside.',
+  'unerring': 'Your next attack cannot miss. Not against anything.',
+  'execute': 'The finisher — guaranteed crit against a wounded mage.',
+  'cleanse': 'Wash one affliction away — you pick the one.',
+  'purify': 'The full rite: every debuff on you, gone.',
+  'meditate': 'Breathe. Every stance you hold deepens by five turns.',
 };
