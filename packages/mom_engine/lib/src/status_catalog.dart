@@ -462,6 +462,32 @@ abstract final class StatusCatalog {
       lingers: true,
     ),
 
+    // ---- Item-lane conditions (pre-existing catalogue gap, closed
+    // 2026-08-29: StatusSnapshot emitted both ids with no entry) ----------
+    StatusInfo(
+      id: 'regrow',
+      name: 'Regrow',
+      description:
+          'Worn gear knits you back together — a share of your maximum '
+          'health at the end of every turn, for as long as the item is worn. '
+          'It never expires, and Meditate has nothing to deepen.',
+      trigger: 'Entering a duel wearing Regrow gear (The Charlock).',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+    StatusInfo(
+      id: 'healOverTime',
+      name: 'Restoration',
+      description:
+          'A drink still working through you: heals a share of your maximum '
+          'health at the end of each of its turns.',
+      trigger: 'A belt tonic that heals over time.',
+      kind: StatusKind.buff,
+      element: null,
+      lingers: true,
+    ),
+
     // ---- Moments: things that happen, rather than conditions ------------
     // The bank's self-instants (§7a INSTANTS) report as moments: they change
     // the board and leave nothing behind to carry.

@@ -123,6 +123,11 @@ const Map<String, StatusFx> statusFx = {
   'reflect': StatusFx(Color(0xFF9FE8DC), StatusMotion.scatter),
   'mending': StatusFx(Color(0xFF77C97A), StatusMotion.orbit),
 
+  // Item-lane heals (catalogue gap closed 2026-08-29) — distinct greens on
+  // distinct motions so the fx-uniqueness test holds.
+  'regrow': StatusFx(Color(0xFF4E8F52), StatusMotion.orbit),
+  'healOverTime': StatusFx(Color(0xFFA3D9A5), StatusMotion.rise),
+
   // The bank's self-instants (§7a) — HUD-lane placeholders.
   'cleansed': StatusFx(Color(0xFFA8E6CF), StatusMotion.scatter),
   'cleanseEmpty': StatusFx(Color(0xFFBDB6D4), StatusMotion.dim),

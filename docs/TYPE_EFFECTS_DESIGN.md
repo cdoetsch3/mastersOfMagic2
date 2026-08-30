@@ -1340,7 +1340,7 @@ Agony, Torment, and Death Wish; rev 4 added Cleanse + Purify; rev 5 gave
 Wither its tier 2, Atrophy 📝) — larger than the shipped book of 25,
 still the right order of magnitude for a generation.
 
-### Unlock placements ✅ APPROVED 2026-08-28 ("no notes" — PROGRESSION §4 holds the shipped table; §4.2 there mirrors this)
+### Unlock placements ✅ APPROVED 2026-08-28 — FOLDED into PROGRESSION §4's master table 2026-08-29 (the ⚔ rows); the §4.2 mirror is retired
 
 Principles: nothing before its charge cap (4c ≥ L20, 5c ≥ L40, per the cap
 schedule); no counter before the thing it counters; the stat game opens

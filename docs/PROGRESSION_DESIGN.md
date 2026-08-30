@@ -153,18 +153,23 @@ level — high-level players crafting trash get trash XP, which keeps the
 
 ## 4. Unlock schedule ✅ (complete — every spell placed)
 
+*(✅ Folded 2026-08-29: the §7a bank's approved placements — the old §4.2
+mirror — now live in this master table, marked ⚔ to keep the generations
+readable. The bank is built and promoted; unlock enforcement remains OFF
+for playtesting.)*
+
 | Level | Charge cap | Elements | Spells unlocked |
 |---|---|---|---|
 | **1** | **2** | **Tier 1** (Aqua, Pyro, Flora) | Flick, Bolt, Ward, Aegis, Quicken |
 | **5** | — | — | Blast, Sap |
-| **10** | **3** | — | Surge, Volley |
-| **15** | — | **Tier 2 — Kinetic** (Electro, Aero, Geo) | Leech, Discharge |
-| **20** | **4** | — | Ruin, Barrier, Barrage |
-| **25** | — | — | Overload, Empower, Rampart, Hallow 📝 |
-| **30** | — | **Tier 3 — Celestial** (Solar, Lunar, Astral) 📝 | Phase |
-| **35** | — | — | Jolt, Flurry, Bulwark, Hasty |
-| **40** | **5** | — | Cataclysm, Sanctuary, Drain |
-| **45** | — | **Tier 4 — Ethereal** (Sanctus, Umbra, Arcane) 📝 | — |
+| **10** | **3** | — | Surge, Volley, ⚔ Glance, ⚔ Mend |
+| **15** | — | **Tier 2 — Kinetic** (Electro, Aero, Geo) | Leech, Discharge, ⚔ Lightfoot, ⚔ Truesight, ⚔ Murk, ⚔ Agony |
+| **20** | **4** | — | Ruin, Barrier, Barrage, ⚔ Keen, ⚔ Heavyhand, ⚔ Steadfast, ⚔ Wither, ⚔ Torment |
+| **25** | — | — | Overload, Empower, Rampart, Hallow 📝, ⚔ Divert, ⚔ Hawkeye, ⚔ Miasma, ⚔ Composure, ⚔ Fester, ⚔ Cleanse |
+| **30** | — | **Tier 3 — Celestial** (Solar, Lunar, Astral) 📝 | Phase, ⚔ Unerring, ⚔ Pierce, ⚔ Scour, ⚔ Meditate, ⚔ Death Wish |
+| **35** | — | — | Jolt, Flurry, Bulwark, Hasty, ⚔ Twinkle Toes, ⚔ Ardent, ⚔ Overkill, ⚔ Renewal, ⚔ Execute, ⚔ Atrophy |
+| **40** | **5** | — | Cataclysm, Sanctuary, Drain, ⚔ Bloodlust, ⚔ Shatter, ⚔ Purify, ⚔ Blight, ⚔ Dispel |
+| **45** | — | **Tier 4 — Ethereal** (Sanctus, Umbra, Arcane) 📝 | ⚔ Reflect |
 | **50** | — | — | max level |
 
 📝 **The level cap stays 50, but Ethereal *content* runs to enemy level 60**
@@ -191,7 +196,8 @@ Knowledge — move from L30 to L45**, leaving L30–44 without an info-war or
 damage-stacking element. Solar inherits Blind, so L30 still gets a proc-based
 Tier 3 effect.
 
-All 25 engine spells are placed. The L35 bucket ("all remaining
+All 59 engine spells are placed (25 original + the 34-spell ⚔ bank,
+folded above). The L35 bucket ("all remaining
 non-charge-5") resolves to Jolt, Flurry, Bulwark, Hasty; every 5-cost spell
 (Cataclysm, Sanctuary, Drain) arrives with the charge-5 cap at L40.
 
@@ -253,27 +259,6 @@ on your charge cap.*
   tutorial meta; Blast at L5 is the first "big" spell.
 - Preset validation (≥1 element, ≥1 offensive spell) is satisfiable from L1:
   Flick and Bolt are both offensive.
-
-### 4.2 Banked-bank placements ✅ (approved 2026-08-28 — designed, NOT built)
-
-The 34-spell combat-stat bank (TYPE_EFFECTS_DESIGN §7a) is design-final
-with these placements, approved with no notes. Specs live in §7a — this
-is the unlock mirror. Unlock enforcement remains OFF for playtesting;
-this is the schedule for when it turns on.
-
-| Level | Bank spells added |
-|---|---|
-| **10** | Glance, Mend |
-| **15** | Lightfoot, Truesight, Murk, Agony |
-| **20** | Keen, Heavyhand, Steadfast, Wither, Torment |
-| **25** | Divert, Hawkeye, Miasma, Composure, Fester, Cleanse |
-| **30** | Unerring, Pierce, Scour, Meditate, Death Wish |
-| **35** | Twinkle Toes, Ardent, Overkill, Renewal, Execute, Atrophy |
-| **40** | Bloodlust, Shatter, Purify, Blight, Dispel |
-| **45** | Reflect |
-
-📝 When the bank builds, fold these rows into the §4 master table and
-retire this mirror.
 
 ---
 

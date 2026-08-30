@@ -20,6 +20,7 @@ import '../game/items/item_catalogue.dart';
 import '../game/enemies/enemy_def.dart';
 import '../ui/app_theme.dart';
 import '../ui/charge_dots.dart';
+import '../ui/cleanse_picker.dart';
 import '../ui/creature_art.dart';
 import '../ui/item_display.dart' show rarityColour;
 import '../ui/item_icon.dart';
@@ -434,6 +435,23 @@ class _DuelScreenState extends State<DuelScreen>
     if (mounted) setState(() => _fxKind = _FxKind.none);
   }
 
+  /// Tapping a spell tab. Almost always a straight submit — except Cleanse
+  /// (TYPE_EFFECTS §7a), whose "one debuff of your CHOICE" needs the choice
+  /// asked: with two or more debuffs a picker opens, and dismissing it
+  /// cancels the cast (tapping away must never spend the charge). With zero
+  /// or one debuff the engine's default pick is already the only sensible
+  /// answer, so no dialog interrupts.
+  Future<void> _tapSpell(Spell spell) async {
+    final effect = spell.effect;
+    if (effect is CleanseEffect && !effect.all && debuffsOn(c.player).length > 1) {
+      final choice = await CleansePickerDialog.show(context, c.player);
+      if (choice == null || !mounted) return;
+      _submit(c.castAction(spell, statusChoice: choice.statusId));
+      return;
+    }
+    _submit(c.castAction(spell));
+  }
+
   Future<void> _submit(MageAction action, {bool fleeAttempt = false}) async {
     // Move locked in. For remote duels, keep a visible countdown running so
     // the wait reads as "opponent has N seconds left", not a frozen app.
@@ -740,7 +758,7 @@ class _DuelScreenState extends State<DuelScreen>
     if (spellSlot >= 0) {
       if (spellSlot < c.loadout.spells.length) {
         final spell = c.loadout.spells[spellSlot];
-        if (c.canAct(spell)) _submit(c.castAction(spell));
+        if (c.canAct(spell)) _tapSpell(spell);
       }
       return KeyEventResult.handled;
     }
@@ -1565,7 +1583,7 @@ class _DuelScreenState extends State<DuelScreen>
         child: Opacity(
           opacity: usable ? 1 : 0.32,
           child: InkWell(
-            onTap: usable ? () => _submit(c.castAction(spell)) : null,
+            onTap: usable ? () => _tapSpell(spell) : null,
             borderRadius: BorderRadius.circular(10),
             // ⭐ The Stack sits OUTSIDE the tab body rather than inside it.
             // Wrapping the inner Row would hand it loose constraints and let

@@ -478,8 +478,10 @@ class DuelController extends ChangeNotifier {
   MageAction chargeAction() =>
       ChargeAction(player.charge == 0 ? pendingElement : null);
 
-  MageAction castAction(Spell spell) =>
-      CastAction(spell, player.charge == 0 ? pendingElement : null);
+  /// [statusChoice] is Cleanse's chosen-debuff payload (TYPE_EFFECTS §7a) —
+  /// null lets the engine apply its documented default (most turns left).
+  MageAction castAction(Spell spell, {String? statusChoice}) => CastAction(
+      spell, player.charge == 0 ? pendingElement : null, statusChoice);
 
   /// Advances the display state past [event] (called after its animation).
   ///
