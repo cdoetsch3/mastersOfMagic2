@@ -358,16 +358,10 @@ class SpellDetailCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
-                    const Text(
-                      'HOW THE SYSTEMS TOUCH IT',
-                      style: TextStyle(
-                        color: AppColors.textFaint,
-                        fontSize: 10.5,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
+                    // The rules follow the numbers with no heading — the
+                    // "HOW THE SYSTEMS TOUCH IT" label explained nothing to
+                    // the designer, and a list needs no announcement.
+                    const SizedBox(height: 10),
                     for (final rule in _systemsRules(spell)) _bullet(rule),
                   ],
                 ),
