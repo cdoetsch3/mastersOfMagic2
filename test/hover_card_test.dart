@@ -90,4 +90,70 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byType(SpellDetailCard), findsNothing);
   });
+
+  testWidgets('⭐ inside a centred column with its own Overlay, the card '
+      'lands beside the tile, not a column-width to the right', (tester) async {
+    // The app centres itself as a column on wide screens and that column has
+    // its own Overlay. The mutant this kills: positioning in WINDOW
+    // coordinates inside the column's overlay — which put the Aegis card
+    // 800px right of Aegis on the designer's monitor.
+    await tester.binding.setSurfaceSize(const Size(1400, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 600,
+              height: 900,
+              child: Overlay(
+                initialEntries: [
+                  OverlayEntry(
+                    builder: (_) => Align(
+                      alignment: Alignment.topLeft,
+                      // Off the overlay's edge, so the 8px edge margin does
+                      // not enter the measurement.
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 40, top: 40),
+                        child: HoverCard(
+                        delay: const Duration(milliseconds: 100),
+                        card: (_) => const SpellDetailCard(
+                          spell: Spellbook.aegis,
+                          showDone: false,
+                        ),
+                        child: const SizedBox(
+                          width: 200,
+                          height: 60,
+                          child: Text('tile'),
+                        ),
+                      ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    addTearDown(mouse.removePointer);
+    await mouse.moveTo(tester.getCenter(find.text('tile')));
+    await tester.pump(const Duration(milliseconds: 200));
+    final tile = tester.getRect(find.text('tile'));
+    final card = tester.getRect(find.byType(SpellDetailCard));
+    expect(
+      (card.left - tile.left).abs(),
+      lessThan(2),
+      reason: 'the card starts at the tile\'s left edge — the column is at '
+          'x=400, and a window-coordinate placement would land at ~800',
+    );
+    expect(
+      card.top,
+      greaterThan(tile.bottom),
+      reason: 'and below it, since there is plenty of room below',
+    );
+  });
 }

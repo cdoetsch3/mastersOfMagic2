@@ -33,6 +33,7 @@ class _HoverCardState extends State<HoverCard> {
   final _portal = OverlayPortalController();
   Timer? _pending;
   Rect _anchor = Rect.zero;
+  Size _overlaySize = Size.zero;
 
   @override
   void dispose() {
@@ -46,8 +47,16 @@ class _HoverCardState extends State<HoverCard> {
       if (!mounted) return;
       final box = context.findRenderObject() as RenderBox?;
       if (box == null || !box.hasSize) return;
-      final origin = box.localToGlobal(Offset.zero);
+      // ⚠️ Measured in the OVERLAY's coordinate space, not the window's.
+      // The app centres itself as a column on wide screens, and the nearest
+      // Overlay is the column's, not the window's — a global offset fed to a
+      // Positioned inside it lands the card a full column-margin to the
+      // right of the tile (the first hover bug this widget shipped with).
+      final overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
+      final origin = overlay.globalToLocal(box.localToGlobal(Offset.zero));
       _anchor = origin & box.size;
+      _overlaySize = overlay.size;
       _portal.show();
       setState(() {});
     });
@@ -63,21 +72,26 @@ class _HoverCardState extends State<HoverCard> {
     return OverlayPortal(
       controller: _portal,
       overlayChildBuilder: (ctx) {
-        final screen = MediaQuery.sizeOf(ctx);
+        final area = _overlaySize;
         const gap = 6.0;
-        // Below the tile when there is room, otherwise above it; and never
-        // past the right edge.
-        final left = (_anchor.left).clamp(8.0, screen.width - widget.cardWidth - 8);
-        final spaceBelow = screen.height - _anchor.bottom - gap;
-        final placeBelow = spaceBelow >= screen.height * 0.45;
+        // The card is capped at 60% of the area's height; it goes BELOW the
+        // tile whenever that much fits, and only otherwise above — flipping
+        // on a looser rule put it over the element grid for tiles halfway
+        // down the screen.
+        final maxHeight = area.height * 0.6;
+        final spaceBelow = area.height - _anchor.bottom - gap;
+        final placeBelow = spaceBelow >= maxHeight ||
+            spaceBelow >= _anchor.top - gap;
+        final maxLeft = (area.width - widget.cardWidth - 8).clamp(8.0, double.infinity);
+        final left = _anchor.left.clamp(8.0, maxLeft);
         return Positioned(
           left: left,
           top: placeBelow ? _anchor.bottom + gap : null,
-          bottom: placeBelow ? null : screen.height - _anchor.top + gap,
+          bottom: placeBelow ? null : area.height - _anchor.top + gap,
           width: widget.cardWidth,
           child: IgnorePointer(
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: screen.height * 0.6),
+              constraints: BoxConstraints(maxHeight: maxHeight),
               child: widget.card(ctx),
             ),
           ),
