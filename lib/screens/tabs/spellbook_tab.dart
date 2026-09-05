@@ -8,6 +8,7 @@ import '../../game/progression.dart';
 import '../../game/spell_browser.dart';
 import '../../ui/app_theme.dart';
 import '../../ui/charge_dots.dart';
+import '../../ui/hover_card.dart';
 import '../element_detail_dialog.dart';
 import '../gameplay_guide_screen.dart';
 import '../home_shell.dart';
@@ -36,10 +37,10 @@ class _SpellbookTabState extends State<SpellbookTab> {
   /// player has to remember setting.
   SpellKind? _kind; // null = All
   var _cost = SpellCostFilter.any;
-  // The shelf reads in authored book order — the sort control was removed by
-  // ruling (2026-08-29): with sections and filters, reordering within a
-  // lane earned nothing a player asked for.
-  static const _sort = SpellSort.book;
+  // [H] Grouping is the PRIMARY axis (designer, 2026-08-29: "it's the
+  // GROUPING that's important"); sort orders within each section.
+  var _grouping = SpellGrouping.kind;
+  var _sort = SpellSort.unlock;
   // [F] Name search. [C] Whether spells beyond the player's level show
   // (dimmed) or hide. Both per-visit, like the chips.
   var _query = '';
@@ -120,6 +121,11 @@ class _SpellbookTabState extends State<SpellbookTab> {
                     onKind: (k) => setState(() => _kind = k),
                     cost: _cost,
                     onCost: (c) => setState(() => _cost = c),
+                    // [H]
+                    grouping: _grouping,
+                    onGrouping: (g) => setState(() => _grouping = g),
+                    sort: _sort,
+                    onSort: (s) => setState(() => _sort = s),
                     // [F]
                     query: _query,
                     onQuery: (q) => setState(() => _query = q),
@@ -178,9 +184,13 @@ class _SpellbookTabState extends State<SpellbookTab> {
     );
   }
 
-  /// The shelf below the toolbar: sections at rest; [B] sections STILL when
-  /// only cost or search narrows the book (each lane narrowed in place); one
-  /// flat list only once a kind chip names a single lane.
+  /// The shelf below the toolbar, sectioned by [_grouping] after every
+  /// filter has narrowed the book, each section ordered by [_sort].
+  ///
+  /// [B] A cost or search filter narrows each section IN PLACE. The shelf
+  /// flattens only when there is nothing to section: grouping is None, or a
+  /// kind chip has already named the single lane a Spell-Type grouping would
+  /// show — one header over one lane says nothing the chip has not.
   Widget _spellShelf(
     BuildContext context,
     GameState game,
@@ -189,46 +199,32 @@ class _SpellbookTabState extends State<SpellbookTab> {
     bool canEdit,
   ) {
     final book = _book(p);
-    if (_kind != null) {
-      final shown = filterSpells(
-        book,
-        kind: _kind,
-        cost: _cost,
-        sort: _sort,
-        query: _query,
-      );
-      if (shown.isEmpty) return const _NoMatches();
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ⭐ The flattened shelf says how much of the book it is showing.
-          // With 60 spells, "12 spells" without the total is a number the
-          // player cannot read anything into.
-          SectionLabel(
-            'Showing ${shown.length} of ${Spellbook.all.length} spells',
-          ),
-          _spellGrid(context, game, p, preset, shown, canEdit),
-        ],
-      );
-    }
-    final groups = groupSpells(
+    final flat = _grouping == SpellGrouping.none ||
+        (_kind != null && _grouping == SpellGrouping.kind);
+    final sections = sectionSpells(
       book,
+      grouping: flat ? SpellGrouping.none : _grouping,
       sort: _sort,
+      kind: _kind,
       cost: _cost,
       query: _query,
     );
-    if (groups.isEmpty) return const _NoMatches();
-    final shownCount = groups.fold(0, (n, g) => n + g.spells.length);
+    if (sections.isEmpty) return const _NoMatches();
+    final shownCount = sections.fold(0, (n, g) => n + g.spells.length);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ⭐ A narrowed shelf says how much of the book it is showing. With
+        // 60 spells, "12 spells" without the total is a number the player
+        // cannot read anything into.
         if (_filtering)
           SectionLabel(
             'Showing $shownCount of ${Spellbook.all.length} spells',
           ),
-        for (final group in groups) ...[
-          SectionLabel('${group.kind.label}  ·  ${group.spells.length}'),
-          _spellGrid(context, game, p, preset, group.spells, canEdit),
+        for (final section in sections) ...[
+          if (section.label.isNotEmpty)
+            SectionLabel('${section.label}  ·  ${section.spells.length}'),
+          _spellGrid(context, game, p, preset, section.spells, canEdit),
           const SizedBox(height: 12),
         ],
       ],
@@ -517,8 +513,8 @@ class _SpellbookTabState extends State<SpellbookTab> {
       // any screen instead of scaling with viewport width.
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 250,
-        // [A] Two text lines plus the dots row: the tile grew 56 → 72.
-        mainAxisExtent: 72,
+        // One line, a bigger icon and bigger dots: 60 tall.
+        mainAxisExtent: 60,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
       ),
@@ -561,13 +557,14 @@ class _SpellbookTabState extends State<SpellbookTab> {
     final nameColor = !unlocked
         ? AppColors.textFaint
         : AppColors.text;
-    return Tooltip(
-      message: !unlocked
-          ? '${spell.name} — unlocks at level $unlockLevel'
-          : ahead
-          ? '${spellTooltip(spell)}\nUnlocks at level $plannedLevel'
-          : spellTooltip(spell),
-      waitDuration: const Duration(milliseconds: 350),
+    // Hover shows the same card the ⓘ opens — never a second, plainer text.
+    final note = !unlocked
+        ? 'Unlocks at level $unlockLevel'
+        : ahead
+        ? 'Unlocks at level $plannedLevel'
+        : null;
+    return HoverCard(
+      card: (_) => SpellDetailCard(spell: spell, showDone: false, note: note),
       child: Opacity(
         opacity: !unlocked
             ? 0.4
@@ -622,37 +619,17 @@ class _SpellbookTabState extends State<SpellbookTab> {
                   ),
                   const SizedBox(width: 9),
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          spell.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: nameColor,
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        // [A] What it does, in the tooltip's own numbers.
-                        // [C] A not-yet-reached spell is told apart by its
-                        // dimming alone (the gold "Lv N" prefix was too loud
-                        // — designer, 2026-08-29); its level lives in the
-                        // tooltip instead.
-                        Text(
-                          !unlocked
-                              ? 'Level $unlockLevel'
-                              : spellEffectLine(spell),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textDim,
-                            fontSize: 10,
-                            height: 1.15,
-                          ),
-                        ),
-                      ],
+                    // The name alone: the effect line was dropped by ruling
+                    // (2026-08-29) — the tooltip carries it, and a tile that
+                    // repeats its hover text spends its space twice.
+                    child: Text(
+                      spell.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: nameColor,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -801,8 +778,9 @@ class _EditableName extends StatelessWidget {
 /// space" the law forbids — and the kind row grows a chip every time the
 /// engine grows a lane.
 class _SpellToolbar extends StatelessWidget {
-  // [E] Three rows now: the equipped tray, the kind chips, the cost chips.
-  static const double height = 110;
+  // [E] Four rows: the equipped tray, the kind chips, the cost chips, and
+  // [H] the group-by / sort-by row.
+  static const double height = 144;
   static const double _rowHeight = 30;
   static const double _searchWidth = 150;
 
@@ -810,6 +788,11 @@ class _SpellToolbar extends StatelessWidget {
   final ValueChanged<SpellKind?> onKind;
   final SpellCostFilter cost;
   final ValueChanged<SpellCostFilter> onCost;
+  // [H]
+  final SpellGrouping grouping;
+  final ValueChanged<SpellGrouping> onGrouping;
+  final SpellSort sort;
+  final ValueChanged<SpellSort> onSort;
   // [F]
   final String query;
   final ValueChanged<String> onQuery;
@@ -826,6 +809,10 @@ class _SpellToolbar extends StatelessWidget {
     required this.onKind,
     required this.cost,
     required this.onCost,
+    required this.grouping,
+    required this.onGrouping,
+    required this.sort,
+    required this.onSort,
     required this.query,
     required this.onQuery,
     required this.counts,
@@ -901,7 +888,38 @@ class _SpellToolbar extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 4),
+        // [H] Group by (primary) and sort by (secondary), one scrolling row.
+        SizedBox(
+          height: _rowHeight,
+          child: _chipRow([
+            _rowLabel('GROUP'),
+            for (final g in SpellGrouping.values)
+              _Chip(
+                label: g.label,
+                on: grouping == g,
+                onTap: () => onGrouping(g),
+              ),
+            const SizedBox(width: 10),
+            _rowLabel('SORT'),
+            for (final o in SpellSort.values)
+              _Chip(label: o.label, on: sort == o, onTap: () => onSort(o)),
+          ]),
+        ),
       ],
+    ),
+  );
+
+  Widget _rowLabel(String text) => Padding(
+    padding: const EdgeInsets.only(right: 2),
+    child: Text(
+      text,
+      style: const TextStyle(
+        color: AppColors.textFaint,
+        fontSize: 10,
+        letterSpacing: 1.1,
+        fontWeight: FontWeight.w600,
+      ),
     ),
   );
 
@@ -916,18 +934,7 @@ class _SpellToolbar extends StatelessWidget {
       );
     }
     return _chipRow([
-      const Padding(
-        padding: EdgeInsets.only(right: 2),
-        child: Text(
-          'IN LOADOUT',
-          style: TextStyle(
-            color: AppColors.textFaint,
-            fontSize: 10,
-            letterSpacing: 1.1,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+      _rowLabel('IN LOADOUT'),
       for (var i = 0; i < equipped.length; i++)
         Tooltip(
           message: onUnequip == null
@@ -1034,6 +1041,8 @@ class _PinnedToolbar extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(_PinnedToolbar oldDelegate) =>
       oldDelegate.child.kind != child.kind ||
       oldDelegate.child.cost != child.cost ||
+      oldDelegate.child.grouping != child.grouping ||
+      oldDelegate.child.sort != child.sort ||
       oldDelegate.child.query != child.query ||
       oldDelegate.child.showLocked != child.showLocked ||
       oldDelegate.child.equipped.length != child.equipped.length ||

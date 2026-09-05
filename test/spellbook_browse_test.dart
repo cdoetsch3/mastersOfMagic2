@@ -20,6 +20,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
+import 'package:masters_of_magic_2/game/progression.dart';
 import 'package:masters_of_magic_2/game/spell_browser.dart';
 import 'package:masters_of_magic_2/screens/tabs/spellbook_tab.dart';
 import 'package:mom_engine/mom_engine.dart';
@@ -308,14 +309,28 @@ void main() {
   // ---- sorting ----------------------------------------------------------
 
   group('sortSpells', () {
-    test('⭐ Book order returns the given sequence untouched', () {
+    test('⭐ Unlock Level ascends the ruled ladder, ties on name', () {
+      final sorted = sortSpells(Spellbook.all, SpellSort.unlock);
+      for (var i = 1; i < sorted.length; i++) {
+        final a = Progression.plannedUnlockLevelOf(sorted[i - 1]);
+        final b = Progression.plannedUnlockLevelOf(sorted[i]);
+        expect(
+          a <= b,
+          isTrue,
+          reason:
+              '⚠️ the mutant this kills: a sort reading the OLD unlock table '
+              '(Cataclysm at 10) instead of the ruled §4 schedule — '
+              '${sorted[i - 1].name} ($a) before ${sorted[i].name} ($b)',
+        );
+        if (a == b) {
+          expect(sorted[i - 1].name.compareTo(sorted[i].name) <= 0, isTrue,
+              reason: 'equal levels tie-break on name, so the order is stable');
+        }
+      }
       expect(
-        _names(sortSpells(Spellbook.all, SpellSort.book)),
-        _names(Spellbook.all),
-        reason:
-            '⚠️ the mutant this kills: a default that quietly alphabetises '
-            "— the authored ladder (ward → sanctuary) is information, and a "
-            'player who sorts away must be able to get it back',
+        sorted.first.name,
+        isNot(Spellbook.cataclysm.name),
+        reason: 'a level-40 spell can never lead the ladder',
       );
     });
 
@@ -368,25 +383,6 @@ void main() {
       }
     });
 
-    test('⭐ Speed puts the FASTEST first — ascending priority', () {
-      final sorted = sortSpells(Spellbook.all, SpellSort.speed);
-      expect(
-        sorted.first.priority,
-        lessThan(sorted.last.priority),
-        reason:
-            '⚠️ THE mutant this test exists to kill: a descending sort, '
-            'read off "bigger number = faster", which puts the slowest spells '
-            'at the top of a list whose control says Speed (lower priority '
-            'acts EARLIER — spell.dart)',
-      );
-      for (var i = 1; i < sorted.length; i++) {
-        expect(
-          sorted[i - 1].priority <= sorted[i].priority,
-          isTrue,
-          reason: 'the whole order must be monotonic, not just its ends',
-        );
-      }
-    });
   });
 
   // ---- filtering and grouping -------------------------------------------
@@ -397,11 +393,11 @@ void main() {
         Spellbook.all,
         kind: SpellKind.shields,
         cost: SpellCostFilter.any,
-        sort: SpellSort.book,
+        sort: SpellSort.name,
       );
       expect(
-        _names(shields),
-        _names(_lane(SpellKind.shields)),
+        List<String>.of(_names(shields))..sort(),
+        List<String>.of(_names(_lane(SpellKind.shields)))..sort(),
         reason:
             '⚠️ the mutant this kills: a filter that lights a chip and '
             'narrows nothing',
@@ -421,7 +417,7 @@ void main() {
           Spellbook.all,
           kind: null,
           cost: SpellCostFilter.any,
-          sort: SpellSort.book,
+          sort: SpellSort.name,
         ).length,
         Spellbook.all.length,
         reason: 'a filter the player cannot clear is a trap',
@@ -433,7 +429,7 @@ void main() {
         Spellbook.all,
         kind: SpellKind.shields,
         cost: SpellCostFilter.cheap,
-        sort: SpellSort.book,
+        sort: SpellSort.name,
       );
       expect(
         cheapShields.every(
@@ -488,7 +484,7 @@ void main() {
           Spellbook.all,
           kind: SpellKind.quick,
           cost: SpellCostFilter.heavy,
-          sort: SpellSort.book,
+          sort: SpellSort.name,
         ),
         isEmpty,
         reason:
@@ -520,7 +516,7 @@ void main() {
 
   group('groupSpells', () {
     test('⭐ sections come back in the engine\'s own priority order', () {
-      final groups = groupSpells(Spellbook.all, sort: SpellSort.book);
+      final groups = groupSpells(Spellbook.all, sort: SpellSort.name);
       expect(
         [for (final g in groups) g.kind],
         SpellKind.values,
@@ -533,7 +529,7 @@ void main() {
 
     test('every spell appears in exactly one section', () {
       final grouped = [
-        for (final g in groupSpells(Spellbook.all, sort: SpellSort.book))
+        for (final g in groupSpells(Spellbook.all, sort: SpellSort.name))
           ...g.spells,
       ];
       expect(
@@ -566,13 +562,109 @@ void main() {
 
     test('⚠️ an empty lane yields no header at all', () {
       final onlyShields = _lane(SpellKind.shields);
-      final groups = groupSpells(onlyShields, sort: SpellSort.book);
+      final groups = groupSpells(onlyShields, sort: SpellSort.name);
       expect(
         [for (final g in groups) g.kind],
         [SpellKind.shields],
         reason:
             '⚠️ the mutant this kills: a header standing over nothing, '
             'which reads as a loading bug rather than an empty category',
+      );
+    });
+  });
+
+  // ---- sectioning (the primary axis) ------------------------------------
+
+  group('sectionSpells', () {
+    test('⭐ Spell Type sections are the kind lanes, in ladder order', () {
+      final sections = sectionSpells(
+        Spellbook.all,
+        grouping: SpellGrouping.kind,
+        sort: SpellSort.name,
+      );
+      expect(
+        [for (final s in sections) s.kind],
+        SpellKind.values,
+        reason: 'grouping by type IS the lane split, nothing new',
+      );
+    });
+
+    test('⭐ Charge Cost sections ascend, and file Barrage by its minimum', () {
+      final sections = sectionSpells(
+        Spellbook.all,
+        grouping: SpellGrouping.cost,
+        sort: SpellSort.name,
+      );
+      final labels = [for (final s in sections) s.label];
+      expect(
+        labels,
+        [for (final c in [0, 1, 2, 3, 4, 5]) costSectionLabel(c)],
+        reason:
+            '⚠️ the mutant this kills: a cost grouping that gives Barrage '
+            'its own "Cost X" section — the filter files it by its minimum, '
+            'and a header that disagrees with the chip is a lie',
+      );
+      final costOne = sections.firstWhere((s) => s.label == 'Cost 1');
+      expect(
+        costOne.spells,
+        contains(Spellbook.barrage),
+        reason: 'Barrage costs at least 1, so it files at 1',
+      );
+      for (final section in sections) {
+        expect(
+          section.spells.every(
+            (sp) => costSectionLabel(sp.chargeCost) == section.label,
+          ),
+          isTrue,
+          reason: 'every spell in a cost section has that cost',
+        );
+      }
+    });
+
+    test('None is one unlabelled section holding the whole (filtered) book', () {
+      final sections = sectionSpells(
+        Spellbook.all,
+        grouping: SpellGrouping.none,
+        sort: SpellSort.cost,
+        cost: SpellCostFilter.heavy,
+      );
+      expect(sections, hasLength(1));
+      expect(sections.single.label, isEmpty,
+          reason: 'a header over "everything" says nothing');
+      expect(
+        sections.single.spells.every((sp) => sp.chargeCost >= 4),
+        isTrue,
+        reason: '⚠️ the mutant this kills: a None grouping that skips the '
+            'filters on its way to the flat list',
+      );
+    });
+
+    test('⭐ the sort orders WITHIN each section', () {
+      final sections = sectionSpells(
+        Spellbook.all,
+        grouping: SpellGrouping.kind,
+        sort: SpellSort.unlock,
+      );
+      for (final section in sections) {
+        final levels = [
+          for (final sp in section.spells) Progression.plannedUnlockLevelOf(sp),
+        ];
+        expect(levels, List<int>.of(levels)..sort(),
+            reason: '${section.label} must climb the unlock ladder inside '
+                'its own header');
+      }
+    });
+
+    test('an empty grouping yields no sections, not an empty header', () {
+      expect(
+        sectionSpells(
+          Spellbook.all,
+          grouping: SpellGrouping.cost,
+          sort: SpellSort.name,
+          kind: SpellKind.quick,
+          cost: SpellCostFilter.heavy,
+        ),
+        isEmpty,
       );
     });
   });

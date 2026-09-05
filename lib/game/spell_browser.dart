@@ -11,14 +11,15 @@ library;
 
 import 'package:mom_engine/mom_engine.dart';
 
+import 'progression.dart';
+
 /// The five shelves of the book.
 ///
 /// ⭐ **Declaration order IS section order**, and it is the engine's own
 /// priority ladder: shields (3) resolve before quick attacks (5), which
 /// resolve before self-aux (7), which resolve before enemy-aux (8), which
-/// resolve before the regular attacks (9). So reading the ungrouped book top
-/// to bottom is reading a turn in the order it actually happens — the same
-/// direction [SpellSort.speed] sorts in.
+/// resolve before the regular attacks (9). So reading the type-grouped book
+/// top to bottom is reading a turn in the order it actually happens.
 ///
 /// ⭐ **Aux is two shelves, not one** (designer's ruling, 2026-08-29): what
 /// you do to YOURSELF (stances, riders, cleanses, Grace, initiative) and what
@@ -109,18 +110,18 @@ enum SpellCostFilter {
   };
 }
 
-/// How the shelf is ordered.
+/// How each section is ordered (the SECONDARY axis — grouping is primary,
+/// by the designer's ruling of 2026-08-29: "it's the GROUPING that's
+/// important, which is why the sorting felt off").
 ///
-/// ⭐ [book] is a real, re-selectable member rather than an implicit starting
-/// state (the Shop's ruling, applied here): the authored order is
-/// information — the shields read ward → sanctuary as a ladder of size — and
-/// a player who sorts by name must be able to get the ladder back without
-/// leaving the screen.
+/// ⚠️ [unlock] is the default because, read within a lane, the ruled unlock
+/// ladder IS the book's authored progression — Flick and Bolt before Blast,
+/// Blast before Surge — so the shelf at rest reads the way a player grows
+/// into it.
 enum SpellSort {
-  book('Book order'),
+  unlock('Unlock Level'),
   name('Name'),
-  cost('Charge cost'),
-  speed('Speed');
+  cost('Charge Cost');
 
   final String label;
   const SpellSort(this.label);
@@ -131,29 +132,33 @@ enum SpellSort {
 /// ⚠️ **Every order tie-breaks on NAME.** Sorting by cost and back again must
 /// not shuffle rows the player had just learned the position of, and the book
 /// ships six spells at cost 3 alone.
-///
-/// ⚠️ [SpellSort.speed] is **ASCENDING priority**, i.e. fastest first, because
-/// lower priority acts earlier (`spell.dart`). The tempting mutant — sorting
-/// descending because the bigger number looks like the faster spell — puts
-/// the slowest attacks at the top of a list whose control says "Speed".
 List<Spell> sortSpells(List<Spell> spells, SpellSort sort) {
   final out = List<Spell>.of(spells);
-  // The given order IS the answer here: the caller's own sequence, untouched.
-  if (sort == SpellSort.book) return out;
   int byName(Spell a, Spell b) => a.name.compareTo(b.name);
   out.sort(switch (sort) {
-    SpellSort.book => byName, // unreachable — guarded above.
     SpellSort.name => byName,
     SpellSort.cost => (a, b) {
       final c = a.chargeCost.compareTo(b.chargeCost);
       return c != 0 ? c : byName(a, b);
     },
-    SpellSort.speed => (a, b) {
-      final c = a.priority.compareTo(b.priority);
+    SpellSort.unlock => (a, b) {
+      final c = Progression.plannedUnlockLevelOf(
+        a,
+      ).compareTo(Progression.plannedUnlockLevelOf(b));
       return c != 0 ? c : byName(a, b);
     },
   });
   return out;
+}
+
+/// How the shelf is sectioned (the PRIMARY axis).
+enum SpellGrouping {
+  none('None'),
+  kind('Spell Type'),
+  cost('Charge Cost');
+
+  final String label;
+  const SpellGrouping(this.label);
 }
 
 /// True when any filter is narrowing the shelf.
@@ -243,4 +248,62 @@ List<SpellGroup> groupSpells(
     groups.add(SpellGroup(kind, sortSpells(lane, sort)));
   }
   return groups;
+}
+
+/// One section of the shelf under any [SpellGrouping]. [kind] is set only
+/// for [SpellGrouping.kind] sections (the stripe colour reads it).
+class SpellSection {
+  final String label;
+  final SpellKind? kind;
+  final List<Spell> spells;
+  const SpellSection(this.label, this.spells, {this.kind});
+}
+
+/// The label of a charge-cost section. ⚠️ X-cost spells (Barrage) file by
+/// their MINIMUM, exactly as [SpellCostFilter] files them — one rule for both
+/// controls, so the chip and the header never disagree about where Barrage
+/// lives.
+String costSectionLabel(int cost) => 'Cost $cost';
+
+/// The shelf, sectioned by [grouping] after every filter has narrowed
+/// [source], each section ordered by [sort]. Empty sections yield nothing.
+/// [SpellGrouping.none] yields at most one unlabelled section.
+List<SpellSection> sectionSpells(
+  List<Spell> source, {
+  required SpellGrouping grouping,
+  required SpellSort sort,
+  SpellKind? kind,
+  SpellCostFilter cost = SpellCostFilter.any,
+  String query = '',
+}) {
+  final kept = filterSpells(
+    source,
+    kind: kind,
+    cost: cost,
+    sort: sort,
+    query: query,
+  );
+  switch (grouping) {
+    case SpellGrouping.none:
+      return kept.isEmpty ? const [] : [SpellSection('', kept)];
+    case SpellGrouping.kind:
+      return [
+        for (final k in SpellKind.values)
+          if (kept.any((s) => spellKindOf(s) == k))
+            SpellSection(
+              k.label,
+              kept.where((s) => spellKindOf(s) == k).toList(),
+              kind: k,
+            ),
+      ];
+    case SpellGrouping.cost:
+      final costs = kept.map((s) => s.chargeCost).toSet().toList()..sort();
+      return [
+        for (final c in costs)
+          SpellSection(
+            costSectionLabel(c),
+            kept.where((s) => s.chargeCost == c).toList(),
+          ),
+      ];
+  }
 }

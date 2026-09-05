@@ -10,7 +10,10 @@ import '../ui/app_theme.dart';
 Future<void> showSpellDetail(BuildContext context, Spell spell) {
   return showDialog<void>(
     context: context,
-    builder: (_) => _SpellDetailDialog(spell: spell),
+    builder: (_) => Dialog(
+      backgroundColor: Colors.transparent,
+      child: SpellDetailCard(spell: spell),
+    ),
   );
 }
 
@@ -205,18 +208,32 @@ List<String> _systemsRules(Spell spell) {
   ];
 }
 
-class _SpellDetailDialog extends StatelessWidget {
+/// The spell detail card — the same panel whether it opens as the ⓘ dialog
+/// or floats on hover over a Spellbook tile (designer's ask, 2026-08-29: the
+/// Material tooltip's black-on-white text was a second, poorer version of
+/// this). [showDone] adds the dialog's Done bar; a hover card has no button
+/// to press, so it omits it. [note] is an extra line under the flavor text
+/// (the locked preview's "Unlocks at level N").
+class SpellDetailCard extends StatelessWidget {
   final Spell spell;
-  const _SpellDetailDialog({required this.spell});
+  final bool showDone;
+  final String? note;
+  const SpellDetailCard({
+    super.key,
+    required this.spell,
+    this.showDone = true,
+    this.note,
+  });
 
   @override
   Widget build(BuildContext context) {
     final cat = _category(spell);
     final flavor = spellDescriptions[spell.id];
 
-    return Dialog(
-      backgroundColor: AppColors.panel,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    return Material(
+      color: AppColors.panel,
+      borderRadius: BorderRadius.circular(14),
+      clipBehavior: Clip.antiAlias,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 380),
         child: Column(
@@ -267,6 +284,14 @@ class _SpellDetailDialog extends StatelessWidget {
                                   color: AppColors.textDim,
                                   fontSize: 12,
                                   fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            if (note != null)
+                              Text(
+                                note!,
+                                style: const TextStyle(
+                                  color: AppColors.gold,
+                                  fontSize: 11.5,
                                 ),
                               ),
                           ],
@@ -348,7 +373,7 @@ class _SpellDetailDialog extends StatelessWidget {
                 ),
               ),
             ),
-            _doneBar(context),
+            if (showDone) _doneBar(context),
           ],
         ),
       ),
