@@ -90,9 +90,29 @@ class _HoverCardState extends State<HoverCard> {
           bottom: placeBelow ? null : area.height - _anchor.top + gap,
           width: widget.cardWidth,
           child: IgnorePointer(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: maxHeight),
-              child: widget.card(ctx),
+            // ⭐ The card floats over panels painted in its own colours, so
+            // it needs an edge the page does not have: a gold border, a deep
+            // drop shadow and a faint gold glow lift it off the ground it
+            // would otherwise blend into (designer, 2026-08-29). A page-wide
+            // scrim was the alternative and was rejected — a hover that dims
+            // the whole screen flickers like a modal as the mouse travels.
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: const Color(0xFFE8C547), width: 1.5),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0xB3000000),
+                    blurRadius: 28,
+                    offset: Offset(0, 10),
+                  ),
+                  BoxShadow(color: Color(0x40E8C547), blurRadius: 14),
+                ],
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: maxHeight),
+                child: widget.card(ctx),
+              ),
             ),
           ),
         );

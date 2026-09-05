@@ -22,10 +22,12 @@ import '../ui/app_theme.dart';
 import '../ui/charge_dots.dart';
 import '../ui/cleanse_picker.dart';
 import '../ui/creature_art.dart';
+import '../ui/hover_card.dart';
 import '../ui/item_display.dart' show rarityColour;
 import '../ui/item_icon.dart';
 import '../ui/element_text.dart';
 import 'home_shell.dart';
+import 'spell_detail_dialog.dart';
 
 /// The landscape duel arena. Keyboard: 1-8 = element slots, QWERT/ASDFG =
 /// spell slots, C = channel. Turn resolution plays the engine's event list
@@ -1575,9 +1577,10 @@ class _DuelScreenState extends State<DuelScreen>
     final elementColor =
         (c.shownPlayerElement ?? c.pendingElement)?.style.color ??
         const Color(0xFF6E6A7A);
-    return Tooltip(
-      message: spellTooltip(spell),
-      waitDuration: const Duration(milliseconds: 350),
+    // The same card the Spellbook floats on hover (designer, 2026-08-29):
+    // one description of a spell everywhere, never a plainer tooltip twin.
+    return HoverCard(
+      card: (_) => SpellDetailCard(spell: spell, showDone: false),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 2),
         child: Opacity(
