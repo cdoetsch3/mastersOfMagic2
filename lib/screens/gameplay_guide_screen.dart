@@ -33,7 +33,8 @@ class GameplayGuideScreen extends StatelessWidget {
                       'round resolves — so every turn is a mind-game. You '
                       'either charge (+1, up to 5) or cast a spell you can '
                       'afford. Casting spends ALL your charge and ends the '
-                      'cycle; next turn you pick a new element.',
+                      'cycle; next turn you pick a new element. The dots in '
+                      'the corner of a spell tab are its charge cost.',
                 ),
                 SizedBox(height: 18),
                 _PriorityLadder(),
@@ -55,9 +56,60 @@ class GameplayGuideScreen extends StatelessWidget {
                       'A spell FIZZLES if your charge is pulled below its '
                       'cost before it resolves (Discharge, or an Electro '
                       'Static Feedback proc) — nothing is cast and you keep '
-                      'the charge you have left. A spell MISSES if you are '
-                      'Blinded — the charge is spent for nothing. Neither one '
-                      'advances an element streak or procs an effect.',
+                      'the charge you have left. An ATTACK can MISS: your '
+                      'Accuracy is weighed against their Dodge (and a Blind '
+                      'on you), but the hit chance never drops below 10% — '
+                      'nobody is unhittable. A miss spends the charge for '
+                      'nothing. Shields, stances and aux-offense spells never '
+                      'roll to hit; Unerring makes your next attack simply '
+                      'not roll. Neither a fizzle nor a miss advances an '
+                      'element streak or procs an effect.',
+                ),
+                SizedBox(height: 18),
+                _Section(
+                  title: 'Hits, crits and deflection',
+                  body:
+                      'Six numbers shape every hit, from gear, enemy kits and '
+                      'stances alike: Accuracy and Dodge decide whether it '
+                      'lands; Crit chance and Crit damage decide whether it '
+                      'lands HARD (a crit multiplies by 100% + your crit '
+                      'damage; Composure on the defender turns any crit back '
+                      'into a plain hit, whatever earned it — Keen, Execute, '
+                      'even Death Wish); Deflect chance and amount shave a '
+                      'share off before the shield, capped at 90% and 90% so '
+                      'a sliver always lands. Reflect sends the deflected '
+                      'share straight back. Pierce makes your next attack '
+                      'un-deflectable; Shatter clears their shield, Barriers '
+                      'and Divert stance at once.',
+                ),
+                SizedBox(height: 18),
+                _Section(
+                  title: 'Stances replace, never stack',
+                  body:
+                      'A stance is a status you cast on yourself — Lightfoot, '
+                      'Keen, Steadfast, Mending — that lasts a stretch of '
+                      'turns. Each covers one axis, and casting another '
+                      'granter of the same axis REPLACES it, strength and '
+                      'clock together: Twinkle Toes over Lightfoot is a new '
+                      'Lightfoot, not a bigger one. Gear and element effects '
+                      'are separate lanes and stack alongside. Meditate adds '
+                      'five turns to every stance you hold; Dispel strips '
+                      'the enemy\'s; Cleanse and Purify remove debuffs from '
+                      'you (Cleanse asks which, when you have more than one).',
+                ),
+                SizedBox(height: 18),
+                _Section(
+                  title: 'Burns and bleeds',
+                  body:
+                      'Ignite, Agony and Torment tick at the end of every '
+                      'turn. A tick is damage, not a hit: your shield eats it '
+                      'first and Divert can deflect it, but it never misses '
+                      'and never crits. Recasting a burn refreshes it rather '
+                      'than stacking. Fester adds three ticks to every burn '
+                      'on them; Scour makes every burn pay out all at once as '
+                      'one hit and clears them; Wither halves the healing they '
+                      'receive, and Blight turns their heals into damage — '
+                      'potions and lifesteal included.',
                 ),
                 SizedBox(height: 18),
                 _StatusList(),
@@ -145,15 +197,21 @@ class _PriorityLadder extends StatelessWidget {
     ),
     (
       p: 7,
-      name: 'Aux / control',
-      what: 'Empower, Quicken, Discharge, Overload',
+      name: 'Aux-self',
+      what: 'what you do to yourself — Empower, Lightfoot, Cleanse, Phase',
+      color: AppColors.gold,
+    ),
+    (
+      p: 8,
+      name: 'Aux-offense',
+      what: 'pressure without a hit roll — Discharge, Murk, Wither, Dispel',
       color: AppColors.gem,
     ),
     (
       p: 9,
       name: 'Regular',
-      what: 'most attacks — Bolt, Blast, Cataclysm',
-      color: AppColors.gold,
+      what: 'most attacks — Bolt, Blast, Agony, Overload, Cataclysm',
+      color: AppColors.ember,
     ),
   ];
 
@@ -207,8 +265,8 @@ class _PriorityLadder extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'End of turn: heals land FIRST, then burns tick '
-                    '— so a Photosynthesis heal resolves before an Ignite '
-                    'burn can finish you.',
+                    '— so a Mending or Photosynthesis heal resolves before '
+                    'an Ignite or Torment burn can finish you.',
                     style: TextStyle(
                       color: AppColors.textDim,
                       fontSize: 12,
