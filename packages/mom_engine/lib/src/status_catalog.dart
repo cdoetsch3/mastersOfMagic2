@@ -257,7 +257,7 @@ abstract final class StatusCatalog {
       description:
           'Your next offensive spell cannot miss. Dodge, blindness and the '
           'base miss chance all stop applying — it does not roll to hit at '
-          'all, which is the one thing in the game that beats a dodge stance '
+          'all, which is the one thing in the game that beats a dodge buff '
           'outright.',
       trigger: 'Casting Unerring.',
       kind: StatusKind.buff,
@@ -518,7 +518,7 @@ abstract final class StatusCatalog {
       id: 'purified',
       name: 'Purified',
       description:
-          'Every debuff on you is gone at once. Your buffs and stances are '
+          'Every debuff on you is gone at once. Your buffs are '
           'untouched — this undoes what was done TO you, not everything.',
       trigger: 'Casting Purify with at least one debuff on you.',
       kind: StatusKind.moment,
@@ -530,7 +530,7 @@ abstract final class StatusCatalog {
       name: 'Meditated',
       description:
           'Every buff of yours that runs on a turn count gains five more '
-          'turns — your stances deepen. Next-attack riders wait for an attack '
+          'turns — your buffs deepen. Next-attack riders wait for an attack '
           'rather than a clock, so they gain nothing.',
       trigger: 'Casting Meditate.',
       kind: StatusKind.moment,
@@ -564,8 +564,8 @@ abstract final class StatusCatalog {
       id: 'dispel',
       name: 'Dispel',
       description:
-          'Strips your buffs — stances, pending riders and Grace. Arcane '
-          'Knowledge is never stripped, and Haste is not a stance.',
+          'Strips your buffs — pending riders and Grace included. Arcane '
+          'Knowledge and Haste are never stripped.',
       trigger: 'The enemy casting Dispel.',
       kind: StatusKind.moment,
       element: null,
@@ -575,7 +575,7 @@ abstract final class StatusCatalog {
       id: 'shatter',
       name: 'Shatter',
       description:
-          'Your shield, every Barrier point and your Divert stance are gone at '
+          'Your shield, every Barrier point and your Divert are gone at '
           'once. It deals no damage — it just leaves you standing in the open.',
       trigger: 'The enemy casting Shatter.',
       kind: StatusKind.moment,

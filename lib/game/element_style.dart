@@ -222,7 +222,7 @@ String spellEffectLine(Spell spell) {
       'Every burn on them pays out all remaining ticks NOW, as one hit',
     DispelEffect() => "Strips the enemy's buffs",
     ShatterEffect() =>
-      'No damage. Destroys their shield, Barriers and Divert stance',
+      'No damage. Destroys their shield, Barriers and Divert',
     DamageEffect(
       :final minAmount,
       :final maxAmount,
@@ -338,7 +338,7 @@ const Map<String, String> spellDescriptions = {
   'lightfoot': 'Move like a rumor. The cheap way to start dodging.',
   'twinkleToes': 'Commit to the dance — a whole duel of not being there.',
   'glance': 'A sliver of deflection. Sometimes the hit just... slides.',
-  'divert': 'The proper deflect stance: more often, and more of it.',
+  'divert': 'The proper deflect: more often, and more of it.',
   'truesight': 'See them clearly — and burn any Blind off your eyes.',
   'hawkeye': 'Nothing escapes you for a long, long while.',
   'keen': 'An edge on every strike. Crits come looking for you.',
@@ -361,12 +361,12 @@ const Map<String, String> spellDescriptions = {
   'wither': 'Half of every heal they drink, gone.',
   'atrophy': 'The same rot, three times the patience.',
   'blight': 'Their medicine is poison now. Every heal wounds them instead.',
-  'dispel': 'Strip their stances bare. The answer to a stacked mage.',
+  'dispel': 'Strip their buffs bare. The answer to a stacked mage.',
   'shatter': 'Turtle-breaker: shield, Barriers and Divert, all gone at once.',
   'pierce': 'Your next attack cannot be turned aside.',
   'unerring': 'Your next attack cannot miss. Not against anything.',
   'execute': 'The finisher — guaranteed crit against a wounded mage.',
   'cleanse': 'Wash one affliction away — you pick the one.',
   'purify': 'The full rite: every debuff on you, gone.',
-  'meditate': 'Breathe. Every stance you hold deepens by five turns.',
+  'meditate': 'Breathe. Every buff you hold deepens by five turns.',
 };

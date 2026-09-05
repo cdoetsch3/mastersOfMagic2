@@ -118,11 +118,11 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
     'paid out at once as ONE hit — one shield to meet, one deflect roll — '
         'and the burns are consumed',
   DispelEffect() =>
-    'stripped from them — stances, pending riders and Grace alike. Arcane '
+    'stripped from them — buffs, pending riders and Grace alike. Arcane '
         'Knowledge is never stripped',
   ShatterEffect() =>
-    'destroyed at once: their shield, every Barrier point and their Divert '
-        'stance. Gear deflection survives; no damage is dealt',
+    'destroyed at once: their shield, every Barrier point and their '
+        'Divert. Gear deflection survives; no damage is dealt',
   DamageEffect(:final lifesteal, :final executeBelowPercent) =>
     '${lifesteal > 0
         // 📝 "health they lose", not "damage that reaches their health" —
@@ -150,7 +150,7 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
   DischargeEffect() => "of the enemy's charge, wiped",
   HallowEffect() => 'banked — it blocks the next debuff applied to you',
   CleanseEffect(:final all) => all
-      ? 'debuff removed from you at once — buffs and stances are untouched'
+      ? 'debuff removed from you at once — your buffs are untouched'
       : 'debuff of your choice, removed from you',
   MeditateEffect() => 'turns added to every buff of yours that runs on a clock',
   final StanceEffect stance => _stanceLabel(stance),
@@ -171,8 +171,10 @@ String _stanceLabel(StanceEffect effect) {
   final cleared = cleanses == null
       ? ''
       : ', and the cast clears ${_statusName(cleanses.statusId)}';
-  return 'of $each$cleared. Casting another granter of the same stance '
-      'replaces it';
+  // ⚠️ No trailing "casting another replaces it" — it repeated on every
+  // one of seventeen spells, and a label that repeats everywhere is a label
+  // nobody needs (designer, 2026-08-29). The rule lives once, in the guide.
+  return 'of $each$cleared';
 }
 
 String _statusName(String statusId) =>

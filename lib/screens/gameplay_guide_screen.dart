@@ -60,7 +60,7 @@ class GameplayGuideScreen extends StatelessWidget {
                       'Accuracy is weighed against their Dodge (and a Blind '
                       'on you), but the hit chance never drops below 10% — '
                       'nobody is unhittable. A miss spends the charge for '
-                      'nothing. Shields, stances and aux-offense spells never '
+                      'nothing. Shields, self-buffs and aux-offense spells never '
                       'roll to hit; Unerring makes your next attack simply '
                       'not roll. Neither a fizzle nor a miss advances an '
                       'element streak or procs an effect.',
@@ -70,7 +70,7 @@ class GameplayGuideScreen extends StatelessWidget {
                   title: 'Hits, crits and deflection',
                   body:
                       'Six numbers shape every hit, from gear, enemy kits and '
-                      'stances alike: Accuracy and Dodge decide whether it '
+                      'buffs alike: Accuracy and Dodge decide whether it '
                       'lands; Crit chance and Crit damage decide whether it '
                       'lands HARD (a crit multiplies by 100% + your crit '
                       'damage; Composure on the defender turns any crit back '
@@ -80,22 +80,22 @@ class GameplayGuideScreen extends StatelessWidget {
                       'a sliver always lands. Reflect sends the deflected '
                       'share straight back. Pierce makes your next attack '
                       'un-deflectable; Shatter clears their shield, Barriers '
-                      'and Divert stance at once.',
+                      'and Divert at once.',
                 ),
                 SizedBox(height: 18),
                 _Section(
-                  title: 'Stances replace, never stack',
+                  title: 'Buffs replace, never stack',
                   body:
-                      'A stance is a status you cast on yourself — Lightfoot, '
-                      'Keen, Steadfast, Mending — that lasts a stretch of '
-                      'turns. Each covers one axis, and casting another '
-                      'granter of the same axis REPLACES it, strength and '
-                      'clock together: Twinkle Toes over Lightfoot is a new '
-                      'Lightfoot, not a bigger one. Gear and element effects '
-                      'are separate lanes and stack alongside. Meditate adds '
-                      'five turns to every stance you hold; Dispel strips '
-                      'the enemy\'s; Cleanse and Purify remove debuffs from '
-                      'you (Cleanse asks which, when you have more than one).',
+                      'A buff you cast on yourself — Lightfoot, Keen, '
+                      'Steadfast, Mending — lasts a stretch of turns. Casting '
+                      'another spell that grants the SAME buff replaces it, '
+                      'strength and clock together: Twinkle Toes over '
+                      'Lightfoot is a new Lightfoot, not a bigger one. Gear '
+                      'and element effects are separate and stack alongside. '
+                      'Meditate adds five turns to every buff you hold; '
+                      'Dispel strips the enemy\'s; Cleanse and Purify remove '
+                      'debuffs from you (Cleanse asks which, when you have '
+                      'more than one).',
                 ),
                 SizedBox(height: 18),
                 _Section(
