@@ -77,8 +77,8 @@ void main() {
       );
       expect(
         spellKindOf(Spellbook.empower),
-        SpellKind.aux,
-        reason: 'priority 7 buffs are the aux lane',
+        SpellKind.auxSelf,
+        reason: 'priority 7 self-buffs are the aux-self lane',
       );
       expect(
         spellKindOf(Spellbook.bolt),
@@ -122,7 +122,7 @@ void main() {
     test('⭐ support on the attack clock is aux, not offense', () {
       expect(
         spellKindOf(_healAtAttackSpeed),
-        SpellKind.aux,
+        SpellKind.auxSelf,
         reason:
             '⚠️ THE mutant the incoming bank will find: priority 9 means '
             '"resolves late", not "harms the enemy". A spell that deals no '
@@ -140,7 +140,7 @@ void main() {
       );
     });
 
-    test('⭐ Discharge is aux: harmful, but it deals no damage', () {
+    test('⭐ Discharge is aux-OFFENSE: harmful, but it deals no damage', () {
       expect(
         Spellbook.discharge.isHarmful,
         isTrue,
@@ -150,10 +150,43 @@ void main() {
       );
       expect(
         spellKindOf(Spellbook.discharge),
-        SpellKind.aux,
+        SpellKind.auxOffense,
         reason:
-            '⚠️ the mutant this kills: a lane split on isHarmful instead '
-            'of isOffensive, which puts charge control under Offense',
+            '⚠️ REVERSED 2026-08-29 with the aux split: isHarmful now '
+            'decides WHICH aux shelf, while isOffensive still decides '
+            'aux-vs-offense. The mutant this kills: a split on isHarmful '
+            'alone, which would put charge control under Offense; and its '
+            'twin, ignoring isHarmful, which files a debuff beside a heal',
+      );
+    });
+
+    test('⭐ the aux shelf splits on WHO it is aimed at (ruled 2026-08-29)', () {
+      expect(
+        spellKindOf(Spellbook.murk),
+        SpellKind.auxOffense,
+        reason: 'a debuff on the enemy is pressure, not preparation — '
+            'the mutant this kills files it beside Lightfoot',
+      );
+      expect(
+        spellKindOf(Spellbook.lightfoot),
+        SpellKind.auxSelf,
+        reason: 'a stance on yourself is preparation',
+      );
+      expect(
+        spellKindOf(Spellbook.cleanse),
+        SpellKind.auxSelf,
+        reason: 'a cleanse acts on you, whatever it removes',
+      );
+      expect(
+        spellKindOf(Spellbook.shatter),
+        SpellKind.auxOffense,
+        reason: 'no damage, but aimed at them',
+      );
+      expect(
+        SpellKind.auxSelf.index < SpellKind.auxOffense.index,
+        isTrue,
+        reason: 'section order is the priority ladder: self-aux (7) resolves '
+            'before enemy-aux (8), so the book reads a turn in order',
       );
     });
 
@@ -471,7 +504,7 @@ void main() {
         reason: 'both chips at rest is the grouped, unfiltered book',
       );
       expect(
-        spellFilterActive(kind: SpellKind.aux, cost: SpellCostFilter.any),
+        spellFilterActive(kind: SpellKind.auxSelf, cost: SpellCostFilter.any),
         isTrue,
       );
       expect(
@@ -613,7 +646,7 @@ void main() {
 
     testWidgets('All puts the whole book back', (tester) async {
       await _pump(tester);
-      await tester.tap(find.text(SpellKind.aux.label));
+      await tester.tap(find.text(SpellKind.auxSelf.label));
       await tester.pumpAndSettle();
       expect(find.text(Spellbook.bolt.name), findsNothing);
 

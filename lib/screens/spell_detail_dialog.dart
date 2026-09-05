@@ -19,8 +19,10 @@ Future<void> showSpellDetail(BuildContext context, Spell spell) {
   BarrageEffect() ||
   OverloadEffect() => (label: 'damaging', color: AppColors.ember),
   ShieldEffect() || BarrierEffect() => (label: 'shield', color: AppColors.sky),
-  DischargeEffect() => (label: 'control', color: AppColors.gem),
-  _ => (label: 'aux', color: AppColors.gold),
+  // The aux split (2026-08-29): the Discharge family is the whole §7a
+  // aux-offense lane; every other non-damaging effect is aimed at yourself.
+  DischargeEffect() => (label: 'aux-offense', color: AppColors.gem),
+  _ => (label: 'aux-self', color: AppColors.gold),
 };
 
 /// The headline figure — kept short so it never crowds the label beside it.

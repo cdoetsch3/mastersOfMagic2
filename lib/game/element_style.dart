@@ -103,7 +103,8 @@ String priorityLabel(int priority) => switch (priority) {
   3 => 'shield',
   4 => 'channel',
   <= 6 => 'quick',
-  <= 8 => 'aux',
+  7 => 'aux-self',
+  8 => 'aux-offense',
   _ => 'regular',
 };
 

@@ -11,13 +11,21 @@ library;
 
 import 'package:mom_engine/mom_engine.dart';
 
-/// The four shelves of the book.
+/// The five shelves of the book.
 ///
 /// ⭐ **Declaration order IS section order**, and it is the engine's own
 /// priority ladder: shields (3) resolve before quick attacks (5), which
-/// resolve before aux (7), which resolve before the regular attacks (9). So
-/// reading the ungrouped book top to bottom is reading a turn in the order it
-/// actually happens — the same direction [SpellSort.speed] sorts in.
+/// resolve before self-aux (7), which resolve before enemy-aux (8), which
+/// resolve before the regular attacks (9). So reading the ungrouped book top
+/// to bottom is reading a turn in the order it actually happens — the same
+/// direction [SpellSort.speed] sorts in.
+///
+/// ⭐ **Aux is two shelves, not one** (designer's ruling, 2026-08-29): what
+/// you do to YOURSELF (stances, riders, cleanses, Grace, initiative) and what
+/// you do to THEM without a damage roll (debuffs, strips, Discharge). They
+/// are different decisions — one is preparation, the other is pressure —
+/// and the §7a lanes give them different clocks, so one header for both
+/// hid the difference the engine makes.
 ///
 /// ⚠️ [offense] is this shelf's word for what `priorityLabel` (element_style)
 /// calls the *regular* band. The engine names a timing slot; the shelf names
@@ -26,7 +34,8 @@ import 'package:mom_engine/mom_engine.dart';
 enum SpellKind {
   shields('Shields'),
   quick('Quick'),
-  aux('Aux'),
+  auxSelf('Aux-self'),
+  auxOffense('Aux-offense'),
   offense('Offense');
 
   final String label;
@@ -44,10 +53,14 @@ enum SpellKind {
 ///  2. **Priority 3 is the shield band by definition** (`spell.dart`'s own
 ///     library doc). A priority-3 spell that is not literally a wall is still
 ///     something you cast at wall speed, and it files with the walls.
-///  3. **A spell that deals no damage is aux** — buffs, initiative, charge
-///     control, Grace. ⚠️ This is why the derivation cannot be priority
-///     alone: the incoming bank puts support spells on the priority-9 clock,
-///     and filing a heal under "Offense" because it resolves late would be a
+///  3. **A spell that deals no damage is aux**, and WHO it is aimed at
+///     splits the shelf: harmful-but-not-damaging (`isHarmful` without
+///     `isOffensive` — the Discharge family, which is the whole §7a
+///     aux-offense lane) is [auxOffense]; everything else that deals no
+///     damage — buffs, initiative, cleanses, Grace — is [auxSelf].
+///     ⚠️ Derived from what the spell DOES, not its priority number, so a
+///     future enemy-facing aux on an odd clock still files under pressure,
+///     and a heal on the priority-9 clock never files under "Offense" — a
 ///     lie told by a section header.
 ///  4. What is left deals damage, and the band splits it: 1–6 is [quick]
 ///     (instants and quick attacks — they beat aux and regular spells to the
@@ -59,7 +72,9 @@ SpellKind spellKindOf(Spell spell) {
       spell.priority == 3) {
     return SpellKind.shields;
   }
-  if (!spell.isOffensive) return SpellKind.aux;
+  if (!spell.isOffensive) {
+    return spell.isHarmful ? SpellKind.auxOffense : SpellKind.auxSelf;
+  }
   return spell.priority <= 6 ? SpellKind.quick : SpellKind.offense;
 }
 
