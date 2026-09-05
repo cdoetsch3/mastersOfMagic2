@@ -156,14 +156,21 @@ List<Spell> sortSpells(List<Spell> spells, SpellSort sort) {
   return out;
 }
 
-/// True when either filter is narrowing the shelf — the condition under which
-/// the screen flattens its sections into one list.
+/// True when any filter is narrowing the shelf.
 bool spellFilterActive({
   required SpellKind? kind,
   required SpellCostFilter cost,
-}) => kind != null || cost != SpellCostFilter.any;
+  String query = '',
+}) => kind != null || cost != SpellCostFilter.any || query.trim().isNotEmpty;
 
-/// The flat shelf: [source] narrowed by both filters, then ordered.
+/// [F] Name search: case-insensitive substring on the spell's name. An empty
+/// or whitespace query matches everything, so the box at rest is not a filter.
+bool spellMatchesQuery(Spell spell, String query) {
+  final q = query.trim().toLowerCase();
+  return q.isEmpty || spell.name.toLowerCase().contains(q);
+}
+
+/// The flat shelf: [source] narrowed by every filter, then ordered.
 ///
 /// ⚠️ Filter first, sort second — the sort must only ever see rows that
 /// survived, or "sort within the current filter" quietly becomes "sort the
@@ -173,12 +180,33 @@ List<Spell> filterSpells(
   required SpellKind? kind,
   required SpellCostFilter cost,
   required SpellSort sort,
+  String query = '',
 }) {
   final kept = source
       .where((s) => kind == null || spellKindOf(s) == kind)
       .where(cost.accepts)
+      .where((s) => spellMatchesQuery(s, query))
       .toList();
   return sortSpells(kept, sort);
+}
+
+/// [F] How many spells each kind chip would show under the OTHER active
+/// filters — so a chip's count is a promise about what tapping it does, not
+/// a fact about the whole book. `null` keys the All chip.
+Map<SpellKind?, int> spellKindCounts(
+  List<Spell> source, {
+  required SpellCostFilter cost,
+  String query = '',
+}) {
+  final visible = source
+      .where(cost.accepts)
+      .where((s) => spellMatchesQuery(s, query))
+      .toList();
+  return {
+    null: visible.length,
+    for (final k in SpellKind.values)
+      k: visible.where((s) => spellKindOf(s) == k).length,
+  };
 }
 
 /// One section of the grouped, unfiltered shelf.
@@ -193,10 +221,24 @@ class SpellGroup {
 /// Sections come back in [SpellKind] declaration order (see there), and an
 /// **empty lane yields no group at all** — ⚠️ a section header standing over
 /// nothing reads as a loading bug, not as an empty category.
-List<SpellGroup> groupSpells(List<Spell> source, {required SpellSort sort}) {
+///
+/// [B] The cost and search filters narrow each lane IN PLACE rather than
+/// flattening the book: a player shopping for "cheap" still wants to know
+/// which of the cheap ones are shields — only the kind chip, which already
+/// names one lane, collapses the sections.
+List<SpellGroup> groupSpells(
+  List<Spell> source, {
+  required SpellSort sort,
+  SpellCostFilter cost = SpellCostFilter.any,
+  String query = '',
+}) {
   final groups = <SpellGroup>[];
   for (final kind in SpellKind.values) {
-    final lane = source.where((s) => spellKindOf(s) == kind).toList();
+    final lane = source
+        .where((s) => spellKindOf(s) == kind)
+        .where(cost.accepts)
+        .where((s) => spellMatchesQuery(s, query))
+        .toList();
     if (lane.isEmpty) continue;
     groups.add(SpellGroup(kind, sortSpells(lane, sort)));
   }

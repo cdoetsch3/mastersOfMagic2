@@ -113,6 +113,42 @@ abstract final class Progression {
 
   static int unlockLevelOf(Spell spell) => spellUnlockLevel[spell.id] ?? 1;
 
+  /// [C] The RULED unlock schedule — PROGRESSION_DESIGN §4's master table,
+  /// all 60 spells (approved 2026-08-28, bank folded 2026-08-29).
+  ///
+  /// ⚠️ Deliberately a SECOND map beside [spellUnlockLevel]: that older
+  /// table is what enemy rosters are tested against (`ai_roster_test`), and
+  /// the two disagree — Cataclysm is 10 there and 40 here. Reconciling them
+  /// is a content decision (enemy kits would have to change), so until it
+  /// is ruled this map drives the Spellbook's "unlocks at" PREVIEW only and
+  /// gates nothing.
+  static const Map<String, int> plannedUnlockLevel = {
+    'flick': 1, 'bolt': 1, 'ward': 1, 'aegis': 1, 'quicken': 1,
+    'blast': 5, 'sap': 5,
+    'surge': 10, 'volley': 10, 'glance': 10, 'mend': 10,
+    'leech': 15, 'discharge': 15,
+    'lightfoot': 15, 'truesight': 15, 'murk': 15, 'agony': 15,
+    'ruin': 20, 'barrier': 20, 'barrage': 20,
+    'keen': 20, 'heavyhand': 20, 'steadfast': 20, 'wither': 20,
+    'torment': 20,
+    'overload': 25, 'empower': 25, 'rampart': 25, 'hallow': 25,
+    'divert': 25, 'hawkeye': 25, 'miasma': 25, 'composure': 25,
+    'fester': 25, 'cleanse': 25,
+    'phase': 30,
+    'unerring': 30, 'pierce': 30, 'scour': 30, 'meditate': 30,
+    'deathWish': 30,
+    'jolt': 35, 'flurry': 35, 'bulwark': 35, 'hasty': 35,
+    'twinkleToes': 35, 'ardent': 35, 'overkill': 35, 'renewal': 35,
+    'execute': 35, 'atrophy': 35,
+    'cataclysm': 40, 'sanctuary': 40, 'drain': 40,
+    'bloodlust': 40, 'shatter': 40, 'purify': 40, 'blight': 40,
+    'dispel': 40,
+    'reflect': 45,
+  };
+
+  static int plannedUnlockLevelOf(Spell spell) =>
+      plannedUnlockLevel[spell.id] ?? 1;
+
   /// TEMPORARY: all spells are unlocked until the leveling/unlock schedule is
   /// finalized. [spellUnlockLevel] is retained for when gating returns.
   static bool isSpellUnlockedAt(Spell spell, int level) => true;

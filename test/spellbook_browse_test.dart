@@ -594,7 +594,7 @@ void main() {
         );
       }
       expect(
-        find.text(Spellbook.ward.name),
+        _tile(Spellbook.ward.name),
         findsOneWidget,
         reason: 'sectioning must not cost the player a single spell',
       );
@@ -604,18 +604,18 @@ void main() {
       tester,
     ) async {
       await _pump(tester);
-      expect(find.text(Spellbook.bolt.name), findsOneWidget);
+      expect(_tile(Spellbook.bolt.name), findsOneWidget);
 
-      await tester.tap(find.text(SpellKind.shields.label));
+      await tester.tap(_chip(SpellKind.shields.label));
       await tester.pumpAndSettle();
 
       expect(
-        find.text(Spellbook.ward.name),
+        _tile(Spellbook.ward.name),
         findsOneWidget,
         reason: 'the chosen lane keeps its spells',
       );
       expect(
-        find.text(Spellbook.bolt.name),
+        _tile(Spellbook.bolt.name),
         findsNothing,
         reason:
             '⚠️ the mutant this kills: a chip row that lights up and '
@@ -646,15 +646,15 @@ void main() {
 
     testWidgets('All puts the whole book back', (tester) async {
       await _pump(tester);
-      await tester.tap(find.text(SpellKind.auxSelf.label));
+      await tester.tap(_chip(SpellKind.auxSelf.label));
       await tester.pumpAndSettle();
-      expect(find.text(Spellbook.bolt.name), findsNothing);
+      expect(_tile(Spellbook.bolt.name), findsNothing);
 
-      await tester.tap(find.text('All'));
+      await tester.tap(_chip('All'));
       await tester.pumpAndSettle();
 
       expect(
-        find.text(Spellbook.bolt.name),
+        _tile(Spellbook.bolt.name),
         findsOneWidget,
         reason: 'a filter the player cannot clear is a trap',
       );
@@ -676,12 +676,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text(Spellbook.flick.name),
+        _tile(Spellbook.flick.name),
         findsOneWidget,
         reason: 'a free spell is in the cheap band',
       );
       expect(
-        find.text(Spellbook.cataclysm.name),
+        _tile(Spellbook.cataclysm.name),
         findsNothing,
         reason:
             '⚠️ the mutant this kills: a cost filter wired to the widget '
@@ -689,10 +689,99 @@ void main() {
       );
     });
 
+    testWidgets('[B] a cost chip keeps the sections and says what it shows', (
+      tester,
+    ) async {
+      await _pump(tester);
+      await tester.tap(find.text(SpellCostFilter.cheap.label));
+      await tester.pumpAndSettle();
+      final cheapShields = _lane(
+        SpellKind.shields,
+      ).where(SpellCostFilter.cheap.accepts).length;
+      expect(
+        _header('${SpellKind.shields.label}  ·  $cheapShields'),
+        findsOneWidget,
+        reason:
+            '⚠️ the mutant this kills: a cost filter that flattens the '
+            'book — a player shopping for cheap spells still wants to know '
+            'which cheap ones are shields',
+      );
+      final cheapAll = Spellbook.all.where(SpellCostFilter.cheap.accepts).length;
+      expect(
+        _header('Showing $cheapAll of ${Spellbook.all.length} spells'),
+        findsOneWidget,
+        reason: 'the narrowed book still says how much of itself it shows',
+      );
+    });
+
+    testWidgets('[F] search narrows by name and the chips count the result', (
+      tester,
+    ) async {
+      await _pump(tester);
+      await tester.enterText(find.byType(TextField), 'tor');
+      await tester.pumpAndSettle();
+      expect(_tile(Spellbook.torment.name), findsOneWidget,
+          reason: 'a substring of the name matches');
+      expect(_tile(Spellbook.bolt.name), findsNothing,
+          reason: '⚠️ the mutant this kills: a search box wired to nothing');
+      final hits = Spellbook.all
+          .where((s) => spellMatchesQuery(s, 'tor'))
+          .length;
+      expect(_chip('All').evaluate().single.widget, isA<Text>());
+      expect(
+        // The count is padded to two figure-spaces (press stability), so
+        // match the padded form the chip actually renders.
+        find.text('All · ${hits.toString().padLeft(2, ' ')}'),
+        findsOneWidget,
+        reason: 'the All chip counts what the search left, not the book',
+      );
+    });
+
+    testWidgets('[C] hiding locked spells drops what the schedule has not '
+        'reached, and only that', (tester) async {
+      await _pump(tester); // a new player: level 1
+      expect(_tile(Spellbook.cataclysm.name), findsOneWidget,
+          reason: 'shown (dimmed) while locked spells are shown');
+      await tester.tap(find.text('Locked: shown'));
+      await tester.pumpAndSettle();
+      expect(_tile(Spellbook.cataclysm.name), findsNothing,
+          reason: '⚠️ the mutant this kills: a toggle that changes its label '
+              'and nothing else — Cataclysm is a level-40 spell');
+      expect(_tile(Spellbook.flick.name), findsOneWidget,
+          reason: 'a level-1 spell survives the cut');
+    });
+
+    testWidgets('[E] the tray lists the loadout and a tap unequips', (
+      tester,
+    ) async {
+      await _pump(tester);
+      final first = PlayerProfile.newPlayer().activePreset.spellIds.first;
+      final spell = Spellbook.byId(first);
+      final tray = find.descendant(
+        of: find.byType(SingleChildScrollView).first,
+        matching: find.text(spell.name),
+      );
+      expect(tray, findsOneWidget,
+          reason: 'an equipped spell is named in the tray');
+      await tester.tap(tray);
+      await tester.pumpAndSettle();
+      expect(
+        find.descendant(
+          of: find.byType(SingleChildScrollView).first,
+          matching: find.text(spell.name),
+        ),
+        findsNothing,
+        reason: '⚠️ the mutant this kills: a tray chip that is decoration — '
+            'tapping it must take the spell out of the loadout',
+      );
+      expect(_tile(spell.name), findsOneWidget,
+          reason: 'and the spell is still in the book to re-equip');
+    });
+
     testWidgets('a filter matching nothing says so, quietly', (tester) async {
       await _pump(tester);
 
-      await tester.tap(find.text(SpellKind.quick.label));
+      await tester.tap(_chip(SpellKind.quick.label));
       await tester.pumpAndSettle();
       await tester.tap(find.text(SpellCostFilter.heavy.label));
       await tester.pumpAndSettle();
@@ -707,44 +796,6 @@ void main() {
       );
     });
 
-    testWidgets('⭐ sorting reorders the shelf inside its sections', (
-      tester,
-    ) async {
-      await _pump(tester);
-      final lane = _lane(SpellKind.offense);
-      final firstByBook = lane.first;
-      final firstByName = (List<Spell>.of(
-        lane,
-      )..sort((a, b) => a.name.compareTo(b.name))).first;
-      expect(
-        firstByBook.name,
-        isNot(firstByName.name),
-        reason:
-            'this fixture only means what it says while the authored '
-            'order and the alphabet disagree',
-      );
-      expect(
-        _order(tester, firstByBook.name),
-        lessThan(_order(tester, firstByName.name)),
-        reason: 'the default IS the authored book order',
-      );
-
-      await _chooseSort(tester, SpellSort.name);
-
-      expect(
-        _order(tester, firstByName.name),
-        lessThan(_order(tester, firstByBook.name)),
-        reason:
-            '⚠️ the mutant this kills: a sort control that repaints its '
-            'own label and leaves the shelf exactly as it found it',
-      );
-      expect(
-        _header('${SpellKind.offense.label}  ·  ${lane.length}'),
-        findsOneWidget,
-        reason: 'sorting orders WITHIN the sections; it must not dissolve them',
-      );
-    });
-
     testWidgets(
       '⭐ the controls hold their positions across filter and sort changes',
       (tester) async {
@@ -753,12 +804,12 @@ void main() {
         Rect shieldChip() => tester.getRect(
           find
               .ancestor(
-                of: find.text(SpellKind.shields.label),
+                of: _chip(SpellKind.shields.label),
                 matching: find.byType(Container),
               )
               .first,
         );
-        Rect sortRect() => tester.getRect(find.byIcon(Icons.sort));
+        Rect searchRect() => tester.getRect(find.byIcon(Icons.search));
         Rect costChip() => tester.getRect(
           find
               .ancestor(
@@ -769,10 +820,10 @@ void main() {
         );
 
         final chip = shieldChip();
-        final sort = sortRect();
+        final search = searchRect();
         final cost = costChip();
 
-        await tester.tap(find.text(SpellKind.shields.label));
+        await tester.tap(_chip(SpellKind.shields.label));
         await tester.pumpAndSettle();
 
         expect(
@@ -783,7 +834,7 @@ void main() {
               'that wrapped onto a second line, moves the control the player '
               'just pressed out from under their finger',
         );
-        expect(sortRect(), sort);
+        expect(searchRect(), search);
         expect(
           costChip(),
           cost,
@@ -793,15 +844,26 @@ void main() {
         );
 
         // The control whose LABEL changes is the sharpest case of the rule.
-        await _chooseSort(tester, SpellSort.cost);
+        Rect lockedChip() => tester.getRect(
+          find
+              .ancestor(
+                of: find.textContaining('Locked: '),
+                matching: find.byType(Container),
+              )
+              .first,
+        );
+        final locked = lockedChip();
+        await tester.tap(find.text('Locked: shown'));
+        await tester.pumpAndSettle();
         expect(
-          sortRect(),
-          sort,
+          lockedChip(),
+          locked,
           reason:
-              '⚠️ the mutant this kills: a sort button sized to its own '
-              "label, which walks away when 'Book order' becomes 'Charge cost'",
+              '⚠️ the mutant this kills: a toggle sized to its own label, '
+              "which walks away when 'shown' becomes 'hidden'",
         );
         expect(shieldChip(), chip);
+        expect(searchRect(), search);
       },
     );
 
@@ -812,7 +874,7 @@ void main() {
       // surface the other tests use shows the whole book at once.
       await _pump(tester, surface: const Size(720, 700));
       final viewportTop = tester.getTopLeft(find.byType(CustomScrollView)).dy;
-      final resting = tester.getRect(find.byIcon(Icons.sort));
+      final resting = tester.getRect(find.byIcon(Icons.search));
       expect(
         resting.top,
         greaterThan(viewportTop),
@@ -832,7 +894,7 @@ void main() {
             'top, or nothing below is being tested',
       );
       expect(
-        find.byIcon(Icons.sort),
+        find.byIcon(Icons.search),
         findsOneWidget,
         reason:
             '⚠️ the mutant this kills: an unpinned toolbar — with ~59 '
@@ -840,7 +902,7 @@ void main() {
             'has to scroll back for',
       );
       expect(
-        tester.getRect(find.byIcon(Icons.sort)).top,
+        tester.getRect(find.byIcon(Icons.search)).top,
         greaterThanOrEqualTo(viewportTop),
         reason:
             '⭐ the pin is what makes the press-stability rule hold while '
@@ -859,22 +921,16 @@ void main() {
 /// rendered a header at all.
 Finder _header(String text) => find.text(text.toUpperCase());
 
-/// Reading position of a tile in the grid: row first, then column.
-///
-/// ⚠️ The shelf is a GRID, so `dy` alone cannot order two tiles — the first
-/// and third spells of a section share a row, and an assertion on `dy` there
-/// compares two equal numbers and proves nothing.
-double _order(WidgetTester tester, String spellName) {
-  final at = tester.getTopLeft(find.text(spellName));
-  return at.dy * 10000 + at.dx;
-}
+/// A kind chip, found by its label PREFIX — [F] chips carry a live count
+/// ('Aux-self · 27'), so an exact-text match would pin today's book size.
+Finder _chip(String label) => find.byWidgetPredicate(
+  (w) => w is Text && (w.data?.startsWith('$label · ') ?? false),
+);
 
-Future<void> _chooseSort(WidgetTester tester, SpellSort sort) async {
-  await tester.tap(find.byIcon(Icons.sort));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text(sort.label).last);
-  await tester.pumpAndSettle();
-}
+/// A spell's TILE — scoped to the grid, because [E] the equipped tray shows
+/// the same names above the shelf.
+Finder _tile(String name) =>
+    find.descendant(of: find.byType(GridView), matching: find.text(name));
 
 /// ⚠️ A tall surface by default: the shelf's grids only build the tiles the
 /// viewport (plus cache) reaches, and an order assertion against tiles that

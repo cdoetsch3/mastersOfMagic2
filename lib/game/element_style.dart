@@ -180,7 +180,21 @@ const Map<String, IconData> spellIcons = {
 /// Multi-line tooltip text for a spell: cost, priority, effect, flavor.
 String spellTooltip(Spell spell) {
   final cost = spell.xCost ? 'X (all charge)' : '${spell.chargeCost}';
-  final detail = switch (spell.effect) {
+  final detail = spellEffectLine(spell);
+  final haste = spell.grantsHaste && spell.effect is! HasteEffect
+      ? '\nAlso seizes Haste'
+      : '';
+  return '${spell.name}\n'
+      'Cost $cost · Priority ${spell.priority} (${priorityLabel(spell.priority)})\n'
+      '$detail$haste\n'
+      '${spellDescriptions[spell.id] ?? ''}';
+}
+
+/// [A] The one-line effect summary — what the spell DOES, in numbers, with no
+/// name, cost or flavor. Shared by the tooltip and the Spellbook tile, so a
+/// retuned spell can never show one figure on the tile and another on hover.
+String spellEffectLine(Spell spell) {
+  return switch (spell.effect) {
     // ⚠️ Subtype arms FIRST — a sealed switch matches in order, and the bank's
     // effects extend shipped ones (DotAttackEffect is a DamageEffect, the
     // aux-offense family are DischargeEffects). Parent-first would read Agony
@@ -257,13 +271,6 @@ String spellTooltip(Spell spell) {
       cleanses,
     ),
   };
-  final haste = spell.grantsHaste && spell.effect is! HasteEffect
-      ? '\nAlso seizes Haste'
-      : '';
-  return '${spell.name}\n'
-      'Cost $cost · Priority ${spell.priority} (${priorityLabel(spell.priority)})\n'
-      '$detail$haste\n'
-      '${spellDescriptions[spell.id] ?? ''}';
 }
 
 /// The tooltip line for a banked stance: each granted status's numbers and its

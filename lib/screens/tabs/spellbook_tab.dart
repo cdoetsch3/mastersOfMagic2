@@ -7,6 +7,7 @@ import '../../game/player_profile.dart';
 import '../../game/progression.dart';
 import '../../game/spell_browser.dart';
 import '../../ui/app_theme.dart';
+import '../../ui/charge_dots.dart';
 import '../element_detail_dialog.dart';
 import '../gameplay_guide_screen.dart';
 import '../home_shell.dart';
@@ -35,9 +36,26 @@ class _SpellbookTabState extends State<SpellbookTab> {
   /// player has to remember setting.
   SpellKind? _kind; // null = All
   var _cost = SpellCostFilter.any;
-  var _sort = SpellSort.book;
+  // The shelf reads in authored book order — the sort control was removed by
+  // ruling (2026-08-29): with sections and filters, reordering within a
+  // lane earned nothing a player asked for.
+  static const _sort = SpellSort.book;
+  // [F] Name search. [C] Whether spells beyond the player's level show
+  // (dimmed) or hide. Both per-visit, like the chips.
+  var _query = '';
+  var _showLocked = true;
 
-  bool get _filtering => spellFilterActive(kind: _kind, cost: _cost);
+  bool get _filtering =>
+      spellFilterActive(kind: _kind, cost: _cost, query: _query);
+
+  /// [C] The book the shelf draws from: every spell, or only what the ruled
+  /// schedule has unlocked by now. Gates DISPLAY only — equipping is still
+  /// ungated while the schedule is in preview.
+  List<Spell> _book(PlayerProfile p) => _showLocked
+      ? Spellbook.all
+      : Spellbook.all
+            .where((s) => Progression.plannedUnlockLevelOf(s) <= p.level)
+            .toList();
 
   @override
   Widget build(BuildContext context) {
@@ -102,8 +120,29 @@ class _SpellbookTabState extends State<SpellbookTab> {
                     onKind: (k) => setState(() => _kind = k),
                     cost: _cost,
                     onCost: (c) => setState(() => _cost = c),
-                    sort: _sort,
-                    onSort: (s) => setState(() => _sort = s),
+                    // [F]
+                    query: _query,
+                    onQuery: (q) => setState(() => _query = q),
+                    counts: spellKindCounts(
+                      _book(p),
+                      cost: _cost,
+                      query: _query,
+                    ),
+                    // [C]
+                    showLocked: _showLocked,
+                    onShowLocked: (v) => setState(() => _showLocked = v),
+                    // [E]
+                    equipped: [
+                      for (final id in preset.spellIds) Spellbook.byId(id),
+                    ],
+                    onUnequip: canEdit
+                        ? (spell) => _setSpells(
+                            game,
+                            p,
+                            preset,
+                            List.of(preset.spellIds)..remove(spell.id),
+                          )
+                        : null,
                   ),
                 ),
               ),
@@ -120,8 +159,28 @@ class _SpellbookTabState extends State<SpellbookTab> {
     );
   }
 
-  /// The shelf below the toolbar: sections at rest, one flat list once either
-  /// filter is on.
+  /// Writes a new spell list into the active preset (shared by tile toggles
+  /// and the [E] tray's unequip).
+  void _setSpells(
+    GameState game,
+    PlayerProfile p,
+    LoadoutPreset preset,
+    List<String> ids,
+  ) {
+    if (ids.isEmpty) return;
+    game.savePreset(
+      p.activePresetIndex,
+      LoadoutPreset(
+        name: preset.name,
+        elementIds: preset.elementIds,
+        spellIds: ids,
+      ),
+    );
+  }
+
+  /// The shelf below the toolbar: sections at rest; [B] sections STILL when
+  /// only cost or search narrows the book (each lane narrowed in place); one
+  /// flat list only once a kind chip names a single lane.
   Widget _spellShelf(
     BuildContext context,
     GameState game,
@@ -129,19 +188,21 @@ class _SpellbookTabState extends State<SpellbookTab> {
     LoadoutPreset preset,
     bool canEdit,
   ) {
-    if (_filtering) {
+    final book = _book(p);
+    if (_kind != null) {
       final shown = filterSpells(
-        Spellbook.all,
+        book,
         kind: _kind,
         cost: _cost,
         sort: _sort,
+        query: _query,
       );
       if (shown.isEmpty) return const _NoMatches();
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ⭐ The flattened shelf says how much of the book it is showing.
-          // With ~59 spells, "12 spells" without the total is a number the
+          // With 60 spells, "12 spells" without the total is a number the
           // player cannot read anything into.
           SectionLabel(
             'Showing ${shown.length} of ${Spellbook.all.length} spells',
@@ -150,10 +211,21 @@ class _SpellbookTabState extends State<SpellbookTab> {
         ],
       );
     }
-    final groups = groupSpells(Spellbook.all, sort: _sort);
+    final groups = groupSpells(
+      book,
+      sort: _sort,
+      cost: _cost,
+      query: _query,
+    );
+    if (groups.isEmpty) return const _NoMatches();
+    final shownCount = groups.fold(0, (n, g) => n + g.spells.length);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (_filtering)
+          SectionLabel(
+            'Showing $shownCount of ${Spellbook.all.length} spells',
+          ),
         for (final group in groups) ...[
           SectionLabel('${group.kind.label}  ·  ${group.spells.length}'),
           _spellGrid(context, game, p, preset, group.spells, canEdit),
@@ -444,8 +516,9 @@ class _SpellbookTabState extends State<SpellbookTab> {
       // Fixed tile height and a max width per tile: tiles stay compact on
       // any screen instead of scaling with viewport width.
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 235,
-        mainAxisExtent: 56,
+        maxCrossAxisExtent: 250,
+        // [A] Two text lines plus the dots row: the tile grew 56 → 68.
+        mainAxisExtent: 68,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
       ),
@@ -468,6 +541,11 @@ class _SpellbookTabState extends State<SpellbookTab> {
     final selected = slot >= 0;
     final unlocked = p.isSpellUnlocked(spell);
     final unlockLevel = Progression.unlockLevelOf(spell);
+    // [C] The ruled schedule's verdict, shown but not enforced: a spell the
+    // player has not reached yet is dimmed and wears its level.
+    final plannedLevel = Progression.plannedUnlockLevelOf(spell);
+    final ahead = plannedLevel > p.level;
+    final kind = spellKindOf(spell);
     void toggle() {
       if (!canEdit || !unlocked) return;
       final ids = List.of(preset.spellIds);
@@ -477,27 +555,26 @@ class _SpellbookTabState extends State<SpellbookTab> {
       } else if (ids.length < Progression.usableSpellsAtLevel(p.level)) {
         ids.add(spell.id);
       }
-      game.savePreset(
-        p.activePresetIndex,
-        LoadoutPreset(
-          name: preset.name,
-          elementIds: preset.elementIds,
-          spellIds: ids,
-        ),
-      );
+      _setSpells(game, p, preset, ids);
     }
 
+    final nameColor = !unlocked
+        ? AppColors.textFaint
+        : AppColors.text;
     return Tooltip(
       message: unlocked
           ? spellTooltip(spell)
           : '${spell.name} — unlocks at level $unlockLevel',
       waitDuration: const Duration(milliseconds: 350),
       child: Opacity(
-        opacity: unlocked ? (canEdit || selected ? 1 : 0.75) : 0.4,
+        opacity: !unlocked
+            ? 0.4
+            : ahead
+            ? 0.45
+            : (canEdit || selected ? 1 : 0.75),
         child: GestureDetector(
           onTap: toggle,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             decoration: BoxDecoration(
               color: selected ? const Color(0xFF2B2150) : AppColors.panelHi,
               borderRadius: BorderRadius.circular(11),
@@ -506,69 +583,105 @@ class _SpellbookTabState extends State<SpellbookTab> {
                 width: selected ? 1.5 : 1,
               ),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  unlocked
-                      ? (spellIcons[spell.id] ?? Icons.auto_fix_high)
-                      : Icons.lock,
-                  size: 18,
-                  color: selected ? AppColors.gold : AppColors.textDim,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        spell.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: unlocked
-                              ? AppColors.text
-                              : AppColors.textFaint,
-                          fontSize: 12.5,
-                        ),
-                      ),
-                      Text(
-                        unlocked
-                            ? (spell.xCost
-                                  ? 'cost X'
-                                  : 'cost ${spell.chargeCost}')
-                            : 'Level $unlockLevel',
-                        style: const TextStyle(
-                          color: AppColors.textDim,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (selected)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.bg,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Text(
-                      slot < _spellKeyLabels.length
-                          ? _spellKeyLabels[slot]
-                          : '•',
-                      style: const TextStyle(
-                        color: AppColors.gold,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
+            // [B] The kind stripe is an INNER clipped child, never a
+            // one-sided border — a rounded box refuses non-uniform borders
+            // (the rarity-stripe lesson), so the stripe sits inside the clip.
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              // [D] The cost dots are an OVERLAY in the top-right corner —
+              // the same corner they hold on the duel tabs — so the two
+              // screens read one language. Nothing in the Row reserves space
+              // for them; the corner is empty by construction (the name and
+              // effect lines are vertically centred, the trailing controls
+              // too), so the overlay collides with nothing at any cost.
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 5,
+                    right: 8,
+                    child: ChargeDots(
+                      cost: spell.chargeCost,
+                      variable: spell.xCost,
+                      color: selected ? AppColors.gold : AppColors.textDim,
                     ),
                   ),
-                if (unlocked) _infoDot(() => showSpellDetail(context, spell)),
-              ],
+                  Row(
+                children: [
+                  Container(width: 3, color: _kindColor(kind)),
+                  const SizedBox(width: 7),
+                  Icon(
+                    unlocked
+                        ? (spellIcons[spell.id] ?? Icons.auto_fix_high)
+                        : Icons.lock,
+                    size: 18,
+                    color: selected ? AppColors.gold : AppColors.textDim,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          spell.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: nameColor, fontSize: 12.5),
+                        ),
+                        // [A] What it does, in the tooltip's own numbers.
+                        // [C] Prefixed with its level when still ahead.
+                        Text(
+                          !unlocked
+                              ? 'Level $unlockLevel'
+                              : ahead
+                              ? 'Lv $plannedLevel · ${spellEffectLine(spell)}'
+                              : spellEffectLine(spell),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: ahead ? AppColors.gold : AppColors.textDim,
+                            fontSize: 9.5,
+                            height: 1.15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  // The key chip's cell is ALWAYS reserved (press-stability
+                  // corollary): its box exists whether or not the spell is
+                  // equipped, so equipping never shifts the info dot.
+                  SizedBox(
+                    width: 22,
+                    height: 16,
+                    child: selected
+                        ? Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: AppColors.bg,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Text(
+                              slot < _spellKeyLabels.length
+                                  ? _spellKeyLabels[slot]
+                                  : '•',
+                              style: const TextStyle(
+                                color: AppColors.gold,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                        : null,
+                  ),
+                  if (unlocked)
+                    _infoDot(() => showSpellDetail(context, spell))
+                  else
+                    const SizedBox(width: 6),
+                ],
+              ),
+                ],
+              ),
             ),
           ),
         ),
@@ -576,6 +689,16 @@ class _SpellbookTabState extends State<SpellbookTab> {
     );
   }
 }
+
+/// [B] The lane colours — the same five the dueling guide's resolution
+/// ladder uses, so a stripe here and a rung there mean one thing.
+Color _kindColor(SpellKind kind) => switch (kind) {
+  SpellKind.shields => AppColors.sky,
+  SpellKind.quick => AppColors.teal,
+  SpellKind.auxSelf => AppColors.gold,
+  SpellKind.auxOffense => AppColors.gem,
+  SpellKind.offense => AppColors.ember,
+};
 
 class _EditableName extends StatelessWidget {
   final LoadoutPreset preset;
@@ -669,24 +792,38 @@ class _EditableName extends StatelessWidget {
 /// space" the law forbids — and the kind row grows a chip every time the
 /// engine grows a lane.
 class _SpellToolbar extends StatelessWidget {
-  static const double height = 74;
+  // [E] Three rows now: the equipped tray, the kind chips, the cost chips.
+  static const double height = 110;
   static const double _rowHeight = 30;
-  static const double _sortWidth = 124;
+  static const double _searchWidth = 150;
 
   final SpellKind? kind;
   final ValueChanged<SpellKind?> onKind;
   final SpellCostFilter cost;
   final ValueChanged<SpellCostFilter> onCost;
-  final SpellSort sort;
-  final ValueChanged<SpellSort> onSort;
+  // [F]
+  final String query;
+  final ValueChanged<String> onQuery;
+  final Map<SpellKind?, int> counts;
+  // [C]
+  final bool showLocked;
+  final ValueChanged<bool> onShowLocked;
+  // [E]
+  final List<Spell> equipped;
+  final ValueChanged<Spell>? onUnequip;
 
   const _SpellToolbar({
     required this.kind,
     required this.onKind,
     required this.cost,
     required this.onCost,
-    required this.sort,
-    required this.onSort,
+    required this.query,
+    required this.onQuery,
+    required this.counts,
+    required this.showLocked,
+    required this.onShowLocked,
+    required this.equipped,
+    required this.onUnequip,
   });
 
   @override
@@ -697,35 +834,163 @@ class _SpellToolbar extends StatelessWidget {
     color: AppColors.bg,
     padding: const EdgeInsets.fromLTRB(14, 4, 14, 6),
     child: Column(
+      // [G] Stretch, so a row narrower than the toolbar starts at the left
+      // edge like its siblings — the default centre alignment is what floated
+      // the cost chips into the middle of the screen.
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // [E] The tray: what is in the loadout, with its key, always in view.
+        SizedBox(height: _rowHeight, child: _tray()),
+        const SizedBox(height: 4),
+        SizedBox(
+          height: _rowHeight,
+          child: _chipRow([
+            for (final k in <SpellKind?>[null, ...SpellKind.values])
+              _Chip(
+                // [F] The count is what tapping would show. ⚠️ Padded to
+                // two figure-spaces and set in tabular numerals, so "60"
+                // and "5" occupy the same width — the Locked toggle and the
+                // cost chips CHANGE these counts, and a chip that shrank
+                // with its number would slide every chip beside it (the
+                // press-stability rule, caught by its own test).
+                label:
+                    '${spellKindFilterLabel(k)} · '
+                    '${(counts[k] ?? 0).toString().padLeft(2, ' ')}',
+                on: kind == k,
+                onTap: () => onKind(k),
+              ),
+          ]),
+        ),
+        const SizedBox(height: 4),
         SizedBox(
           height: _rowHeight,
           child: Row(
             children: [
               Expanded(
                 child: _chipRow([
-                  for (final k in <SpellKind?>[null, ...SpellKind.values])
+                  for (final c in SpellCostFilter.values)
                     _Chip(
-                      label: spellKindFilterLabel(k),
-                      on: kind == k,
-                      onTap: () => onKind(k),
+                      label: c.label,
+                      on: cost == c,
+                      onTap: () => onCost(c),
                     ),
+                  // [C] Fixed width either way: the label changes, the
+                  // chip's footprint must not.
+                  SizedBox(
+                    width: 112,
+                    child: _Chip(
+                      label: showLocked ? 'Locked: shown' : 'Locked: hidden',
+                      on: !showLocked,
+                      onTap: () => onShowLocked(!showLocked),
+                    ),
+                  ),
                 ]),
               ),
               const SizedBox(width: 8),
-              SizedBox(width: _sortWidth, child: _sortControl()),
+              // [F] Name search.
+              SizedBox(width: _searchWidth, child: _searchBox()),
             ],
           ),
         ),
-        const SizedBox(height: 4),
-        SizedBox(
-          height: _rowHeight,
-          child: _chipRow([
-            for (final c in SpellCostFilter.values)
-              _Chip(label: c.label, on: cost == c, onTap: () => onCost(c)),
-          ]),
-        ),
       ],
+    ),
+  );
+
+  Widget _tray() {
+    if (equipped.isEmpty) {
+      return const Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          'Nothing equipped yet',
+          style: TextStyle(color: AppColors.textFaint, fontSize: 11),
+        ),
+      );
+    }
+    return _chipRow([
+      const Padding(
+        padding: EdgeInsets.only(right: 2),
+        child: Text(
+          'IN LOADOUT',
+          style: TextStyle(
+            color: AppColors.textFaint,
+            fontSize: 10,
+            letterSpacing: 1.1,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      for (var i = 0; i < equipped.length; i++)
+        Tooltip(
+          message: onUnequip == null
+              ? equipped[i].name
+              : 'Tap to remove ${equipped[i].name}',
+          child: InkWell(
+            onTap: onUnequip == null ? null : () => onUnequip!(equipped[i]),
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(6, 3, 9, 3),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2B2150),
+                border: Border.all(color: AppColors.gold),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    i < _spellKeyLabels.length ? _spellKeyLabels[i] : '•',
+                    style: const TextStyle(
+                      color: AppColors.gold,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    equipped[i].name,
+                    style: const TextStyle(
+                      color: AppColors.text,
+                      fontSize: 11.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+    ]);
+  }
+
+  Widget _searchBox() => TextField(
+    // ⚠️ Rebuilt on every setState with the same text: a controller-less
+    // field would reset its cursor each keystroke, so the text is seeded
+    // through a fresh controller with the cursor pinned to the end.
+    controller: TextEditingController.fromValue(
+      TextEditingValue(
+        text: query,
+        selection: TextSelection.collapsed(offset: query.length),
+      ),
+    ),
+    onChanged: onQuery,
+    style: const TextStyle(color: AppColors.text, fontSize: 12),
+    cursorColor: AppColors.gold,
+    decoration: InputDecoration(
+      isDense: true,
+      hintText: 'Search spells',
+      hintStyle: const TextStyle(color: AppColors.textFaint, fontSize: 11.5),
+      prefixIcon: const Icon(Icons.search, size: 15, color: AppColors.textDim),
+      prefixIconConstraints: const BoxConstraints(minWidth: 26, minHeight: 0),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      filled: true,
+      fillColor: AppColors.panelHi,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: AppColors.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: AppColors.gold),
+      ),
     ),
   );
 
@@ -738,34 +1003,6 @@ class _SpellToolbar extends StatelessWidget {
     ),
   );
 
-  Widget _sortControl() => PopupMenuButton<SpellSort>(
-    initialValue: sort,
-    tooltip: 'Sort the book',
-    color: AppColors.panel,
-    padding: EdgeInsets.zero,
-    onSelected: onSort,
-    itemBuilder: (_) => [
-      for (final s in SpellSort.values)
-        PopupMenuItem(
-          value: s,
-          child: Text(s.label, style: const TextStyle(color: AppColors.text)),
-        ),
-    ],
-    child: Row(
-      children: [
-        const Icon(Icons.sort, size: 15, color: AppColors.teal),
-        const SizedBox(width: 5),
-        Expanded(
-          child: Text(
-            sort.label,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.right,
-            style: const TextStyle(color: AppColors.teal, fontSize: 11.5),
-          ),
-        ),
-      ],
-    ),
-  );
 }
 
 /// Pins [child] at its own fixed height. Min and max extent are equal by
@@ -788,7 +1025,17 @@ class _PinnedToolbar extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(_PinnedToolbar oldDelegate) =>
       oldDelegate.child.kind != child.kind ||
       oldDelegate.child.cost != child.cost ||
-      oldDelegate.child.sort != child.sort;
+      oldDelegate.child.query != child.query ||
+      oldDelegate.child.showLocked != child.showLocked ||
+      oldDelegate.child.equipped.length != child.equipped.length ||
+      !_sameIds(oldDelegate.child.equipped, child.equipped);
+
+  static bool _sameIds(List<Spell> a, List<Spell> b) {
+    for (var i = 0; i < a.length && i < b.length; i++) {
+      if (a[i].id != b[i].id) return false;
+    }
+    return true;
+  }
 }
 
 /// ⚠️ Hand-rolled rather than [FilterChip], and deliberately the SAME shape
@@ -815,7 +1062,16 @@ class _Chip extends StatelessWidget {
           border: Border.all(color: on ? AppColors.gold : AppColors.border),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text(label, style: TextStyle(color: fg, fontSize: 11.5)),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: fg,
+            fontSize: 11.5,
+            // Digits share one width, so a label's count can change without
+            // its chip changing size.
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
       ),
     );
   }
