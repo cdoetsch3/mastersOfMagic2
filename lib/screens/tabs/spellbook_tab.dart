@@ -517,8 +517,8 @@ class _SpellbookTabState extends State<SpellbookTab> {
       // any screen instead of scaling with viewport width.
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 250,
-        // [A] Two text lines plus the dots row: the tile grew 56 → 68.
-        mainAxisExtent: 68,
+        // [A] Two text lines plus the dots row: the tile grew 56 → 72.
+        mainAxisExtent: 72,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
       ),
@@ -562,9 +562,11 @@ class _SpellbookTabState extends State<SpellbookTab> {
         ? AppColors.textFaint
         : AppColors.text;
     return Tooltip(
-      message: unlocked
-          ? spellTooltip(spell)
-          : '${spell.name} — unlocks at level $unlockLevel',
+      message: !unlocked
+          ? '${spell.name} — unlocks at level $unlockLevel'
+          : ahead
+          ? '${spellTooltip(spell)}\nUnlocks at level $plannedLevel'
+          : spellTooltip(spell),
       waitDuration: const Duration(milliseconds: 350),
       child: Opacity(
         opacity: !unlocked
@@ -602,6 +604,8 @@ class _SpellbookTabState extends State<SpellbookTab> {
                     child: ChargeDots(
                       cost: spell.chargeCost,
                       variable: spell.xCost,
+                      dotSize: 6.5,
+                      gap: 3.5,
                       color: selected ? AppColors.gold : AppColors.textDim,
                     ),
                   ),
@@ -613,10 +617,10 @@ class _SpellbookTabState extends State<SpellbookTab> {
                     unlocked
                         ? (spellIcons[spell.id] ?? Icons.auto_fix_high)
                         : Icons.lock,
-                    size: 18,
+                    size: 24,
                     color: selected ? AppColors.gold : AppColors.textDim,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 9),
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -625,21 +629,26 @@ class _SpellbookTabState extends State<SpellbookTab> {
                         Text(
                           spell.name,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: nameColor, fontSize: 12.5),
+                          style: TextStyle(
+                            color: nameColor,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         // [A] What it does, in the tooltip's own numbers.
-                        // [C] Prefixed with its level when still ahead.
+                        // [C] A not-yet-reached spell is told apart by its
+                        // dimming alone (the gold "Lv N" prefix was too loud
+                        // — designer, 2026-08-29); its level lives in the
+                        // tooltip instead.
                         Text(
                           !unlocked
                               ? 'Level $unlockLevel'
-                              : ahead
-                              ? 'Lv $plannedLevel · ${spellEffectLine(spell)}'
                               : spellEffectLine(spell),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: ahead ? AppColors.gold : AppColors.textDim,
-                            fontSize: 9.5,
+                          style: const TextStyle(
+                            color: AppColors.textDim,
+                            fontSize: 10,
                             height: 1.15,
                           ),
                         ),
