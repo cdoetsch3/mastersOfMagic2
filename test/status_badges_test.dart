@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/duel_status_badges.dart';
 import 'package:masters_of_magic_2/game/element_style.dart';
+import 'package:masters_of_magic_2/ui/app_theme.dart';
 import 'package:mom_engine/mom_engine.dart';
 
 /// The HUD pips, and specifically the Flora streak.
@@ -103,5 +104,65 @@ void main() {
     );
     final empower = badges.firstWhere((b) => b.label == 'Empower');
     expect(empower.sub, isNull);
+  });
+
+  group('the catalogue draws every status no arm names', () {
+    StatusBadge one(StatusView v) {
+      final badges = badgesFromSnapshot(StatusSnapshot([v]));
+      expect(badges, hasLength(1), reason: '${v.id} must produce one pip');
+      return badges.single;
+    }
+
+    test('⭐ a burn shows its damage per turn and its clock, as a debuff', () {
+      final b = one(const StatusView(id: 'agony', turnsLeft: 3, magnitude: 7));
+      expect(b.label, 'Agony');
+      expect(b.sub, '7/t · 3t',
+          reason: 'the pip reads exactly like Ignite\'s — the mutant this '
+              'kills is the one the designer found: a Torment ticking with '
+              'no pip at all');
+      expect(b.kind, BadgeKind.debuff);
+      expect(b.color, AppColors.ember,
+          reason: 'debuffs invert to ember, whatever their fx colour');
+    });
+
+    test('a stance shows its number and clock, as a buff', () {
+      final b = one(
+        const StatusView(id: 'lightfoot', turnsLeft: 10, magnitude: 15),
+      );
+      expect(b.label, 'Lightfoot');
+      expect(b.sub, '+15 · 10t');
+      expect(b.kind, BadgeKind.buff);
+    });
+
+    test('the Divert pair shows both halves', () {
+      final b = one(const StatusView(
+          id: 'divert', turnsLeft: 15, magnitude: 20, secondaryMagnitude: 40));
+      expect(b.sub, '20/40 · 15t');
+    });
+
+    test('a binary stance shows only its clock', () {
+      final b = one(const StatusView(id: 'composure', turnsLeft: 25));
+      expect(b.sub, '25t');
+    });
+
+    test('a moment never sits as a pip', () {
+      expect(
+        badgesFromSnapshot(const StatusSnapshot([StatusView(id: 'fester')])),
+        isEmpty,
+        reason: 'moments flash in the log; a pip would outlive its instant',
+      );
+    });
+
+    test('⭐ EVERY lasting status in the catalogue renders a pip', () {
+      // The guard the HUD lacked: a status the engine can apply but the
+      // HUD cannot show is invisible damage. Any lasting catalogue entry,
+      // handed to the builder as a bare view, must come back as a badge.
+      for (final info in StatusCatalog.lasting) {
+        final badges = badgesFromSnapshot(
+          StatusSnapshot([StatusView(id: info.id, turnsLeft: 2, stacks: 1)]),
+        );
+        expect(badges, isNotEmpty, reason: '${info.id} has no pip');
+      }
+    });
   });
 }

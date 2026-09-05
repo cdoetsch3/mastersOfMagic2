@@ -3,6 +3,7 @@ import 'package:mom_engine/mom_engine.dart';
 
 import '../ui/app_theme.dart';
 import 'element_style.dart';
+import 'status_fx.dart';
 
 /// A2 HUD pip: one chip per active status/streak on a mage. Buffs keep an
 /// element/accent border; debuffs invert to a solid ember fill, so which side
@@ -45,6 +46,13 @@ String _streakPayoffLabel(MagicElement element) => switch (element) {
 /// resolves. Order: streak, buffs, debuffs.
 List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
   final badges = <StatusBadge>[];
+  // Every bespoke arm below records the id it consumed, so the catalogue
+  // fallback at the end knows what is still unshown.
+  final handled = <String>{};
+  StatusView? take(String id) {
+    handled.add(id);
+    return snap[id];
+  }
 
   // --- Streak (only the elements that build toward something) -----------
   //
@@ -55,7 +63,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
   //   • Aero   — becomes "Tailwind", since Tailwind has no pip of its own.
   // Cadence streaks (Aqua/Geo/Sanctus) keep counting, because for those the
   // number is the mechanic: it says how far off the next proc is.
-  final streak = snap['streak'];
+  final streak = take('streak');
   if (streak != null && streak.element != null) {
     final element = streak.element!;
     final mechanic = _streakMechanic(element);
@@ -77,7 +85,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
   }
 
   // --- Buffs (mine) -----------------------------------------------------
-  final photo = snap['photosynthesis'];
+  final photo = take('photosynthesis');
   if (photo != null) {
     // Streak-gated now: active or not, so no count. The Flora streak pip
     // already shows the run that sustains it.
@@ -90,7 +98,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
-  final ak = snap['arcaneKnowledge'];
+  final ak = take('arcaneKnowledge');
   if (ak != null) {
     badges.add(
       StatusBadge(
@@ -101,7 +109,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
-  final align = snap['astralAlignment'];
+  final align = take('astralAlignment');
   if (align != null) {
     badges.add(
       StatusBadge(
@@ -112,7 +120,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
-  final dark = snap['creepingDark'];
+  final dark = take('creepingDark');
   if (dark != null) {
     final tier = dark.stacks >= CreepingDarkStatus.midnightThreshold
         ? 'MIDNIGHT'
@@ -130,7 +138,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
-  final hot = snap['healOverTime'];
+  final hot = take('healOverTime');
   if (hot != null) {
     // ⭐ A Tonic that ticks invisibly is a Tonic the player believes did
     // nothing — the turn it cost is the loudest part of the transaction, so
@@ -144,7 +152,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
-  if (snap['grace'] != null) {
+  if (take('grace') != null) {
     badges.add(
       StatusBadge(
         'Grace',
@@ -154,31 +162,31 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
-  if (snap['haste'] != null) {
+  if (take('haste') != null) {
     badges.add(
       const StatusBadge('Haste', color: AppColors.teal, kind: BadgeKind.buff),
     );
   }
-  if (snap['empower'] != null) {
+  if (take('empower') != null) {
     // ⚠️ No "×2" subtitle. Next to a stack count like "Dark 7" it read as
     // *two* Empowers rather than a doubling — and Empower does not stack.
     badges.add(
       const StatusBadge('Empower', color: AppColors.gold, kind: BadgeKind.buff),
     );
   }
-  if (snap['quicken'] != null) {
+  if (take('quicken') != null) {
     badges.add(
       const StatusBadge('Quicken', color: AppColors.sky, kind: BadgeKind.buff),
     );
   }
-  if (snap['phase'] != null) {
+  if (take('phase') != null) {
     badges.add(
       const StatusBadge('Phase', color: AppColors.gem, kind: BadgeKind.buff),
     );
   }
 
   // --- Debuffs (afflicting me) ------------------------------------------
-  final ignite = snap['ignite'];
+  final ignite = take('ignite');
   if (ignite != null) {
     badges.add(
       StatusBadge(
@@ -189,7 +197,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
-  final blind = snap['blind'];
+  final blind = take('blind');
   if (blind != null) {
     badges.add(
       StatusBadge(
@@ -200,7 +208,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
-  if (snap['stagger'] != null) {
+  if (take('stagger') != null) {
     badges.add(
       const StatusBadge(
         'Staggered',
@@ -210,7 +218,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
       ),
     );
   }
-  if (snap['waterlogged'] != null) {
+  if (take('waterlogged') != null) {
     badges.add(
       const StatusBadge(
         'Waterlogged',
@@ -221,7 +229,57 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
     );
   }
 
+
+  // --- Everything else: the catalogue draws it ---------------------------
+  //
+  // ⭐ The §7a bank added ~30 statuses and NONE of them had an arm above —
+  // Agony and Torment ticked away with no pip, which the designer noticed on
+  // his first playtest. Rather than thirty more hand-written arms (and a
+  // thirty-first the day the next one lands), anything the snapshot carries
+  // that no arm consumed is drawn from the catalogue: its name, its polarity
+  // for the side it sits on, its fx colour, and a subtitle built from the
+  // numbers the snapshot already has. Moments never sit as pips.
+  for (final view in snap.statuses) {
+    if (handled.contains(view.id)) continue;
+    final info = StatusCatalog.byId(view.id);
+    if (info == null || !info.lingers) continue;
+    final debuff = info.polarity == StatusPolarity.debuff;
+    badges.add(
+      StatusBadge(
+        info.name,
+        sub: _genericSub(view),
+        color: debuff ? AppColors.ember : statusColor(info),
+        kind: debuff ? BadgeKind.debuff : BadgeKind.buff,
+      ),
+    );
+  }
+
   return badges;
+}
+
+/// The subtitle for a catalogue-drawn pip, from the snapshot's own numbers.
+///
+/// Per-id units where the bare number would mislead: a burn is damage per
+/// turn, Mending is percent per turn, the percent stances say so, and the
+/// Divert pair shows both halves. Everything else reads `±magnitude · Nt`,
+/// or just the clock when there is no magnitude.
+String? _genericSub(StatusView v) {
+  final t = v.turnsLeft > 0 ? '${v.turnsLeft}t' : null;
+  String withClock(String head) => t == null ? head : '$head · $t';
+  switch (v.id) {
+    case 'agony' || 'torment':
+      return withClock('${v.magnitude}/t');
+    case 'mending' || 'regrow':
+      return withClock('${v.magnitude}%/t');
+    case 'divert':
+      return withClock('${v.magnitude}/${v.secondaryMagnitude}');
+    case 'keen' || 'wither' || 'steadfast':
+      return withClock('${v.magnitude > 0 ? '+' : ''}${v.magnitude}%');
+  }
+  if (v.magnitude != 0) {
+    return withClock('${v.magnitude > 0 ? '+' : ''}${v.magnitude}');
+  }
+  return t;
 }
 
 /// Live-state convenience wrapper — used outside a turn replay (e.g. before
