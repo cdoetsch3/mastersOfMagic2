@@ -11,7 +11,16 @@ class AuthService extends ChangeNotifier {
   }
 
   User? get user => _auth.currentUser;
-  bool get signedIn => user != null;
+
+  /// A guest playing under an anonymous Firebase sign-in (academy.dart).
+  /// They have a uid — enough for matchmaking's rules — but no account.
+  bool get isAnonymous => user?.isAnonymous ?? false;
+
+  /// ⚠️ An anonymous guest is NOT "signed in" to the rest of the app: their
+  /// profile stays local, the account screen still offers sign-up, and
+  /// nothing treats the throwaway uid as a character. Only matchmaking reads
+  /// [user] directly, because a uid is all it needs.
+  bool get signedIn => user != null && !isAnonymous;
   bool get emailVerified => user?.emailVerified ?? false;
   String? get displayName => user?.displayName;
   String? get email => user?.email;
@@ -51,6 +60,28 @@ class AuthService extends ChangeNotifier {
       );
       return null;
     } on FirebaseAuthException catch (e) {
+      return _message(e);
+    } catch (e) {
+      return 'Something went wrong. Please try again.';
+    }
+  }
+
+  /// Signs a guest in anonymously so they can queue for the Academy without
+  /// an account. Returns null on success, or a friendly error message.
+  ///
+  /// ⚠️ Requires the Anonymous provider to be enabled in the Firebase
+  /// console — the 'operation-not-allowed' message below is what that
+  /// omission looks like.
+  Future<String?> signInAsGuest() async {
+    if (user != null) return null; // already someone — guest or account
+    try {
+      await _auth.signInAnonymously();
+      notifyListeners();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'operation-not-allowed') {
+        return 'Guest play is not enabled for this project yet.';
+      }
       return _message(e);
     } catch (e) {
       return 'Something went wrong. Please try again.';

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:mom_engine/mom_engine.dart';
 
+import 'academy.dart';
 import 'ai_personas.dart';
 import 'enemies/enemy_combat_stats.dart';
 import 'enemies/enemy_def.dart';
@@ -112,8 +113,16 @@ class LocalAiDriver implements OpponentDriver {
   MageState? _player;
   MageState? _enemy;
 
-  LocalAiDriver({required this.persona, this.enemy, Random? rng})
-    : rng = rng ?? Random();
+  /// The level the persona is built at when it stands in for a human in
+  /// an Academy bout (academy.dart) — null plays the persona at its own.
+  final int? levelOverride;
+
+  LocalAiDriver({
+    required this.persona,
+    this.enemy,
+    this.levelOverride,
+    Random? rng,
+  }) : rng = rng ?? Random();
 
   @override
   double get opponentHpScale => enemy?.archetype.hpScale ?? 1.0;
@@ -137,7 +146,7 @@ class LocalAiDriver implements OpponentDriver {
   String get opponentName => persona.name;
 
   @override
-  int get opponentLevel => persona.level;
+  int get opponentLevel => levelOverride ?? persona.level;
 
   /// ⚠️ **Never gear.** A persona's difficulty is its brain and its level, and
   /// a bestiary entry's is its archetype — items are the player's lane alone.
@@ -210,11 +219,22 @@ class RemoteDuelDriver implements OpponentDriver {
   @override
   final String opponentName;
 
-  @override
-  final int opponentLevel;
+  /// An Academy bout (academy.dart): the rival is built at [Academy.level]
+  /// wearing nothing, WHATEVER the wire said their level and gear were.
+  /// ⭐ Coerced here, in the one object both clients build their enemy from,
+  /// so a mode mismatch can never desync a duel — both sides read the same
+  /// flag off the same room doc.
+  final bool academy;
+
+  final int _opponentLevel;
+  final ItemModifiers _opponentGear;
 
   @override
-  final ItemModifiers opponentGear;
+  int get opponentLevel => academy ? Academy.level : _opponentLevel;
+
+  @override
+  ItemModifiers get opponentGear =>
+      academy ? ItemModifiers.none : _opponentGear;
 
   static const opponentTimeout = Duration(seconds: 25);
 
@@ -232,13 +252,19 @@ class RemoteDuelDriver implements OpponentDriver {
     // silently simulated the opponent at level 1 — two clients running two
     // different fights (HP pools AND damage scaling), which is a lockstep
     // desync, not a display bug.
-    required this.opponentLevel,
+    required int opponentLevel,
     // ⚠️ Required for exactly the same reason, and it is the same bug: gear
     // that defaults to none makes each client simulate itself geared against
     // a naked rival (ITEMS §7.4 says PvP counts gear). A silent default is
     // how the level desync survived as long as it did — so there isn't one.
-    required this.opponentGear,
-  });
+    required ItemModifiers opponentGear,
+    this.academy = false,
+  }) : _opponentLevel = opponentLevel,
+       _opponentGear = opponentGear;
+
+  // ignore_for_file: prefer_initializing_formals
+  // (the wire values are stored privately so the [academy] getters can
+  // coerce them — an initializing formal would expose the raw fields)
 
   String get _roomPath => 'duels/$roomId';
   String _turnPath(int turn) => '$_roomPath/turns/$turn';

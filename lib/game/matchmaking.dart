@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'academy.dart';
 import 'ai_personas.dart';
 import 'firestore_rest.dart';
 import 'items/item_def.dart';
@@ -80,6 +81,17 @@ class Matchmaking {
     return theirUid.compareTo(myUid) < 0;
   }
 
+  /// Whether a queue ticket belongs to [mode]'s queue.
+  ///
+  /// ⭐ One collection, two queues: the Academy (academy.dart) and geared
+  /// PvP share `matchmaking/` but never match each other — a ticket is only
+  /// claimable by a searcher in the same mode. ⚠️ A ticket with NO mode is
+  /// geared: it was written by a client from before the Academy existed, and
+  /// that client is fighting geared whatever we call it. Public and pure for
+  /// the test.
+  static bool ticketInMode(Map<String, dynamic> ticket, String mode) =>
+      (ticket['mode'] as String? ?? Academy.gearedMode) == mode;
+
   /// Tries to claim [ticket] for [uid]. True only if OUR claim stuck.
   ///
   /// ⚠️ Firestore REST has no transactions here, so the claim is
@@ -129,6 +141,7 @@ class Matchmaking {
         opponentName: ticket['name'] as String? ?? 'Rival mage',
         opponentLevel: (ticket['level'] as num?)?.toInt() ?? 1,
         opponentGear: _gearFrom(ticket['gear']),
+        academy: ticketInMode(ticket, Academy.mode),
       );
 
   /// Searches the queue for a waiting player. Joins them if found; otherwise
@@ -146,10 +159,13 @@ class Matchmaking {
     // ⚠️ Required, like [level]: a caller that forgets it would put a naked
     // mage on the opponent's screen and a geared one on ours.
     required ItemModifiers gear,
+    // The queue to search and post in (academy.dart) — geared by default.
+    String mode = Academy.gearedMode,
     Duration patience = const Duration(seconds: 10),
   }) async {
+    final academy = mode == Academy.mode;
     try {
-      // 1. Claim someone already waiting (oldest first).
+      // 1. Claim someone already waiting (oldest first) — in OUR queue.
       final waiting = await FirestoreRest.query(
         _queue,
         orderBy: 'createdAt',
@@ -158,6 +174,7 @@ class Matchmaking {
       for (final ticket in waiting) {
         if (ticket.id == uid) continue;
         if (ticket.data['claimedBy'] != null) continue;
+        if (!ticketInMode(ticket.data, mode)) continue;
         if (await _claim(
           ticket,
           uid: uid,
@@ -181,6 +198,7 @@ class Matchmaking {
         // ⭐ Whoever claims this ticket builds their enemy from these two
         // fields alone, so both must be here before anyone can claim it.
         'gear': gear.toJson(),
+        'mode': mode,
         'roomId': code,
         'masterSeed': seed,
         'createdAt': createdAt,
@@ -201,6 +219,7 @@ class Matchmaking {
             'guestName': mine?['claimedByName'] as String? ?? 'Rival',
             'guestLevel': (mine?['claimedByLevel'] as num?)?.toInt() ?? 1,
             'guestGear': _gearFrom(mine?['claimedByGear']).toJson(),
+            'mode': mode,
             'masterSeed': seed,
             'createdAt': _now(),
           });
@@ -216,6 +235,7 @@ class Matchmaking {
               // — never ours. Each side wears its own wardrobe and simulates
               // the other's.
               opponentGear: _gearFrom(mine?['claimedByGear']),
+              academy: academy,
             ),
           );
         }
@@ -231,6 +251,7 @@ class Matchmaking {
         for (final ticket in others) {
           if (ticket.id == uid) continue;
           if (ticket.data['claimedBy'] != null) continue;
+          if (!ticketInMode(ticket.data, mode)) continue;
           if (!ticketPrecedes(
             theirUid: ticket.id,
             theirCreatedAt: ticket.data['createdAt'] as String? ?? '',
@@ -258,8 +279,11 @@ class Matchmaking {
       // Fall through to the AI stand-in below.
     }
 
-    // 3. No human found: an AI persona stands in.
-    return MatchResult.ai(AiRoster.nearestToLevel(level));
+    // 3. No human found: an AI persona stands in — at the Academy's level
+    // when that is the queue, since everyone there IS level 50.
+    return MatchResult.ai(
+      AiRoster.nearestToLevel(academy ? Academy.level : level),
+    );
   }
 
   // ---- Friendly duels (room codes) --------------------------------------
@@ -269,11 +293,14 @@ class Matchmaking {
     required String name,
     required int level,
     required ItemModifiers gear,
+    String mode = Academy.gearedMode,
   }) async {
     final code = _newCode();
     final seed = _newSeed();
     await FirestoreRest.set('$_duels/$code', {
       'status': 'waiting',
+      // ⭐ The HOST picks the mode; a guest joining by code adopts it.
+      'mode': mode,
       'hostUid': uid,
       'hostName': name,
       // ⭐ Levels AND gear cross the wire in BOTH directions, or the two
@@ -291,6 +318,7 @@ class Matchmaking {
   static Future<RemoteDuelDriver?> waitForGuest({
     required String code,
     required int seed,
+    String mode = Academy.gearedMode,
     Duration patience = const Duration(minutes: 5),
   }) async {
     final guest = await _poll<({String name, int level, ItemModifiers gear})>(
@@ -312,6 +340,7 @@ class Matchmaking {
       opponentName: guest.name,
       opponentLevel: guest.level,
       opponentGear: guest.gear,
+      academy: mode == Academy.mode,
     );
   }
 
@@ -344,6 +373,9 @@ class Matchmaking {
       opponentName: data['hostName'] as String? ?? 'Rival mage',
       opponentLevel: (data['hostLevel'] as num?)?.toInt() ?? 1,
       opponentGear: _gearFrom(data['hostGear']),
+      // The room's mode, not ours: whoever joins by code fights the host's
+      // duel. The screen re-resolves its loadout off this flag.
+      academy: ticketInMode(data, Academy.mode),
     );
   }
 

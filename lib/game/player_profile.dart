@@ -43,6 +43,28 @@ class LoadoutPreset {
     spellIds: List.of(Progression.starterPresetSpellIds),
   );
 
+  /// The Academy's starting hand: a rounded level-50 kit across the whole
+  /// book, so a first Academy bout is playable before anyone edits it.
+  /// ⚠️ Every id here must resolve — `academy_test` checks — because a
+  /// default that silently dropped a spell would hand a guest a 9-spell
+  /// loadout with no way to know why.
+  factory LoadoutPreset.academy() => LoadoutPreset(
+    name: 'Academy',
+    elementIds: ['pyro', 'aqua', 'flora', 'electro', 'geo'],
+    spellIds: [
+      'bolt',
+      'surge',
+      'cataclysm',
+      'aegis',
+      'bulwark',
+      'agony',
+      'lightfoot',
+      'keen',
+      'cleanse',
+      'empower',
+    ],
+  );
+
   int get elementCount => elementIds.length;
   int get spellCount => spellIds.length;
 
@@ -198,6 +220,10 @@ class PlayerProfile {
   List<LoadoutPreset> presets;
   int activePresetIndex;
 
+  /// The one Academy loadout (academy.dart) — outside the preset slots,
+  /// never level-gated, never the campaign's active preset.
+  LoadoutPreset academyPreset;
+
   /// What this character is carrying. ⭐ **One item per slot** — twenty Oak
   /// Logs fill it (ITEMS §10.3a).
   Backpack backpack;
@@ -265,6 +291,7 @@ class PlayerProfile {
     Map<String, int>? skillXp,
     List<LoadoutPreset>? presets,
     this.activePresetIndex = 0,
+    LoadoutPreset? academyPreset,
     Backpack? backpack,
     Belt? belt,
     Map<String, Storeroom>? storerooms,
@@ -279,6 +306,7 @@ class PlayerProfile {
        zoneClears = zoneClears ?? {},
        skillXp = skillXp ?? {},
        presets = presets ?? [LoadoutPreset.starter('Loadout I')],
+       academyPreset = academyPreset ?? LoadoutPreset.academy(),
        backpack = backpack ?? Backpack.empty(),
        belt = belt ?? const Belt(),
        storerooms = storerooms ?? {},
@@ -348,6 +376,7 @@ class PlayerProfile {
     if (skillXp.isNotEmpty) 'skillXp': skillXp,
     'presets': presets.map((p) => p.toJson()).toList(),
     'activePresetIndex': activePresetIndex,
+    'academyPreset': academyPreset.toJson(),
     'backpack': backpack.toJson(),
     'belt': belt.toJson(),
     'storerooms': {
@@ -413,6 +442,13 @@ class PlayerProfile {
           {},
       presets: presets,
       activePresetIndex: (json['activePresetIndex'] as num?)?.toInt() ?? 0,
+      // Absent on saves from before the Academy — the default hand, exactly
+      // what a new player gets.
+      academyPreset: json['academyPreset'] is Map
+          ? LoadoutPreset.fromJson(
+              (json['academyPreset'] as Map).cast<String, dynamic>(),
+            )
+          : null,
       backpack: Backpack.fromJson(json['backpack'] as List?),
       belt: Belt.fromJson(json['belt'] as List?),
       storerooms:

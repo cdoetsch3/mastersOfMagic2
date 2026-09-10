@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../game/academy.dart';
 import '../game/ai_personas.dart';
 import '../game/auth_service.dart';
 import '../game/duel_launcher.dart';
@@ -20,6 +21,10 @@ import 'account_screen.dart';
 class MatchmakingScreen extends StatefulWidget {
   final Loadout loadout;
 
+  /// The Academy queue (academy.dart): level 50, no gear, no belt, no
+  /// reward, open to guests. [loadout] is then the Academy loadout.
+  final bool academy;
+
   /// A room code arriving from a scanned QR link (main.dart's ?join=
   /// handling). Prefilled AND submitted — the person scanning has already
   /// expressed the intent; asking them to press Join again is a step nobody
@@ -29,6 +34,7 @@ class MatchmakingScreen extends StatefulWidget {
   const MatchmakingScreen({
     super.key,
     required this.loadout,
+    this.academy = false,
     this.initialJoinCode,
   });
 
@@ -68,9 +74,11 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     return (uid: uid, name: game.profile.name);
   }
 
+  String get _mode => widget.academy ? Academy.mode : Academy.gearedMode;
+
   Future<void> _quickMatch() async {
     final id = _identity();
-    if (id == null) return _needAccount();
+    if (id == null) return _needAccount(_quickMatch);
     final game = GameStateScope.read(context);
     setState(() {
       _busy = _Busy.searching;
@@ -84,6 +92,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         // ⭐ PvP is the geared ladder (ITEMS §7.4): our totals go out so the
         // opponent's client can build us as we actually are.
         gear: game.equipmentTotals,
+        mode: _mode,
       );
       if (!mounted) return;
       setState(() => _busy = _Busy.none);
@@ -93,6 +102,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
           loadout: widget.loadout,
           driver: result.remote!,
           campaign: false,
+          academy: widget.academy,
         );
       } else {
         final persona = result.persona!;
@@ -102,6 +112,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
           loadout: widget.loadout,
           persona: persona,
           campaign: false,
+          academy: widget.academy,
         );
       }
     } catch (e) {
@@ -124,7 +135,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
 
   Future<void> _hostRoom() async {
     final id = _identity();
-    if (id == null) return _needAccount();
+    if (id == null) return _needAccount(_hostRoom);
     setState(() {
       _busy = _Busy.hosting;
       _error = null;
@@ -136,12 +147,14 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         name: id.name,
         level: game.profile.level,
         gear: game.equipmentTotals,
+        mode: _mode,
       );
       if (!mounted) return;
       setState(() => _roomCode = room.code);
       final driver = await Matchmaking.waitForGuest(
         code: room.code,
         seed: room.seed,
+        mode: _mode,
       );
       if (!mounted) return;
       setState(() {
@@ -154,6 +167,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
           loadout: widget.loadout,
           driver: driver,
           campaign: false,
+          academy: widget.academy,
         );
       } else {
         await Matchmaking.cancel(uid: id.uid, roomCode: room.code);
@@ -172,7 +186,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
 
   Future<void> _joinRoom() async {
     final id = _identity();
-    if (id == null) return _needAccount();
+    if (id == null) return _needAccount(_joinRoom);
     final code = _codeField.text.trim().toUpperCase();
     if (code.length < 4) {
       setState(() => _error = 'Enter the room code your friend shared.');
@@ -193,11 +207,21 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       );
       if (!mounted) return;
       setState(() => _busy = _Busy.none);
+      // ⭐ A room is the HOST's duel: a guest who arrives by code (or by a
+      // scanned QR, with whatever loadout the shell handed them) fights the
+      // room's mode with the loadout that mode calls for.
+      final academy = driver.academy;
+      final loadout = academy == widget.academy
+          ? widget.loadout
+          : academy
+          ? game.profile.academyPreset.toLoadout()
+          : game.profile.activePreset.toLoadout();
       await launchDuel(
         context,
-        loadout: widget.loadout,
+        loadout: loadout,
         driver: driver,
         campaign: false,
+        academy: academy,
       );
     } catch (e) {
       if (mounted) {
@@ -209,25 +233,46 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     }
   }
 
-  void _needAccount() {
+  /// No uid yet. An account is the full answer; ⭐ for the Academy a guest
+  /// sign-in is enough (academy.dart) — an anonymous uid satisfies the
+  /// matchmaking rules, and [retry] resumes whatever they pressed.
+  void _needAccount(Future<void> Function() retry) {
+    final auth = AuthScope.maybeOf(context);
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.panel,
-        title: const Text(
-          'Account needed',
-          style: TextStyle(color: AppColors.text, fontSize: 17),
+        title: Text(
+          widget.academy ? 'Who are you?' : 'Account needed',
+          style: const TextStyle(color: AppColors.text, fontSize: 17),
         ),
-        content: const Text(
-          'Dueling other players needs an account so they know who beat '
-          'them. Practice duels vs AI work without one.',
-          style: TextStyle(color: AppColors.textDim),
+        content: Text(
+          widget.academy
+              ? 'The Academy is open to guests — play under a temporary '
+                    'name, or sign in to keep a character.'
+              : 'Dueling other players needs an account so they know who '
+                    'beat them. Practice duels vs AI work without one.',
+          style: const TextStyle(color: AppColors.textDim),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Not now'),
           ),
+          if (widget.academy && auth != null)
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                final error = await auth.signInAsGuest();
+                if (!mounted) return;
+                if (error != null) {
+                  setState(() => _error = error);
+                  return;
+                }
+                await retry();
+              },
+              child: const Text('Play as guest'),
+            ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
@@ -248,7 +293,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       backgroundColor: AppColors.bg,
       appBar: AppBar(
         backgroundColor: AppColors.bg,
-        title: const Text('Find a duel'),
+        title: Text(widget.academy ? 'The Academy' : 'Find a duel'),
       ),
       body: SafeArea(
         child: Center(
@@ -365,6 +410,30 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       shrinkWrap: true,
       padding: const EdgeInsets.all(16),
       children: [
+        if (widget.academy) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.panelHi,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.gem),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.school, color: AppColors.gem, size: 20),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Everyone duels at level 50 with no gear and no potions. '
+                    'Nothing is gained or lost — bring your Academy loadout.',
+                    style: TextStyle(color: AppColors.text, fontSize: 12.5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+        ],
         GamePanel(
           onTap: _quickMatch,
           borderColor: AppColors.ember,

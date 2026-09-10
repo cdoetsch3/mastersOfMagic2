@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mom_engine/mom_engine.dart';
 
+import '../../game/academy.dart';
 import '../../game/element_style.dart';
 import '../../game/game_state.dart';
 import '../../game/player_profile.dart';
@@ -46,6 +47,22 @@ class _SpellbookTabState extends State<SpellbookTab> {
   var _query = '';
   var _showLocked = true;
 
+  /// Editing the Academy loadout (academy.dart) instead of a preset: every
+  /// spell and element is open whatever the player's level, editing is
+  /// allowed anywhere, and the caps are the Academy's own. Per-visit.
+  var _academy = false;
+
+  int _level(PlayerProfile p) => _academy ? Academy.level : p.level;
+  bool _spellUnlocked(PlayerProfile p, Spell s) =>
+      _academy || p.isSpellUnlocked(s);
+  bool _elementUnlocked(PlayerProfile p, MagicElement e) =>
+      _academy || p.isElementUnlocked(e);
+  int _spellBudget(PlayerProfile p) =>
+      _academy ? Academy.spellSlots : Progression.usableSpellsAtLevel(p.level);
+  int _elementBudget(PlayerProfile p) => _academy
+      ? Academy.elementSlots
+      : Progression.usableElementsAtLevel(p.level);
+
   bool get _filtering =>
       spellFilterActive(kind: _kind, cost: _cost, query: _query);
 
@@ -55,15 +72,17 @@ class _SpellbookTabState extends State<SpellbookTab> {
   List<Spell> _book(PlayerProfile p) => _showLocked
       ? Spellbook.all
       : Spellbook.all
-            .where((s) => Progression.plannedUnlockLevelOf(s) <= p.level)
+            .where((s) => Progression.plannedUnlockLevelOf(s) <= _level(p))
             .toList();
 
   @override
   Widget build(BuildContext context) {
     final game = GameStateScope.of(context);
     final p = game.profile;
-    final canEdit = game.canEditLoadoutHere;
-    final preset = p.activePreset;
+    // The Academy loadout is not the campaign's: the town rule does not
+    // gate it, and it is never the active preset.
+    final canEdit = _academy || game.canEditLoadoutHere;
+    final preset = _academy ? p.academyPreset : p.activePreset;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,25 +107,28 @@ class _SpellbookTabState extends State<SpellbookTab> {
                     children: [
                       _presetChips(context, game, p),
                       const SizedBox(height: 12),
-                      _EditableName(
-                        preset: preset,
-                        canEdit: canEdit,
-                        game: game,
-                      ),
+                      if (_academy)
+                        const _AcademyHeader()
+                      else
+                        _EditableName(
+                          preset: preset,
+                          canEdit: canEdit,
+                          game: game,
+                        ),
                       const SizedBox(height: 10),
                       _guideLink(context),
                       const SizedBox(height: 12),
                       // Two separate pools, each shown against its own cap.
                       SectionLabel(
                         'Elements  ·  ${preset.elementIds.length}/'
-                        '${Progression.usableElementsAtLevel(p.level)}'
+                        '${_elementBudget(p)}'
                         '   (tap ⓘ for details)',
                       ),
                       _elementGrid(context, game, p, preset, canEdit),
                       const SizedBox(height: 14),
                       SectionLabel(
                         'Spells  ·  ${preset.spellIds.length}/'
-                        '${Progression.usableSpellsAtLevel(p.level)}'
+                        '${_spellBudget(p)}'
                         '   (tap ⓘ for details)',
                       ),
                     ],
@@ -174,14 +196,35 @@ class _SpellbookTabState extends State<SpellbookTab> {
     List<String> ids,
   ) {
     if (ids.isEmpty) return;
-    game.savePreset(
-      p.activePresetIndex,
-      LoadoutPreset(
-        name: preset.name,
-        elementIds: preset.elementIds,
-        spellIds: ids,
-      ),
+    final next = LoadoutPreset(
+      name: preset.name,
+      elementIds: preset.elementIds,
+      spellIds: ids,
     );
+    if (_academy) {
+      game.saveAcademyPreset(next);
+    } else {
+      game.savePreset(p.activePresetIndex, next);
+    }
+  }
+
+  /// The element twin of [_setSpells], routed the same way.
+  void _setElements(
+    GameState game,
+    PlayerProfile p,
+    LoadoutPreset preset,
+    List<String> ids,
+  ) {
+    final next = LoadoutPreset(
+      name: preset.name,
+      elementIds: ids,
+      spellIds: preset.spellIds,
+    );
+    if (_academy) {
+      game.saveAcademyPreset(next);
+    } else {
+      game.savePreset(p.activePresetIndex, next);
+    }
   }
 
   /// The shelf below the toolbar, sectioned by [_grouping] after every
@@ -199,7 +242,8 @@ class _SpellbookTabState extends State<SpellbookTab> {
     bool canEdit,
   ) {
     final book = _book(p);
-    final flat = _grouping == SpellGrouping.none ||
+    final flat =
+        _grouping == SpellGrouping.none ||
         (_kind != null && _grouping == SpellGrouping.kind);
     final sections = sectionSpells(
       book,
@@ -218,9 +262,7 @@ class _SpellbookTabState extends State<SpellbookTab> {
         // 60 spells, "12 spells" without the total is a number the player
         // cannot read anything into.
         if (_filtering)
-          SectionLabel(
-            'Showing $shownCount of ${Spellbook.all.length} spells',
-          ),
+          SectionLabel('Showing $shownCount of ${Spellbook.all.length} spells'),
         for (final section in sections) ...[
           if (section.label.isNotEmpty)
             SectionLabel('${section.label}  ·  ${section.spells.length}'),
@@ -288,11 +330,53 @@ class _SpellbookTabState extends State<SpellbookTab> {
 
   Widget _presetChips(BuildContext context, GameState game, PlayerProfile p) {
     final chips = <Widget>[];
+    // ⭐ The Academy chip leads the row: always there, never locked, its own
+    // colour — a different game, not a sixth preset — and FIRST, because a
+    // chip parked behind four locked slots is a chip nobody scrolls to.
+    chips.add(
+      GestureDetector(
+        onTap: () => setState(() => _academy = true),
+        child: Container(
+          margin: const EdgeInsets.only(right: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: _academy
+                ? AppColors.gem.withValues(alpha: 0.18)
+                : AppColors.panelHi,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: _academy ? AppColors.gem : AppColors.border,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.school,
+                size: 14,
+                color: _academy ? AppColors.gem : AppColors.textDim,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                Academy.presetName,
+                style: TextStyle(
+                  color: _academy ? AppColors.text : AppColors.textDim,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
     for (var i = 0; i < p.presets.length; i++) {
-      final active = i == p.activePresetIndex;
+      final active = !_academy && i == p.activePresetIndex;
       chips.add(
         GestureDetector(
-          onTap: () => game.selectPreset(i),
+          onTap: () {
+            setState(() => _academy = false);
+            game.selectPreset(i);
+          },
           child: Container(
             margin: const EdgeInsets.only(right: 8),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -399,24 +483,17 @@ class _SpellbookTabState extends State<SpellbookTab> {
     final style = element.style;
     final slot = preset.elementIds.indexOf(element.name);
     final selected = slot >= 0;
-    final unlocked = p.isElementUnlocked(element);
+    final unlocked = _elementUnlocked(p, element);
     void toggle() {
       if (!canEdit || !unlocked) return;
       final ids = List.of(preset.elementIds);
       if (selected) {
         if (ids.length <= 1) return; // keep at least one
         ids.remove(element.name);
-      } else if (ids.length < Progression.usableElementsAtLevel(p.level)) {
+      } else if (ids.length < _elementBudget(p)) {
         ids.add(element.name);
       }
-      game.savePreset(
-        p.activePresetIndex,
-        LoadoutPreset(
-          name: preset.name,
-          elementIds: ids,
-          spellIds: preset.spellIds,
-        ),
-      );
+      _setElements(game, p, preset, ids);
     }
 
     return Opacity(
@@ -535,12 +612,12 @@ class _SpellbookTabState extends State<SpellbookTab> {
   ) {
     final slot = preset.spellIds.indexOf(spell.id);
     final selected = slot >= 0;
-    final unlocked = p.isSpellUnlocked(spell);
+    final unlocked = _spellUnlocked(p, spell);
     final unlockLevel = Progression.unlockLevelOf(spell);
     // [C] The ruled schedule's verdict, shown but not enforced: a spell the
     // player has not reached yet is dimmed and wears its level.
     final plannedLevel = Progression.plannedUnlockLevelOf(spell);
-    final ahead = plannedLevel > p.level;
+    final ahead = plannedLevel > _level(p);
     final kind = spellKindOf(spell);
     void toggle() {
       if (!canEdit || !unlocked) return;
@@ -548,15 +625,13 @@ class _SpellbookTabState extends State<SpellbookTab> {
       if (selected) {
         if (ids.length <= 1) return;
         ids.remove(spell.id);
-      } else if (ids.length < Progression.usableSpellsAtLevel(p.level)) {
+      } else if (ids.length < _spellBudget(p)) {
         ids.add(spell.id);
       }
       _setSpells(game, p, preset, ids);
     }
 
-    final nameColor = !unlocked
-        ? AppColors.textFaint
-        : AppColors.text;
+    final nameColor = !unlocked ? AppColors.textFaint : AppColors.text;
     // Hover shows the same card the ⓘ opens — never a second, plainer text.
     final note = !unlocked
         ? 'Unlocks at level $unlockLevel'
@@ -607,65 +682,65 @@ class _SpellbookTabState extends State<SpellbookTab> {
                     ),
                   ),
                   Row(
-                children: [
-                  Container(width: 3, color: _kindColor(kind)),
-                  const SizedBox(width: 7),
-                  Icon(
-                    unlocked
-                        ? (spellIcons[spell.id] ?? Icons.auto_fix_high)
-                        : Icons.lock,
-                    size: 24,
-                    color: selected ? AppColors.gold : AppColors.textDim,
-                  ),
-                  const SizedBox(width: 9),
-                  Expanded(
-                    // The name alone: the effect line was dropped by ruling
-                    // (2026-08-29) — the tooltip carries it, and a tile that
-                    // repeats its hover text spends its space twice.
-                    child: Text(
-                      spell.name,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: nameColor,
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w600,
+                    children: [
+                      Container(width: 3, color: _kindColor(kind)),
+                      const SizedBox(width: 7),
+                      Icon(
+                        unlocked
+                            ? (spellIcons[spell.id] ?? Icons.auto_fix_high)
+                            : Icons.lock,
+                        size: 24,
+                        color: selected ? AppColors.gold : AppColors.textDim,
                       ),
-                    ),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        // The name alone: the effect line was dropped by ruling
+                        // (2026-08-29) — the tooltip carries it, and a tile that
+                        // repeats its hover text spends its space twice.
+                        child: Text(
+                          spell.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: nameColor,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      // The key chip's cell is ALWAYS reserved (press-stability
+                      // corollary): its box exists whether or not the spell is
+                      // equipped, so equipping never shifts the info dot.
+                      SizedBox(
+                        width: 22,
+                        height: 16,
+                        child: selected
+                            ? Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: AppColors.bg,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: AppColors.border),
+                                ),
+                                child: Text(
+                                  slot < _spellKeyLabels.length
+                                      ? _spellKeyLabels[slot]
+                                      : '•',
+                                  style: const TextStyle(
+                                    color: AppColors.gold,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              )
+                            : null,
+                      ),
+                      if (unlocked)
+                        _infoDot(() => showSpellDetail(context, spell))
+                      else
+                        const SizedBox(width: 6),
+                    ],
                   ),
-                  const SizedBox(width: 6),
-                  // The key chip's cell is ALWAYS reserved (press-stability
-                  // corollary): its box exists whether or not the spell is
-                  // equipped, so equipping never shifts the info dot.
-                  SizedBox(
-                    width: 22,
-                    height: 16,
-                    child: selected
-                        ? Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: AppColors.bg,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Text(
-                              slot < _spellKeyLabels.length
-                                  ? _spellKeyLabels[slot]
-                                  : '•',
-                              style: const TextStyle(
-                                color: AppColors.gold,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                        : null,
-                  ),
-                  if (unlocked)
-                    _infoDot(() => showSpellDetail(context, spell))
-                  else
-                    const SizedBox(width: 6),
-                ],
-              ),
                 ],
               ),
             ),
@@ -685,6 +760,39 @@ Color _kindColor(SpellKind kind) => switch (kind) {
   SpellKind.auxOffense => AppColors.gem,
   SpellKind.offense => AppColors.ember,
 };
+
+/// The Academy loadout's header — a fixed name and the rules in a line,
+/// where a preset would show its editable name.
+class _AcademyHeader extends StatelessWidget {
+  const _AcademyHeader();
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      const Icon(Icons.school, color: AppColors.gem, size: 22),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              'Academy loadout',
+              style: TextStyle(
+                color: AppColors.text,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              'Every spell and element, at level 50. Edit it anywhere.',
+              style: TextStyle(color: AppColors.textDim, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
 
 class _EditableName extends StatelessWidget {
   final LoadoutPreset preset;
@@ -1018,7 +1126,6 @@ class _SpellToolbar extends StatelessWidget {
       ],
     ),
   );
-
 }
 
 /// Pins [child] at its own fixed height. Min and max extent are equal by

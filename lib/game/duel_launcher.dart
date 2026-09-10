@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../screens/duel_screen.dart';
 import '../screens/level_up_screen.dart';
+import 'academy.dart';
 import 'ai_personas.dart';
 import 'duel_controller.dart';
 import 'game_state.dart';
@@ -17,8 +18,17 @@ Future<void> launchDuel(
   required Loadout loadout,
   required OpponentDriver driver,
   required bool campaign,
+  // An Academy bout (academy.dart): level 50, no gear, no belt, no reward.
+  bool academy = false,
 }) async {
   final game = GameStateScope.read(context);
+  // ⭐ One seam resolves level, wardrobe and belt for the mode (pinned by
+  // academy_test) — a launch cannot take the Academy level and keep the belt.
+  final inputs = duelInputsFor(
+    academy: academy,
+    profile: game.profile,
+    equipment: game.equipmentTotals,
+  );
 
   await Navigator.of(context).push(
     MaterialPageRoute<void>(
@@ -26,17 +36,18 @@ Future<void> launchDuel(
         loadout: loadout,
         driver: driver,
         campaign: campaign,
+        academy: academy,
         // Scales the player's health and damage (4%/level, compounding).
         // Without this the duel screen defaults to level 1 and everyone
         // fights at 100 HP regardless of their real level.
-        playerLevel: game.profile.level,
+        playerLevel: inputs.level,
         // ⭐ Gear reaches every duel the player actually fights. Tests that
         // build DuelScreen directly stay at the unequipped baseline.
-        playerGear: game.equipmentTotals,
+        playerGear: inputs.gear,
         // ⭐ And so does the belt (ITEMS §10.3b) — including PvP, which is
         // ruled to allow consumables. The save happens the moment one is
         // drunk, not when the duel ends.
-        belt: game.profile.belt.loaded,
+        belt: inputs.belt,
         onItemConsumed: game.consumeBeltItem,
         // ⚠️ Both levels cross this seam. The player's scales their health
         // and damage; the opponent's scales the XP the win is worth. This is
@@ -46,6 +57,9 @@ Future<void> launchDuel(
           // ⚠️ A fled duel is banked by nobody. It pays no XP, no gold, and
           // records neither a win nor a loss (2026-08-17 ruling).
           if (outcome == DuelOutcome.fled) return;
+          // ⭐ And an Academy bout banks NOTHING at all (ruled 2026-09-10):
+          // no XP, no gold, no win count — the character is untouched.
+          if (academy) return;
           game.recordDuelResult(
             won: outcome == DuelOutcome.won,
             opponentLevel: driver.opponentLevel,
@@ -82,9 +96,15 @@ Future<void> launchAiDuel(
   required Loadout loadout,
   required AiPersona persona,
   required bool campaign,
+  bool academy = false,
 }) => launchDuel(
   context,
   loadout: loadout,
-  driver: LocalAiDriver(persona: persona),
+  // An Academy stand-in fights at the Academy's level like everyone there.
+  driver: LocalAiDriver(
+    persona: persona,
+    levelOverride: academy ? Academy.level : null,
+  ),
   campaign: campaign,
+  academy: academy,
 );

@@ -870,6 +870,53 @@ void main() {
           reason: 'and the spell is still in the book to re-equip');
     });
 
+    testWidgets('⭐ the Academy chip opens the whole book, at any level', (
+      tester,
+    ) async {
+      await _pump(tester); // a new player: level 1
+      final scope = tester.widget<GameStateScope>(find.byType(GameStateScope));
+      final game = scope.notifier!;
+      final before = List.of(game.profile.activePreset.spellIds);
+
+      await tester.tap(find.text('Academy'));
+      await tester.pumpAndSettle();
+      expect(find.text('Academy loadout'), findsOneWidget,
+          reason: 'the chip swaps the editable preset name for the fixed '
+              'Academy header');
+
+      // The default Academy hand is FULL at the cap, so free a slot first
+      // (the mutant a full-hand no-op would otherwise hide: the gate).
+      await tester.tap(_tile(Spellbook.bolt.name));
+      await tester.pumpAndSettle();
+      expect(game.profile.academyPreset.spellIds, isNot(contains('bolt')),
+          reason: 'unequipping from the Academy hand saves to the Academy '
+              'preset');
+      // Reflect is a level-45 spell outside the default hand; a level-1
+      // player equips it here.
+      expect(LoadoutPreset.academy().spellIds, isNot(contains('reflect')),
+          reason: 'this fixture only means something while Reflect is not '
+              'already in the default hand');
+      await tester.tap(_tile(Spellbook.reflect.name));
+      await tester.pumpAndSettle();
+      expect(
+        game.profile.academyPreset.spellIds,
+        contains('reflect'),
+        reason: '⚠️ the mutant this kills: an Academy chip that still runs '
+            'the level gate — the whole point is that it does not',
+      );
+      expect(
+        game.profile.activePreset.spellIds,
+        before,
+        reason: 'and the campaign preset is untouched — the Academy loadout '
+            'is its own',
+      );
+
+      // Back to a preset: the Academy header goes, the level gate returns.
+      await tester.tap(find.text('Loadout I'));
+      await tester.pumpAndSettle();
+      expect(find.text('Academy loadout'), findsNothing);
+    });
+
     testWidgets('a filter matching nothing says so, quietly', (tester) async {
       await _pump(tester);
 

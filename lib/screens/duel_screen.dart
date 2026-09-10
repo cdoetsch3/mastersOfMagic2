@@ -46,6 +46,10 @@ class DuelScreen extends StatefulWidget {
   /// this flag is what keeps the two affordances apart.
   final bool campaign;
 
+  /// An Academy bout (academy.dart): the result card shows no reward, because
+  /// there is none — the launcher never banks it.
+  final bool academy;
+
   /// Called once when a duel ends, with how it ended. Lets the caller grant
   /// XP/gold. Draws report [DuelOutcome.lost]; a campaign escape reports
   /// [DuelOutcome.fled], which pays nothing.
@@ -103,6 +107,7 @@ class DuelScreen extends StatefulWidget {
     required this.loadout,
     required this.driver,
     this.campaign = false,
+    this.academy = false,
     this.onResult,
     this.playerStartingHp,
     this.playerGear = ItemModifiers.none,
@@ -445,7 +450,9 @@ class _DuelScreenState extends State<DuelScreen>
   /// answer, so no dialog interrupts.
   Future<void> _tapSpell(Spell spell) async {
     final effect = spell.effect;
-    if (effect is CleanseEffect && !effect.all && debuffsOn(c.player).length > 1) {
+    if (effect is CleanseEffect &&
+        !effect.all &&
+        debuffsOn(c.player).length > 1) {
       final choice = await CleansePickerDialog.show(context, c.player);
       if (choice == null || !mounted) return;
       _submit(c.castAction(spell, statusChoice: choice.statusId));
@@ -1799,25 +1806,41 @@ class _DuelScreenState extends State<DuelScreen>
                   ),
                 ),
                 const SizedBox(height: 16),
-                _rewardRow(
-                  leading: const CoinIcon(size: 20),
-                  label: 'Gold',
-                  value: goldEarned > 0 ? '+$goldEarned' : '—',
-                ),
-                const SizedBox(height: 8),
-                _rewardRow(
-                  leading: const Icon(
-                    Icons.star_rounded,
-                    color: Color(0xFF7FD4E8),
-                    size: 22,
+                // ⭐ An Academy bout pays nothing (academy.dart) — and the
+                // card says so once, rather than showing two dashes that
+                // read as "you were robbed".
+                if (widget.academy)
+                  _rewardRow(
+                    leading: const Icon(
+                      Icons.school,
+                      color: Color(0xFF8B5CD6),
+                      size: 22,
+                    ),
+                    label: 'Academy',
+                    value: 'nothing gained, nothing lost',
+                    muted: true,
+                  )
+                else ...[
+                  _rewardRow(
+                    leading: const CoinIcon(size: 20),
+                    label: 'Gold',
+                    value: goldEarned > 0 ? '+$goldEarned' : '—',
                   ),
-                  label: 'Experience',
-                  value: xpEarned > 0 ? '+$xpEarned XP' : '—',
-                ),
+                  const SizedBox(height: 8),
+                  _rewardRow(
+                    leading: const Icon(
+                      Icons.star_rounded,
+                      color: Color(0xFF7FD4E8),
+                      size: 22,
+                    ),
+                    label: 'Experience',
+                    value: xpEarned > 0 ? '+$xpEarned XP' : '—',
+                  ),
+                ],
                 // ⚠️ Ranking is a PvP concept. A campaign fight has no
                 // ladder, and showing "coming soon" there is noise about a
                 // feature that will never apply to it.
-                if (!widget.campaign) ...[
+                if (!widget.campaign && !widget.academy) ...[
                   const SizedBox(height: 8),
                   _rewardRow(
                     leading: const Icon(

@@ -64,9 +64,7 @@ class HomeTab extends StatelessWidget {
               const SectionLabel('Continue'),
               GamePanel(
                 onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const SkillsScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => const SkillsScreen()),
                 ),
                 child: Row(
                   children: [
@@ -159,10 +157,52 @@ class HomeTab extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 4, 14, 12),
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
           child: _FindDuelButton(),
         ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+          child: _AcademyButton(),
+        ),
       ],
+    );
+  }
+}
+
+/// The Academy (academy.dart): the level playing field, open to guests. No
+/// preset picker — the Academy has exactly one loadout, edited in the
+/// Spellbook under its own chip.
+class _AcademyButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 44,
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.gem,
+          side: const BorderSide(color: AppColors.gem),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        icon: const Icon(Icons.school, size: 20),
+        label: const Text(
+          'The Academy — level 50, no gear, open to all',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        onPressed: () {
+          final game = GameStateScope.read(context);
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => MatchmakingScreen(
+                loadout: game.profile.academyPreset.toLoadout(),
+                academy: true,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

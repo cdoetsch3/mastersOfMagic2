@@ -12,6 +12,7 @@ import 'economy/shop_catalogue.dart';
 import 'economy/shop_pricing.dart';
 import 'economy/shop_state.dart';
 import 'enemies/bestiary.dart';
+import 'academy.dart';
 import 'enemies/loot.dart';
 import 'items/carrying.dart';
 import 'items/equipping.dart';
@@ -73,6 +74,10 @@ class GameState extends ChangeNotifier {
     for (final preset in state.profile.presets) {
       preset.clampToCaps();
     }
+    state.profile.academyPreset.clampToCaps(
+      elementBudget: Academy.elementSlots,
+      spellBudget: Academy.spellSlots,
+    );
     // ⚠️ …and saves made when a beltless character had two free belt slots.
     state.settleBeltOverflow();
     await state._persist();
@@ -381,9 +386,7 @@ class GameState extends ChangeNotifier {
       final short = input.count - profile.backpack.countOf(input.defId);
       if (short > 0) {
         final def = ItemCatalogue.tryById(input.defId);
-        final name = def == null
-            ? input.defId
-            : ItemCatalogue.displayName(def);
+        final name = def == null ? input.defId : ItemCatalogue.displayName(def);
         return CraftOutcome.refused('Needs $short more $name.');
       }
     }
@@ -393,8 +396,7 @@ class GameState extends ChangeNotifier {
       return CraftOutcome.refused('That cannot be made.');
     }
     assert(
-      recipe.inputs.fold<int>(0, (a, i) => a + i.count) >=
-          recipe.outputCount,
+      recipe.inputs.fold<int>(0, (a, i) => a + i.count) >= recipe.outputCount,
       'a recipe that nets slots would make craft() able to overflow the pack',
     );
 
@@ -1448,6 +1450,17 @@ class GameState extends ChangeNotifier {
     if (index >= 0 && index < profile.presets.length) {
       profile.presets[index] = preset;
     }
+  });
+
+  /// The Academy loadout (academy.dart): editable anywhere — it is not the
+  /// campaign's, so the town rule does not apply — and clamped to the
+  /// Academy's own caps.
+  Future<void> saveAcademyPreset(LoadoutPreset preset) => _mutate(() {
+    profile.academyPreset = preset
+      ..clampToCaps(
+        elementBudget: Academy.elementSlots,
+        spellBudget: Academy.spellSlots,
+      );
   });
 
   /// Adds a new preset if the player has an unlocked slot free.

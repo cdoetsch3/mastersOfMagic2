@@ -77,7 +77,14 @@ class _MastersOfMagicAppState extends State<MastersOfMagicApp> {
     });
   }
 
-  void _onAuthChanged() => _gameState?.syncWithAuth(_auth?.user?.uid);
+  /// ⚠️ An anonymous guest (Academy play without an account) keeps the LOCAL
+  /// profile: their throwaway uid must never seed a cloud character, or every
+  /// guest session would litter users/ with orphans.
+  void _onAuthChanged() {
+    final auth = _auth;
+    final uid = (auth != null && auth.signedIn) ? auth.user!.uid : null;
+    _gameState?.syncWithAuth(uid);
+  }
 
   @override
   void dispose() {
