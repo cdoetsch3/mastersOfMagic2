@@ -36,7 +36,7 @@ abstract final class ContentVersion {
   /// last opened silently discards the other's progress. The gate is the only
   /// thing that stops that split brain — this restructure must not reach
   /// players except in a version-gated release.
-  static const int current = 4;
+  static const int current = 5;
 
   /// The server's copy. ⭐ Public-read, no auth (see `firestore.rules`), so
   /// the check can run at boot rather than waiting on sign-in — a desynced
