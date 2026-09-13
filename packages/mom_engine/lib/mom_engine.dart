@@ -13,6 +13,7 @@ export 'src/bank_stances.dart';
 export 'src/combat_stats.dart';
 export 'src/ladder_ai.dart';
 export 'src/duel.dart';
+export 'src/elo.dart';
 export 'src/element.dart';
 export 'src/events.dart';
 export 'src/mage.dart';
