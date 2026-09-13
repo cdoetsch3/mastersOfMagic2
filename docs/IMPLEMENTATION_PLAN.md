@@ -976,8 +976,12 @@ are still his to overturn.
 - ⚠️ Christian verifies in-browser: the narration timing, the card line,
   the header rating, that a bot match is indistinguishable in feel.
 
-**Wave C 🔨:** `tool/ladder_probe_test.dart` — bot round-robin → implied
-ratings vs seeds (§6). Then GAME_DESIGN §5 / ITEMS §7.4 pointers.
+**Wave C ✅:** `tool/ladder_probe_test.dart` — bot round-robin → implied
+ratings vs seeds (§6); ~2 s at default, `LADDER_PROBE_DEEP=1` for N=20.
+⭐ First reading (LADDER §6.1): geared ORDER right (ρ 0.99) but the
+12/level slope is 4–8× too flat; Academy intelligence-only seeds predict
+poorly (ρ 0.35, Sable −332). Two new §8 decisions (7, 8) for Christian
+before any seed moves. Doc pointers landed (e06ee6f).
 
 ## Deferred / banked — do not build without an explicit ask
 

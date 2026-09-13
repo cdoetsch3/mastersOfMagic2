@@ -240,6 +240,45 @@ write. 📝 The sim harness should gain a `--ladder` mode that plays every bot
 against every bot 200× and prints implied ratings, so the seeds can be sanity-
 checked *before* players do it for us.
 
+### How to read the ladder probe
+
+That `--ladder` mode is `tool/ladder_probe_test.dart` — run it with
+`flutter test tool/ladder_probe_test.dart` (a tiny default pass, cheap
+enough for every `flutter test`), or `LADDER_PROBE_DEEP=1 flutter test
+tool/ladder_probe_test.dart` for the report actually worth reading. It plays
+every bot against every other bot, on both ladders, and solves each bot's
+**implied rating** — the rating the round robin's own results say it should
+have, from the same Elo math the live ladder uses. `drift` is implied minus
+seed: near zero means the seed is about right; a large positive drift means
+the bot is winning more than its seed predicts (under-rated — its kit or
+gear outperforms its intelligence); a large negative drift means the
+opposite (over-rated). ⚠️ `|drift| > 150` prints a ⚠️ next to that row — a
+nudge to go look at the bot's kit, not an automatic reseed.
+
+### 6.1 First reading (2026-09-13, `LADDER_PROBE_DEEP=1`, N = 20/pair) ❓
+
+| Ladder | Spearman(seed, implied) | max \|drift\| | What it says |
+|---|---|---|---|
+| Geared | 0.991 | 2416 | The ORDER is right; the SLOPE is not. Implied ratings span ~4900 points from Wick to Al'Dorian; the seed spans 768. Twelve points per level is roughly 4–8× too flat. |
+| Academy | 0.351 | 332 | Intelligence alone is a weak predictor of Academy strength. Kit shape dominates: Sable's DoT kit sits 332 below her seed, Rook's cheap-pressure kit 287 above. |
+
+Consequences, each a designer call:
+1. **Geared band vs level.** With the flat slope a ±100 band around a
+   level-10 player's seed spans bots from level 5 to 17 — and the probe says
+   that is ~1400 Elo of real strength. Either (a) steepen the geared seed to
+   ~50/level so the band does the fence's job within one search (Law 2
+   intact), or (b) add a level fence (±5) to the geared search. Recommend
+   (a): it keeps the search single-axis and a player who has drifted far
+   from their level's seed is exactly the player Elo should be correcting.
+   ⚠️ (a) also moves the PLAYER seed formula, since it must sit on the same
+   line.
+2. **Academy seeds from the probe.** Replace `1200 + 60·(int − 5)` with the
+   probe's implied Academy ratings, rounded to 10, re-anchored to mean 1200.
+   The ±300 clamp binds on Sable under the current seed — that is the clamp
+   doing its job on a mis-seeded bot, and the fix is the seed.
+3. **Re-run after every roster or spell-balance change.** The probe is ~2 s
+   at default and is in the normal `flutter test` sweep.
+
 ## 7. Build shape (✅ "sounds fine")
 
 Lanes, engine-first:
@@ -268,3 +307,7 @@ Roughly one batch. Lanes 1–4 are subagent-shaped; 5–6 are mine.
 4. The roster (§5): names, titles, archetype choices, gear tiers.
 5. Bot think-time flat, or position-aware (§4.2)?
 6. Does a player's rating show on the *home* tab or only on the profile?
+   (Built: home card + duel header; revisit if it clutters.)
+7. **Geared seed slope** (§6.1): steepen to ~50/level, or add a level fence?
+8. **Academy seeds** (§6.1): keep the intelligence formula, or reseed from
+   the probe's implied ratings?
