@@ -73,6 +73,13 @@ double blunderChanceForIntelligence(int intelligence) =>
     blunderRateForIntelligence(intelligence);
 
 /// The Phase-1 roster, weakest to strongest.
+///
+/// ⭐ **The Ladder's 27-bot pool now lives in `ladder_bots.dart`
+/// (`LadderRoster`)**, not here. `AiRoster` remains the campaign/practice
+/// list — [campaignFoe], [strongestAtOrBelow] and [nearestToLevel] still
+/// read from it. `LadderRoster` borrows five of these personas by id
+/// (Wick, Brightgale, Thornwall, Morwen, Al'Dorian) rather than duplicating
+/// them, so this list staying small and hand-curated is still the point.
 abstract final class AiRoster {
   // Loadouts scale with level in BOTH kit and size. Elements and spells share
   // one slot pool (PROGRESSION_DESIGN §1), and each persona fills exactly the
