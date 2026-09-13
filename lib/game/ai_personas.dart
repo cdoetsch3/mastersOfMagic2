@@ -26,14 +26,10 @@ class AiPersona {
   /// ladder in GAME_DESIGN §6b. 1 flicks forever · 3 is random · 5 is
   /// counter-aware · 7 predicts · 9 is genuinely sharp · 10 is optimal.
   ///
-  /// Deliberately separate from [aggression] and [caution], which describe how
-  /// an opponent *prefers* to play. Skill and personality are different axes:
-  /// a cautious level-9 and a reckless level-9 are both hard, differently.
+  /// ⚠️ Used to carry `aggression`/`caution` personality dials alongside this,
+  /// but `LadderAi` never reads them (LADDER §4) — they were dormant and are
+  /// deleted. Skill is the only axis left.
   final int intelligence;
-
-  /// Personality dials (see TunableAi) — orthogonal to [intelligence].
-  final double aggression;
-  final double caution;
 
   const AiPersona({
     required this.id,
@@ -43,8 +39,6 @@ class AiPersona {
     required this.intelligence,
     required this.apparel,
     required this.loadout,
-    required this.aggression,
-    required this.caution,
   });
 
   /// Blunder rate implied by [intelligence]. Retained for personas that still
@@ -214,8 +208,6 @@ abstract final class AiRoster {
       intelligence: 1, // flicks and hopes — the tutorial dummy
       apparel: MageApparel.apprenticeBlue,
       loadout: _novice,
-      aggression: 0.5,
-      caution: 0.15,
     ),
     AiPersona(
       id: 'brightgale',
@@ -232,8 +224,6 @@ abstract final class AiRoster {
         boots: const Color(0xFF2C2230),
       ),
       loadout: _skirmisher,
-      aggression: 0.55,
-      caution: 0.25,
     ),
     AiPersona(
       id: 'thornwall',
@@ -250,8 +240,6 @@ abstract final class AiRoster {
         boots: const Color(0xFF3A2E20),
       ),
       loadout: _warden,
-      aggression: 0.2,
-      caution: 0.7, // the defensive one — same skill, different temperament
     ),
     AiPersona(
       id: 'morwen',
@@ -261,8 +249,6 @@ abstract final class AiRoster {
       intelligence: 7, // starts predicting what you are charging toward
       apparel: MageApparel.duskWitch,
       loadout: _duelist,
-      aggression: 0.45,
-      caution: 0.45,
     ),
     AiPersona(
       id: 'aldorian',
@@ -279,8 +265,6 @@ abstract final class AiRoster {
         boots: const Color(0xFF4A4270),
       ),
       loadout: _lastWarden,
-      aggression: 0.4,
-      caution: 0.5,
     ),
     AiPersona(
       id: 'procarius',
@@ -297,8 +281,6 @@ abstract final class AiRoster {
         boots: const Color(0xFF141021),
       ),
       loadout: _archmage,
-      aggression: 0.4,
-      caution: 0.55,
     ),
   ];
 
@@ -322,8 +304,6 @@ abstract final class AiRoster {
       intelligence: base.intelligence,
       apparel: base.apparel,
       loadout: base.loadout,
-      aggression: base.aggression,
-      caution: base.caution,
     );
   }
 

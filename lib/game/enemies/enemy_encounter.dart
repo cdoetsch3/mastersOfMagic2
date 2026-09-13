@@ -33,10 +33,6 @@ class EnemyEncounter {
     intelligence: def.archetype.intelligence,
     apparel: _apparelFor(def),
     loadout: Loadout(elements: def.elements, spells: def.moves),
-    // ⚠️ Dead fields on LadderAi (see IMPLEMENTATION_PLAN); passed for the
-    // constructor's sake, not because they do anything.
-    aggression: 0.5,
-    caution: 0.5,
   );
 }
 

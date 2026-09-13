@@ -10,6 +10,7 @@ import 'enemies/enemy_def.dart';
 import 'firestore_rest.dart';
 import 'items/belt_potions.dart';
 import 'items/item_def.dart';
+import 'ladder/think_time.dart';
 import 'mage_apparel.dart';
 
 /// What one turn's exchange produced: the opponent's action, plus (for
@@ -117,10 +118,23 @@ class LocalAiDriver implements OpponentDriver {
   /// an Academy bout (academy.dart) — null plays the persona at its own.
   final int? levelOverride;
 
+  /// ⭐ A LADDER bot's wardrobe (LADDER §4): item ids + Quality, derived to
+  /// `ItemModifiers` exactly as a player's own gear is. Defaults to
+  /// [ItemModifiers.none] so every existing caller (campaign, practice) is
+  /// unaffected — only ladder construction ever passes a real one.
+  final ItemModifiers gear;
+
+  /// ⭐ LADDER §4.2 — when set, [exchangeTurn] waits this long before
+  /// returning the brain's action, so a bot never answers instantly. Null
+  /// (every non-ladder caller: campaign, practice) means no delay at all.
+  final ThinkTime? thinkTime;
+
   LocalAiDriver({
     required this.persona,
     this.enemy,
     this.levelOverride,
+    this.gear = ItemModifiers.none,
+    this.thinkTime,
     Random? rng,
   }) : rng = rng ?? Random();
 
@@ -148,11 +162,15 @@ class LocalAiDriver implements OpponentDriver {
   @override
   int get opponentLevel => levelOverride ?? persona.level;
 
-  /// ⚠️ **Never gear.** A persona's difficulty is its brain and its level, and
-  /// a bestiary entry's is its archetype — items are the player's lane alone.
-  /// (Spelled out rather than inherited: `implements` grants no defaults.)
+  /// ⚠️ **A persona or bestiary enemy wears none — archetype stats are their
+  /// lane** (LADDER §5). A LADDER bot is different: it wears a real
+  /// wardrobe derived from catalogue items exactly like a player's does
+  /// (LADDER §4), and that wardrobe arrives through [gear]. But [enemy]
+  /// still wins outright: whenever a bestiary entry is set, this returns
+  /// [ItemModifiers.none] regardless of [gear], because an archetype and a
+  /// wardrobe must never stack on one body (see the file header comments).
   @override
-  ItemModifiers get opponentGear => ItemModifiers.none;
+  ItemModifiers get opponentGear => enemy != null ? ItemModifiers.none : gear;
 
   @override
   MageApparel get opponentApparel => persona.apparel;
@@ -178,6 +196,11 @@ class LocalAiDriver implements OpponentDriver {
         'enemies do not carry items.',
       );
     }
+    // ⭐ LADDER §4.2 — a bot "thinks" before committing, redrawn every turn.
+    // Null for every non-ladder caller (campaign, practice), so nothing
+    // about those duels changes.
+    final delay = thinkTime?.next(rng);
+    if (delay != null) await Future<void>.delayed(delay);
     return TurnExchange(action);
   }
 

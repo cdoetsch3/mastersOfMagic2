@@ -428,8 +428,6 @@ class _CheatingPersona extends AiPersona {
         intelligence: 5,
         apparel: MageApparel.duskWitch,
         loadout: Loadout.starter,
-        aggression: 0.5,
-        caution: 0.5,
       );
 
   @override
