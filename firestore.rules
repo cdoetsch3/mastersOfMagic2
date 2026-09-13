@@ -84,10 +84,10 @@ service cloud.firestore {
         ])
         // A freshly-created bot's ratings must already sit in a sane range —
         // there is no `resource.data` yet to diff against.
-        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ratingGeared'])
+        && (!('ratingGeared' in request.resource.data)
             || (request.resource.data.ratingGeared >= 0
                 && request.resource.data.ratingGeared <= 3000))
-        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ratingAcademy'])
+        && (!('ratingAcademy' in request.resource.data)
             || (request.resource.data.ratingAcademy >= 0
                 && request.resource.data.ratingAcademy <= 3000));
 
