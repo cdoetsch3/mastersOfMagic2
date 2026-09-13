@@ -935,6 +935,14 @@ stats; ✅ the login content-version gate is live and seeded):
 
 ---
 
+## 📝 The Ladder — rated matchmaking + bot pool (design drafted 2026-09-13)
+
+`docs/LADDER_DESIGN.md`. Replaces the nearest-level persona fallback with one
+rated queue (chess Elo, FIDE K schedule, widening bands, humans before bots)
+and a 27-bot pool built on the campaign archetypes, geared from the item
+catalogue, with per-ladder ratings in Firestore `bots/*`. Awaiting Christian's
+red-pen (eight open decisions in §8) before any code moves.
+
 ## Deferred / banked — do not build without an explicit ask
 
 - **📝 Creature sprites: the system works, the ART does not.** Built
