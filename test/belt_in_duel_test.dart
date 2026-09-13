@@ -391,6 +391,8 @@ class _FakeDriver implements OpponentDriver {
   @override
   int get opponentLevel => 1;
   @override
+  int get opponentRating => 1200;
+  @override
   ItemModifiers get opponentGear => ItemModifiers.none;
   @override
   MageApparel get opponentApparel => MageApparel.duskWitch;

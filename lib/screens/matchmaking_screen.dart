@@ -13,6 +13,7 @@ import '../game/loadout.dart';
 import '../game/matchmaking.dart';
 import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
+import '../ui/search_narration.dart';
 import 'account_screen.dart';
 
 /// The matchmaking lobby: quick match (one rated queue of humans and ladder
@@ -52,6 +53,18 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
   String? _roomCode;
   String? _error;
   final _codeField = TextEditingController();
+
+  /// When the current search began — the anchor `_SearchingView` measures
+  /// against before a match exists (LADDER §3). Lazily stamped by
+  /// [_searchingView] and cleared by [build] whenever the search isn't
+  /// running, so the *next* search gets a fresh timestamp instead of
+  /// inheriting this one.
+  DateTime? _searchStartedAt;
+
+  /// When `quickMatch` returned a result (human or bot) — the anchor for the
+  /// 1.2s "Found someone!" hold. Set by [_foundHold]; cleared the same way as
+  /// [_searchStartedAt].
+  DateTime? _matchedAt;
 
   @override
   void initState() {
@@ -97,6 +110,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         gear: game.equipmentTotals,
         mode: _mode,
       );
+      await _foundHold();
       if (!mounted) return;
       setState(() => _busy = _Busy.none);
       if (result.isHuman) {
@@ -126,6 +140,17 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         });
       }
     }
+  }
+
+  /// ⭐ LADDER §3's no-leak rule: stamps [_matchedAt] so `_SearchingView`
+  /// switches to "Found someone!", then holds for a fixed 1.2s before
+  /// `_quickMatch` is allowed to move on to loading the duel — the same
+  /// pause for a bot's instant driver build as for a human handshake.
+  /// The ONLY thing `_quickMatch` calls into this file for.
+  Future<void> _foundHold() async {
+    if (!mounted) return;
+    setState(() => _matchedAt = DateTime.now());
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
   }
 
   /// ⭐ Banner: nothing on the duel screen that follows says the opponent is
@@ -292,6 +317,14 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ⚠️ Cleared whenever a search isn't in flight, so the *next* quick match
+    // stamps a fresh `_searchStartedAt` in [_searchingView] rather than
+    // reusing this one's — mutated outside setState because this only ever
+    // narrows a rebuild that's already happening, never triggers one.
+    if (_busy != _Busy.searching) {
+      _searchStartedAt = null;
+      _matchedAt = null;
+    }
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
@@ -313,7 +346,10 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     );
   }
 
-  Widget _searchingView() => const _SearchingView();
+  Widget _searchingView() {
+    final startedAt = _searchStartedAt ??= DateTime.now();
+    return _SearchingView(startedAt: startedAt, matchedAt: _matchedAt);
+  }
 
   Widget _hostingView() {
     return Column(
@@ -597,12 +633,19 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
   }
 }
 
-/// The quick-match waiting screen: a spinner plus one gameplay tip so the
-/// ~10s search for an opponent teaches a mechanic instead of feeling dead.
-/// A single tip (varied per search) — they're long enough that one is a
-/// comfortable read in the time available.
+/// The quick-match waiting screen: a status line that advances with the
+/// search (LADDER_DESIGN §3), plus one gameplay tip so the ~10s wait teaches
+/// a mechanic instead of feeling dead. A single tip (varied per search) —
+/// they're long enough that one is a comfortable read in the time available.
+///
+/// ⭐ [startedAt]/[matchedAt] are constructor-injected rather than read from
+/// `DateTime.now()` internally, so a widget test can pin both and assert an
+/// exact phase instead of racing the wall clock (LADDER §3).
 class _SearchingView extends StatefulWidget {
-  const _SearchingView();
+  final DateTime startedAt;
+  final DateTime? matchedAt;
+
+  const _SearchingView({required this.startedAt, this.matchedAt});
 
   @override
   State<_SearchingView> createState() => _SearchingViewState();
@@ -675,14 +718,11 @@ class _SearchingViewState extends State<_SearchingView> {
         children: [
           const CircularProgressIndicator(color: AppColors.gold),
           const SizedBox(height: 18),
-          const Text(
-            'Searching for an opponent...',
-            style: TextStyle(color: AppColors.text, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'If no mage answers, a rival steps in.',
-            style: TextStyle(color: AppColors.textDim, fontSize: 12),
+          // ⭐ The ticking phase label lives in ui/search_narration.dart
+          // (LADDER §3) so it can be pumped and asserted on by itself.
+          SearchStatusLine(
+            startedAt: widget.startedAt,
+            matchedAt: widget.matchedAt,
           ),
           const SizedBox(height: 28),
           GamePanel(

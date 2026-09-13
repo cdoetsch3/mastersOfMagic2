@@ -28,6 +28,9 @@ class FakeRemoteDriver implements OpponentDriver {
   int opponentLevel = 1;
 
   @override
+  int get opponentRating => 1200;
+
+  @override
   ItemModifiers opponentGear = ItemModifiers.none;
 
   bool surrenderReported = false;

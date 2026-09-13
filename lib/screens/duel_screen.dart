@@ -1344,6 +1344,7 @@ class _DuelScreenState extends State<DuelScreen>
     return _StatusPanel(
       name: c.enemy.name,
       level: c.enemy.level,
+      rating: widget.driver.opponentRating,
       hp: c.shownEnemyHp,
       maxHp: c.enemy.maxHp,
       charge: c.shownEnemyCharge,
@@ -2059,6 +2060,12 @@ class _StatusPanel extends StatelessWidget {
   /// Before this, nothing in the arena distinguished a level-5 boss from a
   /// level-1 fawn except an HP bar the player has no baseline for.
   final int level;
+
+  /// ⭐ LADDER_DESIGN §7 item 5: the opponent's ladder rating, shown next to
+  /// their name/level exactly like a human's would be (§1 law 3 — nothing
+  /// distinguishes a bot's nameplate from a person's). Null for the player's
+  /// own panel, which has never shown a rating and isn't the ask here.
+  final int? rating;
   final int hp;
   final int maxHp;
   final int charge;
@@ -2080,6 +2087,7 @@ class _StatusPanel extends StatelessWidget {
   const _StatusPanel({
     required this.name,
     required this.level,
+    this.rating,
     required this.hp,
     required this.maxHp,
     required this.charge,
@@ -2130,6 +2138,17 @@ class _StatusPanel extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               _levelPill(),
+              if (rating != null) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '· $rating',
+                  style: const TextStyle(
+                    color: Color(0xFF9C93C4),
+                    fontSize: 11,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
               const SizedBox(width: 6),
               if (barsVeiled)
                 _veilPill()

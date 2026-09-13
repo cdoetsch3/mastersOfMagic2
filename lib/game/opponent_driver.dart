@@ -34,6 +34,13 @@ abstract interface class OpponentDriver {
   /// mage rather than a level-1 one with a good brain.
   int get opponentLevel;
 
+  /// The opponent's Elo on whichever ladder this duel is (LADDER_DESIGN §2),
+  /// shown next to their name/level in the arena (LADDER §7 build shape,
+  /// item 5). Defaults to the Academy/Geared seed floor of 1200 so every
+  /// existing caller (campaign, practice) that never sets one still renders
+  /// something sane rather than an empty pill.
+  int get opponentRating => 1200;
+
   /// What the opponent's equipment adds up to (ITEMS §7.4 — current PvP is
   /// the GEARED ladder, so their wardrobe is part of the fight).
   ///
@@ -129,12 +136,22 @@ class LocalAiDriver implements OpponentDriver {
   /// (every non-ladder caller: campaign, practice) means no delay at all.
   final ThinkTime? thinkTime;
 
+  /// ⭐ LADDER §2 — this bot's Elo on whichever ladder it was drawn from.
+  /// Defaults to 1200 (the Academy seed / the [OpponentDriver] floor) so
+  /// campaign and practice callers, which never pass one, render the same
+  /// number the abstract getter already promises.
+  final int rating;
+
+  @override
+  int get opponentRating => rating;
+
   LocalAiDriver({
     required this.persona,
     this.enemy,
     this.levelOverride,
     this.gear = ItemModifiers.none,
     this.thinkTime,
+    this.rating = 1200,
     Random? rng,
   }) : rng = rng ?? Random();
 
@@ -235,6 +252,12 @@ class RemoteDuelDriver implements OpponentDriver {
   /// their gear wire (`opponentGear`), never from this seam.
   @override
   EnemyCombatStats get opponentCombatStats => EnemyCombatStats.none;
+
+  // 📝 wired at merge — the other lane is adding `opponentRating` as a
+  // required constructor param on this class; landing that alongside this
+  // fixed default would collide, so this stays a stub until the merge.
+  @override
+  int get opponentRating => 1200;
 
   final String roomId;
   final bool isHost;

@@ -306,6 +306,20 @@ class _XpCard extends StatelessWidget {
             '${p.duelsWon}W · ${p.duelsLost}L',
             style: const TextStyle(color: AppColors.textFaint, fontSize: 11),
           ),
+          const SizedBox(height: 2),
+          // ⭐ LADDER_DESIGN §8 item 6: a player's rating shows on the home
+          // tab, not just the profile. ⚠️ Always rendered — even before this
+          // character has a rating — so the card's height never shifts the
+          // instant a first rated match lands (press-stability: nothing here
+          // is a control, but the row above it still shouldn't jump).
+          Text(
+            'Ladder ${p.ratingGeared ?? '—'} · Academy ${p.ratingAcademy ?? '—'}',
+            style: const TextStyle(
+              color: AppColors.textFaint,
+              fontSize: 11,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
         ],
       ),
     );
