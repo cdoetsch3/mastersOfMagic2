@@ -410,7 +410,9 @@ MoM2 adds **spell slots** unlocked via leveling.
 
 ## 5. Game Modes
 
-- ✅ **Online 1v1 PvP** with **two Elo ladders** (per ITEMS_DESIGN §7.4):
+- ✅ **Online 1v1 PvP** with **two Elo ladders** (per ITEMS_DESIGN §7.4;
+  ⭐ built 2026-09-13 — the numbers, the search and the 27-bot pool are in
+  `LADDER_DESIGN.md`):
   **ranked counts gear** (matchmaking should seed on gear power + Elo), and
   **Academy mode** strips all gear and consumables for a separate
   **skills-only Elo**. ❓ Does Academy grant XP / quest credit?

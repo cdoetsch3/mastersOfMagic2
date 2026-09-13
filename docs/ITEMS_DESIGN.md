@@ -1211,6 +1211,11 @@ put a high-impact proc (charge strip, Blind) on a per-hit trigger.
 
 ### 7.4 PvP and the gear gap ✅ (two ladders)
 
+⭐ **Built 2026-09-13.** Chess Elo, the widening band search, the geared
+seed-from-level that answers the "gear power should feed matchmaking" note
+below, and the bot pool that fills an empty queue are all specified in
+`LADDER_DESIGN.md`; this section stays as the *why*.
+
 - ✅ **Ranked counts gear.** A better-geared mage will hold a higher Elo than
   an equally skilled mage with worse gear. Gear is part of the competitive
   investment, not noise to be filtered out.
