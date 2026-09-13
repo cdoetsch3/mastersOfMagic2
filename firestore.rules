@@ -55,6 +55,85 @@ service cloud.firestore {
                 && request.resource.data.claimedBy == request.auth.uid));
     }
 
+    // The ladder bot pool (LADDER_DESIGN §4.1). A duel against a bot runs
+    // entirely on the player's client against LocalAiDriver — nothing about
+    // the match itself is stored — so the only shared write is the post-match
+    // rating/record update, applied as an additive field-transform increment
+    // (FirestoreRest.increment) so two simultaneous finishes against the same
+    // bot both land instead of racing a read-modify-write.
+    //
+    // ⚠️ Firestore evaluates rules AFTER a fieldTransform is applied, against
+    // the resulting document — so these per-field bounds apply to `increment`
+    // writes exactly as they would to a plain `update`. There is no separate
+    // "transform" rule to write.
+    match /bots/{botId} {
+      // Any signed-in user may read the pool, anonymous guests included —
+      // the Academy is the one mode a guest without an account can play.
+      allow read: if request.auth != null;
+
+      allow delete: if false;
+
+      // ⭐ Every mutable field is spelled out — Firestore rules have no
+      // loops — and a write may touch ONLY these six.
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly([
+          'ratingGeared', 'ratingAcademy',
+          'winsGeared', 'lossesGeared',
+          'winsAcademy', 'lossesAcademy',
+          'updatedAt',
+        ])
+        // A freshly-created bot's ratings must already sit in a sane range —
+        // there is no `resource.data` yet to diff against.
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ratingGeared'])
+            || (request.resource.data.ratingGeared >= 0
+                && request.resource.data.ratingGeared <= 3000))
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ratingAcademy'])
+            || (request.resource.data.ratingAcademy >= 0
+                && request.resource.data.ratingAcademy <= 3000));
+
+      // ⚠️ Each bound below is gated on the key actually CHANGING in this
+      // write (affectedKeys), not on it merely existing in the post-write
+      // document — after a transform the whole document is present, so an
+      // Academy result landing on a bot that already has `winsGeared` would
+      // otherwise be asked to bump winsGeared too, and be denied.
+      //
+      // ⚠️ Every existing-value read below goes through `.get(field, 0)`,
+      // never bare `resource.data.field` — a bot document seeded with only
+      // its ratings (the common case; wins/losses start absent and appear on
+      // the first increment) would otherwise throw on an undefined key the
+      // moment `winsGeared` first goes from absent to 1, turning a legitimate
+      // first win into a denied write.
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'ratingGeared', 'ratingAcademy',
+          'winsGeared', 'lossesGeared',
+          'winsAcademy', 'lossesAcademy',
+          'updatedAt',
+        ])
+        // |Δrating| ≤ 40 — the most a single K-40 game can move a rating
+        // (LADDER_DESIGN §2). Each check is guarded so a write that doesn't
+        // touch that field is unaffected by it.
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ratingGeared'])
+            || math.abs(request.resource.data.ratingGeared
+                - resource.data.get('ratingGeared', 0)) <= 40)
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ratingAcademy'])
+            || math.abs(request.resource.data.ratingAcademy
+                - resource.data.get('ratingAcademy', 0)) <= 40)
+        // Win/loss counters only ever move by exactly +1 per match.
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['winsGeared'])
+            || request.resource.data.winsGeared
+                == resource.data.get('winsGeared', 0) + 1)
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['lossesGeared'])
+            || request.resource.data.lossesGeared
+                == resource.data.get('lossesGeared', 0) + 1)
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['winsAcademy'])
+            || request.resource.data.winsAcademy
+                == resource.data.get('winsAcademy', 0) + 1)
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['lossesAcademy'])
+            || request.resource.data.lossesAcademy
+                == resource.data.get('lossesAcademy', 0) + 1);
+    }
+
     // Duel rooms + their turn documents. Room codes are unguessable secrets,
     // so signed-in access is the v1 trust model (commit-reveal handles move
     // secrecy; a server-authoritative layer can come later for ranked play).

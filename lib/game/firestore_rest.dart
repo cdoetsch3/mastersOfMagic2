@@ -15,12 +15,30 @@ class FirestoreRest {
   static const _project = 'mastersofmagic2';
   static const _base =
       'https://firestore.googleapis.com/v1/projects/$_project/databases/(default)/documents';
+  static const _documentsRoot =
+      'projects/$_project/databases/(default)/documents';
+
+  /// ⚠️ **Test seam.** Every call in this class goes through this client
+  /// instead of the bare top-level `http.get`/`post`/etc functions, so a test
+  /// can swap in a `package:http/testing.dart` `MockClient` (`FirestoreRest
+  /// .client = MockClient(...)`) and assert on the request without a network
+  /// call. Production never sets this — it stays the default `http.Client()`.
+  static http.Client client = http.Client();
+
+  /// ⚠️ **Second test seam.** Reading the ID token normally goes through
+  /// `FirebaseAuth.instance`, which throws `[core/no-app]` when no Firebase
+  /// app has been initialized — true of a plain `flutter test` run that
+  /// never calls `Firebase.initializeApp()`. A test that only cares about
+  /// the request shape (e.g. [increment]'s commit body) swaps this for
+  /// `() async => null` instead of standing up a real Firebase app.
+  /// Production never sets this — it stays the default [_token].
+  static Future<String?> Function() tokenProvider = _token;
 
   static Future<String?> _token() =>
       FirebaseAuth.instance.currentUser?.getIdToken() ?? Future.value(null);
 
   static Future<Map<String, String>> _headers() async {
-    final token = await _token();
+    final token = await tokenProvider();
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
@@ -29,7 +47,7 @@ class FirestoreRest {
 
   /// Reads a document. Returns its decoded fields, or null if missing.
   static Future<Map<String, dynamic>?> get(String path) async {
-    final res = await http.get(
+    final res = await client.get(
       Uri.parse('$_base/$path'),
       headers: await _headers(),
     );
@@ -51,10 +69,50 @@ class FirestoreRest {
     final mask = (updateOnly ?? data.keys.toList())
         .map((f) => 'updateMask.fieldPaths=${Uri.encodeQueryComponent(f)}')
         .join('&');
-    final res = await http.patch(
+    final res = await client.patch(
       Uri.parse('$_base/$path?$mask'),
       headers: await _headers(),
       body: jsonEncode({'fields': encodeFields(data)}),
+    );
+    if (res.statusCode != 200) {
+      throw FirestoreRestException(res.statusCode, res.body);
+    }
+  }
+
+  /// Atomically adds [deltas] (field → integer) to a document, creating it if
+  /// absent, via the REST `:commit` endpoint with `fieldTransforms`
+  /// (LADDER §4.1). ⭐ Additive on the server, so two clients finishing
+  /// against the same bot at the same moment both land. Optional [set]: plain
+  /// fields written in the same commit (e.g. updatedAt).
+  static Future<void> increment(
+    String path,
+    Map<String, int> deltas, {
+    Map<String, dynamic>? set,
+  }) async {
+    final name = '$_documentsRoot/$path';
+    final writes = <Map<String, dynamic>>[
+      {
+        'transform': {
+          'document': name,
+          'fieldTransforms': [
+            for (final e in deltas.entries)
+              {
+                'fieldPath': e.key,
+                'increment': {'integerValue': e.value.toString()},
+              },
+          ],
+        },
+      },
+      if (set != null && set.isNotEmpty)
+        {
+          'update': {'name': name, 'fields': encodeFields(set)},
+          'updateMask': {'fieldPaths': set.keys.toList()},
+        },
+    ];
+    final res = await client.post(
+      Uri.parse('$_base:commit'),
+      headers: await _headers(),
+      body: jsonEncode({'writes': writes}),
     );
     if (res.statusCode != 200) {
       throw FirestoreRestException(res.statusCode, res.body);
@@ -68,7 +126,7 @@ class FirestoreRest {
     String docId,
     Map<String, dynamic> data,
   ) async {
-    final res = await http.post(
+    final res = await client.post(
       Uri.parse(
         '$_base/$collection?documentId=$docId&currentDocument.exists=false',
       ),
@@ -81,7 +139,7 @@ class FirestoreRest {
   }
 
   static Future<void> delete(String path) async {
-    await http.delete(Uri.parse('$_base/$path'), headers: await _headers());
+    await client.delete(Uri.parse('$_base/$path'), headers: await _headers());
   }
 
   /// Lists every document in a collection, by id. A collection that has never
@@ -100,7 +158,7 @@ class FirestoreRest {
   static Future<Map<String, Map<String, dynamic>>> list(
     String collectionPath,
   ) async {
-    final res = await http.get(
+    final res = await client.get(
       Uri.parse('$_base/$collectionPath?pageSize=$_listPageSize'),
       headers: await _headers(),
     );
@@ -149,7 +207,7 @@ class FirestoreRest {
           },
         },
     };
-    final res = await http.post(
+    final res = await client.post(
       Uri.parse('$_base:runQuery'),
       headers: await _headers(),
       body: jsonEncode({'structuredQuery': structured}),

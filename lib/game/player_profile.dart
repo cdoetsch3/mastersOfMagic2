@@ -271,6 +271,46 @@ class PlayerProfile {
   int duelsWon;
   int duelsLost;
 
+  /// This character's Elo on the Geared ladder (LADDER_DESIGN §2), or null.
+  ///
+  /// ⭐ **Null means "never played a rated match on this ladder" — it is not
+  /// a default.** The Geared seed depends on level and gear at the moment of
+  /// the *first* rated match (`1080 + 12 × level + 75`), so there is no fixed
+  /// number to default to here; computing the seed is the caller's job, the
+  /// first time it reads null.
+  int? ratingGeared;
+
+  /// This character's Elo on the Academy ladder (LADDER_DESIGN §2), or null
+  /// for the same reason as [ratingGeared] — though the Academy seed (1200)
+  /// happens to be fixed, nulling it keeps the two ladders symmetric and lets
+  /// "never played" stay a single, ladder-agnostic check.
+  int? ratingAcademy;
+
+  /// Rated games played on the Geared ladder — feeds the LADDER §2 K
+  /// schedule (40 for the first 30, then 20).
+  int ratedGamesGeared;
+
+  /// Rated games played on the Academy ladder — same K schedule, separately.
+  int ratedGamesAcademy;
+
+  /// The highest [ratingGeared] this character has ever reached — LADDER §2's
+  /// K-10 rule triggers once a player has *ever* reached 2400, not merely
+  /// sits there now, so the peak must survive a later drop.
+  int peakGeared;
+
+  /// The highest [ratingAcademy] has ever reached. Symmetric with
+  /// [peakGeared].
+  int peakAcademy;
+
+  /// Academy ladder wins. ⚠️ **A separate record from [duelsWon].**
+  /// [duelsWon]/[duelsLost] are the geared/campaign record; the Academy plays
+  /// at a fixed level with no gear, so it earns its own win/loss count rather
+  /// than folding into the number a level-30 grind produced.
+  int academyWins;
+
+  /// Academy ladder losses. See [academyWins].
+  int academyLosses;
+
   /// When this player was last active, for the friends list's presence dot.
   /// Refreshed whenever the save is written, so it tracks real activity rather
   /// than merely having the app open. Null for a save from before presence
@@ -301,6 +341,14 @@ class PlayerProfile {
     this.gender = PlayerGender.unspecified,
     this.duelsWon = 0,
     this.duelsLost = 0,
+    this.ratingGeared,
+    this.ratingAcademy,
+    this.ratedGamesGeared = 0,
+    this.ratedGamesAcademy = 0,
+    this.peakGeared = 0,
+    this.peakAcademy = 0,
+    this.academyWins = 0,
+    this.academyLosses = 0,
   }) : locationId = locationId ?? World.startLocationId,
        discoveredLocationIds = discoveredLocationIds ?? {World.startLocationId},
        zoneClears = zoneClears ?? {},
@@ -394,6 +442,14 @@ class PlayerProfile {
     'gender': gender.name,
     'duelsWon': duelsWon,
     'duelsLost': duelsLost,
+    'ratingGeared': ratingGeared,
+    'ratingAcademy': ratingAcademy,
+    'ratedGamesGeared': ratedGamesGeared,
+    'ratedGamesAcademy': ratedGamesAcademy,
+    'peakGeared': peakGeared,
+    'peakAcademy': peakAcademy,
+    'academyWins': academyWins,
+    'academyLosses': academyLosses,
     'schemaVersion': 2,
   };
 
@@ -484,6 +540,17 @@ class PlayerProfile {
       gender: PlayerGender.byName(json['gender'] as String?),
       duelsWon: (json['duelsWon'] as num?)?.toInt() ?? 0,
       duelsLost: (json['duelsLost'] as num?)?.toInt() ?? 0,
+      // Null stays null — see [ratingGeared]/[ratingAcademy]'s doc comment.
+      // (json[...] as num?)?.toInt() already reads an absent key as null;
+      // there is no `?? default` here on purpose.
+      ratingGeared: (json['ratingGeared'] as num?)?.toInt(),
+      ratingAcademy: (json['ratingAcademy'] as num?)?.toInt(),
+      ratedGamesGeared: (json['ratedGamesGeared'] as num?)?.toInt() ?? 0,
+      ratedGamesAcademy: (json['ratedGamesAcademy'] as num?)?.toInt() ?? 0,
+      peakGeared: (json['peakGeared'] as num?)?.toInt() ?? 0,
+      peakAcademy: (json['peakAcademy'] as num?)?.toInt() ?? 0,
+      academyWins: (json['academyWins'] as num?)?.toInt() ?? 0,
+      academyLosses: (json['academyLosses'] as num?)?.toInt() ?? 0,
     );
     _migratePendingLoot(profile);
     return profile;
