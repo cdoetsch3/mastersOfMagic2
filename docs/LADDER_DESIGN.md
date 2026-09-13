@@ -91,6 +91,26 @@ search runs a widening schedule against **both** populations:
 - Room-code duels are unrated. ❓ Confirm — friends inviting friends by QR
   should not be a rating farm, and it's also where the tournament use case
   lives.
+- ✅ **The screen narrates the search** (Christian, 2026-09-13) so a
+  10-second wait never reads as a hang. Today's static "Searching for an
+  opponent..." becomes a status line that advances with the phases:
+
+  | Elapsed | Status line | Under the hood |
+  |---|---|---|
+  | 0–6 s | **Searching for an opponent…** | phases 1–2 |
+  | 6–10 s | **Almost there…** | phase 3 |
+  | match | **Found someone!** | human claimed *or* bot picked |
+  | +1.2 s | **Loading the duel…** | handshake / driver build |
+
+  ⚠️ **The narration must not leak which kind of opponent was found.** A
+  human match resolves at a random moment; a bot resolves at exactly 10 s and
+  builds instantly. So: (a) "Almost there…" starts at 6 s on the clock, never
+  on "phase 3 found nothing"; (b) "Found someone!" holds a fixed **1.2 s**
+  before "Loading…" for *both* kinds, so a bot's instant driver build wears
+  the same pause a room handshake takes; (c) the bot's own "found" moment is
+  jittered ±1.5 s around the 10 s mark so it isn't a metronome. The existing
+  rotating tip stays beneath the status line. 📝 Widget test pins the status
+  text at each boundary and the fixed hold on the bot path.
 - 📝 The 10-second patience is unchanged. What changes is that the wait now
   *ends in a match* rather than "nobody came, here's Wick".
 
