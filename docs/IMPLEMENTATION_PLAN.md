@@ -959,13 +959,25 @@ are still his to overturn.
   (nothing in band unlocks that early); Divert/Execute/Reflect unlock after
   the bots §5 gave them to (Glance, Agony+Torment, Composure stand in).
 
-**Wave B 🔨 (in flight):** rated search (bands, humans-first, weighted bot
-pick, no-repeat), `settleRatedDuel` at duel end (player profile + bot doc,
-clamped), room-code duels unrated, `_showStandInNote` deleted; UI lane:
-search narration with the 1.2 s hold, profile ratings line, opponent card
-rating, disclosure strings purged.
+**Wave B ✅ (merged b0f5a6f · 9c0be7f, plus the subtitle fix before them):**
+- Search: ticket carries rating; ±100/±200/±400 at 3/6/10 s, humans only;
+  jittered 10 s bot pick, band doubling from ±100, weighted to nearest,
+  never the previous opponent (`profile.lastOpponentBotId`). Live `bots/*`
+  standing when the read answers, seed otherwise — and that ONE number rides
+  the driver into the header and back into settlement.
+- Settlement: `settleRatedDuel` → `GameState.applyRatedResult` (profile
+  save path) + `BotRatings.record` (additive, clamped ±300 to seed). Room
+  codes unrated (`RemoteDuelDriver.rated`). Practice roster unrated.
+- UI: 'Searching…' → 'Almost there…' (6 s on the clock) → 'Found someone!'
+  (fixed 1.2 s hold, both kinds) → 'Loading the duel…'; home card
+  'Ladder N · Academy N'; duel header shows the opponent's rating;
+  stand-in banner, 'a rival steps in' subtitle and 'or a rival AI' lobby
+  copy all gone.
+- ⚠️ Christian verifies in-browser: the narration timing, the card line,
+  the header rating, that a bot match is indistinguishable in feel.
 
-**After B:** sim `--ladder` mode (§6); GAME_DESIGN §5 / ITEMS §7.4 pointers.
+**Wave C 🔨:** `tool/ladder_probe_test.dart` — bot round-robin → implied
+ratings vs seeds (§6). Then GAME_DESIGN §5 / ITEMS §7.4 pointers.
 
 ## Deferred / banked — do not build without an explicit ask
 
