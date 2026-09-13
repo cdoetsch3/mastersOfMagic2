@@ -132,6 +132,7 @@ void main() {
         opponentName: 'Rival',
         opponentLevel: 12,
         opponentGear: const ItemModifiers(maxHpBonus: 40),
+        opponentRating: 1200,
         academy: true,
       );
       expect(
@@ -152,6 +153,7 @@ void main() {
         opponentName: 'Rival',
         opponentLevel: 12,
         opponentGear: const ItemModifiers(maxHpBonus: 40),
+        opponentRating: 1200,
       );
       expect(d.opponentLevel, 12);
       expect(d.opponentGear.maxHpBonus, 40);

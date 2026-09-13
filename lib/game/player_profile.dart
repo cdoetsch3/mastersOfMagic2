@@ -311,6 +311,12 @@ class PlayerProfile {
   /// Academy ladder losses. See [academyWins].
   int academyLosses;
 
+  /// The [LadderBot] id this player most recently fought via quick match
+  /// (LADDER_DESIGN §3), or null. ⭐ Read by the search as `excludeBotId` so
+  /// the very next bot pick can't repeat the same face; set back to null
+  /// after a HUMAN match, since there is no bot to avoid repeating.
+  String? lastOpponentBotId;
+
   /// When this player was last active, for the friends list's presence dot.
   /// Refreshed whenever the save is written, so it tracks real activity rather
   /// than merely having the app open. Null for a save from before presence
@@ -349,6 +355,7 @@ class PlayerProfile {
     this.peakAcademy = 0,
     this.academyWins = 0,
     this.academyLosses = 0,
+    this.lastOpponentBotId,
   }) : locationId = locationId ?? World.startLocationId,
        discoveredLocationIds = discoveredLocationIds ?? {World.startLocationId},
        zoneClears = zoneClears ?? {},
@@ -450,6 +457,7 @@ class PlayerProfile {
     'peakAcademy': peakAcademy,
     'academyWins': academyWins,
     'academyLosses': academyLosses,
+    'lastOpponentBotId': lastOpponentBotId,
     'schemaVersion': 2,
   };
 
@@ -551,6 +559,7 @@ class PlayerProfile {
       peakAcademy: (json['peakAcademy'] as num?)?.toInt() ?? 0,
       academyWins: (json['academyWins'] as num?)?.toInt() ?? 0,
       academyLosses: (json['academyLosses'] as num?)?.toInt() ?? 0,
+      lastOpponentBotId: json['lastOpponentBotId'] as String?,
     );
     _migratePendingLoot(profile);
     return profile;

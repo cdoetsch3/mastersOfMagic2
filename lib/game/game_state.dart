@@ -21,6 +21,7 @@ import 'items/item_catalogue.dart';
 import 'items/item_def.dart';
 import 'items/item_instance.dart';
 import 'items/recipe_def.dart';
+import 'ladder/ladder_record.dart' as ladder_record;
 import 'skills.dart';
 import 'player_profile.dart';
 import 'profile_storage.dart';
@@ -278,6 +279,32 @@ class GameState extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Applies one rated-duel result to the profile (LADDER_DESIGN §2) — the
+  /// same save path as every other mutation. ⭐ Wraps the PURE
+  /// `ladder_record.applyRatedResult` (imported under a prefix so this
+  /// method can share its name without shadowing it) in [_mutate], exactly
+  /// like [recordDuelResult] wraps its own XP/gold math. See
+  /// `ladder/ladder_result.dart`'s `settleRatedDuel`, the only caller.
+  Future<void> applyRatedResult({
+    required bool academy,
+    required int newRating,
+    required bool won,
+  }) => _mutate(() {
+    ladder_record.applyRatedResult(
+      profile,
+      academy: academy,
+      newRating: newRating,
+      won: won,
+    );
+  });
+
+  /// Records the id of the ladder bot this player last fought (LADDER §3:
+  /// the search excludes it next time so two people online at once — or one
+  /// person queuing twice in a row — don't both/always meet the same face).
+  /// Null after a HUMAN match: only a bot leaves a face to avoid repeating.
+  Future<void> setLastOpponentBotId(String? id) =>
+      _mutate(() => profile.lastOpponentBotId = id);
 
   // ---- Gathering --------------------------------------------------------
 

@@ -1,21 +1,40 @@
 import 'dart:math';
 
+import 'package:mom_engine/mom_engine.dart';
+
 import 'academy.dart';
 import 'ai_personas.dart';
 import 'firestore_rest.dart';
 import 'items/item_def.dart';
+import 'ladder/bot_ratings.dart';
+import 'ladder/ladder_bots.dart';
+import 'ladder/ladder_search.dart';
 import 'opponent_driver.dart';
 
 /// The result of any matchmaking path: either a remote driver (human found)
-/// or an AI persona to stand in. The duel itself treats both identically.
+/// or a ladder bot to stand in. The duel itself treats both identically.
 class MatchResult {
   final RemoteDuelDriver? remote;
-  final AiPersona? persona;
+  final LadderBot? bot;
 
-  const MatchResult.human(RemoteDuelDriver this.remote) : persona = null;
-  const MatchResult.ai(AiPersona this.persona) : remote = null;
+  /// ⭐ The rating the search held [bot] at — live when `bots/*` answered,
+  /// else its seed (LADDER §4.1: "the rating it read at match start"). The
+  /// duel header shows it and the settlement measures against it. 0 for a
+  /// human, whose rating rides on the driver instead.
+  final int botRating;
+
+  const MatchResult.human(RemoteDuelDriver this.remote)
+    : bot = null,
+      botRating = 0;
+  const MatchResult.ai(LadderBot this.bot, {required this.botRating})
+    : remote = null;
 
   bool get isHuman => remote != null;
+
+  /// ⭐ Convenience for callers that only want the practice-roster shape —
+  /// `LocalAiDriver`/`launchAiDuel`'s [AiPersona] path — without caring that
+  /// a LADDER bot is a body (level/kit/gear) with a persona bolted on.
+  AiPersona? get persona => bot?.toPersona();
 }
 
 /// Matchmaking is deliberately separate from dueling: these functions find
@@ -103,6 +122,7 @@ class Matchmaking {
     required String name,
     required int level,
     required ItemModifiers gear,
+    required int rating,
   }) async {
     try {
       await FirestoreRest.set('$_queue/${ticket.id}', {
@@ -115,6 +135,10 @@ class Matchmaking {
         // (ITEMS §7.4), so the ticket owner needs our totals to build the
         // same two mages. Trusted as claimed — server validation is later.
         'claimedByGear': gear.toJson(),
+        // ⭐ …and OUR rating (LADDER §2), so the ticket owner's client can
+        // resolve OUR rating for the rated write at duel end without a
+        // second round trip.
+        'claimedByRating': rating,
       });
       final check = await FirestoreRest.get('$_queue/${ticket.id}');
       return check?['claimedBy'] == uid;
@@ -141,15 +165,24 @@ class Matchmaking {
         opponentName: ticket['name'] as String? ?? 'Rival mage',
         opponentLevel: (ticket['level'] as num?)?.toInt() ?? 1,
         opponentGear: _gearFrom(ticket['gear']),
+        // ⚠️ A ticket from a client older than LADDER has no `rating` — read
+        // that as the Elo starting rating, never as an unset/zero rating.
+        opponentRating:
+            (ticket['rating'] as num?)?.toInt() ?? Elo.startingRating,
         academy: ticketInMode(ticket, Academy.mode),
+        // ⭐ Every path through quickMatch's human branch is rated (LADDER
+        // §3) — a ticket only ever exists inside quickMatch.
+        rated: true,
       );
 
-  /// Searches the queue for a waiting player. Joins them if found; otherwise
-  /// posts a ticket and waits [patience] to be claimed — ⭐ **while also
-  /// re-scanning the queue**, because two players who press the button at
-  /// the same moment both see it empty, both post, and would otherwise both
-  /// sit out the timeout and get an AI (the exact reported bug). If nobody
-  /// shows up, falls back to the AI persona nearest [level].
+  /// Searches the queue for a waiting player within the current widening
+  /// band (LADDER_DESIGN §3), joining them if found; otherwise posts a
+  /// ticket and keeps searching — ⭐ **while also re-scanning the queue**,
+  /// because two players who press the button at the same moment both see
+  /// it empty, both post, and would otherwise both sit out the timeout and
+  /// get a bot (the original reported bug). At [patience] (jittered ±1.5 s
+  /// so a bot's exact timing is never a tell — LADDER §3's no-leak rule), a
+  /// ladder bot weighted toward [rating] stands in.
   static Future<MatchResult> quickMatch({
     required String uid,
     required String name,
@@ -159,13 +192,40 @@ class Matchmaking {
     // ⚠️ Required, like [level]: a caller that forgets it would put a naked
     // mage on the opponent's screen and a geared one on ours.
     required ItemModifiers gear,
+    // ⭐ The player's rating on THIS queue's ladder (LADDER §2) — the screen
+    // resolves it (profile rating, or the seed on a first rated match) and
+    // hands it in, so this file never has to know the seed formulas' inputs
+    // beyond the rating itself.
+    required int rating,
     // The queue to search and post in (academy.dart) — geared by default.
     String mode = Academy.gearedMode,
     Duration patience = const Duration(seconds: 10),
+    // ⭐ The bot this player last fought (LADDER §3) — excluded from the
+    // phase-4 pick so two matches in a row don't repeat the same face.
+    String? excludeBotId,
+    Random? random,
+    DateTime Function()? now,
   }) async {
+    final rng = random ?? _random;
+    final clock = now ?? DateTime.now;
     final academy = mode == Academy.mode;
+    final searchStart = clock();
+    // ⭐ LADDER §3's no-leak rule (c): the bot's own "found" moment is
+    // jittered ±1.5 s around [patience] so it never reads as a metronome.
+    final botDeadline = searchStart
+        .add(patience)
+        .add(Duration(milliseconds: (rng.nextDouble() * 3000).round() - 1500));
+
+    bool inBand(Map<String, dynamic> ticket, int band) {
+      final theirRating =
+          (ticket['rating'] as num?)?.toInt() ?? Elo.startingRating;
+      return (theirRating - rating).abs() <= band;
+    }
+
     try {
-      // 1. Claim someone already waiting (oldest first) — in OUR queue.
+      // 1. Claim someone already waiting (oldest first) — in OUR queue and
+      // within OUR current band.
+      var band = LadderSearch.bandAt(clock().difference(searchStart));
       final waiting = await FirestoreRest.query(
         _queue,
         orderBy: 'createdAt',
@@ -175,19 +235,21 @@ class Matchmaking {
         if (ticket.id == uid) continue;
         if (ticket.data['claimedBy'] != null) continue;
         if (!ticketInMode(ticket.data, mode)) continue;
+        if (!inBand(ticket.data, band)) continue;
         if (await _claim(
           ticket,
           uid: uid,
           name: name,
           level: level,
           gear: gear,
+          rating: rating,
         )) {
           return MatchResult.human(_joinTicket(ticket.data));
         }
       }
 
       // 2. Post a ticket, then alternate between "was I claimed?" and
-      // "did someone else post before me?" until the patience runs out.
+      // "did someone else post before me?" until the bot phase begins.
       final code = _newCode();
       final seed = _newSeed();
       final createdAt = _now();
@@ -195,30 +257,34 @@ class Matchmaking {
         'uid': uid,
         'name': name,
         'level': level,
-        // ⭐ Whoever claims this ticket builds their enemy from these two
-        // fields alone, so both must be here before anyone can claim it.
+        // ⭐ Whoever claims this ticket builds their enemy from these three
+        // fields alone, so all must be here before anyone can claim it.
         'gear': gear.toJson(),
+        'rating': rating,
         'mode': mode,
         'roomId': code,
         'masterSeed': seed,
         'createdAt': createdAt,
       });
-      final deadline = DateTime.now().add(patience);
-      while (DateTime.now().isBefore(deadline)) {
+      while (clock().isBefore(botDeadline)) {
         // a. Someone claimed my ticket — I host.
         final mine = await FirestoreRest.get('$_queue/$uid');
         final by = mine?['claimedBy'];
         if (by is String) {
+          final guestRating =
+              (mine?['claimedByRating'] as num?)?.toInt() ?? Elo.startingRating;
           await FirestoreRest.set('$_duels/$code', {
             'status': 'active',
             'hostUid': uid,
             'hostName': name,
             'hostLevel': level,
             'hostGear': gear.toJson(),
+            'hostRating': rating,
             'guestUid': by,
             'guestName': mine?['claimedByName'] as String? ?? 'Rival',
             'guestLevel': (mine?['claimedByLevel'] as num?)?.toInt() ?? 1,
             'guestGear': _gearFrom(mine?['claimedByGear']).toJson(),
+            'guestRating': guestRating,
             'mode': mode,
             'masterSeed': seed,
             'createdAt': _now(),
@@ -235,14 +301,18 @@ class Matchmaking {
               // — never ours. Each side wears its own wardrobe and simulates
               // the other's.
               opponentGear: _gearFrom(mine?['claimedByGear']),
+              opponentRating: guestRating,
               academy: academy,
+              rated: true,
             ),
           );
         }
 
-        // b. A ticket that precedes mine — I claim it and I am the guest.
-        // ⚠️ Strict precedence only (ticketPrecedes), or two simultaneous
-        // searchers would claim each other and open two half-empty rooms.
+        // b. A ticket that precedes mine, in band — I claim it and I am
+        // the guest. ⚠️ Strict precedence only (ticketPrecedes), or two
+        // simultaneous searchers would claim each other and open two
+        // half-empty rooms.
+        band = LadderSearch.bandAt(clock().difference(searchStart));
         final others = await FirestoreRest.query(
           _queue,
           orderBy: 'createdAt',
@@ -252,6 +322,7 @@ class Matchmaking {
           if (ticket.id == uid) continue;
           if (ticket.data['claimedBy'] != null) continue;
           if (!ticketInMode(ticket.data, mode)) continue;
+          if (!inBand(ticket.data, band)) continue;
           if (!ticketPrecedes(
             theirUid: ticket.id,
             theirCreatedAt: ticket.data['createdAt'] as String? ?? '',
@@ -266,6 +337,7 @@ class Matchmaking {
             name: name,
             level: level,
             gear: gear,
+            rating: rating,
           )) {
             await FirestoreRest.delete('$_queue/$uid');
             return MatchResult.human(_joinTicket(ticket.data));
@@ -276,13 +348,36 @@ class Matchmaking {
       }
       await FirestoreRest.delete('$_queue/$uid');
     } catch (_) {
-      // Fall through to the AI stand-in below.
+      // Fall through to the bot stand-in below.
     }
 
-    // 3. No human found: an AI persona stands in — at the Academy's level
-    // when that is the queue, since everyone there IS level 50.
+    // 3. No human found: a ladder bot stands in, weighted toward [rating]
+    // (LADDER §3 phase 4). ⭐ The pick uses each bot's LIVE rating when the
+    // read succeeds, falling back to seeds when it throws — a live read is
+    // strictly better, never required.
+    var liveRatings = const <String, int>{};
+    try {
+      final standings = await BotRatings.fetch(academy: academy);
+      liveRatings = {
+        for (final entry in standings.entries) entry.key: entry.value.rating,
+      };
+    } catch (_) {
+      // Seeds only — see the doc comment above.
+    }
+    final bot = LadderSearch.pickBot(
+      rating,
+      academy: academy,
+      excludeBotId: excludeBotId,
+      rng: rng,
+      liveRatings: liveRatings,
+    );
     return MatchResult.ai(
-      AiRoster.nearestToLevel(academy ? Academy.level : level),
+      bot,
+      botRating: LadderSearch.ratingOf(
+        bot,
+        liveRatings: liveRatings,
+        academy: academy,
+      ),
     );
   }
 
@@ -293,6 +388,10 @@ class Matchmaking {
     required String name,
     required int level,
     required ItemModifiers gear,
+    // ⭐ Rooms are UNRATED (LADDER §3) — this never feeds Elo — but the
+    // lobby card still shows a rating for both sides, so it rides along
+    // exactly like level and gear do.
+    required int rating,
     String mode = Academy.gearedMode,
   }) async {
     final code = _newCode();
@@ -308,6 +407,7 @@ class Matchmaking {
       // then the gear desync it turned out to share a shape with).
       'hostLevel': level,
       'hostGear': gear.toJson(),
+      'hostRating': rating,
       'masterSeed': seed,
       'createdAt': _now(),
     });
@@ -321,17 +421,21 @@ class Matchmaking {
     String mode = Academy.gearedMode,
     Duration patience = const Duration(minutes: 5),
   }) async {
-    final guest = await _poll<({String name, int level, ItemModifiers gear})>(
-      '$_duels/$code',
-      (d) => d?['guestUid'] != null
-          ? (
-              name: d?['guestName'] as String? ?? 'Rival mage',
-              level: (d?['guestLevel'] as num?)?.toInt() ?? 1,
-              gear: _gearFrom(d?['guestGear']),
-            )
-          : null,
-      timeout: patience,
-    );
+    final guest =
+        await _poll<({String name, int level, ItemModifiers gear, int rating})>(
+          '$_duels/$code',
+          (d) => d?['guestUid'] != null
+              ? (
+                  name: d?['guestName'] as String? ?? 'Rival mage',
+                  level: (d?['guestLevel'] as num?)?.toInt() ?? 1,
+                  gear: _gearFrom(d?['guestGear']),
+                  rating:
+                      (d?['guestRating'] as num?)?.toInt() ??
+                      Elo.startingRating,
+                )
+              : null,
+          timeout: patience,
+        );
     if (guest == null) return null;
     return RemoteDuelDriver(
       roomId: code,
@@ -340,7 +444,9 @@ class Matchmaking {
       opponentName: guest.name,
       opponentLevel: guest.level,
       opponentGear: guest.gear,
+      opponentRating: guest.rating,
       academy: mode == Academy.mode,
+      // ⭐ Room codes are unrated (LADDER §3) — the default `rated: false`.
     );
   }
 
@@ -351,6 +457,7 @@ class Matchmaking {
     required String name,
     required int level,
     required ItemModifiers gear,
+    required int rating,
   }) async {
     final roomCode = code.toUpperCase().trim();
     final data = await FirestoreRest.get('$_duels/$roomCode');
@@ -364,6 +471,7 @@ class Matchmaking {
       // ⭐ Written before the driver is built, so the host's waitForGuest poll
       // never sees a guest without their wardrobe.
       'guestGear': gear.toJson(),
+      'guestRating': rating,
       'status': 'active',
     });
     return RemoteDuelDriver(
@@ -373,9 +481,12 @@ class Matchmaking {
       opponentName: data['hostName'] as String? ?? 'Rival mage',
       opponentLevel: (data['hostLevel'] as num?)?.toInt() ?? 1,
       opponentGear: _gearFrom(data['hostGear']),
+      opponentRating:
+          (data['hostRating'] as num?)?.toInt() ?? Elo.startingRating,
       // The room's mode, not ours: whoever joins by code fights the host's
       // duel. The screen re-resolves its loadout off this flag.
       academy: ticketInMode(data, Academy.mode),
+      // ⭐ Room codes are unrated (LADDER §3) — the default `rated: false`.
     );
   }
 

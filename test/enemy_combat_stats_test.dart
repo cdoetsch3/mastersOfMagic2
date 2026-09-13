@@ -364,6 +364,7 @@ void main() {
         opponentName: 'Rival',
         opponentLevel: 10,
         opponentGear: const ItemModifiers(critChance: 5),
+        opponentRating: 1200,
       );
       expect(
         driver.opponentCombatStats,

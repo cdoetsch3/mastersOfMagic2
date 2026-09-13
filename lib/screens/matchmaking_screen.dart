@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mom_engine/mom_engine.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../game/academy.dart';
@@ -92,6 +93,18 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
 
   String get _mode => widget.academy ? Academy.mode : Academy.gearedMode;
 
+  /// This player's current rating on the queue this screen searches
+  /// (LADDER_DESIGN §2): the profile's rating, or — on a first rated match —
+  /// the seed the search treats as a starting point. ⭐ Same resolution
+  /// `settleRatedDuel` uses at duel end, so the number the search widens
+  /// around and the number the result is measured against never disagree.
+  int _myRating(GameState game) {
+    final p = game.profile;
+    return widget.academy
+        ? p.ratingAcademy ?? Elo.startingRating
+        : p.ratingGeared ?? LadderSeeds.gearedPlayer(level: p.level);
+  }
+
   Future<void> _quickMatch() async {
     final id = _identity();
     if (id == null) return _needAccount(_quickMatch);
@@ -108,12 +121,19 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         // ⭐ PvP is the geared ladder (ITEMS §7.4): our totals go out so the
         // opponent's client can build us as we actually are.
         gear: game.equipmentTotals,
+        rating: _myRating(game),
         mode: _mode,
+        // ⭐ LADDER §3: don't hand back the same bot twice in a row.
+        excludeBotId: game.profile.lastOpponentBotId,
       );
       await _foundHold();
       if (!mounted) return;
       setState(() => _busy = _Busy.none);
       if (result.isHuman) {
+        // ⭐ A human opponent leaves no face to avoid repeating. Not
+        // awaited — same fire-and-forget save as every other profile write
+        // that doesn't gate the screen on it (e.g. `recordDuelResult`).
+        game.setLastOpponentBotId(null);
         await launchDuel(
           context,
           loadout: widget.loadout,
@@ -122,12 +142,18 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
           academy: widget.academy,
         );
       } else {
-        final persona = result.persona!;
-        _showStandInNote(persona);
+        final bot = result.bot!;
+        game.setLastOpponentBotId(bot.id);
+        // ⚠️ No stand-in banner here (LADDER §1 law 3: no disclosure) — the
+        // duel that follows must look exactly like a human was found.
         await launchAiDuel(
           context,
           loadout: widget.loadout,
-          persona: persona,
+          bot: bot,
+          // ⭐ The rating the search read for this bot (live, else seed) —
+          // the number the header shows AND the number the result is
+          // measured against, so the two can never disagree.
+          rating: result.botRating,
           campaign: false,
           academy: widget.academy,
         );
@@ -153,14 +179,6 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     await Future<void>.delayed(const Duration(milliseconds: 1200));
   }
 
-  /// ⭐ Banner: nothing on the duel screen that follows says the opponent is
-  /// a stand-in rather than the human the player queued for. Raised in the
-  /// root overlay, so it survives the push into the duel.
-  void _showStandInNote(AiPersona persona) => showAppBanner(
-    context,
-    'No mages answered the call — ${persona.name} steps in!',
-  );
-
   Future<void> _hostRoom() async {
     final id = _identity();
     if (id == null) return _needAccount(_hostRoom);
@@ -175,6 +193,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         name: id.name,
         level: game.profile.level,
         gear: game.equipmentTotals,
+        rating: _myRating(game),
         mode: _mode,
       );
       if (!mounted) return;
@@ -231,6 +250,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         uid: id.uid,
         name: id.name,
         level: game.profile.level,
+        rating: _myRating(game),
         gear: game.equipmentTotals,
       );
       if (!mounted) return;

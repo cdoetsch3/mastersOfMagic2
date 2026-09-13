@@ -100,6 +100,42 @@ void main() {
       expect(p.peakAcademy, 0);
       expect(p.academyWins, 0);
       expect(p.academyLosses, 0);
+      expect(
+        p.lastOpponentBotId,
+        isNull,
+        reason: 'no bot fought yet — absent, same as a fresh character',
+      );
+    });
+
+    test('lastOpponentBotId (LADDER §3) round-trips, and is null by default', () {
+      final fresh = PlayerProfile.newPlayer();
+      expect(
+        fresh.lastOpponentBotId,
+        isNull,
+        reason: 'a brand-new character has fought nobody yet',
+      );
+
+      final p = PlayerProfile.newPlayer()..lastOpponentBotId = 'garrick';
+      final reloaded = PlayerProfile.fromJson(p.toJson());
+      expect(
+        reloaded.lastOpponentBotId,
+        'garrick',
+        reason:
+            'a mutant dropping lastOpponentBotId from toJson/fromJson '
+            'would read this back as null, letting the search repeat the '
+            'same bot',
+      );
+
+      final backToHuman = PlayerProfile.fromJson(
+        (p..lastOpponentBotId = null).toJson(),
+      );
+      expect(
+        backToHuman.lastOpponentBotId,
+        isNull,
+        reason:
+            'set back to null after a human match — the null itself must '
+            'also round-trip, not linger as the last non-null value',
+      );
     });
 
     test('ratingGeared: 0 round-trips as 0, not null', () {

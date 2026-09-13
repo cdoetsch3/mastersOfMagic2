@@ -253,12 +253,6 @@ class RemoteDuelDriver implements OpponentDriver {
   @override
   EnemyCombatStats get opponentCombatStats => EnemyCombatStats.none;
 
-  // 📝 wired at merge — the other lane is adding `opponentRating` as a
-  // required constructor param on this class; landing that alongside this
-  // fixed default would collide, so this stays a stub until the merge.
-  @override
-  int get opponentRating => 1200;
-
   final String roomId;
   final bool isHost;
   final int masterSeed;
@@ -282,6 +276,22 @@ class RemoteDuelDriver implements OpponentDriver {
   ItemModifiers get opponentGear =>
       academy ? ItemModifiers.none : _opponentGear;
 
+  /// The opponent's rating on this duel's ladder (LADDER_DESIGN §2), as
+  /// read off the ticket/room at match time. ⭐ Required, not defaulted —
+  /// same reasoning as [opponentLevel]/[opponentGear]: a silent default
+  /// would let a stale client desync the rated math instead of failing
+  /// loudly. Callers reading an OLD ticket/room doc (no `rating` field: a
+  /// pre-LADDER client) default the parsed value to 1200 themselves before
+  /// it ever reaches here.
+  @override
+  final int opponentRating;
+
+  /// Whether this duel counts for rating (LADDER §3): true only for a
+  /// `Matchmaking.quickMatch` human match. ⚠️ **False for every room-code
+  /// duel** — friends inviting friends by code (or QR) must never be a
+  /// rating farm, so [createRoom]/[waitForGuest]/[joinRoom] never set this.
+  final bool rated;
+
   static const opponentTimeout = Duration(seconds: 25);
 
   final _rng = Random.secure();
@@ -304,7 +314,9 @@ class RemoteDuelDriver implements OpponentDriver {
     // a naked rival (ITEMS §7.4 says PvP counts gear). A silent default is
     // how the level desync survived as long as it did — so there isn't one.
     required ItemModifiers opponentGear,
+    required this.opponentRating,
     this.academy = false,
+    this.rated = false,
   }) : _opponentLevel = opponentLevel,
        _opponentGear = opponentGear;
 
