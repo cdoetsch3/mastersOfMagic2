@@ -15,8 +15,11 @@ import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
 import 'account_screen.dart';
 
-/// The matchmaking lobby: quick match (with AI stand-ins when no human is
-/// found), friendly duels by room code, and the AI practice roster. Whatever
+/// The matchmaking lobby: quick match (one rated queue of humans and ladder
+/// bots — LADDER_DESIGN §3), friendly duels by room code, and the AI practice
+/// roster. ⚠️ Law 3 (§1): nothing player-facing here may say a queue opponent
+/// might be a bot. The practice roster is the one place "AI" is said out
+/// loud, because there the player picks the persona on purpose. Whatever
 /// path is taken, the duel that follows is identical.
 class MatchmakingScreen extends StatefulWidget {
   final Loadout loadout;
@@ -450,7 +453,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                       style: TextStyle(color: AppColors.text, fontSize: 15),
                     ),
                     Text(
-                      'Face another mage — or a rival AI if none answer',
+                      'Face another mage from the queue',
                       style: TextStyle(color: AppColors.textDim, fontSize: 12),
                     ),
                   ],
