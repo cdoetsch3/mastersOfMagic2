@@ -935,13 +935,37 @@ stats; ✅ the login content-version gate is live and seeded):
 
 ---
 
-## 📝 The Ladder — rated matchmaking + bot pool (design drafted 2026-09-13)
+## 🔨 The Ladder — rated matchmaking + bot pool (building, 2026-09-13)
 
 `docs/LADDER_DESIGN.md`. Replaces the nearest-level persona fallback with one
 rated queue (chess Elo, FIDE K schedule, widening bands, humans before bots)
 and a 27-bot pool built on the campaign archetypes, geared from the item
-catalogue, with per-ladder ratings in Firestore `bots/*`. Awaiting Christian's
-red-pen (eight open decisions in §8) before any code moves.
+catalogue, with per-ladder ratings in Firestore `bots/*`. Christian said
+"begin now"; the §8 decisions were taken by the draft's recommendations and
+are still his to overturn.
+
+**Wave A ✅ (Sonnet lanes, merged eaba9f1 · 73f8df6 · 7cd296b+dca82a8 · df91cd8):**
+- `Elo` + `LadderSeeds` in the engine (27 tests; §5 seed numbers pinned).
+- `LocalAiDriver(gear:, thinkTime:)`; `ThinkTime` clamped normal; the
+  persona's dormant aggression/caution dials deleted.
+- `FirestoreRest.increment` (`:commit` field transforms), eight rating
+  fields on the profile, `applyRatedResult` (geared record stays with
+  `recordDuelResult`), `bots/{id}` rules bounded per game and gated on
+  changed keys. ⚠️ Rules deploy with `tool/deploy.sh --rules`.
+- `LadderRoster` — 27 bots, hand-written kits, catalogue wardrobes.
+  📝 Content gaps it surfaced: no uncommon/mythic/legendary equipment in
+  the catalogue and three slots with nothing above common (tiers step
+  down); Pim/Orrin/Dunstan have one attack where their archetype wants two
+  (nothing in band unlocks that early); Divert/Execute/Reflect unlock after
+  the bots §5 gave them to (Glance, Agony+Torment, Composure stand in).
+
+**Wave B 🔨 (in flight):** rated search (bands, humans-first, weighted bot
+pick, no-repeat), `settleRatedDuel` at duel end (player profile + bot doc,
+clamped), room-code duels unrated, `_showStandInNote` deleted; UI lane:
+search narration with the 1.2 s hold, profile ratings line, opponent card
+rating, disclosure strings purged.
+
+**After B:** sim `--ladder` mode (§6); GAME_DESIGN §5 / ITEMS §7.4 pointers.
 
 ## Deferred / banked — do not build without an explicit ask
 

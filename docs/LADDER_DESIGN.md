@@ -201,6 +201,23 @@ Item ids are chosen at build time from the catalogue at the bot's level.
 | 26 | Ysolde | Grand Magus | 50 | aspect | 8 | Peak | 1860 | 1380 | second face at the cap |
 | 27 | Bramwell | Old Master | 50 | executioner | 7 | Worn | 1800 | 1320 | skill over kit at the cap |
 
+📝 **Build-time findings (roster lane, 2026-09-13)** — each asserted by id
+in `test/ladder_roster_test.dart`, so a content fix flips a test rather than
+silently changing a bot:
+- The catalogue ships no uncommon, mythic or legendary equipment, and
+  `robeBottom`/`boots`/`offHand` have nothing above common at any level.
+  Kitted/Prized/Peak step down a rung where they must. ❓ Content gap, not a
+  roster bug — Phase 8 (sets/enchants) is where those rarities arrive.
+- Pim (L3), Orrin (L7) and Dunstan (L13) carry ONE attack where their
+  archetype wants two: nothing in their cost band is unlocked that early
+  under the ruled §4 plan. ❓ Either front-load a second cheap attack in the
+  unlock schedule or nudge those three bots' levels.
+- Divert, Execute and Reflect unlock a few levels after Isolde, Corvane and
+  Seraphel respectively; Glance, Agony+Torment and Composure stand in.
+- Al'Dorian (reused unchanged) carries four attacks against tyrant's three;
+  Brightgale's Jolt and Thornwall's Bulwark predate the ruled schedule and
+  are exempted from that one check.
+
 Notes on the spread:
 - Intelligence 10 is absent on purpose. `LadderAi` at 10 is optimal play; the
   ladder's ceiling should be beatable by a good human, and Procarius already
