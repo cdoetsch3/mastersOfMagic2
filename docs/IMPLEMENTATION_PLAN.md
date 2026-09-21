@@ -1006,9 +1006,10 @@ first, then four Opus lanes + one change by hand. Merged e000454 · 5a8712e ·
 road, the two-line 'MAIN HAND · TWO-HANDED' doll chip (reported taller
 than its row-mates), the craft row's '(1 stored)' suffix, the shop at
 phone width.
-📝 **`dart format` is not clean repo-wide** under SDK 3.13.2 (mage.dart,
-events.dart, inventory_tab.dart reformat untouched); lanes hand-matched
-style. Decide: reformat wholesale in one commit, or pin the formatter.
+✅ **Wholesale `dart format` landed (acfbaaa)** with the repo's Flutter SDK
+(3.47.2 / Dart 3.13.2); `tool/deploy.sh` preflight now refuses a tree the
+formatter would change, so drift is caught per release. Rule: format with
+this SDK only; never hand-match style around the formatter.
 
 ## Deferred / banked — do not build without an explicit ask
 
