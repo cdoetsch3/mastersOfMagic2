@@ -193,7 +193,9 @@ class _ShopScreenState extends State<ShopScreen> {
     // same way `MatchmakingScreen` defers its own opening intent, so the
     // first build never races the mutate.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) GameStateScope.read(context).resolveShop(widget.townId, _today);
+      if (mounted) {
+        GameStateScope.read(context).resolveShop(widget.townId, _today);
+      }
     });
   }
 
@@ -228,7 +230,10 @@ class _ShopScreenState extends State<ShopScreen> {
     if (!ShopCatalogue.isOpen(widget.townId)) {
       return Scaffold(
         backgroundColor: AppColors.bg,
-        appBar: AppBar(backgroundColor: AppColors.panel, title: Text(town.name)),
+        appBar: AppBar(
+          backgroundColor: AppColors.panel,
+          title: Text(town.name),
+        ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(28),
@@ -545,7 +550,11 @@ class _TabChip extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: TextStyle(color: fg, fontSize: 13, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: fg,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -561,9 +570,10 @@ class _TabChip extends StatelessWidget {
 /// only holds if the band it sits in cannot resize.
 ///
 /// ⚠️ A [Row], not a [Wrap]: a Wrap is exactly the thing that would grow a
-/// second line and shove the shelf down. Four chips plus the sort box fit the
-/// narrowest phone this game targets; a fifth would need a horizontal
-/// scroller here, never a taller band.
+/// second line and shove the shelf down. Four chips plus the ICON-ONLY sort
+/// box fit the narrowest phone this game targets (390 dp); the worded box
+/// needs ≥ 480. A fifth chip would need a horizontal scroller here, never a
+/// taller band.
 class _ShopToolbar extends StatelessWidget {
   static const double height = 38;
 
@@ -571,6 +581,12 @@ class _ShopToolbar extends StatelessWidget {
   /// that shrank to fit 'Name' would slide the button out from under the
   /// finger that had just chosen it.
   static const double _sortWidth = 116;
+
+  /// ⭐ The phone width of the same box (ruling 2026-09-21): icon only, still
+  /// FIXED — four chips plus the worded box overflowed 390–480 dp by up to
+  /// 18 px, and a Wrap was never an option (see the class doc). The popup
+  /// still lists the full labels, so nothing is lost but the caption.
+  static const double _sortWidthCompact = 28;
 
   final List<_ShopFilter> filters;
   final _ShopFilter filter;
@@ -592,62 +608,68 @@ class _ShopToolbar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: height,
-    child: Padding(
-      padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
-      child: Row(
-        children: [
-          for (final f in filters) ...[
-            _Chip(
-              label: f.label,
-              on: filter == f,
-              onTap: () => onFilter(f),
-            ),
-            const SizedBox(width: 6),
-          ],
-          const Spacer(),
-          SizedBox(
-            width: _sortWidth,
-            child: PopupMenuButton<_ShopSort>(
-              initialValue: sort,
-              tooltip: 'Sort the shelf',
-              color: AppColors.panel,
-              padding: EdgeInsets.zero,
-              onSelected: onSort,
-              itemBuilder: (_) => [
-                for (final s in _ShopSort.values)
-                  PopupMenuItem(
-                    value: s,
-                    child: Text(
-                      s.labelFor(quantityLabel),
-                      style: const TextStyle(color: AppColors.text),
-                    ),
-                  ),
-              ],
-              child: Row(
-                children: [
-                  const Icon(Icons.sort, size: 15, color: AppColors.teal),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: Text(
-                      sort.labelFor(quantityLabel),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        color: AppColors.teal,
-                        fontSize: 11.5,
+  Widget build(BuildContext context) {
+    final compact = !shopChipsFit(context);
+    return SizedBox(
+      height: height,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+        child: Row(
+          children: [
+            for (final f in filters) ...[
+              _Chip(
+                label: f.label,
+                on: filter == f,
+                compact: compact,
+                onTap: () => onFilter(f),
+              ),
+              SizedBox(width: compact ? 4 : 6),
+            ],
+            const Spacer(),
+            SizedBox(
+              width: compact ? _sortWidthCompact : _sortWidth,
+              child: PopupMenuButton<_ShopSort>(
+                initialValue: sort,
+                tooltip: 'Sort the shelf',
+                color: AppColors.panel,
+                padding: EdgeInsets.zero,
+                onSelected: onSort,
+                itemBuilder: (_) => [
+                  for (final s in _ShopSort.values)
+                    PopupMenuItem(
+                      value: s,
+                      child: Text(
+                        s.labelFor(quantityLabel),
+                        style: const TextStyle(color: AppColors.text),
                       ),
                     ),
-                  ),
                 ],
+                child: Row(
+                  children: [
+                    const Icon(Icons.sort, size: 15, color: AppColors.teal),
+                    if (!compact) ...[
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Text(
+                          sort.labelFor(quantityLabel),
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(
+                            color: AppColors.teal,
+                            fontSize: 11.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 /// ⚠️ Hand-rolled rather than [FilterChip], and deliberately the SAME shape
@@ -658,7 +680,16 @@ class _Chip extends StatelessWidget {
   final String label;
   final bool on;
   final VoidCallback onTap;
-  const _Chip({required this.label, required this.on, required this.onTap});
+
+  /// Phone padding (ruling 2026-09-21): 7 instead of 10, so the chips fit a
+  /// 390 dp toolbar beside the icon-only sort box.
+  final bool compact;
+  const _Chip({
+    required this.label,
+    required this.on,
+    required this.onTap,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -667,7 +698,10 @@ class _Chip extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 7 : 10,
+          vertical: 4,
+        ),
         decoration: BoxDecoration(
           color: on ? AppColors.gold : Colors.transparent,
           border: Border.all(color: on ? AppColors.gold : AppColors.border),
@@ -823,6 +857,26 @@ void _sortShelf<T>(
   });
 }
 
+/// Whether the row has room for its explanatory chips (tier, spike/sale).
+///
+/// ⭐ **Phones hide them** (Christian, 2026-09-21: "shop UI labels too big,
+/// remove on phone layout"). Below [chipBreakpoint] the 'Native −25%' and
+/// 'Price spike +N%' chips collided with the STOCK column; the PRICE column
+/// already shows the number they explain, and the item dialog (tap the name)
+/// still carries the words. Width is the only input — a tablet in portrait
+/// keeps them. Public so the test can pin both sides of the line.
+bool shopChipsFit(BuildContext context) =>
+    MediaQuery.sizeOf(context).width >= chipBreakpoint;
+
+/// Logical pixels. ⚠️ Measured, not guessed (test 'the line itself'): a row
+/// carrying its name, BOTH chips and the four columns first fits without a
+/// RenderFlex overflow at ~740 dp, so phones AND portrait tablets are
+/// compact; desktop and landscape tablets keep the words. Below the line the
+/// same flag also tightens the toolbar chips and the column gaps — a 390 dp
+/// phone was 8 px over on rows and 24 px over on the toolbar even with the
+/// chips gone.
+const double chipBreakpoint = 760;
+
 /// Spike/sale chip — shown only when `eventMod != 1.0` (§6.2).
 class _EventChip extends StatelessWidget {
   final double eventMod;
@@ -842,7 +896,11 @@ class _EventChip extends StatelessWidget {
       ),
       child: Text(
         spike ? 'Price spike +$pct%' : 'Price drop −$pct%',
-        style: TextStyle(color: colour, fontSize: 10, fontWeight: FontWeight.w600),
+        style: TextStyle(
+          color: colour,
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -868,7 +926,11 @@ class _TierChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(color: colour, fontSize: 10, fontWeight: FontWeight.w600),
+        style: TextStyle(
+          color: colour,
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -962,7 +1024,11 @@ class _PriceCell extends StatelessWidget {
     child: Text(
       '${unit}g',
       textAlign: TextAlign.right,
-      style: TextStyle(color: colour, fontSize: 16, fontWeight: FontWeight.w600),
+      style: TextStyle(
+        color: colour,
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      ),
     ),
   );
 }
@@ -1121,7 +1187,9 @@ class _QtyControlState extends State<_QtyControl> {
       children: [
         _StepButton(
           icon: Icons.remove,
-          onTap: !enabled || widget.value <= widget.min ? null : () => _bump(-1),
+          onTap: !enabled || widget.value <= widget.min
+              ? null
+              : () => _bump(-1),
           onHoldStart: !enabled ? null : () => _startRepeat(-1),
           onHoldEnd: _stopRepeat,
         ),
@@ -1397,6 +1465,8 @@ class _BuyRow extends StatelessWidget {
         : eventMod > 1.0
         ? AppColors.ember
         : AppColors.teal;
+    // ⭐ One flag for chips, gaps and the toolbar (chipBreakpoint).
+    final compact = !shopChipsFit(context);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -1428,11 +1498,13 @@ class _BuyRow extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 6),
-                          _TierChip(mod: locationMod),
-                          if (eventMod != 1.0) ...[
-                            const SizedBox(width: 4),
-                            _EventChip(eventMod: eventMod),
+                          if (!compact) ...[
+                            const SizedBox(width: 6),
+                            _TierChip(mod: locationMod),
+                            if (eventMod != 1.0) ...[
+                              const SizedBox(width: 4),
+                              _EventChip(eventMod: eventMod),
+                            ],
                           ],
                         ],
                       ),
@@ -1446,11 +1518,11 @@ class _BuyRow extends StatelessWidget {
             // as aligned columns. QTY is stock REMAINING after the pending
             // basket, live — buying 5 of 60 reads 55 as the stepper moves.
             _QtyCell(remaining: stock - qty),
-            const SizedBox(width: 10),
+            SizedBox(width: compact ? 6 : 10),
             _PriceCell(unit: unit, colour: eventColour),
-            const SizedBox(width: 10),
+            SizedBox(width: compact ? 6 : 10),
             _TotalCell(gold: qty > 0 ? total : null),
-            const SizedBox(width: 10),
+            SizedBox(width: compact ? 6 : 10),
             _QtyControl(
               value: qty,
               min: 0,
@@ -1507,12 +1579,11 @@ class _SellList extends StatelessWidget {
         fungibleIds.where((id) {
           final def = ItemCatalogue.tryById(id);
           return def != null && (room.stacks[id] ?? 0) + pack.countOf(id) > 0;
-        }).toList()
-          ..sort((a, b) {
-            final da = ItemCatalogue.displayName(ItemCatalogue.byId(a));
-            final db = ItemCatalogue.displayName(ItemCatalogue.byId(b));
-            return da.compareTo(db);
-          });
+        }).toList()..sort((a, b) {
+          final da = ItemCatalogue.displayName(ItemCatalogue.byId(a));
+          final db = ItemCatalogue.displayName(ItemCatalogue.byId(b));
+          return da.compareTo(db);
+        });
 
     final instances = <(String instanceId, String defId)>[
       for (final id in room.instanceIds)
@@ -1547,7 +1618,8 @@ class _SellList extends StatelessWidget {
     ];
     final shownInstances = [
       for (final e in instances)
-        if (ItemCatalogue.tryById(e.$2) case final def? when filter.accepts(def))
+        if (ItemCatalogue.tryById(e.$2) case final def?
+            when filter.accepts(def))
           e,
     ];
     if (shownStacks.isEmpty && shownInstances.isEmpty) {
@@ -1559,8 +1631,7 @@ class _SellList extends StatelessWidget {
       nameOf: (id) => ItemCatalogue.displayName(ItemCatalogue.byId(id)),
       priceOf: (id) =>
           _sellUnitPrice(game, townId, today, ItemCatalogue.byId(id)),
-      quantityOf: (id) =>
-          (room.stacks[id] ?? 0) + pack.countOf(id),
+      quantityOf: (id) => (room.stacks[id] ?? 0) + pack.countOf(id),
     );
     _sortShelf(
       shownInstances,
@@ -1571,8 +1642,7 @@ class _SellList extends StatelessWidget {
         ItemCatalogue.byId(e.$2),
         game.profile.itemInstances[e.$1],
       ),
-      priceOf: (e) =>
-          ShopPricing.vendorPrice(ItemCatalogue.byId(e.$2).value),
+      priceOf: (e) => ShopPricing.vendorPrice(ItemCatalogue.byId(e.$2).value),
       // ⚠️ One instance is one unit by construction, so the quantity sort has
       // nothing to say here and falls straight through to the name tie-break
       // rather than pretending to an order it does not have.
@@ -1669,6 +1739,8 @@ class _SellStackRow extends StatelessWidget {
         : eventMod > 1.0
         ? AppColors.ember
         : AppColors.teal;
+    // ⭐ One flag for chips, gaps and the toolbar (chipBreakpoint).
+    final compact = !shopChipsFit(context);
     final hasSubline = bound || !stocked;
 
     return Padding(
@@ -1702,13 +1774,15 @@ class _SellStackRow extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              if (stocked) ...[
-                                const SizedBox(width: 6),
-                                _TierChip(mod: locationMod),
-                              ],
-                              if (eventMod != 1.0) ...[
-                                const SizedBox(width: 4),
-                                _EventChip(eventMod: eventMod),
+                              if (!compact) ...[
+                                if (stocked) ...[
+                                  const SizedBox(width: 6),
+                                  _TierChip(mod: locationMod),
+                                ],
+                                if (eventMod != 1.0) ...[
+                                  const SizedBox(width: 4),
+                                  _EventChip(eventMod: eventMod),
+                                ],
                               ],
                             ],
                           ),
@@ -1742,11 +1816,11 @@ class _SellStackRow extends StatelessWidget {
             // ⭐ QTY then PRICE — QTY is what you'd have LEFT after this
             // basket, live (selling 3 of 6 reads 3 as the stepper moves).
             _QtyCell(remaining: available - qty),
-            const SizedBox(width: 10),
+            SizedBox(width: compact ? 6 : 10),
             _PriceCell(unit: unit, colour: eventColour),
-            const SizedBox(width: 10),
+            SizedBox(width: compact ? 6 : 10),
             _TotalCell(gold: qty > 0 ? total : null),
-            const SizedBox(width: 10),
+            SizedBox(width: compact ? 6 : 10),
             _QtyControl(
               value: qty,
               min: 0,
@@ -1805,11 +1879,8 @@ class _SellInstanceRow extends StatelessWidget {
               child: _InfoTap(
                 onTap: def == null
                     ? () {}
-                    : () => showItemDialog(
-                        context,
-                        def: def,
-                        instance: instance,
-                      ),
+                    : () =>
+                          showItemDialog(context, def: def, instance: instance),
                 child: Row(
                   children: [
                     _ItemGlyph(defId: defId, name: name),
@@ -1956,7 +2027,10 @@ class _SettleBar extends StatelessWidget {
                 Expanded(
                   child: Text(
                     blockReason!,
-                    style: const TextStyle(color: AppColors.ember, fontSize: 11.5),
+                    style: const TextStyle(
+                      color: AppColors.ember,
+                      fontSize: 11.5,
+                    ),
                   ),
                 )
               else
