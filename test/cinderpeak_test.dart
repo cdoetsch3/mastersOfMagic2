@@ -487,8 +487,23 @@ void main() {
       final proof = ItemCatalogue.byId('proof_of_the_foothills');
       expect(proof, isA<KeyDef>());
       expect(proof.tradability, Tradability.bound);
-      expect((proof as KeyDef).gates, 'hearthwood');
-      expect(World.byId('hearthwood').gate, isNotNull);
+      expect(
+        (proof as KeyDef).gates,
+        'pennycross',
+        reason:
+            'kills a mutant that re-points the proof at Hearthwood — the '
+            'gate moved to the north road into Pennycross (ruling 2026-09-21)',
+      );
+      expect(
+        World.byId('pennycross').gate,
+        isNotNull,
+        reason: 'kills a mutant that drops the gate line from Pennycross',
+      );
+      expect(
+        World.byId('hearthwood').gate,
+        isNull,
+        reason: 'kills a mutant that leaves the old gate line on Hearthwood',
+      );
     });
 
     test('⏳ the banking material pays off exactly on schedule '

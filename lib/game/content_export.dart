@@ -70,6 +70,7 @@ abstract final class ContentExport {
     'opensAtLevel': l.opensAtLevel,
     'station': l.station,
     'gate': l.gate,
+    'gateItemIds': l.gateItemIds,
     'blurb': l.blurb,
     'arrival': l.arrival,
     'beats': l.beats,

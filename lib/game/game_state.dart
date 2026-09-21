@@ -172,6 +172,49 @@ class GameState extends ChangeNotifier {
   bool canTravelTo(String locationId) =>
       !isTravelling && profile.location.connections.contains(locationId);
 
+  /// Why the gate at [locationId] will not let this character through, or null
+  /// if it will. **Pure** — asks nothing, changes nothing, so the Map tab can
+  /// call it on every build to decide between "Gated" and "Gate open".
+  ///
+  /// Null in three cases, and the order matters:
+  ///  1. the destination has no `gateItemIds` — most of the world, and the
+  ///     four gates whose copy is written but whose items are not built yet;
+  ///  2. it is already in `profile.openedGates` — ⭐ **checked before the
+  ///     pack**, which is what makes an opening permanent (ruling, Christian
+  ///     2026-09-21). Once through, never asked again;
+  ///  3. every listed item is carried in the backpack.
+  ///
+  /// ⚠️ **Carried means the backpack.** A proof in a town storeroom is not on
+  /// you, and the guard is looking at your hands.
+  ///
+  /// ⚠️ **The copy belongs to the Primal guard.** Pennycross is the only gate
+  /// with items behind it today; the second one wants its own line rather
+  /// than borrowing "the guard" and "proofs".
+  String? gateRefusal(String locationId) {
+    final want = World.byId(locationId).gateItemIds;
+    if (want.isEmpty) return null;
+    if (profile.openedGates.contains(locationId)) return null;
+    final missing = [
+      for (final id in want)
+        if (profile.backpack.countOf(id) == 0) id,
+    ];
+    if (missing.isEmpty) return null;
+    final names = <String>[];
+    for (final id in missing) {
+      final def = ItemCatalogue.tryById(id);
+      names.add(def == null ? id : ItemCatalogue.displayName(def));
+    }
+    return 'The guard wants three proofs — you are missing '
+        '${_listPhrase(names)}.';
+  }
+
+  /// "A", "A and B", "A, B and C" — so a refusal naming two missing proofs
+  /// reads like a sentence instead of a comma-separated dump.
+  static String _listPhrase(List<String> parts) {
+    if (parts.length == 1) return parts.first;
+    return '${parts.sublist(0, parts.length - 1).join(", ")} and ${parts.last}';
+  }
+
   /// True while a journey is under way.
   bool get isTravelling {
     settleTravel();
@@ -191,9 +234,15 @@ class GameState extends ChangeNotifier {
   /// Accepts any location with a route, not just a neighbour — WORLD_DESIGN
   /// §4b.2's point-to-point Travel. The Map tab still offers only neighbours
   /// until the travel UI is built; that is a UI limit, not a rule.
+  ///
+  /// ⚠️ **The gate is enforced here, not only in [travelTo].** [travelTo] asks
+  /// first so the Map tab has a sentence to show; this second check is what
+  /// stops every other caller — the world map, a future point-to-point
+  /// screen — from walking past the guard in silence.
   Future<bool> beginTravel(String toId, {String? mountId}) async {
     settleTravel();
     if (profile.trip != null || toId == profile.locationId) return false;
+    if (gateRefusal(toId) != null) return false;
     final route = Travel.route(profile.locationId, toId);
     if (route == null || route.isTrivial) return false;
 
@@ -206,6 +255,14 @@ class GameState extends ChangeNotifier {
         now().toUtc(),
         mountId: mountId,
       );
+      // ⭐ The gate opens as the trip STARTS, in the same write — so the one
+      // save that records the journey also records the permission. Splitting
+      // them would leave a window where the player is walking to Pennycross
+      // with the road still shut behind a crash. Nothing is consumed: the
+      // proofs stay in the pack (ruling, Christian 2026-09-21).
+      if (World.byId(toId).gateItemIds.isNotEmpty) {
+        profile.openedGates.add(toId);
+      }
     });
     return true;
   }
@@ -249,9 +306,22 @@ class GameState extends ChangeNotifier {
 
   /// Starts a journey to a neighbouring location. Kept for the Map tab, which
   /// offers neighbours only.
-  Future<void> travelTo(String locationId) async {
-    if (!canTravelTo(locationId)) return;
+  ///
+  /// ⭐ **Returns the refusal, if there is one** — the first thing this method
+  /// has ever had to say. Every other way it declines (already travelling, not
+  /// a neighbour) is a tile the UI had already greyed out, so `void` was
+  /// honest; a gate is different, because the tile looks live and the player
+  /// is owed a reason. Null means "under way, or nothing to say".
+  ///
+  /// ⚠️ Returned, not thrown. `interactive_world_map`'s `_travel` already
+  /// catches around this call to report a *save* failure as a modal, and a
+  /// thrown refusal would arrive there wearing that alert's words.
+  Future<String?> travelTo(String locationId) async {
+    final refusal = gateRefusal(locationId);
+    if (refusal != null) return refusal;
+    if (!canTravelTo(locationId)) return null;
     await beginTravel(locationId);
+    return null;
   }
 
   // ---- Duel results ----------------------------------------------------

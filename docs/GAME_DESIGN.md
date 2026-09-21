@@ -796,7 +796,7 @@ only** — but the *shape* of the lock changes as the world gets stranger:
 
 | Tier | What you gather | The lock | What it teaches |
 |---|---|---|---|
-| **Primal** | Three ordinary **proofs** — an arbitrary set of trophies | A **guard** who wants to see them before letting you leave | The world is still mundane: a person, a request, a door |
+| **Primal** | Three ordinary **proofs** — an arbitrary set of trophies | A **guard** on the north road who wants to see them before letting you into **Pennycross** | The world is still mundane: a person, a request, a door |
 | **Kinetic** | Three parts of a **Sigil** | Displayed to enter **Concordance** | Authority is now bureaucratic — you are showing papers, not fighting |
 | **Celestial** | Three **essences** (Solar · Lunar · Astral) | Charge a **Celestial Totem**; the charged totem passes a **magical barrier** to Rimeholt | The world stops asking permission and starts asking power |
 | **Ethereal** | Three **key fragments** | The **Eclipsed Citadel** itself | No gatekeeper left — only the door |
@@ -808,10 +808,28 @@ nobody behind it. The player feels the world getting less human without a
 single line of exposition. Keep the shapes distinct even if the underlying
 rule is shared.
 
-📝 **Deferred:** what the three Primal proofs actually are, and whether the
-assembled objects are consumed or kept as trophies. The Totem in particular
-wants to be keepable — a charged artifact is a better souvenir than a spent
-one.
+⭐ **Ruled 2026-09-21 (Christian) — the Primal gate stands on Pennycross, and
+it is the first gate the game actually enforces.** It was recorded on
+*Hearthwood*, which read as "three trophies to leave the starting town" — and
+you never did; you walk out of Hearthwood on turn one and nothing stops you.
+The line always described the road **into** Pennycross, so both the copy and
+the check now live there (`GameLocation.gateItemIds`). Hearthwood has no gate.
+
+Two halves of that ruling worth keeping straight:
+
+* **Carried, not spent.** The proofs must be in the **backpack** — not a town
+  storeroom — the first time you walk the north road. The guard *looks*; he
+  keeps nothing. Selling them afterwards is allowed and costs you nothing.
+* **Opened once, open for good.** The opening is recorded on the character
+  (`PlayerProfile.openedGates`) and the items are never checked again. A
+  re-check on every trip would make the proofs luggage for the rest of the
+  campaign, which is the opposite of a gate you *passed*.
+
+📝 **Still deferred** for the three later gates: whether their assembled
+objects are consumed or kept as trophies. The Totem in particular wants to be
+keepable — a charged artifact is a better souvenir than a spent one. Their
+`gate:` lines are prose with no `gateItemIds` behind them until then, and that
+is deliberate, not an oversight.
 
 #### 3a. The endgame chain — Citadel → Crown → Zenith ⭐
 
@@ -1152,7 +1170,7 @@ map:
 
 | Deferred | Belongs to |
 |---|---|
-| The three Primal **"proofs"** — arbitrary trophies, but arbitrary still needs choosing, and they are the first collectables a player ever sees | the enemies/loot pass |
+| ~~The three Primal **"proofs"**~~ — ✅ **settled.** Proof of the Woods / the Brook / the Foothills, guaranteed on each Primal pure-zone boss, carried past the Pennycross guard once (ruling 2026-09-21, §3) | done |
 | Whether the assembled **gate objects are consumed or kept** *(the Celestial Totem especially wants to be keepable — a charged artifact is a better souvenir than a spent one)* | the loot pass |
 | The **Core drop rate**, decided *against* the crown's twelve-Core requirement rather than independently | the loot tables |
 | What **Concordance's hour-long buffs** do — ✅ confirmed TBD. Also needs the persistent real-time buff machinery ITEMS §6b.1 flags as unbuilt | items/potions |

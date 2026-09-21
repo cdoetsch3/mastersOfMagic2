@@ -76,7 +76,11 @@ class _MapTabState extends State<MapTab> {
                   // than emptying out mid-trip.
                   travelLabel: Travel.labelBetween(here.id, id),
                   enabled: !game.isTravelling,
-                  onTravel: () => game.travelTo(id),
+                  // ⭐ Still tappable while the gate is shut. The refusal
+                  // names the proof you are short of, which is information;
+                  // a dead tile is not.
+                  gateRefusal: game.gateRefusal(id),
+                  onTravel: () => _travel(context, game, id),
                 ),
             ],
           ),
@@ -157,6 +161,14 @@ class _MapTabState extends State<MapTab> {
   /// which reads as a broken tile rather than a shut door.
   void _shopClosed(BuildContext context) =>
       showAppBanner(context, ShopCatalogue.closedFlavor);
+
+  /// Travel, and say why not when the guard says no. Same reasoning as
+  /// [_shopClosed]: a refused tap that reports nothing reads as a bug.
+  Future<void> _travel(BuildContext context, GameState game, String id) async {
+    final banner = appBannerOf(context);
+    final refusal = await game.travelTo(id);
+    if (refusal != null) banner.show(refusal, color: AppColors.ember);
+  }
 }
 
 class _CurrentLocationCard extends StatelessWidget {
@@ -340,11 +352,17 @@ class _TravelCard extends StatelessWidget {
   /// committing to it rather than discovered afterwards.
   final String? travelLabel;
   final bool enabled;
+
+  /// `GameState.gateRefusal` for this destination — null when the way is open
+  /// (or when the gate is prose only). Passed in rather than read here so the
+  /// card stays a pure function of what it is handed.
+  final String? gateRefusal;
   const _TravelCard({
     required this.location,
     required this.onTravel,
     this.travelLabel,
     this.enabled = true,
+    this.gateRefusal,
   });
 
   @override
@@ -409,10 +427,10 @@ class _TravelCard extends StatelessWidget {
                                 color: AppColors.gem,
                               ),
                             if (location.gate != null)
-                              const _MiniTag(
-                                icon: Icons.lock_outline,
-                                text: 'Gated',
-                                color: AppColors.gold,
+                              _GateTag(
+                                open:
+                                    location.gateItemIds.isNotEmpty &&
+                                    gateRefusal == null,
                               ),
                           ],
                         ),
@@ -457,14 +475,78 @@ class _MiniTag extends StatelessWidget {
   final Color color;
   const _MiniTag({required this.icon, required this.text, required this.color});
 
+  static const double _iconSize = 12;
+  static const double _gap = 4;
+  static const double _fontSize = 11.5;
+
+  /// How wide this tag would be if it sized itself to [text].
+  ///
+  /// ⚠️ **Measured, not a constant.** The obvious `width: 80` was right under
+  /// Roboto and forty pixels short under the test font, where every glyph is
+  /// a square — so the widget looked fine and every widget test overflowed.
+  /// A number read off one font is a number that is wrong in another (and
+  /// wrong again at 200% text scale).
+  ///
+  /// ⚠️ **Resolved through `DefaultTextStyle`, exactly as `Text` resolves its
+  /// own.** Measuring a bare `TextStyle(fontSize: …)` drops the theme's font
+  /// family and comes up about two pixels short — invisible by eye, an
+  /// overflow assertion in a widget test.
+  static double widthOf(BuildContext context, String text) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: DefaultTextStyle.of(
+          context,
+        ).style.merge(const TextStyle(fontSize: _fontSize)),
+      ),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    // The spare pixel keeps a rounded-up glyph run off the overflow stripes.
+    return _iconSize + _gap + painter.width + 1;
+  }
+
   @override
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Icon(icon, size: 12, color: color),
-      const SizedBox(width: 4),
-      Text(text, style: TextStyle(color: color, fontSize: 11.5)),
+      Icon(icon, size: _iconSize, color: color),
+      const SizedBox(width: _gap),
+      Text(
+        text,
+        style: TextStyle(color: color, fontSize: _fontSize),
+      ),
     ],
+  );
+}
+
+/// The lock on a travel card: shut, or opened for good.
+///
+/// ⭐ **One fixed-width cell for both states.** "Gate open" is wider than
+/// "Gated", and this tag sits in a `Wrap` beside the station and element
+/// glyphs — so letting it size itself would shuffle its neighbours the instant
+/// the gate opened, under a finger that is already on its way down. The width
+/// is set by the longer word and never changes (press-stability).
+///
+/// ⚠️ Only reached when `location.gate != null`. A gate with no items behind
+/// it (the four still-unbuilt ones) is always [open] `false` — prose that
+/// describes a lock nothing checks yet.
+class _GateTag extends StatelessWidget {
+  final bool open;
+  const _GateTag({required this.open});
+
+  /// The longer of the two labels, and therefore the one that sets the cell.
+  static const String openLabel = 'Gate open';
+  static const String shutLabel = 'Gated';
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: _MiniTag.widthOf(context, openLabel),
+    child: _MiniTag(
+      icon: open ? Icons.lock_open : Icons.lock_outline,
+      text: open ? openLabel : shutLabel,
+      color: open ? AppColors.teal : AppColors.gold,
+    ),
   );
 }
 

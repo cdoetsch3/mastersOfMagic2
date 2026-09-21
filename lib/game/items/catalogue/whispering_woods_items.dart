@@ -284,9 +284,13 @@ abstract final class WhisperingWoodsItems {
 
   // ---- the gate ------------------------------------------------------
 
-  /// ⭐ **The first real gate item.** Hearthwood's north road asks for *"three
-  /// ordinary proofs"* (`world.dart`) — one from each Primal pure zone. Until
-  /// now every gate in the game was a prose string with nothing behind it.
+  /// ⭐ **The first real gate item.** The north road *into Pennycross* asks for
+  /// *"three ordinary proofs"* (`world.dart`) — one from each Primal pure
+  /// zone. Until now every gate in the game was a prose string with nothing
+  /// behind it.
+  ///
+  /// ⚠️ [KeyDef.gates] reads `pennycross`, not `hearthwood` (ruling, Christian
+  /// 2026-09-21): the proofs were never needed to leave the starting town.
   static const proofOfTheWoods = KeyDef(
     id: 'proof_of_the_woods',
     properName: 'Proof of the Woods',
@@ -294,7 +298,7 @@ abstract final class WhisperingWoodsItems {
     lore:
         'A knot of root that kept growing after it was cut. The guard on the '
         'north road has seen a hundred and still turns each one over twice.',
-    gates: 'hearthwood',
+    gates: 'pennycross',
   );
 
   static const all = <ItemDef>[

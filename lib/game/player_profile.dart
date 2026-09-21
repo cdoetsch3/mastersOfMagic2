@@ -303,6 +303,20 @@ class PlayerProfile {
   /// still gated by the connection graph).
   Set<String> discoveredLocationIds;
 
+  /// Ids of tier gates this character has already talked their way past
+  /// (`GameLocation.gateItemIds`).
+  ///
+  /// ⭐ **Permanent, and the whole point of the field** (ruling, Christian
+  /// 2026-09-21). The proofs are *shown*, not spent: once an id is in here the
+  /// items are never looked for again, so selling, banking or losing them
+  /// cannot shut a road that is already open. A `bool` per gate in disguise —
+  /// a set, because gates are added faster than fields are.
+  ///
+  /// ⚠️ **Not [discoveredLocationIds]**. Seeing a place on the map and being
+  /// allowed through its gate are different permissions, and conflating them
+  /// would open Pennycross the moment its name appeared.
+  Set<String> openedGates;
+
   /// How many times this character has beaten each zone's **boss**.
   ///
   /// ⚠️ **Not the same as [discoveredLocationIds]** — walking somewhere is not
@@ -448,6 +462,7 @@ class PlayerProfile {
     this.trip,
     this.run,
     Set<String>? discoveredLocationIds,
+    Set<String>? openedGates,
     Map<String, int>? zoneClears,
     Map<String, int>? skillXp,
     List<LoadoutPreset>? presets,
@@ -473,6 +488,7 @@ class PlayerProfile {
     this.lastOpponentBotId,
   }) : locationId = locationId ?? World.startLocationId,
        discoveredLocationIds = discoveredLocationIds ?? {World.startLocationId},
+       openedGates = openedGates ?? {},
        zoneClears = zoneClears ?? {},
        skillXp = skillXp ?? {},
        presets = presets ?? [LoadoutPreset.starter('Loadout I')],
@@ -542,6 +558,7 @@ class PlayerProfile {
     'trip': trip?.toJson(),
     'run': run?.toJson(),
     'discoveredLocationIds': discoveredLocationIds.toList(),
+    'openedGates': openedGates.toList(),
     'zoneClears': zoneClears,
     if (skillXp.isNotEmpty) 'skillXp': skillXp,
     'presets': presets.map((p) => p.toJson()).toList(),
@@ -602,6 +619,14 @@ class PlayerProfile {
       // player is simply not on an adventure. See AdventureRun.fromJson.
       run: AdventureRun.fromJson(json['run'] as Map<String, dynamic>?),
       discoveredLocationIds: (json['discoveredLocationIds'] as List?)
+          ?.cast<String>()
+          .map(World.canonicalId)
+          .toSet(),
+      // Absent on every save written before the Primal gate was enforced, and
+      // absent reads as "has opened nothing" — the safe direction: a character
+      // who really did carry the proofs is asked to show them once more, which
+      // costs a walk; the other way round would unlock the tier for free.
+      openedGates: (json['openedGates'] as List?)
           ?.cast<String>()
           .map(World.canonicalId)
           .toSet(),

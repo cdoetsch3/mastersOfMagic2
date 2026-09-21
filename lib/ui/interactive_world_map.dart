@@ -233,7 +233,15 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
       // ⚠️ Awaited. Dropping this future swallowed persistence failures — an
       // offline save would fail silently and the player would find themselves
       // back where they started on next launch.
-      await widget.game.travelTo(loc.id);
+      // ⭐ A gate refusal comes back as a string rather than an exception, so
+      // it lands here and not in the catch below — which is the point: "the
+      // guard wants three proofs" is not "your travel was not saved".
+      final refusal = await widget.game.travelTo(loc.id);
+      if (refusal != null) {
+        if (!mounted) return;
+        showAppBanner(context, refusal, color: AppColors.ember);
+        return;
+      }
     } catch (e) {
       if (!mounted) return;
       // ⚠️ **A modal, not a banner** (notice ruling, 2026-08-26). The map

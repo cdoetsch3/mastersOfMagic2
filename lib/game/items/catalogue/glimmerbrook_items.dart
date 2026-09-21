@@ -151,7 +151,7 @@ abstract final class GlimmerbrookItems {
 
   // ---- the gate ------------------------------------------------------
 
-  /// ⭐ **The second of Hearthwood's *"three ordinary proofs"*** (`world.dart`)
+  /// ⭐ **The second of Pennycross's *"three ordinary proofs"*** (`world.dart`)
   /// — one from each Primal pure zone. ⚠️ Both bosses guarantee it on their
   /// `always` list; on a main table it would be luck, and progression behind a
   /// dice roll is the failure the Woods' proof was written to avoid.
@@ -162,7 +162,7 @@ abstract final class GlimmerbrookItems {
     lore:
         'A pale river stone that has not warmed since it left the water. The '
         'guard on the north road weighs it in his palm and takes his time.',
-    gates: 'hearthwood',
+    gates: 'pennycross',
   );
 
   static const all = <ItemDef>[

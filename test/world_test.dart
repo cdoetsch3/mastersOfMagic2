@@ -398,14 +398,49 @@ void main() {
     });
 
     test('each tier gate is recorded on the place that enforces it', () {
+      // ⭐ Pennycross, not Hearthwood (ruling, Christian 2026-09-21): the
+      // proofs are shown on the road IN, and nothing has ever stopped a mage
+      // walking OUT of the starting town.
       for (final id in [
-        'hearthwood',
+        'pennycross',
         'concordance',
         'rimeholt',
         'the_eclipsed_citadel',
         'zenith',
       ]) {
         expect(byId[id]!.gate, isNotNull, reason: '$id is a gate');
+      }
+      expect(
+        byId['hearthwood']!.gate,
+        isNull,
+        reason: 'kills a mutant that puts the proofs line back on Hearthwood',
+      );
+    });
+
+    test('the three proof zones are reachable without passing Pennycross', () {
+      // ⚠️ **The ruling is only possible because of this.** A gate whose keys
+      // sit behind itself is unopenable; this walks the graph with Pennycross
+      // deleted and insists all three Primal pure zones are still found.
+      final seen = <String>{World.startLocationId};
+      final queue = <String>[World.startLocationId];
+      while (queue.isNotEmpty) {
+        for (final c in byId[queue.removeLast()]!.connections) {
+          if (c == 'pennycross') continue;
+          if (seen.add(c)) queue.add(c);
+        }
+      }
+      for (final zone in [
+        'whispering_woods',
+        'glimmerbrook',
+        'cinderpeak_foothills',
+      ]) {
+        expect(
+          seen,
+          contains(zone),
+          reason:
+              'kills a mutant that routes $zone through Pennycross — its '
+              'proof would then be locked behind the gate it opens',
+        );
       }
     });
   });

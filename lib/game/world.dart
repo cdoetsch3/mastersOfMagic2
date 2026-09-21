@@ -197,7 +197,26 @@ class GameLocation {
   final String? station;
 
   /// What must be assembled to pass, if this place is a tier gate.
+  ///
+  /// ⚠️ **Prose, and prose only.** This line *describes* the lock; it does not
+  /// enforce it. What enforces it is [gateItemIds]. The two are deliberately
+  /// separable: three of the four later gates still have their copy written
+  /// and their items unbuilt, and a gate that says something while checking
+  /// nothing is the honest state of those places, not a bug.
   final String? gate;
+
+  /// The item ids that must be **carried** — in the backpack — to open this
+  /// gate for the first time.
+  ///
+  /// ⭐ **Shown, not spent** (ruling, Christian 2026-09-21). The guard wants
+  /// to *see* the proofs; he does not keep them. So nothing is consumed, and
+  /// the opening is recorded once on the character
+  /// (`PlayerProfile.openedGates`) and never re-checked — a player who sells
+  /// their proofs afterwards does not lose the road they already walked.
+  ///
+  /// ⚠️ Empty is the common case and means "no check". A [gate] line with an
+  /// empty list is descriptive-only; see the note there.
+  final List<String> gateItemIds;
 
   /// The level this place tends to open up at. Towns only; `null` elsewhere.
   final int? opensAtLevel;
@@ -244,6 +263,7 @@ class GameLocation {
     this.maxLevel = 0,
     this.station,
     this.gate,
+    this.gateItemIds = const [],
     this.opensAtLevel,
     this.teleportsTo = const [],
   });
@@ -306,7 +326,11 @@ abstract final class World {
       tier: MagicTier.primal,
       opensAtLevel: 1,
       station: 'Woodcarving',
-      gate: 'Three ordinary proofs, shown to the guard on the north road',
+      // ⚠️ **No gate here** (ruling, Christian 2026-09-21). Hearthwood used to
+      // carry the proofs line, which read as "you need three trophies to
+      // LEAVE the starting town" — and you never did; you walk out on turn
+      // one. The line always described the road INTO Pennycross, so it now
+      // lives on Pennycross, where it is also enforced.
       blurb: 'A wooded river valley where every mage begins.',
       arrival:
           'Alders lean over the water, and the whole valley smells of wet '
@@ -457,6 +481,17 @@ abstract final class World {
       tier: MagicTier.primal,
       opensAtLevel: 8,
       station: 'Tailoring',
+      // ⭐ **The Primal tier gate, and the first one the game enforces**
+      // (ruling, Christian 2026-09-21). One proof from each Primal pure-zone
+      // boss, carried past the guard once; after that the road is simply open.
+      gate:
+          'Three ordinary proofs, shown to the guard on the north road into '
+          'Pennycross',
+      gateItemIds: [
+        'proof_of_the_woods',
+        'proof_of_the_brook',
+        'proof_of_the_foothills',
+      ],
       blurb:
           'The first market, where the river road crosses the mountain road.',
       arrival:

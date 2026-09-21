@@ -129,8 +129,8 @@ abstract final class CinderpeakItems {
   // ---- the gate ------------------------------------------------------
 
   /// ⭐ **The third and last of the *"three ordinary proofs"*.** With this one
-  /// defined, Hearthwood's north road is a gate a player can actually open —
-  /// one boss kill in each Primal pure zone, in any order.
+  /// defined, the north road into Pennycross is a gate a player can actually
+  /// open — one boss kill in each Primal pure zone, in any order.
   static const proofOfTheFoothills = KeyDef(
     id: 'proof_of_the_foothills',
     properName: 'Proof of the Foothills',
@@ -139,7 +139,7 @@ abstract final class CinderpeakItems {
         'A plate of black glass with the heat still somewhere inside it. The '
         'guard on the north road holds each one up to the light before he '
         'nods.',
-    gates: 'hearthwood',
+    gates: 'pennycross',
   );
 
   static const all = <ItemDef>[
