@@ -209,9 +209,7 @@ class _UnbuiltEngineState extends State<_UnbuiltEngine> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => widget.onDone(0.75),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => widget.onDone(0.75));
   }
 
   @override
@@ -260,9 +258,7 @@ class _Result extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final def = ItemCatalogue.tryById(recipe.outputId);
-    final name = def == null
-        ? recipe.outputId
-        : ItemCatalogue.displayName(def);
+    final name = def == null ? recipe.outputId : ItemCatalogue.displayName(def);
     final made = outcome?.succeeded == true;
     return Center(
       child: Column(

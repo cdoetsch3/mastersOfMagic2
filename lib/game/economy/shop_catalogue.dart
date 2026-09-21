@@ -102,8 +102,7 @@ abstract final class ShopCatalogue {
   /// closed for the identical reason (no content, not a town-specific
   /// story), and a builder wiring the UI reads this rather than inventing
   /// four bespoke lines that could drift out of sync with each other.
-  static const String closedFlavor =
-      "The caravans haven't come this season.";
+  static const String closedFlavor = "The caravans haven't come this season.";
 
   // ---- §14b.3: ingots are never stock -------------------------------------
 
@@ -128,7 +127,10 @@ abstract final class ShopCatalogue {
   /// zone" definition, read straight off [GameLocation.edges].
   static Set<String> nativeZonesOf(String townId) {
     final town = World.byId(townId);
-    return {for (final id in town.connections) if (!World.byId(id).isTown) id};
+    return {
+      for (final id in town.connections)
+        if (!World.byId(id).isTown) id,
+    };
   }
 
   /// Every stockable id whose owning zone ([ItemCatalogue.zoneOf]) is native
@@ -223,8 +225,9 @@ abstract final class ShopCatalogue {
   ///
   /// `static final`, not `const`: it resolves ids through [ItemCatalogue],
   /// which is itself a derived (`static final`) map.
-  static final Set<String> consumableIngredientIds =
-      consumableIngredientsIn(RecipeBook.all);
+  static final Set<String> consumableIngredientIds = consumableIngredientsIn(
+    RecipeBook.all,
+  );
 
   /// [consumableIngredientIds]'s rule, over an arbitrary recipe list.
   ///

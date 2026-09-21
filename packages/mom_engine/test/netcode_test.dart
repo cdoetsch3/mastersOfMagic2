@@ -26,8 +26,10 @@ void main() {
   });
 
   group('belt items cross the wire as an ID, never as numbers', () {
-    const draught =
-        ConsumableEffect(name: 'Sapwort Draught', healNowPercent: 20);
+    const draught = ConsumableEffect(
+      name: 'Sapwort Draught',
+      healNowPercent: 20,
+    );
     ConsumableEffect? lookup(String id) =>
         id == 'sapwort_draught' ? draught : null;
 
@@ -35,7 +37,8 @@ void main() {
       expect(
         encodeAction(const UseItemAction('sapwort_draught', draught)),
         'U|sapwort_draught',
-        reason: '⚠️ the EFFECT must not ride along — a wire that carried the '
+        reason:
+            '⚠️ the EFFECT must not ride along — a wire that carried the '
             'heal would let a doctored client drink a 900% potion, and the '
             'commitment hash would happily cover it',
       );
@@ -52,27 +55,32 @@ void main() {
       expect(
         use.effect.healNowPercent,
         20,
-        reason: 'the receiving client resolves the numbers from its OWN '
+        reason:
+            'the receiving client resolves the numbers from its OWN '
             'catalogue — that resolution is the whole point of the id',
       );
       expect(encodeAction(decoded), 'U|sapwort_draught');
     });
 
-    test('⚠️ an item this build cannot resolve throws rather than fizzling',
-        () {
-      expect(
-        () => decodeAction('U|philosophers_stone', consumables: lookup),
-        throwsFormatException,
-        reason: 'a silent no-op potion would desync the two clients — one '
-            'heals, the other does not, and both keep playing',
-      );
-    });
+    test(
+      '⚠️ an item this build cannot resolve throws rather than fizzling',
+      () {
+        expect(
+          () => decodeAction('U|philosophers_stone', consumables: lookup),
+          throwsFormatException,
+          reason:
+              'a silent no-op potion would desync the two clients — one '
+              'heals, the other does not, and both keep playing',
+        );
+      },
+    );
 
     test('a duel with no catalogue injected rejects item moves outright', () {
       expect(
         () => decodeAction('U|sapwort_draught'),
         throwsFormatException,
-        reason: 'no resolver means no way to agree on the heal, which is a '
+        reason:
+            'no resolver means no way to agree on the heal, which is a '
             'refusal, not a default',
       );
     });
@@ -97,10 +105,12 @@ void main() {
     });
 
     test('changing the move after committing fails verification', () {
-      final committed =
-          encodeAction(CastAction(Spellbook.ward, MagicElement.aqua));
-      final swapped =
-          encodeAction(CastAction(Spellbook.cataclysm, MagicElement.pyro));
+      final committed = encodeAction(
+        CastAction(Spellbook.ward, MagicElement.aqua),
+      );
+      final swapped = encodeAction(
+        CastAction(Spellbook.cataclysm, MagicElement.pyro),
+      );
       final commit = commitmentOf(committed, 'nonce');
       expect(verifyCommitment(commit, swapped, 'nonce'), isFalse);
     });

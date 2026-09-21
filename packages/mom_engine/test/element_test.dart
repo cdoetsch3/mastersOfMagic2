@@ -20,24 +20,33 @@ void main() {
     test('no mutual counters (proper 3-cycles)', () {
       for (final a in MagicElement.values) {
         for (final b in a.strongAgainst) {
-          expect(b.counters(a), isFalse,
-              reason: '${a.name} and ${b.name} counter each other');
+          expect(
+            b.counters(a),
+            isFalse,
+            reason: '${a.name} and ${b.name} counter each other',
+          );
         }
       }
     });
 
     test('counteredBy is the inverse of counters', () {
       for (final e in MagicElement.values) {
-        expect(e.counteredBy.counters(e), isTrue,
-            reason: '${e.counteredBy.name} should counter ${e.name}');
+        expect(
+          e.counteredBy.counters(e),
+          isTrue,
+          reason: '${e.counteredBy.name} should counter ${e.name}',
+        );
       }
     });
 
     test('counters never cross tiers', () {
       for (final a in MagicElement.values) {
         for (final b in a.strongAgainst) {
-          expect(b.tier, a.tier,
-              reason: '${a.name} counters ${b.name} across tiers');
+          expect(
+            b.tier,
+            a.tier,
+            reason: '${a.name} counters ${b.name} across tiers',
+          );
         }
       }
     });
@@ -46,8 +55,9 @@ void main() {
   group('tiers', () {
     test('three elements per tier', () {
       for (final tier in MagicTier.values) {
-        final members =
-            MagicElement.values.where((e) => e.tier == tier).toList();
+        final members = MagicElement.values
+            .where((e) => e.tier == tier)
+            .toList();
         expect(members.length, 3, reason: '$tier');
       }
     });
@@ -102,18 +112,23 @@ void main() {
     });
 
     test('tier membership is exactly as designed', () {
-      expect(
-        MagicElement.values.where((e) => e.tier == MagicTier.celestial),
-        [MagicElement.solar, MagicElement.lunar, MagicElement.astral],
-      );
-      expect(
-        MagicElement.values.where((e) => e.tier == MagicTier.ethereal),
-        [MagicElement.sanctus, MagicElement.umbra, MagicElement.arcane],
-      );
+      expect(MagicElement.values.where((e) => e.tier == MagicTier.celestial), [
+        MagicElement.solar,
+        MagicElement.lunar,
+        MagicElement.astral,
+      ]);
+      expect(MagicElement.values.where((e) => e.tier == MagicTier.ethereal), [
+        MagicElement.sanctus,
+        MagicElement.umbra,
+        MagicElement.arcane,
+      ]);
     });
 
     test('"radiant" is gone — the name is now "sanctus"', () {
-      expect(MagicElement.values.map((e) => e.name), isNot(contains('radiant')));
+      expect(
+        MagicElement.values.map((e) => e.name),
+        isNot(contains('radiant')),
+      );
       expect(MagicElement.values.map((e) => e.name), contains('sanctus'));
     });
   });
@@ -125,16 +140,25 @@ void main() {
       expect(MagicTier.kinetic.countersTier(MagicTier.primal), isTrue);
       expect(MagicTier.celestial.countersTier(MagicTier.kinetic), isTrue);
       expect(MagicTier.ethereal.countersTier(MagicTier.celestial), isTrue);
-      expect(MagicTier.primal.countersTier(MagicTier.ethereal), isTrue,
-          reason: 'Primal beats Ethereal — the anti-power-creep valve');
+      expect(
+        MagicTier.primal.countersTier(MagicTier.ethereal),
+        isTrue,
+        reason: 'Primal beats Ethereal — the anti-power-creep valve',
+      );
     });
 
     test('every tier counters exactly one and is countered by one', () {
       for (final t in MagicTier.values) {
-        expect(MagicTier.values.where(t.countersTier).length, 1,
-            reason: '$t counters');
-        expect(MagicTier.values.where((o) => o.countersTier(t)).length, 1,
-            reason: '$t countered by');
+        expect(
+          MagicTier.values.where(t.countersTier).length,
+          1,
+          reason: '$t counters',
+        );
+        expect(
+          MagicTier.values.where((o) => o.countersTier(t)).length,
+          1,
+          reason: '$t countered by',
+        );
       }
     });
 
@@ -152,8 +176,11 @@ void main() {
     test('no tier counters itself, and no mutual counters', () {
       for (final t in MagicTier.values) {
         expect(t.countersTier(t), isFalse);
-        expect(t.beatsTier.countersTier(t), isFalse,
-            reason: '$t and ${t.beatsTier} counter each other');
+        expect(
+          t.beatsTier.countersTier(t),
+          isFalse,
+          reason: '$t and ${t.beatsTier} counter each other',
+        );
       }
     });
 
@@ -170,12 +197,14 @@ void main() {
       expect(MagicTier.ethereal.isNeutralWith(MagicTier.kinetic), isTrue);
     });
 
-    test('a tier is not "neutral" with itself — that is the element triangle',
-        () {
-      for (final t in MagicTier.values) {
-        expect(t.isNeutralWith(t), isFalse);
-      }
-    });
+    test(
+      'a tier is not "neutral" with itself — that is the element triangle',
+      () {
+        for (final t in MagicTier.values) {
+          expect(t.isNeutralWith(t), isFalse);
+        }
+      },
+    );
 
     test('adjacent tiers are never neutral', () {
       for (final t in MagicTier.values) {

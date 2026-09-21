@@ -85,7 +85,8 @@ void main() {
       expect(
         tester.takeException(),
         isNull,
-        reason: 'drop the errorBuilder from ItemIcon and every inventory '
+        reason:
+            'drop the errorBuilder from ItemIcon and every inventory '
             'screen in the game reports "Unable to load asset"',
       );
     });
@@ -98,20 +99,23 @@ void main() {
       expect(
         find.text('Oak Log'),
         findsWidgets,
-        reason: 'the backpack tile falls back to the wrapped name it drew '
+        reason:
+            'the backpack tile falls back to the wrapped name it drew '
             'before ItemIcon existed — swap the fallback for a placeholder '
             'glyph and every pack slot in the game goes blank until art lands',
       );
       expect(
         find.text('Bindweed Fibre'),
         findsOneWidget,
-        reason: 'the Storeroom row keeps its label; the icon there sits '
+        reason:
+            'the Storeroom row keeps its label; the icon there sits '
             'BESIDE the text, so a missing PNG must remove nothing',
       );
       expect(
         find.byType(ItemIcon),
         findsWidgets,
-        reason: 'a missing PNG must not take the widget out of the tree — '
+        reason:
+            'a missing PNG must not take the widget out of the tree — '
             'guard the call sites with a file-exists check and the pipeline '
             'is dead the day the art lands, with nothing failing to say so',
       );
@@ -131,7 +135,8 @@ void main() {
       expect(
         find.text('Oak Log'),
         findsWidgets,
-        reason: 'the pack tile must never show a hole where the name was; '
+        reason:
+            'the pack tile must never show a hole where the name was; '
             'frame zero is the frame the player actually sees when the tab '
             'opens',
       );
@@ -153,14 +158,16 @@ void main() {
       expect(
         gapped,
         isNotEmpty,
-        reason: 'no gapped icon on screen means this test is measuring '
+        reason:
+            'no gapped icon on screen means this test is measuring '
             'nothing — the Storeroom row and the pack tile both mount one',
       );
       for (final icon in gapped) {
         expect(
           tester.getSize(find.byWidget(icon)).width,
           0,
-          reason: '${icon.defId}: with no PNG this must be exactly zero wide, '
+          reason:
+              '${icon.defId}: with no PNG this must be exactly zero wide, '
               'gap included — anything else is a layout shift the designer '
               'never approved, for art that is not there',
         );
@@ -176,7 +183,8 @@ void main() {
       expect(
         bundle.requested,
         contains('assets/items/whispering_woods/oak_log.png'),
-        reason: 'the maintainer generates files named for item ids under a '
+        reason:
+            'the maintainer generates files named for item ids under a '
             'zone folder — point itemIconFor at any other name (the display '
             'name, a flat directory, the instance id) and the PNGs ship '
             'without ever being read',
@@ -184,13 +192,15 @@ void main() {
       expect(
         bundle.requested,
         contains('assets/items/whispering_woods/bindweed_fibre.png'),
-        reason: 'the Storeroom asks by DEF id; ask by the stack key it '
+        reason:
+            'the Storeroom asks by DEF id; ask by the stack key it '
             'happens to hold and non-fungibles would ask for a UUID',
       );
       expect(
         tester.takeException(),
         isNull,
-        reason: 'an icon that IS present must decode quietly too — the '
+        reason:
+            'an icon that IS present must decode quietly too — the '
             'errorBuilder is a fallback, not the normal path',
       );
     });
@@ -214,7 +224,8 @@ void main() {
         expect(
           tester.getSize(find.byWidget(icon)).width,
           icon.size! + icon.gap,
-          reason: '${icon.defId}: a present icon must claim its box AND its '
+          reason:
+              '${icon.defId}: a present icon must claim its box AND its '
               'gap — drop the "+ gap" from the width and the icon lands '
               'jammed against the label it belongs to',
         );
@@ -234,7 +245,8 @@ void main() {
       expect(
         wrongZone,
         isEmpty,
-        reason: 'only Whispering Woods items are on this screen, so a request '
+        reason:
+            'only Whispering Woods items are on this screen, so a request '
             'under another zone means zoneOf is guessing — and the maintainer '
             'would have to produce files in directories nobody documented',
       );
@@ -273,7 +285,8 @@ void main() {
       expect(
         itemIconFor('sunken_widget_of_nowhere'),
         isNull,
-        reason: 'a save written before a content patch must not send the '
+        reason:
+            'a save written before a content patch must not send the '
             'bundle looking for assets/items/null/<id>.png on every rebuild',
       );
     });
@@ -286,14 +299,16 @@ void main() {
         expect(
           ItemCatalogue.zoneOf(def.id),
           isNotNull,
-          reason: '${def.id} is in ItemCatalogue.all but in no zone list — '
+          reason:
+              '${def.id} is in ItemCatalogue.all but in no zone list — '
               'add its catalogue to ItemCatalogue.byZone',
         );
       }
       expect(
         ItemCatalogue.all.length,
         110,
-        reason: 'the Primal quarter is 18/9/8/9/8 (52) plus the Kinetic '
+        reason:
+            'the Primal quarter is 18/9/8/9/8 (52) plus the Kinetic '
             'pure zones 9/13/15 (37) plus The Molten Deep 6; if this number '
             'moved, docs/ITEM_ART.md is now short an entry (or carries a '
             'stale one) and nothing else in the suite would say so',
@@ -306,7 +321,8 @@ void main() {
         expect(
           zones,
           contains(key),
-          reason: '"$key" is not a World location id, so pubspec would be '
+          reason:
+              '"$key" is not a World location id, so pubspec would be '
               'declaring a directory for a place that does not exist',
         );
       }
@@ -325,11 +341,13 @@ void main() {
       );
     }
     for (final zoneDir in root.listSync().whereType<Directory>()) {
-      final zone = zoneDir.uri.pathSegments[zoneDir.uri.pathSegments.length - 2];
+      final zone =
+          zoneDir.uri.pathSegments[zoneDir.uri.pathSegments.length - 2];
       expect(
         ItemCatalogue.byZone.keys,
         contains(zone),
-        reason: 'assets/items/$zone/ is a folder for nowhere — itemIconFor '
+        reason:
+            'assets/items/$zone/ is a folder for nowhere — itemIconFor '
             'can only ever ask under a zone in byZone, so nothing in it will '
             'ever load',
       );
@@ -343,13 +361,15 @@ void main() {
         expect(
           ItemCatalogue.tryById(stem),
           isNotNull,
-          reason: '$zone/$stem.png is an icon for nothing — itemIconFor can '
+          reason:
+              '$zone/$stem.png is an icon for nothing — itemIconFor can '
               'only ever ask for a def id, so nothing will ever load it',
         );
         expect(
           ItemCatalogue.zoneOf(stem),
           zone,
-          reason: '$stem.png is filed under $zone but the catalogue defines '
+          reason:
+              '$stem.png is filed under $zone but the catalogue defines '
               'it in ${ItemCatalogue.zoneOf(stem)} — the game will look in '
               'the other folder and find nothing',
         );

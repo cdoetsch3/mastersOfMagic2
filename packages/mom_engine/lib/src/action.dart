@@ -15,8 +15,7 @@ class ChargeAction extends MageAction {
   const ChargeAction([this.element]);
 
   @override
-  String toString() =>
-      element == null ? 'charge' : 'charge (${element!.name})';
+  String toString() => element == null ? 'charge' : 'charge (${element!.name})';
 }
 
 /// Cast [spell]. Consumes ALL current charge and ends the cycle.

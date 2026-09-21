@@ -23,11 +23,15 @@ class _Burn extends TurnStatus {
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) =>
       phase == TurnPhase.end
-          ? [
-              StatusDamage(amount,
-                  element: element, bypassShield: bypass, source: 'Burn')
-            ]
-          : const [];
+      ? [
+          StatusDamage(
+            amount,
+            element: element,
+            bypassShield: bypass,
+            source: 'Burn',
+          ),
+        ]
+      : const [];
 
   @override
   bool advanceAndCheckExpiry(MageState holder) => --turnsLeft <= 0;
@@ -46,9 +50,7 @@ class _Regen extends TurnStatus {
 
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) =>
-      phase == TurnPhase.end
-          ? [StatusHeal(amount, source: 'Regen')]
-          : const [];
+      phase == TurnPhase.end ? [StatusHeal(amount, source: 'Regen')] : const [];
 
   @override
   bool advanceAndCheckExpiry(MageState holder) => false; // never expires
@@ -69,8 +71,8 @@ class _StartStrike extends TurnStatus {
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) =>
       phase == TurnPhase.start && !_spent
-          ? [StatusDamage(amount, bypassShield: true, source: 'StartStrike')]
-          : const [];
+      ? [StatusDamage(amount, bypassShield: true, source: 'StartStrike')]
+      : const [];
 
   @override
   bool advanceAndCheckExpiry(MageState holder) {
@@ -134,16 +136,18 @@ void main() {
   });
 
   group('survivability-first ordering', () {
-    test('a heal resolves before a same-turn burn that would otherwise kill',
-        () {
-      alice.hp = 6;
-      alice.statuses.add(_Regen(10)); // heal lane (early)
-      alice.statuses.add(_Burn(12, 1, bypass: true)); // damage lane (late)
-      idleTurn();
-      // Heals 6→16 first, then burns 16→4: survives.
-      expect(alice.alive, isTrue);
-      expect(alice.hp, 4);
-    });
+    test(
+      'a heal resolves before a same-turn burn that would otherwise kill',
+      () {
+        alice.hp = 6;
+        alice.statuses.add(_Regen(10)); // heal lane (early)
+        alice.statuses.add(_Burn(12, 1, bypass: true)); // damage lane (late)
+        idleTurn();
+        // Heals 6→16 first, then burns 16→4: survives.
+        expect(alice.alive, isTrue);
+        expect(alice.hp, 4);
+      },
+    );
 
     test('heal event is emitted before the damage event', () {
       alice.hp = 50;
@@ -178,8 +182,7 @@ void main() {
       expect(duel.winner, alice, reason: 'the Haste holder (Bruno) dies first');
     });
 
-    test('no Haste: symmetric lethal DoTs still resolve deterministically',
-        () {
+    test('no Haste: symmetric lethal DoTs still resolve deterministically', () {
       // With nobody holding Haste, the seq tiebreak (mage1 first) decides —
       // still a single winner, never a draw, and always the same one.
       alice.hp = 3;
@@ -245,10 +248,12 @@ void main() {
         final d = DuelEngine(a, b, elementEffects: false, baseMissPercent: 0);
         final log = <String>[];
         for (var i = 0; i < 4; i++) {
-          log.addAll(d
-              .resolveTurn(const ForfeitAction(), const ForfeitAction())
-              .events
-              .map((e) => e.toString()));
+          log.addAll(
+            d
+                .resolveTurn(const ForfeitAction(), const ForfeitAction())
+                .events
+                .map((e) => e.toString()),
+          );
         }
         return log;
       }

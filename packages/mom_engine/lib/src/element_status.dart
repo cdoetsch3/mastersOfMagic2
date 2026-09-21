@@ -54,13 +54,15 @@ class IgniteStatus extends TurnStatus implements DamageOverTime, TurnTimed {
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) =>
       phase == TurnPhase.end
-          ? [
-              StatusDamage(perTick,
-                  lane: Lane.damage,
-                  source: 'Ignite',
-                  element: MagicElement.pyro)
-            ]
-          : const [];
+      ? [
+          StatusDamage(
+            perTick,
+            lane: Lane.damage,
+            source: 'Ignite',
+            element: MagicElement.pyro,
+          ),
+        ]
+      : const [];
 
   @override
   bool advanceAndCheckExpiry(MageState holder) => --turnsLeft <= 0;
@@ -117,7 +119,6 @@ class PhotosynthesisStatus extends TurnStatus {
   @override
   bool advanceAndCheckExpiry(MageState holder) => !activeFor(holder);
 }
-
 
 /// **Blind** (Solar in the V2 roster). The holder's harmful spells have a 50%
 /// chance to miss for their next 3 turns (not the turn it lands — [missChance]

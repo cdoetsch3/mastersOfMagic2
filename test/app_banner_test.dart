@@ -71,13 +71,15 @@ void main() {
       expect(
         banner.bottom,
         lessThan(screen.height / 2),
-        reason: '⭐ THE ruling: the whole banner sits in the top half. A '
+        reason:
+            '⭐ THE ruling: the whole banner sits in the top half. A '
             'SnackBar re-implementation lands at the bottom and fails here',
       );
       expect(
         banner.top,
         greaterThanOrEqualTo(appBar.bottom),
-        reason: 'below the app bar — a notice covering the title bar is a '
+        reason:
+            'below the app bar — a notice covering the title bar is a '
             'different obstruction, not a fix for the first one',
       );
     });
@@ -93,13 +95,15 @@ void main() {
       expect(
         banner.overlaps(bar),
         isFalse,
-        reason: '⭐ the bug being fixed: the notice sat on top of the button '
+        reason:
+            '⭐ the bug being fixed: the notice sat on top of the button '
             'the player was reaching for',
       );
       expect(
         find.byType(SnackBar),
         findsNothing,
-        reason: '⚠️ kills the "just call showSnackBar" mutant outright — no '
+        reason:
+            '⚠️ kills the "just call showSnackBar" mutant outright — no '
             'SnackBar may exist anywhere in the tree',
       );
     });
@@ -116,7 +120,8 @@ void main() {
       expect(
         find.byType(AppBanner),
         findsOneWidget,
-        reason: 'a banner that vanishes early is a banner nobody finishes '
+        reason:
+            'a banner that vanishes early is a banner nobody finishes '
             'reading',
       );
 
@@ -132,9 +137,7 @@ void main() {
 
     testWidgets('⭐ a second banner REPLACES the first', (tester) async {
       var n = 0;
-      await tester.pumpWidget(
-        _host((c) => showAppBanner(c, 'Notice ${++n}')),
-      );
+      await tester.pumpWidget(_host((c) => showAppBanner(c, 'Notice ${++n}')));
 
       await tester.tap(find.text('Do the thing'));
       await tester.pumpAndSettle();
@@ -146,13 +149,15 @@ void main() {
       expect(
         find.byType(AppBanner),
         findsOneWidget,
-        reason: '⭐ one at a time — two stacked notices would re-create the '
+        reason:
+            '⭐ one at a time — two stacked notices would re-create the '
             'obstruction this component removes',
       );
       expect(
         find.text('Notice 1'),
         findsNothing,
-        reason: 'replaced, not queued: a player who taps twice wants the '
+        reason:
+            'replaced, not queued: a player who taps twice wants the '
             'SECOND answer, not to wait out the first',
       );
       expect(find.text('Notice 2'), findsOneWidget);
@@ -162,9 +167,7 @@ void main() {
       tester,
     ) async {
       var n = 0;
-      await tester.pumpWidget(
-        _host((c) => showAppBanner(c, 'Notice ${++n}')),
-      );
+      await tester.pumpWidget(_host((c) => showAppBanner(c, 'Notice ${++n}')));
       await tester.tap(find.text('Do the thing'));
       await tester.pumpAndSettle();
 
@@ -178,7 +181,8 @@ void main() {
       expect(
         find.text('Notice 2'),
         findsOneWidget,
-        reason: '⚠️ the timer belongs to the banner, not to the module — a '
+        reason:
+            '⚠️ the timer belongs to the banner, not to the module — a '
             'shared timer would cut the replacement short at 900ms',
       );
 
@@ -223,7 +227,8 @@ void main() {
       expect(
         taps,
         2,
-        reason: '⭐ no interaction required AND none possible: the banner is '
+        reason:
+            '⭐ no interaction required AND none possible: the banner is '
             'IgnorePointer, so it cannot eat the button under it',
       );
     });
@@ -265,7 +270,8 @@ void main() {
       expect(
         find.text('Password changed.'),
         findsOneWidget,
-        reason: '⚠️ raised in the ROOT overlay — several callers report an '
+        reason:
+            '⚠️ raised in the ROOT overlay — several callers report an '
             'outcome and then leave, and a notice that pops with the route '
             'is a notice nobody ever sees',
       );
@@ -276,8 +282,9 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _host((c) => showAppBanner(c, 'Your pack is full.',
-            color: AppColors.ember)),
+        _host(
+          (c) => showAppBanner(c, 'Your pack is full.', color: AppColors.ember),
+        ),
       );
       await tester.tap(find.text('Do the thing'));
       await tester.pumpAndSettle();
@@ -286,7 +293,8 @@ void main() {
       expect(
         text.style?.color,
         AppColors.text,
-        reason: '⚠️ a refusal is the message a player most needs to READ; '
+        reason:
+            '⚠️ a refusal is the message a player most needs to READ; '
             'ember-on-plum body text would make it the hardest one',
       );
       expect(
@@ -317,7 +325,8 @@ void main() {
       expect(
         find.byType(AppBanner),
         findsNothing,
-        reason: '⚠️ the escalation REPLACES the banner — a refusal that is '
+        reason:
+            '⚠️ the escalation REPLACES the banner — a refusal that is '
             'worth a modal must not also flash past as a banner',
       );
 

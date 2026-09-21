@@ -9,7 +9,12 @@ void main() {
   setUp(() {
     attacker = MageState(name: 'Attacker');
     defender = MageState(name: 'Defender');
-    duel = DuelEngine(attacker, defender, elementEffects: false, baseMissPercent: 0);
+    duel = DuelEngine(
+      attacker,
+      defender,
+      elementEffects: false,
+      baseMissPercent: 0,
+    );
   });
 
   /// Charges [mage] up to [target] charge in [element] while the other mage
@@ -17,9 +22,10 @@ void main() {
   void chargeUp(MageState mage, MagicElement element, int target) {
     while (mage.charge < target) {
       final filler = ChargeAction(
-          (mage == attacker ? defender : attacker).charge == 0
-              ? MagicElement.aero
-              : null);
+        (mage == attacker ? defender : attacker).charge == 0
+            ? MagicElement.aero
+            : null,
+      );
       final action = ChargeAction(mage.charge == 0 ? element : null);
       duel.resolveTurn(
         mage == attacker ? action : filler,
@@ -34,8 +40,12 @@ void main() {
     //  damage, and the remaining 5 damage to the enemy user."
     defender.shield = ActiveShield.elemental(MagicElement.pyro, 50);
     const waterAttack = Spell(
-        id: 'test30', name: 'Test30', chargeCost: 0, priority: 9,
-        effect: DamageEffect(30, 30));
+      id: 'test30',
+      name: 'Test30',
+      chargeCost: 0,
+      priority: 9,
+      effect: DamageEffect(30, 30),
+    );
     duel.resolveTurn(
       CastAction(waterAttack, MagicElement.aqua),
       ChargeAction(MagicElement.aero),
@@ -50,8 +60,12 @@ void main() {
     // now 150%, since Kinetic beats Primal — see the macro-tier group below.)
     defender.shield = ActiveShield.elemental(MagicElement.umbra, 50);
     const geoAttack = Spell(
-        id: 'test30e', name: 'Test30e', chargeCost: 0, priority: 9,
-        effect: DamageEffect(30, 30));
+      id: 'test30e',
+      name: 'Test30e',
+      chargeCost: 0,
+      priority: 9,
+      effect: DamageEffect(30, 30),
+    );
     duel.resolveTurn(
       CastAction(geoAttack, MagicElement.geo),
       ChargeAction(MagicElement.aero),
@@ -65,30 +79,46 @@ void main() {
   group('§0.3 shield multiplier table', () {
     test('within-tier: counter 200, countered 50, mirror 100', () {
       // Primal triangle: pyro → flora → aqua → pyro.
-      expect(shieldMultiplierPercent(MagicElement.pyro, MagicElement.flora),
-          200); // you counter their shield
-      expect(shieldMultiplierPercent(MagicElement.flora, MagicElement.pyro),
-          50); // their shield counters you
-      expect(shieldMultiplierPercent(MagicElement.pyro, MagicElement.pyro),
-          100); // same element
+      expect(
+        shieldMultiplierPercent(MagicElement.pyro, MagicElement.flora),
+        200,
+      ); // you counter their shield
+      expect(
+        shieldMultiplierPercent(MagicElement.flora, MagicElement.pyro),
+        50,
+      ); // their shield counters you
+      expect(
+        shieldMultiplierPercent(MagicElement.pyro, MagicElement.pyro),
+        100,
+      ); // same element
     });
 
     test('macro-tier: your tier wins 150, their tier wins 75', () {
       // Kinetic beats Primal; Primal beats Ethereal.
-      expect(shieldMultiplierPercent(MagicElement.geo, MagicElement.pyro),
-          150); // kinetic attacker into primal shield
-      expect(shieldMultiplierPercent(MagicElement.pyro, MagicElement.geo),
-          75); // primal attacker into kinetic shield
+      expect(
+        shieldMultiplierPercent(MagicElement.geo, MagicElement.pyro),
+        150,
+      ); // kinetic attacker into primal shield
+      expect(
+        shieldMultiplierPercent(MagicElement.pyro, MagicElement.geo),
+        75,
+      ); // primal attacker into kinetic shield
     });
 
     test('opposite tiers are neutral both ways (100)', () {
       // Primal↔Celestial and Kinetic↔Ethereal.
-      expect(shieldMultiplierPercent(MagicElement.pyro, MagicElement.solar),
-          100);
-      expect(shieldMultiplierPercent(MagicElement.solar, MagicElement.pyro),
-          100);
-      expect(shieldMultiplierPercent(MagicElement.geo, MagicElement.umbra),
-          100);
+      expect(
+        shieldMultiplierPercent(MagicElement.pyro, MagicElement.solar),
+        100,
+      );
+      expect(
+        shieldMultiplierPercent(MagicElement.solar, MagicElement.pyro),
+        100,
+      );
+      expect(
+        shieldMultiplierPercent(MagicElement.geo, MagicElement.umbra),
+        100,
+      );
     });
 
     test('element-agnostic damage never counters (100)', () {
@@ -99,8 +129,11 @@ void main() {
       // Every ordered pair lands on exactly one of the five legal values.
       for (final a in MagicElement.values) {
         for (final s in MagicElement.values) {
-          expect(shieldMultiplierPercent(a, s), isIn([50, 75, 100, 150, 200]),
-              reason: '${a.name} vs ${s.name}');
+          expect(
+            shieldMultiplierPercent(a, s),
+            isIn([50, 75, 100, 150, 200]),
+            reason: '${a.name} vs ${s.name}',
+          );
         }
       }
     });
@@ -109,8 +142,12 @@ void main() {
       // Flora attacking into a Pyro shield: Pyro counters Flora → 50%.
       defender.shield = ActiveShield.elemental(MagicElement.pyro, 50);
       const floraAttack = Spell(
-          id: 't50', name: 'T50', chargeCost: 0, priority: 9,
-          effect: DamageEffect(30, 30));
+        id: 't50',
+        name: 'T50',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(30, 30),
+      );
       duel.resolveTurn(
         CastAction(floraAttack, MagicElement.flora),
         ChargeAction(MagicElement.aero),
@@ -125,8 +162,12 @@ void main() {
       // overflow reaches health at the normal 1× rate.
       defender.shield = ActiveShield.elemental(MagicElement.pyro, 30);
       const geoAttack = Spell(
-          id: 't150', name: 'T150', chargeCost: 0, priority: 9,
-          effect: DamageEffect(30, 30));
+        id: 't150',
+        name: 'T150',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(30, 30),
+      );
       duel.resolveTurn(
         CastAction(geoAttack, MagicElement.geo),
         ChargeAction(MagicElement.aero),
@@ -141,8 +182,12 @@ void main() {
       // the attacker is the weaker tier → 75%.
       defender.shield = ActiveShield.elemental(MagicElement.geo, 40);
       const pyroAttack = Spell(
-          id: 't75', name: 'T75', chargeCost: 0, priority: 9,
-          effect: DamageEffect(40, 40));
+        id: 't75',
+        name: 'T75',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(40, 40),
+      );
       duel.resolveTurn(
         CastAction(pyroAttack, MagicElement.pyro),
         ChargeAction(MagicElement.aero),
@@ -158,8 +203,11 @@ void main() {
     for (final shield in MagicElement.values) {
       for (final attack in MagicElement.values) {
         if (attack.tier != shield.tier) {
-          expect(attack.counters(shield), isFalse,
-              reason: '${attack.name} should not counter ${shield.name}');
+          expect(
+            attack.counters(shield),
+            isFalse,
+            reason: '${attack.name} should not counter ${shield.name}',
+          );
         }
       }
     }
@@ -183,20 +231,28 @@ void main() {
         attacker
           ..charge = 2
           ..element = MagicElement.geo;
-        duel.resolveTurn(
-            CastAction(Spellbook.barrier), const ForfeitAction());
-        expect(attacker.barrierPoints, cast > 3 ? 3 : cast,
-            reason: 'after $cast casts');
+        duel.resolveTurn(CastAction(Spellbook.barrier), const ForfeitAction());
+        expect(
+          attacker.barrierPoints,
+          cast > 3 ? 3 : cast,
+          reason: 'after $cast casts',
+        );
       }
     });
 
     test('a 3-hit spell burns three points, and the third hit still lands', () {
       defender.barrierPoints = 2;
       const tripleHit = Spell(
-          id: 'tri6', name: 'Tri6', chargeCost: 0, priority: 9,
-          effect: DamageEffect(6, 6, hits: 3));
+        id: 'tri6',
+        name: 'Tri6',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(6, 6, hits: 3),
+      );
       duel.resolveTurn(
-          CastAction(tripleHit, MagicElement.geo), ChargeAction(MagicElement.aero));
+        CastAction(tripleHit, MagicElement.geo),
+        ChargeAction(MagicElement.aero),
+      );
       expect(defender.barrierPoints, 0, reason: 'both points spent');
       expect(defender.hp, 94, reason: 'hits 1-2 blocked, hit 3 lands for 6');
     });
@@ -204,11 +260,21 @@ void main() {
     test('one big hit spends only one point', () {
       defender.barrierPoints = 3;
       const big = Spell(
-          id: 'big50', name: 'Big50', chargeCost: 0, priority: 9,
-          effect: DamageEffect(50, 50));
+        id: 'big50',
+        name: 'Big50',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(50, 50),
+      );
       duel.resolveTurn(
-          CastAction(big, MagicElement.geo), ChargeAction(MagicElement.aero));
-      expect(defender.barrierPoints, 2, reason: 'a 50-damage hit costs 1 point');
+        CastAction(big, MagicElement.geo),
+        ChargeAction(MagicElement.aero),
+      );
+      expect(
+        defender.barrierPoints,
+        2,
+        reason: 'a 50-damage hit costs 1 point',
+      );
       expect(defender.hp, 100);
     });
 
@@ -217,10 +283,16 @@ void main() {
       // point simply eats the hit regardless.
       defender.barrierPoints = 1;
       const poke = Spell(
-          id: 'pk9', name: 'Pk9', chargeCost: 0, priority: 9,
-          effect: DamageEffect(9, 9));
+        id: 'pk9',
+        name: 'Pk9',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(9, 9),
+      );
       duel.resolveTurn(
-          CastAction(poke, MagicElement.pyro), ChargeAction(MagicElement.aero));
+        CastAction(poke, MagicElement.pyro),
+        ChargeAction(MagicElement.aero),
+      );
       expect(defender.hp, 100);
       expect(defender.barrierPoints, 0);
     });
@@ -236,36 +308,57 @@ void main() {
       chargeUp(attacker, MagicElement.geo, 2);
       duel.resolveTurn(CastAction(Spellbook.barrier), const ChargeAction());
       expect(attacker.barrierPoints, 1, reason: 'barrier is up');
-      expect(attacker.shield!.remaining, shieldBefore,
-          reason: 'and the shield it used to overwrite is still there');
+      expect(
+        attacker.shield!.remaining,
+        shieldBefore,
+        reason: 'and the shield it used to overwrite is still there',
+      );
     });
 
-    test('the barrier absorbs the hit and the shield survives for the next', () {
-      defender.barrierPoints = 1;
-      defender.shield = ActiveShield.elemental(MagicElement.solar, 40);
-      const poke = Spell(
-          id: 'tb10', name: 'TB10', chargeCost: 0, priority: 9,
-          effect: DamageEffect(10, 10));
+    test(
+      'the barrier absorbs the hit and the shield survives for the next',
+      () {
+        defender.barrierPoints = 1;
+        defender.shield = ActiveShield.elemental(MagicElement.solar, 40);
+        const poke = Spell(
+          id: 'tb10',
+          name: 'TB10',
+          chargeCost: 0,
+          priority: 9,
+          effect: DamageEffect(10, 10),
+        );
 
-      duel.resolveTurn(
-          CastAction(poke, MagicElement.pyro), ChargeAction(MagicElement.aero));
-      expect(defender.barrierPoints, 0, reason: 'barrier popped');
-      expect(defender.shield!.remaining, 40, reason: 'shield untouched');
-      expect(defender.hp, 100);
+        duel.resolveTurn(
+          CastAction(poke, MagicElement.pyro),
+          ChargeAction(MagicElement.aero),
+        );
+        expect(defender.barrierPoints, 0, reason: 'barrier popped');
+        expect(defender.shield!.remaining, 40, reason: 'shield untouched');
+        expect(defender.hp, 100);
 
-      // The next hit now meets the shield.
-      duel.resolveTurn(CastAction(poke, MagicElement.pyro), const ChargeAction());
-      expect(defender.shield!.remaining, 30);
-      expect(defender.hp, 100);
-    });
+        // The next hit now meets the shield.
+        duel.resolveTurn(
+          CastAction(poke, MagicElement.pyro),
+          const ChargeAction(),
+        );
+        expect(defender.shield!.remaining, 30);
+        expect(defender.hp, 100);
+      },
+    );
 
     test('a shield-ignoring attack bypasses the barrier as well', () {
       defender.barrierPoints = 1;
       const pierce = Spell(
-          id: 'tbp', name: 'TBPierce', chargeCost: 0, priority: 9,
-          effect: DamageEffect(10, 10, ignoresShields: true));
+        id: 'tbp',
+        name: 'TBPierce',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(10, 10, ignoresShields: true),
+      );
       duel.resolveTurn(
-          CastAction(pierce, MagicElement.geo), ChargeAction(MagicElement.aero));
+        CastAction(pierce, MagicElement.geo),
+        ChargeAction(MagicElement.aero),
+      );
       expect(defender.hp, 90);
       expect(defender.barrierPoints, 1, reason: 'never engaged, so not spent');
     });
@@ -273,8 +366,12 @@ void main() {
 
   test('multi-hit vs barrier: first hit absorbed, later hits land', () {
     const tripleHit = Spell(
-        id: 'test3x4', name: 'Test3x4', chargeCost: 0, priority: 9,
-        effect: DamageEffect(4, 4, hits: 3));
+      id: 'test3x4',
+      name: 'Test3x4',
+      chargeCost: 0,
+      priority: 9,
+      effect: DamageEffect(4, 4, hits: 3),
+    );
     defender.barrierPoints = 1;
     duel.resolveTurn(
       CastAction(tripleHit, MagicElement.geo),
@@ -292,17 +389,23 @@ void main() {
     test('reports full strength even when chipped later the same turn', () {
       chargeUp(attacker, MagicElement.flora, 1);
       const poke = Spell(
-          id: 'testpoke', name: 'Poke', chargeCost: 0, priority: 9,
-          effect: DamageEffect(6, 6));
+        id: 'testpoke',
+        name: 'Poke',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(6, 6),
+      );
       // Ward (priority 3) goes up, then the priority-9 poke chips it.
       final result = duel.resolveTurn(
         CastAction(Spellbook.ward),
         CastAction(poke),
       );
-      final raised =
-          result.events.whereType<ShieldRaisedEvent>().single;
-      expect(raised.strength, inInclusiveRange(13, 17),
-          reason: 'Ward rolls 13-17 — never the post-damage remainder');
+      final raised = result.events.whereType<ShieldRaisedEvent>().single;
+      expect(
+        raised.strength,
+        inInclusiveRange(13, 17),
+        reason: 'Ward rolls 13-17 — never the post-damage remainder',
+      );
       expect(raised.element, MagicElement.flora);
       expect(raised.isBarrier, isFalse);
       // The live shield really did take the hit. The exact chip depends on the
@@ -321,8 +424,12 @@ void main() {
       // strength, then subtract each reported toShield.
       chargeUp(attacker, MagicElement.flora, 1);
       const poke = Spell(
-          id: 'testpoke2', name: 'Poke2', chargeCost: 0, priority: 9,
-          effect: DamageEffect(6, 6));
+        id: 'testpoke2',
+        name: 'Poke2',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(6, 6),
+      );
       final result = duel.resolveTurn(
         CastAction(Spellbook.ward),
         CastAction(poke),
@@ -350,38 +457,43 @@ void main() {
 
   test('shield persists across turns until depleted', () {
     const poke = Spell(
-        id: 'test5', name: 'Test5', chargeCost: 0, priority: 9,
-        effect: DamageEffect(5, 5));
+      id: 'test5',
+      name: 'Test5',
+      chargeCost: 0,
+      priority: 9,
+      effect: DamageEffect(5, 5),
+    );
     defender.shield = ActiveShield.elemental(MagicElement.geo, 40);
     duel.resolveTurn(
       CastAction(poke, MagicElement.geo),
       ChargeAction(MagicElement.aero),
     );
     expect(defender.shield!.remaining, 35);
-    duel.resolveTurn(
-      CastAction(poke, MagicElement.geo),
-      ChargeAction(),
-    );
+    duel.resolveTurn(CastAction(poke, MagicElement.geo), ChargeAction());
     expect(defender.shield!.remaining, 30);
   });
 
   test('casting a new shield replaces the old one', () {
     chargeUp(attacker, MagicElement.geo, 1);
     attacker.shield = ActiveShield.elemental(MagicElement.aqua, 3);
-    duel.resolveTurn(
-      CastAction(Spellbook.ward),
-      ChargeAction(),
-    );
+    duel.resolveTurn(CastAction(Spellbook.ward), ChargeAction());
     expect(attacker.shield!.element, MagicElement.geo);
-    expect(attacker.shield!.remaining, inInclusiveRange(13, 17),
-        reason: 'Ward rolls 13-17');
+    expect(
+      attacker.shield!.remaining,
+      inInclusiveRange(13, 17),
+      reason: 'Ward rolls 13-17',
+    );
   });
 
   test('shield-ignoring damage goes straight to health', () {
     defender.shield = ActiveShield.elemental(MagicElement.geo, 999);
     const pierce = Spell(
-        id: 'testp', name: 'TestPierce', chargeCost: 0, priority: 9,
-        effect: DamageEffect(10, 10, ignoresShields: true));
+      id: 'testp',
+      name: 'TestPierce',
+      chargeCost: 0,
+      priority: 9,
+      effect: DamageEffect(10, 10, ignoresShields: true),
+    );
     duel.resolveTurn(
       CastAction(pierce, MagicElement.geo),
       ChargeAction(MagicElement.aero),
@@ -404,11 +516,14 @@ void main() {
   group('a shield-ignoring hit announces itself', () {
     /// The Murmur's shape (`lib/game/enemies/whispering_woods.dart`).
     const sayYourName = Spell(
-        id: 'ww_sayyourname', name: 'Say Your Name', chargeCost: 3,
-        priority: 2, effect: DamageEffect(14, 18, ignoresShields: true));
+      id: 'ww_sayyourname',
+      name: 'Say Your Name',
+      chargeCost: 3,
+      priority: 2,
+      effect: DamageEffect(14, 18, ignoresShields: true),
+    );
 
-    test('a shield raised a PREVIOUS turn is bypassed, and the log says so',
-        () {
+    test('a shield raised a PREVIOUS turn is bypassed, and the log says so', () {
       // ⚠️ The scenario the playtester actually hit. The shield is old news by
       // the time the spell lands, so priority has nothing to do with it — this
       // is `ignoresShields` doing exactly what it is flagged to do.
@@ -418,20 +533,33 @@ void main() {
       defender.shield = ActiveShield.elemental(MagicElement.geo, 200);
 
       final result = duel.resolveTurn(
-          CastAction(sayYourName), ChargeAction(MagicElement.aero));
+        CastAction(sayYourName),
+        ChargeAction(MagicElement.aero),
+      );
       final hit = result.events.whereType<DamageEvent>().single;
 
       expect(hit.toShield, 0, reason: 'the shield must not soak any of it');
-      expect(defender.shield!.remaining, 200,
-          reason: 'a bypassed shield is untouched, not chipped');
-      expect(hit.bypassedShield, isTrue,
-          reason: 'nothing else in this event distinguishes "your shield did '
-              'not apply" from "your shield did nothing" — the flag is the '
-              'only channel the log and the HUD have');
-      expect('$hit', contains('ignores shields'),
-          reason: 'the battle log line must name the reason the wall did not '
-              'help; a bare "Defender takes Say Your Name: 16 damage" beside '
-              'a full shield bar reads as a bug');
+      expect(
+        defender.shield!.remaining,
+        200,
+        reason: 'a bypassed shield is untouched, not chipped',
+      );
+      expect(
+        hit.bypassedShield,
+        isTrue,
+        reason:
+            'nothing else in this event distinguishes "your shield did '
+            'not apply" from "your shield did nothing" — the flag is the '
+            'only channel the log and the HUD have',
+      );
+      expect(
+        '$hit',
+        contains('ignores shields'),
+        reason:
+            'the battle log line must name the reason the wall did not '
+            'help; a bare "Defender takes Say Your Name: 16 damage" beside '
+            'a full shield bar reads as a bug',
+      );
     });
 
     test('the flag stays off when there was no defence to bypass', () {
@@ -441,14 +569,15 @@ void main() {
         ..charge = 3
         ..element = MagicElement.flora;
       final result = duel.resolveTurn(
-          CastAction(sayYourName), ChargeAction(MagicElement.aero));
+        CastAction(sayYourName),
+        ChargeAction(MagicElement.aero),
+      );
       final hit = result.events.whereType<DamageEvent>().single;
       expect(hit.bypassedShield, isFalse);
       expect('$hit', isNot(contains('ignores shields')));
     });
 
-    test('a same-turn shield goes up AFTER it, and the events say that too',
-        () {
+    test('a same-turn shield goes up AFTER it, and the events say that too', () {
       // Priority 2 beats the shield lane's 3, so a shield cast in answer to it
       // is simply too late — correct, and legible only because the events are
       // in resolution order: the hit, then the wall.
@@ -459,20 +588,29 @@ void main() {
         ..charge = 1
         ..element = MagicElement.geo;
 
-      final result =
-          duel.resolveTurn(CastAction(sayYourName), CastAction(Spellbook.ward));
+      final result = duel.resolveTurn(
+        CastAction(sayYourName),
+        CastAction(Spellbook.ward),
+      );
       final kinds = result.events
           .where((e) => e is DamageEvent || e is ShieldRaisedEvent)
           .map((e) => e.runtimeType.toString())
           .toList();
 
-      expect(kinds.first, 'DamageEvent',
-          reason: 'a priority-2 attack must resolve before a priority-3 '
-              'shield; the log is replayed in this order, so getting it wrong '
-              'would tell the player the wall was up first');
+      expect(
+        kinds.first,
+        'DamageEvent',
+        reason:
+            'a priority-2 attack must resolve before a priority-3 '
+            'shield; the log is replayed in this order, so getting it wrong '
+            'would tell the player the wall was up first',
+      );
       expect(kinds.last, 'ShieldRaisedEvent');
-      expect(defender.shield!.remaining, greaterThan(0),
-          reason: 'the shield still goes up — it just missed this hit');
+      expect(
+        defender.shield!.remaining,
+        greaterThan(0),
+        reason: 'the shield still goes up — it just missed this hit',
+      );
     });
   });
 }

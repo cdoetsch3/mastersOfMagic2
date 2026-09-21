@@ -23,6 +23,8 @@ abstract final class RecipeBook {
   static RecipeDef? tryById(String id) => _byId[id];
 
   /// The recipes a given skill can make, in [all] order.
-  static List<RecipeDef> forSkill(CraftSkill skill) =>
-      [for (final r in all) if (r.skill == skill) r];
+  static List<RecipeDef> forSkill(CraftSkill skill) => [
+    for (final r in all)
+      if (r.skill == skill) r,
+  ];
 }

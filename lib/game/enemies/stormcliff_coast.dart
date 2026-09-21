@@ -394,7 +394,11 @@ abstract final class StormcliffCoastBestiary {
         effect: DamageEffect(26, 34),
       ),
     ],
-    combatStats: EnemyCombatStats(accuracyBonus: 8, critChance: 12, critDamage: 40),
+    combatStats: EnemyCombatStats(
+      accuracyBonus: 8,
+      critChance: 12,
+      critDamage: 40,
+    ),
     drops: _miniDrops,
   );
 

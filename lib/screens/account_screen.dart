@@ -367,7 +367,11 @@ class _AccountView extends StatelessWidget {
         Builder(
           builder: (context) => OutlinedButton.icon(
             onPressed: () => confirmCharacterReset(context),
-            icon: const Icon(Icons.restart_alt, size: 18, color: AppColors.ember),
+            icon: const Icon(
+              Icons.restart_alt,
+              size: 18,
+              color: AppColors.ember,
+            ),
             label: const Text(
               'Character reset',
               style: TextStyle(color: AppColors.ember),

@@ -102,8 +102,9 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
     'damage now, then the $dotName bleed at the end of each of your next '
         '$ticks turns. Recasting refreshes it — burns never stack',
   DebuffGrantEffect(:final debuff, :final turns) => switch (debuff) {
-    BankDebuff.murk => 'to their accuracy for $turns turns — stacks with '
-        'Blind, which is a different source',
+    BankDebuff.murk =>
+      'to their accuracy for $turns turns — stacks with '
+          'Blind, which is a different source',
     BankDebuff.wither =>
       'to all healing they receive for $turns turns — potions, heals over '
           'time and lifesteal alike',
@@ -124,13 +125,11 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
     'destroyed at once: their shield, every Barrier point and their '
         'Divert. Gear deflection survives; no damage is dealt',
   DamageEffect(:final lifesteal, :final executeBelowPercent) =>
-    '${lifesteal > 0
-        // 📝 "health they lose", not "damage that reaches their health" —
-        // overkill pays nothing (playtest ruling), so a killing blow heals
-        // for the sliver they had left, and the copy must not promise more.
-        ? 'damage — heals you for ${(lifesteal * 100).round()}% of the '
-              'health they actually lose'
-        : 'damage, rolled on cast'}'
+    '${lifesteal > 0 // 📝 "health they lose", not "damage that reaches their health" —
+                // overkill pays nothing (playtest ruling), so a killing blow heals
+              // for the sliver they had left, and the copy must not promise more.
+              ? 'damage — heals you for ${(lifesteal * 100).round()}% of the '
+                  'health they actually lose' : 'damage, rolled on cast'}'
         '${executeBelowPercent > 0 ? ' — and always a crit while they are below $executeBelowPercent% health' : ''}',
   BarrageEffect() => 'damage, one hit per charge spent',
   OverloadEffect() => "damage per point of the enemy's charge",
@@ -149,9 +148,10 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
   HasteEffect() => 'seized — you win same-speed ties',
   DischargeEffect() => "of the enemy's charge, wiped",
   HallowEffect() => 'banked — it blocks the next debuff applied to you',
-  CleanseEffect(:final all) => all
-      ? 'debuff removed from you at once — your buffs are untouched'
-      : 'debuff of your choice, removed from you',
+  CleanseEffect(:final all) =>
+    all
+        ? 'debuff removed from you at once — your buffs are untouched'
+        : 'debuff of your choice, removed from you',
   MeditateEffect() => 'turns added to every buff of yours that runs on a clock',
   final StanceEffect stance => _stanceLabel(stance),
 };
@@ -160,13 +160,15 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
 /// numbers, what the cast also clears, and — the rule players most need told —
 /// that the set's other price point would replace it (§7a law 5).
 String _stanceLabel(StanceEffect effect) {
-  final each = effect.grants.map((g) {
-    final granted = g.build();
-    final numbers = granted is StanceDescribing
-        ? ': ${(granted as StanceDescribing).grantLine}'
-        : '';
-    return '${_statusName(g.statusId)}$numbers';
-  }).join(', and ');
+  final each = effect.grants
+      .map((g) {
+        final granted = g.build();
+        final numbers = granted is StanceDescribing
+            ? ': ${(granted as StanceDescribing).grantLine}'
+            : '';
+        return '${_statusName(g.statusId)}$numbers';
+      })
+      .join(', and ');
   final cleanses = effect.cleanses;
   final cleared = cleanses == null
       ? ''

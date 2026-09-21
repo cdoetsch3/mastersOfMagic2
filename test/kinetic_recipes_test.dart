@@ -59,21 +59,28 @@ Set<String> _allNodeIds() => {for (final n in GatherNodes.all) n.yieldsDefId};
 void main() {
   group('the 21 are registered', () {
     test('KineticRecipes.all is exactly 21, ids unique', () {
-      expect(KineticRecipes.all, hasLength(21),
-          reason:
-              'KINETIC_CONTRACT §5.1\'s table is renumbered 1–21 with no '
-              'gaps after the five §8.1/§8.5 cuts — a stray or a dropped '
-              'entry both break this count');
+      expect(
+        KineticRecipes.all,
+        hasLength(21),
+        reason:
+            'KINETIC_CONTRACT §5.1\'s table is renumbered 1–21 with no '
+            'gaps after the five §8.1/§8.5 cuts — a stray or a dropped '
+            'entry both break this count',
+      );
       final ids = KineticRecipes.all.map((r) => r.id).toSet();
       expect(ids, hasLength(21), reason: 'a duplicated id shadows another');
     });
 
     test('every Kinetic recipe is reachable through RecipeBook.all', () {
       for (final r in KineticRecipes.all) {
-        expect(RecipeBook.tryById(r.id), same(r),
-            reason: '${r.id} is authored but not registered in RecipeBook — '
-                'the exact silent failure §7.1 warns about: it compiles fine '
-                'and never appears on the craft screen or the wiki');
+        expect(
+          RecipeBook.tryById(r.id),
+          same(r),
+          reason:
+              '${r.id} is authored but not registered in RecipeBook — '
+              'the exact silent failure §7.1 warns about: it compiles fine '
+              'and never appears on the craft screen or the wiki',
+        );
       }
     });
 
@@ -85,29 +92,44 @@ void main() {
       expect(countOf(CraftSkill.woodcarving), 6);
       expect(countOf(CraftSkill.tailoring), 12);
       expect(countOf(CraftSkill.potionsAndAlchemy), 1);
-      expect(countOf(CraftSkill.jewelry), 0,
-          reason: 'Jewelry does not debut this quarter (§8.1) — its station '
-              'and its learning both stay at Rimeholt, L45');
-      expect(countOf(CraftSkill.enchanting), 0,
-          reason: 'Enchanting stays at Meridian, L36 — no Kinetic recipe '
-              'should claim it early');
+      expect(
+        countOf(CraftSkill.jewelry),
+        0,
+        reason:
+            'Jewelry does not debut this quarter (§8.1) — its station '
+            'and its learning both stay at Rimeholt, L45',
+      );
+      expect(
+        countOf(CraftSkill.enchanting),
+        0,
+        reason:
+            'Enchanting stays at Meridian, L36 — no Kinetic recipe '
+            'should claim it early',
+      );
     });
   });
 
   group('every input and output resolves, and every input is in-band', () {
     test('every output id resolves through ItemCatalogue', () {
       for (final r in KineticRecipes.all) {
-        expect(ItemCatalogue.tryById(r.outputId), isNotNull,
-            reason: '${r.id} mints ${r.outputId}, which no catalogue owns — '
-                'the mint would crash on the real item lookup');
+        expect(
+          ItemCatalogue.tryById(r.outputId),
+          isNotNull,
+          reason:
+              '${r.id} mints ${r.outputId}, which no catalogue owns — '
+              'the mint would crash on the real item lookup',
+        );
       }
     });
 
     test('every input id resolves through ItemCatalogue', () {
       for (final r in KineticRecipes.all) {
         for (final i in r.inputs) {
-          expect(ItemCatalogue.tryById(i.defId), isNotNull,
-              reason: '${r.id} eats ${i.defId}, which no catalogue owns');
+          expect(
+            ItemCatalogue.tryById(i.defId),
+            isNotNull,
+            reason: '${r.id} eats ${i.defId}, which no catalogue owns',
+          );
         }
       }
     });
@@ -120,13 +142,18 @@ void main() {
 
       for (final r in KineticRecipes.all) {
         for (final i in r.inputs) {
-          final obtainable = drops.contains(i.defId) ||
+          final obtainable =
+              drops.contains(i.defId) ||
               nodes.contains(i.defId) ||
               craftedOutputs.contains(i.defId);
-          expect(obtainable, isTrue,
-              reason: '${r.id} needs ${i.defId}, which drops from nothing, '
-                  'has no gather node, and is no recipe\'s output — a '
-                  'material the player can never actually acquire');
+          expect(
+            obtainable,
+            isTrue,
+            reason:
+                '${r.id} needs ${i.defId}, which drops from nothing, '
+                'has no gather node, and is no recipe\'s output — a '
+                'material the player can never actually acquire',
+          );
         }
       }
     });
@@ -159,9 +186,13 @@ void main() {
         for (final r in KineticRecipes.all)
           for (final i in r.inputs) i.defId,
       };
-      expect(consumed.intersection(stillBanking), isEmpty,
-          reason: 'a Kinetic recipe must not force the four-for-four promise '
-              'before the maker that was supposed to spend it opens');
+      expect(
+        consumed.intersection(stillBanking),
+        isEmpty,
+        reason:
+            'a Kinetic recipe must not force the four-for-four promise '
+            'before the maker that was supposed to spend it opens',
+      );
     });
   });
 
@@ -173,26 +204,39 @@ void main() {
             if (r.skill == skill) r.skillLevel,
         ];
         for (var i = 1; i < gates.length; i++) {
-          expect(gates[i], greaterThanOrEqualTo(gates[i - 1]),
-              reason: '$skill\'s ladder regresses at position $i — a later '
-                  'recipe must never gate lower than an earlier one in the '
-                  'same skill');
+          expect(
+            gates[i],
+            greaterThanOrEqualTo(gates[i - 1]),
+            reason:
+                '$skill\'s ladder regresses at position $i — a later '
+                'recipe must never gate lower than an earlier one in the '
+                'same skill',
+          );
         }
       }
     });
 
     test('gates sit within the Kinetic band: Metalworking opens at 1, '
         'nothing exceeds 34', () {
-      final metalworking =
-          KineticRecipes.all.where((r) => r.skill == CraftSkill.metalworking);
-      expect(metalworking.map((r) => r.skillLevel), contains(1),
-          reason: 'Bronze Ingot gates at 1 — "the correct feel for a skill '
-              'you just learned" (§5.2)');
+      final metalworking = KineticRecipes.all.where(
+        (r) => r.skill == CraftSkill.metalworking,
+      );
+      expect(
+        metalworking.map((r) => r.skillLevel),
+        contains(1),
+        reason:
+            'Bronze Ingot gates at 1 — "the correct feel for a skill '
+            'you just learned" (§5.2)',
+      );
       for (final r in KineticRecipes.all) {
-        expect(r.skillLevel, inInclusiveRange(1, 34),
-            reason: '${r.id} gates at ${r.skillLevel}, outside the ladder '
-                '§5.1 actually authors (Metalworking 1–10, everything else '
-                '20–34)');
+        expect(
+          r.skillLevel,
+          inInclusiveRange(1, 34),
+          reason:
+              '${r.id} gates at ${r.skillLevel}, outside the ladder '
+              '§5.1 actually authors (Metalworking 1–10, everything else '
+              '20–34)',
+        );
       }
     });
   });
@@ -201,8 +245,11 @@ void main() {
     test('Metalworking feeds exactly the four Woodcarving recipes that '
         'consume an ingot', () {
       final ingotConsumers = KineticRecipes.all
-          .where((r) => r.inputs.any(
-              (i) => i.defId == 'bronze_ingot' || i.defId == 'iron_ingot'))
+          .where(
+            (r) => r.inputs.any(
+              (i) => i.defId == 'bronze_ingot' || i.defId == 'iron_ingot',
+            ),
+          )
           .map((r) => r.id)
           .toSet();
       expect(
@@ -213,7 +260,8 @@ void main() {
           'craft_rowan_quarterstaff',
           'craft_rowan_wand',
         },
-        reason: '§5.1\'s note: "Metalworking is a pure feeder lane… two '
+        reason:
+            '§5.1\'s note: "Metalworking is a pure feeder lane… two '
             'recipes and four downstream consumers, all Woodcarving" — a '
             'fifth consumer or a missing one both break the claim',
       );
@@ -227,12 +275,20 @@ void main() {
       for (final r in KineticRecipes.all) {
         final def = ItemCatalogue.byId(r.outputId);
         if (def is EquipmentDef) {
-          expect(def.slot, isNot(EquipSlot.neck),
-              reason: '${r.id}: §5.3 — Neck stays drop-only this quarter, '
-                  'Jewelry\'s station still at Rimeholt (§8.1)');
-          expect(def.slot, isNot(EquipSlot.ring),
-              reason: '${r.id}: §5.3 — Ring stays drop-only for the same '
-                  'reason');
+          expect(
+            def.slot,
+            isNot(EquipSlot.neck),
+            reason:
+                '${r.id}: §5.3 — Neck stays drop-only this quarter, '
+                'Jewelry\'s station still at Rimeholt (§8.1)',
+          );
+          expect(
+            def.slot,
+            isNot(EquipSlot.ring),
+            reason:
+                '${r.id}: §5.3 — Ring stays drop-only for the same '
+                'reason',
+          );
         }
       }
     });
@@ -245,8 +301,10 @@ void main() {
             if (ItemCatalogue.byId(r.outputId) case final EquipmentDef d)
               d.slot,
       };
-      expect(slotsFor(CraftSkill.woodcarving),
-          {EquipSlot.mainHand, EquipSlot.offHand});
+      expect(slotsFor(CraftSkill.woodcarving), {
+        EquipSlot.mainHand,
+        EquipSlot.offHand,
+      });
       expect(slotsFor(CraftSkill.tailoring), {
         EquipSlot.hat,
         EquipSlot.robeTop,
@@ -281,36 +339,72 @@ void main() {
       );
       final out = await game.craft(KineticRecipes.bronzeIngot, rng: Random(1));
 
-      expect(out.succeeded, isTrue,
-          reason: 'a profile carrying exactly the recipe\'s inputs at gate '
-              'level must succeed');
-      expect(game.profile.backpack.countOf('copper_ore'), 0,
-          reason: 'both copper eaten');
-      expect(game.profile.backpack.countOf('tin_ore'), 0,
-          reason: 'the missing half Old Quarry supplies, eaten');
-      expect(game.profile.backpack.countOf('charcoal'), 0,
-          reason: 'the banked Ashfall Vale material, finally spent');
-      expect(game.profile.backpack.countOf('bronze_ingot'), 1,
-          reason: 'the mint must actually happen');
-      expect(game.profile.skillXp['metalworking'], 24,
-          reason: 'Skills.xpForRecipe(bronzeIngot) = 4 × 6 = 24, banked on '
-              'the ledger — the first Metalworking XP anyone has ever '
-              'earned');
-      expect(game.profile.skillLevel('metalworking'), 2,
-          reason: 'xpToNext(1) = 20 + 5×0 = 20, and 24 XP clears it — the '
-              'first Metalworking level-up in the game');
-      expect(out.leveledTo, 2,
-          reason: 'the craft that crosses the gate must report it, or the '
-              'UI never celebrates the very first Metalworking level');
+      expect(
+        out.succeeded,
+        isTrue,
+        reason:
+            'a profile carrying exactly the recipe\'s inputs at gate '
+            'level must succeed',
+      );
+      expect(
+        game.profile.backpack.countOf('copper_ore'),
+        0,
+        reason: 'both copper eaten',
+      );
+      expect(
+        game.profile.backpack.countOf('tin_ore'),
+        0,
+        reason: 'the missing half Old Quarry supplies, eaten',
+      );
+      expect(
+        game.profile.backpack.countOf('charcoal'),
+        0,
+        reason: 'the banked Ashfall Vale material, finally spent',
+      );
+      expect(
+        game.profile.backpack.countOf('bronze_ingot'),
+        1,
+        reason: 'the mint must actually happen',
+      );
+      expect(
+        game.profile.skillXp['metalworking'],
+        24,
+        reason:
+            'Skills.xpForRecipe(bronzeIngot) = 4 × 6 = 24, banked on '
+            'the ledger — the first Metalworking XP anyone has ever '
+            'earned',
+      );
+      expect(
+        game.profile.skillLevel('metalworking'),
+        2,
+        reason:
+            'xpToNext(1) = 20 + 5×0 = 20, and 24 XP clears it — the '
+            'first Metalworking level-up in the game',
+      );
+      expect(
+        out.leveledTo,
+        2,
+        reason:
+            'the craft that crosses the gate must report it, or the '
+            'UI never celebrates the very first Metalworking level',
+      );
 
       // bronze_ingot is fungible (a MaterialDef): no instance is minted.
-      final slot = game.profile.backpack.slots
-          .firstWhere((s) => s?.defId == 'bronze_ingot');
-      expect(slot!.instanceId, isNull,
-          reason: 'two Bronze Ingots are interchangeable — an instance id '
-              'would be meaningless state, same ruling as a potion');
-      expect(out.quality, isNull,
-          reason: 'a fungible material rolls no quality');
+      final slot = game.profile.backpack.slots.firstWhere(
+        (s) => s?.defId == 'bronze_ingot',
+      );
+      expect(
+        slot!.instanceId,
+        isNull,
+        reason:
+            'two Bronze Ingots are interchangeable — an instance id '
+            'would be meaningless state, same ruling as a potion',
+      );
+      expect(
+        out.quality,
+        isNull,
+        reason: 'a fungible material rolls no quality',
+      );
     });
 
     test('⚠️ gate 1 is the floor, not a wall: zero Metalworking XP still '
@@ -319,19 +413,29 @@ void main() {
       // *positive* XP — level 1 is the default level with zero XP banked.
       final game = _carrying({'copper_ore': 2, 'tin_ore': 1, 'charcoal': 1});
       final out = await game.craft(KineticRecipes.bronzeIngot);
-      expect(out.succeeded, isTrue,
-          reason: 'a brand-new profile with zero Metalworking XP is already '
-              'level 1, and Bronze gates at exactly 1');
+      expect(
+        out.succeeded,
+        isTrue,
+        reason:
+            'a brand-new profile with zero Metalworking XP is already '
+            'level 1, and Bronze gates at exactly 1',
+      );
     });
 
     test('refuses missing materials, counting the shortfall', () async {
       final game = _carrying({'copper_ore': 1, 'tin_ore': 1, 'charcoal': 1});
       final out = await game.craft(KineticRecipes.bronzeIngot);
       expect(out.succeeded, isFalse);
-      expect(out.refusal, contains('1 more'),
-          reason: 'one copper short of the two the recipe needs');
-      expect(game.profile.backpack.countOf('copper_ore'), 1,
-          reason: 'a refusal must not eat materials');
+      expect(
+        out.refusal,
+        contains('1 more'),
+        reason: 'one copper short of the two the recipe needs',
+      );
+      expect(
+        game.profile.backpack.countOf('copper_ore'),
+        1,
+        reason: 'a refusal must not eat materials',
+      );
     });
 
     test('the whole craft survives a JSON reload', () async {
@@ -348,8 +452,11 @@ void main() {
 
       final back = GameState(storage, (await storage.load())!);
       expect(back.profile.backpack.countOf('bronze_ingot'), 1);
-      expect(back.profile.skillXp['metalworking'], 24,
-          reason: 'XP that does not survive the save never existed');
+      expect(
+        back.profile.skillXp['metalworking'],
+        24,
+        reason: 'XP that does not survive the save never existed',
+      );
     });
   });
 }

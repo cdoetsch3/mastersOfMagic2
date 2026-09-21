@@ -61,9 +61,10 @@ void main() {
     test('every id is the snake_case of its own name', () {
       // ⚠️ The export, the art pipeline and the achievement log all key on id.
       for (final e in all) {
-        final derived = e.name
-            .toLowerCase()
-            .replaceAll(RegExp(r"[^a-z0-9]+"), '_');
+        final derived = e.name.toLowerCase().replaceAll(
+          RegExp(r"[^a-z0-9]+"),
+          '_',
+        );
         expect(e.id, derived, reason: '${e.name} should be id "$derived"');
       }
     });
@@ -219,9 +220,11 @@ void main() {
       // place*, and a war of attrition here is unwinnable. ⚠️ If either of
       // these loses its lifesteal the zone stops teaching anything.
       double steal(EnemyDef e) => e.moves
-          .map((m) => m.effect is DamageEffect
-              ? (m.effect as DamageEffect).lifesteal
-              : 0.0)
+          .map(
+            (m) => m.effect is DamageEffect
+                ? (m.effect as DamageEffect).lifesteal
+                : 0.0,
+          )
           .fold(0.0, (a, b) => a > b ? a : b);
 
       final siphons = ThornmireBestiary.commons
@@ -244,8 +247,11 @@ void main() {
       final walker = ThornmireBestiary.mirewalker;
       expect(walker.archetype.id, 'adept');
       expect(
-        walker.moves.any((m) => m.effect is DamageEffect &&
-            (m.effect as DamageEffect).lifesteal == 0),
+        walker.moves.any(
+          (m) =>
+              m.effect is DamageEffect &&
+              (m.effect as DamageEffect).lifesteal == 0,
+        ),
         isTrue,
       );
     });
@@ -260,7 +266,8 @@ void main() {
         expect(
           e.moves.any((m) => m.effect is ShieldEffect),
           isTrue,
-          reason: '${e.id} is a ${e.archetype.name} with nothing to hide behind',
+          reason:
+              '${e.id} is a ${e.archetype.name} with nothing to hide behind',
         );
       }
     });
@@ -278,7 +285,8 @@ void main() {
       );
       expect(
         mother.moves.any(
-          (m) => m.effect is DamageEffect &&
+          (m) =>
+              m.effect is DamageEffect &&
               (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
@@ -290,10 +298,12 @@ void main() {
       // ⚠️ "Bring a shield — one misplay ends you" is only true if its ceiling
       // is genuinely the ceiling among the minis.
       int ceiling(EnemyDef e) => e.moves
-          .map((m) => m.effect is DamageEffect
-              ? (m.effect as DamageEffect).maxAmount *
-                    (m.effect as DamageEffect).hits
-              : 0)
+          .map(
+            (m) => m.effect is DamageEffect
+                ? (m.effect as DamageEffect).maxAmount *
+                      (m.effect as DamageEffect).hits
+                : 0,
+          )
           .reduce((a, b) => a > b ? a : b);
 
       final wicker = ThornmireBestiary.wickerdrowned;
@@ -388,8 +398,12 @@ void main() {
       // the derivation has been quietly replaced by a choice.
       final dropped = ThornmireBestiary.allDrops;
       for (final id in [
-        'flora_dust', 'flora_shard', 'flora_crystal',
-        'aqua_dust', 'aqua_shard', 'aqua_crystal',
+        'flora_dust',
+        'flora_shard',
+        'flora_crystal',
+        'aqua_dust',
+        'aqua_shard',
+        'aqua_crystal',
       ]) {
         expect(dropped, contains(id), reason: '$id is missing from the zone');
       }

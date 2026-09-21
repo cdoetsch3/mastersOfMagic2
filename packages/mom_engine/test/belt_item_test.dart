@@ -12,10 +12,7 @@ import 'package:mom_engine/mom_engine.dart';
 import 'package:test/test.dart';
 
 /// The catalogue's two real shapes, as the app resolves them.
-const _draught = ConsumableEffect(
-  name: 'Sapwort Draught',
-  healNowPercent: 20,
-);
+const _draught = ConsumableEffect(name: 'Sapwort Draught', healNowPercent: 20);
 const _tonic = ConsumableEffect(
   name: 'Brookmint Tonic',
   hotPercentPerTurn: 9,
@@ -43,7 +40,8 @@ void main() {
       expect(
         alice.hp,
         70,
-        reason: '20% of the 100 max — reading it off missing health would '
+        reason:
+            '20% of the 100 max — reading it off missing health would '
             'make the same potion better the closer to death you are',
       );
     });
@@ -55,7 +53,8 @@ void main() {
       expect(
         alice.hp,
         70,
-        reason: '20 × 1.5 = 30 — a potion that skipped MageState.heal would '
+        reason:
+            '20 × 1.5 = 30 — a potion that skipped MageState.heal would '
             'heal a flat 20 and quietly make the stat lie',
       );
     });
@@ -76,7 +75,8 @@ void main() {
       expect(
         used.healed,
         5,
-        reason: 'a 20 in the log against a 5-point bar move is the "potions '
+        reason:
+            'a 20 in the log against a 5-point bar move is the "potions '
             'do nothing" bug report',
       );
       expect(used.item, 'Sapwort Draught', reason: 'the log names the item');
@@ -85,15 +85,20 @@ void main() {
     test('a heal that rounds to nothing still heals 1', () {
       final tiny = MageState(name: 'Tiny', maxHp: 20)..hp = 1;
       final other = MageState(name: 'Other');
-      DuelEngine(tiny, other, elementEffects: false, baseMissPercent: 0)
-          .resolveTurn(
+      DuelEngine(
+        tiny,
+        other,
+        elementEffects: false,
+        baseMissPercent: 0,
+      ).resolveTurn(
         _drink(const ConsumableEffect(name: 'Dram', healNowPercent: 1)),
         const ChargeAction(MagicElement.geo),
       );
       expect(
         tiny.hp,
         2,
-        reason: 'matches ItemEffect.healFor and RegrowStatus — an item that '
+        reason:
+            'matches ItemEffect.healFor and RegrowStatus — an item that '
             'visibly does nothing reads as a bug',
       );
     });
@@ -109,7 +114,8 @@ void main() {
       expect(
         alice.element,
         MagicElement.pyro,
-        reason: 'the cycle is not ended — that is a cast\'s cost, not a '
+        reason:
+            'the cycle is not ended — that is a cast\'s cost, not a '
             "potion's",
       );
     });
@@ -121,7 +127,8 @@ void main() {
       expect(
         alice.charge,
         1,
-        reason: 'a potion turn that also channelled would be strictly better '
+        reason:
+            'a potion turn that also channelled would be strictly better '
             'than channelling',
       );
     });
@@ -137,8 +144,7 @@ void main() {
       bruno.charge = 2;
       bruno.element = MagicElement.aqua;
       alice.hp = 100;
-      final r =
-          duel.resolveTurn(_drink(_draught), CastAction(Spellbook.blast));
+      final r = duel.resolveTurn(_drink(_draught), CastAction(Spellbook.blast));
       expect(
         r.events.whereType<DamageEvent>().single.toHp,
         inInclusiveRange(20, 26),
@@ -158,7 +164,8 @@ void main() {
       expect(
         alice.streakCount,
         streakBefore,
-        reason: 'a potion that advanced the streak would let a player buy '
+        reason:
+            'a potion that advanced the streak would let a player buy '
             'Tailwind and Absolution out of the shop',
       );
     });
@@ -167,8 +174,12 @@ void main() {
   group('nothing in the combat system can stop it', () {
     test('⭐ a blinded, dodged, base-miss-ridden mage still drinks', () {
       // Every accuracy dial jammed to "you cannot possibly land anything".
-      final unlucky = DuelEngine(alice, bruno,
-          elementEffects: false, baseMissPercent: 100);
+      final unlucky = DuelEngine(
+        alice,
+        bruno,
+        elementEffects: false,
+        baseMissPercent: 100,
+      );
       alice.hp = 50;
       alice.statuses.add(BlindStatus());
       bruno.dodge = 100;
@@ -179,7 +190,8 @@ void main() {
       expect(
         alice.hp,
         70,
-        reason: 'the potion lane never runs the hit roll — routing it through '
+        reason:
+            'the potion lane never runs the hit roll — routing it through '
             '_resolveCast is exactly the bug this pins',
       );
       expect(
@@ -203,7 +215,8 @@ void main() {
       expect(
         alice.hp,
         70,
-        reason: 'a potion has no cost to be pulled below — fizzling one would '
+        reason:
+            'a potion has no cost to be pulled below — fizzling one would '
             'mean the belt answers to the charge economy it sits outside of',
       );
       expect(result.events.whereType<SpellFizzledEvent>(), isEmpty);
@@ -217,36 +230,41 @@ void main() {
       expect(
         alice.shield?.remaining,
         30,
-        reason: 'the heal must not walk through _applyOneHit and chip the '
+        reason:
+            'the heal must not walk through _applyOneHit and chip the '
             'wall it is standing behind',
       );
     });
   });
 
   group('the potion lane sits AFTER the attacks (P3)', () {
-    test('⚠️ a lethal hit kills before the drink — the corpse does not drink',
-        () {
-      alice.hp = 1;
-      bruno.charge = 2;
-      bruno.element = MagicElement.aqua;
-      final result = duel.resolveTurn(
-        _drink(_draught),
-        CastAction(Spellbook.blast),
-      );
-      expect(
-        alice.alive,
-        isFalse,
-        reason: '⚠️ PINNED RULING: a potion resolving before the attacks '
-            'would make the belt a better shield than a shield — you drank '
-            'instead of defending, and the opponent committed blind',
-      );
-      expect(
-        result.events.whereType<ItemUsedEvent>(),
-        isEmpty,
-        reason: 'the lane is skipped once the duel is over, exactly as the '
-            'end phase is',
-      );
-    });
+    test(
+      '⚠️ a lethal hit kills before the drink — the corpse does not drink',
+      () {
+        alice.hp = 1;
+        bruno.charge = 2;
+        bruno.element = MagicElement.aqua;
+        final result = duel.resolveTurn(
+          _drink(_draught),
+          CastAction(Spellbook.blast),
+        );
+        expect(
+          alice.alive,
+          isFalse,
+          reason:
+              '⚠️ PINNED RULING: a potion resolving before the attacks '
+              'would make the belt a better shield than a shield — you drank '
+              'instead of defending, and the opponent committed blind',
+        );
+        expect(
+          result.events.whereType<ItemUsedEvent>(),
+          isEmpty,
+          reason:
+              'the lane is skipped once the duel is over, exactly as the '
+              'end phase is',
+        );
+      },
+    );
 
     test('a survivable hit is topped up the same turn', () {
       alice.hp = 100;
@@ -264,28 +282,31 @@ void main() {
       );
     });
 
-    test('the drink is reported after the hit, before the end-of-turn ticks',
-        () {
-      alice.hp = 100;
-      alice.statuses.add(IgniteStatus(4));
-      bruno.charge = 2;
-      bruno.element = MagicElement.aqua;
-      final events = duel
-          .resolveTurn(_drink(_draught), CastAction(Spellbook.blast))
-          .events;
-      final hit = events.indexWhere((e) => e is DamageEvent);
-      final drink = events.indexWhere((e) => e is ItemUsedEvent);
-      final burn = events.indexWhere(
-        (e) => e is EffectDamageEvent && e.source == 'Ignite',
-      );
-      expect(hit, lessThan(drink), reason: 'attacks land first');
-      expect(
-        drink,
-        lessThan(burn),
-        reason: 'and the end phase ticks last — a drink after the burn would '
-            'let a potion answer damage it never saw',
-      );
-    });
+    test(
+      'the drink is reported after the hit, before the end-of-turn ticks',
+      () {
+        alice.hp = 100;
+        alice.statuses.add(IgniteStatus(4));
+        bruno.charge = 2;
+        bruno.element = MagicElement.aqua;
+        final events = duel
+            .resolveTurn(_drink(_draught), CastAction(Spellbook.blast))
+            .events;
+        final hit = events.indexWhere((e) => e is DamageEvent);
+        final drink = events.indexWhere((e) => e is ItemUsedEvent);
+        final burn = events.indexWhere(
+          (e) => e is EffectDamageEvent && e.source == 'Ignite',
+        );
+        expect(hit, lessThan(drink), reason: 'attacks land first');
+        expect(
+          drink,
+          lessThan(burn),
+          reason:
+              'and the end phase ticks last — a drink after the burn would '
+              'let a potion answer damage it never saw',
+        );
+      },
+    );
   });
 
   group('the Tonic — heal over time', () {
@@ -310,7 +331,8 @@ void main() {
       expect(
         ticks,
         3,
-        reason: '9% × 3 turns, first tick on the turn it is drunk — a fourth '
+        reason:
+            '9% × 3 turns, first tick on the turn it is drunk — a fourth '
             'tick means advanceAndCheckExpiry is off by one',
       );
       expect(healedTotal, 27, reason: '9 per tick off a 100 max');
@@ -331,7 +353,8 @@ void main() {
       expect(
         used.healed,
         0,
-        reason: 'the payout is the ticks; claiming an instant heal here would '
+        reason:
+            'the payout is the ticks; claiming an instant heal here would '
             'double-count it in the log',
       );
     });
@@ -346,7 +369,8 @@ void main() {
       expect(
         alice.statuses.whereType<HealOverTimeStatus>().length,
         1,
-        reason: 'two ticking copies would let a pocketful of Tonics buy a '
+        reason:
+            'two ticking copies would let a pocketful of Tonics buy a '
             'permanent Regrow the turn cost never paid for',
       );
       expect(
@@ -359,22 +383,25 @@ void main() {
       );
     });
 
-    test('ticks scale with healing-received gear, via the status machinery',
-        () {
-      alice.hp = 40;
-      alice.healingReceivedPercent = 100;
-      final tick = duel
-          .resolveTurn(_drink(_tonic), const ChargeAction(MagicElement.geo))
-          .events
-          .whereType<EffectHealEvent>()
-          .firstWhere((e) => e.source == 'Brookmint Tonic');
-      expect(
-        tick.amount,
-        18,
-        reason: '9 doubled — the tick goes through heal() like every other '
-            'StatusHeal, which is why it rides the same lane',
-      );
-    });
+    test(
+      'ticks scale with healing-received gear, via the status machinery',
+      () {
+        alice.hp = 40;
+        alice.healingReceivedPercent = 100;
+        final tick = duel
+            .resolveTurn(_drink(_tonic), const ChargeAction(MagicElement.geo))
+            .events
+            .whereType<EffectHealEvent>()
+            .firstWhere((e) => e.source == 'Brookmint Tonic');
+        expect(
+          tick.amount,
+          18,
+          reason:
+              '9 doubled — the tick goes through heal() like every other '
+              'StatusHeal, which is why it rides the same lane',
+        );
+      },
+    );
   });
 
   group('both mages may drink on the same turn', () {
@@ -387,7 +414,8 @@ void main() {
       expect(
         result.events.whereType<ItemUsedEvent>().map((e) => e.mage.name),
         ['Alice', 'Bruno'],
-        reason: 'fixed mage1→mage2 order: lockstep clients must emit the same '
+        reason:
+            'fixed mage1→mage2 order: lockstep clients must emit the same '
             'event list, and a set-iteration order would not',
       );
     });

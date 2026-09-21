@@ -27,11 +27,9 @@ void main() {
     );
 
     final aboveCap = AiRoster.all.where((p) => p.level > 50).toList();
-    expect(
-      aboveCap.map((p) => p.name),
-      ['Procarius'],
-      reason: 'only the Eclipsed sits above the player level cap',
-    );
+    expect(aboveCap.map((p) => p.name), [
+      'Procarius',
+    ], reason: 'only the Eclipsed sits above the player level cap');
   });
 
   test('intelligence stays on the 1-10 ladder and rises with level', () {

@@ -51,15 +51,18 @@ void main() {
       expect(effect.hotTurns, 3);
     });
 
-    test('⚠️ a ration is Usable but NOT beltable, so it resolves to nothing',
-        () {
-      expect(
-        consumableEffectFor(_ration),
-        isNull,
-        reason: 'gating on Usable rather than BeltableDef is exactly the '
-            'loophole §6b.3 splits the two types to close',
-      );
-    });
+    test(
+      '⚠️ a ration is Usable but NOT beltable, so it resolves to nothing',
+      () {
+        expect(
+          consumableEffectFor(_ration),
+          isNull,
+          reason:
+              'gating on Usable rather than BeltableDef is exactly the '
+              'loophole §6b.3 splits the two types to close',
+        );
+      },
+    );
 
     test('an id nothing owns resolves to nothing rather than crashing', () {
       expect(consumableEffectFor('philosophers_stone'), isNull);
@@ -93,7 +96,8 @@ void main() {
       expect(
         storage.saved?.belt.loaded,
         isEmpty,
-        reason: '⚠️ SAVED, not merely mutated — a save deferred to the end of '
+        reason:
+            '⚠️ SAVED, not merely mutated — a save deferred to the end of '
             'the duel gives the potion back to anyone who closes the tab, '
             'which is the dupe this ruling exists to forbid',
       );
@@ -110,7 +114,8 @@ void main() {
       expect(
         game.profile.backpack.countOf(_draught),
         0,
-        reason: 'unloadFromBelt returns it; consuming must not — that would '
+        reason:
+            'unloadFromBelt returns it; consuming must not — that would '
             'make every duel a source of free potions',
       );
     });
@@ -124,11 +129,9 @@ void main() {
         onItemConsumed: game.consumeBeltItem,
       );
       await controller.spendBeltItem(_draught);
-      expect(
-        controller.beltItems,
-        [_draught],
-        reason: 'removing every match would eat a whole stack per sip',
-      );
+      expect(controller.beltItems, [
+        _draught,
+      ], reason: 'removing every match would eat a whole stack per sip');
       expect(storage.saved?.belt.loaded, [_draught]);
     });
 
@@ -165,15 +168,15 @@ void main() {
       expect(
         controller.beltItems,
         isEmpty,
-        reason: 'newDuel resets duel state; the belt is inventory, and '
+        reason:
+            'newDuel resets duel state; the belt is inventory, and '
             '"Duel again" refilling it is a dupe one tap wide',
       );
     });
   });
 
   group('using an item is a real turn', () {
-    test('⭐ it resets the forfeit streak like any other played move',
-        () async {
+    test('⭐ it resets the forfeit streak like any other played move', () async {
       final driver = _FakeDriver()..autoRespond = const ForfeitAction();
       final controller = _controller(driver, belt: const [_draught]);
 
@@ -195,14 +198,14 @@ void main() {
       expect(
         controller.playerDefeated,
         isFalse,
-        reason: '⚠️ the streak must reset — a player drinking a potion is the '
+        reason:
+            '⚠️ the streak must reset — a player drinking a potion is the '
             'opposite of an absent one. This flows through the ordinary '
             'non-forfeit path; a special case here is how it would rot',
       );
     });
 
-    test('the control case: three straight forfeits still surrender',
-        () async {
+    test('the control case: three straight forfeits still surrender', () async {
       final driver = _FakeDriver()..autoRespond = const ForfeitAction();
       final controller = _controller(driver, belt: const [_draught]);
       for (var i = 0; i < DuelController.forfeitLimit; i++) {
@@ -212,7 +215,8 @@ void main() {
       expect(
         controller.playerDefeated,
         isTrue,
-        reason: 'without this the streak test above would pass on a rule that '
+        reason:
+            'without this the streak test above would pass on a rule that '
             'no longer fires at all',
       );
     });
@@ -226,7 +230,8 @@ void main() {
       expect(
         controller.battleLog,
         contains('You drink Sapwort Draught — healed 20'),
-        reason: '"You drinks" is the third-person template leaking; the log '
+        reason:
+            '"You drinks" is the third-person template leaking; the log '
             'is written to the player, and the number is what landed',
       );
     });
@@ -243,27 +248,28 @@ void main() {
       expect(
         controller.player.charge,
         3,
-        reason: 'drinking costs the TURN, not the cycle — losing the bar too '
+        reason:
+            'drinking costs the TURN, not the cycle — losing the bar too '
             'would price a potion out of every deck',
       );
     });
   });
 
   group('enemies never use items', () {
-    test('⚠️ a brain that emits one is a loud failure, not a healed monster',
-        () async {
-      final driver = LocalAiDriver(persona: _CheatingPersona());
-      driver.bind(
-        MageState(name: 'You'),
-        MageState(name: 'Cheat'),
-      );
-      expect(
-        () => driver.exchangeTurn(1, const ForfeitAction()),
-        throwsA(isA<StateError>()),
-        reason: 'items are the player\'s lane alone (ENEMIES §2.1). Silently '
-            'passing it through is how a Shambler ends up drinking',
-      );
-    });
+    test(
+      '⚠️ a brain that emits one is a loud failure, not a healed monster',
+      () async {
+        final driver = LocalAiDriver(persona: _CheatingPersona());
+        driver.bind(MageState(name: 'You'), MageState(name: 'Cheat'));
+        expect(
+          () => driver.exchangeTurn(1, const ForfeitAction()),
+          throwsA(isA<StateError>()),
+          reason:
+              'items are the player\'s lane alone (ENEMIES §2.1). Silently '
+              'passing it through is how a Shambler ends up drinking',
+        );
+      },
+    );
 
     test('the ordinary ladder brain never emits one', () {
       final persona = AiRoster.all.first;
@@ -276,7 +282,8 @@ void main() {
         expect(
           brain.chooseAction(self, MageState(name: 'You'), rng),
           isNot(isA<UseItemAction>()),
-          reason: 'the guard above is a backstop, not the only thing standing '
+          reason:
+              'the guard above is a backstop, not the only thing standing '
               'between a monster and a potion',
         );
       }
@@ -284,8 +291,9 @@ void main() {
   });
 
   group('the arena draws the belt', () {
-    testWidgets('⭐ a loaded potion is a control the player can see and tap',
-        (tester) async {
+    testWidgets('⭐ a loaded potion is a control the player can see and tap', (
+      tester,
+    ) async {
       var consumed = <String>[];
       await _pumpArena(
         tester,
@@ -301,7 +309,8 @@ void main() {
       expect(
         find.text('turn'),
         findsOneWidget,
-        reason: '⚠️ the turn cost is ON the button — a heal that silently ate '
+        reason:
+            '⚠️ the turn cost is ON the button — a heal that silently ate '
             'the turn is the most expensive surprise the arena can sell',
       );
 
@@ -311,7 +320,8 @@ void main() {
       expect(
         consumed,
         [_draught],
-        reason: 'tapping spends it — through the controller, which is what '
+        reason:
+            'tapping spends it — through the controller, which is what '
             'persists it',
       );
     });
@@ -327,7 +337,8 @@ void main() {
       expect(
         find.text('Sapwort Draught'),
         findsNothing,
-        reason: 'a button that stays after the last sip is a button that '
+        reason:
+            'a button that stays after the last sip is a button that '
             'lies about what is left',
       );
     });
@@ -337,7 +348,8 @@ void main() {
       expect(
         find.byIcon(Icons.local_drink),
         findsNothing,
-        reason: 'an empty rail spends arena height to say "you brought '
+        reason:
+            'an empty rail spends arena height to say "you brought '
             'nothing"; the belt row is absent, not disabled-and-present',
       );
     });
@@ -475,10 +487,7 @@ Future<void> _pumpArena(
     MaterialApp(
       home: DuelScreen(
         loadout: Loadout.starter,
-        driver: LocalAiDriver(
-          persona: AiRoster.all.first,
-          rng: Random(2),
-        ),
+        driver: LocalAiDriver(persona: AiRoster.all.first, rng: Random(2)),
         belt: belt,
         onItemConsumed: onItemConsumed,
       ),

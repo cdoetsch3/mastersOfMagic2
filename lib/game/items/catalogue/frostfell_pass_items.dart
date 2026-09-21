@@ -114,11 +114,7 @@ abstract final class FrostfellPassItems {
     slot: EquipSlot.ring,
     form: 'Ring',
     material: 'Everice',
-    modifiers: ItemModifiers(
-      deflectChance: 10,
-      deflectAmount: 20,
-      dodge: 3,
-    ),
+    modifiers: ItemModifiers(deflectChance: 10, deflectAmount: 20, dodge: 3),
     tradability: Tradability.untradeable,
     equipLevel: 24,
     value: 290,

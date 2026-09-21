@@ -79,9 +79,10 @@ void main() {
     test('every id is the snake_case of its own name', () {
       // ⚠️ The export, the art pipeline and the achievement log all key on id.
       for (final e in all) {
-        final derived = e.name
-            .toLowerCase()
-            .replaceAll(RegExp(r"[^a-z0-9]+"), '_');
+        final derived = e.name.toLowerCase().replaceAll(
+          RegExp(r"[^a-z0-9]+"),
+          '_',
+        );
         expect(e.id, derived, reason: '${e.name} should be id "$derived"');
       }
     });
@@ -250,8 +251,11 @@ void main() {
       final wall = green.moves.firstWhere((m) => m.effect is ShieldEffect);
       expect(wall.priority, lessThan(3), reason: 'the wall arrives too late');
       expect(
-        green.moves.any((m) => m.effect is DamageEffect &&
-            (m.effect as DamageEffect).lifesteal > 0),
+        green.moves.any(
+          (m) =>
+              m.effect is DamageEffect &&
+              (m.effect as DamageEffect).lifesteal > 0,
+        ),
         isTrue,
         reason: 'regrowth that does not regrow is just a Sentinel',
       );
@@ -275,9 +279,11 @@ void main() {
       // that absorbs should absorb. If the other four commons also stole, it
       // would stop being a shock and become the zone's weather.
       double steal(EnemyDef e) => e.moves
-          .map((m) => m.effect is DamageEffect
-              ? (m.effect as DamageEffect).lifesteal
-              : 0.0)
+          .map(
+            (m) => m.effect is DamageEffect
+                ? (m.effect as DamageEffect).lifesteal
+                : 0.0,
+          )
           .fold(0.0, (a, b) => a > b ? a : b);
 
       final sapling = AshfallValeBestiary.ashrootSapling;
@@ -299,7 +305,8 @@ void main() {
         expect(
           e.moves.any((m) => m.effect is ShieldEffect),
           isTrue,
-          reason: '${e.id} is a ${e.archetype.name} with nothing to hide behind',
+          reason:
+              '${e.id} is a ${e.archetype.name} with nothing to hide behind',
         );
       }
     });
@@ -318,7 +325,8 @@ void main() {
       expect((first.effect as DamageEffect).lifesteal, greaterThan(0));
       expect(
         root.moves.any(
-          (m) => m.effect is DamageEffect &&
+          (m) =>
+              m.effect is DamageEffect &&
               (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
@@ -330,10 +338,12 @@ void main() {
       // ⚠️ "Bring a shield — one misplay ends you" is only true if its ceiling
       // is genuinely the ceiling among the minis.
       int ceiling(EnemyDef e) => e.moves
-          .map((m) => m.effect is DamageEffect
-              ? (m.effect as DamageEffect).maxAmount *
-                    (m.effect as DamageEffect).hits
-              : 0)
+          .map(
+            (m) => m.effect is DamageEffect
+                ? (m.effect as DamageEffect).maxAmount *
+                      (m.effect as DamageEffect).hits
+                : 0,
+          )
           .reduce((a, b) => a > b ? a : b);
 
       final ember = AshfallValeBestiary.lastEmber;
@@ -365,8 +375,11 @@ void main() {
         reason: 'The Rooting hiding behind a wall is a second Crown',
       );
       expect(
-        rooting.moves.any((m) => m.effect is DamageEffect &&
-            (m.effect as DamageEffect).ignoresShields),
+        rooting.moves.any(
+          (m) =>
+              m.effect is DamageEffect &&
+              (m.effect as DamageEffect).ignoresShields,
+        ),
         isTrue,
         reason: 'something is keeping The Rooting out',
       );
@@ -438,8 +451,12 @@ void main() {
       // from a hand-authored list. Pyro+Flora therefore means both ladders.
       final dropped = AshfallValeBestiary.allDrops;
       for (final id in [
-        'pyro_dust', 'pyro_shard', 'pyro_crystal',
-        'flora_dust', 'flora_shard', 'flora_crystal',
+        'pyro_dust',
+        'pyro_shard',
+        'pyro_crystal',
+        'flora_dust',
+        'flora_shard',
+        'flora_crystal',
       ]) {
         expect(dropped, contains(id), reason: '$id is missing from the zone');
       }

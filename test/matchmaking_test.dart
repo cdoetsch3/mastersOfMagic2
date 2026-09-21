@@ -25,18 +25,33 @@ void main() {
       // claim (or neither), and the reported bug returns.
       const t = '2026-08-09T10:00:00.000Z';
       final aClaimsB = Matchmaking.ticketPrecedes(
-        theirUid: 'b', theirCreatedAt: t, myUid: 'a', myCreatedAt: t);
+        theirUid: 'b',
+        theirCreatedAt: t,
+        myUid: 'a',
+        myCreatedAt: t,
+      );
       final bClaimsA = Matchmaking.ticketPrecedes(
-        theirUid: 'a', theirCreatedAt: t, myUid: 'b', myCreatedAt: t);
-      expect(aClaimsB != bClaimsA, isTrue,
-          reason: 'exactly one direction may claim');
+        theirUid: 'a',
+        theirCreatedAt: t,
+        myUid: 'b',
+        myCreatedAt: t,
+      );
+      expect(
+        aClaimsB != bClaimsA,
+        isTrue,
+        reason: 'exactly one direction may claim',
+      );
     });
 
     test('a ticket never precedes itself', () {
       const t = '2026-08-09T10:00:00.000Z';
       expect(
         Matchmaking.ticketPrecedes(
-          theirUid: 'a', theirCreatedAt: t, myUid: 'a', myCreatedAt: t),
+          theirUid: 'a',
+          theirCreatedAt: t,
+          myUid: 'a',
+          myCreatedAt: t,
+        ),
         isFalse,
       );
     });

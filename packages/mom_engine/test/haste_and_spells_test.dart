@@ -42,13 +42,17 @@ void main() {
       charge(alice, MagicElement.pyro, 2);
       charge(bruno, MagicElement.aqua, 2);
       duel.resolveTurn(
-          CastAction(Spellbook.blast), CastAction(Spellbook.blast));
+        CastAction(Spellbook.blast),
+        CastAction(Spellbook.blast),
+      );
       expect(duel.hasteHolder, isNull);
     });
 
     test('channeling never establishes Haste', () {
-      duel.resolveTurn(const ChargeAction(MagicElement.pyro),
-          const ChargeAction(MagicElement.aqua));
+      duel.resolveTurn(
+        const ChargeAction(MagicElement.pyro),
+        const ChargeAction(MagicElement.aqua),
+      );
       expect(duel.hasteHolder, isNull);
     });
   });
@@ -57,16 +61,20 @@ void main() {
     test('an ordinary spell does not move an established Haste', () {
       alice.hasHaste = true;
       charge(bruno, MagicElement.aqua, 2);
-      duel.resolveTurn(const ChargeAction(MagicElement.pyro),
-          CastAction(Spellbook.blast));
+      duel.resolveTurn(
+        const ChargeAction(MagicElement.pyro),
+        CastAction(Spellbook.blast),
+      );
       expect(duel.hasteHolder, alice);
     });
 
     test('a Haste-granting spell (Jolt) steals it', () {
       alice.hasHaste = true;
       charge(bruno, MagicElement.aqua, 2);
-      duel.resolveTurn(const ChargeAction(MagicElement.pyro),
-          CastAction(Spellbook.jolt));
+      duel.resolveTurn(
+        const ChargeAction(MagicElement.pyro),
+        CastAction(Spellbook.jolt),
+      );
       expect(duel.hasteHolder, bruno);
     });
 
@@ -74,8 +82,10 @@ void main() {
       // Alice holds it, so her Hasty resolves first and Bruno's lands last —
       // Bruno steals the initiative.
       alice.hasHaste = true;
-      duel.resolveTurn(CastAction(Spellbook.hasty, MagicElement.pyro),
-          CastAction(Spellbook.hasty, MagicElement.aqua));
+      duel.resolveTurn(
+        CastAction(Spellbook.hasty, MagicElement.pyro),
+        CastAction(Spellbook.hasty, MagicElement.aqua),
+      );
       expect(duel.hasteHolder, bruno);
     });
 
@@ -85,8 +95,10 @@ void main() {
       // Alice casts the faster Jolt (5). Hasty resolves last, so Bruno keeps.
       bruno.hasHaste = true;
       charge(alice, MagicElement.pyro, 2);
-      duel.resolveTurn(CastAction(Spellbook.jolt),
-          CastAction(Spellbook.hasty, MagicElement.aqua));
+      duel.resolveTurn(
+        CastAction(Spellbook.jolt),
+        CastAction(Spellbook.hasty, MagicElement.aqua),
+      );
       expect(duel.hasteHolder, bruno);
     });
   });
@@ -99,7 +111,9 @@ void main() {
       alice.hp = 10;
       bruno.hp = 10;
       duel.resolveTurn(
-          CastAction(Spellbook.blast), CastAction(Spellbook.blast));
+        CastAction(Spellbook.blast),
+        CastAction(Spellbook.blast),
+      );
       expect(duel.isDraw, isFalse);
       expect(duel.winner, alice);
       expect(alice.hp, 10, reason: "Bruno died before his Blast landed");
@@ -108,8 +122,10 @@ void main() {
 
   group('Hasty', () {
     test('grants Haste and deals no damage', () {
-      duel.resolveTurn(CastAction(Spellbook.hasty, MagicElement.pyro),
-          const ChargeAction(MagicElement.aqua));
+      duel.resolveTurn(
+        CastAction(Spellbook.hasty, MagicElement.pyro),
+        const ChargeAction(MagicElement.aqua),
+      );
       expect(duel.hasteHolder, alice);
       expect(bruno.hp, 100);
     });
@@ -119,8 +135,7 @@ void main() {
     test('wipes the opponent charge', () {
       charge(alice, MagicElement.pyro, 3);
       charge(bruno, MagicElement.aqua, 4);
-      duel.resolveTurn(const ChargeAction(),
-          CastAction(Spellbook.discharge));
+      duel.resolveTurn(const ChargeAction(), CastAction(Spellbook.discharge));
       expect(alice.charge, 0, reason: 'Bruno discharged Alice');
     });
 
@@ -128,8 +143,7 @@ void main() {
       // Channel (priority 4) resolves, then Discharge (priority 7) wipes it.
       charge(alice, MagicElement.pyro, 2);
       charge(bruno, MagicElement.aqua, 3);
-      duel.resolveTurn(
-          const ChargeAction(), CastAction(Spellbook.discharge));
+      duel.resolveTurn(const ChargeAction(), CastAction(Spellbook.discharge));
       expect(alice.charge, 0);
     });
 
@@ -137,8 +151,14 @@ void main() {
       charge(alice, MagicElement.pyro, 3);
       charge(bruno, MagicElement.aqua, 3);
       duel.resolveTurn(
-          CastAction(Spellbook.barrage), CastAction(Spellbook.discharge));
-      expect(bruno.hp, 100, reason: 'Alice charge wiped before Barrage read it');
+        CastAction(Spellbook.barrage),
+        CastAction(Spellbook.discharge),
+      );
+      expect(
+        bruno.hp,
+        100,
+        reason: 'Alice charge wiped before Barrage read it',
+      );
     });
   });
 
@@ -147,46 +167,55 @@ void main() {
       charge(alice, MagicElement.pyro, 2);
       charge(bruno, MagicElement.aqua, 3);
       // Bruno holds his charge (forfeits), so Overload punishes all 3 of it.
-      duel.resolveTurn(
-          CastAction(Spellbook.overload), const ForfeitAction());
+      duel.resolveTurn(CastAction(Spellbook.overload), const ForfeitAction());
       expect(bruno.hp, inInclusiveRange(100 - 33, 100 - 21));
     });
 
-    test('a same-priority enemy cast spends the charge before Overload reads it',
-        () {
-      // ⚠️ TIE BEHAVIOUR, FLAGGED FOR A RULING. With no Haste, same-priority
-      // casts pay simultaneously — so Bruno's Bolt commits his charge in the
-      // same instant, and Overload finds nothing to punish. This makes two
-      // mutual Overloads both fizzle (each sees the other already empty), which
-      // is the stated intent — but it also means Overload does NOT out-speed a
-      // tied attack, which the spec's other line wanted. The two cannot both
-      // hold; this is the version that keeps the mutual-Overload rule.
-      charge(alice, MagicElement.pyro, 2);
-      charge(bruno, MagicElement.aqua, 3);
-      duel.resolveTurn(
-          CastAction(Spellbook.overload), CastAction(Spellbook.bolt));
-      expect(bruno.hp, 100, reason: 'Bruno spent his charge casting Bolt');
-    });
+    test(
+      'a same-priority enemy cast spends the charge before Overload reads it',
+      () {
+        // ⚠️ TIE BEHAVIOUR, FLAGGED FOR A RULING. With no Haste, same-priority
+        // casts pay simultaneously — so Bruno's Bolt commits his charge in the
+        // same instant, and Overload finds nothing to punish. This makes two
+        // mutual Overloads both fizzle (each sees the other already empty), which
+        // is the stated intent — but it also means Overload does NOT out-speed a
+        // tied attack, which the spec's other line wanted. The two cannot both
+        // hold; this is the version that keeps the mutual-Overload rule.
+        charge(alice, MagicElement.pyro, 2);
+        charge(bruno, MagicElement.aqua, 3);
+        duel.resolveTurn(
+          CastAction(Spellbook.overload),
+          CastAction(Spellbook.bolt),
+        );
+        expect(bruno.hp, 100, reason: 'Bruno spent his charge casting Bolt');
+      },
+    );
 
     test('does nothing to a chargeless enemy', () {
       charge(alice, MagicElement.pyro, 2);
       bruno.charge = 0;
-      duel.resolveTurn(CastAction(Spellbook.overload),
-          CastAction(Spellbook.flick, MagicElement.aqua));
+      duel.resolveTurn(
+        CastAction(Spellbook.overload),
+        CastAction(Spellbook.flick, MagicElement.aqua),
+      );
       expect(bruno.hp, 100);
     });
 
-    test('channeling before an Overload increases the hit (channel is faster)',
-        () {
-      charge(alice, MagicElement.pyro, 2);
-      charge(bruno, MagicElement.aqua, 2);
-      // Bruno channels 2 -> 3 at priority 4, before Overload reads it at 7.
-      duel.resolveTurn(
-          CastAction(Spellbook.overload), const ChargeAction());
-      // 7-11 per point of the target's charge: 3 charge is 21-33.
-      expect(bruno.hp, inInclusiveRange(100 - 33, 100 - 21),
-          reason: 'Overload read Bruno at 3 charge, not 2');
-    });
+    test(
+      'channeling before an Overload increases the hit (channel is faster)',
+      () {
+        charge(alice, MagicElement.pyro, 2);
+        charge(bruno, MagicElement.aqua, 2);
+        // Bruno channels 2 -> 3 at priority 4, before Overload reads it at 7.
+        duel.resolveTurn(CastAction(Spellbook.overload), const ChargeAction());
+        // 7-11 per point of the target's charge: 3 charge is 21-33.
+        expect(
+          bruno.hp,
+          inInclusiveRange(100 - 33, 100 - 21),
+          reason: 'Overload read Bruno at 3 charge, not 2',
+        );
+      },
+    );
 
     test('respects shields', () {
       charge(alice, MagicElement.pyro, 2);
@@ -194,7 +223,9 @@ void main() {
       bruno.element = MagicElement.aqua;
       bruno.shield = ActiveShield.elemental(MagicElement.aero, 200);
       duel.resolveTurn(
-          CastAction(Spellbook.overload), CastAction(Spellbook.bolt));
+        CastAction(Spellbook.overload),
+        CastAction(Spellbook.bolt),
+      );
       expect(bruno.hp, 100, reason: 'the big air shield soaks Overload');
     });
   });
@@ -207,38 +238,56 @@ void main() {
   // seized it, not appended at end of turn (where it read as an unexplained
   // extra beat after all the damage).
   group('Haste is reported at the moment it is seized', () {
-    test('the transfer lands right after the granting cast, before later casts',
-        () {
-      alice.charge = 2;
-      alice.element = MagicElement.pyro;
-      bruno.charge = 2;
-      bruno.element = MagicElement.solar;
-      // Jolt (priority 5, grants Haste) resolves before Blast (priority 9).
-      final result = duel.resolveTurn(
-          CastAction(Spellbook.jolt), CastAction(Spellbook.blast));
-      final events = result.events;
-      final haste = events.indexWhere((e) => e is HasteChangedEvent);
-      final jolt = events.indexWhere(
-          (e) => e is SpellCastEvent && e.spell == Spellbook.jolt);
-      final blast = events.indexWhere(
-          (e) => e is SpellCastEvent && e.spell == Spellbook.blast);
+    test(
+      'the transfer lands right after the granting cast, before later casts',
+      () {
+        alice.charge = 2;
+        alice.element = MagicElement.pyro;
+        bruno.charge = 2;
+        bruno.element = MagicElement.solar;
+        // Jolt (priority 5, grants Haste) resolves before Blast (priority 9).
+        final result = duel.resolveTurn(
+          CastAction(Spellbook.jolt),
+          CastAction(Spellbook.blast),
+        );
+        final events = result.events;
+        final haste = events.indexWhere((e) => e is HasteChangedEvent);
+        final jolt = events.indexWhere(
+          (e) => e is SpellCastEvent && e.spell == Spellbook.jolt,
+        );
+        final blast = events.indexWhere(
+          (e) => e is SpellCastEvent && e.spell == Spellbook.blast,
+        );
 
-      expect(haste, greaterThan(jolt), reason: 'after the Jolt that seized it');
-      expect(haste, lessThan(blast),
-          reason: 'and before the later cast — not at the end of the turn');
-    });
+        expect(
+          haste,
+          greaterThan(jolt),
+          reason: 'after the Jolt that seized it',
+        );
+        expect(
+          haste,
+          lessThan(blast),
+          reason: 'and before the later cast — not at the end of the turn',
+        );
+      },
+    );
 
     test('it still sits after its own cast damage', () {
       alice.charge = 2;
       alice.element = MagicElement.pyro;
-      final result =
-          duel.resolveTurn(CastAction(Spellbook.jolt), const ForfeitAction());
+      final result = duel.resolveTurn(
+        CastAction(Spellbook.jolt),
+        const ForfeitAction(),
+      );
       final events = result.events;
       final haste = events.indexWhere((e) => e is HasteChangedEvent);
       final damage = events.indexWhere((e) => e is DamageEvent);
       expect(damage, greaterThanOrEqualTo(0), reason: 'the Jolt hit');
-      expect(haste, greaterThan(damage),
-          reason: 'the cast fully resolves, then the initiative is reported');
+      expect(
+        haste,
+        greaterThan(damage),
+        reason: 'the cast fully resolves, then the initiative is reported',
+      );
     });
   });
 }

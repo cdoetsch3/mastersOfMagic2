@@ -41,7 +41,8 @@ void main() {
       expect(
         ShopCatalogue.consumableIngredientIds.toList()..sort(),
         ['brookmint', 'saltwort', 'sapwort'],
-        reason: 'sapwort→sapwort_draught, brookmint→brookmint_tonic, '
+        reason:
+            'sapwort→sapwort_draught, brookmint→brookmint_tonic, '
             'saltwort→saltwort_draught are the only three consumable recipes '
             'the game ships',
       );
@@ -59,7 +60,8 @@ void main() {
         expect(
           feedsAConsumable,
           isTrue,
-          reason: '"$id" is classified as a consumable ingredient but feeds no '
+          reason:
+              '"$id" is classified as a consumable ingredient but feeds no '
               'consumable recipe — the derivation is collecting the wrong side',
         );
         expect(
@@ -77,58 +79,59 @@ void main() {
         expect(
           ShopCatalogue.consumableIngredientIds,
           isNot(contains(gearOnly)),
-          reason: '$gearOnly feeds only gear recipes; classifying it as a '
+          reason:
+              '$gearOnly feeds only gear recipes; classifying it as a '
               'brewing herb would drop its E from 60 to 10 and starve the '
               'crafting shelf the whole town is built around',
         );
       }
     });
 
-    test(
-      '⭐ THE MUTANT-KILLER: one new consumable recipe reclassifies its '
-      'inputs, with no edit to shop_catalogue.dart',
-      () {
-        // ⚠️ **This is the assertion a hand-written list cannot pass.** It
-        // appends a recipe the game does not ship — a potion brewed from
-        // `oak_log`, today a pure GEAR material — and asks the derivation
-        // whether `oak_log` is now an ingredient. A literal
-        // `{'sapwort', 'brookmint', 'saltwort'}` answers "no" no matter what
-        // ids it contains, so this test fails the instant anyone "simplifies"
-        // the RecipeBook walk into a constant.
-        const oakTonic = RecipeDef(
-          id: 'zz_test_oak_tonic',
-          outputId: 'sapwort_draught', // a real consumable output
-          skill: CraftSkill.potionsAndAlchemy,
-          skillLevel: 1,
-          inputs: [RecipeInput('oak_log', 1)],
-        );
+    test('⭐ THE MUTANT-KILLER: one new consumable recipe reclassifies its '
+        'inputs, with no edit to shop_catalogue.dart', () {
+      // ⚠️ **This is the assertion a hand-written list cannot pass.** It
+      // appends a recipe the game does not ship — a potion brewed from
+      // `oak_log`, today a pure GEAR material — and asks the derivation
+      // whether `oak_log` is now an ingredient. A literal
+      // `{'sapwort', 'brookmint', 'saltwort'}` answers "no" no matter what
+      // ids it contains, so this test fails the instant anyone "simplifies"
+      // the RecipeBook walk into a constant.
+      const oakTonic = RecipeDef(
+        id: 'zz_test_oak_tonic',
+        outputId: 'sapwort_draught', // a real consumable output
+        skill: CraftSkill.potionsAndAlchemy,
+        skillLevel: 1,
+        inputs: [RecipeInput('oak_log', 1)],
+      );
 
-        expect(
-          ShopCatalogue.consumableIngredientsIn(RecipeBook.all),
-          isNot(contains('oak_log')),
-          reason: 'baseline: oak_log is NOT an ingredient in the shipped book '
-              '— without this the assertion below proves nothing',
-        );
-        expect(
-          ShopCatalogue.consumableIngredientsIn([...RecipeBook.all, oakTonic]),
-          contains('oak_log'),
-          reason: 'adding one consumable recipe MUST reclassify its inputs '
-              'mechanically — this is the hand-list mutant',
-        );
+      expect(
+        ShopCatalogue.consumableIngredientsIn(RecipeBook.all),
+        isNot(contains('oak_log')),
+        reason:
+            'baseline: oak_log is NOT an ingredient in the shipped book '
+            '— without this the assertion below proves nothing',
+      );
+      expect(
+        ShopCatalogue.consumableIngredientsIn([...RecipeBook.all, oakTonic]),
+        contains('oak_log'),
+        reason:
+            'adding one consumable recipe MUST reclassify its inputs '
+            'mechanically — this is the hand-list mutant',
+      );
 
-        // ⭐ And the same case settles the tie-break the ruling had to decide:
-        // `oak_log` would still be a Hearthwood-native gear material (E=60),
-        // yet it comes back an ingredient (E=10). SCARCER WINS.
-        expect(
-          ShopCatalogue.consumableIngredientsIn([...RecipeBook.all, oakTonic]),
-          contains('oak_log'),
-          reason: 'a material feeding BOTH gear and consumables takes the '
-              'LOWER E — the tighter shelf, because double demand is more '
-              'pressure, and because that rule is monotone: a new recipe can '
-              'only ever tighten a shelf, never loosen one',
-        );
-      },
-    );
+      // ⭐ And the same case settles the tie-break the ruling had to decide:
+      // `oak_log` would still be a Hearthwood-native gear material (E=60),
+      // yet it comes back an ingredient (E=10). SCARCER WINS.
+      expect(
+        ShopCatalogue.consumableIngredientsIn([...RecipeBook.all, oakTonic]),
+        contains('oak_log'),
+        reason:
+            'a material feeding BOTH gear and consumables takes the '
+            'LOWER E — the tighter shelf, because double demand is more '
+            'pressure, and because that rule is monotone: a new recipe can '
+            'only ever tighten a shelf, never loosen one',
+      );
+    });
   });
 
   group('§14d.2 — categoryFor precedence is ascending E (scarcer wins)', () {
@@ -139,7 +142,8 @@ void main() {
       expect(
         ShopCatalogue.nativeZonesOf('hearthwood'),
         contains(ItemCatalogue.zoneOf('sapwort')),
-        reason: 'fixture check — sapwort must be native to Hearthwood, or this '
+        reason:
+            'fixture check — sapwort must be native to Hearthwood, or this '
             'test is not exercising the precedence it claims to',
       );
       expect(
@@ -157,7 +161,8 @@ void main() {
       expect(
         ShopCatalogue.nativeZonesOf('pennycross'),
         isNot(contains(ItemCatalogue.zoneOf('brookmint'))),
-        reason: 'fixture check — brookmint must NOT be native to Pennycross, '
+        reason:
+            'fixture check — brookmint must NOT be native to Pennycross, '
             'or this test is not exercising the imported branch at all',
       );
       expect(
@@ -175,7 +180,8 @@ void main() {
           expect(
             ShopCatalogue.categoryFor(town, id),
             ShopItemCategory.consumable,
-            reason: '$id at $town — a ConsumableDef/BeltableDef is the scarcest E '
+            reason:
+                '$id at $town — a ConsumableDef/BeltableDef is the scarcest E '
                 'regardless of which zone it is native to',
           );
         }
@@ -254,7 +260,8 @@ void main() {
       expect(
         _game().shopEquilibriumFor('hearthwood', 'sapwort'),
         999,
-        reason: 'config/economy overrides outrank every category default, '
+        reason:
+            'config/economy overrides outrank every category default, '
             'including the new consumable-ingredient one',
       );
     });
@@ -278,7 +285,8 @@ void main() {
       expect(
         _connections('ashfall_vale'),
         isNot(contains('whispering_woods')),
-        reason: 'the vale must not list the woods back — the reverse edge is '
+        reason:
+            'the vale must not list the woods back — the reverse edge is '
             'stored separately and is the half people forget',
       );
     });
@@ -290,13 +298,15 @@ void main() {
       expect(
         _connections('ashfall_vale'),
         ['cinderpeak_foothills'],
-        reason: 'the vale is now a leaf hanging off Cinderpeak Foothills — '
+        reason:
+            'the vale is now a leaf hanging off Cinderpeak Foothills — '
             'drop this last edge and the zone is stranded',
       );
       expect(
         _connections('cinderpeak_foothills'),
         contains('hearthwood'),
-        reason: 'and the Foothills reach the start town in one more hop, so '
+        reason:
+            'and the Foothills reach the start town in one more hop, so '
             'the full route is hearthwood → cinderpeak_foothills → '
             'ashfall_vale',
       );
@@ -325,8 +335,14 @@ void main() {
       ], reason: 'Hearthwood was the shelf most likely to move, and did not');
       expect(
         ShopCatalogue.nativeZonesOf('hearthwood').toList()..sort(),
-        ['cinderpeak_foothills', 'glimmerbrook', 'thornmire', 'whispering_woods'],
-        reason: 'the vale was never native to Hearthwood — it reaches town '
+        [
+          'cinderpeak_foothills',
+          'glimmerbrook',
+          'thornmire',
+          'whispering_woods',
+        ],
+        reason:
+            'the vale was never native to Hearthwood — it reaches town '
             'through the Foothills, which is exactly why the shelf held',
       );
     });
@@ -339,13 +355,15 @@ void main() {
       expect(
         ItemCatalogue.zoneOf('birch_log'),
         'ashfall_vale',
-        reason: 'fixture check — pick a genuine Ashfall Vale material, or this '
+        reason:
+            'fixture check — pick a genuine Ashfall Vale material, or this '
             'test measures nothing about the removed edge',
       );
       expect(
         ShopCatalogue.locationModFor('hearthwood', 'birch_log'),
         ShopCatalogue.regionalMod,
-        reason: 'birch_log is an Ashfall Vale material, and Hearthwood still '
+        reason:
+            'birch_log is an Ashfall Vale material, and Hearthwood still '
             'reaches the vale in two zone-hops through Cinderpeak Foothills — '
             'a drop to baseline/import here would mean the graph walk lost '
             'the surviving route',

@@ -107,7 +107,11 @@ void main() {
       expect(deflectChanceSection, contains('`seawrack_gloves`'));
       final deflectAmountSection = section('### `deflectAmount`');
       expect(deflectAmountSection, contains('`seawrack_gloves`'));
-      for (final s in [dodgeSection, deflectChanceSection, deflectAmountSection]) {
+      for (final s in [
+        dodgeSection,
+        deflectChanceSection,
+        deflectAmountSection,
+      ]) {
         final rows = s
             .split('\n')
             .where((l) => l.startsWith('| ') && l.contains('`'))

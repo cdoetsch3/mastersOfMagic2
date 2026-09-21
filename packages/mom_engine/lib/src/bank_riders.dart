@@ -65,25 +65,31 @@ List<RemovableDebuff> debuffsOn(MageState mage) {
   final pool = <RemovableDebuff>[];
   for (final s in mage.statusesWithPolarity(StatusPolarity.debuff)) {
     final timer = s is TurnTimed ? (s as TurnTimed).turnsLeft : 0;
-    pool.add(RemovableDebuff(
-      id: s.id,
-      turnsLeft: timer,
-      remove: () => mage.statuses.remove(s),
-    ));
+    pool.add(
+      RemovableDebuff(
+        id: s.id,
+        turnsLeft: timer,
+        remove: () => mage.statuses.remove(s),
+      ),
+    );
   }
   if (mage.priorityPenalty > 0) {
-    pool.add(RemovableDebuff(
-      id: 'waterlogged',
-      turnsLeft: 0,
-      remove: () => mage.priorityPenalty = 0,
-    ));
+    pool.add(
+      RemovableDebuff(
+        id: 'waterlogged',
+        turnsLeft: 0,
+        remove: () => mage.priorityPenalty = 0,
+      ),
+    );
   }
   if (mage.nextOffensiveDamageScale < 1.0) {
-    pool.add(RemovableDebuff(
-      id: 'stagger',
-      turnsLeft: 0,
-      remove: () => mage.nextOffensiveDamageScale = 1.0,
-    ));
+    pool.add(
+      RemovableDebuff(
+        id: 'stagger',
+        turnsLeft: 0,
+        remove: () => mage.nextOffensiveDamageScale = 1.0,
+      ),
+    );
   }
   return pool;
 }
@@ -115,9 +121,8 @@ RemovableDebuff? defaultCleanseChoice(List<RemovableDebuff> pool) {
 /// ⭐ What it DOES reach is the stance game: every [StatStanceStatus] is a
 /// timed buff, so Meditate deepens a Twinkle Toes or an Overkill — which is why
 /// §7a pairs it with Dispel as the answer.
-Iterable<TurnTimed> timedBuffsOn(MageState mage) => mage
-    .statusesWithPolarity(StatusPolarity.buff)
-    .whereType<TurnTimed>();
+Iterable<TurnTimed> timedBuffsOn(MageState mage) =>
+    mage.statusesWithPolarity(StatusPolarity.buff).whereType<TurnTimed>();
 
 /// Turns Meditate adds to each timed buff (§7a INSTANTS).
 const int meditateBonusTurns = 5;

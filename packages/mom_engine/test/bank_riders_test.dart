@@ -57,8 +57,13 @@ void main() {
     return d.resolveTurn(CastAction(s, e, choice), const ForfeitAction());
   }
 
-  DuelEngine engine(Random rng) => DuelEngine(alice, bruno,
-      rng: rng, elementEffects: false, baseMissPercent: 0);
+  DuelEngine engine(Random rng) => DuelEngine(
+    alice,
+    bruno,
+    rng: rng,
+    elementEffects: false,
+    baseMissPercent: 0,
+  );
 
   // ======================================================================
   // NEXT-ATTACK RIDERS — the Phase pattern (§7a)
@@ -78,21 +83,31 @@ void main() {
       expect(alice.pierceNext, isTrue, reason: 'the rider is banked');
 
       cast(duel, Spellbook.bolt, MagicElement.geo);
-      expect(bruno.hp, 89,
-          reason: "Bolt's min roll of 11 landed whole — a maxed Divert removed "
-              'nothing');
+      expect(
+        bruno.hp,
+        89,
+        reason:
+            "Bolt's min roll of 11 landed whole — a maxed Divert removed "
+            'nothing',
+      );
     });
 
-    test('the control: the clamp leaves a sliver, the rider leaves the lot',
-        () {
-      turtle(bruno);
-      final duel = engine(CountingRandom());
-      cast(duel, Spellbook.bolt, MagicElement.geo);
-      expect(bruno.hp, 99,
-          reason: 'unpierced, the 90% fraction cap still lets 1 of 11 through '
+    test(
+      'the control: the clamp leaves a sliver, the rider leaves the lot',
+      () {
+        turtle(bruno);
+        final duel = engine(CountingRandom());
+        cast(duel, Spellbook.bolt, MagicElement.geo);
+        expect(
+          bruno.hp,
+          99,
+          reason:
+              'unpierced, the 90% fraction cap still lets 1 of 11 through '
               '— that sliver is the whole point of the cap, and Pierce is what '
-              'turns it back into a full hit');
-    });
+              'turns it back into a full hit',
+        );
+      },
+    );
 
     test('⚠️ Divert never ROLLS — it is skipped, not overruled', () {
       turtle(bruno);
@@ -101,8 +116,11 @@ void main() {
       final control = CountingRandom();
       var duel = engine(control);
       cast(duel, Spellbook.bolt, MagicElement.geo);
-      expect(control.intCalls, 2,
-          reason: 'unpierced: one damage roll, one deflect roll');
+      expect(
+        control.intCalls,
+        2,
+        reason: 'unpierced: one damage roll, one deflect roll',
+      );
 
       // Pierced: the deflect draw is never made, so the stream advances by one.
       alice = MageState(name: 'Alice');
@@ -113,16 +131,22 @@ void main() {
       cast(duel, Spellbook.pierce, MagicElement.geo);
       final before = pierced.intCalls;
       cast(duel, Spellbook.bolt, MagicElement.geo);
-      expect(pierced.intCalls - before, 1,
-          reason: 'pierced: the damage roll only — Divert drew nothing');
+      expect(
+        pierced.intCalls - before,
+        1,
+        reason: 'pierced: the damage roll only — Divert drew nothing',
+      );
     });
 
     test('waits until an ATTACK spends it, exactly as Phase does', () {
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.pierce, MagicElement.geo);
       cast(duel, Spellbook.ward, MagicElement.geo);
-      expect(alice.pierceNext, isTrue,
-          reason: 'a shield is not an offensive attack — the rider is unspent');
+      expect(
+        alice.pierceNext,
+        isTrue,
+        reason: 'a shield is not an offensive attack — the rider is unspent',
+      );
       cast(duel, Spellbook.bolt, MagicElement.geo);
       expect(alice.pierceNext, isFalse, reason: 'the attack consumed it');
     });
@@ -130,29 +154,46 @@ void main() {
     test('it beats a Divert STANCE, not just gear', () {
       // Glance grants Divert 10/20 — the spell-lane source Pierce is the
       // counter to, per §7a's counter-web.
-      final duel = DuelEngine(bruno, alice,
-          rng: CountingRandom(), elementEffects: false, baseMissPercent: 0);
+      final duel = DuelEngine(
+        bruno,
+        alice,
+        rng: CountingRandom(),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
       bruno
         ..charge = Spellbook.glance.chargeCost
         ..element = MagicElement.geo;
       duel.resolveTurn(
-          CastAction(Spellbook.glance, MagicElement.geo), const ForfeitAction());
-      expect(bruno.effectiveDeflectChance, greaterThan(0),
-          reason: 'the stance is contributing through the seam');
+        CastAction(Spellbook.glance, MagicElement.geo),
+        const ForfeitAction(),
+      );
+      expect(
+        bruno.effectiveDeflectChance,
+        greaterThan(0),
+        reason: 'the stance is contributing through the seam',
+      );
 
       alice
         ..charge = Spellbook.pierce.chargeCost
         ..element = MagicElement.geo;
-      duel.resolveTurn(const ForfeitAction(),
-          CastAction(Spellbook.pierce, MagicElement.geo));
+      duel.resolveTurn(
+        const ForfeitAction(),
+        CastAction(Spellbook.pierce, MagicElement.geo),
+      );
       final hp = bruno.hp;
       alice
         ..charge = Spellbook.bolt.chargeCost
         ..element = MagicElement.geo;
       duel.resolveTurn(
-          const ForfeitAction(), CastAction(Spellbook.bolt, MagicElement.geo));
-      expect(hp - bruno.hp, 11,
-          reason: 'the full roll landed through a running Divert stance');
+        const ForfeitAction(),
+        CastAction(Spellbook.bolt, MagicElement.geo),
+      );
+      expect(
+        hp - bruno.hp,
+        11,
+        reason: 'the full roll landed through a running Divert stance',
+      );
     });
   });
 
@@ -171,8 +212,11 @@ void main() {
       // 0.95 → 95, which is NOT under the 90% miss chance: it lands.
       final duel = engine(CountingRandom([0.95]));
       cast(duel, Spellbook.bolt, MagicElement.geo);
-      expect(bruno.hp, 89,
-          reason: 'the clamp is why stacked evasion is never immunity');
+      expect(
+        bruno.hp,
+        89,
+        reason: 'the clamp is why stacked evasion is never immunity',
+      );
     });
 
     test('the control: the same attack, same roll, misses', () {
@@ -191,36 +235,58 @@ void main() {
       final before = rng.doubleCalls;
       cast(duel, Spellbook.bolt, MagicElement.geo);
 
-      expect(bruno.hp, 89,
-          reason: 'the very roll that missed above now never happens');
-      expect(rng.doubleCalls - before, 0,
-          reason: 'it does not out-roll the dodge and it is not a 100% clamp — '
-              'it never reaches the expression the clamp guards');
+      expect(
+        bruno.hp,
+        89,
+        reason: 'the very roll that missed above now never happens',
+      );
+      expect(
+        rng.doubleCalls - before,
+        0,
+        reason:
+            'it does not out-roll the dodge and it is not a 100% clamp — '
+            'it never reaches the expression the clamp guards',
+      );
     });
 
     test('it beats a dodge STANCE too', () {
       // Twinkle Toes is the deepest dodge the spell lane can buy.
-      final duel = DuelEngine(bruno, alice,
-          rng: CountingRandom([0.0]), elementEffects: false, baseMissPercent: 0);
+      final duel = DuelEngine(
+        bruno,
+        alice,
+        rng: CountingRandom([0.0]),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
       bruno
         ..charge = Spellbook.twinkleToes.chargeCost
         ..element = MagicElement.geo;
-      duel.resolveTurn(CastAction(Spellbook.twinkleToes, MagicElement.geo),
-          const ForfeitAction());
+      duel.resolveTurn(
+        CastAction(Spellbook.twinkleToes, MagicElement.geo),
+        const ForfeitAction(),
+      );
       expect(bruno.effectiveDodge, greaterThan(0));
 
       alice
         ..charge = Spellbook.unerring.chargeCost
         ..element = MagicElement.geo;
-      duel.resolveTurn(const ForfeitAction(),
-          CastAction(Spellbook.unerring, MagicElement.geo));
+      duel.resolveTurn(
+        const ForfeitAction(),
+        CastAction(Spellbook.unerring, MagicElement.geo),
+      );
       final hp = bruno.hp;
       alice
         ..charge = Spellbook.bolt.chargeCost
         ..element = MagicElement.geo;
       duel.resolveTurn(
-          const ForfeitAction(), CastAction(Spellbook.bolt, MagicElement.geo));
-      expect(hp - bruno.hp, 11, reason: 'Lightfoot ⟶ Unerring, as the web says');
+        const ForfeitAction(),
+        CastAction(Spellbook.bolt, MagicElement.geo),
+      );
+      expect(
+        hp - bruno.hp,
+        11,
+        reason: 'Lightfoot ⟶ Unerring, as the web says',
+      );
     });
 
     test('is spent by the attack, and the next one can miss again', () {
@@ -246,13 +312,17 @@ void main() {
       cast(duel, Spellbook.phase, MagicElement.geo);
       cast(duel, Spellbook.pierce, MagicElement.geo);
       cast(duel, Spellbook.unerring, MagicElement.geo);
-      expect([alice.phaseNext, alice.pierceNext, alice.unerringNext],
-          everyElement(isTrue),
-          reason: 'different bypasses, so they stack rather than replace');
+      expect(
+        [alice.phaseNext, alice.pierceNext, alice.unerringNext],
+        everyElement(isTrue),
+        reason: 'different bypasses, so they stack rather than replace',
+      );
       cast(duel, Spellbook.bolt, MagicElement.geo);
-      expect([alice.phaseNext, alice.pierceNext, alice.unerringNext],
-          everyElement(isFalse),
-          reason: 'one attack spends every rider it is holding');
+      expect(
+        [alice.phaseNext, alice.pierceNext, alice.unerringNext],
+        everyElement(isFalse),
+        reason: 'one attack spends every rider it is holding',
+      );
     });
   });
 
@@ -272,8 +342,11 @@ void main() {
       final duel = engine(CountingRandom());
       final r = cast(duel, Spellbook.execute, MagicElement.geo);
       expect(critOf(r), isTrue, reason: '29% is below the 30% line');
-      expect(bruno.hp, 290 - 47,
-          reason: 'the min roll of 31 at the default +50% crit damage');
+      expect(
+        bruno.hp,
+        290 - 47,
+        reason: 'the min roll of 31 at the default +50% crit damage',
+      );
     });
 
     test('does not crit at 31%', () {
@@ -287,8 +360,11 @@ void main() {
     test('⚠️ the line is BELOW 30%, not at it', () {
       bruno.hp = 300;
       final duel = engine(CountingRandom());
-      expect(critOf(cast(duel, Spellbook.execute, MagicElement.geo)), isFalse,
-          reason: 'exactly 30% is not below 30%');
+      expect(
+        critOf(cast(duel, Spellbook.execute, MagicElement.geo)),
+        isFalse,
+        reason: 'exactly 30% is not below 30%',
+      );
     });
 
     test('⭐ the guarantee routes through normal crit resolution', () {
@@ -301,7 +377,11 @@ void main() {
       final duel = engine(CountingRandom());
       final r = cast(duel, Spellbook.execute, MagicElement.geo);
       expect(critOf(r), isTrue);
-      expect(bruno.hp, 290 - 93, reason: 'crit damage rides the guarantee: 31 x 3');
+      expect(
+        bruno.hp,
+        290 - 93,
+        reason: 'crit damage rides the guarantee: 31 x 3',
+      );
     });
 
     test('⭐ a Heavyhand STANCE rides the guaranteed crit', () {
@@ -312,9 +392,13 @@ void main() {
       cast(duel, Spellbook.heavyhand, MagicElement.geo);
       expect(alice.effectiveCritDamage, 80, reason: '50 base + 30 stance');
       cast(duel, Spellbook.execute, MagicElement.geo);
-      expect(bruno.hp, 290 - 56,
-          reason: 'the stance reached the crit because the crit went through '
-              'the ordinary door');
+      expect(
+        bruno.hp,
+        290 - 56,
+        reason:
+            'the stance reached the crit because the crit went through '
+            'the ordinary door',
+      );
     });
 
     test('a guaranteed crit spends no crit roll', () {
@@ -323,23 +407,32 @@ void main() {
       final guaranteed = CountingRandom();
       var duel = engine(guaranteed);
       cast(duel, Spellbook.execute, MagicElement.geo);
-      expect(guaranteed.intCalls, 1,
-          reason: 'the damage roll only — the crit was decided, not rolled');
+      expect(
+        guaranteed.intCalls,
+        1,
+        reason: 'the damage roll only — the crit was decided, not rolled',
+      );
 
       alice = MageState(name: 'Alice')..critChance = 100;
       bruno = MageState(name: 'Bruno', maxHp: 1000)..hp = 900;
       final rolled = CountingRandom();
       duel = engine(rolled);
       cast(duel, Spellbook.execute, MagicElement.geo);
-      expect(rolled.intCalls, 2,
-          reason: 'above the line it is an ordinary crit: damage + crit roll');
+      expect(
+        rolled.intCalls,
+        2,
+        reason: 'above the line it is an ordinary crit: damage + crit roll',
+      );
     });
 
     test('above the line, an ordinary no-crit build never crits', () {
       bruno.hp = 900;
       final duel = engine(CountingRandom());
-      expect(critOf(cast(duel, Spellbook.execute, MagicElement.geo)), isFalse,
-          reason: 'no Keen, no execute window, no crit');
+      expect(
+        critOf(cast(duel, Spellbook.execute, MagicElement.geo)),
+        isFalse,
+        reason: 'no Keen, no execute window, no crit',
+      );
     });
   });
 
@@ -352,20 +445,32 @@ void main() {
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.cleanse, MagicElement.geo, choice: 'blind');
 
-      expect(alice.statuses.whereType<BlindStatus>(), isEmpty,
-          reason: 'the named debuff is the one that goes');
-      expect(alice.statuses.whereType<IgniteStatus>(), isNotEmpty,
-          reason: 'exactly ONE debuff — the burn is untouched');
+      expect(
+        alice.statuses.whereType<BlindStatus>(),
+        isEmpty,
+        reason: 'the named debuff is the one that goes',
+      );
+      expect(
+        alice.statuses.whereType<IgniteStatus>(),
+        isNotEmpty,
+        reason: 'exactly ONE debuff — the burn is untouched',
+      );
     });
 
     test('lifts a DoT when that is what was named', () {
       alice.statuses.addAll([IgniteStatus(4), BlindStatus()]);
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.cleanse, MagicElement.geo, choice: 'ignite');
-      expect(alice.statuses.whereType<IgniteStatus>(), isEmpty,
-          reason: 'DoT statuses are cleansable like any other debuff');
-      expect(alice.hp, 100,
-          reason: 'lifted before the end phase, so it never got its tick');
+      expect(
+        alice.statuses.whereType<IgniteStatus>(),
+        isEmpty,
+        reason: 'DoT statuses are cleansable like any other debuff',
+      );
+      expect(
+        alice.hp,
+        100,
+        reason: 'lifted before the end phase, so it never got its tick',
+      );
     });
 
     test('with no choice, takes the debuff with the most turns left', () {
@@ -375,10 +480,16 @@ void main() {
       ]);
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.cleanse, MagicElement.geo);
-      expect(alice.statuses.whereType<IgniteStatus>(), isEmpty,
-          reason: 'the default sheds the biggest running commitment');
-      expect(alice.statuses.whereType<BlindStatus>(), isNotEmpty,
-          reason: 'the shorter debuff is left standing');
+      expect(
+        alice.statuses.whereType<IgniteStatus>(),
+        isEmpty,
+        reason: 'the default sheds the biggest running commitment',
+      );
+      expect(
+        alice.statuses.whereType<BlindStatus>(),
+        isNotEmpty,
+        reason: 'the shorter debuff is left standing',
+      );
     });
 
     test('never touches a buff, however long it has left', () {
@@ -388,66 +499,97 @@ void main() {
       ]);
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.cleanse, MagicElement.geo);
-      expect(alice.statuses.whereType<HealOverTimeStatus>(), isNotEmpty,
-          reason: 'the default reads the DEBUFF pool, not the longest clock');
+      expect(
+        alice.statuses.whereType<HealOverTimeStatus>(),
+        isNotEmpty,
+        reason: 'the default reads the DEBUFF pool, not the longest clock',
+      );
       expect(alice.statuses.whereType<IgniteStatus>(), isEmpty);
     });
 
     test('casting it clean is legal and does nothing', () {
       final duel = engine(CountingRandom());
       final r = cast(duel, Spellbook.cleanse, MagicElement.geo);
-      expect(r.events.whereType<SpellCastEvent>(), isNotEmpty,
-          reason: 'a no-op rite still RESOLVES — it is not a fizzle');
+      expect(
+        r.events.whereType<SpellCastEvent>(),
+        isNotEmpty,
+        reason: 'a no-op rite still RESOLVES — it is not a fizzle',
+      );
       expect(alice.charge, 0, reason: 'and it still cost the turn');
     });
 
-    test('a named debuff that is no longer there falls back to the default',
-        () {
-      alice.statuses.add(IgniteStatus(4));
-      final duel = engine(CountingRandom());
-      cast(duel, Spellbook.cleanse, MagicElement.geo, choice: 'blind');
-      expect(alice.statuses.whereType<IgniteStatus>(), isEmpty,
-          reason: 'a stale pick still cleanses something rather than whiffing');
-    });
+    test(
+      'a named debuff that is no longer there falls back to the default',
+      () {
+        alice.statuses.add(IgniteStatus(4));
+        final duel = engine(CountingRandom());
+        cast(duel, Spellbook.cleanse, MagicElement.geo, choice: 'blind');
+        expect(
+          alice.statuses.whereType<IgniteStatus>(),
+          isEmpty,
+          reason: 'a stale pick still cleanses something rather than whiffing',
+        );
+      },
+    );
 
     test('⭐ the choice serializes, and both clients decode the same move', () {
       const action = CastAction(Spellbook.cleanse, MagicElement.pyro, 'ignite');
       final wire = encodeAction(action);
-      expect(wire, 'S|cleanse|pyro|ignite',
-          reason: 'the status is a fourth field, not smuggled into the id');
+      expect(
+        wire,
+        'S|cleanse|pyro|ignite',
+        reason: 'the status is a fourth field, not smuggled into the id',
+      );
 
       final back = decodeAction(wire) as CastAction;
       expect(back.spell.id, 'cleanse');
       expect(back.element, MagicElement.pyro);
-      expect(back.statusChoice, 'ignite',
-          reason: 'the pick survives the round trip');
-      expect(encodeAction(back), wire, reason: 'encode/decode is a fixed point');
-      expect(commitmentOf(wire, 'nonce'),
-          commitmentOf(encodeAction(back), 'nonce'),
-          reason: 'so the commitment hash is identical on both clients');
+      expect(
+        back.statusChoice,
+        'ignite',
+        reason: 'the pick survives the round trip',
+      );
+      expect(
+        encodeAction(back),
+        wire,
+        reason: 'encode/decode is a fixed point',
+      );
+      expect(
+        commitmentOf(wire, 'nonce'),
+        commitmentOf(encodeAction(back), 'nonce'),
+        reason: 'so the commitment hash is identical on both clients',
+      );
     });
 
     test('⚠️ a cast with no choice encodes exactly as it always did', () {
-      expect(encodeAction(const CastAction(Spellbook.bolt, MagicElement.pyro)),
-          'S|bolt|pyro',
-          reason: 'no empty trailing field — old commitments must not shift');
-      expect((decodeAction('S|cleanse|pyro') as CastAction).statusChoice, isNull,
-          reason: 'three fields still decode, and mean "you pick"');
+      expect(
+        encodeAction(const CastAction(Spellbook.bolt, MagicElement.pyro)),
+        'S|bolt|pyro',
+        reason: 'no empty trailing field — old commitments must not shift',
+      );
+      expect(
+        (decodeAction('S|cleanse|pyro') as CastAction).statusChoice,
+        isNull,
+        reason: 'three fields still decode, and mean "you pick"',
+      );
     });
 
     test('a status id can never smuggle a separator onto the wire', () {
       expect(
-          () => encodeAction(
-              const CastAction(Spellbook.cleanse, MagicElement.pyro, 'a|b')),
-          throwsArgumentError,
-          reason: 'a re-shaped move is a desync, not a bad cleanse');
+        () => encodeAction(
+          const CastAction(Spellbook.cleanse, MagicElement.pyro, 'a|b'),
+        ),
+        throwsArgumentError,
+        reason: 'a re-shaped move is a desync, not a bad cleanse',
+      );
     });
   });
 
   group('Purify', () {
     test('⭐ removes ALL debuffs and nothing else', () {
       alice
-        ..nextOffensiveDamageScale = 0.5 // Stagger
+        ..nextOffensiveDamageScale =
+            0.5 // Stagger
         ..statuses.addAll([
           IgniteStatus(4),
           BlindStatus(),
@@ -459,13 +601,23 @@ void main() {
 
       expect(alice.statuses.whereType<IgniteStatus>(), isEmpty);
       expect(alice.statuses.whereType<BlindStatus>(), isEmpty);
-      expect(alice.nextOffensiveDamageScale, 1.0,
-          reason: 'Stagger is an affliction too — the element lane\'s purge '
-              'already treats it as one');
-      expect(alice.statuses.whereType<ArcaneKnowledgeStatus>(), isNotEmpty,
-          reason: 'buffs are untouched');
-      expect(alice.statuses.whereType<HealOverTimeStatus>(), isNotEmpty,
-          reason: 'a running HoT is a buff, not something done TO you');
+      expect(
+        alice.nextOffensiveDamageScale,
+        1.0,
+        reason:
+            'Stagger is an affliction too — the element lane\'s purge '
+            'already treats it as one',
+      );
+      expect(
+        alice.statuses.whereType<ArcaneKnowledgeStatus>(),
+        isNotEmpty,
+        reason: 'buffs are untouched',
+      );
+      expect(
+        alice.statuses.whereType<HealOverTimeStatus>(),
+        isNotEmpty,
+        reason: 'a running HoT is a buff, not something done TO you',
+      );
       expect(alice.hp, 100, reason: 'the burn never reached the end phase');
     });
 
@@ -474,8 +626,11 @@ void main() {
       cast(duel, Spellbook.lightfoot, MagicElement.geo);
       alice.statuses.add(IgniteStatus(4));
       cast(duel, Spellbook.purify, MagicElement.geo);
-      expect(alice.effectiveDodge, 15,
-          reason: 'Purify is recovery, not the mirror of Dispel');
+      expect(
+        alice.effectiveDodge,
+        15,
+        reason: 'Purify is recovery, not the mirror of Dispel',
+      );
       expect(alice.statuses.whereType<IgniteStatus>(), isEmpty);
     });
 
@@ -499,38 +654,56 @@ void main() {
     test('⭐ a stance gains five turns', () {
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.lightfoot, MagicElement.geo);
-      expect(alice.statuses.whereType<LightfootStatus>().single.turnsLeft, 9,
-          reason: '10 turns, less the landing turn');
+      expect(
+        alice.statuses.whereType<LightfootStatus>().single.turnsLeft,
+        9,
+        reason: '10 turns, less the landing turn',
+      );
       cast(duel, Spellbook.meditate, MagicElement.geo);
-      expect(alice.statuses.whereType<LightfootStatus>().single.turnsLeft, 13,
-          reason: '9 + 5, less this turn\'s decrement — Meditate is what '
-              'raises the stakes of the stance game');
+      expect(
+        alice.statuses.whereType<LightfootStatus>().single.turnsLeft,
+        13,
+        reason:
+            '9 + 5, less this turn\'s decrement — Meditate is what '
+            'raises the stakes of the stance game',
+      );
     });
 
     test('the control: the same stance without Meditate just ticks down', () {
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.lightfoot, MagicElement.geo);
       cast(duel, Spellbook.hasty, MagicElement.geo);
-      expect(alice.statuses.whereType<LightfootStatus>().single.turnsLeft, 8,
-          reason: 'a different priority-7 aux spell feeds nothing');
+      expect(
+        alice.statuses.whereType<LightfootStatus>().single.turnsLeft,
+        8,
+        reason: 'a different priority-7 aux spell feeds nothing',
+      );
     });
 
     test('a turn-timed buff from another lane gains it too', () {
       alice.statuses.add(HealOverTimeStatus(percentPerTurn: 1, turnsLeft: 3));
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.meditate, MagicElement.geo);
-      expect(alice.statuses.whereType<HealOverTimeStatus>().single.turnsLeft, 7,
-          reason: 'polarity and a clock is the whole test — not which lane '
-              'granted it');
+      expect(
+        alice.statuses.whereType<HealOverTimeStatus>().single.turnsLeft,
+        7,
+        reason:
+            'polarity and a clock is the whole test — not which lane '
+            'granted it',
+      );
     });
 
     test('⚠️ a turn-timed DEBUFF gains nothing', () {
       alice.statuses.add(IgniteStatus(1)); // 3 turns
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.meditate, MagicElement.geo);
-      expect(alice.statuses.whereType<IgniteStatus>().single.turnsLeft, 2,
-          reason: 'it is on a clock, but it is not YOURS — polarity keeps it '
-              'out, or Meditate would be a self-inflicted Fester');
+      expect(
+        alice.statuses.whereType<IgniteStatus>().single.turnsLeft,
+        2,
+        reason:
+            'it is on a clock, but it is not YOURS — polarity keeps it '
+            'out, or Meditate would be a self-inflicted Fester',
+      );
     });
 
     test('⭐ pending Empower and every next-attack rider gain nothing', () {
@@ -546,29 +719,39 @@ void main() {
 
       // The ruling, stated as a count: exactly ONE thing was fed, and it was
       // the buff on a clock. If the riders were reachable, this reads 4.
-      expect(meditateLine(r), contains('1 stance'),
-          reason: 'only the turn-timed buff was extended');
+      expect(
+        meditateLine(r),
+        contains('1 stance'),
+        reason: 'only the turn-timed buff was extended',
+      );
       expect(alice.empowerMultiplier, 2, reason: 'still banked, still x2');
-      expect([alice.phaseNext, alice.pierceNext, alice.unerringNext],
-          everyElement(isTrue),
-          reason: 'riders wait for an attack, not for a clock — a 2-charge '
-              'spell must not start banking them');
+      expect(
+        [alice.phaseNext, alice.pierceNext, alice.unerringNext],
+        everyElement(isTrue),
+        reason:
+            'riders wait for an attack, not for a clock — a 2-charge '
+            'spell must not start banking them',
+      );
     });
 
     test('a permanent buff has no clock to extend', () {
       alice.statuses.add(RegrowStatus(1));
       final duel = engine(CountingRandom());
-      expect(meditateLine(cast(duel, Spellbook.meditate, MagicElement.geo)),
-          contains('no stance'),
-          reason: 'Regrow never ends, so "+5 turns" is meaningless on it');
+      expect(
+        meditateLine(cast(duel, Spellbook.meditate, MagicElement.geo)),
+        contains('no stance'),
+        reason: 'Regrow never ends, so "+5 turns" is meaningless on it',
+      );
     });
 
     test('deepens every stance at once', () {
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.lightfoot, MagicElement.geo);
       cast(duel, Spellbook.keen, MagicElement.geo);
-      expect(meditateLine(cast(duel, Spellbook.meditate, MagicElement.geo)),
-          contains('2 stance'));
+      expect(
+        meditateLine(cast(duel, Spellbook.meditate, MagicElement.geo)),
+        contains('2 stance'),
+      );
     });
   });
 
@@ -581,9 +764,11 @@ void main() {
         ..priorityPenalty = 10
         ..nextOffensiveDamageScale = 0.5
         ..statuses.addAll([IgniteStatus(4), ArcaneKnowledgeStatus(2)]);
-      expect(debuffsOn(alice).map((d) => d.id),
-          ['ignite', 'waterlogged', 'stagger'],
-          reason: 'a fixed order — Absolution indexes a shared RNG into it');
+      expect(debuffsOn(alice).map((d) => d.id), [
+        'ignite',
+        'waterlogged',
+        'stagger',
+      ], reason: 'a fixed order — Absolution indexes a shared RNG into it');
     });
 
     test('reports a timer where there is one, and 0 where there is not', () {
@@ -592,30 +777,47 @@ void main() {
         ..statuses.add(IgniteStatus(4)..turnsLeft = 6);
       final pool = debuffsOn(alice);
       expect(pool.firstWhere((d) => d.id == 'ignite').turnsLeft, 6);
-      expect(pool.firstWhere((d) => d.id == 'stagger').turnsLeft, 0,
-          reason: 'untimed, so it sorts last for the default pick');
+      expect(
+        pool.firstWhere((d) => d.id == 'stagger').turnsLeft,
+        0,
+        reason: 'untimed, so it sorts last for the default pick',
+      );
       expect(defaultCleanseChoice(pool)!.id, 'ignite');
     });
 
     test('a stance is never in it, and always in Meditate\'s', () {
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.divert, MagicElement.geo);
-      expect(debuffsOn(alice), isEmpty,
-          reason: 'Cleanse and Purify must never eat your own stance');
+      expect(
+        debuffsOn(alice),
+        isEmpty,
+        reason: 'Cleanse and Purify must never eat your own stance',
+      );
       expect(timedBuffsOn(alice), hasLength(1));
     });
 
     test('the shipped clocks declare themselves timed, correctly signed', () {
       expect(IgniteStatus(1), isA<TurnTimed>());
       expect(BlindStatus(), isA<TurnTimed>());
-      expect(HealOverTimeStatus(percentPerTurn: 1, turnsLeft: 1),
-          isA<TurnTimed>());
-      expect(RegrowStatus(1), isNot(isA<TurnTimed>()),
-          reason: 'permanent: there is no clock to move');
-      expect(ArcaneKnowledgeStatus(1), isNot(isA<TurnTimed>()),
-          reason: 'permanent, and stack-based');
-      expect(CreepingDarkStatus(1), isNot(isA<TurnTimed>()),
-          reason: 'stacks and activity decay, not a clock');
+      expect(
+        HealOverTimeStatus(percentPerTurn: 1, turnsLeft: 1),
+        isA<TurnTimed>(),
+      );
+      expect(
+        RegrowStatus(1),
+        isNot(isA<TurnTimed>()),
+        reason: 'permanent: there is no clock to move',
+      );
+      expect(
+        ArcaneKnowledgeStatus(1),
+        isNot(isA<TurnTimed>()),
+        reason: 'permanent, and stack-based',
+      );
+      expect(
+        CreepingDarkStatus(1),
+        isNot(isA<TurnTimed>()),
+        reason: 'stacks and activity decay, not a clock',
+      );
     });
   });
 
@@ -630,22 +832,29 @@ void main() {
     });
 
     test('ids, costs and lanes match the §7a tables', () {
-      expect({for (final s in Spellbook.bank) s.id: s.chargeCost}, {
-        'pierce': 3,
-        'unerring': 3,
-        'execute': 4,
-        'cleanse': 2,
-        'purify': 5,
-        'meditate': 2,
-      });
-      expect({for (final s in Spellbook.bank) s.id: s.priority}, {
-        'pierce': SpellPriority.auxDefense,
-        'unerring': SpellPriority.auxDefense,
-        'execute': SpellPriority.attack,
-        'cleanse': SpellPriority.auxDefense,
-        'purify': SpellPriority.auxDefense,
-        'meditate': SpellPriority.auxDefense,
-      }, reason: 'all six point at the caster except the finisher');
+      expect(
+        {for (final s in Spellbook.bank) s.id: s.chargeCost},
+        {
+          'pierce': 3,
+          'unerring': 3,
+          'execute': 4,
+          'cleanse': 2,
+          'purify': 5,
+          'meditate': 2,
+        },
+      );
+      expect(
+        {for (final s in Spellbook.bank) s.id: s.priority},
+        {
+          'pierce': SpellPriority.auxDefense,
+          'unerring': SpellPriority.auxDefense,
+          'execute': SpellPriority.attack,
+          'cleanse': SpellPriority.auxDefense,
+          'purify': SpellPriority.auxDefense,
+          'meditate': SpellPriority.auxDefense,
+        },
+        reason: 'all six point at the caster except the finisher',
+      );
     });
 
     test('no id collides anywhere in the promoted book', () {
@@ -653,11 +862,17 @@ void main() {
       // "not in all" became self-contradictory. The property that matters
       // survives as global uniqueness.
       final ids = Spellbook.all.map((s) => s.id).toList();
-      expect(ids.toSet().length, ids.length,
-          reason: 'a duplicated id makes byId ambiguous on the wire');
+      expect(
+        ids.toSet().length,
+        ids.length,
+        reason: 'a duplicated id makes byId ambiguous on the wire',
+      );
       for (final s in Spellbook.bank) {
-        expect(ids, contains(s.id),
-            reason: '${s.id} was promoted with the bank');
+        expect(
+          ids,
+          contains(s.id),
+          reason: '${s.id} was promoted with the bank',
+        );
       }
     });
 

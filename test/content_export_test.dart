@@ -54,8 +54,11 @@ void main() {
     }
     for (final n in GatherNodes.all) {
       check(n.yieldsDefId, 'gather node ${n.id}');
-      expect(World.exists(n.zoneId), isTrue,
-          reason: '${n.id} spawns in a zone that does not exist');
+      expect(
+        World.exists(n.zoneId),
+        isTrue,
+        reason: '${n.id} spawns in a zone that does not exist',
+      );
     }
     // Salvage is already covered by the items' own tests, but the export
     // walks it too — keep the net over the same water.
@@ -88,8 +91,8 @@ void main() {
     expect(oak, isNotEmpty);
     expect(
       oak.any(
-        (s) => (s as Map)['type'] == 'drop' &&
-            s['zoneId'] == 'whispering_woods',
+        (s) =>
+            (s as Map)['type'] == 'drop' && s['zoneId'] == 'whispering_woods',
       ),
       isTrue,
     );

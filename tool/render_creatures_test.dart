@@ -55,9 +55,12 @@ void main() {
       );
       return img.toByteData(format: ui.ImageByteFormat.png);
     });
-    File('docs/plates/creatures-whispering-woods.png')
-        .writeAsBytesSync(png!.buffer.asUint8List());
-    print('wrote ${entries.length} creatures, '
-        '${size.width.round()}x${size.height.round()}');
+    File(
+      'docs/plates/creatures-whispering-woods.png',
+    ).writeAsBytesSync(png!.buffer.asUint8List());
+    print(
+      'wrote ${entries.length} creatures, '
+      '${size.width.round()}x${size.height.round()}',
+    );
   });
 }

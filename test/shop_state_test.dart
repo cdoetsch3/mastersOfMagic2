@@ -66,8 +66,7 @@ void main() {
   group('§6.1 the nightly resupply catch-up', () {
     int flatEquilibrium(String id) => 60;
 
-    test('zero elapsed days resolves to the same stock, not a fresh reset',
-        () {
+    test('zero elapsed days resolves to the same stock, not a fresh reset', () {
       const prior = TownShopState(stock: {'oak_log': 10}, lastResetDay: 100);
       final resolved = ShopState.resolve(
         state: prior,
@@ -114,18 +113,20 @@ void main() {
       expect(resolved.stock['oak_log'], 60);
     });
 
-    test('RESUPPLY_RATE 1.0 holds at full equilibrium for any further days',
-        () {
-      const prior = TownShopState(stock: {'oak_log': 0}, lastResetDay: 0);
-      final resolved = ShopState.resolve(
-        state: prior,
-        today: 40,
-        itemIds: ['oak_log'],
-        equilibriumOf: flatEquilibrium,
-        resupplyRate: 1.0,
-      );
-      expect(resolved.stock['oak_log'], 60);
-    });
+    test(
+      'RESUPPLY_RATE 1.0 holds at full equilibrium for any further days',
+      () {
+        const prior = TownShopState(stock: {'oak_log': 0}, lastResetDay: 0);
+        final resolved = ShopState.resolve(
+          state: prior,
+          today: 40,
+          itemIds: ['oak_log'],
+          equilibriumOf: flatEquilibrium,
+          resupplyRate: 1.0,
+        );
+        expect(resolved.stock['oak_log'], 60);
+      },
+    );
 
     test('a glutted shop (stock above E) decays back DOWN toward E too', () {
       const prior = TownShopState(stock: {'oak_log': 200}, lastResetDay: 0);
@@ -153,8 +154,7 @@ void main() {
       expect(resolved.lastResetDay, 40);
     });
 
-    test('a never-visited town (null state) resolves fresh at equilibrium',
-        () {
+    test('a never-visited town (null state) resolves fresh at equilibrium', () {
       final resolved = ShopState.resolve(
         state: null,
         today: 500,
@@ -199,19 +199,22 @@ void main() {
       },
     );
 
-    test('elapsed days never goes negative even with a clock that looks stale', () {
-      // A defensive guard: `today` earlier than `lastResetDay` (a bad clock,
-      // a save imported across devices) must not produce a negative
-      // exponent or corrupt stock.
-      const prior = TownShopState(stock: {'oak_log': 10}, lastResetDay: 100);
-      final resolved = ShopState.resolve(
-        state: prior,
-        today: 50,
-        itemIds: ['oak_log'],
-        equilibriumOf: flatEquilibrium,
-      );
-      expect(resolved.stock['oak_log'], 10, reason: 'zero elapsed, no-op');
-    });
+    test(
+      'elapsed days never goes negative even with a clock that looks stale',
+      () {
+        // A defensive guard: `today` earlier than `lastResetDay` (a bad clock,
+        // a save imported across devices) must not produce a negative
+        // exponent or corrupt stock.
+        const prior = TownShopState(stock: {'oak_log': 10}, lastResetDay: 100);
+        final resolved = ShopState.resolve(
+          state: prior,
+          today: 50,
+          itemIds: ['oak_log'],
+          equilibriumOf: flatEquilibrium,
+        );
+        expect(resolved.stock['oak_log'], 10, reason: 'zero elapsed, no-op');
+      },
+    );
 
     test('stock never resolves negative', () {
       const prior = TownShopState(stock: {'oak_log': 0}, lastResetDay: 0);
@@ -277,8 +280,7 @@ void main() {
       'sapwort_draught',
     ];
 
-    test('two independent computations of the same inputs agree exactly',
-        () {
+    test('two independent computations of the same inputs agree exactly', () {
       final a = ShopState.eventsFor(
         shopId: 'hearthwood',
         today: 20330,
@@ -306,8 +308,7 @@ void main() {
       expect(forward, reversed);
     });
 
-    test('a different shop, same day, picks a different set or directions',
-        () {
+    test('a different shop, same day, picks a different set or directions', () {
       final hearthwood = ShopState.eventsFor(
         shopId: 'hearthwood',
         today: 20330,
@@ -325,20 +326,22 @@ void main() {
       );
     });
 
-    test('the same shop, a different day, picks a different set or directions',
-        () {
-      final day1 = ShopState.eventsFor(
-        shopId: 'hearthwood',
-        today: 20330,
-        candidateItemIds: catalogue,
-      );
-      final day2 = ShopState.eventsFor(
-        shopId: 'hearthwood',
-        today: 20331,
-        candidateItemIds: catalogue,
-      );
-      expect(day1, isNot(equals(day2)));
-    });
+    test(
+      'the same shop, a different day, picks a different set or directions',
+      () {
+        final day1 = ShopState.eventsFor(
+          shopId: 'hearthwood',
+          today: 20330,
+          candidateItemIds: catalogue,
+        );
+        final day2 = ShopState.eventsFor(
+          shopId: 'hearthwood',
+          today: 20331,
+          candidateItemIds: catalogue,
+        );
+        expect(day1, isNot(equals(day2)));
+      },
+    );
 
     test('defaults to ~2 items per shop per day, each at ±20%', () {
       final events = ShopState.eventsFor(
@@ -388,8 +391,7 @@ void main() {
       expect(events, isEmpty);
     });
 
-    test('duplicate ids in the candidate list are deduped before picking',
-        () {
+    test('duplicate ids in the candidate list are deduped before picking', () {
       final withDupes = ShopState.eventsFor(
         shopId: 'hearthwood',
         today: 20330,

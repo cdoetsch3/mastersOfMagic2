@@ -14,14 +14,15 @@ import 'package:masters_of_magic_2/game/content_version.dart';
 
 void main() {
   test('pubspec version is exactly $appVersion+${ContentVersion.current}', () {
-    final line = File('pubspec.yaml')
-        .readAsLinesSync()
-        .firstWhere((l) => l.startsWith('version:'));
+    final line = File(
+      'pubspec.yaml',
+    ).readAsLinesSync().firstWhere((l) => l.startsWith('version:'));
     final v = line.split(':')[1].trim();
     expect(
       v,
       '$appVersion+${ContentVersion.current}',
-      reason: 'the build number IS the content version (the number the login '
+      reason:
+          'the build number IS the content version (the number the login '
           'gate compares and the About panel shows) — bump ContentVersion'
           '.current, pubspec\'s +N, and the server doc together, every '
           'release. ⚠️ The mutant this kills: any of the three moving alone.',

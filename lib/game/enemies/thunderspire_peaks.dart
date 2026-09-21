@@ -104,7 +104,11 @@ abstract final class ThunderspirePeaksBestiary {
         effect: DamageEffect(30, 40),
       ),
     ],
-    combatStats: EnemyCombatStats(accuracyBonus: -8, critChance: 8, critDamage: 25),
+    combatStats: EnemyCombatStats(
+      accuracyBonus: -8,
+      critChance: 8,
+      critDamage: 25,
+    ),
     drops: DropTable(
       always: _commonAlways,
       main: [
@@ -416,7 +420,11 @@ abstract final class ThunderspirePeaksBestiary {
         effect: DamageEffect(26, 34),
       ),
     ],
-    combatStats: EnemyCombatStats(accuracyBonus: 8, critChance: 12, critDamage: 40),
+    combatStats: EnemyCombatStats(
+      accuracyBonus: 8,
+      critChance: 12,
+      critDamage: 40,
+    ),
     drops: _miniDrops,
   );
 

@@ -25,8 +25,7 @@ abstract final class CraftQuality {
 
   /// Lever 6 as a scalar: >1 means wider timing windows / slower tempo.
   /// The gesture engines multiply their windows by this.
-  static double windowScale(int margin) =>
-      (1 + 0.05 * margin).clamp(1.0, 1.8);
+  static double windowScale(int margin) => (1 + 0.05 * margin).clamp(1.0, 1.8);
 
   /// The best quality this execution can yield (§9b.9d step 2).
   ///

@@ -68,9 +68,10 @@ void main() {
 
     test('every id is the snake_case of its own name', () {
       for (final e in all) {
-        final derived = e.name
-            .toLowerCase()
-            .replaceAll(RegExp(r"[^a-z0-9]+"), '_');
+        final derived = e.name.toLowerCase().replaceAll(
+          RegExp(r"[^a-z0-9]+"),
+          '_',
+        );
         expect(e.id, derived, reason: '${e.name} should be id "$derived"');
       }
     });
@@ -86,7 +87,8 @@ void main() {
           expect(
             loc.elements,
             contains(el),
-            reason: '${e.id} uses $el, which is not one of this hybrid\'s '
+            reason:
+                '${e.id} uses $el, which is not one of this hybrid\'s '
                 'two elements',
           );
         }
@@ -208,33 +210,36 @@ void main() {
         expect(
           e.combatStats.dodge,
           lessThanOrEqualTo(10),
-          reason: '${e.id} — enemy dodge should read as slippery, never '
+          reason:
+              '${e.id} — enemy dodge should read as slippery, never '
               'unhittable',
         );
       }
     });
 
-    test('crit damage and deflect amount never appear without their chance',
-        () {
-      for (final e in all) {
-        final s = e.combatStats;
-        expect(
-          s.critDamage == 0 || s.critChance > 0,
-          isTrue,
-          reason: '${e.id} has crit damage but critChance == 0',
-        );
-        expect(
-          s.deflectAmount == 0 || s.deflectChance > 0,
-          isTrue,
-          reason: '${e.id} has deflect amount but deflectChance == 0',
-        );
-        expect(
-          s.deflectChance == 0 || s.deflectAmount > 0,
-          isTrue,
-          reason: '${e.id} has deflect chance but deflectAmount == 0',
-        );
-      }
-    });
+    test(
+      'crit damage and deflect amount never appear without their chance',
+      () {
+        for (final e in all) {
+          final s = e.combatStats;
+          expect(
+            s.critDamage == 0 || s.critChance > 0,
+            isTrue,
+            reason: '${e.id} has crit damage but critChance == 0',
+          );
+          expect(
+            s.deflectAmount == 0 || s.deflectChance > 0,
+            isTrue,
+            reason: '${e.id} has deflect amount but deflectChance == 0',
+          );
+          expect(
+            s.deflectChance == 0 || s.deflectAmount > 0,
+            isTrue,
+            reason: '${e.id} has deflect chance but deflectAmount == 0',
+          );
+        }
+      },
+    );
   });
 
   group('creatures are creatures, not mages', () {
@@ -251,8 +256,7 @@ void main() {
       }
     });
 
-    test('move ids are unique across the whole zone, and all prefixed md_',
-        () {
+    test('move ids are unique across the whole zone, and all prefixed md_', () {
       final ids = [for (final e in all) ...e.moves.map((m) => m.id)];
       expect(ids.toSet(), hasLength(ids.length));
       for (final id in ids) {
@@ -337,7 +341,8 @@ void main() {
         expect(
           e.moves.any((m) => m.effect is ShieldEffect),
           isTrue,
-          reason: '${e.id} is a ${e.archetype.name} with nothing to hide '
+          reason:
+              '${e.id} is a ${e.archetype.name} with nothing to hide '
               'behind',
         );
       }
@@ -346,15 +351,15 @@ void main() {
     test('the Redoubt carries its lifesteal move', () {
       expect(
         TheMoltenDeepBestiary.magmaBehemoth.moves.any(
-          (m) => m.effect is DamageEffect &&
+          (m) =>
+              m.effect is DamageEffect &&
               (m.effect as DamageEffect).lifesteal > 0,
         ),
         isTrue,
       );
     });
 
-    test('the Hexer gets ahead of the whole board, and bypasses a shield',
-        () {
+    test('the Hexer gets ahead of the whole board, and bypasses a shield', () {
       final firstmelt = TheMoltenDeepBestiary.firstmelt;
       expect(firstmelt.archetype.id, 'hexer');
       expect(
@@ -364,7 +369,8 @@ void main() {
       );
       expect(
         firstmelt.moves.any(
-          (m) => m.effect is DamageEffect &&
+          (m) =>
+              m.effect is DamageEffect &&
               (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
@@ -394,8 +400,7 @@ void main() {
       );
     });
 
-    test('nothing in this zone lifesteals except the Redoubt\'s finisher',
-        () {
+    test('nothing in this zone lifesteals except the Redoubt\'s finisher', () {
       for (final e in all) {
         for (final m in e.moves) {
           final effect = m.effect;
@@ -464,8 +469,7 @@ void main() {
       }
     });
 
-    test('both crystal families only appear on the mini and boss tables',
-        () {
+    test('both crystal families only appear on the mini and boss tables', () {
       for (final e in TheMoltenDeepBestiary.commons) {
         expect(e.drops.possibleDrops, isNot(contains('pyro_crystal')));
         expect(e.drops.possibleDrops, isNot(contains('geo_crystal')));
@@ -491,10 +495,18 @@ void main() {
     test('a Pyro + Geo hybrid drops only Pyro and Geo motes — no motes of '
         'its own (§3.2)', () {
       const foreign = {
-        'flora_dust', 'flora_shard', 'flora_crystal',
-        'aqua_dust', 'aqua_shard', 'aqua_crystal',
-        'electro_dust', 'electro_shard', 'electro_crystal',
-        'aero_dust', 'aero_shard', 'aero_crystal',
+        'flora_dust',
+        'flora_shard',
+        'flora_crystal',
+        'aqua_dust',
+        'aqua_shard',
+        'aqua_crystal',
+        'electro_dust',
+        'electro_shard',
+        'electro_crystal',
+        'aero_dust',
+        'aero_shard',
+        'aero_crystal',
       };
       for (final id in TheMoltenDeepBestiary.allDrops) {
         expect(foreign, isNot(contains(id)), reason: '$id is off-element');
@@ -552,8 +564,7 @@ void main() {
       }
     });
 
-    test('the catalogue is registered under the real zone id, with 6 defs',
-        () {
+    test('the catalogue is registered under the real zone id, with 6 defs', () {
       expect(ItemCatalogue.byZone.keys, contains(zone));
       expect(ItemCatalogue.byZone[zone], hasLength(6));
     });
@@ -588,7 +599,8 @@ void main() {
           expect(
             d.properName,
             isNotNull,
-            reason: '${d.id} is drop-only equipment and must set its own '
+            reason:
+                '${d.id} is drop-only equipment and must set its own '
                 'name',
           );
         }

@@ -64,8 +64,12 @@ void main() {
   /// single seed measures noise rather than skill — and swapping seats removes
   /// any turn-order advantage. Tuning against one seed produced a ladder that
   /// reordered itself every run.
-  double winRate(int a, int b,
-      {List<int> seeds = const [1, 7, 23], int duels = 300}) {
+  double winRate(
+    int a,
+    int b, {
+    List<int> seeds = const [1, 7, 23],
+    int duels = 300,
+  }) {
     var total = 0.0;
     var samples = 0;
     for (final seed in seeds) {
@@ -90,31 +94,48 @@ void main() {
           failures.add('${low + 1} vs $low = ${r.toStringAsFixed(1)}%');
         }
       }
-      expect(failures, isEmpty,
-          reason: 'these rungs do not climb: ${failures.join(", ")}');
+      expect(
+        failures,
+        isEmpty,
+        reason: 'these rungs do not climb: ${failures.join(", ")}',
+      );
     });
 
     test('level 9 beats level 7', () {
       final r = winRate(9, 7);
-      expect(r, greaterThan(51.0),
-          reason: 'level 9 won only ${r.toStringAsFixed(1)}% against level 7');
+      expect(
+        r,
+        greaterThan(51.0),
+        reason: 'level 9 won only ${r.toStringAsFixed(1)}% against level 7',
+      );
     });
 
-    test('level 10 beats level 9 — it is the same brain that never blunders',
-        () {
-      final r = winRate(10, 9);
-      expect(r, greaterThan(51.0),
-          reason: 'level 10 won only ${r.toStringAsFixed(1)}% against level 9');
-    });
+    test(
+      'level 10 beats level 9 — it is the same brain that never blunders',
+      () {
+        final r = winRate(10, 9);
+        expect(
+          r,
+          greaterThan(51.0),
+          reason: 'level 10 won only ${r.toStringAsFixed(1)}% against level 9',
+        );
+      },
+    );
 
     test('the scale spans a real difficulty range', () {
       // Against a mid-ladder baseline the rungs must fan out, not cluster.
       final low = winRate(1, 5);
       final high = winRate(10, 5);
-      expect(low, lessThan(25.0),
-          reason: 'level 1 measured ${low.toStringAsFixed(1)}% vs level 5');
-      expect(high, greaterThan(70.0),
-          reason: 'level 10 measured ${high.toStringAsFixed(1)}% vs level 5');
+      expect(
+        low,
+        lessThan(25.0),
+        reason: 'level 1 measured ${low.toStringAsFixed(1)}% vs level 5',
+      );
+      expect(
+        high,
+        greaterThan(70.0),
+        reason: 'level 10 measured ${high.toStringAsFixed(1)}% vs level 5',
+      );
     });
 
     test('the big competence jumps are decisive', () {
@@ -133,19 +154,30 @@ void main() {
         (5, 9, 60.0), // counter-aware -> predictive
         (1, 10, 90.0), // top vs bottom
       ]) {
-        final r = winRate(high, low,
-            seeds: const [1, 7, 23, 31, 47, 59], duels: 1000);
-        expect(r, greaterThan(floor),
-            reason: 'level $high scored ${r.toStringAsFixed(1)}% against level '
-                '$low, below the $floor% this step should clear');
+        final r = winRate(
+          high,
+          low,
+          seeds: const [1, 7, 23, 31, 47, 59],
+          duels: 1000,
+        );
+        expect(
+          r,
+          greaterThan(floor),
+          reason:
+              'level $high scored ${r.toStringAsFixed(1)}% against level '
+              '$low, below the $floor% this step should clear',
+        );
       }
     });
 
     test('a rung is even with itself', () {
       for (final level in const [4, 7, 9]) {
         final r = winRate(level, level);
-        expect(r, inInclusiveRange(40.0, 60.0),
-            reason: 'level $level mirror came out ${r.toStringAsFixed(1)}%');
+        expect(
+          r,
+          inInclusiveRange(40.0, 60.0),
+          reason: 'level $level mirror came out ${r.toStringAsFixed(1)}%',
+        );
       }
     });
   });
@@ -158,11 +190,16 @@ void main() {
         final self = MageState(name: 'A')
           ..charge = 5
           ..element = MagicElement.pyro;
-        final a = LadderAi(1).chooseAction(self, MageState(name: 'B'), Random(i));
+        final a = LadderAi(
+          1,
+        ).chooseAction(self, MageState(name: 'B'), Random(i));
         seen.add(a is CastAction ? a.spell.id : 'charge');
       }
-      expect(seen.length, greaterThan(3),
-          reason: 'level 1 should flail across the whole action space');
+      expect(
+        seen.length,
+        greaterThan(3),
+        reason: 'level 1 should flail across the whole action space',
+      );
     });
 
     test('level 2 repeats one cheap habit', () {
@@ -174,8 +211,10 @@ void main() {
         final self = MageState(name: 'A')
           ..charge = 5
           ..element = MagicElement.pyro;
-        final a = LadderAi(2, spells: book)
-            .chooseAction(self, MageState(name: 'B'), Random(i));
+        final a = LadderAi(
+          2,
+          spells: book,
+        ).chooseAction(self, MageState(name: 'B'), Random(i));
         if (a is CastAction && a.spell.id != 'bolt') {
           // Only a blunder may deviate from the habit.
           expect(LadderAi(2).intelligence, 2);
@@ -186,12 +225,17 @@ void main() {
         final self = MageState(name: 'A')
           ..charge = 5
           ..element = MagicElement.pyro;
-        final a = LadderAi(2, spells: book)
-            .chooseAction(self, MageState(name: 'B'), Random(i));
+        final a = LadderAi(
+          2,
+          spells: book,
+        ).chooseAction(self, MageState(name: 'B'), Random(i));
         if (a is CastAction) habits.add(a.spell.id);
       }
-      expect(habits, contains('bolt'),
-          reason: 'level 2 should settle on its cheapest attack');
+      expect(
+        habits,
+        contains('bolt'),
+        reason: 'level 2 should settle on its cheapest attack',
+      );
     });
 
     test('level 3 spends the charge it built', () {
@@ -206,8 +250,11 @@ void main() {
         final a = LadderAi(3).chooseAction(me, MageState(name: 'B'), Random(i));
         if (a is CastAction && a.spell.chargeCost > 1) bigCasts++;
       }
-      expect(bigCasts, greaterThan(50),
-          reason: 'level 3 charges to a fixed number then spends it');
+      expect(
+        bigCasts,
+        greaterThan(50),
+        reason: 'level 3 charges to a fixed number then spends it',
+      );
       expect(self.charge, 3);
     });
 
@@ -217,10 +264,18 @@ void main() {
         final self = MageState(name: 'A')
           ..charge = 5
           ..element = MagicElement.pyro;
-        final a = LadderAi(4).chooseAction(self, MageState(name: 'B'), Random(i));
-        if (a is CastAction && a.spell.chargeCost <= 1 && !a.spell.xCost) wasted++;
+        final a = LadderAi(
+          4,
+        ).chooseAction(self, MageState(name: 'B'), Random(i));
+        if (a is CastAction && a.spell.chargeCost <= 1 && !a.spell.xCost) {
+          wasted++;
+        }
       }
-      expect(wasted, lessThan(20), reason: 'wasted a 5-charge cycle $wasted/200');
+      expect(
+        wasted,
+        lessThan(20),
+        reason: 'wasted a 5-charge cycle $wasted/200',
+      );
     });
 
     test('level 6 never misses a guaranteed kill', () {
@@ -244,8 +299,10 @@ void main() {
             ..element = MagicElement.pyro;
           final enemy = MageState(name: 'B')..charge = 4;
           final a = LadderAi(lvl).chooseAction(self, enemy, Random(i));
-          final guard = a is CastAction &&
-              (a.spell.effect is ShieldEffect || a.spell.effect is BarrierEffect);
+          final guard =
+              a is CastAction &&
+              (a.spell.effect is ShieldEffect ||
+                  a.spell.effect is BarrierEffect);
           if (guard) lvl == 9 ? seven++ : five++;
         }
       }
@@ -260,8 +317,12 @@ void main() {
             ..charge = 3
             ..element = MagicElement.pyro
             ..statuses.add(BlindStatus());
-          final a = LadderAi(lvl).chooseAction(self, MageState(name: 'B'), Random(i));
-          if (a is CastAction && a.spell.isOffensive) lvl == 7 ? eight++ : seven++;
+          final a = LadderAi(
+            lvl,
+          ).chooseAction(self, MageState(name: 'B'), Random(i));
+          if (a is CastAction && a.spell.isOffensive) {
+            lvl == 7 ? eight++ : seven++;
+          }
         }
       }
       expect(eight, lessThan(seven), reason: '$eight vs $seven swings of 100');
@@ -288,10 +349,14 @@ void main() {
       for (var i = 0; i < 150; i++) {
         if (choice(5, i) != choice(4, i)) differed++;
       }
-      expect(differed, greaterThan(0),
-          reason: 'level 5 made the identical choice to level 4 on all 150 '
-              'seeds against a resistant wall — counter-awareness is not '
-              'reaching the board');
+      expect(
+        differed,
+        greaterThan(0),
+        reason:
+            'level 5 made the identical choice to level 4 on all 150 '
+            'seeds against a resistant wall — counter-awareness is not '
+            'reaching the board',
+      );
     });
 
     test('level 8 is more patient than level 7', () {
@@ -305,15 +370,21 @@ void main() {
           final self = MageState(name: 'A')
             ..charge = 2
             ..element = MagicElement.pyro;
-          final a = LadderAi(lvl).chooseAction(self, MageState(name: 'B'), Random(i));
+          final a = LadderAi(
+            lvl,
+          ).chooseAction(self, MageState(name: 'B'), Random(i));
           if (a is ChargeAction) held++;
         }
         return held;
       }
 
-      expect(charges(8), greaterThan(charges(7)),
-          reason: 'level 8 (${charges(8)}/200) was no more patient than '
-              'level 7 (${charges(7)}/200)');
+      expect(
+        charges(8),
+        greaterThan(charges(7)),
+        reason:
+            'level 8 (${charges(8)}/200) was no more patient than '
+            'level 7 (${charges(7)}/200)',
+      );
     });
 
     test('level 10 plays exactly like level 9, minus the blunders', () {
@@ -332,15 +403,21 @@ void main() {
           final self = MageState(name: 'A')
             ..charge = 5
             ..element = MagicElement.pyro;
-          final a = LadderAi(lvl).chooseAction(self, MageState(name: 'B'), Random(i));
+          final a = LadderAi(
+            lvl,
+          ).chooseAction(self, MageState(name: 'B'), Random(i));
           return a is CastAction ? a.spell.id : 'charge';
         }
 
         if (choice(10) == choice(9)) same++;
       }
-      expect(same, greaterThan(150),
-          reason: 'levels 9 and 10 should differ only by blunder frequency '
-              '(matched on $same/200 seeds)');
+      expect(
+        same,
+        greaterThan(150),
+        reason:
+            'levels 9 and 10 should differ only by blunder frequency '
+            '(matched on $same/200 seeds)',
+      );
     });
 
     test('the blunder rate falls monotonically up the ladder', () {
@@ -404,16 +481,25 @@ void main() {
       }
 
       final visible = castsOn(() => MageState(name: 'B')..hp = 3);
-      final hidden = castsOn(() => MageState(name: 'B')
-        ..hp = 3
-        ..statuses.add(CreepingDarkStatus(10)));
+      final hidden = castsOn(
+        () => MageState(name: 'B')
+          ..hp = 3
+          ..statuses.add(CreepingDarkStatus(10)),
+      );
 
       // Not all 60: even level 8 blunders 7% of the time.
-      expect(visible, greaterThan(50),
-          reason: 'with the bar visible the kill should be near-certain');
-      expect(hidden, lessThan(visible),
-          reason: 'under Dusk the AI still found the kill $hidden/60 times — '
-              'it is reading through Creeping Dark');
+      expect(
+        visible,
+        greaterThan(50),
+        reason: 'with the bar visible the kill should be near-certain',
+      );
+      expect(
+        hidden,
+        lessThan(visible),
+        reason:
+            'under Dusk the AI still found the kill $hidden/60 times — '
+            'it is reading through Creeping Dark',
+      );
     });
   });
 
@@ -432,62 +518,85 @@ void main() {
     // the cheapest pop or a multi-hit whose later hits land, never the
     // biggest number (playtest ruling, 2026-08-10).
     const cheap = Spell(
-        id: 'flick',
-        name: 'Flick',
-        chargeCost: 1,
-        priority: 9,
-        effect: DamageEffect(6, 8));
+      id: 'flick',
+      name: 'Flick',
+      chargeCost: 1,
+      priority: 9,
+      effect: DamageEffect(6, 8),
+    );
     const big = Spell(
-        id: 'slam',
-        name: 'Slam',
-        chargeCost: 5,
-        priority: 9,
-        effect: DamageEffect(40, 50));
+      id: 'slam',
+      name: 'Slam',
+      chargeCost: 5,
+      priority: 9,
+      effect: DamageEffect(40, 50),
+    );
     const volley = Spell(
-        id: 'volley',
-        name: 'Volley',
-        chargeCost: 3,
-        priority: 9,
-        effect: DamageEffect(4, 6, hits: 3));
+      id: 'volley',
+      name: 'Volley',
+      chargeCost: 3,
+      priority: 9,
+      effect: DamageEffect(4, 6, hits: 3),
+    );
 
-    MageState walled() => MageState(name: 'You')
-      ..barrierPoints = MageState.maxBarrierPoints;
+    MageState walled() =>
+        MageState(name: 'You')..barrierPoints = MageState.maxBarrierPoints;
 
     MageState full() => MageState(name: 'Foe')
       ..charge = MageState.maxCharge
       ..element = MagicElement.flora;
 
     test('a small spell outranks a large one against a Barrier', () {
-      final ai = LadderAi(5,
-          spells: const [cheap, big], elements: const [MagicElement.flora]);
+      final ai = LadderAi(
+        5,
+        spells: const [cheap, big],
+        elements: const [MagicElement.flora],
+      );
       final action = ai.chooseAction(full(), walled(), Random(3));
       expect(action, isA<CastAction>());
-      expect((action as CastAction).spell.id, 'flick',
-          reason: 'a raw-damage sort spends a Slam where a Flick does the '
-              'identical job — the barrier eats one hit whole either way');
+      expect(
+        (action as CastAction).spell.id,
+        'flick',
+        reason:
+            'a raw-damage sort spends a Slam where a Flick does the '
+            'identical job — the barrier eats one hit whole either way',
+      );
     });
 
     test('a multi-hit spell outranks the cheap pop — its later hits land', () {
-      final ai = LadderAi(5,
-          spells: const [cheap, big, volley],
-          elements: const [MagicElement.flora]);
+      final ai = LadderAi(
+        5,
+        spells: const [cheap, big, volley],
+        elements: const [MagicElement.flora],
+      );
       final action = ai.chooseAction(full(), walled(), Random(3));
       expect(action, isA<CastAction>());
-      expect((action as CastAction).spell.id, 'volley',
-          reason: 'hits after the first get past the popped point — real '
-              'damage this turn, which no single hit can offer');
+      expect(
+        (action as CastAction).spell.id,
+        'volley',
+        reason:
+            'hits after the first get past the popped point — real '
+            'damage this turn, which no single hit can offer',
+      );
     });
 
     test('⚠️ the asymmetry: against an elemental shield, big still wins', () {
-      final ai = LadderAi(5,
-          spells: const [cheap, big], elements: const [MagicElement.flora]);
+      final ai = LadderAi(
+        5,
+        spells: const [cheap, big],
+        elements: const [MagicElement.flora],
+      );
       final shielded = MageState(name: 'You')
         ..shield = ActiveShield.elemental(MagicElement.geo, 500);
       final action = ai.chooseAction(full(), shielded, Random(3));
       expect(action, isA<CastAction>());
-      expect((action as CastAction).spell.id, 'slam',
-          reason: 'a shield is a POOL — chipping scales with the hit, so the '
-              'barrier rule must not leak onto elemental shields');
+      expect(
+        (action as CastAction).spell.id,
+        'slam',
+        reason:
+            'a shield is a POOL — chipping scales with the hit, so the '
+            'barrier rule must not leak onto elemental shields',
+      );
     });
   });
 
@@ -498,17 +607,19 @@ void main() {
     /// bestiary entry; this is the engine-side shape of it.)
     final moves = [
       Spell(
-          id: 'ww_puffburst',
-          name: 'Puffburst',
-          chargeCost: 1,
-          priority: 8,
-          effect: DamageEffect(3, 5, hits: 2)),
+        id: 'ww_puffburst',
+        name: 'Puffburst',
+        chargeCost: 1,
+        priority: 8,
+        effect: DamageEffect(3, 5, hits: 2),
+      ),
       Spell(
-          id: 'ww_settle',
-          name: 'Settle',
-          chargeCost: 2,
-          priority: 8,
-          effect: DamageEffect(4, 6, hits: 3)),
+        id: 'ww_settle',
+        name: 'Settle',
+        chargeCost: 2,
+        priority: 8,
+        effect: DamageEffect(4, 6, hits: 3),
+      ),
     ];
 
     /// Intelligence 5 is the Blighter archetype's rung — and 5 is where the
@@ -547,16 +658,28 @@ void main() {
         }
         duel.resolveTurn(action, const ForfeitAction());
       }
-      expect(forfeits, 0,
-          reason: 'forfeited $forfeits/20 turns while holding an affordable '
-              'attack — the brain is scoring a blocked hit as worthless and '
-              'quitting instead of chipping the wall down');
-      expect(longestStreak, lessThan(3),
-          reason: 'a streak this long is what DuelController.forfeitLimit '
-              'converts into a surrender');
-      expect(barriersBroken, greaterThan(0),
-          reason: 'it never actually attacked the Barrier — charging forever '
-              'is the same stalemate wearing a different action');
+      expect(
+        forfeits,
+        0,
+        reason:
+            'forfeited $forfeits/20 turns while holding an affordable '
+            'attack — the brain is scoring a blocked hit as worthless and '
+            'quitting instead of chipping the wall down',
+      );
+      expect(
+        longestStreak,
+        lessThan(3),
+        reason:
+            'a streak this long is what DuelController.forfeitLimit '
+            'converts into a surrender',
+      );
+      expect(
+        barriersBroken,
+        greaterThan(0),
+        reason:
+            'it never actually attacked the Barrier — charging forever '
+            'is the same stalemate wearing a different action',
+      );
     });
 
     test('a Barrier does not change how willing the brain is to swing', () {
@@ -581,10 +704,14 @@ void main() {
 
       final walled = swings(barrier: true);
       final open = swings(barrier: false);
-      expect(walled, greaterThan(open * 3 ~/ 4),
-          reason: 'attacked only $walled/300 times through a Barrier versus '
-              '$open/300 against a naked target — a blocked hit is being '
-              'scored as worthless rather than as one barrier point removed');
+      expect(
+        walled,
+        greaterThan(open * 3 ~/ 4),
+        reason:
+            'attacked only $walled/300 times through a Barrier versus '
+            '$open/300 against a naked target — a blocked hit is being '
+            'scored as worthless rather than as one barrier point removed',
+      );
     });
 
     test('every rung, at full charge, casts rather than quits', () {
@@ -605,12 +732,15 @@ void main() {
           }
           final ai = brainAt(rung);
           for (var i = 0; i < 40; i++) {
-            expect(ai.chooseAction(foe, dummy, Random(i)),
-                isNot(isA<ForfeitAction>()),
-                reason: 'rung $rung forfeited at full charge against a $wall '
-                    'while Puffburst and Settle were both affordable — '
-                    'ForfeitAction must mean "no legal move", not "no good '
-                    'move"');
+            expect(
+              ai.chooseAction(foe, dummy, Random(i)),
+              isNot(isA<ForfeitAction>()),
+              reason:
+                  'rung $rung forfeited at full charge against a $wall '
+                  'while Puffburst and Settle were both affordable — '
+                  'ForfeitAction must mean "no legal move", not "no good '
+                  'move"',
+            );
           }
         }
       }
@@ -623,21 +753,28 @@ void main() {
       // brain has to spend it. This is the last remaining route to a forfeit
       // streak, and the fallback in `chooseAction` is what closes it.
       final overload = Spell(
-          id: 'overload',
-          name: 'Overload',
-          chargeCost: 2,
-          priority: 9,
-          effect: const OverloadEffect(6, 9));
-      final ai = LadderAi(9,
-          spells: [overload], elements: const [MagicElement.electro]);
+        id: 'overload',
+        name: 'Overload',
+        chargeCost: 2,
+        priority: 9,
+        effect: const OverloadEffect(6, 9),
+      );
+      final ai = LadderAi(
+        9,
+        spells: [overload],
+        elements: const [MagicElement.electro],
+      );
       for (var i = 0; i < 40; i++) {
         final me = MageState(name: 'AI')
           ..charge = MageState.maxCharge
           ..element = MagicElement.electro;
-        expect(ai.chooseAction(me, MageState(name: 'You'), Random(i)),
-            isNot(isA<ForfeitAction>()),
-            reason: 'forfeited with an affordable spell in hand because it '
-                'scored zero — three of these in a row is a surrender');
+        expect(
+          ai.chooseAction(me, MageState(name: 'You'), Random(i)),
+          isNot(isA<ForfeitAction>()),
+          reason:
+              'forfeited with an affordable spell in hand because it '
+              'scored zero — three of these in a row is a surrender',
+        );
       }
     });
   });

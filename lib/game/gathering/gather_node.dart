@@ -293,8 +293,7 @@ abstract final class GatherNodes {
     max: 3,
     step: GestureStep(GestureEngine.alignCommit, 'split', complexity: 2),
     xp: 37,
-    flavor:
-        'Red banding in a cut face, squarer than anything nature makes.',
+    flavor: 'Red banding in a cut face, squarer than anything nature makes.',
   );
 
   // ---- Windward Steppe (Aero, band 19–24, KINETIC_CONTRACT §6) ----------
@@ -512,6 +511,8 @@ abstract final class GatherNodes {
 
   static GatherNodeDef? byId(String id) => _byId[id];
 
-  static List<GatherNodeDef> forZone(String zoneId) =>
-      [for (final n in all) if (n.zoneId == zoneId) n];
+  static List<GatherNodeDef> forZone(String zoneId) => [
+    for (final n in all)
+      if (n.zoneId == zoneId) n,
+  ];
 }

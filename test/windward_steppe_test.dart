@@ -33,7 +33,11 @@ void main() {
     test('registered in Bestiary.all and reachable via forZone', () {
       // ⚠️ An unlisted zone compiles fine and simply never spawns.
       for (final e in all) {
-        expect(Bestiary.byId(e.id), same(e), reason: '${e.id} not in Bestiary.all');
+        expect(
+          Bestiary.byId(e.id),
+          same(e),
+          reason: '${e.id} not in Bestiary.all',
+        );
       }
       expect(Bestiary.forZone(zone).length, 11);
       expect(Bestiary.forZone(zone).toSet(), all.toSet());
@@ -51,10 +55,7 @@ void main() {
     test('the boss pair is the constant/exception pair the design names', () {
       // ⭐ §4.3: The Unbroken Blow (a force — Juggernaut) is the constant;
       // Tempest Monarch (a will — Tyrant) is the gust, the exception.
-      expect(
-        WindwardSteppeBestiary.theUnbrokenBlow.archetype.id,
-        'juggernaut',
-      );
+      expect(WindwardSteppeBestiary.theUnbrokenBlow.archetype.id, 'juggernaut');
       expect(WindwardSteppeBestiary.tempestMonarch.archetype.id, 'tyrant');
     });
 
@@ -94,9 +95,10 @@ void main() {
 
     test('every id is the snake_case of its own name', () {
       for (final e in all) {
-        final derived = e.name
-            .toLowerCase()
-            .replaceAll(RegExp(r"[^a-z0-9]+"), '_');
+        final derived = e.name.toLowerCase().replaceAll(
+          RegExp(r"[^a-z0-9]+"),
+          '_',
+        );
         expect(e.id, derived, reason: '${e.name} should be id "$derived"');
       }
     });
@@ -105,11 +107,9 @@ void main() {
       final loc = World.byId(zone);
       for (final e in all) {
         expect(e.zoneId, zone);
-        expect(
-          e.elements,
-          [MagicElement.aero],
-          reason: '${e.id} — a pure zone means one element (ENEMIES §2h)',
-        );
+        expect(e.elements, [
+          MagicElement.aero,
+        ], reason: '${e.id} — a pure zone means one element (ENEMIES §2h)');
         expect(loc.elements, contains(e.elements.single));
       }
     });
@@ -177,7 +177,10 @@ void main() {
       // allowed near it." This is the other of the two.
       final e = WindwardSteppeBestiary.windWraith;
       expect(e.archetype, Archetypes.hexer);
-      expect(e.combatStats, const EnemyCombatStats(accuracyBonus: 8, dodge: 10));
+      expect(
+        e.combatStats,
+        const EnemyCombatStats(accuracyBonus: 8, dodge: 10),
+      );
       expect(e.combatStats.dodge, lessThanOrEqualTo(10));
     });
 
@@ -192,25 +195,28 @@ void main() {
       }
     });
 
-    test('critDamage is never carried without critChance (inert-stat trap)', () {
-      // ⚠️ §2.1's guard: critChance == 0 makes critDamage a dead stat.
-      for (final e in all) {
-        if (e.combatStats.critDamage != 0) {
-          expect(
-            e.combatStats.critChance,
-            greaterThan(0),
-            reason: '${e.id} carries critDamage with no critChance',
-          );
+    test(
+      'critDamage is never carried without critChance (inert-stat trap)',
+      () {
+        // ⚠️ §2.1's guard: critChance == 0 makes critDamage a dead stat.
+        for (final e in all) {
+          if (e.combatStats.critDamage != 0) {
+            expect(
+              e.combatStats.critChance,
+              greaterThan(0),
+              reason: '${e.id} carries critDamage with no critChance',
+            );
+          }
+          if (e.combatStats.deflectAmount != 0) {
+            expect(
+              e.combatStats.deflectChance,
+              greaterThan(0),
+              reason: '${e.id} carries deflectAmount with no deflectChance',
+            );
+          }
         }
-        if (e.combatStats.deflectAmount != 0) {
-          expect(
-            e.combatStats.deflectChance,
-            greaterThan(0),
-            reason: '${e.id} carries deflectAmount with no deflectChance',
-          );
-        }
-      }
-    });
+      },
+    );
 
     test('the archetype determines the stat block — no swaps', () {
       // 🚫 Kills a mutant that hands one archetype's row to another.
@@ -242,7 +248,8 @@ void main() {
         expect(
           e.combatStats,
           byArchetype[e.archetype.id],
-          reason: '${e.id} (${e.archetype.id}) does not match its '
+          reason:
+              '${e.id} (${e.archetype.id}) does not match its '
               'archetype\'s KINETIC_CONTRACT §2.3 row',
         );
       }
@@ -277,10 +284,16 @@ void main() {
       for (final e in all) {
         for (final m in e.moves) {
           final n = m.name.toLowerCase();
-          expect(reservedVerbs.contains(n), isFalse,
-              reason: '"${m.name}" is one of the game\'s own verbs');
-          expect(elements.contains(n), isFalse,
-              reason: '"${m.name}" is an element name');
+          expect(
+            reservedVerbs.contains(n),
+            isFalse,
+            reason: '"${m.name}" is one of the game\'s own verbs',
+          );
+          expect(
+            elements.contains(n),
+            isFalse,
+            reason: '"${m.name}" is an element name',
+          );
         }
       }
     });
@@ -391,7 +404,8 @@ void main() {
         expect(
           e.moves.any((m) => m.effect is ShieldEffect),
           isTrue,
-          reason: '${e.id} is a ${e.archetype.name} with nothing to hide behind',
+          reason:
+              '${e.id} is a ${e.archetype.name} with nothing to hide behind',
         );
       }
     });
@@ -402,7 +416,9 @@ void main() {
       expect(titan.moves.any((m) => m.effect is ShieldEffect), isTrue);
       expect(
         titan.moves.any(
-          (m) => m.effect is DamageEffect && (m.effect as DamageEffect).lifesteal > 0,
+          (m) =>
+              m.effect is DamageEffect &&
+              (m.effect as DamageEffect).lifesteal > 0,
         ),
         isTrue,
         reason: 'Sky Titan has no lifesteal move',
@@ -418,24 +434,29 @@ void main() {
       );
       expect(
         wraith.moves.any(
-          (m) => m.effect is DamageEffect && (m.effect as DamageEffect).ignoresShields,
+          (m) =>
+              m.effect is DamageEffect &&
+              (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
         reason: 'nothing the Hexer throws goes through a wall',
       );
     });
 
-    test('the Tyrant plays well: a cheap shield and priority over the player', () {
-      final monarch = WindwardSteppeBestiary.tempestMonarch;
-      expect(monarch.archetype.id, 'tyrant');
-      final wall = monarch.moves.firstWhere((m) => m.effect is ShieldEffect);
-      expect(wall.chargeCost, 1, reason: 'a wall it cannot always afford');
-      expect(
-        monarch.moves.any((m) => m.isOffensive && m.priority < 3),
-        isTrue,
-        reason: 'nothing Tempest Monarch throws beats a shield to the board',
-      );
-    });
+    test(
+      'the Tyrant plays well: a cheap shield and priority over the player',
+      () {
+        final monarch = WindwardSteppeBestiary.tempestMonarch;
+        expect(monarch.archetype.id, 'tyrant');
+        final wall = monarch.moves.firstWhere((m) => m.effect is ShieldEffect);
+        expect(wall.chargeCost, 1, reason: 'a wall it cannot always afford');
+        expect(
+          monarch.moves.any((m) => m.isOffensive && m.priority < 3),
+          isTrue,
+          reason: 'nothing Tempest Monarch throws beats a shield to the board',
+        );
+      },
+    );
   });
 
   group('drop tables resolve and are honest', () {
@@ -461,15 +482,21 @@ void main() {
 
     test('commons can come up empty; minis and bosses never do', () {
       for (final e in WindwardSteppeBestiary.commons) {
-        expect(e.drops.main.any((d) => d.defId == null), isTrue,
-            reason: '${e.id} always pays out');
+        expect(
+          e.drops.main.any((d) => d.defId == null),
+          isTrue,
+          reason: '${e.id} always pays out',
+        );
       }
       for (final e in [
         ...WindwardSteppeBestiary.minis,
         ...WindwardSteppeBestiary.bosses,
       ]) {
-        expect(e.drops.main.any((d) => d.defId == null), isFalse,
-            reason: '${e.id} is a fight you sought out; it must pay');
+        expect(
+          e.drops.main.any((d) => d.defId == null),
+          isFalse,
+          reason: '${e.id} is a fight you sought out; it must pay',
+        );
       }
     });
 
@@ -491,11 +518,21 @@ void main() {
 
     test('a pure Aero zone drops only Aero motes', () {
       const foreign = {
-        'flora_dust', 'flora_shard', 'flora_crystal',
-        'aqua_dust', 'aqua_shard', 'aqua_crystal',
-        'pyro_dust', 'pyro_shard', 'pyro_crystal',
-        'geo_dust', 'geo_shard', 'geo_crystal',
-        'electro_dust', 'electro_shard', 'electro_crystal',
+        'flora_dust',
+        'flora_shard',
+        'flora_crystal',
+        'aqua_dust',
+        'aqua_shard',
+        'aqua_crystal',
+        'pyro_dust',
+        'pyro_shard',
+        'pyro_crystal',
+        'geo_dust',
+        'geo_shard',
+        'geo_crystal',
+        'electro_dust',
+        'electro_shard',
+        'electro_crystal',
       };
       for (final id in WindwardSteppeBestiary.allDrops) {
         expect(foreign, isNot(contains(id)), reason: '$id is off-element');
@@ -514,7 +551,10 @@ void main() {
     test('the Rare chase hangs off the mini pool, and stays rare', () {
       for (final e in WindwardSteppeBestiary.minis) {
         expect(e.drops.possibleDrops, contains('leanstone_charm'));
-        expect(e.drops.mainChanceOf('leanstone_charm'), lessThanOrEqualTo(0.10));
+        expect(
+          e.drops.mainChanceOf('leanstone_charm'),
+          lessThanOrEqualTo(0.10),
+        );
       }
       expect(ItemCatalogue.byId('leanstone_charm').rarity, Rarity.rare);
     });
@@ -571,8 +611,11 @@ void main() {
           final effect = m.effect;
           if (effect is! DamageEffect) continue;
           final worst = effect.maxAmount * effect.hits;
-          expect(worst, lessThan(startingHp),
-              reason: '${e.id}\'s "${m.name}" can hit for $worst');
+          expect(
+            worst,
+            lessThan(startingHp),
+            reason: '${e.id}\'s "${m.name}" can hit for $worst',
+          );
         }
       }
     });
@@ -617,10 +660,10 @@ void main() {
     });
 
     test('the two materials each get exactly one node', () {
-      expect(
-        nodes.map((n) => n.yieldsDefId).toSet(),
-        {'yew_log', 'tussock_flax'},
-      );
+      expect(nodes.map((n) => n.yieldsDefId).toSet(), {
+        'yew_log',
+        'tussock_flax',
+      });
     });
   });
 
@@ -659,7 +702,11 @@ void main() {
           0,
           reason: '${d.id} carries crit; that debuts on Rowan, not Yew',
         );
-        expect(d.modifiers.critDamage, 0, reason: '${d.id} carries crit damage');
+        expect(
+          d.modifiers.critDamage,
+          0,
+          reason: '${d.id} carries crit damage',
+        );
       }
     });
 
@@ -681,9 +728,16 @@ void main() {
     test('every creature carries a field note, in the right voice', () {
       for (final e in all) {
         expect(e.lore.length, greaterThan(40), reason: '${e.id} lore is thin');
-        expect(e.lore.endsWith('.'), isTrue, reason: '${e.id} lore is not a sentence');
         expect(
-          RegExp(r'\d+\s*(hp|damage|dmg)', caseSensitive: false).hasMatch(e.lore),
+          e.lore.endsWith('.'),
+          isTrue,
+          reason: '${e.id} lore is not a sentence',
+        );
+        expect(
+          RegExp(
+            r'\d+\s*(hp|damage|dmg)',
+            caseSensitive: false,
+          ).hasMatch(e.lore),
           isFalse,
           reason: '${e.id} lore leaks mechanics',
         );

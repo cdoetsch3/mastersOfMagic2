@@ -221,8 +221,7 @@ String spellEffectLine(Spell spell) {
     ScourEffect() =>
       'Every burn on them pays out all remaining ticks NOW, as one hit',
     DispelEffect() => "Strips the enemy's buffs",
-    ShatterEffect() =>
-      'No damage. Destroys their shield, Barriers and Divert',
+    ShatterEffect() => 'No damage. Destroys their shield, Barriers and Divert',
     DamageEffect(
       :final minAmount,
       :final maxAmount,
@@ -258,9 +257,8 @@ String spellEffectLine(Spell spell) {
     HallowEffect() => 'Grants Grace — blocks the next debuff on you',
     // The banked self-instants (§7a). ⚠️ [SpellEffect] is sealed, so these arms
     // are not optional — they are what a new effect type costs.
-    CleanseEffect(:final all) => all
-        ? 'Removes every debuff on you'
-        : 'Removes one debuff of your choice',
+    CleanseEffect(:final all) =>
+      all ? 'Removes every debuff on you' : 'Removes one debuff of your choice',
     MeditateEffect(:final bonusTurns) =>
       'Every turn-timed buff you hold gains $bonusTurns turns',
     // The banked stances (TYPE_EFFECTS §7a) — stat and special alike, one arm
@@ -287,13 +285,15 @@ String _stanceDetail(
   List<StanceGrant> grants,
   ({String statusId, String momentId})? cleanses,
 ) {
-  final numbers = grants.map((g) {
-    final granted = g.build();
-    return granted is StanceDescribing
-        ? '${(granted as StanceDescribing).grantLine} for '
-              '${(granted as StanceDescribing).turnsLeft} turns'
-        : 'Grants ${StatusCatalog.byId(granted.id)?.name ?? granted.id}';
-  }).join(', and ');
+  final numbers = grants
+      .map((g) {
+        final granted = g.build();
+        return granted is StanceDescribing
+            ? '${(granted as StanceDescribing).grantLine} for '
+                  '${(granted as StanceDescribing).turnsLeft} turns'
+            : 'Grants ${StatusCatalog.byId(granted.id)?.name ?? granted.id}';
+      })
+      .join(', and ');
   final cleanse = cleanses == null
       ? ''
       : ', and clears '

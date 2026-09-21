@@ -168,8 +168,9 @@ class AdventureRun {
             i == line.length || line[i].rank != EnemyRank.common;
         if (!sectionEnds) continue;
         if (i > sectionStart) {
-          final def = nodeDefs[(section + rng.nextInt(nodeDefs.length)) %
-              nodeDefs.length];
+          final def =
+              nodeDefs[(section + rng.nextInt(nodeDefs.length)) %
+                  nodeDefs.length];
           // After a random encounter within the section, never the boss.
           final after = sectionStart + rng.nextInt(i - sectionStart);
           nodes.add(ActiveGatherNode(defId: def.id, afterIndex: after));
@@ -337,8 +338,7 @@ class AdventureRun {
     'encounters': [
       for (final e in encounters) {'defId': e.def.id, 'level': e.level},
     ],
-    if (nodes.isNotEmpty)
-      'nodes': [for (final n in nodes) n.toJson()],
+    if (nodes.isNotEmpty) 'nodes': [for (final n in nodes) n.toJson()],
     // ⚠️ Written only when there is a choice outstanding, and NEVER under the
     // old `pendingLoot` key: a downgrade to a pre-ruling build must not find
     // something it would treat as a run-long haul. [legacyPendingLoot] is

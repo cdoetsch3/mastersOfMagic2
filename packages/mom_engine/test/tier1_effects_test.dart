@@ -36,11 +36,17 @@ void main() {
 
   group('Ignite (Pyro §2.2)', () {
     test('a proc burns 10% of raw damage for 3 end-of-turn ticks', () {
-      final duel =
-          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: Random(seedWhere(procs: true)),
+        baseMissPercent: 0,
+      );
       charge(alice, MagicElement.pyro, 1);
       final r1 = duel.resolveTurn(
-          CastAction(Spellbook.bolt), const ForfeitAction());
+        CastAction(Spellbook.bolt),
+        const ForfeitAction(),
+      );
       final hit = r1.events.whereType<DamageEvent>().single.toHp;
       final tick = (hit * 0.10).round();
       expect(tick, greaterThanOrEqualTo(1));
@@ -54,44 +60,70 @@ void main() {
       final r3 = duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       expect(r3.events.whereType<EffectDamageEvent>().single.toHp, tick);
       final r4 = duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-      expect(r4.events.whereType<EffectDamageEvent>(), isEmpty,
-          reason: '3 ticks total — expired');
+      expect(
+        r4.events.whereType<EffectDamageEvent>(),
+        isEmpty,
+        reason: '3 ticks total — expired',
+      );
       expect(bruno.hp, 100 - hit - tick * 3);
     });
 
     test('no proc, no burn', () {
-      final duel =
-          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: false)), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: Random(seedWhere(procs: false)),
+        baseMissPercent: 0,
+      );
       charge(alice, MagicElement.pyro, 1);
       final r = duel.resolveTurn(
-          CastAction(Spellbook.bolt), const ForfeitAction());
+        CastAction(Spellbook.bolt),
+        const ForfeitAction(),
+      );
       expect(r.events.whereType<EffectDamageEvent>(), isEmpty);
       expect(bruno.statuses, isEmpty);
     });
 
     test('a shielded hit can still ignite (proc is on-attack raw damage)', () {
-      final duel =
-          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: Random(seedWhere(procs: true)),
+        baseMissPercent: 0,
+      );
       bruno.shield = ActiveShield.elemental(MagicElement.geo, 999);
       charge(alice, MagicElement.pyro, 1);
       duel.resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
-      expect(bruno.statuses.whereType<IgniteStatus>(), hasLength(1),
-          reason: 'fully-absorbed hit still procs');
+      expect(
+        bruno.statuses.whereType<IgniteStatus>(),
+        hasLength(1),
+        reason: 'fully-absorbed hit still procs',
+      );
     });
 
-    test('the burn itself is shield-aware (regular damage, hits shield first)',
-        () {
-      bruno.statuses.add(IgniteStatus(5));
-      bruno.shield = ActiveShield.elemental(MagicElement.geo, 30);
-      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
-      duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-      expect(bruno.hp, 100);
-      // The burn carries Pyro's element — the same identity that gives it 2×
-      // vs a Flora shield gives it the §0.3 macro penalty here: Geo's Kinetic
-      // tier resists Pyro's Primal, so 5 lands at 75% → 3 to the shield.
-      expect(bruno.shield!.remaining, 27,
-          reason: 'geo (Kinetic) resists a primal burn at 75%: 5 × 0.75 = 3');
-    });
+    test(
+      'the burn itself is shield-aware (regular damage, hits shield first)',
+      () {
+        bruno.statuses.add(IgniteStatus(5));
+        bruno.shield = ActiveShield.elemental(MagicElement.geo, 30);
+        final duel = DuelEngine(
+          alice,
+          bruno,
+          rng: Random(1),
+          baseMissPercent: 0,
+        );
+        duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
+        expect(bruno.hp, 100);
+        // The burn carries Pyro's element — the same identity that gives it 2×
+        // vs a Flora shield gives it the §0.3 macro penalty here: Geo's Kinetic
+        // tier resists Pyro's Primal, so 5 lands at 75% → 3 to the shield.
+        expect(
+          bruno.shield!.remaining,
+          27,
+          reason: 'geo (Kinetic) resists a primal burn at 75%: 5 × 0.75 = 3',
+        );
+      },
+    );
 
     test('the burn counters a Flora shield (pyro burns flora, 2x)', () {
       bruno.statuses.add(IgniteStatus(5));
@@ -128,8 +160,11 @@ void main() {
       final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       alice.hp = 50;
       floraCast(duel, alice, 4);
-      expect(alice.statuses.whereType<PhotosynthesisStatus>(), isEmpty,
-          reason: 'four casts does not activate it');
+      expect(
+        alice.statuses.whereType<PhotosynthesisStatus>(),
+        isEmpty,
+        reason: 'four casts does not activate it',
+      );
       expect(alice.hp, 50, reason: 'no heal before the threshold');
     });
 
@@ -145,7 +180,9 @@ void main() {
       floraCast(duel, alice, 5);
       alice.hp = 50;
       duel.resolveTurn(
-          const ChargeAction(MagicElement.flora), const ForfeitAction());
+        const ChargeAction(MagicElement.flora),
+        const ForfeitAction(),
+      );
       expect(alice.hp, 51, reason: '1% of 100 max HP');
       expect(PhotosynthesisStatus.healPercent, 1);
     });
@@ -177,27 +214,44 @@ void main() {
       expect(PhotosynthesisStatus.activeFor(alice), isFalse);
     });
 
-    test('an active Photosynthesis blocks Waterlogged; four casts does not', () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
-      floraCast(duel, alice, 5);
-      expect(PhotosynthesisStatus.activeFor(alice), isTrue);
-      expect(alice.statuses.whereType<PhotosynthesisStatus>(), hasLength(1));
-    });
+    test(
+      'an active Photosynthesis blocks Waterlogged; four casts does not',
+      () {
+        final duel = DuelEngine(
+          alice,
+          bruno,
+          rng: Random(1),
+          baseMissPercent: 0,
+        );
+        floraCast(duel, alice, 5);
+        expect(PhotosynthesisStatus.activeFor(alice), isTrue);
+        expect(alice.statuses.whereType<PhotosynthesisStatus>(), hasLength(1));
+      },
+    );
 
-    test('the heal lands before same-turn burn damage (survivability first)',
-        () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
-      floraCast(duel, alice, 5);
-      alice.hp = 2;
-      // ⚠️ Ward built the streak, so Alice is standing behind a Flora shield.
-      // Burn hits the shield first (§2.2), which would swallow the tick.
-      alice.shield = null;
-      alice.statuses.add(IgniteStatus(2)); // -2 at E8
-      duel.resolveTurn(
-          const ChargeAction(MagicElement.flora), const ForfeitAction());
-      expect(alice.alive, isTrue, reason: '2 +1 = 3, then -2 = 1');
-      expect(alice.hp, 1);
-    });
+    test(
+      'the heal lands before same-turn burn damage (survivability first)',
+      () {
+        final duel = DuelEngine(
+          alice,
+          bruno,
+          rng: Random(1),
+          baseMissPercent: 0,
+        );
+        floraCast(duel, alice, 5);
+        alice.hp = 2;
+        // ⚠️ Ward built the streak, so Alice is standing behind a Flora shield.
+        // Burn hits the shield first (§2.2), which would swallow the tick.
+        alice.shield = null;
+        alice.statuses.add(IgniteStatus(2)); // -2 at E8
+        duel.resolveTurn(
+          const ChargeAction(MagicElement.flora),
+          const ForfeitAction(),
+        );
+        expect(alice.alive, isTrue, reason: '2 +1 = 3, then -2 = 1');
+        expect(alice.hp, 1);
+      },
+    );
   });
 
   group('Waterlogged (Aqua §2.1)', () {
@@ -223,27 +277,38 @@ void main() {
       expect(bruno.priorityPenalty, 10, reason: 'streak of 6 = 2nd trigger');
     });
 
-    test('an active Photosynthesis blocks Waterlogged (Flora shrugs off Aqua)',
-        () {
-      // Streak-gated now: it is a live 5-cast Flora run, not a stack
-      // count. Bruno forfeits throughout, which cannot break his own streak.
-      bruno
-        ..streakElement = MagicElement.flora
-        ..streakCount = 5
-        ..statuses.add(PhotosynthesisStatus());
-      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
-      for (var i = 0; i < 3; i++) {
-        charge(alice, MagicElement.aqua, 1);
-        duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
-      }
-      expect(bruno.priorityPenalty, 0, reason: 'immune while ≥1 stack');
-    });
+    test(
+      'an active Photosynthesis blocks Waterlogged (Flora shrugs off Aqua)',
+      () {
+        // Streak-gated now: it is a live 5-cast Flora run, not a stack
+        // count. Bruno forfeits throughout, which cannot break his own streak.
+        bruno
+          ..streakElement = MagicElement.flora
+          ..streakCount = 5
+          ..statuses.add(PhotosynthesisStatus());
+        final duel = DuelEngine(
+          alice,
+          bruno,
+          rng: Random(1),
+          baseMissPercent: 0,
+        );
+        for (var i = 0; i < 3; i++) {
+          charge(alice, MagicElement.aqua, 1);
+          duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
+        }
+        expect(bruno.priorityPenalty, 0, reason: 'immune while ≥1 stack');
+      },
+    );
   });
 
   group('cleanse web (§2 table)', () {
     test('Ignite breaks an active Photosynthesis (Pyro burns Flora)', () {
-      final duel =
-          DuelEngine(alice, bruno, rng: Random(seedWhere(procs: true)), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: Random(seedWhere(procs: true)),
+        baseMissPercent: 0,
+      );
       bruno
         ..streakElement = MagicElement.flora
         ..streakCount = 5
@@ -251,8 +316,11 @@ void main() {
       charge(alice, MagicElement.pyro, 1);
       duel.resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
       expect(bruno.statuses.whereType<PhotosynthesisStatus>(), isEmpty);
-      expect(bruno.streakCount, 0,
-          reason: 'the STREAK must break, or it returns next cast');
+      expect(
+        bruno.streakCount,
+        0,
+        reason: 'the STREAK must break, or it returns next cast',
+      );
       expect(bruno.statuses.whereType<IgniteStatus>(), hasLength(1));
     });
 
@@ -261,10 +329,15 @@ void main() {
       final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       charge(alice, MagicElement.aqua, 1);
       final r = duel.resolveTurn(
-          CastAction(Spellbook.ward), const ForfeitAction());
+        CastAction(Spellbook.ward),
+        const ForfeitAction(),
+      );
       expect(alice.statuses.whereType<IgniteStatus>(), isEmpty);
-      expect(r.events.whereType<EffectDamageEvent>(), isEmpty,
-          reason: 'doused before the end phase — no tick');
+      expect(
+        r.events.whereType<EffectDamageEvent>(),
+        isEmpty,
+        reason: 'doused before the end phase — no tick',
+      );
     });
 
     test('an Aqua ATTACK does not clear Ignite (only shields douse)', () {
@@ -280,10 +353,15 @@ void main() {
     test('no fatigue at or below the threshold', () {
       final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       for (var i = 0; i < DuelEngine.fatigueThreshold; i++) {
-        final r =
-            duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-        expect(r.events.whereType<EffectDamageEvent>(), isEmpty,
-            reason: 'turn ${duel.turnNumber}');
+        final r = duel.resolveTurn(
+          const ForfeitAction(),
+          const ForfeitAction(),
+        );
+        expect(
+          r.events.whereType<EffectDamageEvent>(),
+          isEmpty,
+          reason: 'turn ${duel.turnNumber}',
+        );
       }
       expect(alice.hp, 100);
       expect(bruno.hp, 100);
@@ -296,12 +374,18 @@ void main() {
         duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
       }
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-      expect(alice.hp, 100 - DuelEngine.fatiguePerTurn,
-          reason: 'shield does not block fatigue');
+      expect(
+        alice.hp,
+        100 - DuelEngine.fatiguePerTurn,
+        reason: 'shield does not block fatigue',
+      );
       expect(bruno.hp, 100 - DuelEngine.fatiguePerTurn);
       duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
-      expect(alice.hp, 100 - DuelEngine.fatiguePerTurn * 3,
-          reason: 'turn 2 past threshold deals 2x the step');
+      expect(
+        alice.hp,
+        100 - DuelEngine.fatiguePerTurn * 3,
+        reason: 'turn 2 past threshold deals 2x the step',
+      );
     });
 
     test('fatigue outpaces Photosynthesis healing (no infinite stall)', () {

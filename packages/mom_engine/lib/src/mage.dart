@@ -14,12 +14,9 @@ class ActiveShield {
   final bool isBarrier;
 
   ActiveShield.elemental(MagicElement this.element, this.remaining)
-      : isBarrier = false;
+    : isBarrier = false;
 
-  ActiveShield.barrier()
-      : element = null,
-        remaining = 0,
-        isBarrier = true;
+  ActiveShield.barrier() : element = null, remaining = 0, isBarrier = true;
 
   @override
   String toString() =>
@@ -291,8 +288,8 @@ class MageState {
       (base * levelScaleFor(level)).round();
 
   MageState({required this.name, this.level = 1, int? maxHp})
-      : maxHp = maxHp ?? scaledMaxHp(level),
-        hp = maxHp ?? scaledMaxHp(level);
+    : maxHp = maxHp ?? scaledMaxHp(level),
+      hp = maxHp ?? scaledMaxHp(level);
 
   /// Records a resolved cast for streak tracking. Not called for charges,
   /// forfeits, fizzles, or misses (those behave like a charge — no change).
@@ -312,9 +309,10 @@ class MageState {
   }
 
   /// Highest miss chance among any [Blinding] status on this mage (0 if none).
-  double get missChance => statuses
-      .whereType<Blinding>()
-      .fold(0.0, (m, b) => b.missChance > m ? b.missChance : m);
+  double get missChance => statuses.whereType<Blinding>().fold(
+    0.0,
+    (m, b) => b.missChance > m ? b.missChance : m,
+  );
 
   bool get alive => hp > 0;
 

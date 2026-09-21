@@ -35,8 +35,12 @@ class ScriptedRandom implements Random {
 /// A fixed-damage attack: `_roll(n, n)` draws no RNG, so the only [Random]
 /// calls in these tests are the rolls under test.
 Spell dmg(int amount) => Spell(
-    id: 'dmg$amount', name: 'Dmg$amount', chargeCost: 0,
-    priority: SpellPriority.attack, effect: DamageEffect(amount, amount));
+  id: 'dmg$amount',
+  name: 'Dmg$amount',
+  chargeCost: 0,
+  priority: SpellPriority.attack,
+  effect: DamageEffect(amount, amount),
+);
 
 void main() {
   late MageState alice;
@@ -46,10 +50,13 @@ void main() {
   /// A duel with the noise turned off: no element procs, no base miss — so a
   /// number that moves moved because a stance moved it.
   void newDuel({List<double> doubles = const [], List<int> ints = const []}) {
-    duel = DuelEngine(alice, bruno,
-        rng: ScriptedRandom(doubles: doubles, ints: ints),
-        elementEffects: false,
-        baseMissPercent: 0);
+    duel = DuelEngine(
+      alice,
+      bruno,
+      rng: ScriptedRandom(doubles: doubles, ints: ints),
+      elementEffects: false,
+      baseMissPercent: 0,
+    );
   }
 
   setUp(() {
@@ -60,16 +67,21 @@ void main() {
 
   /// [caster] casts [spell]; the other mage forfeits. Charge is topped up to
   /// exactly the cost, the way a real cycle would have paid for it.
-  List<DuelEvent> castBy(MageState caster, Spell spell,
-      [MagicElement element = MagicElement.pyro]) {
+  List<DuelEvent> castBy(
+    MageState caster,
+    Spell spell, [
+    MagicElement element = MagicElement.pyro,
+  ]) {
     caster
       ..charge = spell.chargeCost
       ..element = element;
     final action = CastAction(spell, element);
     final isAlice = identical(caster, alice);
     return duel
-        .resolveTurn(isAlice ? action : const ForfeitAction(),
-            isAlice ? const ForfeitAction() : action)
+        .resolveTurn(
+          isAlice ? action : const ForfeitAction(),
+          isAlice ? const ForfeitAction() : action,
+        )
         .events;
   }
 
@@ -82,10 +94,16 @@ void main() {
   /// The one stance of [id] on [m] — and the assertion that there is exactly
   /// one, which is half of law 5 on its own.
   StatStanceStatus theStance(MageState m, String id) {
-    final found = m.statuses.whereType<StatStanceStatus>().where((s) => s.id == id);
-    expect(found, hasLength(1),
-        reason: "⚠️ exactly one '$id' — two means the granters stacked "
-            'instead of replacing (§7a law 5)');
+    final found = m.statuses.whereType<StatStanceStatus>().where(
+      (s) => s.id == id,
+    );
+    expect(
+      found,
+      hasLength(1),
+      reason:
+          "⚠️ exactly one '$id' — two means the granters stacked "
+          'instead of replacing (§7a law 5)',
+    );
     return found.first;
   }
 
@@ -95,12 +113,19 @@ void main() {
   group('the ruled table', () {
     test('every stance is a self-targeting aux spell at priority 7', () {
       for (final s in Spellbook.stances) {
-        expect(s.priority, SpellPriority.auxDefense,
-            reason: '⚠️ ${s.name} at 8 would be an enemy-targeting spell, and '
-                'at 9 a stance would land after the attack it exists to '
-                'blunt — the split is the whole point of the lane (§7a)');
-        expect(s.isHarmful, isFalse,
-            reason: '${s.name} points at nobody but its caster');
+        expect(
+          s.priority,
+          SpellPriority.auxDefense,
+          reason:
+              '⚠️ ${s.name} at 8 would be an enemy-targeting spell, and '
+              'at 9 a stance would land after the attack it exists to '
+              'blunt — the split is the whole point of the lane (§7a)',
+        );
+        expect(
+          s.isHarmful,
+          isFalse,
+          reason: '${s.name} points at nobody but its caster',
+        );
         expect(s.isOffensive, isFalse, reason: s.name);
       }
       expect(Spellbook.stances, hasLength(10));
@@ -115,9 +140,13 @@ void main() {
         // ✅ Overkill re-ruled 4 → 3, 2026-09-21.
         'heavyhand': 2, 'overkill': 3,
       };
-      expect({for (final s in Spellbook.stances) s.id: s.chargeCost}, ruled,
-          reason: '⚠️ the price points ARE the design — a stance mispriced by '
-              'one charge is a different spell in a different unlock bucket');
+      expect(
+        {for (final s in Spellbook.stances) s.id: s.chargeCost},
+        ruled,
+        reason:
+            '⚠️ the price points ARE the design — a stance mispriced by '
+            'one charge is a different spell in a different unlock bucket',
+      );
     });
 
     test('⭐ a SET is one status at two prices, not two statuses', () {
@@ -135,9 +164,13 @@ void main() {
         for (final id in spellIds) {
           final spell = Spellbook.stances.firstWhere((s) => s.id == id);
           final grants = (spell.effect as StanceEffect).grants;
-          expect(grants.single.statusId, statusId,
-              reason: "⚠️ $id must grant '$statusId', and only it — a set's "
-                  'price points share ONE status or they are not a set');
+          expect(
+            grants.single.statusId,
+            statusId,
+            reason:
+                "⚠️ $id must grant '$statusId', and only it — a set's "
+                'price points share ONE status or they are not a set',
+          );
         }
       });
     });
@@ -148,11 +181,18 @@ void main() {
       // the property worth pinning is global uniqueness — no id appears
       // twice anywhere, which is what byId and the wire actually require.
       final ids = Spellbook.all.map((s) => s.id).toList();
-      expect(ids.toSet().length, ids.length,
-          reason: 'a duplicated id makes byId ambiguous — a desync, '
-              'not a cosmetic collision');
-      expect(Spellbook.stances.map((s) => s.id).toSet(), hasLength(10),
-          reason: 'and the lane still ships exactly its ten');
+      expect(
+        ids.toSet().length,
+        ids.length,
+        reason:
+            'a duplicated id makes byId ambiguous — a desync, '
+            'not a cosmetic collision',
+      );
+      expect(
+        Spellbook.stances.map((s) => s.id).toSet(),
+        hasLength(10),
+        reason: 'and the lane still ships exactly its ten',
+      );
     });
 
     test('a cast builds a FRESH status, never a shared instance', () {
@@ -175,13 +215,21 @@ void main() {
       castBy(bruno, Spellbook.twinkleToes); // +20 dodge, 30 turns
 
       final s = theStance(bruno, 'lightfoot');
-      expect(bruno.effectiveDodge, 20,
-          reason: '⚠️ 35 is stacking (two statuses summing through the seam), '
-              '15 is a granter that refused to overwrite a running stance');
-      expect(s.turnsLeft, 29,
-          reason: 'the new clock, decremented once by the cast turn itself — '
-              "⚠️ 5 is a build that took the new magnitude and kept the old "
-              "spell's remaining duration");
+      expect(
+        bruno.effectiveDodge,
+        20,
+        reason:
+            '⚠️ 35 is stacking (two statuses summing through the seam), '
+            '15 is a granter that refused to overwrite a running stance',
+      );
+      expect(
+        s.turnsLeft,
+        29,
+        reason:
+            'the new clock, decremented once by the cast turn itself — '
+            "⚠️ 5 is a build that took the new magnitude and kept the old "
+            "spell's remaining duration",
+      );
     });
 
     test('⭐ …and Lightfoot over Twinkle Toes DOWNGRADES it', () {
@@ -192,13 +240,21 @@ void main() {
       castBy(bruno, Spellbook.lightfoot); //  +15, 10 turns
 
       final s = theStance(bruno, 'lightfoot');
-      expect(bruno.effectiveDodge, 15,
-          reason: '⚠️ THE mutant: 20 is best-of-both keeping the better '
-              'magnitude. Last cast wins, in both directions — a cheap stance '
-              'cast over an expensive one is the player\'s mistake to make');
-      expect(s.turnsLeft, 9,
-          reason: '⚠️ 28 is best-of-both keeping the longer clock, which would '
-              'hand out a 30-turn stance nobody priced');
+      expect(
+        bruno.effectiveDodge,
+        15,
+        reason:
+            '⚠️ THE mutant: 20 is best-of-both keeping the better '
+            'magnitude. Last cast wins, in both directions — a cheap stance '
+            'cast over an expensive one is the player\'s mistake to make',
+      );
+      expect(
+        s.turnsLeft,
+        9,
+        reason:
+            '⚠️ 28 is best-of-both keeping the longer clock, which would '
+            'hand out a 30-turn stance nobody priced',
+      );
     });
 
     test('a same-spell recast refreshes the clock', () {
@@ -207,9 +263,13 @@ void main() {
       expect(theStance(bruno, 'lightfoot').turnsLeft, 6);
 
       castBy(bruno, Spellbook.lightfoot);
-      expect(theStance(bruno, 'lightfoot').turnsLeft, 9,
-          reason: '⚠️ 5 is a recast that did nothing but tick, and 15 is one '
-              'that added the new duration to the old');
+      expect(
+        theStance(bruno, 'lightfoot').turnsLeft,
+        9,
+        reason:
+            '⚠️ 5 is a recast that did nothing but tick, and 15 is one '
+            'that added the new duration to the old',
+      );
       expect(bruno.effectiveDodge, 15);
     });
 
@@ -220,8 +280,10 @@ void main() {
       castBy(alice, Spellbook.lightfoot);
       castBy(alice, Spellbook.keen);
       castBy(alice, Spellbook.heavyhand);
-      expect(alice.statuses.whereType<StatStanceStatus>().map((s) => s.id),
-          containsAll(['lightfoot', 'keen', 'heavyhand']));
+      expect(
+        alice.statuses.whereType<StatStanceStatus>().map((s) => s.id),
+        containsAll(['lightfoot', 'keen', 'heavyhand']),
+      );
       expect(alice.effectiveDodge, 15);
       expect(alice.effectiveCritChance, 15);
       expect(alice.effectiveCritDamage, 80);
@@ -234,11 +296,14 @@ void main() {
 
       castBy(bruno, Spellbook.glance); // 10/20, 10 turns
       theStance(bruno, 'divert');
-      expect([bruno.effectiveDeflectChance, bruno.effectiveDeflectAmount],
-          [10, 20],
-          reason: '⚠️ THE mutant: half a replace. [10, 40] or [20, 20] is a '
-              'build treating the pair as two independent axes, which lets a '
-              'player keep the better half of a stance they overwrote');
+      expect(
+        [bruno.effectiveDeflectChance, bruno.effectiveDeflectAmount],
+        [10, 20],
+        reason:
+            '⚠️ THE mutant: half a replace. [10, 40] or [20, 20] is a '
+            'build treating the pair as two independent axes, which lets a '
+            'player keep the better half of a stance they overwrote',
+      );
     });
   });
 
@@ -251,21 +316,28 @@ void main() {
         alice.statuses.add(BlindStatus());
         final events = castBy(alice, spell);
 
-        expect(alice.statuses.whereType<BlindStatus>(), isEmpty,
-            reason: '⚠️ THE mutant: a granter that only grants. §7a says '
-                'EVERY Truesight granter cleanses Blind — it is the '
-                "element-agnostic answer to Solar's blinder");
-        expect(theStance(alice, 'truesight'), isNotNull,
-            reason: 'and the stance still lands — the cleanse is a rider, not '
-                'a replacement for the spell');
         expect(
-            events
-                .whereType<BuffAppliedEvent>()
-                .map((e) => e.statusId)
-                .toList(),
-            ['blindLifted', 'truesight'],
-            reason: '⚠️ order is the log line a player reads: the Blind lifts, '
-                'THEN the stance lands');
+          alice.statuses.whereType<BlindStatus>(),
+          isEmpty,
+          reason:
+              '⚠️ THE mutant: a granter that only grants. §7a says '
+              'EVERY Truesight granter cleanses Blind — it is the '
+              "element-agnostic answer to Solar's blinder",
+        );
+        expect(
+          theStance(alice, 'truesight'),
+          isNotNull,
+          reason:
+              'and the stance still lands — the cleanse is a rider, not '
+              'a replacement for the spell',
+        );
+        expect(
+          events.whereType<BuffAppliedEvent>().map((e) => e.statusId).toList(),
+          ['blindLifted', 'truesight'],
+          reason:
+              '⚠️ order is the log line a player reads: the Blind lifts, '
+              'THEN the stance lands',
+        );
       });
     }
 
@@ -281,12 +353,14 @@ void main() {
     test('cleansing nothing logs nothing', () {
       final events = castBy(alice, Spellbook.truesight);
       expect(
-          events
-              .whereType<BuffAppliedEvent>()
-              .where((e) => e.statusId == 'blindLifted'),
-          isEmpty,
-          reason: '⚠️ a moment that fires on empty air teaches the player they '
-              'were Blinded when they were not');
+        events.whereType<BuffAppliedEvent>().where(
+          (e) => e.statusId == 'blindLifted',
+        ),
+        isEmpty,
+        reason:
+            '⚠️ a moment that fires on empty air teaches the player they '
+            'were Blinded when they were not',
+      );
     });
 
     test('it clears the Blind in hand, and grants no immunity to the next', () {
@@ -294,9 +368,13 @@ void main() {
       // ward — Grace is the ward, and it costs its own charge.
       castBy(alice, Spellbook.hawkeye);
       alice.statuses.add(BlindStatus());
-      expect(alice.statuses.whereType<BlindStatus>(), hasLength(1),
-          reason: '⚠️ a build that filtered Blind out while Truesight is up '
-              'would quietly turn a 1-charge cleanse into a 25-turn immunity');
+      expect(
+        alice.statuses.whereType<BlindStatus>(),
+        hasLength(1),
+        reason:
+            '⚠️ a build that filtered Blind out while Truesight is up '
+            'would quietly turn a 1-charge cleanse into a 25-turn immunity',
+      );
     });
   });
 
@@ -312,9 +390,13 @@ void main() {
       // 100 − 15 = 85 hit, so 15 miss. The scripted 10 < 15 misses.
       newDuel(doubles: [0.10]);
       castBy(alice, dmg(20));
-      expect(bruno.hp, 100,
-          reason: '⚠️ THE mutant: without the status in the roll the hit '
-              'chance is 100, no roll is drawn at all, and Bruno is at 80');
+      expect(
+        bruno.hp,
+        100,
+        reason:
+            '⚠️ THE mutant: without the status in the roll the hit '
+            'chance is 100, no roll is drawn at all, and Bruno is at 80',
+      );
     });
 
     test('⭐ Truesight moves accuracy, and buys back a dodged hit', () {
@@ -325,10 +407,14 @@ void main() {
       // 100 + 20 − 40 = 80 hit → 20 miss; the scripted 30 lands.
       newDuel(doubles: [0.30]);
       castBy(alice, dmg(20));
-      expect(bruno.hp, 80,
-          reason: '⚠️ THE mutant: without the status the miss chance is 40 and '
-              'the same roll whiffs (hp 100). The HIT is the proof the roll '
-              'read the stance at resolution time');
+      expect(
+        bruno.hp,
+        80,
+        reason:
+            '⚠️ THE mutant: without the status the miss chance is 40 and '
+            'the same roll whiffs (hp 100). The HIT is the proof the roll '
+            'read the stance at resolution time',
+      );
     });
 
     test('⭐ Keen moves crit chance, and the crit fires because of it', () {
@@ -338,10 +424,14 @@ void main() {
 
       newDuel(ints: [14]); // 14 < 15 → crit
       castBy(alice, dmg(20));
-      expect(bruno.hp, 70,
-          reason: '⚠️ THE mutant: reading the stored critChance leaves 0, the '
-              'roll is skipped entirely, and 20 lands flat (hp 80). 20 × 1.5 '
-              '= 30 is the crit');
+      expect(
+        bruno.hp,
+        70,
+        reason:
+            '⚠️ THE mutant: reading the stored critChance leaves 0, the '
+            'roll is skipped entirely, and 20 lands flat (hp 80). 20 × 1.5 '
+            '= 30 is the crit',
+      );
     });
 
     test('⭐ Heavyhand moves crit damage, on top of the base 50', () {
@@ -352,28 +442,43 @@ void main() {
 
       newDuel(ints: [0]);
       castBy(alice, dmg(20));
-      expect(bruno.hp, 64,
-          reason: '⚠️ THE mutant: reading the stored critDamage gives 20 × 1.5 '
-              '= 30 (hp 70); replacing the base instead of adding to it gives '
-              '20 × 1.3 = 26 (hp 74). It ADDS: 20 × 1.8 = 36');
+      expect(
+        bruno.hp,
+        64,
+        reason:
+            '⚠️ THE mutant: reading the stored critDamage gives 20 × 1.5 '
+            '= 30 (hp 70); replacing the base instead of adding to it gives '
+            '20 × 1.3 = 26 (hp 74). It ADDS: 20 × 1.8 = 36',
+      );
     });
 
-    test('⭐ Divert is one status carrying two numbers, and the roll uses both',
-        () {
-      castBy(bruno, Spellbook.glance); // 10/20
-      expect(bruno.statuses.whereType<StatStanceStatus>(), hasLength(1),
-          reason: 'one status, not one per number');
-      expect([bruno.effectiveDeflectChance, bruno.effectiveDeflectAmount],
-          [10, 20]);
+    test(
+      '⭐ Divert is one status carrying two numbers, and the roll uses both',
+      () {
+        castBy(bruno, Spellbook.glance); // 10/20
+        expect(
+          bruno.statuses.whereType<StatStanceStatus>(),
+          hasLength(1),
+          reason: 'one status, not one per number',
+        );
+        expect(
+          [bruno.effectiveDeflectChance, bruno.effectiveDeflectAmount],
+          [10, 20],
+        );
 
-      newDuel(ints: [9]); // 9 < 10 → the deflect fires
-      castBy(alice, dmg(20));
-      expect(bruno.hp, 84,
-          reason: '⚠️ three mutants, three numbers: no status leaves hp 80 (no '
+        newDuel(ints: [9]); // 9 < 10 → the deflect fires
+        castBy(alice, dmg(20));
+        expect(
+          bruno.hp,
+          84,
+          reason:
+              '⚠️ three mutants, three numbers: no status leaves hp 80 (no '
               'roll is even drawn), an activation-only status leaves hp 80 '
               'again (nothing to remove), and reading the pair correctly '
-              'removes 20% of 20 — 4 — so 16 lands');
-    });
+              'removes 20% of 20 — 4 — so 16 lands',
+        );
+      },
+    );
 
     test('the deflect halves land on the right stats', () {
       // ⚠️ Kills a swapped pair, which is invisible at 10/20 in a duel log and
@@ -383,16 +488,23 @@ void main() {
       final s = theStance(bruno, 'divert');
       expect(s.contributionTo(CombatStat.deflectActivation), 20);
       expect(s.contributionTo(CombatStat.deflectAmount), 40);
-      expect(s.contributionTo(CombatStat.dodge), 0,
-          reason: 'and nothing leaks into a neighbouring axis');
+      expect(
+        s.contributionTo(CombatStat.dodge),
+        0,
+        reason: 'and nothing leaks into a neighbouring axis',
+      );
     });
 
     test('a stance sums with gear rather than replacing it', () {
       bruno.dodge = 10; // gear lane
       castBy(bruno, Spellbook.twinkleToes); // spell lane, +20
-      expect(bruno.effectiveDodge, 30,
-          reason: '⚠️ 20 is a spell lane that overwrote the gear lane. §7a law '
-              '4: different currencies may pay twice');
+      expect(
+        bruno.effectiveDodge,
+        30,
+        reason:
+            '⚠️ 20 is a spell lane that overwrote the gear lane. §7a law '
+            '4: different currencies may pay twice',
+      );
     });
   });
 
@@ -400,33 +512,50 @@ void main() {
   // Expiry — the stat falls back to base, and the base never moved
   // ======================================================================
   group('expiry', () {
-    test('⭐ the stance expires on its ruled clock and the BASE is untouched',
-        () {
-      bruno.dodge = 10; // gear underneath, which must survive all of this
-      castBy(bruno, Spellbook.lightfoot); // 10 turns, one spent on the cast
+    test(
+      '⭐ the stance expires on its ruled clock and the BASE is untouched',
+      () {
+        bruno.dodge = 10; // gear underneath, which must survive all of this
+        castBy(bruno, Spellbook.lightfoot); // 10 turns, one spent on the cast
 
-      idleTurns(8); // …9 turns in; one left
-      expect(theStance(bruno, 'lightfoot').turnsLeft, 1);
-      expect(bruno.effectiveDodge, 25);
+        idleTurns(8); // …9 turns in; one left
+        expect(theStance(bruno, 'lightfoot').turnsLeft, 1);
+        expect(bruno.effectiveDodge, 25);
 
-      idleTurns(1); // the tenth turn
-      expect(bruno.statuses.whereType<StatStanceStatus>(), isEmpty,
-          reason: '⚠️ a 10-turn stance that outlives its tenth turn is an '
-              'off-by-one every duration in the bank inherits');
-      expect(bruno.dodge, 10,
-          reason: '⚠️ THE mutant: mutate-and-revert leaves 25 here (never '
+        idleTurns(1); // the tenth turn
+        expect(
+          bruno.statuses.whereType<StatStanceStatus>(),
+          isEmpty,
+          reason:
+              '⚠️ a 10-turn stance that outlives its tenth turn is an '
+              'off-by-one every duration in the bank inherits',
+        );
+        expect(
+          bruno.dodge,
+          10,
+          reason:
+              '⚠️ THE mutant: mutate-and-revert leaves 25 here (never '
               'reverted) or −5 (reverted twice). Derivation cannot get this '
-              'wrong, which is exactly why the seam exists');
-      expect(bruno.effectiveDodge, 10,
-          reason: 'and the derived value falls back to gear on its own');
-    });
+              'wrong, which is exactly why the seam exists',
+        );
+        expect(
+          bruno.effectiveDodge,
+          10,
+          reason: 'and the derived value falls back to gear on its own',
+        );
+      },
+    );
 
     test('the long price point really is the long one', () {
       castBy(alice, Spellbook.overkill); // 30 turns
       idleTurns(20);
-      expect(theStance(alice, 'heavyhand').turnsLeft, 9,
-          reason: '⚠️ kills a duration read off the cheap price point — the '
-              'extra charge buys the clock, and nothing else here');
+      expect(
+        theStance(alice, 'heavyhand').turnsLeft,
+        9,
+        reason:
+            '⚠️ kills a duration read off the cheap price point — the '
+            'extra charge buys the clock, and nothing else here',
+      );
       expect(alice.effectiveCritDamage, 100);
     });
 
@@ -438,9 +567,13 @@ void main() {
 
       newDuel(ints: [0]);
       castBy(alice, dmg(20));
-      expect(bruno.hp, 70,
-          reason: '⚠️ hp 64 is a contribution still being summed after the '
-              'status was removed — a cached sum, not a derived one');
+      expect(
+        bruno.hp,
+        70,
+        reason:
+            '⚠️ hp 64 is a contribution still being summed after the '
+            'status was removed — a cached sum, not a derived one',
+      );
     });
   });
 
@@ -455,22 +588,33 @@ void main() {
         final info = StatusCatalog.byId(id);
         expect(info, isNotNull, reason: "'$id' is not in the catalogue");
         expect(info!.lingers, isTrue, reason: '$id shows as a HUD pip');
-        expect(info.polarity, StatusPolarity.buff,
-            reason: "⚠️ '$id' classified anything else drops out of Dispel's "
-                "pool and into Cleanse's — the counter-web reads polarity, "
-                'never a status name');
+        expect(
+          info.polarity,
+          StatusPolarity.buff,
+          reason:
+              "⚠️ '$id' classified anything else drops out of Dispel's "
+              "pool and into Cleanse's — the counter-web reads polarity, "
+              'never a status name',
+        );
       }
-      expect(StatusCatalog.byId('blindLifted')!.lingers, isFalse,
-          reason: 'the cleanse is a moment, not a condition you carry');
+      expect(
+        StatusCatalog.byId('blindLifted')!.lingers,
+        isFalse,
+        reason: 'the cleanse is a moment, not a condition you carry',
+      );
     });
 
     test('the runtime status agrees with its catalogue entry, id by id', () {
       for (final spell in Spellbook.stances) {
         for (final grant in (spell.effect as StanceEffect).grants) {
           final status = grant.build();
-          expect(StatusCatalog.polarityOf(status.id), status.polarity,
-              reason: "⚠️ '${status.id}' must read the same in the catalogue "
-                  'as it does in the engine');
+          expect(
+            StatusCatalog.polarityOf(status.id),
+            status.polarity,
+            reason:
+                "⚠️ '${status.id}' must read the same in the catalogue "
+                'as it does in the engine',
+          );
         }
       }
     });
@@ -485,21 +629,27 @@ void main() {
       // first argument of a [StanceGrant]. Missing the second would have let
       // the whole spell table slip past this guard silently — which is exactly
       // what it did the moment the shape changed.
-      final src = File('lib/src/bank_stances.dart').readAsStringSync() +
+      final src =
+          File('lib/src/bank_stances.dart').readAsStringSync() +
           File('lib/src/spellbook.dart').readAsStringSync();
-      final emitted = RegExp(
-              r"(?:statusId|momentId):\s*'([a-zA-Z]+)'|StanceGrant\('([a-zA-Z]+)'")
-          .allMatches(src)
-          .map((m) => m.group(1) ?? m.group(2)!)
-          .toSet()
-        // The one id that reaches an event through a named constant rather
-        // than a literal, so the scrape cannot see it.
-        ..add(blindLiftedStatusId);
-      expect(emitted, containsAll(['lightfoot', 'divert', 'blind']),
-          reason: 'the scrape found nothing useful — bad regex?');
+      final emitted =
+          RegExp(
+              r"(?:statusId|momentId):\s*'([a-zA-Z]+)'|StanceGrant\('([a-zA-Z]+)'",
+            ).allMatches(src).map((m) => m.group(1) ?? m.group(2)!).toSet()
+            // The one id that reaches an event through a named constant rather
+            // than a literal, so the scrape cannot see it.
+            ..add(blindLiftedStatusId);
+      expect(
+        emitted,
+        containsAll(['lightfoot', 'divert', 'blind']),
+        reason: 'the scrape found nothing useful — bad regex?',
+      );
       for (final id in emitted) {
-        expect(StatusCatalog.byId(id), isNotNull,
-            reason: "the stance lane emits '$id' with no StatusCatalog entry");
+        expect(
+          StatusCatalog.byId(id),
+          isNotNull,
+          reason: "the stance lane emits '$id' with no StatusCatalog entry",
+        );
       }
     });
 
@@ -514,18 +664,26 @@ void main() {
       expect(snap['truesight']!.magnitude, 35);
       expect(snap['keen']!.magnitude, 25);
       expect(snap['heavyhand']!.magnitude, 50);
-      expect(snap['lightfoot']!.turnsLeft, 26,
-          reason: '⚠️ a pip with no clock (0) cannot tell a player whether the '
-              'stance they are counting on survives the next exchange');
+      expect(
+        snap['lightfoot']!.turnsLeft,
+        26,
+        reason:
+            '⚠️ a pip with no clock (0) cannot tell a player whether the '
+            'stance they are counting on survives the next exchange',
+      );
     });
 
     test('⭐ the snapshot carries BOTH of Divert\'s numbers', () {
       castBy(bruno, Spellbook.divert);
       final view = StatusSnapshot.of(bruno)['divert']!;
-      expect([view.magnitude, view.secondaryMagnitude], [20, 40],
-          reason: '⚠️ THE mutant: reporting one number. The pair is the whole '
-              'stance — an activation chance alone tells the player nothing '
-              'about what a deflection is worth');
+      expect(
+        [view.magnitude, view.secondaryMagnitude],
+        [20, 40],
+        reason:
+            '⚠️ THE mutant: reporting one number. The pair is the whole '
+            'stance — an activation chance alone tells the player nothing '
+            'about what a deflection is worth',
+      );
       expect(view.turnsLeft, 14);
     });
 
@@ -537,7 +695,9 @@ void main() {
         ..charge = Spellbook.keen.chargeCost
         ..element = MagicElement.pyro;
       final result = duel.resolveTurn(
-          CastAction(Spellbook.keen, MagicElement.pyro), const ForfeitAction());
+        CastAction(Spellbook.keen, MagicElement.pyro),
+        const ForfeitAction(),
+      );
       expect(result.frames.any((f) => f.mage1['keen'] != null), isTrue);
     });
   });

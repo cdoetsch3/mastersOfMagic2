@@ -23,8 +23,14 @@ void main(List<String> args) {
 
 const _turnCap = 200;
 
-void _matchup(String name1, DuelAi ai1, String name2, DuelAi ai2, int duels,
-    int seed) {
+void _matchup(
+  String name1,
+  DuelAi ai1,
+  String name2,
+  DuelAi ai2,
+  int duels,
+  int seed,
+) {
   final rng = Random(seed);
   var wins1 = 0, wins2 = 0, draws = 0, timeouts = 0, totalTurns = 0;
   for (var i = 0; i < duels; i++) {
@@ -49,10 +55,12 @@ void _matchup(String name1, DuelAi ai1, String name2, DuelAi ai2, int duels,
     }
   }
   String pct(int n) => '${(n * 100 / duels).toStringAsFixed(1)}%';
-  print('$name1 vs $name2 ($duels duels): '
-      '$name1 ${pct(wins1)} | $name2 ${pct(wins2)} | draws ${pct(draws)}'
-      '${timeouts > 0 ? ' | timeouts ${pct(timeouts)}' : ''} | '
-      'avg ${(totalTurns / duels).toStringAsFixed(1)} turns');
+  print(
+    '$name1 vs $name2 ($duels duels): '
+    '$name1 ${pct(wins1)} | $name2 ${pct(wins2)} | draws ${pct(draws)}'
+    '${timeouts > 0 ? ' | timeouts ${pct(timeouts)}' : ''} | '
+    'avg ${(totalTurns / duels).toStringAsFixed(1)} turns',
+  );
 }
 
 void _verboseDuel({required int seed}) {
@@ -67,11 +75,15 @@ void _verboseDuel({required int seed}) {
       ai1.chooseAction(m1, m2, rng),
       ai2.chooseAction(m2, m1, rng),
     );
-    print('— Turn ${result.turn} '
-        '(${m1.name} ${m1.hp}hp, ${m2.name} ${m2.hp}hp)');
+    print(
+      '— Turn ${result.turn} '
+      '(${m1.name} ${m1.hp}hp, ${m2.name} ${m2.hp}hp)',
+    );
     print(result);
   }
-  print(duel.isDraw
-      ? 'Draw!'
-      : '${duel.winner!.name} wins on turn ${duel.turnNumber}.');
+  print(
+    duel.isDraw
+        ? 'Draw!'
+        : '${duel.winner!.name} wins on turn ${duel.turnNumber}.',
+  );
 }

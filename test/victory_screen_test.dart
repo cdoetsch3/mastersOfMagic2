@@ -53,27 +53,31 @@ void main() {
     /// ruling: PvP surrenders flat, while a campaign fight ROLLS to escape. So
     /// the campaign route forces a winning roll ([_AlwaysEscapes]) rather than
     /// tapping a button that no longer ends anything by itself.
-    Future<void> playToTheEnd(WidgetTester tester,
-        {required bool campaign}) async {
+    Future<void> playToTheEnd(
+      WidgetTester tester, {
+      required bool campaign,
+    }) async {
       tester.view.physicalSize = const Size(1280, 720);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
 
-      await tester.pumpWidget(MaterialApp(
-        home: DuelScreen(
-          loadout: Loadout.starter,
-          campaign: campaign,
-          rng: campaign ? _AlwaysEscapes() : null,
-          driver: LocalAiDriver(
-            persona: const EnemyEncounter(
-              def: WhisperingWoodsBestiary.sporecapShambler,
-              level: 3,
-            ).toPersona(),
-            enemy: WhisperingWoodsBestiary.sporecapShambler,
-            rng: Random(1),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: DuelScreen(
+            loadout: Loadout.starter,
+            campaign: campaign,
+            rng: campaign ? _AlwaysEscapes() : null,
+            driver: LocalAiDriver(
+              persona: const EnemyEncounter(
+                def: WhisperingWoodsBestiary.sporecapShambler,
+                level: 3,
+              ).toPersona(),
+              enemy: WhisperingWoodsBestiary.sporecapShambler,
+              rng: Random(1),
+            ),
           ),
         ),
-      ));
+      );
       await tester.pump();
       // The campaign button carries its live odds ("Flee (70%)"), so match on
       // the prefix rather than pinning a number this test does not care about.
@@ -95,19 +99,30 @@ void main() {
 
     testWidgets('a campaign encounter offers no rematch', (tester) async {
       await playToTheEnd(tester, campaign: true);
-      expect(find.text('Leave'), findsOneWidget,
-          reason: 'the end-of-duel card should be showing');
-      expect(find.text('Again'), findsNothing,
-          reason: '⚠️ the encounter is already settled — XP, loot and the '
-              "run's carried health were banked the moment it ended, so a "
-              'rematch pays the whole thing out a second time');
+      expect(
+        find.text('Leave'),
+        findsOneWidget,
+        reason: 'the end-of-duel card should be showing',
+      );
+      expect(
+        find.text('Again'),
+        findsNothing,
+        reason:
+            '⚠️ the encounter is already settled — XP, loot and the '
+            "run's carried health were banked the moment it ended, so a "
+            'rematch pays the whole thing out a second time',
+      );
     });
 
     testWidgets('a practice duel still offers one', (tester) async {
       await playToTheEnd(tester, campaign: false);
-      expect(find.text('Again'), findsOneWidget,
-          reason: 'a local persona duel banks nothing that a rematch could '
-              'duplicate — excluding it here would be a plain regression');
+      expect(
+        find.text('Again'),
+        findsOneWidget,
+        reason:
+            'a local persona duel banks nothing that a rematch could '
+            'duplicate — excluding it here would be a plain regression',
+      );
     });
   });
 }

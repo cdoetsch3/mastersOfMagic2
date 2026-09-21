@@ -25,11 +25,12 @@ class ScriptedRandom implements Random {
 }
 
 Spell dmg(int amount) => Spell(
-    id: 'dmg$amount',
-    name: 'Dmg$amount',
-    chargeCost: 0,
-    priority: 9,
-    effect: DamageEffect(amount, amount));
+  id: 'dmg$amount',
+  name: 'Dmg$amount',
+  chargeCost: 0,
+  priority: 9,
+  effect: DamageEffect(amount, amount),
+);
 
 void main() {
   late MageState alice;
@@ -85,19 +86,26 @@ void main() {
   group('shield strength %', () {
     test('a shield rolls stronger for its caster, and only its caster', () {
       alice.shieldStrengthPercent = 10;
-      final duel =
-          DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       const shield = Spell(
-          id: 'sh',
-          name: 'Shield',
-          chargeCost: 1,
-          priority: 5,
-          effect: ShieldEffect(20, 20));
+        id: 'sh',
+        name: 'Shield',
+        chargeCost: 1,
+        priority: 5,
+        effect: ShieldEffect(20, 20),
+      );
       alice
         ..charge = 1
         ..element = MagicElement.aqua;
       duel.resolveTurn(
-          const CastAction(shield, MagicElement.aqua), const ForfeitAction());
+        const CastAction(shield, MagicElement.aqua),
+        const ForfeitAction(),
+      );
       expect(alice.shield?.remaining, 22, reason: '20 × 1.10');
       expect(bruno.shield, isNull);
     });
@@ -108,21 +116,31 @@ void main() {
         'the truth', () {
       alice.healingReceivedPercent = 10;
       alice.hp = 50;
-      final duel =
-          DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       const drain = Spell(
-          id: 'drain',
-          name: 'Drain',
-          chargeCost: 0,
-          priority: 9,
-          effect: DamageEffect(20, 20, lifesteal: 0.5));
+        id: 'drain',
+        name: 'Drain',
+        chargeCost: 0,
+        priority: 9,
+        effect: DamageEffect(20, 20, lifesteal: 0.5),
+      );
       final result = duel.resolveTurn(
-          const CastAction(drain, MagicElement.flora), const ForfeitAction());
+        const CastAction(drain, MagicElement.flora),
+        const ForfeitAction(),
+      );
       // 20 damage → 10 lifesteal → ×1.10 → 11.
       expect(alice.hp, 61, reason: '⚠️ kills applying the % outside heal()');
       final healed = result.events.whereType<HealedEvent>().single;
-      expect(healed.amount, 11,
-          reason: 'the event must report what actually happened');
+      expect(
+        healed.amount,
+        11,
+        reason: 'the event must report what actually happened',
+      );
     });
   });
 
@@ -131,14 +149,21 @@ void main() {
       alice
         ..hp = 50
         ..statuses.add(RegrowStatus(2));
-      final duel =
-          DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(1), MagicElement.flora);
       expect(alice.hp, 52, reason: '2% of 100');
       cast(duel, dmg(1), MagicElement.flora);
       expect(alice.hp, 54, reason: '⚠️ kills a one-shot implementation');
-      expect(alice.statuses.whereType<RegrowStatus>(), isNotEmpty,
-          reason: 'worn gear does not expire');
+      expect(
+        alice.statuses.whereType<RegrowStatus>(),
+        isNotEmpty,
+        reason: 'worn gear does not expire',
+      );
     });
 
     test('healing received % multiplies the tick', () {
@@ -146,8 +171,12 @@ void main() {
         ..hp = 50
         ..healingReceivedPercent = 50
         ..statuses.add(RegrowStatus(2));
-      final duel =
-          DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(1), MagicElement.flora);
       expect(alice.hp, 53, reason: '2 × 1.5 — all healing walks one door');
     });
@@ -157,17 +186,23 @@ void main() {
     test('ticks for its duration, then leaves', () {
       alice
         ..hp = 50
-        ..statuses
-            .add(HealOverTimeStatus(percentPerTurn: 9, turnsLeft: 3));
-      final duel =
-          DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+        ..statuses.add(HealOverTimeStatus(percentPerTurn: 9, turnsLeft: 3));
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       for (var t = 0; t < 3; t++) {
         cast(duel, dmg(1), MagicElement.flora);
       }
       expect(alice.hp, 50 + 27, reason: '9 × 3 ticked (the caster is unhit)');
       cast(duel, dmg(1), MagicElement.flora);
-      expect(alice.hp, 50 + 27,
-          reason: '⚠️ a fourth tick means expiry never ran');
+      expect(
+        alice.hp,
+        50 + 27,
+        reason: '⚠️ a fourth tick means expiry never ran',
+      );
       expect(alice.statuses.whereType<HealOverTimeStatus>(), isEmpty);
     });
   });

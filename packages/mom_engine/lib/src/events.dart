@@ -226,7 +226,8 @@ class SpellFizzledEvent extends DuelEvent {
   const SpellFizzledEvent(this.caster, this.spell);
 
   @override
-  String toString() => "${caster.name}'s ${spell.name} fizzles (not enough "
+  String toString() =>
+      "${caster.name}'s ${spell.name} fizzles (not enough "
       'charge at resolution)';
 }
 

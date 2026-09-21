@@ -22,18 +22,34 @@ void main() {
   }
 
   test('fires one hit per point of charge', () {
-    final duel = DuelEngine(alice, bruno, rng: Random(3), elementEffects: false, baseMissPercent: 0);
+    final duel = DuelEngine(
+      alice,
+      bruno,
+      rng: Random(3),
+      elementEffects: false,
+      baseMissPercent: 0,
+    );
     charge(4);
     final r = duel.resolveTurn(
-        CastAction(Spellbook.barrage), const ForfeitAction());
+      CastAction(Spellbook.barrage),
+      const ForfeitAction(),
+    );
     expect(r.events.whereType<DamageEvent>(), hasLength(4));
   });
 
   test('a single charge is a single hit', () {
-    final duel = DuelEngine(alice, bruno, rng: Random(3), elementEffects: false, baseMissPercent: 0);
+    final duel = DuelEngine(
+      alice,
+      bruno,
+      rng: Random(3),
+      elementEffects: false,
+      baseMissPercent: 0,
+    );
     charge(1);
     final r = duel.resolveTurn(
-        CastAction(Spellbook.barrage), const ForfeitAction());
+      CastAction(Spellbook.barrage),
+      const ForfeitAction(),
+    );
     expect(r.events.whereType<DamageEvent>(), hasLength(1));
   });
 
@@ -44,7 +60,13 @@ void main() {
     for (var seed = 0; seed < 25; seed++) {
       final a = MageState(name: 'A');
       final b = MageState(name: 'B');
-      final duel = DuelEngine(a, b, rng: Random(seed), elementEffects: false, baseMissPercent: 0);
+      final duel = DuelEngine(
+        a,
+        b,
+        rng: Random(seed),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
       a
         ..charge = 4
         ..element = MagicElement.pyro;
@@ -61,7 +83,13 @@ void main() {
     for (var seed = 0; seed < 40; seed++) {
       final a = MageState(name: 'A');
       final b = MageState(name: 'B');
-      final duel = DuelEngine(a, b, rng: Random(seed), elementEffects: false, baseMissPercent: 0);
+      final duel = DuelEngine(
+        a,
+        b,
+        rng: Random(seed),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
       a
         ..charge = 4
         ..element = MagicElement.pyro;
@@ -71,26 +99,41 @@ void main() {
     expect(totals.length, greaterThan(1), reason: 'damage varies');
     // The all-minimum (40) and all-maximum (48) outcomes each need four
     // independent rolls to agree, so they should be rare-to-absent here.
-    expect(totals.where((t) => t == 40 || t == 48).length,
-        lessThan(totals.length),
-        reason: 'independent rolls should not pin the extremes');
+    expect(
+      totals.where((t) => t == 40 || t == 48).length,
+      lessThan(totals.length),
+      reason: 'independent rolls should not pin the extremes',
+    );
   });
 
   group('against defences, each bolt counts separately', () {
     test('it burns one Barrier point per bolt', () {
-      final duel =
-          DuelEngine(alice, bruno, rng: Random(3), elementEffects: false, baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: Random(3),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
       bruno.barrierPoints = 3;
       charge(5);
       duel.resolveTurn(CastAction(Spellbook.barrage), const ForfeitAction());
       expect(bruno.barrierPoints, 0, reason: 'three bolts spent three points');
-      expect(bruno.hp, lessThan(100),
-          reason: 'bolts four and five got through');
+      expect(
+        bruno.hp,
+        lessThan(100),
+        reason: 'bolts four and five got through',
+      );
     });
 
     test('a 2-charge Barrage cannot break more than two points', () {
-      final duel =
-          DuelEngine(alice, bruno, rng: Random(3), elementEffects: false, baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: Random(3),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
       bruno.barrierPoints = 3;
       charge(2);
       duel.resolveTurn(CastAction(Spellbook.barrage), const ForfeitAction());
@@ -99,31 +142,49 @@ void main() {
     });
 
     test('each bolt is chipped by the shield separately', () {
-      final duel =
-          DuelEngine(alice, bruno, rng: Random(3), elementEffects: false, baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: Random(3),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
       // Solar is neutral to Pyro (opposite tiers), so the shield takes the
       // bolts at face value and the arithmetic stays clean.
       bruno.shield = ActiveShield.elemental(MagicElement.solar, 200);
       charge(3);
       final r = duel.resolveTurn(
-          CastAction(Spellbook.barrage), const ForfeitAction());
+        CastAction(Spellbook.barrage),
+        const ForfeitAction(),
+      );
       final hits = r.events.whereType<DamageEvent>().toList();
       expect(hits, hasLength(3));
       expect(hits.every((h) => h.toShield > 0 && h.toHp == 0), isTrue);
-      expect(bruno.shield!.remaining, 200 - hits.fold(0, (a, h) => a + h.toShield));
+      expect(
+        bruno.shield!.remaining,
+        200 - hits.fold(0, (a, h) => a + h.toShield),
+      );
     });
   });
 
   test('a same-turn Discharge still fizzles it outright', () {
     // Discharge (priority 7) beats Barrage (9) and empties the charge the
     // spell reads live, so there is nothing to fire.
-    final duel = DuelEngine(alice, bruno, rng: Random(3), elementEffects: false, baseMissPercent: 0);
+    final duel = DuelEngine(
+      alice,
+      bruno,
+      rng: Random(3),
+      elementEffects: false,
+      baseMissPercent: 0,
+    );
     charge(4);
     bruno
       ..charge = 2
       ..element = MagicElement.aqua;
     final r = duel.resolveTurn(
-        CastAction(Spellbook.barrage), CastAction(Spellbook.discharge));
+      CastAction(Spellbook.barrage),
+      CastAction(Spellbook.discharge),
+    );
     expect(r.events.whereType<SpellFizzledEvent>(), hasLength(1));
     expect(r.events.whereType<DamageEvent>(), isEmpty);
   });

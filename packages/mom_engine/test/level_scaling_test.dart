@@ -22,8 +22,13 @@ void main() {
       a
         ..charge = 1
         ..element = MagicElement.pyro;
-      DuelEngine(a, b, rng: Random(seed), elementEffects: false, baseMissPercent: 0)
-          .resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
+      DuelEngine(
+        a,
+        b,
+        rng: Random(seed),
+        elementEffects: false,
+        baseMissPercent: 0,
+      ).resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
       total += 100000 - b.hp;
     }
     return total / trials;
@@ -32,8 +37,7 @@ void main() {
   test('health scales geometrically with level', () {
     expect(MageState(name: 'x').maxHp, 100);
     expect(MageState(name: 'x', level: 3).maxHp, 108); // 1.04^2
-    expect(MageState(name: 'x', level: 60).maxHp,
-        MageState.scaledMaxHp(60));
+    expect(MageState(name: 'x', level: 60).maxHp, MageState.scaledMaxHp(60));
     expect(MageState(name: 'x', level: 60).maxHp, greaterThan(900));
   });
 
@@ -42,27 +46,37 @@ void main() {
     final atTwentyFive = averageBoltDamage(25);
     final atSixty = averageBoltDamage(60);
 
-    expect(atTwentyFive, greaterThan(atOne * 2),
-        reason: 'level 25 is 1.04^24 = ~2.56x a level 1');
-    expect(atSixty, greaterThan(atOne * 8),
-        reason: 'level 60 is 1.04^59 = ~10x a level 1');
+    expect(
+      atTwentyFive,
+      greaterThan(atOne * 2),
+      reason: 'level 25 is 1.04^24 = ~2.56x a level 1',
+    );
+    expect(
+      atSixty,
+      greaterThan(atOne * 8),
+      reason: 'level 60 is 1.04^59 = ~10x a level 1',
+    );
 
     // And it tracks the same curve health uses, not some other multiplier.
     final expected = atOne * MageState(name: 'x', level: 60).levelScale;
     expect(atSixty, closeTo(expected, expected * 0.08));
   });
 
-  test('an even-level duel is unchanged, which is what keeps balance valid',
-      () {
-    // Same level on both sides -> the ratio of damage to health is identical
-    // at every level, so every figure tuned at level 1 still holds.
-    for (final level in [1, 10, 30, 60]) {
-      final m = MageState(name: 'x', level: level);
-      expect(averageBoltDamage(level) / m.maxHp,
+  test(
+    'an even-level duel is unchanged, which is what keeps balance valid',
+    () {
+      // Same level on both sides -> the ratio of damage to health is identical
+      // at every level, so every figure tuned at level 1 still holds.
+      for (final level in [1, 10, 30, 60]) {
+        final m = MageState(name: 'x', level: level);
+        expect(
+          averageBoltDamage(level) / m.maxHp,
           closeTo(averageBoltDamage(1) / 100, 0.02),
-          reason: 'level $level shifted the damage-to-health ratio');
-    }
-  });
+          reason: 'level $level shifted the damage-to-health ratio',
+        );
+      }
+    },
+  );
 
   test('SHIELDS scale geometrically with level too', () {
     // ⚠️ Asserted separately from damage. Shields are rolled in their own
@@ -74,8 +88,13 @@ void main() {
       a
         ..charge = 2
         ..element = MagicElement.aqua;
-      DuelEngine(a, b, rng: Random(4), elementEffects: false, baseMissPercent: 0)
-          .resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
+      DuelEngine(
+        a,
+        b,
+        rng: Random(4),
+        elementEffects: false,
+        baseMissPercent: 0,
+      ).resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
       return a.shield!.remaining;
     }
 

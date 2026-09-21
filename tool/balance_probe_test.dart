@@ -101,8 +101,18 @@ class _Band {
   });
 }
 
-const _commonBand = _Band(loNaked: 0.45, hiNaked: 0.90, loCrafted: 0.65, hiCrafted: 0.97);
-const _bossBand = _Band(loNaked: 0.10, hiNaked: 0.60, loCrafted: 0.35, hiCrafted: 0.85);
+const _commonBand = _Band(
+  loNaked: 0.45,
+  hiNaked: 0.90,
+  loCrafted: 0.65,
+  hiCrafted: 0.97,
+);
+const _bossBand = _Band(
+  loNaked: 0.10,
+  hiNaked: 0.60,
+  loCrafted: 0.35,
+  hiCrafted: 0.85,
+);
 
 _Band _bandFor(EnemyRank rank) =>
     rank == EnemyRank.boss ? _bossBand : _commonBand;
@@ -412,7 +422,9 @@ ProbeReport runZoneBalanceProbe({
         final outside = agg.winRate < lo || agg.winRate > hi;
         var flag = '';
         if (outside) flag = 'WARN';
-        if (rank == EnemyRank.mini) flag = flag.isEmpty ? '(mini~common)' : '$flag (mini~common)';
+        if (rank == EnemyRank.mini) {
+          flag = flag.isEmpty ? '(mini~common)' : '$flag (mini~common)';
+        }
 
         buf.writeln(
           zone.name.padRight(22) +
@@ -463,22 +475,18 @@ void main() {
   // nothing in this repo's `flutter test` gate should take minutes.
   final duelsPerCreature = deep ? 250 : 12;
 
-  test(
-    'zone balance probe',
-    () {
-      final report = runZoneBalanceProbe(duelsPerCreature: duelsPerCreature);
-      print(report.table);
-      if (report.warnings.isEmpty) {
-        print('\nNo zones outside the placeholder sanity bands.');
-      } else {
-        print('\nWARN — outside first-pass placeholder sanity bands:');
-        for (final w in report.warnings) {
-          print('  - $w');
-        }
+  test('zone balance probe', () {
+    final report = runZoneBalanceProbe(duelsPerCreature: duelsPerCreature);
+    print(report.table);
+    if (report.warnings.isEmpty) {
+      print('\nNo zones outside the placeholder sanity bands.');
+    } else {
+      print('\nWARN — outside first-pass placeholder sanity bands:');
+      for (final w in report.warnings) {
+        print('  - $w');
       }
-    },
-    timeout: Timeout(Duration(minutes: deep ? 15 : 2)),
-  );
+    }
+  }, timeout: Timeout(Duration(minutes: deep ? 15 : 2)));
 
   test('deterministic: two runs at a tiny N print byte-identical reports', () {
     final a = runZoneBalanceProbe(
@@ -489,116 +497,153 @@ void main() {
       zoneIds: const ['whispering_woods', 'the_molten_deep'],
       duelsPerCreature: 3,
     );
-    expect(a.table, b.table, reason: 'the report must be a pure function of its seeds');
+    expect(
+      a.table,
+      b.table,
+      reason: 'the report must be a pure function of its seeds',
+    );
     expect(a.warnings, b.warnings);
   });
 
   group('probe machinery', () {
-    test(
-      'crafted loadout derivation picks only crafted-obtainable gear',
-      () {
-        // Every Primal recipe is unlocked well before level 12 (the highest
-        // `skillLevel` in `PrimalRecipes` is 10; equip levels top out at 11),
-        // so this is the full Primal crafted wardrobe, hand-verified against
-        // `primal_recipes.dart` + the Whispering Woods/Ashfall Vale/Cinderpeak
-        // catalogues:
-        //   mainHand  birch_quarterstaff (eq10): +2 dmg/charge, +6 accuracy
-        //   offHand   birch_knot         (eq10): +4 accuracy
-        //   hat       bogflax_hood       (eq10): +2 accuracy
-        //   robeTop   bogflax_robe       (eq10): +10 max HP
-        //   robeBottom bogflax_leggings  (eq10): +7 max HP
-        //   boots     bogflax_boots      (eq10): +2 max HP
-        //   gloves    bogflax_gloves     (eq10): +2 max HP
-        //   belt      tuskhide_belt      (eq11): +2 belt slots
-        // totals: accuracy 6+4+2=12, dmg/charge 2, max HP 10+7+2+2=21, belt 2
-        final gear = craftedGearAt(12);
-        expect(gear.accuracyBonus, 12, reason: 'crafted mainHand+offHand+hat accuracy');
-        expect(gear.damagePerCharge, 2, reason: 'crafted mainHand damage/charge');
-        expect(gear.maxHpBonus, 21, reason: 'crafted robe set max HP');
-        expect(gear.beltSlots, 2, reason: 'crafted belt slots');
-        expect(gear.damagePerCast, 0, reason: 'the wand lost the mainHand tiebreak — must not also contribute');
-        expect(gear.critChance, 0);
-        expect(gear.dodge, 0);
-        expect(gear.deflectChance, 0);
+    test('crafted loadout derivation picks only crafted-obtainable gear', () {
+      // Every Primal recipe is unlocked well before level 12 (the highest
+      // `skillLevel` in `PrimalRecipes` is 10; equip levels top out at 11),
+      // so this is the full Primal crafted wardrobe, hand-verified against
+      // `primal_recipes.dart` + the Whispering Woods/Ashfall Vale/Cinderpeak
+      // catalogues:
+      //   mainHand  birch_quarterstaff (eq10): +2 dmg/charge, +6 accuracy
+      //   offHand   birch_knot         (eq10): +4 accuracy
+      //   hat       bogflax_hood       (eq10): +2 accuracy
+      //   robeTop   bogflax_robe       (eq10): +10 max HP
+      //   robeBottom bogflax_leggings  (eq10): +7 max HP
+      //   boots     bogflax_boots      (eq10): +2 max HP
+      //   gloves    bogflax_gloves     (eq10): +2 max HP
+      //   belt      tuskhide_belt      (eq11): +2 belt slots
+      // totals: accuracy 6+4+2=12, dmg/charge 2, max HP 10+7+2+2=21, belt 2
+      final gear = craftedGearAt(12);
+      expect(
+        gear.accuracyBonus,
+        12,
+        reason: 'crafted mainHand+offHand+hat accuracy',
+      );
+      expect(gear.damagePerCharge, 2, reason: 'crafted mainHand damage/charge');
+      expect(gear.maxHpBonus, 21, reason: 'crafted robe set max HP');
+      expect(gear.beltSlots, 2, reason: 'crafted belt slots');
+      expect(
+        gear.damagePerCast,
+        0,
+        reason:
+            'the wand lost the mainHand tiebreak — must not also contribute',
+      );
+      expect(gear.critChance, 0);
+      expect(gear.dodge, 0);
+      expect(gear.deflectChance, 0);
 
-        // ⭐ The negative check, isolated to ONE slot via [bestCraftedItemFor]
-        // rather than inferred from an aggregate sum several slots feed into
-        // (a mistake this test itself made on its first draft — the naive
-        // "robeTop should read 6" assumption ignored that bindweed_leggings/
-        // boots/gloves also contribute maxHpBonus at level 4, netting 12
-        // there by coincidence, which would have silently passed even if
-        // robeTop had wrongly resolved to something else entirely).
-        //
-        // `sporecap_mantle` (Whispering Woods, robeTop, +12 max HP, +2
-        // accuracy, equip level 4) is DROP-ONLY — no recipe makes it — and by
-        // its own doc comment "beats the Standard crafted robe (+6 HP)
-        // outright". If the derivation ever started pulling from
-        // `ItemCatalogue` instead of `RecipeBook` outputs, robeTop at level 4
-        // would resolve to `sporecap_mantle` instead of `bindweed_robe` and
-        // this fails immediately.
-        final robeTopPick = bestCraftedItemFor(EquipSlot.robeTop, 4);
-        expect(robeTopPick?.id, 'bindweed_robe', reason: 'the only CRAFTED robeTop item unlocked by level 4');
-        expect(robeTopPick?.modifiers.maxHpBonus, 6);
+      // ⭐ The negative check, isolated to ONE slot via [bestCraftedItemFor]
+      // rather than inferred from an aggregate sum several slots feed into
+      // (a mistake this test itself made on its first draft — the naive
+      // "robeTop should read 6" assumption ignored that bindweed_leggings/
+      // boots/gloves also contribute maxHpBonus at level 4, netting 12
+      // there by coincidence, which would have silently passed even if
+      // robeTop had wrongly resolved to something else entirely).
+      //
+      // `sporecap_mantle` (Whispering Woods, robeTop, +12 max HP, +2
+      // accuracy, equip level 4) is DROP-ONLY — no recipe makes it — and by
+      // its own doc comment "beats the Standard crafted robe (+6 HP)
+      // outright". If the derivation ever started pulling from
+      // `ItemCatalogue` instead of `RecipeBook` outputs, robeTop at level 4
+      // would resolve to `sporecap_mantle` instead of `bindweed_robe` and
+      // this fails immediately.
+      final robeTopPick = bestCraftedItemFor(EquipSlot.robeTop, 4);
+      expect(
+        robeTopPick?.id,
+        'bindweed_robe',
+        reason: 'the only CRAFTED robeTop item unlocked by level 4',
+      );
+      expect(robeTopPick?.modifiers.maxHpBonus, 6);
 
-        // And the aggregate at level 4, for completeness — everything the
-        // Bindweed set (all equip level 1) plus the Fawnhide belt (equip
-        // level 4) grants, nothing bogflax/birch/tuskhide (equip level
-        // 10-11) or drop-only yet.
-        final low = craftedGearAt(4);
-        expect(
-          low.maxHpBonus,
-          6 + 4 + 1 + 1, // robe + leggings + boots + gloves
-          reason: 'the whole Bindweed set\'s max HP, summed — NOT sporecap_mantle\'s +12 alone',
-        );
-        expect(
-          low.accuracyBonus,
-          5 + 3 + 1, // oak_quarterstaff + oak_knot + bindweed_hood
-          reason: 'oak_quarterstaff(+5) + oak_knot(+3) + bindweed_hood(+1) — sporecap_mantle\'s +2 must not appear',
-        );
-        expect(low.beltSlots, 1, reason: 'fawnhide_belt unlocks at equip level 4');
-      },
-    );
+      // And the aggregate at level 4, for completeness — everything the
+      // Bindweed set (all equip level 1) plus the Fawnhide belt (equip
+      // level 4) grants, nothing bogflax/birch/tuskhide (equip level
+      // 10-11) or drop-only yet.
+      final low = craftedGearAt(4);
+      expect(
+        low.maxHpBonus,
+        6 + 4 + 1 + 1, // robe + leggings + boots + gloves
+        reason:
+            'the whole Bindweed set\'s max HP, summed — NOT sporecap_mantle\'s +12 alone',
+      );
+      expect(
+        low.accuracyBonus,
+        5 + 3 + 1, // oak_quarterstaff + oak_knot + bindweed_hood
+        reason:
+            'oak_quarterstaff(+5) + oak_knot(+3) + bindweed_hood(+1) — sporecap_mantle\'s +2 must not appear',
+      );
+      expect(
+        low.beltSlots,
+        1,
+        reason: 'fawnhide_belt unlocks at equip level 4',
+      );
+    });
 
-    test(
-      'enemy construction matches the campaign path field-for-field '
-      '(kills the probe-drifts-from-campaign mutant)',
-      () {
-        // Same fixture `test/enemy_combat_stats_test.dart` pins its own
-        // invariance test against: a real, stat-free Q1 creature.
-        final fawn = WhisperingWoodsBestiary.listeningFawn;
-        const level = 5;
+    test('enemy construction matches the campaign path field-for-field '
+        '(kills the probe-drifts-from-campaign mutant)', () {
+      // Same fixture `test/enemy_combat_stats_test.dart` pins its own
+      // invariance test against: a real, stat-free Q1 creature.
+      final fawn = WhisperingWoodsBestiary.listeningFawn;
+      const level = 5;
 
-        final rig = _DuelRig.build(
-          def: fawn,
-          level: level,
-          playerGear: ItemModifiers.none,
-          seed: 1,
-        );
+      final rig = _DuelRig.build(
+        def: fawn,
+        level: level,
+        playerGear: ItemModifiers.none,
+        seed: 1,
+      );
 
-        // Independently hand-computed from the documented formula
-        // (`DuelController._buildMage`'s own doc, and
-        // `enemy_combat_stats_test.dart`'s `preSeamEnemy`) — NOT read back
-        // off the rig, so a rig that quietly stopped going through
-        // `EnemyEncounter`/`LocalAiDriver`/`DuelController` (e.g. someone
-        // "simplifies" `_DuelRig.build` into hand-rolled arithmetic that
-        // drifts from a future campaign change) fails this test even if
-        // their arithmetic looks plausible.
-        final expectedMaxHp =
-            (MageState.scaledMaxHp(level) * fawn.archetype.hpScale).round();
-        expect(rig.enemy.maxHp, expectedMaxHp, reason: 'enemy HP must be the level baseline × archetype hpScale');
-        expect(rig.enemy.powerScale, fawn.archetype.damageScale, reason: 'enemy damage must carry the archetype scale');
-        expect(rig.enemy.accuracyBonus, 0, reason: 'a stat-free Q1 EnemyDef must build at the engine baseline');
-        expect(rig.enemy.dodge, 0);
-        expect(rig.enemy.critChance, 0);
-        expect(rig.enemy.critDamage, 50, reason: 'the engine\'s own inert default');
-        expect(rig.enemy.deflectChance, 0);
-        expect(rig.enemy.deflectAmount, 0);
+      // Independently hand-computed from the documented formula
+      // (`DuelController._buildMage`'s own doc, and
+      // `enemy_combat_stats_test.dart`'s `preSeamEnemy`) — NOT read back
+      // off the rig, so a rig that quietly stopped going through
+      // `EnemyEncounter`/`LocalAiDriver`/`DuelController` (e.g. someone
+      // "simplifies" `_DuelRig.build` into hand-rolled arithmetic that
+      // drifts from a future campaign change) fails this test even if
+      // their arithmetic looks plausible.
+      final expectedMaxHp =
+          (MageState.scaledMaxHp(level) * fawn.archetype.hpScale).round();
+      expect(
+        rig.enemy.maxHp,
+        expectedMaxHp,
+        reason: 'enemy HP must be the level baseline × archetype hpScale',
+      );
+      expect(
+        rig.enemy.powerScale,
+        fawn.archetype.damageScale,
+        reason: 'enemy damage must carry the archetype scale',
+      );
+      expect(
+        rig.enemy.accuracyBonus,
+        0,
+        reason: 'a stat-free Q1 EnemyDef must build at the engine baseline',
+      );
+      expect(rig.enemy.dodge, 0);
+      expect(rig.enemy.critChance, 0);
+      expect(
+        rig.enemy.critDamage,
+        50,
+        reason: 'the engine\'s own inert default',
+      );
+      expect(rig.enemy.deflectChance, 0);
+      expect(rig.enemy.deflectAmount, 0);
 
-        // The player side of the same rig: naked gear must build at exactly
-        // the level baseline, nothing more.
-        expect(rig.player.maxHp, MageState.scaledMaxHp(level), reason: 'naked player must be the bare level baseline');
-        expect(rig.player.accuracyBonus, 0);
-      },
-    );
+      // The player side of the same rig: naked gear must build at exactly
+      // the level baseline, nothing more.
+      expect(
+        rig.player.maxHp,
+        MageState.scaledMaxHp(level),
+        reason: 'naked player must be the bare level baseline',
+      );
+      expect(rig.player.accuracyBonus, 0);
+    });
   });
 }

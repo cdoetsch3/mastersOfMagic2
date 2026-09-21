@@ -220,8 +220,7 @@ abstract final class StatusCatalog {
     StatusInfo(
       id: 'quicken',
       name: 'Quicken',
-      description:
-          'Your next offensive spell resolves ahead of enemy shields.',
+      description: 'Your next offensive spell resolves ahead of enemy shields.',
       trigger: 'Casting Quicken.',
       kind: StatusKind.buff,
       element: null,
@@ -693,9 +692,7 @@ abstract final class StatusCatalog {
     ),
   ];
 
-  static final Map<String, StatusInfo> _byId = {
-    for (final s in all) s.id: s,
-  };
+  static final Map<String, StatusInfo> _byId = {for (final s in all) s.id: s};
 
   static StatusInfo? byId(String id) => _byId[id];
 

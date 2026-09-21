@@ -62,7 +62,10 @@ String _statusSegment(String? statusChoice) {
   if (statusChoice == null) return '';
   if (statusChoice.isEmpty || statusChoice.contains('|')) {
     throw ArgumentError.value(
-        statusChoice, 'statusChoice', 'must be a non-empty id without "|"');
+      statusChoice,
+      'statusChoice',
+      'must be a non-empty id without "|"',
+    );
   }
   return '|$statusChoice';
 }
@@ -119,8 +122,9 @@ int deriveTurnSeed(int masterSeed, int turn, String moveA, String moveB) {
   // Sort the two moves so both clients derive the same seed regardless of
   // which side they consider "A".
   final moves = [moveA, moveB]..sort();
-  final digest =
-      sha256.convert(utf8.encode('$masterSeed|$turn|${moves.join('|')}'));
+  final digest = sha256.convert(
+    utf8.encode('$masterSeed|$turn|${moves.join('|')}'),
+  );
   var seed = 0;
   for (var i = 0; i < 4; i++) {
     seed = (seed << 8) | digest.bytes[i];

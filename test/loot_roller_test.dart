@@ -334,20 +334,25 @@ void main() {
       );
     });
 
-    test('rollDrops with no rng draws from the shared lootRng, and it moves',
-        () {
-      // ⭐ The production call shape after the audit: no rng at all, so
-      // `lootRng` supplies it. 🚫 Kills a default that hands back a *fresh*
-      // `Random()` each call on a backend where that could correlate, and
-      // kills a `lootRng` accidentally declared `Random(<literal>)`.
-      final drops = WhisperingWoodsBestiary.heartwood.drops;
-      final hauls = <String>{};
-      for (var i = 0; i < 200; i++) {
-        hauls.add(rollDrops(drops).slots.map((s) => s.defId).join(','));
-      }
-      expect(hauls.length, greaterThan(1),
-          reason: 'the default rng is stuck — 200 kills, one haul');
-    });
+    test(
+      'rollDrops with no rng draws from the shared lootRng, and it moves',
+      () {
+        // ⭐ The production call shape after the audit: no rng at all, so
+        // `lootRng` supplies it. 🚫 Kills a default that hands back a *fresh*
+        // `Random()` each call on a backend where that could correlate, and
+        // kills a `lootRng` accidentally declared `Random(<literal>)`.
+        final drops = WhisperingWoodsBestiary.heartwood.drops;
+        final hauls = <String>{};
+        for (var i = 0; i < 200; i++) {
+          hauls.add(rollDrops(drops).slots.map((s) => s.defId).join(','));
+        }
+        expect(
+          hauls.length,
+          greaterThan(1),
+          reason: 'the default rng is stuck — 200 kills, one haul',
+        );
+      },
+    );
 
     test('one Random instance carries an encounter, and keeps advancing', () {
       // ⭐ Sharing an rng across a kill's rolls is correct and cheap. What is
@@ -440,34 +445,46 @@ void main() {
       _expectRate(epics, 0.10, 'heartwood_stave over $shape', liveTolerance);
     }
 
-    test('a fresh unseeded Random per kill — the shape production ships today',
-        () {
-      // 🚫 Kills the whole reported hypothesis: if per-kill `Random()`
-      // construction correlated on any backend we build for, 20k of them in a
-      // tight loop is the very worst case for it, and this is where it shows.
-      auditEpicRate('20k live boss kills, fresh Random() each',
-          (table) => rollDrops(table, Random()));
-    });
+    test(
+      'a fresh unseeded Random per kill — the shape production ships today',
+      () {
+        // 🚫 Kills the whole reported hypothesis: if per-kill `Random()`
+        // construction correlated on any backend we build for, 20k of them in a
+        // tight loop is the very worst case for it, and this is where it shows.
+        auditEpicRate(
+          '20k live boss kills, fresh Random() each',
+          (table) => rollDrops(table, Random()),
+        );
+      },
+    );
 
     test('the shared lootRng — the shape production ships after the audit', () {
       auditEpicRate(
-          '20k live boss kills, one shared lootRng', (table) => rollDrops(table));
+        '20k live boss kills, one shared lootRng',
+        (table) => rollDrops(table),
+      );
     });
 
-    test('every rolled run ends on a boss, and both bosses share one table',
-        () {
-      // ⚠️ The audit above is only about `heartwood_stave` if the walk really
-      // lands on a boss table. Whispering Woods has two bosses and the roll
-      // shuffles them, so BOTH must carry the stave at 10% or the rate the
-      // player experiences is a blend of two different numbers.
-      final bosses = Bestiary.forZone('whispering_woods')
-          .where((e) => e.rank == EnemyRank.boss);
-      expect(bosses.length, 2);
-      for (final b in bosses) {
-        expect(b.drops.mainChanceOf('heartwood_stave'), 0.10,
-            reason: '${b.id} pays the Epic at a different rate');
-      }
-    });
+    test(
+      'every rolled run ends on a boss, and both bosses share one table',
+      () {
+        // ⚠️ The audit above is only about `heartwood_stave` if the walk really
+        // lands on a boss table. Whispering Woods has two bosses and the roll
+        // shuffles them, so BOTH must carry the stave at 10% or the rate the
+        // player experiences is a blend of two different numbers.
+        final bosses = Bestiary.forZone(
+          'whispering_woods',
+        ).where((e) => e.rank == EnemyRank.boss);
+        expect(bosses.length, 2);
+        for (final b in bosses) {
+          expect(
+            b.drops.mainChanceOf('heartwood_stave'),
+            0.10,
+            reason: '${b.id} pays the Epic at a different rate',
+          );
+        }
+      },
+    );
   });
 
   // ------------------------------------------------------------------------
@@ -541,13 +558,18 @@ void main() {
         final haul = perRun(entry.key, entry.value);
         final dust = sumOf(haul, 'dust');
         final shards = sumOf(haul, 'shard');
-        expect(shards, greaterThan(0),
-            reason: '${entry.key} stopped paying Shards entirely — the ruling '
-                'made them uncommon, not extinct');
+        expect(
+          shards,
+          greaterThan(0),
+          reason:
+              '${entry.key} stopped paying Shards entirely — the ruling '
+              'made them uncommon, not extinct',
+        );
         expect(
           dust / shards,
           greaterThan(4),
-          reason: '${entry.key} pays ${dust.toStringAsFixed(2)} Dust to '
+          reason:
+              '${entry.key} pays ${dust.toStringAsFixed(2)} Dust to '
               '${shards.toStringAsFixed(2)} Shards per run — Dust is supposed '
               'to be the routine mote',
         );
@@ -565,21 +587,29 @@ void main() {
       // it guarantees every Crystal it carries.
       for (final zoneId in zones.keys) {
         for (final e in Bestiary.forZone(zoneId)) {
-          final shards =
-              e.drops.always.where((d) => d.defId?.endsWith('_shard') == true);
+          final shards = e.drops.always.where(
+            (d) => d.defId?.endsWith('_shard') == true,
+          );
           final owed = shards.fold(0.0, (a, d) => a + d.chance);
-          final crystals =
-              e.drops.possibleDrops.where((id) => id.endsWith('_crystal'));
+          final crystals = e.drops.possibleDrops.where(
+            (id) => id.endsWith('_crystal'),
+          );
           switch (e.rank) {
             case EnemyRank.common:
               expect(crystals, isEmpty, reason: '${e.id} hands out Crystal');
             case EnemyRank.mini:
-              expect(owed, closeTo(1, 1e-9),
-                  reason: '${e.id} owes $owed Shards a kill, not one');
+              expect(
+                owed,
+                closeTo(1, 1e-9),
+                reason: '${e.id} owes $owed Shards a kill, not one',
+              );
               expect(crystals, isNotEmpty, reason: '${e.id} lost its Crystal');
             case EnemyRank.boss:
-              expect(shards.every((d) => d.chance >= 1), isTrue,
-                  reason: '${e.id} put a Shard behind a dice roll');
+              expect(
+                shards.every((d) => d.chance >= 1),
+                isTrue,
+                reason: '${e.id} put a Shard behind a dice roll',
+              );
               expect(crystals, isNotEmpty, reason: '${e.id} lost its Crystal');
           }
         }
@@ -592,8 +622,11 @@ void main() {
       // every *other* slot's percentage on that table silently.
       for (final zoneId in zones.keys) {
         for (final e in Bestiary.forZone(zoneId)) {
-          expect(e.drops.totalWeight, 100,
-              reason: '${e.id} main table sums to ${e.drops.totalWeight}');
+          expect(
+            e.drops.totalWeight,
+            100,
+            reason: '${e.id} main table sums to ${e.drops.totalWeight}',
+          );
         }
       }
     });
@@ -610,9 +643,13 @@ void main() {
             final dust = e.drops.main
                 .where((d) => d.defId == '${element}_dust')
                 .fold(0, (a, d) => a + d.weight);
-            expect(dust, greaterThan(shard.weight),
-                reason: '${e.id} sells $element Shards at weight '
-                    '${shard.weight} against $dust of Dust');
+            expect(
+              dust,
+              greaterThan(shard.weight),
+              reason:
+                  '${e.id} sells $element Shards at weight '
+                  '${shard.weight} against $dust of Dust',
+            );
           }
         }
       }
@@ -631,14 +668,24 @@ void main() {
         final q = rollDropQuality(rng);
         counts[q] = (counts[q] ?? 0) + 1;
       }
-      expect(counts[Quality.rough], isNull,
-          reason: '⭐ the ruling: a drop was never your hands — Rough is a '
-              'crafting story, and on found gear it is only a penalty');
+      expect(
+        counts[Quality.rough],
+        isNull,
+        reason:
+            '⭐ the ruling: a drop was never your hands — Rough is a '
+            'crafting story, and on found gear it is only a penalty',
+      );
       expect(counts[Quality.standard]! / _n, closeTo(0.90, 0.01));
-      expect(counts[Quality.ornate]! / _n, closeTo(0.08, 0.01),
-          reason: '⚠️ kills a <= where < belongs on the 0.10 boundary');
-      expect(counts[Quality.master]! / _n, closeTo(0.02, 0.005),
-          reason: 'the 2% jackpot is declared, not vibes');
+      expect(
+        counts[Quality.ornate]! / _n,
+        closeTo(0.08, 0.01),
+        reason: '⚠️ kills a <= where < belongs on the 0.10 boundary',
+      );
+      expect(
+        counts[Quality.master]! / _n,
+        closeTo(0.02, 0.005),
+        reason: 'the 2% jackpot is declared, not vibes',
+      );
     });
 
     test('rolled equipment instances carry the tier; fungibles never do', () {
@@ -651,46 +698,58 @@ void main() {
           for (final slot in loot.slots) {
             if (slot.instanceId != null) {
               sawGear = true;
-              expect(loot.instances[slot.instanceId]!.quality, isNotNull,
-                  reason: '⚠️ the mutant this kills: minting drops plain, '
-                      'which silently reads as Standard forever and deletes '
-                      'the 10% that should shine');
+              expect(
+                loot.instances[slot.instanceId]!.quality,
+                isNotNull,
+                reason:
+                    '⚠️ the mutant this kills: minting drops plain, '
+                    'which silently reads as Standard forever and deletes '
+                    'the 10% that should shine',
+              );
             } else {
               sawFungible = true;
             }
           }
         }
       }
-      expect(sawGear && sawFungible, isTrue,
-          reason: 'the fixture must exercise both mint paths');
+      expect(
+        sawGear && sawFungible,
+        isTrue,
+        reason: 'the fixture must exercise both mint paths',
+      );
     });
   });
 
   group('a kill rolls its drops exactly once', () {
-    test('what winEncounter reports is what the run banked — no second roll',
-        () async {
-      // 🚫 Kills an end screen (or anything downstream) that rolls its own
-      // copy of the haul to display: the reported list and the banked list
-      // would then be two independent draws and diverge within a few kills.
-      // That divergence is also the only way a "10%" table could feel like
-      // 20% — two rolls per kill doubles every chase slot.
-      final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
-      await game.beginAdventure(World.byId('whispering_woods'), rng: Random(9));
-      final reported = <String>[];
-      while (game.run != null && !game.run!.isOver && !game.run!.isFinished) {
-        reported.addAll(await game.winEncounter(remainingHp: 90));
-      }
-      // (2026-08-17 model: unanswered victory drops accumulate on
-      // run.unclaimed until the picker claims them — this walk never claims,
-      // so the whole haul is still there to compare.)
-      final banked = [for (final s in game.run!.unclaimed) s.defId];
-      expect(
-        (reported..sort()).join(','),
-        (banked..sort()).join(','),
-        reason: 'the run banked a different haul than the screen was shown',
-      );
-      expect(reported, isNotEmpty, reason: 'the walk rolled nothing at all');
-    });
+    test(
+      'what winEncounter reports is what the run banked — no second roll',
+      () async {
+        // 🚫 Kills an end screen (or anything downstream) that rolls its own
+        // copy of the haul to display: the reported list and the banked list
+        // would then be two independent draws and diverge within a few kills.
+        // That divergence is also the only way a "10%" table could feel like
+        // 20% — two rolls per kill doubles every chase slot.
+        final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
+        await game.beginAdventure(
+          World.byId('whispering_woods'),
+          rng: Random(9),
+        );
+        final reported = <String>[];
+        while (game.run != null && !game.run!.isOver && !game.run!.isFinished) {
+          reported.addAll(await game.winEncounter(remainingHp: 90));
+        }
+        // (2026-08-17 model: unanswered victory drops accumulate on
+        // run.unclaimed until the picker claims them — this walk never claims,
+        // so the whole haul is still there to compare.)
+        final banked = [for (final s in game.run!.unclaimed) s.defId];
+        expect(
+          (reported..sort()).join(','),
+          (banked..sort()).join(','),
+          reason: 'the run banked a different haul than the screen was shown',
+        );
+        expect(reported, isNotEmpty, reason: 'the walk rolled nothing at all');
+      },
+    );
   });
 }
 

@@ -128,11 +128,10 @@ void main() {
         spellIds: const ['flick', 'bolt'],
       )..clampToCaps();
       expect(preset.elementCount, 5);
-      expect(
-        preset.spellIds,
-        ['flick', 'bolt'],
-        reason: 'the spell pool was already legal and must be untouched',
-      );
+      expect(preset.spellIds, [
+        'flick',
+        'bolt',
+      ], reason: 'the spell pool was already legal and must be untouched');
     });
 
     test(

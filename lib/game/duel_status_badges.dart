@@ -229,7 +229,6 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
     );
   }
 
-
   // --- Everything else: the catalogue draws it ---------------------------
   //
   // ⭐ The §7a bank added ~30 statuses and NONE of them had an arm above —

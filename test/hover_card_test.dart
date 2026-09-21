@@ -22,7 +22,11 @@ void main() {
                 showDone: false,
                 note: 'Unlocks at level 20',
               ),
-              child: const SizedBox(width: 200, height: 60, child: Text('tile')),
+              child: const SizedBox(
+                width: 200,
+                height: 60,
+                child: Text('tile'),
+              ),
             ),
           ),
         ),
@@ -42,7 +46,8 @@ void main() {
     expect(
       find.byType(SpellDetailCard),
       findsNothing,
-      reason: '⚠️ the mutant this kills: a card that pops the instant the '
+      reason:
+          '⚠️ the mutant this kills: a card that pops the instant the '
           'pointer crosses a tile — a grid of 60 would flicker like a '
           'marquee as the mouse travels',
     );
@@ -50,20 +55,28 @@ void main() {
     expect(
       find.byType(SpellDetailCard),
       findsOneWidget,
-      reason: 'after the rest, the SAME card the ⓘ dialog shows — not a '
+      reason:
+          'after the rest, the SAME card the ⓘ dialog shows — not a '
           'second, plainer description',
     );
-    expect(find.text('Unlocks at level 20'), findsOneWidget,
-        reason: 'the note rides along on the card');
-    expect(find.text('Done'), findsNothing,
-        reason: 'a hover card has no button to press');
+    expect(
+      find.text('Unlocks at level 20'),
+      findsOneWidget,
+      reason: 'the note rides along on the card',
+    );
+    expect(
+      find.text('Done'),
+      findsNothing,
+      reason: 'a hover card has no button to press',
+    );
 
     await mouse.moveTo(const Offset(5, 5));
     await tester.pump();
     expect(
       find.byType(SpellDetailCard),
       findsNothing,
-      reason: '⚠️ the mutant this kills: a card that stays open once shown '
+      reason:
+          '⚠️ the mutant this kills: a card that stays open once shown '
           '— a modal in disguise',
     );
   });
@@ -77,9 +90,13 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     await mouse.moveTo(const Offset(5, 5));
     await tester.pump(const Duration(milliseconds: 400));
-    expect(find.byType(SpellDetailCard), findsNothing,
-        reason: '⚠️ the mutant this kills: a pending timer that fires after '
-            'the pointer has already left');
+    expect(
+      find.byType(SpellDetailCard),
+      findsNothing,
+      reason:
+          '⚠️ the mutant this kills: a pending timer that fires after '
+          'the pointer has already left',
+    );
   });
 
   testWidgets('a touch never opens it — the ⓘ dialog is the touch path', (
@@ -116,17 +133,17 @@ void main() {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 40, top: 40),
                         child: HoverCard(
-                        delay: const Duration(milliseconds: 100),
-                        card: (_) => const SpellDetailCard(
-                          spell: Spellbook.aegis,
-                          showDone: false,
+                          delay: const Duration(milliseconds: 100),
+                          card: (_) => const SpellDetailCard(
+                            spell: Spellbook.aegis,
+                            showDone: false,
+                          ),
+                          child: const SizedBox(
+                            width: 200,
+                            height: 60,
+                            child: Text('tile'),
+                          ),
                         ),
-                        child: const SizedBox(
-                          width: 200,
-                          height: 60,
-                          child: Text('tile'),
-                        ),
-                      ),
                       ),
                     ),
                   ),
@@ -147,7 +164,8 @@ void main() {
     expect(
       (card.left - tile.left).abs(),
       lessThan(2),
-      reason: 'the card starts at the tile\'s left edge — the column is at '
+      reason:
+          'the card starts at the tile\'s left edge — the column is at '
           'x=400, and a window-coordinate placement would land at ~800',
     );
     expect(

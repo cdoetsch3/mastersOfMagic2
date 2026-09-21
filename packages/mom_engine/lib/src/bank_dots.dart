@@ -89,8 +89,8 @@ class BankDotStatus extends TimedDebuffStatus implements DamageOverTime {
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) =>
       phase == TurnPhase.end
-          ? [StatusDamage(damagePerTick, lane: Lane.damage, source: name)]
-          : const [];
+      ? [StatusDamage(damagePerTick, lane: Lane.damage, source: name)]
+      : const [];
 }
 
 /// **Murk** — the holder's own accuracy is reduced while it lasts. One status
@@ -106,7 +106,7 @@ class MurkStatus extends TimedDebuffStatus implements StatModifier {
   final int accuracyPercent;
 
   MurkStatus({required this.accuracyPercent, required int turns})
-      : super(turns);
+    : super(turns);
 
   @override
   String get id => 'murk';
@@ -129,8 +129,10 @@ class WitherStatus extends TimedDebuffStatus implements HealingModifier {
   /// The ruled magnitude: −50%, at every price point.
   static const int witherPercent = -50;
 
-  WitherStatus({this.healingReceivedPercent = witherPercent, required int turns})
-      : super(turns);
+  WitherStatus({
+    this.healingReceivedPercent = witherPercent,
+    required int turns,
+  }) : super(turns);
 
   @override
   String get id => 'wither';
@@ -198,16 +200,20 @@ class DebuffGrantEffect extends AuxOffenseEffect {
 
   final int turns;
 
-  const DebuffGrantEffect(this.debuff,
-      {this.magnitude = 0, required this.turns});
+  const DebuffGrantEffect(
+    this.debuff, {
+    this.magnitude = 0,
+    required this.turns,
+  });
 
   TimedDebuffStatus buildStatus() => switch (debuff) {
-        BankDebuff.murk =>
-          MurkStatus(accuracyPercent: magnitude, turns: turns),
-        BankDebuff.wither =>
-          WitherStatus(healingReceivedPercent: magnitude, turns: turns),
-        BankDebuff.blight => BlightStatus(turns: turns),
-      };
+    BankDebuff.murk => MurkStatus(accuracyPercent: magnitude, turns: turns),
+    BankDebuff.wither => WitherStatus(
+      healingReceivedPercent: magnitude,
+      turns: turns,
+    ),
+    BankDebuff.blight => BlightStatus(turns: turns),
+  };
 }
 
 /// **Fester** — a small hit, then every DoT on the target gains [bonusTicks].

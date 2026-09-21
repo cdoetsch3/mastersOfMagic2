@@ -78,7 +78,8 @@ void main() {
       expect(
         find.text(_nameOf('craft_fawnhide_belt')),
         findsOneWidget,
-        reason: 'this is the reported bug itself — a locked recipe that the '
+        reason:
+            'this is the reported bug itself — a locked recipe that the '
             'player cannot see is a recipe they conclude does not exist',
       );
     });
@@ -92,7 +93,8 @@ void main() {
       expect(
         find.text(_nameOf('craft_oak_quarterstaff')),
         findsOneWidget,
-        reason: 'a fresh player has no oak logs; hiding missing-material rows '
+        reason:
+            'a fresh player has no oak logs; hiding missing-material rows '
             'by default would empty the Workbench on first open',
       );
     });
@@ -159,7 +161,8 @@ void main() {
       expect(
         find.text('Jewelry'),
         findsNothing,
-        reason: 'a chip whose filter can only ever show an empty shelf '
+        reason:
+            'a chip whose filter can only ever show an empty shelf '
             'teaches the player the screen is broken',
       );
     });
@@ -183,7 +186,8 @@ void main() {
       expect(
         find.text(_nameOf('craft_oak_quarterstaff')),
         findsOneWidget,
-        reason: 'hide-LOCKED must not also eat rows that are merely '
+        reason:
+            'hide-LOCKED must not also eat rows that are merely '
             'missing materials — they are different complaints',
       );
     });
@@ -204,7 +208,8 @@ void main() {
       expect(
         find.text('No recipes match these filters.'),
         findsOneWidget,
-        reason: 'an empty list must blame the filters; silence here reads as '
+        reason:
+            'an empty list must blame the filters; silence here reads as '
             '"the game has no recipes", which is the original bug again',
       );
     });
@@ -221,7 +226,8 @@ void main() {
       expect(
         find.text('Unlocks at $gate'),
         findsOneWidget,
-        reason: 'the chip must lead with WHAT opens the row, not with the '
+        reason:
+            'the chip must lead with WHAT opens the row, not with the '
             'level the player already knows they are',
       );
       expect(
@@ -247,7 +253,8 @@ void main() {
       expect(
         belt.skillLevel,
         lessThan(birch.skillLevel),
-        reason: 'the fixtures must straddle a gate boundary, in different '
+        reason:
+            'the fixtures must straddle a gate boundary, in different '
             'skills, or this test proves nothing about the ordering',
       );
 
@@ -270,7 +277,8 @@ void main() {
       expect(
         tester.getTopLeft(beltFinder).dy,
         lessThan(tester.getTopLeft(birchFinder).dy),
-        reason: 'gate ascending must cross skills — a Tailoring 4 belt above '
+        reason:
+            'gate ascending must cross skills — a Tailoring 4 belt above '
             'a Woodcarving 10 staff is the whole point of this sort, and '
             'grouping by skill first would rebury the belt',
       );
@@ -282,7 +290,8 @@ void main() {
       expect(
         find.text('Craftable first'),
         findsOneWidget,
-        reason: 'the default order must be named on screen, or the player '
+        reason:
+            'the default order must be named on screen, or the player '
             'cannot tell there is another one',
       );
 

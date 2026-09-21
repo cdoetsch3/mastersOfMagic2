@@ -106,10 +106,7 @@ void main() {
         35,
         reason: '⚠️ kills the pre-halving 60 + 10/level rates',
       );
-      expect(
-        Progression.xpForDuel(won: true, opponentLevel: 60),
-        330,
-      );
+      expect(Progression.xpForDuel(won: true, opponentLevel: 60), 330);
       expect(Progression.winXp, 30);
       expect(Progression.xpPerOpponentLevel, 5);
     });
@@ -138,15 +135,19 @@ void main() {
         Progression.xpForDuel(won: false, opponentLevel: 1, pvp: true),
         Progression.lossXp,
       );
-      expect(Progression.lossXp, 8,
-          reason: '⚠️ kills the pre-halving 15 consolation');
+      expect(
+        Progression.lossXp,
+        8,
+        reason: '⚠️ kills the pre-halving 15 consolation',
+      );
     });
 
     test('⭐ a single-player loss pays NOTHING (ruling 2026-08-17)', () {
       expect(
         Progression.xpForDuel(won: false, opponentLevel: 60),
         0,
-        reason: 'an AI you can lose to on purpose is a farm — the floor only '
+        reason:
+            'an AI you can lose to on purpose is a farm — the floor only '
             'exists for opponents you cannot conjure on demand',
       );
       expect(
@@ -156,7 +157,8 @@ void main() {
       expect(
         Progression.xpForDuel(won: true, opponentLevel: 4),
         Progression.xpForDuel(won: true, opponentLevel: 4, pvp: true),
-        reason: 'the ruling touches losses only — a win pays the same wherever '
+        reason:
+            'the ruling touches losses only — a win pays the same wherever '
             'it was won',
       );
     });

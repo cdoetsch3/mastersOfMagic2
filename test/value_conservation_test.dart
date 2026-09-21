@@ -156,11 +156,7 @@ void main() {
       } else if (_boundaryIds.contains(r.id)) {
         test('${r.id}: blessed boundary — Σ(inputs) at/under Standard', () {
           final a = audit(r);
-          expect(
-            a.sum,
-            lessThanOrEqualTo(a.standard),
-            reason: exemptReason,
-          );
+          expect(a.sum, lessThanOrEqualTo(a.standard), reason: exemptReason);
           // ⚠️ Still bounded — a boundary case drifting arbitrarily far
           // under Standard would be a real exploit, not a blessed squeak.
           // None of the three is more than 2 gold under Standard today.
@@ -316,38 +312,35 @@ void main() {
       }
     });
 
-    test(
-      'native discount holds for every open town\'s own-zone materials',
-      () {
-        for (final townId in ShopCatalogue.status.keys.where(
-          ShopCatalogue.isOpen,
-        )) {
-          for (final zoneId in ShopCatalogue.nativeZonesOf(townId)) {
-            final zoneItems = ItemCatalogue.byZone[zoneId];
-            if (zoneItems == null) continue;
-            for (final def in zoneItems) {
-              if (def is! MaterialDef &&
-                  def is! ConsumableDef &&
-                  def is! BeltableDef) {
-                continue;
-              }
-              final mod = ShopCatalogue.locationModFor(townId, def.id);
-              expect(
-                mod,
-                0.75,
-                reason:
-                    '⚠️ the mutant this kills: an inverted sign on the native '
-                    'branch (native priced as a PREMIUM, e.g. 1.25, instead '
-                    'of the ruled −25% discount) — $townId selling its own '
-                    '$zoneId output at $mod instead of 0.75 is exactly '
-                    '§4.1\'s "discounted where it comes from" rule running '
-                    'backwards',
-              );
+    test('native discount holds for every open town\'s own-zone materials', () {
+      for (final townId in ShopCatalogue.status.keys.where(
+        ShopCatalogue.isOpen,
+      )) {
+        for (final zoneId in ShopCatalogue.nativeZonesOf(townId)) {
+          final zoneItems = ItemCatalogue.byZone[zoneId];
+          if (zoneItems == null) continue;
+          for (final def in zoneItems) {
+            if (def is! MaterialDef &&
+                def is! ConsumableDef &&
+                def is! BeltableDef) {
+              continue;
             }
+            final mod = ShopCatalogue.locationModFor(townId, def.id);
+            expect(
+              mod,
+              0.75,
+              reason:
+                  '⚠️ the mutant this kills: an inverted sign on the native '
+                  'branch (native priced as a PREMIUM, e.g. 1.25, instead '
+                  'of the ruled −25% discount) — $townId selling its own '
+                  '$zoneId output at $mod instead of 0.75 is exactly '
+                  '§4.1\'s "discounted where it comes from" rule running '
+                  'backwards',
+            );
           }
         }
-      },
-    );
+      }
+    });
 
     test('a genuine same-tier baseline (0%) case exists and reads 1.00', () {
       // Galehaven (kinetic) importing Old Quarry's tin_ore (kinetic): not
@@ -371,23 +364,26 @@ void main() {
       );
     });
 
-    test('a one-tier-band import prices at +10% (Forgeholm worked example)', () {
-      // §4.2's own worked consequence: Forgeholm importing Primal-zone
-      // copper_ore/charcoal (two zones back, one MagicTier band).
-      expect(
-        ShopCatalogue.locationModFor('forgeholm', 'copper_ore'),
-        1.10,
-        reason:
-            '§4.2\'s named worked example — "the very first Kinetic recipe a '
-            'player meets costs a small, legible premium for the two '
-            'ingredients they didn\'t carry themselves"',
-      );
-      expect(
-        ShopCatalogue.locationModFor('forgeholm', 'charcoal'),
-        1.10,
-        reason: 'same worked example, the other half of Bronze\'s import.',
-      );
-    });
+    test(
+      'a one-tier-band import prices at +10% (Forgeholm worked example)',
+      () {
+        // §4.2's own worked consequence: Forgeholm importing Primal-zone
+        // copper_ore/charcoal (two zones back, one MagicTier band).
+        expect(
+          ShopCatalogue.locationModFor('forgeholm', 'copper_ore'),
+          1.10,
+          reason:
+              '§4.2\'s named worked example — "the very first Kinetic recipe a '
+              'player meets costs a small, legible premium for the two '
+              'ingredients they didn\'t carry themselves"',
+        );
+        expect(
+          ShopCatalogue.locationModFor('forgeholm', 'charcoal'),
+          1.10,
+          reason: 'same worked example, the other half of Bronze\'s import.',
+        );
+      },
+    );
 
     test('a two-tier-band import prices at the +25% exotic cap', () {
       // §4.2's other named worked example: Rimeholt (Ethereal) pricing
@@ -441,22 +437,36 @@ void main() {
     test('one value per tier, uniform across every element', () {
       final motes = ItemCatalogue.all.whereType<MoteDef>().toList();
       expect(motes.length, 18, reason: '6 elements × 3 shipped tiers');
-      const perTier = {MoteTier.dust: 2, MoteTier.shard: 25, MoteTier.crystal: 150};
+      const perTier = {
+        MoteTier.dust: 2,
+        MoteTier.shard: 25,
+        MoteTier.crystal: 150,
+      };
       for (final m in motes) {
-        expect(m.value, perTier[m.tier],
-            reason: '${m.id}: aqua dust and pyro dust are the SAME 2g — the '
-                'ruling is per-tier, and a per-element drift here is the '
-                'mutant this kills');
+        expect(
+          m.value,
+          perTier[m.tier],
+          reason:
+              '${m.id}: aqua dust and pyro dust are the SAME 2g — the '
+              'ruling is per-tier, and a per-element drift here is the '
+              'mutant this kills',
+        );
       }
     });
 
     test('⭐ the vendor ladder is LOSSY against refinement, every rung', () {
       // Dust →50→ Shard →20→ Crystal (§6.1). If a rung ever vendors for
       // more than its conversion cost, refine-and-vendor mints gold.
-      expect(25, lessThan(50 * 2),
-          reason: 'a Shard must vendor under its 50-Dust cost');
-      expect(150, lessThan(20 * 25),
-          reason: 'a Crystal must vendor under its 20-Shard cost');
+      expect(
+        25,
+        lessThan(50 * 2),
+        reason: 'a Shard must vendor under its 50-Dust cost',
+      );
+      expect(
+        150,
+        lessThan(20 * 25),
+        reason: 'a Crystal must vendor under its 20-Shard cost',
+      );
       // 📝 When Cores (900g proposed) and Hearts arrive: 900 < 12×150, and
       // Hearts get NO value at all — craft-only (§6.0) means unvendorable,
       // untradeable, the one mote-family exception, already ruled.
@@ -467,10 +477,14 @@ void main() {
       // uncouple Enchanting from fighting exactly as a mote node would.
       for (final town in World.locations.where((l) => l.isTown)) {
         for (final id in ShopCatalogue.stockFor(town.id)) {
-          expect(ItemCatalogue.byId(id) is MoteDef, isFalse,
-              reason: '${town.id} stocks $id — motes are vendorable, never '
-                  'stockable (the mutant: MoteDef sneaking into '
-                  '_isStockableKind)');
+          expect(
+            ItemCatalogue.byId(id) is MoteDef,
+            isFalse,
+            reason:
+                '${town.id} stocks $id — motes are vendorable, never '
+                'stockable (the mutant: MoteDef sneaking into '
+                '_isStockableKind)',
+          );
         }
       }
     });

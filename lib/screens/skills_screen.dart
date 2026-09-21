@@ -294,9 +294,7 @@ class _AllRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final def = ItemCatalogue.tryById(recipe.outputId);
-    final name = def == null
-        ? recipe.outputId
-        : ItemCatalogue.displayName(def);
+    final name = def == null ? recipe.outputId : ItemCatalogue.displayName(def);
     final colour = !unlocked
         ? AppColors.textFaint
         : def == null
@@ -315,10 +313,7 @@ class _AllRow extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(
-                name,
-                style: TextStyle(color: colour, fontSize: 13),
-              ),
+              child: Text(name, style: TextStyle(color: colour, fontSize: 13)),
             ),
             Text(
               'Lv ${recipe.skillLevel}',
@@ -342,9 +337,7 @@ class _ItemChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final def = ItemCatalogue.tryById(recipe.outputId);
-    final name = def == null
-        ? recipe.outputId
-        : ItemCatalogue.displayName(def);
+    final name = def == null ? recipe.outputId : ItemCatalogue.displayName(def);
     final colour = locked
         ? AppColors.textFaint
         : def == null
@@ -356,9 +349,7 @@ class _ItemChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: locked ? AppColors.borderDim : colour,
-          ),
+          border: Border.all(color: locked ? AppColors.borderDim : colour),
           borderRadius: BorderRadius.circular(5),
         ),
         child: Text(name, style: TextStyle(color: colour, fontSize: 11)),

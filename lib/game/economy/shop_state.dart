@@ -39,15 +39,14 @@ class TownShopState {
     'lastResetDay': lastResetDay,
   };
 
-  factory TownShopState.fromJson(Map<String, dynamic>? json) =>
-      TownShopState(
-        stock:
-            (json?['stock'] as Map?)?.map(
-              (k, v) => MapEntry(k as String, (v as num).toInt()),
-            ) ??
-            const {},
-        lastResetDay: (json?['lastResetDay'] as num?)?.toInt() ?? 0,
-      );
+  factory TownShopState.fromJson(Map<String, dynamic>? json) => TownShopState(
+    stock:
+        (json?['stock'] as Map?)?.map(
+          (k, v) => MapEntry(k as String, (v as num).toInt()),
+        ) ??
+        const {},
+    lastResetDay: (json?['lastResetDay'] as num?)?.toInt() ?? 0,
+  );
 }
 
 /// Nightly resupply catch-up (§6.1) and deterministic daily events (§6.2).
@@ -71,11 +70,7 @@ abstract final class ShopState {
   /// same instant — §6.2 requires every client to agree.
   static int epochDayOf(DateTime date) {
     final u = date.toUtc();
-    return DateTime.utc(
-      u.year,
-      u.month,
-      u.day,
-    ).millisecondsSinceEpoch ~/
+    return DateTime.utc(u.year, u.month, u.day).millisecondsSinceEpoch ~/
         Duration.millisecondsPerDay;
   }
 
@@ -165,12 +160,12 @@ abstract final class ShopState {
     // of whatever collection the caller happened to hand over.
     final ids = candidateItemIds.toSet().toList()..sort();
     if (ids.isEmpty || itemsPerDay <= 0) return const {};
-    final ranked = [
-      for (final id in ids) MapEntry(id, _stableHash('$shopId|$today|$id')),
-    ]..sort((a, b) {
-      final byHash = a.value.compareTo(b.value);
-      return byHash != 0 ? byHash : a.key.compareTo(b.key);
-    });
+    final ranked =
+        [for (final id in ids) MapEntry(id, _stableHash('$shopId|$today|$id'))]
+          ..sort((a, b) {
+            final byHash = a.value.compareTo(b.value);
+            return byHash != 0 ? byHash : a.key.compareTo(b.key);
+          });
     final picked = ranked.take(
       itemsPerDay > ids.length ? ids.length : itemsPerDay,
     );

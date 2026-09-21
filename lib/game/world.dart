@@ -490,10 +490,7 @@ abstract final class World {
       // ⭐ **One road in from the south, through the quarry.** Everything
       // deeper in the range hangs off the city, so Forgeholm is passed
       // THROUGH rather than visited — which is what makes it a gate.
-      edges: [
-        TravelEdge('old_quarry', 5),
-        TravelEdge('thunderspire_peaks', 5),
-      ],
+      edges: [TravelEdge('old_quarry', 5), TravelEdge('thunderspire_peaks', 5)],
     ),
     GameLocation(
       id: 'old_quarry',

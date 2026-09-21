@@ -62,7 +62,7 @@ class StatusHeal extends StatusOp {
 /// for the Creeping-Dark strip), so this op carries no data of its own.
 class StatusPurge extends StatusOp {
   const StatusPurge({int lane = Lane.heal, String source = 'Absolution'})
-      : super(lane, source);
+    : super(lane, source);
 }
 
 /// Marker for statuses that can make the holder's offensive spells miss

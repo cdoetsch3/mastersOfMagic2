@@ -73,15 +73,28 @@ void main() {
     final you = MageState(name: 'You')
       ..shield = ActiveShield.elemental(MagicElement.geo, 40);
     const sayYourName = Spell(
-        id: 'ww_sayyourname', name: 'Say Your Name', chargeCost: 3,
-        priority: 2, effect: DamageEffect(14, 18, ignoresShields: true));
+      id: 'ww_sayyourname',
+      name: 'Say Your Name',
+      chargeCost: 3,
+      priority: 2,
+      effect: DamageEffect(14, 18, ignoresShields: true),
+    );
     final line = fix(
-        DamageEvent(you, sayYourName, toShield: 0, toHp: 16,
-                bypassedShield: true)
-            .toString());
-    expect(line, 'You take Say Your Name: 16 damage, ignores shields',
-        reason: 'without the tag this line is "You take Say Your Name: 16 '
-            'damage" next to a full shield bar, which reads as the shield '
-            'having failed rather than having been bypassed');
+      DamageEvent(
+        you,
+        sayYourName,
+        toShield: 0,
+        toHp: 16,
+        bypassedShield: true,
+      ).toString(),
+    );
+    expect(
+      line,
+      'You take Say Your Name: 16 damage, ignores shields',
+      reason:
+          'without the tag this line is "You take Say Your Name: 16 '
+          'damage" next to a full shield bar, which reads as the shield '
+          'having failed rather than having been bypassed',
+    );
   });
 }

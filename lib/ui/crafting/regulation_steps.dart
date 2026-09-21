@@ -87,14 +87,11 @@ class _RateDragStepState extends State<RateDragStep>
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          switch (widget.step.skin) {
-            'grind' => 'Grind — steady circles',
-            'swirl' => 'Swirl — steady circles',
-            _ => 'Scrub — small steady strokes',
-          },
-          style: const TextStyle(color: AppColors.text, fontSize: 14),
-        ),
+        Text(switch (widget.step.skin) {
+          'grind' => 'Grind — steady circles',
+          'swirl' => 'Swirl — steady circles',
+          _ => 'Scrub — small steady strokes',
+        }, style: const TextStyle(color: AppColors.text, fontSize: 14)),
         const SizedBox(height: 12),
         GestureDetector(
           onPanUpdate: (d) => _onMove(d.localPosition),

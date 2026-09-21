@@ -42,8 +42,14 @@ void main() {
       // ⭐ Seconds are the source of truth; minutes are a rounded-up view of
       // them. Asserting minutes*60 would break the moment a leg is shorter
       // than a minute, which it is while testing.
-      expect(trip.totalSeconds, Travel.secondsBetween('hearthwood', 'rimeholt'));
-      expect(trip.totalMinutes, Travel.minutesBetween('hearthwood', 'rimeholt'));
+      expect(
+        trip.totalSeconds,
+        Travel.secondsBetween('hearthwood', 'rimeholt'),
+      );
+      expect(
+        trip.totalMinutes,
+        Travel.minutesBetween('hearthwood', 'rimeholt'),
+      );
       for (var i = 1; i < trip.secondsAtStop.length; i++) {
         expect(trip.secondsAtStop[i], greaterThan(trip.secondsAtStop[i - 1]));
       }
@@ -202,7 +208,10 @@ void main() {
       final trip = game.profile.trip!;
       expect(trip.stops.length, greaterThan(2));
       expect(trip.toId, 'rimeholt');
-      expect(trip.totalMinutes, Travel.minutesBetween('hearthwood', 'rimeholt'));
+      expect(
+        trip.totalMinutes,
+        Travel.minutesBetween('hearthwood', 'rimeholt'),
+      );
     });
   });
 

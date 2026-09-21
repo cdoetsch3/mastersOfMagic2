@@ -186,7 +186,11 @@ abstract final class StormcliffCoastItems {
     slot: EquipSlot.gloves,
     form: 'Gloves',
     material: 'Seawrack',
-    modifiers: ItemModifiers(maxHpBonus: 3, deflectChance: 6, deflectAmount: 15),
+    modifiers: ItemModifiers(
+      maxHpBonus: 3,
+      deflectChance: 6,
+      deflectAmount: 15,
+    ),
     salvage: [SalvageYield('seawrack_fibre', 1, 1)],
     equipLevel: 16,
     value: 55,

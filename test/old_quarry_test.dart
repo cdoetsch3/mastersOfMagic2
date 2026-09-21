@@ -21,7 +21,8 @@ void main() {
       expect(
         fromBestiary.map((e) => e.id).toSet(),
         OldQuarryBestiary.all.map((e) => e.id).toSet(),
-        reason: 'Bestiary.all must include every OldQuarryBestiary def, or '
+        reason:
+            'Bestiary.all must include every OldQuarryBestiary def, or '
             'the zone compiles fine and simply never appears in an encounter',
       );
     });
@@ -74,9 +75,10 @@ void main() {
       expect(all.map((e) => e.id).toSet(), hasLength(all.length));
       expect(all.map((e) => e.name).toSet(), hasLength(all.length));
       for (final e in all) {
-        final derived = e.name
-            .toLowerCase()
-            .replaceAll(RegExp(r"[^a-z0-9]+"), '_');
+        final derived = e.name.toLowerCase().replaceAll(
+          RegExp(r"[^a-z0-9]+"),
+          '_',
+        );
         expect(e.id, derived, reason: '${e.name} should be id "$derived"');
       }
     });
@@ -222,7 +224,8 @@ void main() {
           expect(
             e.maxHpAt(level),
             (MageState.scaledMaxHp(level) * e.archetype.hpScale).round(),
-            reason: '${e.id} at $level should follow the shared curve, not a '
+            reason:
+                '${e.id} at $level should follow the shared curve, not a '
                 'second one',
           );
         }
@@ -331,7 +334,8 @@ void main() {
         expect(
           e.moves.any((m) => m.effect is ShieldEffect),
           isTrue,
-          reason: '${e.id} is a ${e.archetype.name} with nothing to hide '
+          reason:
+              '${e.id} is a ${e.archetype.name} with nothing to hide '
               'behind',
         );
       }
@@ -340,7 +344,8 @@ void main() {
     test('the Redoubt carries its lifesteal move', () {
       expect(
         OldQuarryBestiary.earthTitan.moves.any(
-          (m) => m.effect is DamageEffect &&
+          (m) =>
+              m.effect is DamageEffect &&
               (m.effect as DamageEffect).lifesteal > 0,
         ),
         isTrue,
@@ -350,7 +355,8 @@ void main() {
     test('the Hexer has one ignoresShields move', () {
       expect(
         OldQuarryBestiary.theOverseer.moves.any(
-          (m) => m.effect is DamageEffect &&
+          (m) =>
+              m.effect is DamageEffect &&
               (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
@@ -381,12 +387,21 @@ void main() {
 
     test('commons can come up empty; minis and bosses never do', () {
       for (final e in OldQuarryBestiary.commons) {
-        expect(e.drops.main.any((d) => d.defId == null), isTrue,
-            reason: '${e.id} always pays out');
+        expect(
+          e.drops.main.any((d) => d.defId == null),
+          isTrue,
+          reason: '${e.id} always pays out',
+        );
       }
-      for (final e in [...OldQuarryBestiary.minis, ...OldQuarryBestiary.bosses]) {
-        expect(e.drops.main.any((d) => d.defId == null), isFalse,
-            reason: '${e.id} is a fight you sought out; it must pay');
+      for (final e in [
+        ...OldQuarryBestiary.minis,
+        ...OldQuarryBestiary.bosses,
+      ]) {
+        expect(
+          e.drops.main.any((d) => d.defId == null),
+          isFalse,
+          reason: '${e.id} is a fight you sought out; it must pay',
+        );
       }
     });
 
@@ -408,9 +423,15 @@ void main() {
 
     test('a pure Geo zone drops only Geo motes', () {
       const foreign = {
-        'flora_dust', 'flora_shard', 'flora_crystal',
-        'aqua_dust', 'aqua_shard', 'aqua_crystal',
-        'pyro_dust', 'pyro_shard', 'pyro_crystal',
+        'flora_dust',
+        'flora_shard',
+        'flora_crystal',
+        'aqua_dust',
+        'aqua_shard',
+        'aqua_crystal',
+        'pyro_dust',
+        'pyro_shard',
+        'pyro_crystal',
       };
       for (final id in OldQuarryBestiary.allDrops) {
         expect(foreign, isNot(contains(id)), reason: '$id is off-element');
@@ -426,13 +447,15 @@ void main() {
     test('both bosses can hand over the Overseer\'s Seal and The Given '
         'Weight', () {
       expect(
-        OldQuarryBestiary.mountainHeart.drops.main
-            .any((d) => d.defId == 'the_given_weight'),
+        OldQuarryBestiary.mountainHeart.drops.main.any(
+          (d) => d.defId == 'the_given_weight',
+        ),
         isTrue,
       );
       expect(
-        OldQuarryBestiary.theEmptyCourse.drops.main
-            .any((d) => d.defId == 'the_given_weight'),
+        OldQuarryBestiary.theEmptyCourse.drops.main.any(
+          (d) => d.defId == 'the_given_weight',
+        ),
         isTrue,
       );
     });
@@ -497,9 +520,13 @@ void main() {
       for (final n in GatherNodes.forZone(zone)) {
         final def = ItemCatalogue.tryById(n.yieldsDefId);
         expect(def, isNotNull, reason: '${n.id} yields an id nothing defines');
-        expect(def!.isFungible, isTrue,
-            reason: '${n.id} yields a non-fungible item, which a stack '
-                'cannot represent');
+        expect(
+          def!.isFungible,
+          isTrue,
+          reason:
+              '${n.id} yields a non-fungible item, which a stack '
+              'cannot represent',
+        );
       }
     });
 
@@ -522,11 +549,16 @@ void main() {
     test('every creature carries a field note, in the right voice', () {
       for (final e in all) {
         expect(e.lore.length, greaterThan(40), reason: '${e.id} lore is thin');
-        expect(e.lore.endsWith('.'), isTrue,
-            reason: '${e.id} lore is not a sentence');
         expect(
-          RegExp(r'\d+\s*(hp|damage|dmg)', caseSensitive: false)
-              .hasMatch(e.lore),
+          e.lore.endsWith('.'),
+          isTrue,
+          reason: '${e.id} lore is not a sentence',
+        );
+        expect(
+          RegExp(
+            r'\d+\s*(hp|damage|dmg)',
+            caseSensitive: false,
+          ).hasMatch(e.lore),
           isFalse,
           reason: '${e.id} lore leaks mechanics',
         );

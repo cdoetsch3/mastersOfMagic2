@@ -89,27 +89,37 @@ void main() {
       ),
       reason: 'item dialog: a Master mantle',
     );
-    expect(find.text('Master Sporecap Mantle'), findsOneWidget,
-        reason: 'the roll is part of the name (§9b.5a) and the dialog must '
-            'be given the instance to compose it');
-    expect(find.text('+17 max health'), findsOneWidget,
-        reason: '12 × 1.40 → 17 — a tooltip printing the base 12 while the '
-            'duel fights with 17 is exactly the disagreement the one-writer '
-            'rule exists to prevent');
+    expect(
+      find.text('Master Sporecap Mantle'),
+      findsOneWidget,
+      reason:
+          'the roll is part of the name (§9b.5a) and the dialog must '
+          'be given the instance to compose it',
+    );
+    expect(
+      find.text('+17 max health'),
+      findsOneWidget,
+      reason:
+          '12 × 1.40 → 17 — a tooltip printing the base 12 while the '
+          'duel fights with 17 is exactly the disagreement the one-writer '
+          'rule exists to prevent',
+    );
   });
 
   testWidgets('an unrolled item still shows its plain numbers', (tester) async {
     await expectOpensCleanly(
       tester,
-      (context) => showItemDialog(
-        context,
-        def: ItemCatalogue.byId('sporecap_mantle'),
-      ),
+      (context) =>
+          showItemDialog(context, def: ItemCatalogue.byId('sporecap_mantle')),
       reason: 'item dialog: no instance at all',
     );
-    expect(find.text('+12 max health'), findsOneWidget,
-        reason: 'the Workbench previews items nobody owns yet — the base is '
-            'the honest answer, and null must never scale');
+    expect(
+      find.text('+12 max health'),
+      findsOneWidget,
+      reason:
+          'the Workbench previews items nobody owns yet — the base is '
+          'the honest answer, and null must never scale',
+    );
   });
 
   testWidgets('the gameplay guide lays out on a phone screen', (tester) async {

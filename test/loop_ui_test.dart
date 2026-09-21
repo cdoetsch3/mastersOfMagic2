@@ -87,7 +87,8 @@ void main() {
     expect(
       find.text('Deposit all'),
       findsNothing,
-      reason: '⭐ evidence #2: with nothing left to move the button removes '
+      reason:
+          '⭐ evidence #2: with nothing left to move the button removes '
           'itself, which is a louder "it worked" than any sentence',
     );
     expect(
@@ -122,9 +123,7 @@ void main() {
     expect(find.text('BELT'), findsOneWidget);
   });
 
-  testWidgets('⚠️ with no belt worn there is no bay at all', (
-    tester,
-  ) async {
+  testWidgets('⚠️ with no belt worn there is no bay at all', (tester) async {
     // Option A (2026-08-25): the belt wearable is a grid chip; the bay of
     // loaded slots only exists once a belt grants some. A beltless fresh
     // character gets ONE quiet 'BELT — Empty' chip, not a lecture.
@@ -138,7 +137,8 @@ void main() {
     expect(
       find.textContaining('spends your turn'),
       findsNothing,
-      reason: 'the turn cost is taught on the duel rail where it is paid, '
+      reason:
+          'the turn cost is taught on the duel rail where it is paid, '
           'not lectured here (Option A ruling)',
     );
   });
@@ -210,15 +210,14 @@ void main() {
   testWidgets('a Beltable item can be loaded from the pack', (tester) async {
     final game = GameState(_Mem(), PlayerProfile.newPlayer());
     game.profile
-      ..xp = 100000 // past the Tuskhide's level 11
+      ..xp =
+          100000 // past the Tuskhide's level 11
       ..itemInstances['b'] = const ItemInstance(
         instanceId: 'b',
         defId: 'tuskhide_belt',
       )
       ..equipped[EquipSlot.belt] = 'b'
-      ..backpack = Backpack.of(
-        const [InventorySlot(defId: 'sapwort_draught')],
-      );
+      ..backpack = Backpack.of(const [InventorySlot(defId: 'sapwort_draught')]);
     await _pump(tester, game);
 
     // Long-press opens the full menu (tap stows, in town).
@@ -241,9 +240,9 @@ void main() {
     // A "Load onto belt" that simply vanishes teaches the player that the
     // draught is not beltable, which is the opposite of true.
     final game = GameState(_Mem(), PlayerProfile.newPlayer());
-    game.profile.backpack = Backpack.of(
-      const [InventorySlot(defId: 'sapwort_draught')],
-    );
+    game.profile.backpack = Backpack.of(const [
+      InventorySlot(defId: 'sapwort_draught'),
+    ]);
     await _pump(tester, game);
     await tester.longPress(find.text('Sapwort Draught'));
     await tester.pumpAndSettle();
@@ -301,7 +300,8 @@ void main() {
     expect(
       find.byType(SnackBar),
       findsNothing,
-      reason: '⚠️ the whole ruling: no notice may occupy the bottom of this '
+      reason:
+          '⚠️ the whole ruling: no notice may occupy the bottom of this '
           'screen, where Take / Take all live',
     );
   });
@@ -382,7 +382,8 @@ void main() {
     expect(
       find.text('Oak Log'),
       findsOneWidget,
-      reason: 'materials is everything neither worn nor used, so nothing '
+      reason:
+          'materials is everything neither worn nor used, so nothing '
           'can hide from every chip',
     );
     expect(find.text('Cinder Loop'), findsNothing);

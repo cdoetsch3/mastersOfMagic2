@@ -136,9 +136,8 @@ class EconomyConfig {
     );
   }
 
-  static double? _asDouble(dynamic value) => value is num
-      ? value.toDouble()
-      : null;
+  static double? _asDouble(dynamic value) =>
+      value is num ? value.toDouble() : null;
 
   /// A map field is only trusted if it decoded as a `Map` at all — anything
   /// else (wrong type on the whole field) falls back to empty, i.e. "no

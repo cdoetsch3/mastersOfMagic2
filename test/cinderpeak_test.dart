@@ -64,9 +64,10 @@ void main() {
       // ⚠️ The export, the art pipeline and the achievement log all key on id.
       // An id that drifts from its name is a rename nobody notices.
       for (final e in all) {
-        final derived = e.name
-            .toLowerCase()
-            .replaceAll(RegExp(r"[^a-z0-9]+"), '_');
+        final derived = e.name.toLowerCase().replaceAll(
+          RegExp(r"[^a-z0-9]+"),
+          '_',
+        );
         expect(e.id, derived, reason: '${e.name} should be id "$derived"');
       }
     });
@@ -75,11 +76,9 @@ void main() {
       final loc = World.byId(zone);
       for (final e in all) {
         expect(e.zoneId, zone);
-        expect(
-          e.elements,
-          [MagicElement.pyro],
-          reason: '${e.id} — a pure zone means one element (ENEMIES §2h)',
-        );
+        expect(e.elements, [
+          MagicElement.pyro,
+        ], reason: '${e.id} — a pure zone means one element (ENEMIES §2h)');
         expect(loc.elements, contains(e.elements.single));
       }
     });
@@ -252,7 +251,8 @@ void main() {
         expect(
           e.moves.any((m) => m.effect is ShieldEffect),
           isTrue,
-          reason: '${e.id} is a ${e.archetype.name} with nothing to hide behind',
+          reason:
+              '${e.id} is a ${e.archetype.name} with nothing to hide behind',
         );
       }
     });
@@ -270,7 +270,8 @@ void main() {
       );
       expect(
         queen.moves.any(
-          (m) => m.effect is DamageEffect &&
+          (m) =>
+              m.effect is DamageEffect &&
               (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
@@ -282,10 +283,12 @@ void main() {
       // ⚠️ "Bring a shield — one misplay ends you" is only true if its ceiling
       // is genuinely the ceiling among the minis.
       int ceiling(EnemyDef e) => e.moves
-          .map((m) => m.effect is DamageEffect
-              ? (m.effect as DamageEffect).maxAmount *
-                    (m.effect as DamageEffect).hits
-              : 0)
+          .map(
+            (m) => m.effect is DamageEffect
+                ? (m.effect as DamageEffect).maxAmount *
+                      (m.effect as DamageEffect).hits
+                : 0,
+          )
           .reduce((a, b) => a > b ? a : b);
 
       final tusk = CinderpeakBestiary.charTusk;
@@ -423,8 +426,12 @@ void main() {
       // ⚠️ The hybrids drop two ladders on purpose; a pure zone doing it would
       // make the element economy unreadable.
       const foreign = {
-        'flora_dust', 'flora_shard', 'flora_crystal',
-        'aqua_dust', 'aqua_shard', 'aqua_crystal',
+        'flora_dust',
+        'flora_shard',
+        'flora_crystal',
+        'aqua_dust',
+        'aqua_shard',
+        'aqua_crystal',
       };
       for (final id in CinderpeakBestiary.allDrops) {
         expect(foreign, isNot(contains(id)), reason: '$id is off-element');
@@ -496,11 +503,15 @@ void main() {
           .where((r) => r.inputs.any((i) => i.defId == 'copper_ore'))
           .map((r) => r.id)
           .toSet();
-      expect(copperConsumers, {'craft_bronze_ingot'},
-          reason: 'copper banked for exactly one maker — Bronze Ingot, the '
-              'first Kinetic recipe a player meets; anything else here means '
-              'either the payoff recipe went missing or a second, uninvited '
-              'consumer appeared');
+      expect(
+        copperConsumers,
+        {'craft_bronze_ingot'},
+        reason:
+            'copper banked for exactly one maker — Bronze Ingot, the '
+            'first Kinetic recipe a player meets; anything else here means '
+            'either the payoff recipe went missing or a second, uninvited '
+            'consumer appeared',
+      );
       for (final b in CinderpeakBestiary.bosses) {
         final copper = b.drops.main.firstWhere((d) => d.defId == 'copper_ore');
         expect(copper.max, greaterThanOrEqualTo(4));
@@ -554,19 +565,28 @@ void main() {
 
       // 🚫 Kills a "fix" that quietly buffs the Moth toward the yardstick: it
       // must stay the flimsiest thing in the zone, well under an even fight.
-      expect(moth.maxHpAt(9), lessThan(MageState.scaledMaxHp(9) * 0.6),
-          reason: 'a Glasswing that survives a trade is not a Glasswing');
+      expect(
+        moth.maxHpAt(9),
+        lessThan(MageState.scaledMaxHp(9) * 0.6),
+        reason: 'a Glasswing that survives a trade is not a Glasswing',
+      );
       for (final e in CinderpeakBestiary.commons) {
-        expect(moth.maxHpAt(9), lessThanOrEqualTo(e.maxHpAt(9)),
-            reason: '${e.id} is now flimsier than the zone\'s glass cannon');
+        expect(
+          moth.maxHpAt(9),
+          lessThanOrEqualTo(e.maxHpAt(9)),
+          reason: '${e.id} is now flimsier than the zone\'s glass cannon',
+        );
       }
       // ⭐ Against the Adept — the 1.0×/1.0× yardstick every archetype is felt
       // against (§2.7) — the trade is explicit: it gives up half its health
       // and is paid in damage for it.
-      expect(moth.archetype.damageScale,
-          greaterThan(Archetypes.adept.damageScale),
-          reason: 'it pays for the missing health in damage, or it pays for '
-              'nothing');
+      expect(
+        moth.archetype.damageScale,
+        greaterThan(Archetypes.adept.damageScale),
+        reason:
+            'it pays for the missing health in damage, or it pays for '
+            'nothing',
+      );
     });
 
     test('no common one-shots a character who just walked in', () {

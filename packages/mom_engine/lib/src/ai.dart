@@ -19,12 +19,15 @@ int estimateDamage(Spell spell, MageState self, MageState enemy) {
   int raw;
   switch (spell.effect) {
     case DamageEffect(:final minAmount, :final maxAmount, :final hits):
-      raw = ((minAmount + maxAmount) * hits ~/ 2) * (self.empowerMultiplier ?? 1);
+      raw =
+          ((minAmount + maxAmount) * hits ~/ 2) * (self.empowerMultiplier ?? 1);
     case BarrageEffect(:final minPerCharge, :final maxPerCharge):
-      raw = ((minPerCharge + maxPerCharge) * self.charge ~/ 2) *
+      raw =
+          ((minPerCharge + maxPerCharge) * self.charge ~/ 2) *
           (self.empowerMultiplier ?? 1);
     case OverloadEffect(:final minPerCharge, :final maxPerCharge):
-      raw = ((minPerCharge + maxPerCharge) * enemy.charge ~/ 2) *
+      raw =
+          ((minPerCharge + maxPerCharge) * enemy.charge ~/ 2) *
           (self.empowerMultiplier ?? 1);
     default:
       return 0;
@@ -43,9 +46,9 @@ int estimateDamage(Spell spell, MageState self, MageState enemy) {
 }
 
 List<Spell> _affordable(MageState self, List<Spell> spells) => [
-      for (final s in spells)
-        if (s.xCost ? self.charge >= 1 : s.chargeCost <= self.charge) s,
-    ];
+  for (final s in spells)
+    if (s.xCost ? self.charge >= 1 : s.chargeCost <= self.charge) s,
+];
 
 /// Picks any legal move uniformly. The baseline sparring partner.
 class RandomAi implements DuelAi {
@@ -55,7 +58,8 @@ class RandomAi implements DuelAi {
 
   @override
   MageAction chooseAction(MageState self, MageState enemy, Random rng) {
-    final element = self.element ??
+    final element =
+        self.element ??
         MagicElement.values[rng.nextInt(MagicElement.values.length)];
     final options = <MageAction>[
       if (self.charge < MageState.maxCharge)
@@ -93,7 +97,8 @@ class TunableAi implements DuelAi {
 
   @override
   MageAction chooseAction(MageState self, MageState enemy, Random rng) {
-    final element = self.element ??
+    final element =
+        self.element ??
         MagicElement.values[rng.nextInt(MagicElement.values.length)];
     MagicElement? elementArg() => self.charge == 0 ? element : null;
     final affordable = _affordable(self, spells);
@@ -109,8 +114,7 @@ class TunableAi implements DuelAi {
 
     // Take a kill if one is on the board.
     for (final spell in affordable) {
-      if (spell.isOffensive &&
-          estimateDamage(spell, self, enemy) >= enemy.hp) {
+      if (spell.isOffensive && estimateDamage(spell, self, enemy) >= enemy.hp) {
         return CastAction(spell, elementArg());
       }
     }
@@ -119,8 +123,13 @@ class TunableAi implements DuelAi {
     if (self.charge >= MageState.maxCharge) {
       final offense = affordable.where((s) => s.isOffensive).toList();
       if (offense.isNotEmpty) {
-        offense.sort((a, b) => estimateDamage(b, self, enemy)
-            .compareTo(estimateDamage(a, self, enemy)));
+        offense.sort(
+          (a, b) => estimateDamage(
+            b,
+            self,
+            enemy,
+          ).compareTo(estimateDamage(a, self, enemy)),
+        );
         return CastAction(offense.first, elementArg());
       }
     }
@@ -141,10 +150,14 @@ class TunableAi implements DuelAi {
     // Otherwise: mostly charge toward bigger spells, sometimes strike now.
     final attacks = affordable.where((s) => s.isOffensive).toList();
     final canCharge = self.charge < MageState.maxCharge;
-    if (attacks.isNotEmpty &&
-        (!canCharge || rng.nextDouble() < aggression)) {
-      attacks.sort((a, b) => estimateDamage(b, self, enemy)
-          .compareTo(estimateDamage(a, self, enemy)));
+    if (attacks.isNotEmpty && (!canCharge || rng.nextDouble() < aggression)) {
+      attacks.sort(
+        (a, b) => estimateDamage(
+          b,
+          self,
+          enemy,
+        ).compareTo(estimateDamage(a, self, enemy)),
+      );
       if (estimateDamage(attacks.first, self, enemy) > 0) {
         return CastAction(attacks.first, elementArg());
       }
@@ -158,5 +171,3 @@ class TunableAi implements DuelAi {
     return const ForfeitAction();
   }
 }
-
-

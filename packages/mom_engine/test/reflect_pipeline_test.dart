@@ -25,10 +25,10 @@ class _AlwaysHits implements Random {
 class _Divert extends TurnStatus implements StatModifier {
   @override
   int contributionTo(CombatStat stat) => switch (stat) {
-        CombatStat.deflectActivation => 100,
-        CombatStat.deflectAmount => 50,
-        _ => 0,
-      };
+    CombatStat.deflectActivation => 100,
+    CombatStat.deflectAmount => 50,
+    _ => 0,
+  };
 
   @override
   String get id => 'divert';
@@ -54,49 +54,75 @@ void main() {
       ..statuses.add(ReflectStatus.reflect());
   });
 
-  DuelEngine engine() => DuelEngine(alice, bruno,
-      rng: _AlwaysHits(), elementEffects: false, baseMissPercent: 0);
+  DuelEngine engine() => DuelEngine(
+    alice,
+    bruno,
+    rng: _AlwaysHits(),
+    elementEffects: false,
+    baseMissPercent: 0,
+  );
 
   test('⭐ a deflected DoT TICK is returned by Reflect', () {
     bruno.statuses.add(
-        BankDotStatus(id: 'agony', name: 'Agony', damagePerTick: 10, ticks: 3));
+      BankDotStatus(id: 'agony', name: 'Agony', damagePerTick: 10, ticks: 3),
+    );
     final duel = engine();
     final r = duel.resolveTurn(const ForfeitAction(), const ForfeitAction());
     final back = r.events
         .whereType<EffectDamageEvent>()
         .where((e) => e.source == 'Reflect')
         .single;
-    expect(back.target, same(alice),
-        reason: 'the return goes to the OPPONENT — every hostile packet in a '
-            'duel originates there. Mutant killed: Reflect firing only on the '
-            'attack path (the pre-merge specials shape), which never sees a '
-            'tick deflect at all.');
-    expect(back.toHp, 5,
-        reason: 'exactly the deflected half of the 10 tick, 100% returned '
-            '(§7a ruling) — not the full tick, not a re-rolled amount');
-    expect(alice.hp, 95,
-        reason: 'and it is real damage, not just an event row');
+    expect(
+      back.target,
+      same(alice),
+      reason:
+          'the return goes to the OPPONENT — every hostile packet in a '
+          'duel originates there. Mutant killed: Reflect firing only on the '
+          'attack path (the pre-merge specials shape), which never sees a '
+          'tick deflect at all.',
+    );
+    expect(
+      back.toHp,
+      5,
+      reason:
+          'exactly the deflected half of the 10 tick, 100% returned '
+          '(§7a ruling) — not the full tick, not a re-rolled amount',
+    );
+    expect(
+      alice.hp,
+      95,
+      reason: 'and it is real damage, not just an event row',
+    );
   });
 
   test('⭐ a deflected Scour packet is returned by Reflect', () {
     bruno.statuses.add(
-        BankDotStatus(id: 'agony', name: 'Agony', damagePerTick: 10, ticks: 3));
+      BankDotStatus(id: 'agony', name: 'Agony', damagePerTick: 10, ticks: 3),
+    );
     final duel = engine();
     alice
       ..charge = Spellbook.scour.chargeCost
       ..element = MagicElement.flora;
     final r = duel.resolveTurn(
-        CastAction(Spellbook.scour, MagicElement.flora),
-        const ForfeitAction());
+      CastAction(Spellbook.scour, MagicElement.flora),
+      const ForfeitAction(),
+    );
     final back = r.events
         .whereType<EffectDamageEvent>()
         .where((e) => e.source == 'Reflect')
         .single;
-    expect(back.toHp, 15,
-        reason: 'the packet is the burn\'s full remaining 30, deflected by '
-            'half and returned in full — ONE packet, one deflect roll, one '
-            'return. Mutant killed: no _maybeReflect at the Scour site.');
-    expect(alice.hp, 85,
-        reason: 'the collector pays for detonating into a Reflect stance');
+    expect(
+      back.toHp,
+      15,
+      reason:
+          'the packet is the burn\'s full remaining 30, deflected by '
+          'half and returned in full — ONE packet, one deflect roll, one '
+          'return. Mutant killed: no _maybeReflect at the Scour site.',
+    );
+    expect(
+      alice.hp,
+      85,
+      reason: 'the collector pays for detonating into a Reflect stance',
+    );
   });
 }

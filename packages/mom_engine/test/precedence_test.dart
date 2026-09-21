@@ -56,14 +56,12 @@ void main() {
   group('streak tracking (§5.4)', () {
     test('consecutive same-element casts advance the streak', () {
       charge(alice, MagicElement.aqua, 1);
-      duel.resolveTurn(
-          CastAction(Spellbook.ward), const ForfeitAction());
+      duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
       expect(alice.streakElement, MagicElement.aqua);
       expect(alice.streakCount, 1);
 
       charge(alice, MagicElement.aqua, 1);
-      duel.resolveTurn(
-          CastAction(Spellbook.ward), const ForfeitAction());
+      duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
       expect(alice.streakCount, 2);
     });
 
@@ -83,10 +81,16 @@ void main() {
       expect(alice.streakCount, 1);
       // A charge turn (no cast) — streak must be untouched.
       duel.resolveTurn(
-          const ChargeAction(MagicElement.aqua), const ForfeitAction());
+        const ChargeAction(MagicElement.aqua),
+        const ForfeitAction(),
+      );
       expect(alice.streakCount, 1, reason: 'charging leaves the streak alone');
       duel.resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
-      expect(alice.streakCount, 2, reason: 'the two Aqua casts are consecutive');
+      expect(
+        alice.streakCount,
+        2,
+        reason: 'the two Aqua casts are consecutive',
+      );
     });
 
     test('a non-damaging cast still advances the streak', () {
@@ -98,26 +102,36 @@ void main() {
   });
 
   group('fizzle (charge stripped below cost)', () {
-    test('a spell whose charge is drained below cost fizzles and keeps charge',
-        () {
-      // Alice commits a 4-cost Ruin at 4 charge; Bruno Discharges (P7) first,
-      // wiping her charge — Ruin (P9) can no longer be cast.
-      charge(alice, MagicElement.geo, 4);
-      charge(bruno, MagicElement.aqua, 3);
-      final r = duel.resolveTurn(
-          CastAction(Spellbook.ruin), CastAction(Spellbook.discharge));
-      expect(r.events.whereType<SpellFizzledEvent>(), hasLength(1));
-      expect(bruno.hp, 100, reason: 'Ruin never landed');
-      // Fizzle keeps charge (Static Feedback: "you'd still have 3 charge").
-      expect(alice.charge, 0,
-          reason: 'Discharge wiped it to 0 — nothing to keep, but not spent by a cast');
-    });
+    test(
+      'a spell whose charge is drained below cost fizzles and keeps charge',
+      () {
+        // Alice commits a 4-cost Ruin at 4 charge; Bruno Discharges (P7) first,
+        // wiping her charge — Ruin (P9) can no longer be cast.
+        charge(alice, MagicElement.geo, 4);
+        charge(bruno, MagicElement.aqua, 3);
+        final r = duel.resolveTurn(
+          CastAction(Spellbook.ruin),
+          CastAction(Spellbook.discharge),
+        );
+        expect(r.events.whereType<SpellFizzledEvent>(), hasLength(1));
+        expect(bruno.hp, 100, reason: 'Ruin never landed');
+        // Fizzle keeps charge (Static Feedback: "you'd still have 3 charge").
+        expect(
+          alice.charge,
+          0,
+          reason:
+              'Discharge wiped it to 0 — nothing to keep, but not spent by a cast',
+        );
+      },
+    );
 
     test('fizzled casts do not advance the streak', () {
       charge(alice, MagicElement.geo, 4);
       charge(bruno, MagicElement.aqua, 3);
       duel.resolveTurn(
-          CastAction(Spellbook.ruin), CastAction(Spellbook.discharge));
+        CastAction(Spellbook.ruin),
+        CastAction(Spellbook.discharge),
+      );
       expect(alice.streakCount, 0, reason: 'a fizzle is like a charge');
     });
 
@@ -135,14 +149,20 @@ void main() {
     // have flaked one run in ten. The miss is now driven deterministically by
     // [_AlwaysMiss]; what the test proves — that a missed harmful cast does
     // nothing, still spends the charge, and advances no streak — is unchanged.
-    test('a rolled miss makes a harmful spell do nothing but spend charge',
-        () {
+    test('a rolled miss makes a harmful spell do nothing but spend charge', () {
       charge(alice, MagicElement.geo, 2);
       alice.statuses.add(_Blind(1.0, 3)); // 100% blind → the floored 90% miss
-      final blinded = DuelEngine(alice, bruno,
-          rng: _AlwaysMiss(), elementEffects: false, baseMissPercent: 0);
+      final blinded = DuelEngine(
+        alice,
+        bruno,
+        rng: _AlwaysMiss(),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
       final r = blinded.resolveTurn(
-          CastAction(Spellbook.blast), const ForfeitAction());
+        CastAction(Spellbook.blast),
+        const ForfeitAction(),
+      );
       final miss = r.events.whereType<SpellMissedEvent>().single;
       expect(bruno.hp, 100, reason: 'Blast missed');
       expect(alice.charge, 0, reason: 'charge is still spent on a miss');
@@ -156,10 +176,16 @@ void main() {
       // No Blind status; the base miss chance alone whiffs the cast. The UI
       // must say "missed", never "blinded" (ITEMS §9b.8).
       charge(alice, MagicElement.geo, 2);
-      final unlucky = DuelEngine(alice, bruno,
-          rng: _AlwaysMiss(), baseMissPercent: 20);
+      final unlucky = DuelEngine(
+        alice,
+        bruno,
+        rng: _AlwaysMiss(),
+        baseMissPercent: 20,
+      );
       final r = unlucky.resolveTurn(
-          CastAction(Spellbook.blast), const ForfeitAction());
+        CastAction(Spellbook.blast),
+        const ForfeitAction(),
+      );
       final miss = r.events.whereType<SpellMissedEvent>().single;
       expect(miss.blinded, isFalse, reason: 'no Blind, so no "blinded" blame');
     });
@@ -175,15 +201,29 @@ void main() {
       charge(alice, MagicElement.geo, 3);
       charge(bruno, MagicElement.aqua, 4);
       alice.statuses.add(_Blind(1.0, 3));
-      final blinded = DuelEngine(alice, bruno,
-          rng: _AlwaysMiss(), elementEffects: false, baseMissPercent: 0);
+      final blinded = DuelEngine(
+        alice,
+        bruno,
+        rng: _AlwaysMiss(),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
       final r = blinded.resolveTurn(
-          CastAction(Spellbook.discharge), const ForfeitAction());
-      expect(r.events.whereType<SpellMissedEvent>(), isEmpty,
-          reason: 'no roll happens, so nothing can miss — even a total Blind');
-      expect(bruno.charge, 0,
-          reason: 'the wipe lands regardless; Discharge resolves or it does '
-              'not, exactly like the bank\'s aux-offense spells');
+        CastAction(Spellbook.discharge),
+        const ForfeitAction(),
+      );
+      expect(
+        r.events.whereType<SpellMissedEvent>(),
+        isEmpty,
+        reason: 'no roll happens, so nothing can miss — even a total Blind',
+      );
+      expect(
+        bruno.charge,
+        0,
+        reason:
+            'the wipe lands regardless; Discharge resolves or it does '
+            'not, exactly like the bank\'s aux-offense spells',
+      );
     });
 
     test('a 0% blind never misses; defensive casts are never blinded', () {
@@ -243,25 +283,26 @@ void main() {
       expect(alice.nextOffensiveDamageScale, 1.0, reason: 'consumed');
     });
 
-    test('order: additive then multiplicative (AK, then Empower, then Stagger)',
-        () {
-      // base 20-26; ×(1.25) AK; ×2 Empower; ×0.5 Stagger  => ×1.25 net.
-      charge(alice, MagicElement.geo, 2);
-      alice
-        ..bonusDamagePercent = 25
-        ..empowerMultiplier = 2
-        ..nextOffensiveDamageScale = 0.5;
-      duel.resolveTurn(CastAction(Spellbook.blast), const ForfeitAction());
-      // 20-26 × 1.25 = 25-32.5 -> 25-33.
-      expect(100 - bruno.hp, inInclusiveRange(25, 33));
-    });
+    test(
+      'order: additive then multiplicative (AK, then Empower, then Stagger)',
+      () {
+        // base 20-26; ×(1.25) AK; ×2 Empower; ×0.5 Stagger  => ×1.25 net.
+        charge(alice, MagicElement.geo, 2);
+        alice
+          ..bonusDamagePercent = 25
+          ..empowerMultiplier = 2
+          ..nextOffensiveDamageScale = 0.5;
+        duel.resolveTurn(CastAction(Spellbook.blast), const ForfeitAction());
+        // 20-26 × 1.25 = 25-32.5 -> 25-33.
+        expect(100 - bruno.hp, inInclusiveRange(25, 33));
+      },
+    );
 
     test('Discharge consumes Stagger harmlessly (the stagger-eater)', () {
       charge(alice, MagicElement.geo, 3);
       charge(bruno, MagicElement.aqua, 2);
       alice.nextOffensiveDamageScale = 0.5;
-      duel.resolveTurn(
-          CastAction(Spellbook.discharge), const ForfeitAction());
+      duel.resolveTurn(CastAction(Spellbook.discharge), const ForfeitAction());
       expect(alice.nextOffensiveDamageScale, 1.0, reason: 'eaten by Discharge');
     });
   });

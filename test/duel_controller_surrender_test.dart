@@ -101,8 +101,11 @@ void main() {
           regrowPercent: 2,
         ),
       );
-      expect(geared.player.maxHp, 112,
-          reason: 'flat HP must reach the constructor, not be added after');
+      expect(
+        geared.player.maxHp,
+        112,
+        reason: 'flat HP must reach the constructor, not be added after',
+      );
       expect(geared.player.accuracyBonus, 5);
       expect(geared.player.damagePerCharge, 1);
       // ⭐ The ruling: crit = 150% base + points. Engine base is 50, so the
@@ -113,8 +116,11 @@ void main() {
       // ⭐ Regrow arrives as a status, so the HUD pip and the heal-lane
       // ordering come for free.
       expect(geared.player.statuses.whereType<RegrowStatus>(), isNotEmpty);
-      expect(geared.enemy.accuracyBonus, 0,
-          reason: 'a driver reporting no gear must leave the enemy bare');
+      expect(
+        geared.enemy.accuracyBonus,
+        0,
+        reason: 'a driver reporting no gear must leave the enemy bare',
+      );
       expect(geared.enemy.statuses.whereType<RegrowStatus>(), isEmpty);
     });
 
@@ -264,8 +270,11 @@ void main() {
       );
       expect(bare.player.maxHp, 100);
       expect(bare.player.critChance, 0);
-      expect(bare.player.critDamage, 50,
-          reason: 'the engine default, untouched by empty gear');
+      expect(
+        bare.player.critDamage,
+        50,
+        reason: 'the engine default, untouched by empty gear',
+      );
     });
   });
 

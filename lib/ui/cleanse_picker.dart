@@ -33,9 +33,11 @@ class CleansePickerDialog extends StatelessWidget {
   static Future<CleanseChoice?> show(BuildContext context, MageState mage) =>
       showDialog<CleanseChoice>(
         context: context,
-        builder: (_) => CleansePickerDialog(debuffs: [
-          for (final d in debuffsOn(mage)) (id: d.id, turnsLeft: d.turnsLeft),
-        ]),
+        builder: (_) => CleansePickerDialog(
+          debuffs: [
+            for (final d in debuffsOn(mage)) (id: d.id, turnsLeft: d.turnsLeft),
+          ],
+        ),
       );
 
   @override
@@ -52,27 +54,31 @@ class CleansePickerDialog extends StatelessWidget {
             for (final d in debuffs)
               ListTile(
                 dense: true,
-                leading:
-                    const Icon(Icons.cleaning_services, color: AppColors.gem),
+                leading: const Icon(
+                  Icons.cleaning_services,
+                  color: AppColors.gem,
+                ),
                 title: Text(StatusCatalog.byId(d.id)?.name ?? d.id),
                 // 0 turns = an untimed debuff (Waterlogged, Stagger): it has
                 // no clock to show, not a clock at zero.
                 trailing: d.turnsLeft > 0
-                    ? Text('${d.turnsLeft} turns',
-                        style: const TextStyle(color: AppColors.textDim))
+                    ? Text(
+                        '${d.turnsLeft} turns',
+                        style: const TextStyle(color: AppColors.textDim),
+                      )
                     : null,
-                onTap: () =>
-                    Navigator.of(context).pop(CleanseChoice(d.id)),
+                onTap: () => Navigator.of(context).pop(CleanseChoice(d.id)),
               ),
             const Divider(height: 12),
             ListTile(
               dense: true,
               leading: const Icon(Icons.auto_awesome, color: AppColors.gold),
               title: const Text('Whichever runs longest'),
-              subtitle: const Text('Let the spell decide',
-                  style: TextStyle(color: AppColors.textDim, fontSize: 11)),
-              onTap: () =>
-                  Navigator.of(context).pop(const CleanseChoice(null)),
+              subtitle: const Text(
+                'Let the spell decide',
+                style: TextStyle(color: AppColors.textDim, fontSize: 11),
+              ),
+              onTap: () => Navigator.of(context).pop(const CleanseChoice(null)),
             ),
           ],
         ),

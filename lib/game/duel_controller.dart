@@ -222,25 +222,28 @@ class DuelController extends ChangeNotifier {
     double hpScale = 1.0,
     EnemyCombatStats combatStats = EnemyCombatStats.none,
   }) {
-    final mage = MageState(
-      name: name,
-      level: level,
-      // ⚠️ Archetype scales the BASELINE; gear is flat on top. Scaling the
-      // gear too would make a Redoubt's hat worth more than a mage's.
-      maxHp: (MageState.scaledMaxHp(level) * hpScale).round() + gear.maxHpBonus,
-    )
-      ..accuracyBonus = gear.accuracyBonus + combatStats.accuracyBonus
-      ..dodge = gear.dodge + combatStats.dodge
-      ..critChance = gear.critChance + combatStats.critChance
-      // ⭐ critDamage ADDS to the engine's 50 base, so Cinder Loop's 5 points
-      // read 155%, exactly as ruled — an archetype's lean adds the same way.
-      ..critDamage = 50 + gear.critDamage + combatStats.critDamage
-      ..deflectChance = gear.deflectChance + combatStats.deflectChance
-      ..deflectAmount = gear.deflectAmount + combatStats.deflectAmount
-      ..damagePerCast = gear.damagePerCast
-      ..damagePerCharge = gear.damagePerCharge
-      ..shieldStrengthPercent = gear.shieldStrengthPercent
-      ..healingReceivedPercent = gear.healingReceivedPercent;
+    final mage =
+        MageState(
+            name: name,
+            level: level,
+            // ⚠️ Archetype scales the BASELINE; gear is flat on top. Scaling the
+            // gear too would make a Redoubt's hat worth more than a mage's.
+            maxHp:
+                (MageState.scaledMaxHp(level) * hpScale).round() +
+                gear.maxHpBonus,
+          )
+          ..accuracyBonus = gear.accuracyBonus + combatStats.accuracyBonus
+          ..dodge = gear.dodge + combatStats.dodge
+          ..critChance = gear.critChance + combatStats.critChance
+          // ⭐ critDamage ADDS to the engine's 50 base, so Cinder Loop's 5 points
+          // read 155%, exactly as ruled — an archetype's lean adds the same way.
+          ..critDamage = 50 + gear.critDamage + combatStats.critDamage
+          ..deflectChance = gear.deflectChance + combatStats.deflectChance
+          ..deflectAmount = gear.deflectAmount + combatStats.deflectAmount
+          ..damagePerCast = gear.damagePerCast
+          ..damagePerCharge = gear.damagePerCharge
+          ..shieldStrengthPercent = gear.shieldStrengthPercent
+          ..healingReceivedPercent = gear.healingReceivedPercent;
     // ⭐ Regrow rides the status machinery (item_status.dart), so the lane
     // sort and the HUD pip come for free. Permanent: gear is not taken off
     // mid-duel.
@@ -481,7 +484,10 @@ class DuelController extends ChangeNotifier {
   /// [statusChoice] is Cleanse's chosen-debuff payload (TYPE_EFFECTS §7a) —
   /// null lets the engine apply its documented default (most turns left).
   MageAction castAction(Spell spell, {String? statusChoice}) => CastAction(
-      spell, player.charge == 0 ? pendingElement : null, statusChoice);
+    spell,
+    player.charge == 0 ? pendingElement : null,
+    statusChoice,
+  );
 
   /// Advances the display state past [event] (called after its animation).
   ///

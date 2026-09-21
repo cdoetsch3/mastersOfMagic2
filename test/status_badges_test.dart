@@ -116,13 +116,20 @@ void main() {
     test('⭐ a burn shows its damage per turn and its clock, as a debuff', () {
       final b = one(const StatusView(id: 'agony', turnsLeft: 3, magnitude: 7));
       expect(b.label, 'Agony');
-      expect(b.sub, '7/t · 3t',
-          reason: 'the pip reads exactly like Ignite\'s — the mutant this '
-              'kills is the one the designer found: a Torment ticking with '
-              'no pip at all');
+      expect(
+        b.sub,
+        '7/t · 3t',
+        reason:
+            'the pip reads exactly like Ignite\'s — the mutant this '
+            'kills is the one the designer found: a Torment ticking with '
+            'no pip at all',
+      );
       expect(b.kind, BadgeKind.debuff);
-      expect(b.color, AppColors.ember,
-          reason: 'debuffs invert to ember, whatever their fx colour');
+      expect(
+        b.color,
+        AppColors.ember,
+        reason: 'debuffs invert to ember, whatever their fx colour',
+      );
     });
 
     test('a stance shows its number and clock, as a buff', () {
@@ -135,8 +142,14 @@ void main() {
     });
 
     test('the Divert pair shows both halves', () {
-      final b = one(const StatusView(
-          id: 'divert', turnsLeft: 15, magnitude: 20, secondaryMagnitude: 40));
+      final b = one(
+        const StatusView(
+          id: 'divert',
+          turnsLeft: 15,
+          magnitude: 20,
+          secondaryMagnitude: 40,
+        ),
+      );
       expect(b.sub, '20/40 · 15t');
     });
 

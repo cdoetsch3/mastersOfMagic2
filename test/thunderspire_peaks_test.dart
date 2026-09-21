@@ -73,9 +73,10 @@ void main() {
 
     test('every id is the snake_case of its own name', () {
       for (final e in all) {
-        final derived = e.name
-            .toLowerCase()
-            .replaceAll(RegExp(r"[^a-z0-9]+"), '_');
+        final derived = e.name.toLowerCase().replaceAll(
+          RegExp(r"[^a-z0-9]+"),
+          '_',
+        );
         expect(e.id, derived, reason: '${e.name} should be id "$derived"');
       }
     });
@@ -134,7 +135,8 @@ void main() {
       expect(
         all.where((e) => e.archetype.id == 'adept'),
         hasLength(1),
-        reason: 'the swap replaces a Skirmisher, it does not add a second '
+        reason:
+            'the swap replaces a Skirmisher, it does not add a second '
             'yardstick',
       );
       expect(
@@ -145,11 +147,14 @@ void main() {
     });
 
     test('Thunder Roc keeps its Electro assignment, per ruling §8.8', () {
-      expect(ThunderspirePeaksBestiary.thunderRoc.elements, [MagicElement.electro]);
+      expect(ThunderspirePeaksBestiary.thunderRoc.elements, [
+        MagicElement.electro,
+      ]);
       expect(
         ThunderspirePeaksBestiary.stormcrestRoc.elements,
         [MagicElement.aero],
-        reason: 'the two rocs must stay different elements or they read as '
+        reason:
+            'the two rocs must stay different elements or they read as '
             'one species at two sizes',
       );
     });
@@ -171,7 +176,11 @@ void main() {
     test('the Bruiser hits like a truck, sometimes whiffs entirely', () {
       expect(
         ThunderspirePeaksBestiary.stormcrestRoc.combatStats,
-        const EnemyCombatStats(accuracyBonus: -8, critChance: 8, critDamage: 25),
+        const EnemyCombatStats(
+          accuracyBonus: -8,
+          critChance: 8,
+          critDamage: 25,
+        ),
       );
     });
 
@@ -242,7 +251,11 @@ void main() {
       // that row "per zone").
       expect(
         ThunderspirePeaksBestiary.theStrikeThatLands.combatStats,
-        const EnemyCombatStats(accuracyBonus: 10, critChance: 30, critDamage: 50),
+        const EnemyCombatStats(
+          accuracyBonus: 10,
+          critChance: 30,
+          critDamage: 50,
+        ),
       );
     });
 
@@ -251,33 +264,36 @@ void main() {
         expect(
           e.combatStats.dodge,
           lessThanOrEqualTo(10),
-          reason: '${e.id} — enemy dodge should read as slippery, never '
+          reason:
+              '${e.id} — enemy dodge should read as slippery, never '
               'unhittable',
         );
       }
     });
 
-    test('crit damage and deflect amount never appear without their chance',
-        () {
-      for (final e in all) {
-        final s = e.combatStats;
-        expect(
-          s.critDamage == 0 || s.critChance > 0,
-          isTrue,
-          reason: '${e.id} has crit damage but critChance == 0',
-        );
-        expect(
-          s.deflectAmount == 0 || s.deflectChance > 0,
-          isTrue,
-          reason: '${e.id} has deflect amount but deflectChance == 0',
-        );
-        expect(
-          s.deflectChance == 0 || s.deflectAmount > 0,
-          isTrue,
-          reason: '${e.id} has deflect chance but deflectAmount == 0',
-        );
-      }
-    });
+    test(
+      'crit damage and deflect amount never appear without their chance',
+      () {
+        for (final e in all) {
+          final s = e.combatStats;
+          expect(
+            s.critDamage == 0 || s.critChance > 0,
+            isTrue,
+            reason: '${e.id} has crit damage but critChance == 0',
+          );
+          expect(
+            s.deflectAmount == 0 || s.deflectChance > 0,
+            isTrue,
+            reason: '${e.id} has deflect amount but deflectChance == 0',
+          );
+          expect(
+            s.deflectChance == 0 || s.deflectAmount > 0,
+            isTrue,
+            reason: '${e.id} has deflect chance but deflectAmount == 0',
+          );
+        }
+      },
+    );
   });
 
   group('creatures are creatures, not mages', () {
@@ -386,7 +402,8 @@ void main() {
         expect(
           e.moves.any((m) => m.effect is ShieldEffect),
           isTrue,
-          reason: '${e.id} is a ${e.archetype.name} with nothing to hide '
+          reason:
+              '${e.id} is a ${e.archetype.name} with nothing to hide '
               'behind',
         );
       }
@@ -403,7 +420,8 @@ void main() {
       );
       expect(
         shortening.moves.any(
-          (m) => m.effect is DamageEffect &&
+          (m) =>
+              m.effect is DamageEffect &&
               (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
@@ -419,8 +437,7 @@ void main() {
       }
     });
 
-    test('nothing in this zone lifesteals except the Redoubt\'s finisher',
-        () {
+    test('nothing in this zone lifesteals except the Redoubt\'s finisher', () {
       for (final e in all) {
         for (final m in e.moves) {
           final effect = m.effect;
@@ -521,10 +538,18 @@ void main() {
     test('a hybrid zone drops only its two parent elements\' motes, and '
         'DEFINES none of them', () {
       const foreign = {
-        'flora_dust', 'flora_shard', 'flora_crystal',
-        'aqua_dust', 'aqua_shard', 'aqua_crystal',
-        'pyro_dust', 'pyro_shard', 'pyro_crystal',
-        'geo_dust', 'geo_shard', 'geo_crystal',
+        'flora_dust',
+        'flora_shard',
+        'flora_crystal',
+        'aqua_dust',
+        'aqua_shard',
+        'aqua_crystal',
+        'pyro_dust',
+        'pyro_shard',
+        'pyro_crystal',
+        'geo_dust',
+        'geo_shard',
+        'geo_crystal',
       };
       for (final id in ThunderspirePeaksBestiary.allDrops) {
         expect(foreign, isNot(contains(id)), reason: '$id is off-element');
@@ -633,7 +658,8 @@ void main() {
       expect(
         grips.modifiers.critChance,
         0,
-        reason: 'Groundfault Grips carries the accuracy/on-hit-damage lane '
+        reason:
+            'Groundfault Grips carries the accuracy/on-hit-damage lane '
             'ruled for it, not crit',
       );
     });
@@ -726,8 +752,7 @@ void main() {
       }
     });
 
-    test('every node yields a real, fungible item from this zone\'s skill',
-        () {
+    test('every node yields a real, fungible item from this zone\'s skill', () {
       for (final n in nodes) {
         final def = ItemCatalogue.tryById(n.yieldsDefId);
         expect(def, isNotNull, reason: '${n.id} yields nothing real');

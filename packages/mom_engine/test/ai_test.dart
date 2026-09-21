@@ -9,7 +9,11 @@ void main() {
   const turnCap = 200;
 
   ({int wins1, int wins2, int draws, int unfinished}) run(
-      DuelAi ai1, DuelAi ai2, int duels, int seed) {
+    DuelAi ai1,
+    DuelAi ai2,
+    int duels,
+    int seed,
+  ) {
     final rng = Random(seed);
     var wins1 = 0, wins2 = 0, draws = 0, unfinished = 0;
     for (var i = 0; i < duels; i++) {
@@ -37,8 +41,11 @@ void main() {
 
   test('AI duels run legally to completion', () {
     final result = run(LadderAi(1), LadderAi(1), 200, 1);
-    expect(result.unfinished, lessThan(10),
-        reason: 'almost all random duels should end within the cap');
+    expect(
+      result.unfinished,
+      lessThan(10),
+      reason: 'almost all random duels should end within the cap',
+    );
   });
 
   test('greedy AI convincingly beats random AI', () {
@@ -51,7 +58,10 @@ void main() {
     final decisive = result.wins1 + result.wins2;
     expect(decisive, greaterThan(0));
     final ratio = result.wins1 / decisive;
-    expect(ratio, closeTo(0.5, 0.15),
-        reason: 'neither seat should have a large structural advantage');
+    expect(
+      ratio,
+      closeTo(0.5, 0.15),
+      reason: 'neither seat should have a large structural advantage',
+    );
   });
 }

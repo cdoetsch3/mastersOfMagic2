@@ -49,13 +49,15 @@
 //    see Decision 4 (§8.7/end) for why that gap is a maintainer call, not a
 //    probe defect.
 library;
+
 // ignore_for_file: avoid_print
 
 import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:masters_of_magic_2/game/adventure.dart' show commonsPerSectionFor;
+import 'package:masters_of_magic_2/game/adventure.dart'
+    show commonsPerSectionFor;
 import 'package:masters_of_magic_2/game/crafting/craft_quality.dart';
 import 'package:masters_of_magic_2/game/economy/economy_config.dart';
 import 'package:masters_of_magic_2/game/economy/shop_catalogue.dart';
@@ -218,8 +220,9 @@ class _StrategyRun {
   final List<String> notes;
   const _StrategyRun(this.label, this.dailyGold, [this.notes = const []]);
 
-  double get meanPerDay =>
-      dailyGold.isEmpty ? 0 : dailyGold.reduce((a, b) => a + b) / dailyGold.length;
+  double get meanPerDay => dailyGold.isEmpty
+      ? 0
+      : dailyGold.reduce((a, b) => a + b) / dailyGold.length;
   int get maxDay => dailyGold.isEmpty ? 0 : dailyGold.reduce(max);
   int get minDay => dailyGold.isEmpty ? 0 : dailyGold.reduce(min);
   int get total => dailyGold.fold(0, (a, b) => a + b);
@@ -256,7 +259,12 @@ _StrategyRun _runRoundTripper(int days) {
       for (final item in ShopCatalogue.stockFor(town)) {
         for (final n in _roundTripCandidateNs) {
           final buy = bot.quoteBuy(town, item, n);
-          final sell = bot.quoteSell(town, item, n, stockOverride: buy.newStock);
+          final sell = bot.quoteSell(
+            town,
+            item,
+            n,
+            stockOverride: buy.newStock,
+          );
           final profit = sell.totalGold - buy.totalGold;
           if (profit > bestProfit) {
             bestProfit = profit;
@@ -305,7 +313,8 @@ _StrategyRun _runRoundTripper(int days) {
 // rather than every town pair — the spec's own phrasing ("cheapest-mod...
 // highest-mod").
 
-const _dayLengthMinutes = 1440; // one UTC reset cycle (§6.1), the travel budget.
+const _dayLengthMinutes =
+    1440; // one UTC reset cycle (§6.1), the travel budget.
 
 Map<String, List<String>> _itemToStockingTowns() {
   final map = <String, List<String>>{};
@@ -348,7 +357,9 @@ _HaulRun _runHauler(int days) {
       var sellTown = towns.first;
       for (final t in towns) {
         if (locationModOf(t, item) < locationModOf(buyTown, item)) buyTown = t;
-        if (locationModOf(t, item) > locationModOf(sellTown, item)) sellTown = t;
+        if (locationModOf(t, item) > locationModOf(sellTown, item)) {
+          sellTown = t;
+        }
       }
       if (buyTown == sellTown) continue;
       for (var n = 1; n <= Carrying.backpackSlots; n++) {
@@ -379,9 +390,15 @@ _HaulRun _runHauler(int days) {
     final hops = hopsBetween(bBuy, bSell);
     maxHopsSeen = max(maxHopsSeen, hops);
     minHopsSeen = min(minHopsSeen, hops);
-    final legMinutes = TravelTimes.between(bBuy, bSell); // flat per leg, real API
+    final legMinutes = TravelTimes.between(
+      bBuy,
+      bSell,
+    ); // flat per leg, real API
     final roundTripMinutes = hops * legMinutes * 2;
-    final daysNeeded = (roundTripMinutes / _dayLengthMinutes).ceil().clamp(1, 1 << 30);
+    final daysNeeded = (roundTripMinutes / _dayLengthMinutes).ceil().clamp(
+      1,
+      1 << 30,
+    );
     if (daysNeeded > 1) anyMultiDayRoute = true;
     final profitB = daysNeeded <= 1 ? profitA : (profitA / daysNeeded).round();
     dailyB.add(profitB);
@@ -492,7 +509,12 @@ Map<String, _EquipEval> _precomputeEquipmentEvals(int margin, int seedBase) {
 /// The best-selling town for a non-equipment recipe output, marginal-priced
 /// — falls back to the flat vendor sink if no open town's catalogue stocks
 /// it (e.g. bronze/iron ingot, §14b.3).
-({String? town, int gold}) _bestSell(_BotShop bot, String itemId, int n, int base) {
+({String? town, int gold}) _bestSell(
+  _BotShop bot,
+  String itemId,
+  int n,
+  int base,
+) {
   String? bestTown;
   var bestGold = -1;
   for (final town in openTowns) {
@@ -503,7 +525,9 @@ Map<String, _EquipEval> _precomputeEquipmentEvals(int margin, int seedBase) {
       bestTown = town;
     }
   }
-  return bestTown == null ? (town: null, gold: ShopPricing.vendorPrice(base)) : (town: bestTown, gold: bestGold);
+  return bestTown == null
+      ? (town: null, gold: ShopPricing.vendorPrice(base))
+      : (town: bestTown, gold: bestGold);
 }
 
 class _CrafterDayPick {
@@ -516,10 +540,18 @@ class _CrafterRun {
   final _StrategyRun run;
   final String bestRecipeSummary;
   final String masterLotterySummary;
-  const _CrafterRun(this.run, this.bestRecipeSummary, this.masterLotterySummary);
+  const _CrafterRun(
+    this.run,
+    this.bestRecipeSummary,
+    this.masterLotterySummary,
+  );
 }
 
-_CrafterRun _runCrafter(int days, int margin, Map<String, _EquipEval> equipEvals) {
+_CrafterRun _runCrafter(
+  int days,
+  int margin,
+  Map<String, _EquipEval> equipEvals,
+) {
   final bot = _BotShop();
   final daily = <int>[];
   const maxCraftsPerDay = 40;
@@ -606,7 +638,9 @@ _CrafterRun _runCrafter(int days, int margin, Map<String, _EquipEval> equipEvals
         }
         int actualSale;
         if (outputDef is EquipmentDef) {
-          actualSale = ShopPricing.roundGold(equipEvals[recipe.id]!.meanSaleGold);
+          actualSale = ShopPricing.roundGold(
+            equipEvals[recipe.id]!.meanSaleGold,
+          );
         } else {
           final sell = _bestSell(
             bot,
@@ -677,7 +711,8 @@ _StrategyRun _runGatherer(int days, String zoneId) {
   final bot = _BotShop();
   final zone = World.byId(zoneId);
   final tier = zone.tier;
-  final duelsPerRun = commonsPerSectionFor(tier) * 3 + 2 + 1; // 2 minis + 1 boss
+  final duelsPerRun =
+      commonsPerSectionFor(tier) * 3 + 2 + 1; // 2 minis + 1 boss
   const dailyDuelBudget = 80; // ✅ ECONOMY_CONTRACT §8.7
   final runsPerDay = (dailyDuelBudget / duelsPerRun).floor().clamp(1, 1 << 30);
   final nodeDefs = GatherNodes.forZone(zoneId);
@@ -695,7 +730,12 @@ _StrategyRun _runGatherer(int days, String zoneId) {
         for (final node in nodeDefs) {
           final qty = ((node.min + node.max) / 2.0).round();
           if (qty <= 0) continue;
-          final sell = _bestSell(bot, node.yieldsDefId, qty, baseValueOf(node.yieldsDefId));
+          final sell = _bestSell(
+            bot,
+            node.yieldsDefId,
+            qty,
+            baseValueOf(node.yieldsDefId),
+          );
           sumGold += sell.gold;
         }
         dayGold += (sumGold / nodeDefs.length).round();
@@ -703,7 +743,8 @@ _StrategyRun _runGatherer(int days, String zoneId) {
     }
     daily.add(dayGold);
   }
-  final label = 'gatherer-vendor (${zone.name}, ${tier?.name ?? "?"}, '
+  final label =
+      'gatherer-vendor (${zone.name}, ${tier?.name ?? "?"}, '
       '$duelsPerRun duels/run, $runsPerDay runs/day)';
   return _StrategyRun(label, daily);
 }
@@ -763,8 +804,8 @@ ProbeReport runEconomyProbe(int days) {
     final flag = !overCeiling
         ? ''
         : hardCeiling
-            ? 'WARN >2400g/day'
-            : 'FLAG >2400g/day (honest baseline, not hard-asserted)';
+        ? 'WARN >2400g/day'
+        : 'FLAG >2400g/day (honest baseline, not hard-asserted)';
     buf.writeln(
       row.label.padRight(72) +
           row.meanPerDay.toStringAsFixed(1).padRight(12) +
@@ -776,11 +817,11 @@ ProbeReport runEconomyProbe(int days) {
       warnings.add(
         hardCeiling
             ? '${row.label}: max day ${row.maxDay}g exceeds the §8.7/§9/§10 '
-                '~2,400g/day sanity ceiling'
+                  '~2,400g/day sanity ceiling'
             : '📝 ${row.label}: max day ${row.maxDay}g exceeds the duels-only '
-                '~2,400g/day sanity number once honestly-vendored gathered '
-                'materials are added — Decision 4 (§8.7/end) territory, not '
-                'hard-asserted here',
+                  '~2,400g/day sanity number once honestly-vendored gathered '
+                  'materials are added — Decision 4 (§8.7/end) territory, not '
+                  'hard-asserted here',
       );
     }
   }
@@ -835,101 +876,100 @@ void main() {
   // exactly like the balance probe's own BALANCE_PROBE_DEEP.
   final days = deep ? 1000 : 5;
 
-  test(
-    'economy probe: greedy-bot exploitation strategies stay bounded',
-    () {
-      final report = runEconomyProbe(days);
-      print(report.table);
-      if (report.warnings.isEmpty) {
-        print('\nNo warnings — every strategy stayed inside its sanity bounds.');
-      } else {
-        print('\nWARN:');
-        for (final w in report.warnings) {
-          print('  - $w');
-        }
+  test('economy probe: greedy-bot exploitation strategies stay bounded', () {
+    final report = runEconomyProbe(days);
+    print(report.table);
+    if (report.warnings.isEmpty) {
+      print('\nNo warnings — every strategy stayed inside its sanity bounds.');
+    } else {
+      print('\nWARN:');
+      for (final w in report.warnings) {
+        print('  - $w');
       }
+    }
 
-      // ---- HARD assertions (§10) -----------------------------------
-      //
-      // 🔴 **KNOWN FAILING as of §14d ruling 2 (2026-08-26) — deliberately
-      // NOT relaxed.** Dropping consumables to E=6 makes this assertion fail
-      // (~+1g per same-day round trip on `pennycross/hardtack`, +5g across a
-      // 5-day run). The cause is structural, not a rounding artefact:
-      //
-      //   §3.1 clamps the scarcity multiplier at 2.5, and that ceiling is what
-      //   FLATTENS the curve at low stock. It binds only while `E / stock >
-      //   6.25`. At E=60 every shelf below 9 units is pinned flat at 2.5, so a
-      //   buy-then-sell-back pair sees the same multiplier both ways and the
-      //   10%/-10% spread is all that is left — a guaranteed loss, which is
-      //   the invariant. At E=6 the clamp NEVER binds, the low-stock curve
-      //   keeps its full gradient, and one unit of stock movement changes the
-      //   price by `sqrt(s / (s-1))`. That exceeds the spread ratio
-      //   `1.10 / 0.90 = 1.222` for any stock ≤ 3 — so buying one unit off a
-      //   nearly-empty shelf and selling it straight back is positive-EV, and
-      //   a bot can repeat it forever.
-      //
-      // Swept thresholds (see the report): E ≤ 8 exploitable, E ≥ 10 clean.
-      // Ruling 2's OTHER new number, consumable-ingredient E=10, sits just
-      // inside the safe band and does not trip this.
-      //
-      // ⚠️ Fixing this is a DESIGNER call, not a probe edit — either the
-      // consumable E moves to ≥10, or §3.1's clamp/spread changes. Relaxing
-      // this expectation to a tolerance would convert a gold faucet into a
-      // green tick, which is precisely what §10 exists to prevent.
-      final roundTrip = _runRoundTripper(days);
+    // ---- HARD assertions (§10) -----------------------------------
+    //
+    // 🔴 **KNOWN FAILING as of §14d ruling 2 (2026-08-26) — deliberately
+    // NOT relaxed.** Dropping consumables to E=6 makes this assertion fail
+    // (~+1g per same-day round trip on `pennycross/hardtack`, +5g across a
+    // 5-day run). The cause is structural, not a rounding artefact:
+    //
+    //   §3.1 clamps the scarcity multiplier at 2.5, and that ceiling is what
+    //   FLATTENS the curve at low stock. It binds only while `E / stock >
+    //   6.25`. At E=60 every shelf below 9 units is pinned flat at 2.5, so a
+    //   buy-then-sell-back pair sees the same multiplier both ways and the
+    //   10%/-10% spread is all that is left — a guaranteed loss, which is
+    //   the invariant. At E=6 the clamp NEVER binds, the low-stock curve
+    //   keeps its full gradient, and one unit of stock movement changes the
+    //   price by `sqrt(s / (s-1))`. That exceeds the spread ratio
+    //   `1.10 / 0.90 = 1.222` for any stock ≤ 3 — so buying one unit off a
+    //   nearly-empty shelf and selling it straight back is positive-EV, and
+    //   a bot can repeat it forever.
+    //
+    // Swept thresholds (see the report): E ≤ 8 exploitable, E ≥ 10 clean.
+    // Ruling 2's OTHER new number, consumable-ingredient E=10, sits just
+    // inside the safe band and does not trip this.
+    //
+    // ⚠️ Fixing this is a DESIGNER call, not a probe edit — either the
+    // consumable E moves to ≥10, or §3.1's clamp/spread changes. Relaxing
+    // this expectation to a tolerance would convert a gold faucet into a
+    // green tick, which is precisely what §10 exists to prevent.
+    final roundTrip = _runRoundTripper(days);
+    expect(
+      roundTrip.total,
+      lessThanOrEqualTo(0),
+      reason:
+          'round-tripping (buy then sell straight back, same town, '
+          'same day) must never net positive across the run — §10\'s '
+          'first required assertion',
+    );
+
+    final haul = _runHauler(days);
+    final craft5 = _runCrafter(days, 5, _precomputeEquipmentEvals(5, 1000));
+    final craft15 = _runCrafter(days, 15, _precomputeEquipmentEvals(15, 2000));
+    // 📝 The 2,400g/day ceiling is hard-asserted only against the three
+    // EXPLOIT strategies (round-tripper, hauler, crafter), not the
+    // gatherer-vendor honest baseline. §8.7 derives 2,400g purely from
+    // duel gold (~80 duels × 30g) and never accounts for the gathered
+    // materials an honest, fully-engaged session also vendors along the
+    // way — so a baseline that stacks BOTH honestly exceeding a
+    // duels-only sanity number is not itself an exploit finding; it is
+    // the reference other strategies are measured against. The report
+    // table above still prints and WARN-flags it when it happens (see
+    // the printed table's own flag column) so the maintainer sees it —
+    // per Decision 4 (§8.7/end), whether the flat-duel-gold ruling still
+    // holds against gathered-material income is exactly the kind of
+    // "normal vs. exploit accumulation" call this probe is meant to
+    // surface, not silently resolve by hard-failing the honest baseline.
+    for (final run in [
+      roundTrip,
+      haul.ignoreTravel,
+      haul.withTravel,
+      craft5.run,
+      craft15.run,
+    ]) {
       expect(
-        roundTrip.total,
-        lessThanOrEqualTo(0),
-        reason: 'round-tripping (buy then sell straight back, same town, '
-            'same day) must never net positive across the run — §10\'s '
-            'first required assertion',
+        run.maxDay,
+        lessThanOrEqualTo(_sanityCeilingGoldPerDay.round()),
+        reason:
+            '${run.label}: no strategy may exceed the §8.7/§9/§10 '
+            '~2,400g/day sanity ceiling on any single day',
       );
+    }
 
-      final haul = _runHauler(days);
-      final craft5 = _runCrafter(days, 5, _precomputeEquipmentEvals(5, 1000));
-      final craft15 = _runCrafter(days, 15, _precomputeEquipmentEvals(15, 2000));
-      // 📝 The 2,400g/day ceiling is hard-asserted only against the three
-      // EXPLOIT strategies (round-tripper, hauler, crafter), not the
-      // gatherer-vendor honest baseline. §8.7 derives 2,400g purely from
-      // duel gold (~80 duels × 30g) and never accounts for the gathered
-      // materials an honest, fully-engaged session also vendors along the
-      // way — so a baseline that stacks BOTH honestly exceeding a
-      // duels-only sanity number is not itself an exploit finding; it is
-      // the reference other strategies are measured against. The report
-      // table above still prints and WARN-flags it when it happens (see
-      // the printed table's own flag column) so the maintainer sees it —
-      // per Decision 4 (§8.7/end), whether the flat-duel-gold ruling still
-      // holds against gathered-material income is exactly the kind of
-      // "normal vs. exploit accumulation" call this probe is meant to
-      // surface, not silently resolve by hard-failing the honest baseline.
-      for (final run in [
-        roundTrip,
-        haul.ignoreTravel,
-        haul.withTravel,
-        craft5.run,
-        craft15.run,
-      ]) {
-        expect(
-          run.maxDay,
-          lessThanOrEqualTo(_sanityCeilingGoldPerDay.round()),
-          reason: '${run.label}: no strategy may exceed the §8.7/§9/§10 '
-              '~2,400g/day sanity ceiling on any single day',
-        );
-      }
-
-      // Hauling-with-travel must at least beat round-tripping (trivially
-      // true since round-trip nets ≤ 0, but stated as its own assertion so
-      // a future change to either strategy's shape cannot silently invert
-      // it without a visible failure here).
-      expect(
-        haul.withTravel.meanPerDay,
-        greaterThanOrEqualTo(roundTrip.meanPerDay),
-        reason: 'hauling must beat round-tripping — §10\'s comparison, '
-            'hard because it follows directly from the round-trip ≤ 0 proof',
-      );
-    },
-    timeout: Timeout(Duration(minutes: deep ? 15 : 2)),
-  );
+    // Hauling-with-travel must at least beat round-tripping (trivially
+    // true since round-trip nets ≤ 0, but stated as its own assertion so
+    // a future change to either strategy's shape cannot silently invert
+    // it without a visible failure here).
+    expect(
+      haul.withTravel.meanPerDay,
+      greaterThanOrEqualTo(roundTrip.meanPerDay),
+      reason:
+          'hauling must beat round-tripping — §10\'s comparison, '
+          'hard because it follows directly from the round-trip ≤ 0 proof',
+    );
+  }, timeout: Timeout(Duration(minutes: deep ? 15 : 2)));
 
   test('deterministic: two tiny runs print byte-identical reports', () {
     final a = runEconomyProbe(3);
@@ -937,7 +977,8 @@ void main() {
     expect(
       a.table,
       b.table,
-      reason: 'the report must be a pure function of its injected day '
+      reason:
+          'the report must be a pure function of its injected day '
           'indices — no wall clock, no unseeded rng',
     );
     expect(a.warnings, b.warnings);
@@ -957,7 +998,11 @@ void main() {
         final eq = equilibriumOf(town, item);
         expect(eq, 60, reason: 'native material at its own town, §5.1');
         final loc = locationModOf(town, item);
-        expect(loc, ShopCatalogue.nativeMod, reason: "Hearthwood IS oak_log's native town");
+        expect(
+          loc,
+          ShopCatalogue.nativeMod,
+          reason: "Hearthwood IS oak_log's native town",
+        );
 
         final probePrice = ShopPricing.price(
           base: base,
@@ -980,93 +1025,98 @@ void main() {
       },
     );
 
-    test(
-      'kills the batch-pricing mutant: the exact round trip this probe '
-      'finds acceptable-loss WOULD turn a profit under batch-at-'
-      'starting-stock pricing (§3.2) — proving the marginal walk is what '
-      'protects the economy, not luck in the numbers chosen',
-      () {
-        // Reuses shop_pricing_test.dart's own batch-mutant shape, applied
-        // to one of the round-tripper's own candidate Ns (§10's round-tripper
-        // sweeps [_roundTripCandidateNs], and this is deliberately one of
-        // them) — a moderate trade at a well-stocked native town, exactly
-        // like the exploit worked table in §3.2. n=20 was tried first but
-        // rejected: at this exact (item, town, stock) the rounded batch buy
-        // and batch sell totals land on the SAME gold value (215==215), a
-        // coincidental tie that makes `greaterThan` fail without disproving
-        // the exploit — n=30 clears that tie with margin to spare.
-        const item = 'oak_log';
-        const town = 'hearthwood';
-        const n = 30;
-        final base = baseValueOf(item);
-        final eq = equilibriumOf(town, item);
-        final loc = locationModOf(town, item);
+    test('kills the batch-pricing mutant: the exact round trip this probe '
+        'finds acceptable-loss WOULD turn a profit under batch-at-'
+        'starting-stock pricing (§3.2) — proving the marginal walk is what '
+        'protects the economy, not luck in the numbers chosen', () {
+      // Reuses shop_pricing_test.dart's own batch-mutant shape, applied
+      // to one of the round-tripper's own candidate Ns (§10's round-tripper
+      // sweeps [_roundTripCandidateNs], and this is deliberately one of
+      // them) — a moderate trade at a well-stocked native town, exactly
+      // like the exploit worked table in §3.2. n=20 was tried first but
+      // rejected: at this exact (item, town, stock) the rounded batch buy
+      // and batch sell totals land on the SAME gold value (215==215), a
+      // coincidental tie that makes `greaterThan` fail without disproving
+      // the exploit — n=30 clears that tie with margin to spare.
+      const item = 'oak_log';
+      const town = 'hearthwood';
+      const n = 30;
+      final base = baseValueOf(item);
+      final eq = equilibriumOf(town, item);
+      final loc = locationModOf(town, item);
 
-        final correctBuy = ShopPricing.buyQuote(
-          n: n,
-          base: base,
-          equilibrium: eq,
-          stock: eq,
-          locationMod: loc,
-        );
-        final correctSell = ShopPricing.sellQuote(
-          n: n,
-          base: base,
-          equilibrium: eq,
-          stock: correctBuy.newStock,
-          locationMod: loc,
-        );
-        expect(
-          correctSell.totalGold,
-          lessThanOrEqualTo(correctBuy.totalGold),
-          reason: 'the real marginal implementation never profits on this trip',
-        );
+      final correctBuy = ShopPricing.buyQuote(
+        n: n,
+        base: base,
+        equilibrium: eq,
+        stock: eq,
+        locationMod: loc,
+      );
+      final correctSell = ShopPricing.sellQuote(
+        n: n,
+        base: base,
+        equilibrium: eq,
+        stock: correctBuy.newStock,
+        locationMod: loc,
+      );
+      expect(
+        correctSell.totalGold,
+        lessThanOrEqualTo(correctBuy.totalGold),
+        reason: 'the real marginal implementation never profits on this trip',
+      );
 
-        int batchBuyTotal(int stock) => ShopPricing.roundGold(
-              ShopPricing.buyPrice(
-                base: base,
-                equilibrium: eq,
-                stock: stock,
-                locationMod: loc,
-              ) *
-                  n,
-            );
-        int batchSellTotal(int stock) => ShopPricing.roundGold(
-              ShopPricing.sellPrice(
-                base: base,
-                equilibrium: eq,
-                stock: stock,
-                locationMod: loc,
-              ) *
-                  n,
-            );
+      int batchBuyTotal(int stock) => ShopPricing.roundGold(
+        ShopPricing.buyPrice(
+              base: base,
+              equilibrium: eq,
+              stock: stock,
+              locationMod: loc,
+            ) *
+            n,
+      );
+      int batchSellTotal(int stock) => ShopPricing.roundGold(
+        ShopPricing.sellPrice(
+              base: base,
+              equilibrium: eq,
+              stock: stock,
+              locationMod: loc,
+            ) *
+            n,
+      );
 
-        final wrongBuyTotal = batchBuyTotal(eq);
-        final wrongStockAfterBuy = max(0, eq - n);
-        final wrongSellTotal = batchSellTotal(wrongStockAfterBuy);
+      final wrongBuyTotal = batchBuyTotal(eq);
+      final wrongStockAfterBuy = max(0, eq - n);
+      final wrongSellTotal = batchSellTotal(wrongStockAfterBuy);
 
-        expect(
-          wrongSellTotal,
-          greaterThan(wrongBuyTotal),
-          reason: '⚠️ THE EXPLOIT: batch-priced-at-current-stock turns this '
-              'exact same round trip profitable — buy=$wrongBuyTotal '
-              'sell=$wrongSellTotal — exactly the failure mode §3.2 names '
-              'and ShopPricing.buyQuote/sellQuote structurally prevent by '
-              'walking unit-by-unit instead',
-        );
-      },
-    );
+      expect(
+        wrongSellTotal,
+        greaterThan(wrongBuyTotal),
+        reason:
+            '⚠️ THE EXPLOIT: batch-priced-at-current-stock turns this '
+            'exact same round trip profitable — buy=$wrongBuyTotal '
+            'sell=$wrongSellTotal — exactly the failure mode §3.2 names '
+            'and ShopPricing.buyQuote/sellQuote structurally prevent by '
+            'walking unit-by-unit instead',
+      );
+    });
 
     test('openTowns is exactly the five §14b.2 towns', () {
-      expect(
-        openTowns.toSet(),
-        {'hearthwood', 'pennycross', 'forgeholm', 'galehaven', 'concordance'},
-      );
+      expect(openTowns.toSet(), {
+        'hearthwood',
+        'pennycross',
+        'forgeholm',
+        'galehaven',
+        'concordance',
+      });
     });
 
     test('hopsBetween finds the real town-to-town paths', () {
       expect(hopsBetween('hearthwood', 'hearthwood'), 0);
-      expect(hopsBetween('hearthwood', 'pennycross'), 1, reason: 'a direct road');
+      expect(
+        hopsBetween('hearthwood', 'pennycross'),
+        1,
+        reason: 'a direct road',
+      );
       expect(
         hopsBetween('hearthwood', 'forgeholm'),
         greaterThan(1),

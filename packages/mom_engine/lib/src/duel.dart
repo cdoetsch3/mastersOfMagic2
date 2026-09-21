@@ -155,11 +155,13 @@ class DuelEngine {
   /// duels never override it — both lockstep clients must agree.
   final int baseMissPercent;
 
-  DuelEngine(this.mage1, this.mage2,
-      {Random? rng,
-      this.elementEffects = true,
-      this.baseMissPercent = ElementTuning.baseMissPercent})
-      : rng = rng ?? Random();
+  DuelEngine(
+    this.mage1,
+    this.mage2, {
+    Random? rng,
+    this.elementEffects = true,
+    this.baseMissPercent = ElementTuning.baseMissPercent,
+  }) : rng = rng ?? Random();
 
   int _roll(int min, int max) =>
       min >= max ? min : min + rng.nextInt(max - min + 1);
@@ -243,13 +245,15 @@ class DuelEngine {
           break;
         case ChargeAction():
           mage.activeElementThisTurn = mage.element ?? action.element;
-          entries.add(_Entry(
-            caster: mage,
-            target: opponent,
-            action: action,
-            element: mage.element ?? action.element!,
-            priority: channelPriority + _consumePriorityPenalty(mage),
-          ));
+          entries.add(
+            _Entry(
+              caster: mage,
+              target: opponent,
+              action: action,
+              element: mage.element ?? action.element!,
+              priority: channelPriority + _consumePriorityPenalty(mage),
+            ),
+          );
         case CastAction(:final spell):
           var priority = spell.priority;
           if (spell.isOffensive && mage.quickenPriority != null) {
@@ -261,13 +265,15 @@ class DuelEngine {
           // Counts as element activity even if it later fizzles or misses
           // (those "behave like a charge" of the cycling element).
           mage.activeElementThisTurn = mage.element ?? action.element;
-          entries.add(_Entry(
-            caster: mage,
-            target: opponent,
-            action: action,
-            element: mage.element ?? action.element!,
-            priority: priority,
-          ));
+          entries.add(
+            _Entry(
+              caster: mage,
+              target: opponent,
+              action: action,
+              element: mage.element ?? action.element!,
+              priority: priority,
+            ),
+          );
       }
     }
     entries.sort((a, b) => a.priority.compareTo(b.priority));
@@ -281,8 +287,7 @@ class DuelEngine {
         j++;
       }
       final group = entries.sublist(i, j).where((e) => e.caster.alive).toList();
-      final twoCasts =
-          group.length == 2 && group.every((e) => !e.isChannel);
+      final twoCasts = group.length == 2 && group.every((e) => !e.isChannel);
 
       if (twoCasts && startHolder != null) {
         // Haste tiebreak: the holder resolves first; if it kills the
@@ -291,8 +296,9 @@ class DuelEngine {
         // ⭐ The holder also PAYS first, which is what makes Haste matter to
         // Overload: the holder reads a full enemy charge bar, and the
         // opponent's Overload then reads the zero the holder just left behind.
-        final first =
-            identical(group[0].caster, startHolder) ? group[0] : group[1];
+        final first = identical(group[0].caster, startHolder)
+            ? group[0]
+            : group[1];
         final second = identical(first, group[0]) ? group[1] : group[0];
         _spendFor(first);
         _resolveEntry(first, events);
@@ -350,8 +356,9 @@ class DuelEngine {
           .where((e) => !e.isChannel && identical(e.caster, grab))
           .map((e) => e.endEventIndex);
       events.insert(
-          from.isEmpty ? events.length : from.last.clamp(0, events.length),
-          HasteChangedEvent(grab));
+        from.isEmpty ? events.length : from.last.clamp(0, events.length),
+        HasteChangedEvent(grab),
+      );
     }
 
     // POTION lane — belt consumables, after every cast has landed and before
@@ -376,14 +383,21 @@ class DuelEngine {
     // kills them, the other mage survives the turn: never a fatigue draw.
     if (!isOver && turnNumber > fatigueThreshold) {
       final dmg = (turnNumber - fatigueThreshold) * fatiguePerTurn;
-      final order =
-          identical(hasteHolder, mage2) ? [mage2, mage1] : [mage1, mage2];
+      final order = identical(hasteHolder, mage2)
+          ? [mage2, mage1]
+          : [mage1, mage2];
       for (final mage in order) {
         if (isOver) break;
         // Through the one door, so the killing tick reports the health the
         // mage had left rather than the tick's nominal size.
-        events.add(EffectDamageEvent(mage, 'Fatigue',
-            toShield: 0, toHp: _takeHpDamage(mage, dmg)));
+        events.add(
+          EffectDamageEvent(
+            mage,
+            'Fatigue',
+            toShield: 0,
+            toHp: _takeHpDamage(mage, dmg),
+          ),
+        );
       }
     }
 
@@ -407,15 +421,16 @@ class DuelEngine {
       case ChargeAction(:final element):
         if (mage.charge >= MageState.maxCharge) {
           throw ArgumentError(
-              '${mage.name} is already at maximum charge (${MageState.maxCharge}).');
+            '${mage.name} is already at maximum charge (${MageState.maxCharge}).',
+          );
         }
         if (mage.charge == 0 && element == null) {
           throw ArgumentError(
-              '${mage.name} must choose an element to begin charging.');
+            '${mage.name} must choose an element to begin charging.',
+          );
         }
         if (mage.charge > 0 && element != null && element != mage.element) {
-          throw ArgumentError(
-              '${mage.name} cannot switch elements mid-cycle.');
+          throw ArgumentError('${mage.name} cannot switch elements mid-cycle.');
         }
       case CastAction(:final spell, :final element):
         if (spell.xCost) {
@@ -424,16 +439,17 @@ class DuelEngine {
           }
         } else if (spell.chargeCost > mage.charge) {
           throw ArgumentError(
-              '${spell.name} needs ${spell.chargeCost} charge; '
-              '${mage.name} has ${mage.charge}.');
+            '${spell.name} needs ${spell.chargeCost} charge; '
+            '${mage.name} has ${mage.charge}.',
+          );
         }
         if (mage.charge == 0 && element == null) {
           throw ArgumentError(
-              '${mage.name} must choose an element to cast ${spell.name}.');
+            '${mage.name} must choose an element to cast ${spell.name}.',
+          );
         }
         if (mage.charge > 0 && element != null && element != mage.element) {
-          throw ArgumentError(
-              '${mage.name} cannot switch elements mid-cycle.');
+          throw ArgumentError('${mage.name} cannot switch elements mid-cycle.');
         }
     }
   }
@@ -492,11 +508,13 @@ class DuelEngine {
       // is what a potion is balanced against, and stacking would let a player
       // buy a permanent Regrow with pocket money.
       mage.statuses.removeWhere((s) => s is HealOverTimeStatus);
-      mage.statuses.add(HealOverTimeStatus(
-        percentPerTurn: effect.hotPercentPerTurn,
-        turnsLeft: effect.hotTurns,
-        source: effect.name,
-      ));
+      mage.statuses.add(
+        HealOverTimeStatus(
+          percentPerTurn: effect.hotPercentPerTurn,
+          turnsLeft: effect.hotTurns,
+          source: effect.name,
+        ),
+      );
     }
   }
 
@@ -647,19 +665,24 @@ class DuelEngine {
       caster.unerringNext = false;
     } else if (spell.isHarmful && spell.effect is! DischargeEffect) {
       final slips = cast.element == MagicElement.astral;
-      final blindPenalty =
-          slips ? 0 : (caster.missChance * 100).round(); // 50 if blinded
+      final blindPenalty = slips
+          ? 0
+          : (caster.missChance * 100).round(); // 50 if blinded
       final dodge = slips ? 0 : cast.target.effectiveDodge;
-      final hitChance = CombatClamps.hitChance(spell.accuracy -
-          baseMissPercent +
-          caster.effectiveAccuracyBonus -
-          dodge -
-          blindPenalty);
+      final hitChance = CombatClamps.hitChance(
+        spell.accuracy -
+            baseMissPercent +
+            caster.effectiveAccuracyBonus -
+            dodge -
+            blindPenalty,
+      );
       final missPercent = 100 - hitChance;
       if (missPercent > 0 && rng.nextDouble() * 100 < missPercent) {
         // ⭐ Tag the cause: only a real Blind window says "blinded" (§9b.8).
         // A whiff against the base miss or dodge is just a miss.
-        events.add(SpellMissedEvent(caster, spell, blinded: caster.missChance > 0));
+        events.add(
+          SpellMissedEvent(caster, spell, blinded: caster.missChance > 0),
+        );
         return;
       }
     }
@@ -686,7 +709,8 @@ class DuelEngine {
     // The Lunar phase modifier is additive alongside Arcane Knowledge (§5.2
     // step 5), and only for a Lunar attack. New −25 / Waxing +25 / Full +50 /
     // Waning 0; an eclipsed Lunar mage is locked to New (−25).
-    final lunarPercent = (cast.element == MagicElement.lunar && spell.isOffensive)
+    final lunarPercent =
+        (cast.element == MagicElement.lunar && spell.isOffensive)
         ? lunarAttackPercent(_effectiveMoonPhase(caster))
         : 0;
 
@@ -704,13 +728,13 @@ class DuelEngine {
     _lastAttackToHp = 0; // reset; _attack sets it, non-attacks leave it 0
     switch (spell.effect) {
       case DamageEffect(
-          :final minAmount,
-          :final maxAmount,
-          :final hits,
-          :final lifesteal,
-          :final ignoresShields,
-          :final executeBelowPercent
-        ):
+        :final minAmount,
+        :final maxAmount,
+        :final hits,
+        :final lifesteal,
+        :final ignoresShields,
+        :final executeBelowPercent,
+      ):
         final buffs = caster.consumeOffensiveBuffs();
         rawDamage = _attack(
           cast,
@@ -779,32 +803,53 @@ class DuelEngine {
         // once. That is what makes the ledger entry true: the pool this
         // produces is a pool, so the stance expiring later cannot reach back
         // into a shield that is already standing (or half spent).
-        final strength = (_roll(minStrength, maxStrength) *
-                caster.levelScale *
-                (1 + caster.effectiveShieldStrengthPercent / 100))
-            .round();
+        final strength =
+            (_roll(minStrength, maxStrength) *
+                    caster.levelScale *
+                    (1 + caster.effectiveShieldStrengthPercent / 100))
+                .round();
         caster.shield = ActiveShield.elemental(cast.element, strength);
-        events.add(ShieldRaisedEvent(caster,
-            element: cast.element, isBarrier: false, strength: strength));
+        events.add(
+          ShieldRaisedEvent(
+            caster,
+            element: cast.element,
+            isBarrier: false,
+            strength: strength,
+          ),
+        );
       case BarrierEffect():
         // Barrier stacks: each cast adds a point, up to the cap. `strength`
         // reports the resulting point count so the UI can show the level.
-        caster.barrierPoints =
-            (caster.barrierPoints + 1).clamp(0, MageState.maxBarrierPoints);
-        events.add(ShieldRaisedEvent(caster,
+        caster.barrierPoints = (caster.barrierPoints + 1).clamp(
+          0,
+          MageState.maxBarrierPoints,
+        );
+        events.add(
+          ShieldRaisedEvent(
+            caster,
             element: null,
             isBarrier: true,
-            strength: caster.barrierPoints));
+            strength: caster.barrierPoints,
+          ),
+        );
       case EmpowerEffect(:final multiplier):
         caster.empowerMultiplier = multiplier;
-        events.add(BuffAppliedEvent(
-            caster, 'next offensive spell deals ${multiplier}x damage',
-            statusId: 'empower'));
+        events.add(
+          BuffAppliedEvent(
+            caster,
+            'next offensive spell deals ${multiplier}x damage',
+            statusId: 'empower',
+          ),
+        );
       case QuickenEffect(:final priorityOverride):
         caster.quickenPriority = priorityOverride;
-        events.add(BuffAppliedEvent(caster,
+        events.add(
+          BuffAppliedEvent(
+            caster,
             'next offensive spell resolves at priority $priorityOverride',
-            statusId: 'quicken'));
+            statusId: 'quicken',
+          ),
+        );
       case PhaseEffect(:final bypass):
         // The next-attack riders — Phase, Pierce, Unerring (§7a). Recasting one
         // refreshes a flag that is already true; holding two DIFFERENT riders
@@ -813,19 +858,31 @@ class DuelEngine {
         switch (bypass) {
           case AttackBypass.shields:
             caster.phaseNext = true;
-            events.add(BuffAppliedEvent(
-                caster, 'next offensive spell ignores shields',
-                statusId: 'phase'));
+            events.add(
+              BuffAppliedEvent(
+                caster,
+                'next offensive spell ignores shields',
+                statusId: 'phase',
+              ),
+            );
           case AttackBypass.deflection:
             caster.pierceNext = true;
-            events.add(BuffAppliedEvent(
-                caster, 'next offensive spell cannot be deflected',
-                statusId: 'pierce'));
+            events.add(
+              BuffAppliedEvent(
+                caster,
+                'next offensive spell cannot be deflected',
+                statusId: 'pierce',
+              ),
+            );
           case AttackBypass.evasion:
             caster.unerringNext = true;
-            events.add(BuffAppliedEvent(
-                caster, 'next offensive spell cannot miss',
-                statusId: 'unerring'));
+            events.add(
+              BuffAppliedEvent(
+                caster,
+                'next offensive spell cannot miss',
+                statusId: 'unerring',
+              ),
+            );
         }
       case CleanseEffect(:final all):
         _resolveCleanse(caster, all, cast.statusChoice, events);
@@ -872,13 +929,22 @@ class DuelEngine {
         // Grace doesn't stack past one, so casting Hallow while already warded
         // is a wasted turn — say so rather than logging a fresh success.
         if (caster.hasGrace) {
-          events.add(BuffAppliedEvent(
-              caster, 'Already warded — Grace unchanged',
-              statusId: 'graceAlready'));
+          events.add(
+            BuffAppliedEvent(
+              caster,
+              'Already warded — Grace unchanged',
+              statusId: 'graceAlready',
+            ),
+          );
         } else {
           caster.hasGrace = true;
-          events.add(BuffAppliedEvent(
-              caster, 'Grace — next debuff blocked', statusId: 'grace'));
+          events.add(
+            BuffAppliedEvent(
+              caster,
+              'Grace — next debuff blocked',
+              statusId: 'grace',
+            ),
+          );
         }
     }
 
@@ -957,7 +1023,8 @@ class DuelEngine {
       // from the next hit on, and a heal that resolved earlier this turn takes
       // them back off it. Death Wish and Composure live inside [_rollsCrit],
       // so every crit source shares one door and one counter.
-      final executes = executeBelowPercent > 0 &&
+      final executes =
+          executeBelowPercent > 0 &&
           target.hp * 100 < target.maxHp * executeBelowPercent;
       final crit = _rollsCrit(caster, target, guaranteed: executes);
       if (crit) {
@@ -981,12 +1048,19 @@ class DuelEngine {
       // clamps rather than arguing with them: the 90% caps keep a *sliver*
       // landing against Divert, and Pierce removes Divert from the question
       // entirely for one attack.
-      final r = _damagePacket(target, perHit, cast.element,
-          ignoresShields: ignoresShields,
-          piercePercent: piercePct,
-          canDeflect: !noDeflect);
+      final r = _damagePacket(
+        target,
+        perHit,
+        cast.element,
+        ignoresShields: ignoresShields,
+        piercePercent: piercePct,
+        canDeflect: !noDeflect,
+      );
       totalToHp += r.toHp;
-      events.add(DamageEvent(target, spell,
+      events.add(
+        DamageEvent(
+          target,
+          spell,
           toShield: r.toShield,
           toHp: r.toHp,
           shieldMultiplierPercent: r.multiplierPercent,
@@ -994,7 +1068,9 @@ class DuelEngine {
           barrierPopped: r.barrierPopped,
           crit: crit,
           deflected: r.deflected,
-          bypassedShield: bypassedShield));
+          bypassedShield: bypassedShield,
+        ),
+      );
 
       _maybeReflect(target, r.deflected, events);
     }
@@ -1044,8 +1120,11 @@ class DuelEngine {
   /// ⚠️ No clamp here, deliberately: crit is the one output §7a leaves
   /// uncapped, because Execute and Death Wish are *meant* to reach certainty
   /// and Composure is the counter rather than a ceiling.
-  bool _rollsCrit(MageState caster, MageState target,
-      {required bool guaranteed}) {
+  bool _rollsCrit(
+    MageState caster,
+    MageState target, {
+    required bool guaranteed,
+  }) {
     // ⭐ Death Wish (§7a): while the ATTACKER'S OWN health is below 15% of
     // max, this is a crit with no roll at all. Like [guaranteed] (Execute),
     // the short-circuit is load-bearing for lockstep as well as for taste —
@@ -1073,7 +1152,11 @@ class DuelEngine {
   /// is the attack's total pre-shield damage (0 for non-damaging spells).
   /// [chargeSpent] is the charge consumed by this cast (casting spends all).
   void _triggerElementEffects(
-      _Entry cast, int rawDamage, int chargeSpent, List<DuelEvent> e) {
+    _Entry cast,
+    int rawDamage,
+    int chargeSpent,
+    List<DuelEvent> e,
+  ) {
     final caster = cast.caster;
     final target = cast.target;
     final spell = cast.spell!;
@@ -1092,8 +1175,13 @@ class DuelEngine {
         if (PhotosynthesisStatus.activeFor(caster)) {
           if (_statusOf<PhotosynthesisStatus>(caster) == null) {
             caster.statuses.add(PhotosynthesisStatus());
-            e.add(BuffAppliedEvent(caster, 'Photosynthesis — active',
-                statusId: 'photosynthesis'));
+            e.add(
+              BuffAppliedEvent(
+                caster,
+                'Photosynthesis — active',
+                statusId: 'photosynthesis',
+              ),
+            );
           }
         }
       case MagicElement.aqua:
@@ -1104,9 +1192,13 @@ class DuelEngine {
           if (_statusOf<PhotosynthesisStatus>(target) == null &&
               !_graceBlocks(target, e)) {
             target.priorityPenalty = ElementTuning.waterloggedPriorityPenalty;
-            e.add(BuffAppliedEvent(
-                target, 'Waterlogged — next action slowed',
-                statusId: 'waterlogged'));
+            e.add(
+              BuffAppliedEvent(
+                target,
+                'Waterlogged — next action slowed',
+                statusId: 'waterlogged',
+              ),
+            );
             // ⭐ Ruled 2026-09-21: the water also takes the initiative. Slowing
             // a mage who holds Haste and leaving them the same-priority
             // tiebreak was the two halves of one idea disagreeing.
@@ -1123,8 +1215,9 @@ class DuelEngine {
         if (spell.effect is ShieldEffect &&
             _statusOf<IgniteStatus>(caster) != null) {
           caster.statuses.removeWhere((s) => s is IgniteStatus);
-          e.add(BuffAppliedEvent(caster, 'Ignite doused',
-              statusId: 'igniteDoused'));
+          e.add(
+            BuffAppliedEvent(caster, 'Ignite doused', statusId: 'igniteDoused'),
+          );
         }
 
       // ---- Tier 2 — Kinetic --------------------------------------------
@@ -1136,8 +1229,13 @@ class DuelEngine {
               target.streakCount > 0) {
             target.streakElement = null;
             target.streakCount = 0;
-            e.add(BuffAppliedEvent(target, 'Tailwind scattered',
-                statusId: 'tailwindScattered'));
+            e.add(
+              BuffAppliedEvent(
+                target,
+                'Tailwind scattered',
+                statusId: 'tailwindScattered',
+              ),
+            );
           }
           // Static Feedback — 20% on hit strips one charge. Grounded out by
           // a Geo shield still standing after the hit.
@@ -1163,14 +1261,19 @@ class DuelEngine {
         // Tailwind streak of 3+ (Aero weathers Geo).
         if (caster.streakElement == MagicElement.geo &&
             caster.streakCount % ElementTuning.staggerEveryNthCast == 0) {
-          final windShielded = target.streakElement == MagicElement.aero &&
+          final windShielded =
+              target.streakElement == MagicElement.aero &&
               target.streakCount >= 3;
           if (!windShielded && !_graceBlocks(target, e)) {
             target.nextOffensiveDamageScale =
-              ElementTuning.staggerDamagePercent / 100;
-            e.add(BuffAppliedEvent(
-                target, 'Staggered — next offensive spell halved',
-                statusId: 'stagger'));
+                ElementTuning.staggerDamagePercent / 100;
+            e.add(
+              BuffAppliedEvent(
+                target,
+                'Staggered — next offensive spell halved',
+                statusId: 'stagger',
+              ),
+            );
           }
         }
 
@@ -1194,16 +1297,25 @@ class DuelEngine {
           if (align != null) {
             if (_effectiveMoonPhase(caster) == MoonPhase.full) {
               target.statuses.removeWhere((s) => s is AstralAlignmentStatus);
-              e.add(BuffAppliedEvent(
-                  target, 'Alignment scattered (Full Moon)',
-                  statusId: 'alignmentStripped'));
+              e.add(
+                BuffAppliedEvent(
+                  target,
+                  'Alignment scattered (Full Moon)',
+                  statusId: 'alignmentStripped',
+                ),
+              );
             } else {
               align.stacks--;
               if (align.stacks <= 0) {
                 target.statuses.removeWhere((s) => s is AstralAlignmentStatus);
               }
-              e.add(BuffAppliedEvent(target, 'Alignment stripped',
-                  statusId: 'alignmentStripped'));
+              e.add(
+                BuffAppliedEvent(
+                  target,
+                  'Alignment stripped',
+                  statusId: 'alignmentStripped',
+                ),
+              );
             }
           }
         }
@@ -1213,17 +1325,21 @@ class DuelEngine {
         // cheap ones. Decay is the status's end-of-turn bookkeeping.
         // A 0-charge cast (Flick) grants nothing — spending is the commitment.
         if (chargeSpent > 0) {
-          final align = _statusOf<AstralAlignmentStatus>(caster) ??
+          final align =
+              _statusOf<AstralAlignmentStatus>(caster) ??
               (() {
                 final s = AstralAlignmentStatus(0);
                 caster.statuses.add(s);
                 return s;
               })();
           align.addStacks(chargeSpent);
-          e.add(BuffAppliedEvent(
+          e.add(
+            BuffAppliedEvent(
               caster,
               'Astral Alignment (${align.stacks} — ${align.piercePercent}% pierce)',
-              statusId: 'astralAlignment'));
+              statusId: 'astralAlignment',
+            ),
+          );
         }
 
       // ---- Tier 4 — Ethereal -------------------------------------------
@@ -1233,22 +1349,32 @@ class DuelEngine {
         if (caster.streakElement == MagicElement.sanctus &&
             caster.streakCount % 3 == 0) {
           caster.statuses.add(PendingAbsolutionStatus());
-          e.add(BuffAppliedEvent(caster, 'Absolution rising',
-              statusId: 'absolutionRising'));
+          e.add(
+            BuffAppliedEvent(
+              caster,
+              'Absolution rising',
+              statusId: 'absolutionRising',
+            ),
+          );
         }
       case MagicElement.umbra:
         // Creeping Dark — stacks grow by the charge spent on each cast.
         if (chargeSpent > 0) {
-          final dark = _statusOf<CreepingDarkStatus>(caster) ??
+          final dark =
+              _statusOf<CreepingDarkStatus>(caster) ??
               (() {
                 final s = CreepingDarkStatus();
                 caster.statuses.add(s);
                 return s;
               })();
           dark.addStacks(chargeSpent);
-          e.add(BuffAppliedEvent(
-              caster, 'Creeping Dark (${dark.stacks} stacks)',
-              statusId: 'creepingDark'));
+          e.add(
+            BuffAppliedEvent(
+              caster,
+              'Creeping Dark (${dark.stacks} stacks)',
+              statusId: 'creepingDark',
+            ),
+          );
         }
       case MagicElement.arcane:
         // Arcane → Sanctus: an Arcane attack that lands on health resets the
@@ -1259,8 +1385,13 @@ class DuelEngine {
             target.streakElement == MagicElement.sanctus) {
           target.streakElement = null;
           target.streakCount = 0;
-          e.add(BuffAppliedEvent(target, 'Sanctus rite unravelled',
-              statusId: 'sanctusUnravelled'));
+          e.add(
+            BuffAppliedEvent(
+              target,
+              'Sanctus rite unravelled',
+              statusId: 'sanctusUnravelled',
+            ),
+          );
         }
         // Arcane Knowledge — a 4+ charge Arcane cast earns a stack, unless
         // the opponent's darkness is at Dusk or worse (Umbra corrupts
@@ -1277,11 +1408,14 @@ class DuelEngine {
             final stacks = _statusOf<ArcaneKnowledgeStatus>(caster)!.stacks;
             caster.bonusDamagePercent =
                 stacks * ArcaneKnowledgeStatus.percentPerStack;
-            e.add(BuffAppliedEvent(
+            e.add(
+              BuffAppliedEvent(
                 caster,
                 'Arcane Knowledge ($stacks stacks, '
-                    '+${caster.bonusDamagePercent}% damage)',
-                statusId: 'arcaneKnowledge'));
+                '+${caster.bonusDamagePercent}% damage)',
+                statusId: 'arcaneKnowledge',
+              ),
+            );
           }
         }
     }
@@ -1298,8 +1432,13 @@ class DuelEngine {
     } else {
       target.statuses.add(BlindStatus());
     }
-    e.add(BuffAppliedEvent(target, 'Blinded — 50% miss for 3 turns',
-        statusId: 'blind'));
+    e.add(
+      BuffAppliedEvent(
+        target,
+        'Blinded — 50% miss for 3 turns',
+        statusId: 'blind',
+      ),
+    );
   }
 
   /// The moon phase governing [mage]'s Lunar spells: the global clock, unless
@@ -1309,17 +1448,21 @@ class DuelEngine {
   /// so the eclipse matches Blind's 3 turns exactly and skips the application
   /// turn — the same "starts next turn" rule the misses follow. Per-mage: the
   /// Solar caster's own moon still turns.
-  MoonPhase _effectiveMoonPhase(MageState mage) => mage.missChance > 0
-      ? MoonPhase.newMoon
-      : moonPhaseForTurn(turnNumber);
+  MoonPhase _effectiveMoonPhase(MageState mage) =>
+      mage.missChance > 0 ? MoonPhase.newMoon : moonPhaseForTurn(turnNumber);
 
   /// If [target] holds Grace, consume it and return true (the incoming debuff
   /// is blocked). Grace is max-1 and persists until spent (§4c.1).
   bool _graceBlocks(MageState target, List<DuelEvent> e) {
     if (!target.hasGrace) return false;
     target.hasGrace = false;
-    e.add(BuffAppliedEvent(target, 'Grace absorbs the debuff',
-        statusId: 'graceConsumed'));
+    e.add(
+      BuffAppliedEvent(
+        target,
+        'Grace absorbs the debuff',
+        statusId: 'graceConsumed',
+      ),
+    );
     return true;
   }
 
@@ -1345,8 +1488,9 @@ class DuelEngine {
     } else {
       target.statuses.add(IgniteStatus(perTick));
     }
-    e.add(BuffAppliedEvent(target, 'Ignited ($perTick/turn)',
-        statusId: 'ignite'));
+    e.add(
+      BuffAppliedEvent(target, 'Ignited ($perTick/turn)', statusId: 'ignite'),
+    );
   }
 
   // ---- The bank: DoT engine & debuff suite (TYPE_EFFECTS §7a) -----------
@@ -1378,27 +1522,40 @@ class DuelEngine {
   /// Replace, never stack (§7a law 5): a recast is a REFRESH — a fresh clock
   /// at the new value, the same rule Ignite's re-proc follows. Different DoTs
   /// coexist and tick side by side; only a same-id collision replaces.
-  void _applyBankDot(MageState caster, MageState target, DotAttackEffect dot,
-      List<DuelEvent> e) {
+  void _applyBankDot(
+    MageState caster,
+    MageState target,
+    DotAttackEffect dot,
+    List<DuelEvent> e,
+  ) {
     if (_graceBlocks(target, e)) return;
     final perTick = _scaledForCaster(caster, dot.damagePerTick);
     target.statuses.removeWhere((s) => s.id == dot.dotId);
-    target.statuses.add(BankDotStatus(
-      id: dot.dotId,
-      name: dot.dotName,
-      damagePerTick: perTick,
-      ticks: dot.ticks,
-    ));
-    e.add(BuffAppliedEvent(
-        target, '${dot.dotName} — $perTick/turn for ${dot.ticks} turns',
-        statusId: dot.dotId));
+    target.statuses.add(
+      BankDotStatus(
+        id: dot.dotId,
+        name: dot.dotName,
+        damagePerTick: perTick,
+        ticks: dot.ticks,
+      ),
+    );
+    e.add(
+      BuffAppliedEvent(
+        target,
+        '${dot.dotName} — $perTick/turn for ${dot.ticks} turns',
+        statusId: dot.dotId,
+      ),
+    );
   }
 
   /// Applies Murk / Wither / Blight. Replace-on-cast: magnitude and duration
   /// together, last cast wins — so Miasma over Murk is an upgrade, and Murk
   /// over Miasma is a downgrade the caster chose.
   void _applyBankDebuff(
-      MageState target, DebuffGrantEffect grant, List<DuelEvent> e) {
+    MageState target,
+    DebuffGrantEffect grant,
+    List<DuelEvent> e,
+  ) {
     if (_graceBlocks(target, e)) return;
     final status = grant.buildStatus();
     target.statuses.removeWhere((s) => s.id == status.id);
@@ -1425,27 +1582,38 @@ class DuelEngine {
     final target = cast.target;
     if (damage > 0) {
       final r = _damagePacket(
-          target, _scaledForCaster(cast.caster, damage), cast.element);
-      e.add(DamageEvent(target, cast.spell!,
+        target,
+        _scaledForCaster(cast.caster, damage),
+        cast.element,
+      );
+      e.add(
+        DamageEvent(
+          target,
+          cast.spell!,
           toShield: r.toShield,
           toHp: r.toHp,
           shieldMultiplierPercent: r.multiplierPercent,
           shieldBroken: r.broken,
           barrierPopped: r.barrierPopped,
-          deflected: r.deflected));
+          deflected: r.deflected,
+        ),
+      );
       _maybeReflect(target, r.deflected, e);
     }
     final dots = target.statuses.whereType<DamageOverTime>().toList();
     for (final dot in dots) {
       dot.addTicks(bonusTicks);
     }
-    e.add(BuffAppliedEvent(
+    e.add(
+      BuffAppliedEvent(
         target,
         dots.isEmpty
             ? 'Nothing is festering'
             : 'Festering — +$bonusTicks ticks on ${dots.length} burn'
-                '${dots.length == 1 ? '' : 's'}',
-        statusId: 'fester'));
+                  '${dots.length == 1 ? '' : 's'}',
+        statusId: 'fester',
+      ),
+    );
   }
 
   /// **Scour**: every DoT on the target pays out all its remaining ticks NOW
@@ -1461,22 +1629,30 @@ class DuelEngine {
     final dots = target.statuses.whereType<DamageOverTime>().toList();
     final total = dots.fold(0, (sum, d) => sum + d.remainingDamage);
     target.statuses.removeWhere((s) => s is DamageOverTime);
-    e.add(BuffAppliedEvent(
+    e.add(
+      BuffAppliedEvent(
         target,
         dots.isEmpty
             ? 'Nothing to scour'
             : 'Scoured — ${dots.length} burn${dots.length == 1 ? '' : 's'} '
-                'collected for $total',
-        statusId: 'scour'));
+                  'collected for $total',
+        statusId: 'scour',
+      ),
+    );
     if (total <= 0) return;
     final r = _damagePacket(target, total, null);
-    e.add(DamageEvent(target, cast.spell!,
+    e.add(
+      DamageEvent(
+        target,
+        cast.spell!,
         toShield: r.toShield,
         toHp: r.toHp,
         shieldMultiplierPercent: r.multiplierPercent,
         shieldBroken: r.broken,
         barrierPopped: r.barrierPopped,
-        deflected: r.deflected));
+        deflected: r.deflected,
+      ),
+    );
     _maybeReflect(target, r.deflected, e);
   }
 
@@ -1512,12 +1688,15 @@ class DuelEngine {
       target.hasGrace = false;
       stripped.add('grace');
     }
-    e.add(BuffAppliedEvent(
+    e.add(
+      BuffAppliedEvent(
         target,
         stripped.isEmpty
             ? 'Nothing to dispel'
             : 'Dispelled — ${stripped.join(', ')}',
-        statusId: 'dispel'));
+        statusId: 'dispel',
+      ),
+    );
   }
 
   /// **Shatter**: no damage. The elemental shield, every Barrier point, and
@@ -1526,18 +1705,22 @@ class DuelEngine {
   /// ⚠️ Statuses only, for deflection: gear's deflect stats are not a stance
   /// and cannot be shattered off someone's armour.
   void _shatter(MageState target, List<DuelEvent> e) {
-    final had = target.shield != null ||
+    final had =
+        target.shield != null ||
         target.barrierPoints > 0 ||
         target.statuses.any(isDivertFamily);
     target.shield = null;
     target.barrierPoints = 0;
     target.statuses.removeWhere(isDivertFamily);
-    e.add(BuffAppliedEvent(
+    e.add(
+      BuffAppliedEvent(
         target,
         had
             ? 'Shattered — shields, Barrier and Divert are gone'
             : 'Nothing to shatter',
-        statusId: 'shatter'));
+        statusId: 'shatter',
+      ),
+    );
   }
 
   T? _statusOf<T extends TurnStatus>(MageState mage) {
@@ -1582,8 +1765,9 @@ class DuelEngine {
     int toHp,
     bool broken,
     int multiplierPercent,
-    bool barrierPopped
-  }) _damagePacket(
+    bool barrierPopped,
+  })
+  _damagePacket(
     MageState target,
     int amount,
     MagicElement? element, {
@@ -1596,17 +1780,20 @@ class DuelEngine {
     // ⭐ BOTH halves of the Divert pair are clamped at 90 on the assembled
     // output (§7a): deflection never becomes a certainty, and a deflected hit
     // is never erased. "There is always a sliver that lands."
-    final chance =
-        CombatClamps.deflectActivation(target.effectiveDeflectChance);
+    final chance = CombatClamps.deflectActivation(
+      target.effectiveDeflectChance,
+    );
     if (canDeflect && chance > 0 && rng.nextInt(100) < chance) {
-      deflected = (remaining *
-              CombatClamps.deflectFraction(target.effectiveDeflectAmount) /
-              100)
-          .round();
+      deflected =
+          (remaining *
+                  CombatClamps.deflectFraction(target.effectiveDeflectAmount) /
+                  100)
+              .round();
       remaining -= deflected;
     }
-    final pierce =
-        piercePercent > 0 ? (remaining * piercePercent / 100).round() : 0;
+    final pierce = piercePercent > 0
+        ? (remaining * piercePercent / 100).round()
+        : 0;
     final r = _applyOneHit(target, remaining - pierce, element, ignoresShields);
     // The pierced slice walks through [_takeHpDamage] too, so overkill on it
     // is clamped exactly like the main portion.
@@ -1617,7 +1804,7 @@ class DuelEngine {
       toHp: toHp,
       broken: r.broken,
       multiplierPercent: r.multiplierPercent,
-      barrierPopped: r.barrierPopped
+      barrierPopped: r.barrierPopped,
     );
   }
 
@@ -1633,18 +1820,26 @@ class DuelEngine {
   /// rather than by a condition: [_applyOneHit] never rolls deflection, so a
   /// return never becomes a deflect and there is no second bounce.
   void _maybeReflect(
-      MageState deflector, int deflected, List<DuelEvent> events) {
+    MageState deflector,
+    int deflected,
+    List<DuelEvent> events,
+  ) {
     if (deflected <= 0) return;
     final returned = reflectedAmount(deflector, deflected);
     if (returned <= 0) return;
     final sender = identical(deflector, mage1) ? mage2 : mage1;
     final back = _applyOneHit(sender, returned, null, false);
-    events.add(EffectDamageEvent(sender, 'Reflect',
+    events.add(
+      EffectDamageEvent(
+        sender,
+        'Reflect',
         toShield: back.toShield,
         toHp: back.toHp,
         shieldMultiplierPercent: back.multiplierPercent,
         shieldBroken: back.broken,
-        barrierPopped: back.barrierPopped));
+        barrierPopped: back.barrierPopped,
+      ),
+    );
   }
 
   /// Applies one [amount] of damage to [target], resolving shields and counter
@@ -1658,8 +1853,9 @@ class DuelEngine {
     int toHp,
     bool broken,
     int multiplierPercent,
-    bool barrierPopped
-  }) _applyOneHit(
+    bool barrierPopped,
+  })
+  _applyOneHit(
     MageState target,
     int amount,
     MagicElement? attackElement,
@@ -1677,7 +1873,7 @@ class DuelEngine {
         toHp: 0,
         broken: false,
         multiplierPercent: 100,
-        barrierPopped: true
+        barrierPopped: true,
       );
     }
     final shield = ignoresShields ? null : target.shield;
@@ -1687,7 +1883,7 @@ class DuelEngine {
         toHp: _takeHpDamage(target, amount),
         broken: false,
         multiplierPercent: 100,
-        barrierPopped: false
+        barrierPopped: false,
       );
     }
     // Defensive: barriers belong in [MageState.barrier], but an element-less
@@ -1700,7 +1896,7 @@ class DuelEngine {
         toHp: 0,
         broken: false,
         multiplierPercent: 100,
-        barrierPopped: true
+        barrierPopped: true,
       );
     }
     // §0.3 shield multiplier (50/75/100/150/200%). All arithmetic stays
@@ -1714,7 +1910,7 @@ class DuelEngine {
         toHp: 0,
         broken: false,
         multiplierPercent: pct,
-        barrierPopped: false
+        barrierPopped: false,
       );
     }
     // Overflow: the raw damage spent breaking the shield is rounded in the
@@ -1728,7 +1924,7 @@ class DuelEngine {
       toHp: _takeHpDamage(target, amount - rawConsumed),
       broken: true,
       multiplierPercent: pct,
-      barrierPopped: false
+      barrierPopped: false,
     );
   }
 
@@ -1781,22 +1977,31 @@ class DuelEngine {
         final delta = _heal(holder, amount, events);
         if (delta >= 0) events.add(EffectHealEvent(holder, source, delta));
       case StatusDamage(
-          :final amount,
-          :final element,
-          :final bypassShield,
-          :final source
-        ):
+        :final amount,
+        :final element,
+        :final bypassShield,
+        :final source,
+      ):
         // ⭐ A tick is DAMAGE: the same path a spell's hit takes, so a shield
         // eats it first and Divert can deflect it (ruled 2026-08-28).
-        final r = _damagePacket(holder, amount, element,
-            ignoresShields: bypassShield);
-        events.add(EffectDamageEvent(holder, source,
+        final r = _damagePacket(
+          holder,
+          amount,
+          element,
+          ignoresShields: bypassShield,
+        );
+        events.add(
+          EffectDamageEvent(
+            holder,
+            source,
             toShield: r.toShield,
             toHp: r.toHp,
             shieldMultiplierPercent: r.multiplierPercent,
             shieldBroken: r.broken,
             barrierPopped: r.barrierPopped,
-            deflected: r.deflected));
+            deflected: r.deflected,
+          ),
+        );
         _maybeReflect(holder, r.deflected, events);
       case StatusPurge():
         _resolveAbsolution(holder, events);
@@ -1822,31 +2027,41 @@ class DuelEngine {
     // goes wrong.
     final pool = debuffsOn(caster);
     if (pool.isEmpty) {
-      events.add(BuffAppliedEvent(
-          caster, all ? 'Nothing to purify' : 'Nothing to cleanse',
-          statusId: 'cleanseEmpty'));
+      events.add(
+        BuffAppliedEvent(
+          caster,
+          all ? 'Nothing to purify' : 'Nothing to cleanse',
+          statusId: 'cleanseEmpty',
+        ),
+      );
       return;
     }
     if (all) {
       for (final d in pool) {
         d.remove();
       }
-      events.add(BuffAppliedEvent(
-          caster, 'Purified — ${pool.length} debuff(s) lifted',
-          statusId: 'purified'));
+      events.add(
+        BuffAppliedEvent(
+          caster,
+          'Purified — ${pool.length} debuff(s) lifted',
+          statusId: 'purified',
+        ),
+      );
       return;
     }
     // ⚠️ A named id that is no longer on the board falls through to the default
     // rather than doing nothing: both clients agree either way, and a UI racing
     // a debuff that expired between submission and resolution should still
     // cleanse *something* rather than burn the turn on a technicality.
-    final chosen = (statusChoice == null
+    final chosen =
+        (statusChoice == null
             ? null
             : pool.where((d) => d.id == statusChoice).firstOrNull) ??
         defaultCleanseChoice(pool)!;
     chosen.remove();
-    events.add(BuffAppliedEvent(caster, 'Cleansed — ${chosen.id}',
-        statusId: 'cleansed'));
+    events.add(
+      BuffAppliedEvent(caster, 'Cleansed — ${chosen.id}', statusId: 'cleansed'),
+    );
   }
 
   /// Resolves **Meditate** (§7a): every turn-timed buff gains [bonusTurns].
@@ -1855,17 +2070,23 @@ class DuelEngine {
   /// The riders above have no clock and the burns are the wrong polarity, so
   /// both are out by construction rather than by a check here.
   void _resolveMeditate(
-      MageState caster, int bonusTurns, List<DuelEvent> events) {
+    MageState caster,
+    int bonusTurns,
+    List<DuelEvent> events,
+  ) {
     final fed = timedBuffsOn(caster).toList();
     for (final b in fed) {
       b.extendTurns(bonusTurns);
     }
-    events.add(BuffAppliedEvent(
+    events.add(
+      BuffAppliedEvent(
         caster,
         fed.isEmpty
             ? 'Meditated — no stance to deepen'
             : 'Meditated — ${fed.length} stance(s) +$bonusTurns turns',
-        statusId: 'meditated'));
+        statusId: 'meditated',
+      ),
+    );
   }
 
   /// Resolves Absolution for [holder] (Sanctus, §4c). Two parts, both
@@ -1881,8 +2102,13 @@ class DuelEngine {
       if (dark.stacks <= 0) {
         opponent.statuses.removeWhere((s) => s is CreepingDarkStatus);
       }
-      events.add(BuffAppliedEvent(opponent, 'Creeping Dark seared (−5)',
-          statusId: 'darkSeared'));
+      events.add(
+        BuffAppliedEvent(
+          opponent,
+          'Creeping Dark seared (−5)',
+          statusId: 'darkSeared',
+        ),
+      );
     }
 
     // The removable-debuff pool is every lingering debuff-polarity status PLUS
@@ -1907,22 +2133,34 @@ class DuelEngine {
       // cast against a status-light opponent.
       if (!holder.hasGrace) {
         holder.hasGrace = true;
-        events.add(BuffAppliedEvent(holder, 'Grace — next debuff blocked',
-            statusId: 'grace'));
+        events.add(
+          BuffAppliedEvent(
+            holder,
+            'Grace — next debuff blocked',
+            statusId: 'grace',
+          ),
+        );
       }
     } else {
       // Uniformly random, from the shared per-turn seed (§4c.1).
       final victim = removable[rng.nextInt(removable.length)];
       victim.remove();
-      events.add(BuffAppliedEvent(
-          holder, 'Absolution — ${victim.id} purged',
-          statusId: 'absolution'));
+      events.add(
+        BuffAppliedEvent(
+          holder,
+          'Absolution — ${victim.id} purged',
+          statusId: 'absolution',
+        ),
+      );
     }
   }
 
   // Transfers Haste based on this turn's casts (see class doc for the rules).
   void _updateHaste(
-      List<_Entry> entries, MageState? startHolder, List<DuelEvent> events) {
+    List<_Entry> entries,
+    MageState? startHolder,
+    List<DuelEvent> events,
+  ) {
     final casts = entries.where((e) => !e.isChannel).toList();
     final qualifying = startHolder == null
         ? casts // unheld: any non-channel cast grabs it
@@ -1963,8 +2201,8 @@ class DuelEngine {
     final owner = newHolder == null
         ? qualifying.map((e) => e.endEventIndex).reduce((a, b) => a > b ? a : b)
         : qualifying
-            .firstWhere((e) => identical(e.caster, newHolder))
-            .endEventIndex;
+              .firstWhere((e) => identical(e.caster, newHolder))
+              .endEventIndex;
     events.insert(owner.clamp(0, events.length), HasteChangedEvent(newHolder));
   }
 }

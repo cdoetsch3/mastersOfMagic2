@@ -165,7 +165,8 @@ void main() {
       expect(
         spellKindOf(Spellbook.murk),
         SpellKind.auxOffense,
-        reason: 'a debuff on the enemy is pressure, not preparation — '
+        reason:
+            'a debuff on the enemy is pressure, not preparation — '
             'the mutant this kills files it beside Lightfoot',
       );
       expect(
@@ -186,7 +187,8 @@ void main() {
       expect(
         SpellKind.auxSelf.index < SpellKind.auxOffense.index,
         isTrue,
-        reason: 'section order is the priority ladder: self-aux (7) resolves '
+        reason:
+            'section order is the priority ladder: self-aux (7) resolves '
             'before enemy-aux (8), so the book reads a turn in order',
       );
     });
@@ -323,8 +325,11 @@ void main() {
               '${sorted[i - 1].name} ($a) before ${sorted[i].name} ($b)',
         );
         if (a == b) {
-          expect(sorted[i - 1].name.compareTo(sorted[i].name) <= 0, isTrue,
-              reason: 'equal levels tie-break on name, so the order is stable');
+          expect(
+            sorted[i - 1].name.compareTo(sorted[i].name) <= 0,
+            isTrue,
+            reason: 'equal levels tie-break on name, so the order is stable',
+          );
         }
       }
       expect(
@@ -382,7 +387,6 @@ void main() {
         }
       }
     });
-
   });
 
   // ---- filtering and grouping -------------------------------------------
@@ -598,7 +602,9 @@ void main() {
       final labels = [for (final s in sections) s.label];
       expect(
         labels,
-        [for (final c in [0, 1, 2, 3, 4, 5]) costSectionLabel(c)],
+        [
+          for (final c in [0, 1, 2, 3, 4, 5]) costSectionLabel(c),
+        ],
         reason:
             '⚠️ the mutant this kills: a cost grouping that gives Barrage '
             'its own "Cost X" section — the filter files it by its minimum, '
@@ -621,23 +627,30 @@ void main() {
       }
     });
 
-    test('None is one unlabelled section holding the whole (filtered) book', () {
-      final sections = sectionSpells(
-        Spellbook.all,
-        grouping: SpellGrouping.none,
-        sort: SpellSort.cost,
-        cost: SpellCostFilter.heavy,
-      );
-      expect(sections, hasLength(1));
-      expect(sections.single.label, isEmpty,
-          reason: 'a header over "everything" says nothing');
-      expect(
-        sections.single.spells.every((sp) => sp.chargeCost >= 4),
-        isTrue,
-        reason: '⚠️ the mutant this kills: a None grouping that skips the '
-            'filters on its way to the flat list',
-      );
-    });
+    test(
+      'None is one unlabelled section holding the whole (filtered) book',
+      () {
+        final sections = sectionSpells(
+          Spellbook.all,
+          grouping: SpellGrouping.none,
+          sort: SpellSort.cost,
+          cost: SpellCostFilter.heavy,
+        );
+        expect(sections, hasLength(1));
+        expect(
+          sections.single.label,
+          isEmpty,
+          reason: 'a header over "everything" says nothing',
+        );
+        expect(
+          sections.single.spells.every((sp) => sp.chargeCost >= 4),
+          isTrue,
+          reason:
+              '⚠️ the mutant this kills: a None grouping that skips the '
+              'filters on its way to the flat list',
+        );
+      },
+    );
 
     test('⭐ the sort orders WITHIN each section', () {
       final sections = sectionSpells(
@@ -649,9 +662,13 @@ void main() {
         final levels = [
           for (final sp in section.spells) Progression.plannedUnlockLevelOf(sp),
         ];
-        expect(levels, List<int>.of(levels)..sort(),
-            reason: '${section.label} must climb the unlock ladder inside '
-                'its own header');
+        expect(
+          levels,
+          List<int>.of(levels)..sort(),
+          reason:
+              '${section.label} must climb the unlock ladder inside '
+              'its own header',
+        );
       }
     });
 
@@ -798,7 +815,9 @@ void main() {
             'book — a player shopping for cheap spells still wants to know '
             'which cheap ones are shields',
       );
-      final cheapAll = Spellbook.all.where(SpellCostFilter.cheap.accepts).length;
+      final cheapAll = Spellbook.all
+          .where(SpellCostFilter.cheap.accepts)
+          .length;
       expect(
         _header('Showing $cheapAll of ${Spellbook.all.length} spells'),
         findsOneWidget,
@@ -812,10 +831,16 @@ void main() {
       await _pump(tester);
       await tester.enterText(find.byType(TextField), 'tor');
       await tester.pumpAndSettle();
-      expect(_tile(Spellbook.torment.name), findsOneWidget,
-          reason: 'a substring of the name matches');
-      expect(_tile(Spellbook.bolt.name), findsNothing,
-          reason: '⚠️ the mutant this kills: a search box wired to nothing');
+      expect(
+        _tile(Spellbook.torment.name),
+        findsOneWidget,
+        reason: 'a substring of the name matches',
+      );
+      expect(
+        _tile(Spellbook.bolt.name),
+        findsNothing,
+        reason: '⚠️ the mutant this kills: a search box wired to nothing',
+      );
       final hits = Spellbook.all
           .where((s) => spellMatchesQuery(s, 'tor'))
           .length;
@@ -832,15 +857,25 @@ void main() {
     testWidgets('[C] hiding locked spells drops what the schedule has not '
         'reached, and only that', (tester) async {
       await _pump(tester); // a new player: level 1
-      expect(_tile(Spellbook.cataclysm.name), findsOneWidget,
-          reason: 'shown (dimmed) while locked spells are shown');
+      expect(
+        _tile(Spellbook.cataclysm.name),
+        findsOneWidget,
+        reason: 'shown (dimmed) while locked spells are shown',
+      );
       await tester.tap(find.text('Locked: shown'));
       await tester.pumpAndSettle();
-      expect(_tile(Spellbook.cataclysm.name), findsNothing,
-          reason: '⚠️ the mutant this kills: a toggle that changes its label '
-              'and nothing else — Cataclysm is a level-40 spell');
-      expect(_tile(Spellbook.flick.name), findsOneWidget,
-          reason: 'a level-1 spell survives the cut');
+      expect(
+        _tile(Spellbook.cataclysm.name),
+        findsNothing,
+        reason:
+            '⚠️ the mutant this kills: a toggle that changes its label '
+            'and nothing else — Cataclysm is a level-40 spell',
+      );
+      expect(
+        _tile(Spellbook.flick.name),
+        findsOneWidget,
+        reason: 'a level-1 spell survives the cut',
+      );
     });
 
     testWidgets('[E] the tray lists the loadout and a tap unequips', (
@@ -853,8 +888,11 @@ void main() {
         of: find.byType(SingleChildScrollView).first,
         matching: find.text(spell.name),
       );
-      expect(tray, findsOneWidget,
-          reason: 'an equipped spell is named in the tray');
+      expect(
+        tray,
+        findsOneWidget,
+        reason: 'an equipped spell is named in the tray',
+      );
       await tester.tap(tray);
       await tester.pumpAndSettle();
       expect(
@@ -863,11 +901,15 @@ void main() {
           matching: find.text(spell.name),
         ),
         findsNothing,
-        reason: '⚠️ the mutant this kills: a tray chip that is decoration — '
+        reason:
+            '⚠️ the mutant this kills: a tray chip that is decoration — '
             'tapping it must take the spell out of the loadout',
       );
-      expect(_tile(spell.name), findsOneWidget,
-          reason: 'and the spell is still in the book to re-equip');
+      expect(
+        _tile(spell.name),
+        findsOneWidget,
+        reason: 'and the spell is still in the book to re-equip',
+      );
     });
 
     testWidgets('⭐ the Academy chip opens the whole book, at any level', (
@@ -880,34 +922,48 @@ void main() {
 
       await tester.tap(find.text('Academy'));
       await tester.pumpAndSettle();
-      expect(find.text('Academy loadout'), findsOneWidget,
-          reason: 'the chip swaps the editable preset name for the fixed '
-              'Academy header');
+      expect(
+        find.text('Academy loadout'),
+        findsOneWidget,
+        reason:
+            'the chip swaps the editable preset name for the fixed '
+            'Academy header',
+      );
 
       // The default Academy hand is FULL at the cap, so free a slot first
       // (the mutant a full-hand no-op would otherwise hide: the gate).
       await tester.tap(_tile(Spellbook.bolt.name));
       await tester.pumpAndSettle();
-      expect(game.profile.academyPreset.spellIds, isNot(contains('bolt')),
-          reason: 'unequipping from the Academy hand saves to the Academy '
-              'preset');
+      expect(
+        game.profile.academyPreset.spellIds,
+        isNot(contains('bolt')),
+        reason:
+            'unequipping from the Academy hand saves to the Academy '
+            'preset',
+      );
       // Reflect is a level-45 spell outside the default hand; a level-1
       // player equips it here.
-      expect(LoadoutPreset.academy().spellIds, isNot(contains('reflect')),
-          reason: 'this fixture only means something while Reflect is not '
-              'already in the default hand');
+      expect(
+        LoadoutPreset.academy().spellIds,
+        isNot(contains('reflect')),
+        reason:
+            'this fixture only means something while Reflect is not '
+            'already in the default hand',
+      );
       await tester.tap(_tile(Spellbook.reflect.name));
       await tester.pumpAndSettle();
       expect(
         game.profile.academyPreset.spellIds,
         contains('reflect'),
-        reason: '⚠️ the mutant this kills: an Academy chip that still runs '
+        reason:
+            '⚠️ the mutant this kills: an Academy chip that still runs '
             'the level gate — the whole point is that it does not',
       );
       expect(
         game.profile.activePreset.spellIds,
         before,
-        reason: 'and the campaign preset is untouched — the Academy loadout '
+        reason:
+            'and the campaign preset is untouched — the Academy loadout '
             'is its own',
       );
 

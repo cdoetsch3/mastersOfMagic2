@@ -27,7 +27,11 @@ void main() {
       final move1 = ai.chooseAction(a1, a2, script);
       final move2 = ai.chooseAction(a2, a1, script);
       final seed = deriveTurnSeed(
-          masterSeed, turn, encodeAction(move1), encodeAction(move2));
+        masterSeed,
+        turn,
+        encodeAction(move1),
+        encodeAction(move2),
+      );
       rngA.reseed(seed);
       rngB.reseed(seed);
       engineA.resolveTurn(move1, move2);
@@ -96,8 +100,11 @@ void main() {
         if (duel.winner == sharp) sharpWins++;
         if (duel.winner == sloppy) sloppyWins++;
       }
-      expect(sharpWins, greaterThan(sloppyWins * 2),
-          reason: 'skill dial should matter ($sharpWins vs $sloppyWins)');
+      expect(
+        sharpWins,
+        greaterThan(sloppyWins * 2),
+        reason: 'skill dial should matter ($sharpWins vs $sloppyWins)',
+      );
     });
   });
 }

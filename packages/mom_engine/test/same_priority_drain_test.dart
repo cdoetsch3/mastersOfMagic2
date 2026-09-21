@@ -34,11 +34,18 @@ void main() {
     final you = mage('You', MagicElement.electro, 3);
     final wick = mage('Wick', MagicElement.umbra, 2);
 
-    final r = DuelEngine(you, wick, rng: _AlwaysProc(), baseMissPercent: 0)
-        .resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.bolt));
+    final r = DuelEngine(
+      you,
+      wick,
+      rng: _AlwaysProc(),
+      baseMissPercent: 0,
+    ).resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.bolt));
 
-    expect(r.events.whereType<ChargeDrainedEvent>(), hasLength(1),
-        reason: 'the strip must actually happen, not silently no-op');
+    expect(
+      r.events.whereType<ChargeDrainedEvent>(),
+      hasLength(1),
+      reason: 'the strip must actually happen, not silently no-op',
+    );
   });
 
   test('a same-priority strip FIZZLES an exactly-affordable spell', () {
@@ -47,14 +54,24 @@ void main() {
     final you = mage('You', MagicElement.electro, 3);
     final wick = mage('Wick', MagicElement.umbra, 1);
 
-    final r = DuelEngine(you, wick, rng: _AlwaysProc(), baseMissPercent: 0)
-        .resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.bolt));
+    final r = DuelEngine(
+      you,
+      wick,
+      rng: _AlwaysProc(),
+      baseMissPercent: 0,
+    ).resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.bolt));
 
-    expect(r.events.whereType<SpellFizzledEvent>(), hasLength(1),
-        reason: 'Bolt lost the only charge it had');
+    expect(
+      r.events.whereType<SpellFizzledEvent>(),
+      hasLength(1),
+      reason: 'Bolt lost the only charge it had',
+    );
     expect(you.hp, greaterThan(0));
-    expect(r.events.whereType<SpellCastEvent>().length, 1,
-        reason: 'only Leech went off');
+    expect(
+      r.events.whereType<SpellCastEvent>().length,
+      1,
+      reason: 'only Leech went off',
+    );
   });
 
   test('a strip that leaves enough charge does NOT fizzle the spell', () {
@@ -64,12 +81,19 @@ void main() {
     final you = mage('You', MagicElement.electro, 3);
     final wick = mage('Wick', MagicElement.umbra, 2);
 
-    final r = DuelEngine(you, wick, rng: _AlwaysProc(), baseMissPercent: 0)
-        .resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.bolt));
+    final r = DuelEngine(
+      you,
+      wick,
+      rng: _AlwaysProc(),
+      baseMissPercent: 0,
+    ).resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.bolt));
 
     expect(r.events.whereType<SpellFizzledEvent>(), isEmpty);
-    expect(r.events.whereType<SpellCastEvent>().length, 2,
-        reason: '1 charge remained, and Bolt costs 1');
+    expect(
+      r.events.whereType<SpellCastEvent>().length,
+      2,
+      reason: '1 charge remained, and Bolt costs 1',
+    );
   });
 
   // ⚠️ UPDATED 2026-08-28 for the aux-lane split (§7a): Discharge moved from
@@ -85,14 +109,24 @@ void main() {
 
     // A harmless aux-offense-lane cast, so Wick collides with Discharge at 8.
     const decoy = Spell(
-        id: 'decoy', name: 'Decoy', chargeCost: 1,
-        priority: SpellPriority.auxOffense, effect: HallowEffect());
+      id: 'decoy',
+      name: 'Decoy',
+      chargeCost: 1,
+      priority: SpellPriority.auxOffense,
+      effect: HallowEffect(),
+    );
     final r = DuelEngine(you, wick, rng: Random(1), baseMissPercent: 0)
-        .resolveTurn(CastAction(Spellbook.discharge),
-            CastAction(decoy, MagicElement.umbra));
+        .resolveTurn(
+          CastAction(Spellbook.discharge),
+          CastAction(decoy, MagicElement.umbra),
+        );
 
     final drained = r.events.whereType<ChargeDrainedEvent>();
-    expect(drained, isNotEmpty, reason: 'Discharge must take the committed bar');
+    expect(
+      drained,
+      isNotEmpty,
+      reason: 'Discharge must take the committed bar',
+    );
     expect(wick.charge, 0);
   });
 
@@ -104,10 +138,17 @@ void main() {
     final wick = mage('Wick', MagicElement.umbra, 3);
 
     // Wick's Flick is priority 5 and resolves before the Electro Leech at 9.
-    final r = DuelEngine(you, wick, rng: _AlwaysProc(), baseMissPercent: 0).resolveTurn(
-        CastAction(Spellbook.leech), CastAction(Spellbook.flick));
+    final r = DuelEngine(
+      you,
+      wick,
+      rng: _AlwaysProc(),
+      baseMissPercent: 0,
+    ).resolveTurn(CastAction(Spellbook.leech), CastAction(Spellbook.flick));
 
-    expect(r.events.whereType<SpellFizzledEvent>(), isEmpty,
-        reason: "Wick's Flick had already resolved when the strip landed");
+    expect(
+      r.events.whereType<SpellFizzledEvent>(),
+      isEmpty,
+      reason: "Wick's Flick had already resolved when the strip landed",
+    );
   });
 }

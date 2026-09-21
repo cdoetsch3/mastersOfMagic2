@@ -19,8 +19,12 @@ class ScriptedRandom implements Random {
 }
 
 Spell dmg(int amount, {int hits = 1}) => Spell(
-    id: 'dmg$amount', name: 'Dmg$amount', chargeCost: 0, priority: 9,
-    effect: DamageEffect(amount, amount, hits: hits));
+  id: 'dmg$amount',
+  name: 'Dmg$amount',
+  chargeCost: 0,
+  priority: 9,
+  effect: DamageEffect(amount, amount, hits: hits),
+);
 
 void main() {
   late MageState alice;
@@ -46,7 +50,12 @@ void main() {
       // 100 accuracy, 0 dodge → the full 20 lands. (That the default path
       // draws *no* RNG isn't proven here — a missPercent of 0 never rolls
       // regardless — but by the sim staying byte-identical to Phase 3.)
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.0]),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.flora);
       expect(bruno.hp, 80, reason: '100 accuracy, 0 dodge → always lands');
     });
@@ -54,14 +63,24 @@ void main() {
     test('dodge subtracts from accuracy, creating a miss chance', () {
       bruno.dodge = 30; // 100 − 30 = 70 hit → 30 miss
       // 0.2 → 20 < 30 → miss.
-      var duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.2]), baseMissPercent: 0);
+      var duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.2]),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.pyro);
       expect(bruno.hp, 100, reason: 'rolled a miss');
 
       // 0.5 → 50 < 30 is false → hit.
       alice = MageState(name: 'Alice');
       bruno = MageState(name: 'Bruno')..dodge = 30;
-      duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.5]), baseMissPercent: 0);
+      duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.5]),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.pyro);
       expect(bruno.hp, 80, reason: 'rolled a hit');
     });
@@ -71,24 +90,42 @@ void main() {
       bruno.dodge = 30;
       alice.accuracyBonus = 20;
       // 0.2 → 20 < 10 is false → hits (a 100-accuracy attacker would miss here).
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.2]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.2]),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.pyro);
-      expect(bruno.hp, 80, reason: 'the extra accuracy turned a miss into a hit');
+      expect(
+        bruno.hp,
+        80,
+        reason: 'the extra accuracy turned a miss into a hit',
+      );
     });
 
-    test('accuracy above 100 is not clamped — a miss chance can still exist',
-        () {
+    test('accuracy above 100 is not clamped — a miss chance can still exist', () {
       bruno.dodge = 30;
       alice.accuracyBonus = 20; // 90 hit → 10 miss
       // 0.05 → 5 < 10 → still a miss: 120 accuracy does not fully cancel dodge.
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.05]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.05]),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.pyro);
       expect(bruno.hp, 100);
     });
 
     test('Blind is exactly a flat −50 accuracy penalty', () {
       // Unblinded 100-accuracy attacker never misses...
-      var duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.4]), baseMissPercent: 0);
+      var duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.4]),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.pyro);
       expect(bruno.hp, 80);
 
@@ -96,7 +133,12 @@ void main() {
       alice = MageState(name: 'Alice')
         ..statuses.add(BlindStatus()..advanceAndCheckExpiry(alice));
       bruno = MageState(name: 'Bruno');
-      duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.4]), baseMissPercent: 0);
+      duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.4]),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.pyro);
       expect(bruno.hp, 100, reason: '0.4 < 0.5 → the blinded attack misses');
     });
@@ -110,37 +152,61 @@ void main() {
       alice
         ..critChance = 100
         ..critDamage = 50; // ×1.5
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.pyro);
       expect(bruno.hp, 70, reason: '20 × 1.5 = 30');
     });
 
     test('crit is emitted on the DamageEvent', () {
       alice.critChance = 100;
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       alice
         ..charge = 0
         ..element = MagicElement.pyro;
       final r = duel.resolveTurn(
-          CastAction(dmg(20), MagicElement.pyro), const ForfeitAction());
+        CastAction(dmg(20), MagicElement.pyro),
+        const ForfeitAction(),
+      );
       expect(r.events.whereType<DamageEvent>().single.crit, isTrue);
     });
 
-    test('crit rolls per hit — a whole multi-hit spell crits together here',
-        () {
-      alice
-        ..critChance = 100
-        ..critDamage = 50;
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
-      cast(duel, dmg(4, hits: 3), MagicElement.pyro); // 4×1.5 = 6, ×3 = 18
-      expect(bruno.hp, 82);
-      alice
-        ..charge = 0
-        ..element = MagicElement.pyro;
-      final r = duel.resolveTurn(
-          CastAction(dmg(4, hits: 3), MagicElement.pyro), const ForfeitAction());
-      expect(r.events.whereType<DamageEvent>().where((e) => e.crit).length, 3);
-    });
+    test(
+      'crit rolls per hit — a whole multi-hit spell crits together here',
+      () {
+        alice
+          ..critChance = 100
+          ..critDamage = 50;
+        final duel = DuelEngine(
+          alice,
+          bruno,
+          rng: ScriptedRandom(),
+          baseMissPercent: 0,
+        );
+        cast(duel, dmg(4, hits: 3), MagicElement.pyro); // 4×1.5 = 6, ×3 = 18
+        expect(bruno.hp, 82);
+        alice
+          ..charge = 0
+          ..element = MagicElement.pyro;
+        final r = duel.resolveTurn(
+          CastAction(dmg(4, hits: 3), MagicElement.pyro),
+          const ForfeitAction(),
+        );
+        expect(
+          r.events.whereType<DamageEvent>().where((e) => e.crit).length,
+          3,
+        );
+      },
+    );
   });
 
   // ======================================================================
@@ -151,7 +217,12 @@ void main() {
       bruno
         ..deflectChance = 100
         ..deflectAmount = 40;
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.pyro);
       expect(bruno.hp, 88, reason: '40% of 20 = 8 removed, 12 lands');
     });
@@ -160,12 +231,19 @@ void main() {
       bruno
         ..deflectChance = 100
         ..deflectAmount = 40;
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       alice
         ..charge = 0
         ..element = MagicElement.pyro;
       final r = duel.resolveTurn(
-          CastAction(dmg(20), MagicElement.pyro), const ForfeitAction());
+        CastAction(dmg(20), MagicElement.pyro),
+        const ForfeitAction(),
+      );
       expect(r.events.whereType<DamageEvent>().single.deflected, 8);
       expect(alice.hp, 100, reason: 'nothing is bounced back to the attacker');
     });
@@ -182,11 +260,20 @@ void main() {
       bruno
         ..deflectChance = 100
         ..deflectAmount = 120; // ruled cap: 90
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.pyro);
-      expect(bruno.hp, 98,
-          reason: '⚠️ kills the old clamp-to-100 (hp 100, hit erased) and the '
-              'unclamped read (hp 100 too, at 120%); 90% of 20 is 18, so 2 lands');
+      expect(
+        bruno.hp,
+        98,
+        reason:
+            '⚠️ kills the old clamp-to-100 (hp 100, hit erased) and the '
+            'unclamped read (hp 100 too, at 120%); 90% of 20 is 18, so 2 lands',
+      );
     });
   });
 
@@ -200,7 +287,12 @@ void main() {
     bruno
       ..deflectChance = 100
       ..deflectAmount = 50; // 30 → 15 removed, 15 lands
-    final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+    final duel = DuelEngine(
+      alice,
+      bruno,
+      rng: ScriptedRandom(),
+      baseMissPercent: 0,
+    );
     cast(duel, dmg(20), MagicElement.pyro);
     expect(bruno.hp, 85, reason: '20 ×1.5 = 30, then −50% = 15 lands');
   });
@@ -211,14 +303,24 @@ void main() {
   group('flat damage from gear', () {
     test('damagePerCast adds once to a single hit', () {
       alice.damagePerCast = 2; // the wand lane
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.flora);
       expect(bruno.hp, 78, reason: '20 + 2, once');
     });
 
     test('damagePerCast adds once to a multi-hit spell, not per hit', () {
       alice.damagePerCast = 2;
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(5, hits: 4), MagicElement.flora);
       // ⚠️ Kills the per-hit implementation: 4×(5+2) would be 28.
       expect(bruno.hp, 100 - (5 * 4 + 2), reason: '20 + 2, ONCE');
@@ -227,9 +329,18 @@ void main() {
     test('damagePerCharge scales with the charge the spell cost', () {
       alice.damagePerCharge = 1; // the quarterstaff lane
       final threeCharge = Spell(
-          id: 'big', name: 'Big', chargeCost: 3, priority: 9,
-          effect: const DamageEffect(20, 20));
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+        id: 'big',
+        name: 'Big',
+        chargeCost: 3,
+        priority: 9,
+        effect: const DamageEffect(20, 20),
+      );
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       cast(duel, threeCharge, MagicElement.flora);
       // ⚠️ Kills the flat-constant implementation (21) and the per-cast
       // confusion (20 + 0): the staff pays for COMMITMENT.
@@ -238,7 +349,12 @@ void main() {
 
     test('a zero-cost spell pays the staff nothing', () {
       alice.damagePerCharge = 1;
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom(), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
       cast(duel, dmg(20), MagicElement.flora); // chargeCost 0
       expect(bruno.hp, 80, reason: 'no charge spent, no staff bonus');
     });

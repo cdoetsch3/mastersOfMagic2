@@ -82,10 +82,7 @@ void main() {
     });
 
     test('two of the same stack onto two slots, one at a time', () async {
-      final game = _game(
-        belt: 'tuskhide_belt',
-        carrying: [_draught, _draught],
-      );
+      final game = _game(belt: 'tuskhide_belt', carrying: [_draught, _draught]);
       expect(await game.loadOntoBelt(_draught), isNull);
       expect(await game.loadOntoBelt(_draught), isNull);
       expect(game.profile.belt.loaded, [_draught, _draught]);
@@ -105,11 +102,9 @@ void main() {
       final game = GameState(storage, profile);
       await game.loadOntoBelt(_draught);
       final reloaded = PlayerProfile.fromJson(storage.saved!.toJson());
-      expect(
-        reloaded.belt.loaded,
-        [_draught],
-        reason: 'a belt that empties itself on restart is not a belt',
-      );
+      expect(reloaded.belt.loaded, [
+        _draught,
+      ], reason: 'a belt that empties itself on restart is not a belt');
     });
   });
 
@@ -172,11 +167,9 @@ void main() {
           const InventorySlot(defId: _log),
       ]);
       expect(await game.unloadFromBelt(_draught), contains('full'));
-      expect(
-        game.profile.belt.loaded,
-        [_draught],
-        reason: 'a refused unload must leave the item on the belt',
-      );
+      expect(game.profile.belt.loaded, [
+        _draught,
+      ], reason: 'a refused unload must leave the item on the belt');
     });
 
     test('unloading what is not there changes nothing', () async {
@@ -225,11 +218,10 @@ void main() {
         legacy(location: 'whispering_woods', packUsed: 20),
       );
       expect(game.settleBeltOverflow(), 0);
-      expect(
-        game.profile.belt.loaded,
-        [_draught, _draught],
-        reason: 'an over-capacity belt is legal; an eaten potion is not',
-      );
+      expect(game.profile.belt.loaded, [
+        _draught,
+        _draught,
+      ], reason: 'an over-capacity belt is legal; an eaten potion is not');
       expect(game.profile.storerooms, isEmpty);
     });
 

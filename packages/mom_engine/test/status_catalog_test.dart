@@ -43,16 +43,21 @@ void main() {
     // status without documenting it and this fails.
     test('every statusId the engine emits is catalogued', () {
       final src = File('lib/src/duel.dart').readAsStringSync();
-      final emitted = RegExp(r"statusId:\s*'([a-zA-Z]+)'")
-          .allMatches(src)
-          .map((m) => m.group(1)!)
-          .toSet();
+      final emitted = RegExp(
+        r"statusId:\s*'([a-zA-Z]+)'",
+      ).allMatches(src).map((m) => m.group(1)!).toSet();
 
-      expect(emitted, isNotEmpty,
-          reason: 'the scrape found nothing — bad regex?');
+      expect(
+        emitted,
+        isNotEmpty,
+        reason: 'the scrape found nothing — bad regex?',
+      );
       for (final id in emitted) {
-        expect(StatusCatalog.byId(id), isNotNull,
-            reason: "duel.dart emits '$id' with no StatusCatalog entry");
+        expect(
+          StatusCatalog.byId(id),
+          isNotNull,
+          reason: "duel.dart emits '$id' with no StatusCatalog entry",
+        );
       }
     });
 
@@ -60,15 +65,28 @@ void main() {
     // entry too, or the HUD would show a chip the guide can't explain.
     test('every snapshot id is catalogued as a lasting status', () {
       const snapshotIds = {
-        'photosynthesis', 'arcaneKnowledge', 'creepingDark', 'astralAlignment',
-        'ignite', 'blind', 'haste', 'grace', 'empower', 'quicken', 'phase',
-        'waterlogged', 'stagger',
+        'photosynthesis',
+        'arcaneKnowledge',
+        'creepingDark',
+        'astralAlignment',
+        'ignite',
+        'blind',
+        'haste',
+        'grace',
+        'empower',
+        'quicken',
+        'phase',
+        'waterlogged',
+        'stagger',
       };
       for (final id in snapshotIds) {
         final info = StatusCatalog.byId(id);
         expect(info, isNotNull, reason: "snapshot reports '$id'");
-        expect(info!.lingers, isTrue,
-            reason: "'$id' shows as a pip so it must be a lasting status");
+        expect(
+          info!.lingers,
+          isTrue,
+          reason: "'$id' shows as a pip so it must be a lasting status",
+        );
       }
     });
   });

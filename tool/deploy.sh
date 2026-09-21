@@ -47,6 +47,12 @@ ok "release $CODE_V · app $APP_V · pubspec $PUB_LINE"
 # ---- 2. Git must be clean and on main --------------------------------------
 step "Preflight: git"
 [[ -z "$(git status --porcelain)" ]] || die "working tree is dirty — commit or stash first"
+# ⭐ Formatting drift is caught HERE, at release, so it can never accumulate
+# into a 141-file surprise again (wholesale reformat 2026-09-21). The tree
+# formats with the repo's own Flutter SDK; a different SDK on another
+# machine is the one thing that can make this fail on a clean tree.
+dart format --output=none --set-exit-if-changed . >/dev/null 2>&1 \
+  || die "dart format would change files — run 'dart format .' and commit (same Flutter SDK as the repo)"
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 [[ "$BRANCH" == "main" ]] || echo "  ⚠ on branch '$BRANCH', not main"
 ok "clean at $(git rev-parse --short HEAD) on $BRANCH"

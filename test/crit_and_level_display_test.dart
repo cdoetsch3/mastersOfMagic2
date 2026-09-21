@@ -35,7 +35,8 @@ void main() {
       expect(
         foe.level,
         isNot(playerLevel),
-        reason: 'the two pills must be distinguishable for this test to mean '
+        reason:
+            'the two pills must be distinguishable for this test to mean '
             'anything',
       );
 
@@ -53,7 +54,8 @@ void main() {
       expect(
         find.text('LV $playerLevel'),
         findsOneWidget,
-        reason: "the player's own level anchors the comparison — without it "
+        reason:
+            "the player's own level anchors the comparison — without it "
             "the enemy's number has nothing to be big relative to",
       );
       expect(
@@ -104,8 +106,13 @@ void main() {
   group('a crit announces itself', () {
     final target = MageState(name: 'Morwen');
 
-    DamageEvent hit({required bool crit, int toHp = 12}) =>
-        DamageEvent(target, Spellbook.bolt, toShield: 0, toHp: toHp, crit: crit);
+    DamageEvent hit({required bool crit, int toHp = 12}) => DamageEvent(
+      target,
+      Spellbook.bolt,
+      toShield: 0,
+      toHp: toHp,
+      crit: crit,
+    );
 
     test('the impact float says CRIT!, and says it first', () {
       final text = impactFloatText(hit(crit: true));
@@ -123,19 +130,22 @@ void main() {
       expect(impactFloatText(hit(crit: false)), '-12');
     });
 
-    test('the crit tag rides alongside the other tags, not instead of them', () {
-      final shattering = DamageEvent(
-        target,
-        Spellbook.bolt,
-        toShield: 8,
-        toHp: 3,
-        shieldBroken: true,
-        crit: true,
-      );
-      final text = impactFloatText(shattering);
-      expect(text, contains('CRIT!'));
-      expect(text, contains('shield shattered'));
-    });
+    test(
+      'the crit tag rides alongside the other tags, not instead of them',
+      () {
+        final shattering = DamageEvent(
+          target,
+          Spellbook.bolt,
+          toShield: 8,
+          toHp: 3,
+          shieldBroken: true,
+          crit: true,
+        );
+        final text = impactFloatText(shattering);
+        expect(text, contains('CRIT!'));
+        expect(text, contains('shield shattered'));
+      },
+    );
 
     test('the impact FX is meaningfully stronger', () {
       // ⚠️ "Stronger" has to mean *visibly* stronger: 2.4 is the threshold at
@@ -157,7 +167,8 @@ void main() {
         expect(
           showsCriticalPip(hit(crit: false)),
           isFalse,
-          reason: 'an ordinary hit that pipped would make the pip meaningless '
+          reason:
+              'an ordinary hit that pipped would make the pip meaningless '
               'within one turn',
         );
       });
@@ -168,8 +179,9 @@ void main() {
         // this names the events that must stay silent.
         expect(showsCriticalPip(HealedEvent(target, 20)), isFalse);
         expect(
-          showsCriticalPip(SpellCastEvent(target, Spellbook.bolt,
-              MagicElement.pyro)),
+          showsCriticalPip(
+            SpellCastEvent(target, Spellbook.bolt, MagicElement.pyro),
+          ),
           isFalse,
         );
         expect(
@@ -192,7 +204,10 @@ void main() {
           MaterialApp(
             home: DuelScreen(
               loadout: Loadout.starter,
-              driver: LocalAiDriver(persona: AiRoster.all.first, rng: Random(3)),
+              driver: LocalAiDriver(
+                persona: AiRoster.all.first,
+                rng: Random(3),
+              ),
               playerGear: const ItemModifiers(
                 critChance: 100,
                 accuracyBonus: ElementTuning.baseMissPercent,
@@ -204,7 +219,8 @@ void main() {
         expect(
           find.text(criticalPipText),
           findsNothing,
-          reason: 'the pip must not be standing chrome — it means nothing if '
+          reason:
+              'the pip must not be standing chrome — it means nothing if '
               'it is already there before a hit lands',
         );
 
@@ -238,7 +254,8 @@ void main() {
         expect(
           gone,
           isTrue,
-          reason: 'it is a flash, not a sticker — a pip that never clears '
+          reason:
+              'it is a flash, not a sticker — a pip that never clears '
               'would sit over the arena for the rest of the duel',
         );
       });
@@ -282,11 +299,21 @@ void main() {
     final m = MageState(name: 'A');
     final t = MageState(name: 'B');
     const spell = Spell(
-        id: 's', name: 'S', chargeCost: 1, priority: 9,
-        effect: DamageEffect(5, 5, ignoresShields: true));
-    final e = DamageEvent(t, spell,
-        toShield: 0, toHp: 5, shieldMultiplierPercent: 100,
-        shieldBroken: false, bypassedShield: true);
+      id: 's',
+      name: 'S',
+      chargeCost: 1,
+      priority: 9,
+      effect: DamageEffect(5, 5, ignoresShields: true),
+    );
+    final e = DamageEvent(
+      t,
+      spell,
+      toShield: 0,
+      toHp: 5,
+      shieldMultiplierPercent: 100,
+      shieldBroken: false,
+      bypassedShield: true,
+    );
     expect(impactFloatText(e), contains('ignores shields'));
     expect(m.alive, isTrue); // silence unused warning honestly
   });

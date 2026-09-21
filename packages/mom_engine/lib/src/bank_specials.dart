@@ -93,8 +93,7 @@ class SteadfastStatus extends BankedStance implements ShieldStrengthModifier {
   SteadfastStatus({required this.percent, required int turns}) : super(turns);
 
   /// The 3-cost price point: +25% shield strength, 25 turns.
-  static SteadfastStatus steadfast() =>
-      SteadfastStatus(percent: 25, turns: 25);
+  static SteadfastStatus steadfast() => SteadfastStatus(percent: 25, turns: 25);
 
   @override
   String get id => 'steadfast';
@@ -288,7 +287,7 @@ class MendingStatus extends BankedStance {
   final int percentPerTurn;
 
   MendingStatus({required this.percentPerTurn, required int turns})
-      : super(turns);
+    : super(turns);
 
   /// Mend, the 2-cost price point: 3%/turn for 6 turns (18% total).
   static MendingStatus mend() => MendingStatus(percentPerTurn: 3, turns: 6);
@@ -296,8 +295,7 @@ class MendingStatus extends BankedStance {
   /// Renewal, the 4-cost price point: 5%/turn for 10 turns (50% total).
   /// Retuned down at design time to sit just under the equivalent-cost
   /// shields — a heal that beats a wall makes the wall pointless.
-  static MendingStatus renewal() =>
-      MendingStatus(percentPerTurn: 5, turns: 10);
+  static MendingStatus renewal() => MendingStatus(percentPerTurn: 5, turns: 10);
 
   @override
   String get id => 'mending';
@@ -311,7 +309,7 @@ class MendingStatus extends BankedStance {
     // nothing at low levels reads as a bug rather than as rounding.
     final heal = (holder.maxHp * percentPerTurn / 100).round();
     return [
-      StatusHeal(heal < 1 ? 1 : heal, lane: Lane.heal, source: 'Mending')
+      StatusHeal(heal < 1 ? 1 : heal, lane: Lane.heal, source: 'Mending'),
     ];
   }
 

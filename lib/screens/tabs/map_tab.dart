@@ -153,12 +153,10 @@ class _MapTabState extends State<MapTab> {
     ];
   }
 
-
   /// ⭐ Banner: a tap on a closed shop's tile otherwise does nothing at all,
   /// which reads as a broken tile rather than a shut door.
   void _shopClosed(BuildContext context) =>
       showAppBanner(context, ShopCatalogue.closedFlavor);
-
 }
 
 class _CurrentLocationCard extends StatelessWidget {

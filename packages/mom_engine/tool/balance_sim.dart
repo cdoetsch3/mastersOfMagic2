@@ -76,7 +76,11 @@ class SimLoadout {
   final List<Spell> spells;
   SimLoadout(this.elements, this.spells);
 
-  static SimLoadout random(Random rng, {int elementCount = 5, int spellCount = 10}) {
+  static SimLoadout random(
+    Random rng, {
+    int elementCount = 5,
+    int spellCount = 10,
+  }) {
     final els = List.of(MagicElement.values)..shuffle(rng);
     final sp = List.of(Spellbook.all)..shuffle(rng);
     // A loadout with no way to deal damage is not a loadout; guarantee one.
@@ -134,33 +138,55 @@ void main(List<String> args) {
     return stats;
   }
 
-  print('=== $n duels per config, cap $cap turns, '
-      'fatigue from turn ${DuelEngine.fatigueThreshold + 1} ===\n');
+  print(
+    '=== $n duels per config, cap $cap turns, '
+    'fatigue from turn ${DuelEngine.fatigueThreshold + 1} ===\n',
+  );
 
-  run('i1 (random) vs i1, effects OFF', () => LadderAi(1), () => LadderAi(1),
-      effects: false);
-  run('i1 (random) vs i1, effects ON', () => LadderAi(1), () => LadderAi(1),
-      effects: true);
-  print('');
-  run('i7 vs i7, effects OFF', () => LadderAi(7), () => LadderAi(7),
-      effects: false);
-  run('i7 vs i7, effects ON', () => LadderAi(7), () => LadderAi(7),
-      effects: true);
+  run(
+    'i1 (random) vs i1, effects OFF',
+    () => LadderAi(1),
+    () => LadderAi(1),
+    effects: false,
+  );
+  run(
+    'i1 (random) vs i1, effects ON',
+    () => LadderAi(1),
+    () => LadderAi(1),
+    effects: true,
+  );
   print('');
   run(
-      'FLORA mirror (i7), ON',
-      () => MonoElementAi(LadderAi(7), MagicElement.flora),
-      () => MonoElementAi(LadderAi(7), MagicElement.flora),
-      effects: true);
+    'i7 vs i7, effects OFF',
+    () => LadderAi(7),
+    () => LadderAi(7),
+    effects: false,
+  );
   run(
-      'FLORA mirror (i1), ON',
-      () => MonoElementAi(LadderAi(1), MagicElement.flora),
-      () => MonoElementAi(LadderAi(1), MagicElement.flora),
-      effects: true);
+    'i7 vs i7, effects ON',
+    () => LadderAi(7),
+    () => LadderAi(7),
+    effects: true,
+  );
+  print('');
+  run(
+    'FLORA mirror (i7), ON',
+    () => MonoElementAi(LadderAi(7), MagicElement.flora),
+    () => MonoElementAi(LadderAi(7), MagicElement.flora),
+    effects: true,
+  );
+  run(
+    'FLORA mirror (i1), ON',
+    () => MonoElementAi(LadderAi(1), MagicElement.flora),
+    () => MonoElementAi(LadderAi(1), MagicElement.flora),
+    effects: true,
+  );
 
   // ---- The intelligence ladder, on realistic loadouts -----------------
-  print('\n=== intelligence ladder — random ~5 element / ~10 spell loadouts, '
-      'effects ON, $n duels/pair ===');
+  print(
+    '\n=== intelligence ladder — random ~5 element / ~10 spell loadouts, '
+    'effects ON, $n duels/pair ===',
+  );
   print('row win% vs column');
   const rungs = [1, 3, 5, 7, 9, 10];
   print('        ${rungs.map((r) => 'i$r'.padRight(6)).join(' ')}');
@@ -179,10 +205,8 @@ void main(List<String> args) {
         final duel = DuelEngine(m1, m2, rng: rng, elementEffects: true);
         final l1 = SimLoadout.random(rng);
         final l2 = SimLoadout.random(rng);
-        final a1 =
-            LadderAi(row, spells: l1.spells, elements: l1.elements);
-        final a2 =
-            LadderAi(col, spells: l2.spells, elements: l2.elements);
+        final a1 = LadderAi(row, spells: l1.spells, elements: l1.elements);
+        final a2 = LadderAi(col, spells: l2.spells, elements: l2.elements);
         while (!duel.isOver && duel.turnNumber < cap) {
           duel.resolveTurn(
             a1.chooseAction(m1, m2, rng),
@@ -213,11 +237,14 @@ void main(List<String> args) {
   // elements whose strength lives in planning. If an edge moves between i4 and
   // i10, that edge depends on competence rather than on raw numbers.
   void roundRobin(int intelligence, int duels) {
-    print('\n=== mono-element round robin — INTELLIGENCE $intelligence, '
-        'random ~10-spell loadouts, effects ON, $duels duels/pair ===');
+    print(
+      '\n=== mono-element round robin — INTELLIGENCE $intelligence, '
+      'random ~10-spell loadouts, effects ON, $duels duels/pair ===',
+    );
     print('row win% vs column');
-    final names =
-        MagicElement.values.map((e) => e.name.padRight(7).substring(0, 7));
+    final names = MagicElement.values.map(
+      (e) => e.name.padRight(7).substring(0, 7),
+    );
     print('        ${names.join(' ')}');
     final rowAvg = <MagicElement, double>{};
     for (final row in MagicElement.values) {
@@ -239,11 +266,13 @@ void main(List<String> args) {
           // with all 25 spells, and pretending otherwise rewards a
           // charge-to-five pattern that a real loadout cannot always run.
           final a1 = MonoElementAi(
-              LadderAi(intelligence, spells: SimLoadout.random(rng).spells),
-              row);
+            LadderAi(intelligence, spells: SimLoadout.random(rng).spells),
+            row,
+          );
           final a2 = MonoElementAi(
-              LadderAi(intelligence, spells: SimLoadout.random(rng).spells),
-              col);
+            LadderAi(intelligence, spells: SimLoadout.random(rng).spells),
+            col,
+          );
           while (!duel.isOver && duel.turnNumber < cap) {
             duel.resolveTurn(
               a1.chooseAction(m1, m2, rng),

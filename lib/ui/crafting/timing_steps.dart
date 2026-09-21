@@ -48,7 +48,9 @@ class _ReleaseTimingStepState extends State<ReleaseTimingStep>
 
   /// Slower climb at higher margin — lever 6 as a felt thing.
   double get _period => 1.1 * widget.tuning.tempo;
-  double get _window => 0.11 * widget.tuning.window * // lever 4's authored
+  double get _window =>
+      0.11 *
+      widget.tuning.window * // lever 4's authored
       (1.0 - 0.1 * (widget.step.complexity - 1)); //    half tightens it
 
   @override
@@ -120,8 +122,10 @@ class _ReleaseTimingStepState extends State<ReleaseTimingStep>
               padding: const EdgeInsets.only(top: 6),
               child: Text(
                 _swings.map((s) => gradeLabel(s)).join(' · '),
-                style:
-                    const TextStyle(color: AppColors.textFaint, fontSize: 11),
+                style: const TextStyle(
+                  color: AppColors.textFaint,
+                  fontSize: 11,
+                ),
               ),
             ),
         ],
@@ -262,8 +266,10 @@ class _SweetSpotStepState extends State<SweetSpotStep>
               padding: const EdgeInsets.only(top: 6),
               child: Text(
                 _taps.map(gradeLabel).join(' · '),
-                style:
-                    const TextStyle(color: AppColors.textFaint, fontSize: 11),
+                style: const TextStyle(
+                  color: AppColors.textFaint,
+                  fontSize: 11,
+                ),
               ),
             ),
         ],

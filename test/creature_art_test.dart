@@ -95,7 +95,9 @@ void main() {
   /// finder that ignored the paint would pass just as happily on a hardcoded
   /// Flora green behind every creature in the game.
   Finder silhouetteOf(EnemyDef def) {
-    final element = def.elements.isEmpty ? MagicElement.flora : def.elements.first;
+    final element = def.elements.isEmpty
+        ? MagicElement.flora
+        : def.elements.first;
     final body = SpritePalette.forElement(element).body;
     return find.descendant(
       of: find.byType(CreatureView),
@@ -142,7 +144,8 @@ void main() {
         expect(
           Bestiary.forZone(zone).length,
           11,
-          reason: '$zone must be 11 (5 common, 4 mini, 2 boss) — the art '
+          reason:
+              '$zone must be 11 (5 common, 4 mini, 2 boss) — the art '
               'contract is a fixed list of eleven filenames per zone, so a '
               'roster that grew or shrank silently leaves art missing or '
               'orphaned with nothing else to notice',
@@ -151,7 +154,8 @@ void main() {
       expect(
         Bestiary.all.length,
         121,
-        reason: 'the Primal quarter (5 x 11 = 55) plus the three Kinetic '
+        reason:
+            'the Primal quarter (5 x 11 = 55) plus the three Kinetic '
             'pure zones (3 x 11) plus The Molten Deep (11); a zone landing '
             'in Bestiary.all needs its own pubspec directory and '
             'description section before its art can load',
@@ -167,7 +171,8 @@ void main() {
       expect(
         paths.toSet().length,
         paths.length,
-        reason: 'two creatures sharing an asset path means one of them can '
+        reason:
+            'two creatures sharing an asset path means one of them can '
             'never have its own art — and Bestiary.byId would only ever '
             'return the first of the pair',
       );
@@ -186,7 +191,8 @@ void main() {
         expect(
           dir.existsSync(),
           isTrue,
-          reason: 'assets/creatures/$zone/ is declared in pubspec.yaml and a '
+          reason:
+              'assets/creatures/$zone/ is declared in pubspec.yaml and a '
               'declared directory must exist — delete it (or lose it to a '
               'clone, because git does not track empty directories) and '
               '`flutter build` stops with "unable to find directory entry"',
@@ -200,7 +206,8 @@ void main() {
           expect(
             name.endsWith('.png'),
             isTrue,
-            reason: '$zone/$name is neither a PNG nor a known non-sprite file '
+            reason:
+                '$zone/$name is neither a PNG nor a known non-sprite file '
                 '— creatureAssetFor only ever asks for <id>.png, so a .jpg or '
                 '.webp here is weight in the bundle that nothing can load',
           );
@@ -208,7 +215,8 @@ void main() {
           expect(
             ids,
             contains(stem),
-            reason: '$zone/$name is art for nobody in $zone. Either the stem '
+            reason:
+                '$zone/$name is art for nobody in $zone. Either the stem '
                 'is a typo of a creature id, or the sprite belongs to another '
                 'zone — and both failures look identical in game, because the '
                 'creature it was meant for simply keeps its silhouette',
@@ -219,7 +227,8 @@ void main() {
       expect(
         pngsSeen,
         greaterThanOrEqualTo(11),
-        reason: 'whispering_woods has shipped 11 sprites — if this loop stops '
+        reason:
+            'whispering_woods has shipped 11 sprites — if this loop stops '
             'seeing them the check above has become vacuous and would pass on '
             'a directory full of garbage',
       );
@@ -239,20 +248,23 @@ void main() {
       expect(
         tool,
         contains('OUT_DIR = ROOT / "assets" / "creatures"'),
-        reason: 'creature mode must write under assets/creatures/ — the same '
+        reason:
+            'creature mode must write under assets/creatures/ — the same '
             'prefix creatureAssetFor asks for',
       );
       expect(
         tool,
         contains('out_dir = OUT_DIR / args.zone'),
-        reason: 'and it must sub-divide by zone id, because the game asks for '
+        reason:
+            'and it must sub-divide by zone id, because the game asks for '
             'assets/creatures/<zone>/<id>.png — a flat output directory would '
             'produce eleven files per zone that nothing can load',
       );
       expect(
         creatureAssetFor(Bestiary.byId('brook_naiad')!),
         startsWith('assets/creatures/glimmerbrook/'),
-        reason: 'the Dart half of the same claim, so this test fails if '
+        reason:
+            'the Dart half of the same claim, so this test fails if '
             'either end moves rather than only if the Python does',
       );
     });
@@ -273,7 +285,8 @@ void main() {
       expect(
         declared,
         _primalZones.toSet(),
-        reason: 'every Primal zone directory must be declared before its art '
+        reason:
+            'every Primal zone directory must be declared before its art '
             'exists, and nothing else may be: an undeclared zone ships its '
             'PNGs nowhere, and a declared-but-absent one fails the build',
       );
@@ -286,7 +299,8 @@ void main() {
       expect(
         onDisk,
         declared,
-        reason: 'a directory under assets/creatures/ with no pubspec line is '
+        reason:
+            'a directory under assets/creatures/ with no pubspec line is '
             'art that will never load; a pubspec line with no directory is a '
             'build that will never run',
       );
@@ -313,14 +327,16 @@ void main() {
           expect(
             tester.takeException(),
             isNull,
-            reason: 'drop the errorBuilder from CreatureView and ${def.id} '
+            reason:
+                'drop the errorBuilder from CreatureView and ${def.id} '
                 'reports "Unable to load asset" — with four zones empty that '
                 'is most of the bestiary throwing on sight',
           );
           expect(
             find.byType(CreatureView),
             findsOneWidget,
-            reason: '${def.id} must still be in the tree; without this the '
+            reason:
+                '${def.id} must still be in the tree; without this the '
                 'no-exception check would also pass on a build that collapsed',
           );
         }
@@ -344,7 +360,8 @@ void main() {
       expect(
         noGrid.length,
         110,
-        reason: 'eight zones x 11 have no pixel grid — if this number moves, '
+        reason:
+            'eight zones x 11 have no pixel grid — if this number moves, '
             'either a roster changed or a zone grew grids, and the loop below '
             'is no longer testing what it says it is',
       );
@@ -356,7 +373,8 @@ void main() {
         expect(
           silhouetteOf(def),
           findsOneWidget,
-          reason: '${def.id} has no PNG and no pixel grid, so it must fall all '
+          reason:
+              '${def.id} has no PNG and no pixel grid, so it must fall all '
               'the way through to a silhouette in its own element colour — '
               'point the fallback at one fixed palette and every creature in '
               'four zones becomes the same coloured lump',
@@ -364,7 +382,8 @@ void main() {
         expect(
           find.byType(CreatureSprite),
           findsNothing,
-          reason: '${def.id} has no entry in WhisperingWoodsArt, so borrowing '
+          reason:
+              '${def.id} has no entry in WhisperingWoodsArt, so borrowing '
               'a grid would mean drawing another zone\'s creature — the exact '
               'mistake the mage sprite was making before this widget existed',
         );
@@ -390,14 +409,16 @@ void main() {
       expect(
         find.byType(CreatureSprite),
         findsOneWidget,
-        reason: 'the Listening Fawn has a hand-placed grid and no loadable '
+        reason:
+            'the Listening Fawn has a hand-placed grid and no loadable '
             'PNG in the test bundle — it must reach the grid, not the plain '
             'silhouette that the other 55 creatures get',
       );
       expect(
         silhouetteOf(fawn),
         findsNothing,
-        reason: 'a creature that has a grid must not ALSO draw the '
+        reason:
+            'a creature that has a grid must not ALSO draw the '
             'unfinished-looking box behind it',
       );
     });
@@ -424,7 +445,8 @@ void main() {
         expect(
           bundle.requested,
           contains('assets/creatures/${def.zoneId}/$id.png'),
-          reason: 'the maintainer generates <zone>/<id>.png — point '
+          reason:
+              'the maintainer generates <zone>/<id>.png — point '
               'creatureAssetFor at any other name (the display name, a flat '
               'directory, a manifest key) and every PNG in the quarter ships '
               'without ever being read',
@@ -432,7 +454,8 @@ void main() {
         expect(
           tester.takeException(),
           isNull,
-          reason: 'a sprite that IS present must decode quietly — the '
+          reason:
+              'a sprite that IS present must decode quietly — the '
               'errorBuilder is the fallback, not the normal path',
         );
       }
@@ -447,7 +470,8 @@ void main() {
       expect(
         bundle.requested.where((k) => k.startsWith('assets/creatures/')),
         {'assets/creatures/glimmerbrook/stillwater.png'},
-        reason: 'one sprite per creature: a second request would mean the '
+        reason:
+            'one sprite per creature: a second request would mean the '
             'view is guessing at extensions, resolutions or a manifest, and '
             'the maintainer would have to produce files nobody documented',
       );
@@ -465,7 +489,8 @@ void main() {
       expect(
         find.byType(CreatureSprite),
         findsNothing,
-        reason: 'once a PNG loads it must replace the pixel grid — if the grid '
+        reason:
+            'once a PNG loads it must replace the pixel grid — if the grid '
             'still wins, the generated art for all 55 creatures is dead weight '
             'in the bundle and the maintainer would never see it',
       );
@@ -485,23 +510,25 @@ void main() {
     // silently stopped matching would otherwise make the coverage test pass by
     // finding nothing and comparing nothing.
     final doc = File('docs/BESTIARY_ART.md').readAsStringSync();
-    final described = RegExp(r'^\*\*([^*]+)\*\* — \*', multiLine: true)
-        .allMatches(doc)
-        .map((m) => m.group(1)!)
-        .toList();
+    final described = RegExp(
+      r'^\*\*([^*]+)\*\* — \*',
+      multiLine: true,
+    ).allMatches(doc).map((m) => m.group(1)!).toList();
 
     test('the parser still finds the entries it is anchored on', () {
       expect(
         described.length,
         121,
-        reason: 'the entry format changed (or the file moved) and the coverage '
+        reason:
+            'the entry format changed (or the file moved) and the coverage '
             'check below has quietly become a comparison of two empty sets — '
             'entries are `**Name** — *rank · archetype · element*`',
       );
       expect(
         described.toSet().length,
         described.length,
-        reason: 'a duplicated heading means one creature has two descriptions '
+        reason:
+            'a duplicated heading means one creature has two descriptions '
             'and — since the counts match — another has none',
       );
     });
@@ -511,7 +538,8 @@ void main() {
       expect(
         described.toSet(),
         roster,
-        reason: 'docs/BESTIARY_ART.md is the ONLY input to the art pipeline: a '
+        reason:
+            'docs/BESTIARY_ART.md is the ONLY input to the art pipeline: a '
             'creature with no entry can never be generated, and an entry with '
             'no creature is a description of something that was renamed or '
             'cut. Names must match the EnemyDef `name` exactly, because that '
@@ -527,7 +555,8 @@ void main() {
         expect(
           doc,
           contains('`assets/backgrounds/$zone.png`'),
-          reason: 'the $zone backdrop brief names its own output file — lose '
+          reason:
+              'the $zone backdrop brief names its own output file — lose '
               'it and the maintainer has no prompt to generate from',
         );
       }

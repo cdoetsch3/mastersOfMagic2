@@ -41,8 +41,12 @@ void main() {
     test('a proc strips one charge from the target', () {
       // Roll order for the Flick cast: damage roll uses nextInt (scripted 0),
       // then Static rolls nextDouble: 0.1 < 0.20 procs.
-      final duel =
-          DuelEngine(alice, bruno, rng: ScriptedRandom([0.1]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.1]),
+        baseMissPercent: 0,
+      );
       charge(bruno, MagicElement.geo, 3);
       duel.resolveTurn(
         CastAction(Spellbook.flick, MagicElement.electro),
@@ -52,7 +56,12 @@ void main() {
     });
 
     test('no proc at 0.20 or above (20% chance)', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.20]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.20]),
+        baseMissPercent: 0,
+      );
       charge(bruno, MagicElement.geo, 3);
       duel.resolveTurn(
         CastAction(Spellbook.flick, MagicElement.electro),
@@ -62,7 +71,12 @@ void main() {
     });
 
     test('a standing Geo shield grounds the proc entirely', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.0]),
+        baseMissPercent: 0,
+      );
       charge(bruno, MagicElement.geo, 3);
       bruno.shield = ActiveShield.elemental(MagicElement.geo, 999);
       duel.resolveTurn(
@@ -77,7 +91,12 @@ void main() {
       // Bruno commits Surge (cost 3) with exactly 3 charge. Alice's Electro
       // Flick (P5) resolves before Surge (P9), procs static (0.0), stripping
       // to 2 — Surge fizzles, Bruno keeps 2 charge.
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.0]),
+        baseMissPercent: 0,
+      );
       charge(bruno, MagicElement.geo, 3);
       final result = duel.resolveTurn(
         CastAction(Spellbook.flick, MagicElement.electro),
@@ -85,25 +104,35 @@ void main() {
       );
       expect(result.events.whereType<SpellFizzledEvent>(), hasLength(1));
       expect(alice.hp, 100, reason: 'Surge never resolved');
-      expect(bruno.charge, 2,
-          reason: 'fizzle keeps the remaining charge (the §3.1 ruling)');
+      expect(
+        bruno.charge,
+        2,
+        reason: 'fizzle keeps the remaining charge (the §3.1 ruling)',
+      );
     });
 
-    test('an Electro attack scatters the Tailwind streak but not held Haste',
-        () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.99]), baseMissPercent: 0);
-      bruno
-        ..streakElement = MagicElement.aero
-        ..streakCount = 4
-        ..hasHaste = true;
-      duel.resolveTurn(
-        CastAction(Spellbook.flick, MagicElement.electro),
-        const ForfeitAction(),
-      );
-      expect(bruno.streakCount, 0, reason: 'streak wiped');
-      expect(bruno.streakElement, isNull);
-      expect(bruno.hasHaste, isTrue, reason: 'held Haste is kept');
-    });
+    test(
+      'an Electro attack scatters the Tailwind streak but not held Haste',
+      () {
+        final duel = DuelEngine(
+          alice,
+          bruno,
+          rng: ScriptedRandom([0.99]),
+          baseMissPercent: 0,
+        );
+        bruno
+          ..streakElement = MagicElement.aero
+          ..streakCount = 4
+          ..hasHaste = true;
+        duel.resolveTurn(
+          CastAction(Spellbook.flick, MagicElement.electro),
+          const ForfeitAction(),
+        );
+        expect(bruno.streakCount, 0, reason: 'streak wiped');
+        expect(bruno.streakElement, isNull);
+        expect(bruno.hasHaste, isTrue, reason: 'held Haste is kept');
+      },
+    );
   });
 
   group('Tier 2 — Tailwind (Aero §3.2)', () {
@@ -169,7 +198,12 @@ void main() {
   group('Tier 3 — Blind (Solar §4b.1)', () {
     test('proc chance is 10% per charge spent', () {
       // 4 charge spent → 40%: a 0.39 roll procs...
-      var duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.39]), baseMissPercent: 0);
+      var duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.39]),
+        baseMissPercent: 0,
+      );
       charge(alice, MagicElement.solar, 4);
       duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
       expect(bruno.statuses.whereType<BlindStatus>(), hasLength(1));
@@ -177,14 +211,24 @@ void main() {
       // ...and a 0.41 roll does not.
       alice = MageState(name: 'Alice');
       bruno = MageState(name: 'Bruno');
-      duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.41]), baseMissPercent: 0);
+      duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.41]),
+        baseMissPercent: 0,
+      );
       charge(alice, MagicElement.solar, 4);
       duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
       expect(bruno.statuses.whereType<BlindStatus>(), isEmpty);
     });
 
     test('a 0-cost attack can never blind', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.0]),
+        baseMissPercent: 0,
+      );
       duel.resolveTurn(
         CastAction(Spellbook.flick, MagicElement.solar),
         const ForfeitAction(),
@@ -196,16 +240,23 @@ void main() {
       // Turn 1: Alice blinds Bruno (0.0 procs at 40%).
       // Bruno then attacks each turn; miss rolls scripted to always miss
       // (0.4 < 0.5) while blind is active.
-      final duel = DuelEngine(alice, bruno,
-          rng: ScriptedRandom([0.0, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.0, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]),
+        baseMissPercent: 0,
+      );
       charge(alice, MagicElement.solar, 4);
       duel.resolveTurn(
         CastAction(Spellbook.ruin),
         CastAction(Spellbook.flick, MagicElement.geo), // same turn: no miss
       );
       final afterTurn1 = alice.hp;
-      expect(afterTurn1, lessThan(100),
-          reason: 'same-turn cast is not affected by the fresh blind');
+      expect(
+        afterTurn1,
+        lessThan(100),
+        reason: 'same-turn cast is not affected by the fresh blind',
+      );
 
       // Turns 2-4: all Bruno's attacks miss.
       for (var t = 0; t < 3; t++) {
@@ -226,7 +277,12 @@ void main() {
     });
 
     test('Astral spells never miss while blinded (Astral slips Solar)', () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0, 0.0]), baseMissPercent: 0);
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom([0.0, 0.0]),
+        baseMissPercent: 0,
+      );
       bruno.statuses.add(BlindStatus()..advanceAndCheckExpiry(bruno));
       duel.resolveTurn(
         const ForfeitAction(),
@@ -235,20 +291,35 @@ void main() {
       expect(alice.hp, lessThan(100), reason: 'Astral is exempt from Blind');
     });
 
-    test('a Blind proc no longer touches Creeping Dark (that is Absolution now)',
-        () {
-      final duel = DuelEngine(alice, bruno, rng: ScriptedRandom([0.0]), baseMissPercent: 0);
-      bruno.statuses.add(CreepingDarkStatus(12));
-      charge(alice, MagicElement.solar, 4);
-      // Bruno charges Umbra so its dark doesn't take its normal -1 decay this
-      // turn — isolating the question of whether the Blind proc cleared it.
-      duel.resolveTurn(
-          CastAction(Spellbook.ruin), const ChargeAction(MagicElement.umbra));
-      expect(bruno.statuses.whereType<BlindStatus>(), hasLength(1),
-          reason: 'the blind lands');
-      expect(bruno.statuses.whereType<CreepingDarkStatus>().single.stacks, 12,
-          reason: 'the dark is untouched by the blind');
-    });
+    test(
+      'a Blind proc no longer touches Creeping Dark (that is Absolution now)',
+      () {
+        final duel = DuelEngine(
+          alice,
+          bruno,
+          rng: ScriptedRandom([0.0]),
+          baseMissPercent: 0,
+        );
+        bruno.statuses.add(CreepingDarkStatus(12));
+        charge(alice, MagicElement.solar, 4);
+        // Bruno charges Umbra so its dark doesn't take its normal -1 decay this
+        // turn — isolating the question of whether the Blind proc cleared it.
+        duel.resolveTurn(
+          CastAction(Spellbook.ruin),
+          const ChargeAction(MagicElement.umbra),
+        );
+        expect(
+          bruno.statuses.whereType<BlindStatus>(),
+          hasLength(1),
+          reason: 'the blind lands',
+        );
+        expect(
+          bruno.statuses.whereType<CreepingDarkStatus>().single.stacks,
+          12,
+          reason: 'the dark is untouched by the blind',
+        );
+      },
+    );
   });
 
   group('Tier 3 — Creeping Dark (Umbra §4.2)', () {
@@ -261,7 +332,9 @@ void main() {
 
       // Charging Umbra pauses decay.
       duel.resolveTurn(
-          const ChargeAction(MagicElement.umbra), const ForfeitAction());
+        const ChargeAction(MagicElement.umbra),
+        const ForfeitAction(),
+      );
       expect(alice.statuses.whereType<CreepingDarkStatus>().single.stacks, 5);
 
       // A non-Umbra turn decays one stack — and Shadow lifts below 5.
@@ -276,7 +349,9 @@ void main() {
         bruno.hp = 100; // survive the repeated Cataclysms — not under test
         charge(alice, MagicElement.umbra, 5);
         duel.resolveTurn(
-            CastAction(Spellbook.cataclysm), const ForfeitAction());
+          CastAction(Spellbook.cataclysm),
+          const ForfeitAction(),
+        );
       }
       final dark = alice.statuses.whereType<CreepingDarkStatus>().single;
       expect(dark.stacks, 15);
@@ -310,7 +385,9 @@ void main() {
       final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
       charge(alice, MagicElement.arcane, 4);
       duel.resolveTurn(
-          CastAction(Spellbook.bolt), const ForfeitAction()); // cost 1, spends 4
+        CastAction(Spellbook.bolt),
+        const ForfeitAction(),
+      ); // cost 1, spends 4
       expect(alice.statuses.whereType<ArcaneKnowledgeStatus>(), hasLength(1));
     });
 
@@ -331,14 +408,24 @@ void main() {
       expect(alice.bonusDamagePercent, 5);
     });
 
-    test('gaining is blocked under the opponent Dusk (Umbra corrupts Arcane)',
-        () {
-      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
-      bruno.statuses.add(CreepingDarkStatus(10)); // Dusk
-      charge(alice, MagicElement.arcane, 4);
-      duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
-      expect(alice.statuses.whereType<ArcaneKnowledgeStatus>(), isEmpty,
-          reason: 'no AK gain under Dusk');
-    });
+    test(
+      'gaining is blocked under the opponent Dusk (Umbra corrupts Arcane)',
+      () {
+        final duel = DuelEngine(
+          alice,
+          bruno,
+          rng: Random(1),
+          baseMissPercent: 0,
+        );
+        bruno.statuses.add(CreepingDarkStatus(10)); // Dusk
+        charge(alice, MagicElement.arcane, 4);
+        duel.resolveTurn(CastAction(Spellbook.ruin), const ForfeitAction());
+        expect(
+          alice.statuses.whereType<ArcaneKnowledgeStatus>(),
+          isEmpty,
+          reason: 'no AK gain under Dusk',
+        );
+      },
+    );
   });
 }

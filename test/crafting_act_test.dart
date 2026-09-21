@@ -59,8 +59,11 @@ void main() {
     test('closeness is 1 dead-on, linear to 0 at the window edge', () {
       expect(closeness(0.8, 0.8, 0.1), 1);
       expect(closeness(0.85, 0.8, 0.1), closeTo(0.5, 1e-9));
-      expect(closeness(0.91, 0.8, 0.1), 0,
-          reason: 'outside the window is a miss, not negative');
+      expect(
+        closeness(0.91, 0.8, 0.1),
+        0,
+        reason: 'outside the window is a miss, not negative',
+      );
     });
 
     test('trace coverage dominates fidelity 70/30', () {
@@ -82,8 +85,11 @@ void main() {
 
     test('the fail threshold vanishes at margin 5', () {
       expect(failThreshold(0), greaterThan(0));
-      expect(failThreshold(5), 0,
-          reason: 'a veteran does not ruin oak — §9b.9c');
+      expect(
+        failThreshold(5),
+        0,
+        reason: 'a veteran does not ruin oak — §9b.9c',
+      );
     });
 
     test('pingPong is deterministic and bounces', () {
@@ -100,8 +106,9 @@ void main() {
   });
 
   group('the act, played', () {
-    testWidgets('a played oak-wand act crafts the wand and shows the grade',
-        (tester) async {
+    testWidgets('a played oak-wand act crafts the wand and shows the grade', (
+      tester,
+    ) async {
       final game = _gameWithLogs(3);
       await tester.pumpWidget(
         _wrap(game, CraftingActScreen(recipe: PrimalRecipes.oakWand)),
@@ -139,15 +146,22 @@ void main() {
 
       // The result panel, and the wand genuinely minted.
       expect(find.textContaining('Grade'), findsOneWidget);
-      expect(game.profile.backpack.countOf('oak_wand'), 1,
-          reason: 'the act must end in a real craft, not a display');
-      expect(game.profile.backpack.countOf('oak_log'), 1,
-          reason: 'materials consumed by the real craft() path');
+      expect(
+        game.profile.backpack.countOf('oak_wand'),
+        1,
+        reason: 'the act must end in a real craft, not a display',
+      );
+      expect(
+        game.profile.backpack.countOf('oak_log'),
+        1,
+        reason: 'materials consumed by the real craft() path',
+      );
       expect(game.profile.skillXp['woodcarving'], isNotNull);
     });
 
-    testWidgets('a frame rendered while the craft saves must not crash',
-        (tester) async {
+    testWidgets('a frame rendered while the craft saves must not crash', (
+      tester,
+    ) async {
       // ⚠️ The field report: finishing the LAST step (the knot's sand scrub)
       // threw RangeError(steps[2] of 2) — the view only flipped to the
       // result AFTER awaiting craft(), and the save's latency let a frame
@@ -156,8 +170,7 @@ void main() {
         _SlowMem(),
         PlayerProfile.newPlayer()
           ..backpack = Backpack.of([
-            for (var i = 0; i < 3; i++)
-              const InventorySlot(defId: 'oak_log'),
+            for (var i = 0; i < 3; i++) const InventorySlot(defId: 'oak_log'),
           ]),
       );
       await tester.pumpWidget(
@@ -191,11 +204,18 @@ void main() {
       // ⭐ THE frame the bug lived in: rendered while craft() awaits the
       // slow save. Before the fix this pump threw the RangeError.
       await tester.pump();
-      expect(tester.takeException(), isNull,
-          reason: 'the mid-save frame must render the result, not index '
-              'steps[length]');
-      expect(find.textContaining('Grade'), findsOneWidget,
-          reason: 'the grade flips the view synchronously with the score');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason:
+            'the mid-save frame must render the result, not index '
+            'steps[length]',
+      );
+      expect(
+        find.textContaining('Grade'),
+        findsOneWidget,
+        reason: 'the grade flips the view synchronously with the score',
+      );
 
       await tester.pumpAndSettle();
       expect(game.profile.backpack.countOf('oak_wand'), 1);
@@ -236,14 +256,23 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('The attempt fails'), findsOneWidget);
-      expect(find.textContaining('unspent'), findsOneWidget,
-          reason: 'the safety rule must be said out loud');
+      expect(
+        find.textContaining('unspent'),
+        findsOneWidget,
+        reason: 'the safety rule must be said out loud',
+      );
       // ⚠️ The whole §9b.9c abort ruling: nothing consumed, nothing paid.
-      expect(game.profile.backpack.countOf('oak_log'), 3,
-          reason: 'a failed act must never eat materials');
+      expect(
+        game.profile.backpack.countOf('oak_log'),
+        3,
+        reason: 'a failed act must never eat materials',
+      );
       expect(game.profile.backpack.countOf('oak_wand'), 0);
-      expect(game.profile.skillXp['woodcarving'], isNull,
-          reason: 'no XP for an aborted attempt');
+      expect(
+        game.profile.skillXp['woodcarving'],
+        isNull,
+        reason: 'no XP for an aborted attempt',
+      );
     });
   });
 }

@@ -89,8 +89,12 @@ class EnemyView {
   final bool chargeHidden;
   final bool healthHidden;
 
-  EnemyView._(this._enemy, this.elementHidden, this.chargeHidden,
-      this.healthHidden);
+  EnemyView._(
+    this._enemy,
+    this.elementHidden,
+    this.chargeHidden,
+    this.healthHidden,
+  );
 
   factory EnemyView.of(MageState enemy) {
     CreepingDarkStatus? dark;
@@ -143,8 +147,15 @@ class EnemyView {
 // 0.48 collapse point; 4 drops a step so its deliberating body stays ahead
 // of the sharpened 3.
 const Map<int, double> _blunderRate = {
-  2: 0.44, 3: 0.27, 4: 0.18, 5: 0.17, 6: 0.13,
-  7: 0.10, 8: 0.07, 9: 0.04, 10: 0.00,
+  2: 0.44,
+  3: 0.27,
+  4: 0.18,
+  5: 0.17,
+  6: 0.13,
+  7: 0.10,
+  8: 0.07,
+  9: 0.04,
+  10: 0.00,
 };
 
 /// Chance an enemy of the given [intelligence] throws away its turn.
@@ -316,8 +327,9 @@ class LadderAi implements DuelAi {
     // competence: level 9+ assumes the worst and guards anyway, while 7-8
     // simply lose the read — which is precisely what Creeping Dark is for.
     final seenCharge = view.charge;
-    final threatening =
-        seenCharge != null ? seenCharge >= 4 : (_can(9) && enemy.shield == null);
+    final threatening = seenCharge != null
+        ? seenCharge >= 4
+        : (_can(9) && enemy.shield == null);
     if (_can(9) && threatening && self.shield == null && !urgent) {
       final guard = _defensive(affordable);
       if (guard != null) return CastAction(guard, elementArg());
@@ -344,8 +356,9 @@ class LadderAi implements DuelAi {
     if (_can(7)) {
       final utility = _bestUtility(self, enemy, affordable);
       if (utility != null) {
-        final bestAttack = affordable.where((s) => s.isOffensive).fold<int>(
-            0, (m, s) => max(m, _score(s, self, enemy)));
+        final bestAttack = affordable
+            .where((s) => s.isOffensive)
+            .fold<int>(0, (m, s) => max(m, _score(s, self, enemy)));
         // The floor of 11 stops dithering: a 6-point strip is never worth a
         // turn that could charge toward a Surge.
         if (utility.ev > max(bestAttack, 11)) {
@@ -425,10 +438,10 @@ class LadderAi implements DuelAi {
     var strikeNow = _can(8)
         ? 0.08
         : _can(6)
-            ? 0.16
-            : _can(4)
-                ? 0.25
-                : 0.35;
+        ? 0.16
+        : _can(4)
+        ? 0.25
+        : 0.35;
     // Burning changes the maths: damage you will take regardless makes waiting
     // worse than trading. Level 7 is the first rung that can see this.
     if (urgent) strikeNow = 0.5;
@@ -457,12 +470,16 @@ class LadderAi implements DuelAi {
   }
 
   List<Spell> _affordable(MageState self) => [
-        for (final s in spells)
-          if (s.xCost ? self.charge >= 1 : s.chargeCost <= self.charge) s,
-      ];
+    for (final s in spells)
+      if (s.xCost ? self.charge >= 1 : s.chargeCost <= self.charge) s,
+  ];
 
   MageAction _uniform(
-      MageState self, List<Spell> affordable, MagicElement? arg, Random rng) {
+    MageState self,
+    List<Spell> affordable,
+    MagicElement? arg,
+    Random rng,
+  ) {
     final options = <MageAction>[
       if (self.charge < MageState.maxCharge) ChargeAction(arg),
       for (final s in affordable) CastAction(s, arg),
@@ -570,7 +587,10 @@ class LadderAi implements DuelAi {
   /// unbroken tie let low rungs coin-flip between a 35-damage cast and an
   /// 8-damage one, which is how the ladder stopped climbing.
   void _sortAttacks(
-      List<Spell> attacks, MageState self, int Function(Spell) primary) {
+    List<Spell> attacks,
+    MageState self,
+    int Function(Spell) primary,
+  ) {
     attacks.sort((a, b) {
       final p = primary(b).compareTo(primary(a));
       if (p != 0) return p;
@@ -596,7 +616,10 @@ class LadderAi implements DuelAi {
   /// The best EV-positive utility cast on the board, or null when nothing
   /// prices above zero. Level 7+ only — every valuation here reads statuses.
   ({Spell spell, int ev})? _bestUtility(
-      MageState self, MageState enemy, List<Spell> affordable) {
+    MageState self,
+    MageState enemy,
+    List<Spell> affordable,
+  ) {
     ({Spell spell, int ev})? best;
     void consider(Spell sp, int ev) {
       if (ev <= 0) return;
@@ -626,14 +649,14 @@ class LadderAi implements DuelAi {
           consider(sp, bonusTicks * perTurn * 6 ~/ 10);
         case ShatterEffect():
           consider(
-              sp,
-              (enemy.shield?.remaining ?? 0) * 8 ~/ 10 +
-                  enemy.barrierPoints * 12 +
-                  (enemy.statuses.any(isDivertFamily) ? 10 : 0));
+            sp,
+            (enemy.shield?.remaining ?? 0) * 8 ~/ 10 +
+                enemy.barrierPoints * 12 +
+                (enemy.statuses.any(isDivertFamily) ? 10 : 0),
+          );
         case DispelEffect():
           var count = enemy.statuses
-              .where(
-                  (s) => s.polarity == StatusPolarity.buff && s.strippable)
+              .where((s) => s.polarity == StatusPolarity.buff && s.strippable)
               .length;
           if (enemy.empowerMultiplier != null) count++;
           if (enemy.hasGrace) count++;
@@ -659,11 +682,12 @@ class LadderAi implements DuelAi {
           for (final g in grants) {
             if (g.statusId != 'mending') continue;
             final granted = g.build();
-            if (granted is MendingStatus &&
-                self.hp * 100 < self.maxHp * 60) {
+            if (granted is MendingStatus && self.hp * 100 < self.maxHp * 60) {
               final total =
-                  granted.percentPerTurn * granted.turnsLeft * self.maxHp ~/
-                      100;
+                  granted.percentPerTurn *
+                  granted.turnsLeft *
+                  self.maxHp ~/
+                  100;
               consider(sp, min(total, self.maxHp - self.hp) * 6 ~/ 10);
             }
           }
@@ -693,8 +717,13 @@ class LadderAi implements DuelAi {
   /// land**, and refusing to dump it into a wall.
   ///
   /// Levels 1–7 fire on a fixed rhythm. Level 8 reads the board first.
-  MageAction? _planned(MageState self, MageState enemy, List<Spell> affordable,
-      MagicElement element, Random rng) {
+  MageAction? _planned(
+    MageState self,
+    MageState enemy,
+    List<Spell> affordable,
+    MagicElement element,
+    Random rng,
+  ) {
     final view = EnemyView.of(enemy);
     // Unknown charge is treated as dangerous — planning on an assumption of
     // safety is how a clever brain loses to a hidden board.
@@ -707,8 +736,9 @@ class LadderAi implements DuelAi {
     // cannot make.
     final wall = view.shield;
     if (wall != null && self.charge >= 3 && safe) {
-      final best = affordable.where((s) => s.isOffensive).fold<int>(
-          0, (m, s) => max(m, _score(s, self, enemy)));
+      final best = affordable
+          .where((s) => s.isOffensive)
+          .fold<int>(0, (m, s) => max(m, _score(s, self, enemy)));
       if (best == 0 && self.charge < MageState.maxCharge) {
         return ChargeAction(arg());
       }
@@ -718,10 +748,10 @@ class LadderAi implements DuelAi {
     // with charge spent, and Photosynthesis persists as long as the
     // Flora streak is not broken by casting something else.
     final building = self.statuses.any(
-        (s) => s is AstralAlignmentStatus || s is PhotosynthesisStatus);
+      (s) => s is AstralAlignmentStatus || s is PhotosynthesisStatus,
+    );
     if (building && safe && self.charge < 4) return ChargeAction(arg());
 
     return null;
   }
-
 }

@@ -62,9 +62,10 @@ void main() {
       // ⚠️ The export, the art pipeline and the achievement log all key on id.
       // An id that drifts from its name is a rename nobody notices.
       for (final e in all) {
-        final derived = e.name
-            .toLowerCase()
-            .replaceAll(RegExp(r"[^a-z0-9]+"), '_');
+        final derived = e.name.toLowerCase().replaceAll(
+          RegExp(r"[^a-z0-9]+"),
+          '_',
+        );
         expect(e.id, derived, reason: '${e.name} should be id "$derived"');
       }
     });
@@ -73,11 +74,9 @@ void main() {
       final loc = World.byId(zone);
       for (final e in all) {
         expect(e.zoneId, zone);
-        expect(
-          e.elements,
-          [MagicElement.aqua],
-          reason: '${e.id} — a pure zone means one element (ENEMIES §2h)',
-        );
+        expect(e.elements, [
+          MagicElement.aqua,
+        ], reason: '${e.id} — a pure zone means one element (ENEMIES §2h)');
         expect(loc.elements, contains(e.elements.single));
       }
     });
@@ -247,7 +246,8 @@ void main() {
         expect(
           e.moves.any((m) => m.effect is ShieldEffect),
           isTrue,
-          reason: '${e.id} is a ${e.archetype.name} with nothing to hide behind',
+          reason:
+              '${e.id} is a ${e.archetype.name} with nothing to hide behind',
         );
       }
     });
@@ -265,7 +265,9 @@ void main() {
       );
       expect(
         naiad.moves.any(
-          (m) => m.effect is DamageEffect && (m.effect as DamageEffect).ignoresShields,
+          (m) =>
+              m.effect is DamageEffect &&
+              (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
         reason: 'nothing the Hexer throws goes through a wall',
@@ -276,10 +278,12 @@ void main() {
       // ⚠️ "Bring a shield — one misplay ends you" is only true if its ceiling
       // is genuinely the zone's ceiling among the minis.
       int ceiling(EnemyDef e) => e.moves
-          .map((m) => m.effect is DamageEffect
-              ? (m.effect as DamageEffect).maxAmount *
-                    (m.effect as DamageEffect).hits
-              : 0)
+          .map(
+            (m) => m.effect is DamageEffect
+                ? (m.effect as DamageEffect).maxAmount *
+                      (m.effect as DamageEffect).hits
+                : 0,
+          )
           .reduce((a, b) => a > b ? a : b);
 
       final coil = GlimmerbrookBestiary.paleCoil;
@@ -301,7 +305,9 @@ void main() {
       final still = GlimmerbrookBestiary.stillwater;
       expect(
         still.moves.any(
-          (m) => m.effect is DamageEffect && (m.effect as DamageEffect).ignoresShields,
+          (m) =>
+              m.effect is DamageEffect &&
+              (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
         reason: 'Stillwater without a shield-piercer is a second Juggernaut',
@@ -310,7 +316,8 @@ void main() {
       expect(
         wall.chargeCost,
         1,
-        reason: 'the one-charge wall IS the extreme; at 3 it is an ordinary boss',
+        reason:
+            'the one-charge wall IS the extreme; at 3 it is an ordinary boss',
       );
     });
 
@@ -419,8 +426,12 @@ void main() {
       // ⚠️ The hybrids drop two ladders on purpose; a pure zone doing it would
       // make the element economy unreadable.
       const foreign = {
-        'flora_dust', 'flora_shard', 'flora_crystal',
-        'pyro_dust', 'pyro_shard', 'pyro_crystal',
+        'flora_dust',
+        'flora_shard',
+        'flora_crystal',
+        'pyro_dust',
+        'pyro_shard',
+        'pyro_crystal',
       };
       for (final id in GlimmerbrookBestiary.allDrops) {
         expect(foreign, isNot(contains(id)), reason: '$id is off-element');
@@ -443,10 +454,7 @@ void main() {
           reason: '${e.id} hands the chase out too freely',
         );
       }
-      expect(
-        ItemCatalogue.byId('brookstone_pendant').rarity,
-        Rarity.rare,
-      );
+      expect(ItemCatalogue.byId('brookstone_pendant').rarity, Rarity.rare);
     });
 
     test('the Epic chase is boss-only, and rare', () {

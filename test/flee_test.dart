@@ -234,7 +234,11 @@ void main() {
       expect(c.fled, isTrue);
       expect(c.gameOver, isTrue, reason: 'the fight is over the moment we go');
       expect(c.outcome, DuelOutcome.fled);
-      expect(c.playerWon, isFalse, reason: 'nobody won a fight nobody finished');
+      expect(
+        c.playerWon,
+        isFalse,
+        reason: 'nobody won a fight nobody finished',
+      );
       expect(c.isDraw, isFalse, reason: 'a draw is a result; this is not');
       expect(
         c.playerDefeated,
@@ -477,16 +481,24 @@ void main() {
       expect(game.run!.unclaimed, isNotEmpty);
       await game.loseEncounter();
       expect(game.run!.outcome, RunOutcome.died);
-      expect(game.run!.unclaimed, isEmpty,
-          reason: 'defeat forfeits the unanswered batch (recordDefeat)');
-      expect(game.profile.backpack.used, 0,
-          reason: 'the 2026-08-17 wipe: death costs the inventory');
+      expect(
+        game.run!.unclaimed,
+        isEmpty,
+        reason: 'defeat forfeits the unanswered batch (recordDefeat)',
+      );
+      expect(
+        game.profile.backpack.used,
+        0,
+        reason: 'the 2026-08-17 wipe: death costs the inventory',
+      );
       expect(game.profile.duelsLost, 1);
     });
   });
 
   group('the arena button', () {
-    testWidgets('a campaign fight shows the live escape chance', (tester) async {
+    testWidgets('a campaign fight shows the live escape chance', (
+      tester,
+    ) async {
       await _pumpDuel(tester, campaign: true);
       expect(
         find.text('Flee (80%)'),
@@ -553,7 +565,8 @@ void main() {
       expect(
         settled,
         DuelOutcome.fled,
-        reason: '⚠️ the mutant this kills: the campaign branch calling '
+        reason:
+            '⚠️ the mutant this kills: the campaign branch calling '
             'surrender(), which would settle as lost and wipe the run',
       );
       expect(find.text('Escaped'), findsOneWidget);

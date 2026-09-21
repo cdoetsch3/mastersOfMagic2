@@ -27,39 +27,58 @@ void main() {
     // Turn 1 — Aero Flick. Streak becomes 1.
     alice.element = MagicElement.aero;
     var r = duel.resolveTurn(
-        CastAction(Spellbook.flick, MagicElement.aero), const ForfeitAction());
-    expect(streakIn(r.frames.last.mage1), 1,
-        reason: 'the first cast shows a streak of 1 on its own turn');
+      CastAction(Spellbook.flick, MagicElement.aero),
+      const ForfeitAction(),
+    );
+    expect(
+      streakIn(r.frames.last.mage1),
+      1,
+      reason: 'the first cast shows a streak of 1 on its own turn',
+    );
 
     // Turn 2 — charge Aero. The streak does not advance on a charge.
     r = duel.resolveTurn(
-        const ChargeAction(MagicElement.aero), const ForfeitAction());
+      const ChargeAction(MagicElement.aero),
+      const ForfeitAction(),
+    );
     expect(streakIn(r.frames.last.mage1), 1, reason: 'charging never advances');
 
     // Turn 3 — Aero Bolt. This is the one that used to lag.
     r = duel.resolveTurn(CastAction(Spellbook.bolt), const ForfeitAction());
-    expect(streakIn(r.frames.last.mage1), 2,
-        reason: 'the Bolt turn must show 2, not wait for the next charge');
+    expect(
+      streakIn(r.frames.last.mage1),
+      2,
+      reason: 'the Bolt turn must show 2, not wait for the next charge',
+    );
   });
 
-  test('the new count is carried by the cast event itself, not a later one',
-      () {
-    final duel = DuelEngine(alice, bruno, rng: Random(7), baseMissPercent: 0);
-    alice.element = MagicElement.aero;
-    final r = duel.resolveTurn(
-        CastAction(Spellbook.flick, MagicElement.aero), const ForfeitAction());
+  test(
+    'the new count is carried by the cast event itself, not a later one',
+    () {
+      final duel = DuelEngine(alice, bruno, rng: Random(7), baseMissPercent: 0);
+      alice.element = MagicElement.aero;
+      final r = duel.resolveTurn(
+        CastAction(Spellbook.flick, MagicElement.aero),
+        const ForfeitAction(),
+      );
 
-    final castIdx = r.events.indexWhere((e) => e is SpellCastEvent);
-    expect(castIdx, greaterThanOrEqualTo(0));
-    expect(streakIn(r.frames[castIdx].mage1), 1,
-        reason: 'the pip lands with the cast, not at end of turn');
-  });
+      final castIdx = r.events.indexWhere((e) => e is SpellCastEvent);
+      expect(castIdx, greaterThanOrEqualTo(0));
+      expect(
+        streakIn(r.frames[castIdx].mage1),
+        1,
+        reason: 'the pip lands with the cast, not at end of turn',
+      );
+    },
+  );
 
   test('a fizzle or miss still leaves the streak alone', () {
     final duel = DuelEngine(alice, bruno, rng: Random(7), baseMissPercent: 0);
     alice.element = MagicElement.aero;
     var r = duel.resolveTurn(
-        CastAction(Spellbook.flick, MagicElement.aero), const ForfeitAction());
+      CastAction(Spellbook.flick, MagicElement.aero),
+      const ForfeitAction(),
+    );
     expect(streakIn(r.frames.last.mage1), 1);
 
     // A real fizzle: Alice commits a Bolt she can afford, but Bruno's
@@ -72,10 +91,18 @@ void main() {
       ..charge = 2
       ..element = MagicElement.pyro;
     r = duel.resolveTurn(
-        CastAction(Spellbook.bolt), CastAction(Spellbook.discharge));
-    expect(r.events.whereType<SpellFizzledEvent>(), hasLength(1),
-        reason: 'the Bolt fizzled');
-    expect(streakIn(r.frames.last.mage1), 1,
-        reason: 'a fizzle behaves like a charge — no streak change');
+      CastAction(Spellbook.bolt),
+      CastAction(Spellbook.discharge),
+    );
+    expect(
+      r.events.whereType<SpellFizzledEvent>(),
+      hasLength(1),
+      reason: 'the Bolt fizzled',
+    );
+    expect(
+      streakIn(r.frames.last.mage1),
+      1,
+      reason: 'a fizzle behaves like a charge — no streak change',
+    );
   });
 }

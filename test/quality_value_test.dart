@@ -37,7 +37,8 @@ void main() {
         expect(
           qualityValue(def, _inst(q)),
           (def.value * q.statPercent + 50) ~/ 100,
-          reason: '${q.name} must ride the same ladder as stats, and the only '
+          reason:
+              '${q.name} must ride the same ladder as stats, and the only '
               'way to guarantee that is to read statPercent',
         );
       }
@@ -51,7 +52,11 @@ void main() {
       final ornate = qualityValue(def, _inst(Quality.ornate));
       final master = qualityValue(def, _inst(Quality.master));
 
-      expect(standard, def.value, reason: 'Standard is the baseline rung, ×1.00');
+      expect(
+        standard,
+        def.value,
+        reason: 'Standard is the baseline rung, ×1.00',
+      );
       expect(
         [rough, standard, ornate, master],
         [
@@ -60,7 +65,8 @@ void main() {
           greaterThan(standard),
           greaterThan(ornate),
         ],
-        reason: 'the ladder must be strictly increasing across all four rungs '
+        reason:
+            'the ladder must be strictly increasing across all four rungs '
             '— a flat or inverted ladder is the ruling reversed',
       );
       // The concrete numbers for value 110, spelled out so a silent retune of
@@ -103,7 +109,8 @@ void main() {
         expect(
           q.statPercent % 20,
           0,
-          reason: 'a rung that is not a multiple of 20 makes the half-away '
+          reason:
+              'a rung that is not a multiple of 20 makes the half-away '
               'rule observable — write the tie test that becomes necessary',
         );
       }
@@ -111,7 +118,8 @@ void main() {
       expect(
         ShopPricing.roundGold(0.5),
         1,
-        reason: 'half away from zero — a .floor() here returns 0 and is the '
+        reason:
+            'half away from zero — a .floor() here returns 0 and is the '
             'mutant both this seam and the sink are guarding against',
       );
     });
@@ -130,7 +138,10 @@ void main() {
       );
       for (final q in Quality.values) {
         expect(
-          qualityValue(worthless, ItemInstance(instanceId: 'i', defId: 'zz', quality: q)),
+          qualityValue(
+            worthless,
+            ItemInstance(instanceId: 'i', defId: 'zz', quality: q),
+          ),
           0,
           reason: '${q.name} × 0 is 0 — a flat bonus implementation fails here',
         );
@@ -144,7 +155,8 @@ void main() {
         expect(
           instanceVendorPrice(def, _inst(q)),
           ShopPricing.vendorPrice(qualityValue(def, _inst(q))),
-          reason: 'the sink applies to the quality-scaled value, not to the '
+          reason:
+              'the sink applies to the quality-scaled value, not to the '
               'raw def.value with quality bolted on afterward',
         );
       }
@@ -159,12 +171,15 @@ void main() {
         greaterThan(instanceVendorPrice(def, _inst(Quality.rough))),
         reason: 'quality must reach the NPC price, or the ruling did nothing',
       );
-      expect([
-        instanceVendorPrice(def, _inst(Quality.rough)),
-        instanceVendorPrice(def, _inst(Quality.standard)),
-        instanceVendorPrice(def, _inst(Quality.ornate)),
-        instanceVendorPrice(def, _inst(Quality.master)),
-      ], [53, 66, 79, 92]);
+      expect(
+        [
+          instanceVendorPrice(def, _inst(Quality.rough)),
+          instanceVendorPrice(def, _inst(Quality.standard)),
+          instanceVendorPrice(def, _inst(Quality.ornate)),
+          instanceVendorPrice(def, _inst(Quality.master)),
+        ],
+        [53, 66, 79, 92],
+      );
     });
 
     test('an unqualified instance still prices exactly as it always did', () {

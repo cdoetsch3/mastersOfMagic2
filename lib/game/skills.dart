@@ -112,11 +112,10 @@ abstract final class Skills {
   /// Everything [skill] can ever make, unlock order then name — the
   /// "view all" sheet, scrollable past level 40 without curation.
   static List<RecipeDef> allRecipesFor(CraftSkill skill) =>
-      RecipeBook.forSkill(skill)
-        ..sort((a, b) {
-          final byLevel = a.skillLevel.compareTo(b.skillLevel);
-          return byLevel != 0 ? byLevel : a.outputId.compareTo(b.outputId);
-        });
+      RecipeBook.forSkill(skill)..sort((a, b) {
+        final byLevel = a.skillLevel.compareTo(b.skillLevel);
+        return byLevel != 0 ? byLevel : a.outputId.compareTo(b.outputId);
+      });
 
   /// The last few things [level] has already opened, newest first.
   ///

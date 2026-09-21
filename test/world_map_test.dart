@@ -76,9 +76,10 @@ void main() {
       for (var i = 0; i < spine.length - 1; i++) {
         final a = spine[i];
         final seg = spine[i + 1] - a;
-        final t = (((at - a).dx * seg.dx + (at - a).dy * seg.dy) /
-                seg.distanceSquared)
-            .clamp(0.0, 1.0);
+        final t =
+            (((at - a).dx * seg.dx + (at - a).dy * seg.dy) /
+                    seg.distanceSquared)
+                .clamp(0.0, 1.0);
         final d = (at - (a + seg * t)).distance;
         if (d < nearest) nearest = d;
       }
@@ -384,7 +385,9 @@ void main() {
       final after = WorldMapPainter(seen: {'hearthwood', 'pennycross'});
       expect(before.shouldRepaint(after), isTrue);
       expect(
-        before.shouldRepaint(WorldMapPainter(seen: {'thornmire', 'hearthwood'})),
+        before.shouldRepaint(
+          WorldMapPainter(seen: {'thornmire', 'hearthwood'}),
+        ),
         isFalse,
         reason: 'set equality, not order',
       );

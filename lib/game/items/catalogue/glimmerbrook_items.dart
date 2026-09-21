@@ -117,7 +117,8 @@ abstract final class GlimmerbrookItems {
   static const fawnhideBelt = EquipmentDef(
     id: 'fawnhide_belt',
     rarity: Rarity.common,
-    lore: 'Soft enough to sleep in. It will hold a bottle where you can '
+    lore:
+        'Soft enough to sleep in. It will hold a bottle where you can '
         'reach it, which is worth more than it sounds.',
     slot: EquipSlot.belt,
     form: 'Belt',

@@ -119,15 +119,13 @@ class LightfootStatus extends StatStanceStatus {
 
   /// The 4-cost price point: +20 dodge, 30 turns — the duration is what the
   /// extra charge mostly buys.
-  static LightfootStatus twinkleToes() =>
-      LightfootStatus(dodge: 20, turns: 30);
+  static LightfootStatus twinkleToes() => LightfootStatus(dodge: 20, turns: 30);
 
   @override
   String get id => 'lightfoot';
 
   @override
-  int contributionTo(CombatStat stat) =>
-      stat == CombatStat.dodge ? dodge : 0;
+  int contributionTo(CombatStat stat) => stat == CombatStat.dodge ? dodge : 0;
 
   @override
   String get grantLine => '+$dodge dodge';
@@ -156,22 +154,22 @@ class DivertStatus extends StatStanceStatus {
   }) : super(turns);
 
   /// The 1-cost price point: 10/20 for 10 turns — a sliver, as designed.
-  static DivertStatus glance() => DivertStatus(
-      activationPercent: 10, deflectedPercent: 20, turns: 10);
+  static DivertStatus glance() =>
+      DivertStatus(activationPercent: 10, deflectedPercent: 20, turns: 10);
 
   /// The 3-cost price point: 20/40 for 15 turns.
-  static DivertStatus divert() => DivertStatus(
-      activationPercent: 20, deflectedPercent: 40, turns: 15);
+  static DivertStatus divert() =>
+      DivertStatus(activationPercent: 20, deflectedPercent: 40, turns: 15);
 
   @override
   String get id => 'divert';
 
   @override
   int contributionTo(CombatStat stat) => switch (stat) {
-        CombatStat.deflectActivation => activationPercent,
-        CombatStat.deflectAmount => deflectedPercent,
-        _ => 0,
-      };
+    CombatStat.deflectActivation => activationPercent,
+    CombatStat.deflectAmount => deflectedPercent,
+    _ => 0,
+  };
 
   @override
   String get grantLine =>
@@ -248,7 +246,7 @@ class HeavyhandStatus extends StatStanceStatus {
   final int critDamage;
 
   HeavyhandStatus({required this.critDamage, required int turns})
-      : super(turns);
+    : super(turns);
 
   /// The 2-cost price point: +30 crit damage, 12 turns.
   static HeavyhandStatus heavyhand() =>
@@ -295,12 +293,15 @@ List<DuelEvent> applyStance(MageState caster, StanceEffect effect) {
   final events = <DuelEvent>[];
 
   final cleanse = effect.cleanses;
-  if (cleanse != null &&
-      caster.statuses.any((s) => s.id == cleanse.statusId)) {
+  if (cleanse != null && caster.statuses.any((s) => s.id == cleanse.statusId)) {
     caster.statuses.removeWhere((s) => s.id == cleanse.statusId);
-    events.add(BuffAppliedEvent(
-        caster, '${_nameOf(cleanse.statusId)} lifted',
-        statusId: cleanse.momentId));
+    events.add(
+      BuffAppliedEvent(
+        caster,
+        '${_nameOf(cleanse.statusId)} lifted',
+        statusId: cleanse.momentId,
+      ),
+    );
   }
 
   // Law 5, once per grant: the granter REPLACES that id's existing status
@@ -314,8 +315,12 @@ List<DuelEvent> applyStance(MageState caster, StanceEffect effect) {
     final granted = grant.build();
     caster.statuses.add(granted);
     events.add(
-        BuffAppliedEvent(caster, stanceLine(grant.statusId, granted),
-            statusId: grant.statusId));
+      BuffAppliedEvent(
+        caster,
+        stanceLine(grant.statusId, granted),
+        statusId: grant.statusId,
+      ),
+    );
   }
   return events;
 }
@@ -325,9 +330,9 @@ List<DuelEvent> applyStance(MageState caster, StanceEffect effect) {
 /// describe itself (nothing in the bank, but the type allows it).
 String stanceLine(String statusId, TurnStatus granted) =>
     granted is StanceDescribing
-        ? '${_nameOf(statusId)} — ${(granted as StanceDescribing).grantLine}, '
-            '${(granted as StanceDescribing).turnsLeft} turns'
-        : _nameOf(statusId);
+    ? '${_nameOf(statusId)} — ${(granted as StanceDescribing).grantLine}, '
+          '${(granted as StanceDescribing).turnsLeft} turns'
+    : _nameOf(statusId);
 
 /// The catalogued player-facing name for [statusId] — read from the catalogue
 /// rather than retyped, so the log and the guide can never call one status two

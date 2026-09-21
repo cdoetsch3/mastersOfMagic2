@@ -16,7 +16,9 @@ void main() {
     alice.charge = 3;
     alice.element = MagicElement.pyro;
     duel.resolveTurn(
-        const ForfeitAction(), const ChargeAction(MagicElement.aqua));
+      const ForfeitAction(),
+      const ChargeAction(MagicElement.aqua),
+    );
     expect(alice.charge, 3, reason: 'no charge gained or lost');
     expect(alice.element, MagicElement.pyro);
     expect(alice.hp, 100);
@@ -26,7 +28,9 @@ void main() {
     alice.charge = 1;
     alice.element = MagicElement.pyro;
     duel.resolveTurn(
-        const ForfeitAction(), const ChargeAction(MagicElement.aqua));
+      const ForfeitAction(),
+      const ChargeAction(MagicElement.aqua),
+    );
     expect(alice.charge, 1);
     expect(bruno.charge, 1, reason: 'Bruno channeled to 1');
   });
@@ -40,7 +44,9 @@ void main() {
 
   test('forfeiting never grants Haste (like channeling)', () {
     duel.resolveTurn(
-        const ForfeitAction(), const ChargeAction(MagicElement.aqua));
+      const ForfeitAction(),
+      const ChargeAction(MagicElement.aqua),
+    );
     expect(duel.hasteHolder, isNull);
   });
 

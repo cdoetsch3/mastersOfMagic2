@@ -75,11 +75,10 @@ void main() {
             'winEncounter that banks on its own makes the picker decorative — '
             'the items would already be in the pack when it opened',
       );
-      expect(
-        game.run!.unclaimed.map((s) => s.defId),
-        ['oak_log', 'heartwood_stave'],
-        reason: 'the screen has nothing to draw if the roll is not parked',
-      );
+      expect(game.run!.unclaimed.map((s) => s.defId), [
+        'oak_log',
+        'heartwood_stave',
+      ], reason: 'the screen has nothing to draw if the roll is not parked');
     });
 
     test('⭐ the drops survive a force-quit taken mid-choice', () async {
@@ -170,11 +169,9 @@ void main() {
             'loot left behind but still saved on the run comes back on the '
             'next launch — abandonment has to be permanent to be a decision',
       );
-      expect(
-        reloaded.backpack.contents.map((s) => s.defId),
-        ['flora_crystal'],
-        reason: 'the choice never reached disk',
-      );
+      expect(reloaded.backpack.contents.map((s) => s.defId), [
+        'flora_crystal',
+      ], reason: 'the choice never reached disk');
     });
 
     test('taking nothing is allowed, and abandons the lot', () async {
@@ -192,8 +189,7 @@ void main() {
       );
     });
 
-    test('⭐ a claimed instance is registered; an abandoned one is not',
-        () async {
+    test('⭐ a claimed instance is registered; an abandoned one is not', () async {
       final game = await _wonWith([_staff, _mantle]);
       await game.claimVictoryLoot({0});
 
@@ -220,39 +216,41 @@ void main() {
   });
 
   group('bounded by the free slots', () {
-    test('⚠️ a selection too big is clamped, not refused — best first',
-        () async {
-      // One slot free, three things wanted. Clamping is what stops a confirm
-      // button from doing nothing at all; rarity-first is what decides the
-      // casualty.
-      final game = await _wonWith([
-        _log,
-        _staff,
-        _crystal,
-      ], packUsed: Carrying.backpackSlots - 1);
-      final result = await game.claimVictoryLoot({0, 1, 2});
+    test(
+      '⚠️ a selection too big is clamped, not refused — best first',
+      () async {
+        // One slot free, three things wanted. Clamping is what stops a confirm
+        // button from doing nothing at all; rarity-first is what decides the
+        // casualty.
+        final game = await _wonWith([
+          _log,
+          _staff,
+          _crystal,
+        ], packUsed: Carrying.backpackSlots - 1);
+        final result = await game.claimVictoryLoot({0, 1, 2});
 
-      expect(
-        result.taken.map((s) => s.defId),
-        ['heartwood_stave'],
-        reason:
-            'clamping by list order abandons the epic and keeps a log — '
-            'exactly the loss this whole step was built to prevent',
-      );
-      expect(
-        result.left.map((s) => s.defId),
-        containsAll(['oak_log', 'flora_crystal']),
-        reason: 'the overflow has to be reported, not silently dropped',
-      );
-      expect(game.profile.backpack.isFull, isTrue);
-      expect(
-        game.run!.unclaimed,
-        isEmpty,
-        reason:
-            'a clamp that refuses instead of proceeding strands the run '
-            'holding a picker it can never close',
-      );
-    });
+        expect(
+          result.taken.map((s) => s.defId),
+          ['heartwood_stave'],
+          reason:
+              'clamping by list order abandons the epic and keeps a log — '
+              'exactly the loss this whole step was built to prevent',
+        );
+        expect(
+          result.left.map((s) => s.defId),
+          containsAll(['oak_log', 'flora_crystal']),
+          reason: 'the overflow has to be reported, not silently dropped',
+        );
+        expect(game.profile.backpack.isFull, isTrue);
+        expect(
+          game.run!.unclaimed,
+          isEmpty,
+          reason:
+              'a clamp that refuses instead of proceeding strands the run '
+              'holding a picker it can never close',
+        );
+      },
+    );
 
     test('a full pack takes nothing and says so', () async {
       final game = await _wonWith([_staff], packUsed: Carrying.backpackSlots);
@@ -333,9 +331,10 @@ void main() {
         InventorySlot(defId: 'flora_shard'),
         InventorySlot(defId: 'bindweed_fibre'),
       ];
-      final names = lootDisplayOrder(loot, const {})
-          .map((i) => loot[i].defId)
-          .toList();
+      final names = lootDisplayOrder(
+        loot,
+        const {},
+      ).map((i) => loot[i].defId).toList();
       expect(
         names,
         ['bindweed_fibre', 'flora_shard', 'oak_log'],
@@ -455,8 +454,8 @@ void main() {
       final profile = PlayerProfile.fromJson(
         legacySave(pending: [_log.toJson()]),
       );
-      final written = jsonDecode(jsonEncode(profile.toJson()))
-          as Map<String, dynamic>;
+      final written =
+          jsonDecode(jsonEncode(profile.toJson())) as Map<String, dynamic>;
       expect(
         (written['run'] as Map).containsKey('pendingLoot'),
         isFalse,

@@ -80,9 +80,12 @@ class _HoverCardState extends State<HoverCard> {
         // down the screen.
         final maxHeight = area.height * 0.6;
         final spaceBelow = area.height - _anchor.bottom - gap;
-        final placeBelow = spaceBelow >= maxHeight ||
-            spaceBelow >= _anchor.top - gap;
-        final maxLeft = (area.width - widget.cardWidth - 8).clamp(8.0, double.infinity);
+        final placeBelow =
+            spaceBelow >= maxHeight || spaceBelow >= _anchor.top - gap;
+        final maxLeft = (area.width - widget.cardWidth - 8).clamp(
+          8.0,
+          double.infinity,
+        );
         final left = _anchor.left.clamp(8.0, maxLeft);
         return Positioned(
           left: left,

@@ -79,21 +79,24 @@ void main() {
       expect(
         tester.takeException(),
         isNull,
-        reason: 'drop the errorBuilder from ArenaBackdrop and every duel in '
+        reason:
+            'drop the errorBuilder from ArenaBackdrop and every duel in '
             'the game reports "Unable to load asset" — assets/backgrounds/ is '
             'empty today, so this is the state the game actually ships in',
       );
       expect(
         find.byType(ArenaBackdrop),
         findsOneWidget,
-        reason: 'the missing PNG must not take the backdrop widget out of the '
+        reason:
+            'the missing PNG must not take the backdrop widget out of the '
             'tree — remove it from the Stack and the pipeline is dead the day '
             'the art lands, with nothing failing to say so',
       );
       expect(
         find.text('LV 3'),
         findsOneWidget,
-        reason: 'the rest of the arena must still be there; without this the '
+        reason:
+            'the rest of the arena must still be there; without this the '
             'no-exception check above would also pass on a screen that failed '
             'to build at all',
       );
@@ -115,7 +118,8 @@ void main() {
       expect(
         stack.children.first,
         isA<ArenaBackdrop>(),
-        reason: 'move it up one place and it covers the ground ellipse; move '
+        reason:
+            'move it up one place and it covers the ground ellipse; move '
             'it above the sprites and a dimmed forest is painted over the two '
             'combatants — the whole point is that it loses to everything',
       );
@@ -132,14 +136,16 @@ void main() {
       expect(
         bundle.requested,
         contains('assets/backgrounds/whispering_woods.png'),
-        reason: 'the maintainer generates files named for zone ids — point '
+        reason:
+            'the maintainer generates files named for zone ids — point '
             'backdropFor at any other name (a manifest key, the zone display '
             'name, a subdirectory) and the PNGs ship without ever being read',
       );
       expect(
         tester.takeException(),
         isNull,
-        reason: 'a backdrop that IS present must decode quietly too — the '
+        reason:
+            'a backdrop that IS present must decode quietly too — the '
             'errorBuilder is a fallback, not the normal path',
       );
     });
@@ -155,7 +161,8 @@ void main() {
       expect(
         bundle.requested.where((k) => k.startsWith('assets/backgrounds/')),
         {'assets/backgrounds/whispering_woods.png'},
-        reason: 'exactly one backdrop per duel: a second request would mean '
+        reason:
+            'exactly one backdrop per duel: a second request would mean '
             'the arena is guessing at extensions or variants, and the '
             'maintainer would have to produce files nobody documented',
       );
@@ -168,14 +175,23 @@ void main() {
       // rather than derived, because a test that builds the expectation with
       // the same expression as the code under test proves only that the
       // expression is deterministic.
-      expect(backdropFor('whispering_woods'), 'assets/backgrounds/whispering_woods.png');
-      expect(backdropFor('glimmerbrook'), 'assets/backgrounds/glimmerbrook.png');
+      expect(
+        backdropFor('whispering_woods'),
+        'assets/backgrounds/whispering_woods.png',
+      );
+      expect(
+        backdropFor('glimmerbrook'),
+        'assets/backgrounds/glimmerbrook.png',
+      );
       expect(
         backdropFor('cinderpeak_foothills'),
         'assets/backgrounds/cinderpeak_foothills.png',
       );
       expect(backdropFor('thornmire'), 'assets/backgrounds/thornmire.png');
-      expect(backdropFor('ashfall_vale'), 'assets/backgrounds/ashfall_vale.png');
+      expect(
+        backdropFor('ashfall_vale'),
+        'assets/backgrounds/ashfall_vale.png',
+      );
     });
 
     test(_backdropsOnDiskAreNamedForZones, () {
@@ -196,7 +212,8 @@ void main() {
         expect(
           zones,
           contains(stem),
-          reason: '$stem.png is a backdrop for nowhere — backdropFor() can '
+          reason:
+              '$stem.png is a backdrop for nowhere — backdropFor() can '
               'only ever ask for a zone id, so nothing will ever load it',
         );
       }

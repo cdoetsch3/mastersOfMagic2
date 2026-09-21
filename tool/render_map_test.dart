@@ -37,8 +37,9 @@ void main() {
       );
       return img.toByteData(format: ui.ImageByteFormat.png);
     });
-    File('docs/plates/world-map.png')
-        .writeAsBytesSync(png!.buffer.asUint8List());
+    File(
+      'docs/plates/world-map.png',
+    ).writeAsBytesSync(png!.buffer.asUint8List());
 
     String hex(Color c) =>
         '#${(c.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
@@ -77,9 +78,12 @@ void main() {
             },
       ],
     };
-    File('docs/plates/world-map.json')
-        .writeAsStringSync(const JsonEncoder.withIndent('  ').convert(data));
-    print('terrain ${size.width.round()}x${size.height.round()}, '
-        '${(data['places']! as List).length} places');
+    File(
+      'docs/plates/world-map.json',
+    ).writeAsStringSync(const JsonEncoder.withIndent('  ').convert(data));
+    print(
+      'terrain ${size.width.round()}x${size.height.round()}, '
+      '${(data['places']! as List).length} places',
+    );
   });
 }

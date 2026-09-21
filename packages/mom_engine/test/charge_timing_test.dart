@@ -11,8 +11,13 @@ import 'package:test/test.dart';
 /// charge that had already been spent. Reported from play: "Al'Dorian casts
 /// Bulwark ... You cast Overload ... 48 to shield", off a bar that was gone.
 void main() {
-  DuelEngine duel(MageState a, MageState b, {int seed = 1}) =>
-      DuelEngine(a, b, rng: Random(seed), elementEffects: false, baseMissPercent: 0);
+  DuelEngine duel(MageState a, MageState b, {int seed = 1}) => DuelEngine(
+    a,
+    b,
+    rng: Random(seed),
+    elementEffects: false,
+    baseMissPercent: 0,
+  );
 
   void charged(MageState m, MagicElement e, int n) {
     m
@@ -71,10 +76,10 @@ void main() {
       // reads the board after the turn's shields and quick spells have landed.
       // What is left to punish is charge its owner chose to keep — here, by
       // charging again instead of spending.
-      duel(a, b).resolveTurn(
-        CastAction(Spellbook.overload),
-        const ChargeAction(),
-      );
+      duel(
+        a,
+        b,
+      ).resolveTurn(CastAction(Spellbook.overload), const ChargeAction());
       expect(100 - b.hp, inInclusiveRange(35, 55), reason: '5 x 7-11');
     });
   });
@@ -155,7 +160,8 @@ void main() {
       expect(
         a.charge,
         0,
-        reason: 'Discharge took the bar; the fizzle gives back only what was '
+        reason:
+            'Discharge took the bar; the fizzle gives back only what was '
             'there at the moment of casting, which was nothing',
       );
     });
@@ -165,11 +171,15 @@ void main() {
       final b = MageState(name: 'B');
       charged(a, MagicElement.pyro, 4);
 
-      duel(a, b).resolveTurn(CastAction(Spellbook.barrage), const ForfeitAction());
+      duel(
+        a,
+        b,
+      ).resolveTurn(CastAction(Spellbook.barrage), const ForfeitAction());
       expect(
         100 - b.hp,
         inInclusiveRange(28, 40),
-        reason: '4 hits of 7-10 — the caster reads the bar it paid, not the '
+        reason:
+            '4 hits of 7-10 — the caster reads the bar it paid, not the '
             'zero left behind by paying it',
       );
     });

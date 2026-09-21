@@ -72,9 +72,10 @@ void main() {
       // ⚠️ The export, the art pipeline and the achievement log all key on id.
       // An id that drifts from its name is a rename nobody notices.
       for (final e in all) {
-        final derived = e.name
-            .toLowerCase()
-            .replaceAll(RegExp(r"[^a-z0-9]+"), '_');
+        final derived = e.name.toLowerCase().replaceAll(
+          RegExp(r"[^a-z0-9]+"),
+          '_',
+        );
         expect(e.id, derived, reason: '${e.name} should be id "$derived"');
       }
     });
@@ -83,11 +84,9 @@ void main() {
       final loc = World.byId(zone);
       for (final e in all) {
         expect(e.zoneId, zone);
-        expect(
-          e.elements,
-          [MagicElement.electro],
-          reason: '${e.id} — a pure zone means one element (ENEMIES §2h)',
-        );
+        expect(e.elements, [
+          MagicElement.electro,
+        ], reason: '${e.id} — a pure zone means one element (ENEMIES §2h)');
         expect(loc.elements, contains(e.elements.single));
       }
     });
@@ -206,7 +205,11 @@ void main() {
       // enormous flash — a stronger crit block than even the Tyrant's.
       expect(
         StormcliffCoastBestiary.theReturnStroke.combatStats,
-        const EnemyCombatStats(accuracyBonus: 5, critChance: 25, critDamage: 45),
+        const EnemyCombatStats(
+          accuracyBonus: 5,
+          critChance: 25,
+          critDamage: 45,
+        ),
       );
     });
 
@@ -215,35 +218,38 @@ void main() {
         expect(
           e.combatStats.dodge,
           lessThanOrEqualTo(10),
-          reason: '${e.id} — enemy dodge should read as slippery, never '
+          reason:
+              '${e.id} — enemy dodge should read as slippery, never '
               'unhittable',
         );
       }
     });
 
-    test('crit damage and deflect amount never appear without their chance',
-        () {
-      // ⚠️ §2.1's three inert-stat traps: a "buff" with a zero chance to
-      // trigger is dead weight nobody notices until they read the code.
-      for (final e in all) {
-        final s = e.combatStats;
-        expect(
-          s.critDamage == 0 || s.critChance > 0,
-          isTrue,
-          reason: '${e.id} has crit damage but critChance == 0',
-        );
-        expect(
-          s.deflectAmount == 0 || s.deflectChance > 0,
-          isTrue,
-          reason: '${e.id} has deflect amount but deflectChance == 0',
-        );
-        expect(
-          s.deflectChance == 0 || s.deflectAmount > 0,
-          isTrue,
-          reason: '${e.id} has deflect chance but deflectAmount == 0',
-        );
-      }
-    });
+    test(
+      'crit damage and deflect amount never appear without their chance',
+      () {
+        // ⚠️ §2.1's three inert-stat traps: a "buff" with a zero chance to
+        // trigger is dead weight nobody notices until they read the code.
+        for (final e in all) {
+          final s = e.combatStats;
+          expect(
+            s.critDamage == 0 || s.critChance > 0,
+            isTrue,
+            reason: '${e.id} has crit damage but critChance == 0',
+          );
+          expect(
+            s.deflectAmount == 0 || s.deflectChance > 0,
+            isTrue,
+            reason: '${e.id} has deflect amount but deflectChance == 0',
+          );
+          expect(
+            s.deflectChance == 0 || s.deflectAmount > 0,
+            isTrue,
+            reason: '${e.id} has deflect chance but deflectAmount == 0',
+          );
+        }
+      },
+    );
   });
 
   group('creatures are creatures, not mages', () {
@@ -383,14 +389,14 @@ void main() {
         expect(
           e.moves.any((m) => m.effect is ShieldEffect),
           isTrue,
-          reason: '${e.id} is a ${e.archetype.name} with nothing to hide '
+          reason:
+              '${e.id} is a ${e.archetype.name} with nothing to hide '
               'behind',
         );
       }
     });
 
-    test('the Hexer gets ahead of the whole board, and bypasses a shield',
-        () {
+    test('the Hexer gets ahead of the whole board, and bypasses a shield', () {
       final shaman = StormcliffCoastBestiary.stormShaman;
       expect(shaman.archetype.id, 'hexer');
       expect(
@@ -400,7 +406,8 @@ void main() {
       );
       expect(
         shaman.moves.any(
-          (m) => m.effect is DamageEffect &&
+          (m) =>
+              m.effect is DamageEffect &&
               (m.effect as DamageEffect).ignoresShields,
         ),
         isTrue,
@@ -431,8 +438,7 @@ void main() {
       );
     });
 
-    test('nothing in this zone lifesteals except the Redoubt\'s finisher',
-        () {
+    test('nothing in this zone lifesteals except the Redoubt\'s finisher', () {
       // ⭐ ENEMIES §2.6 — the Siphon (and casual lifesteal) is Thornmire's
       // lesson; a Redoubt's "one lifesteal" move (§1.3) is the sole exception.
       for (final e in all) {
@@ -459,8 +465,7 @@ void main() {
     // must resolve today.
     const knownCrossZonePending = <String>{}; // hardtack landed with Old Quarry
 
-    test('every id in every table is a real item, or a known pending one',
-        () {
+    test('every id in every table is a real item, or a known pending one', () {
       for (final e in all) {
         for (final id in e.drops.possibleDrops) {
           if (knownCrossZonePending.contains(id)) continue;
@@ -541,11 +546,21 @@ void main() {
 
     test('a pure Electro zone drops only Electro motes', () {
       const foreign = {
-        'flora_dust', 'flora_shard', 'flora_crystal',
-        'aqua_dust', 'aqua_shard', 'aqua_crystal',
-        'pyro_dust', 'pyro_shard', 'pyro_crystal',
-        'geo_dust', 'geo_shard', 'geo_crystal',
-        'aero_dust', 'aero_shard', 'aero_crystal',
+        'flora_dust',
+        'flora_shard',
+        'flora_crystal',
+        'aqua_dust',
+        'aqua_shard',
+        'aqua_crystal',
+        'pyro_dust',
+        'pyro_shard',
+        'pyro_crystal',
+        'geo_dust',
+        'geo_shard',
+        'geo_crystal',
+        'aero_dust',
+        'aero_shard',
+        'aero_crystal',
       };
       for (final id in StormcliffCoastBestiary.allDrops) {
         expect(foreign, isNot(contains(id)), reason: '$id is off-element');
@@ -658,8 +673,7 @@ void main() {
       }
     });
 
-    test('every node yields a real, fungible item from this zone\'s skill',
-        () {
+    test('every node yields a real, fungible item from this zone\'s skill', () {
       for (final n in nodes) {
         final def = ItemCatalogue.tryById(n.yieldsDefId);
         expect(def, isNotNull, reason: '${n.id} yields nothing real');

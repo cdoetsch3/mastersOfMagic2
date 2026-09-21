@@ -104,8 +104,9 @@ class AuthService extends ChangeNotifier {
       await _auth.sendPasswordResetEmail(email: email.trim());
       return null;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found')
+      if (e.code == 'user-not-found') {
         return null; // don't leak account existence
+      }
       return _message(e);
     } catch (e) {
       return 'Something went wrong. Please try again.';

@@ -12,20 +12,22 @@ void main() {
   ) async {
     CleanseChoice? result;
     var settled = false;
-    await tester.pumpWidget(MaterialApp(
-      home: Builder(
-        builder: (context) => TextButton(
-          onPressed: () async {
-            result = await showDialog<CleanseChoice>(
-              context: context,
-              builder: (_) => CleansePickerDialog(debuffs: debuffs),
-            );
-            settled = true;
-          },
-          child: const Text('open'),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () async {
+              result = await showDialog<CleanseChoice>(
+                context: context,
+                builder: (_) => CleansePickerDialog(debuffs: debuffs),
+              );
+              settled = true;
+            },
+            child: const Text('open'),
+          ),
         ),
       ),
-    ));
+    );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
     expect(settled, isFalse, reason: 'the dialog should be waiting');
@@ -39,12 +41,19 @@ void main() {
 
   testWidgets('every debuff is a row, named from the catalogue', (t) async {
     await pump(t, twoDebuffs);
-    expect(find.text('Torment'), findsOneWidget,
-        reason: 'rows carry catalogue names, not raw ids — the mutant this '
-            'kills shows the player "torment" the identifier');
+    expect(
+      find.text('Torment'),
+      findsOneWidget,
+      reason:
+          'rows carry catalogue names, not raw ids — the mutant this '
+          'kills shows the player "torment" the identifier',
+    );
     expect(find.text('Blight'), findsOneWidget);
-    expect(find.text('7 turns'), findsOneWidget,
-        reason: 'a timed debuff shows its clock');
+    expect(
+      find.text('7 turns'),
+      findsOneWidget,
+      reason: 'a timed debuff shows its clock',
+    );
   });
 
   testWidgets('an untimed debuff shows no zero-turn clock', (t) async {
@@ -52,51 +61,66 @@ void main() {
       (id: 'stagger', turnsLeft: 0),
       (id: 'torment', turnsLeft: 7),
     ]);
-    expect(find.text('0 turns'), findsNothing,
-        reason: 'Waterlogged and Stagger have no clock — "0 turns" would '
-            'read as expiring, which is the opposite of untimed');
+    expect(
+      find.text('0 turns'),
+      findsNothing,
+      reason:
+          'Waterlogged and Stagger have no clock — "0 turns" would '
+          'read as expiring, which is the opposite of untimed',
+    );
   });
 
   testWidgets('the three-way contract: pick, auto, and dismissal', (t) async {
     // Pick a specific debuff → CleanseChoice with its id.
     CleanseChoice? picked;
-    await t.pumpWidget(MaterialApp(
-      home: Builder(
-        builder: (context) => TextButton(
-          onPressed: () async {
-            picked = await showDialog<CleanseChoice>(
-              context: context,
-              builder: (_) => const CleansePickerDialog(debuffs: twoDebuffs),
-            );
-          },
-          child: const Text('open'),
+    await t.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () async {
+              picked = await showDialog<CleanseChoice>(
+                context: context,
+                builder: (_) => const CleansePickerDialog(debuffs: twoDebuffs),
+              );
+            },
+            child: const Text('open'),
+          ),
         ),
       ),
-    ));
+    );
     await t.tap(find.text('open'));
     await t.pumpAndSettle();
     await t.tap(find.text('Torment'));
     await t.pumpAndSettle();
-    expect(picked?.statusId, 'torment',
-        reason: 'the chosen row travels as the action payload');
+    expect(
+      picked?.statusId,
+      'torment',
+      reason: 'the chosen row travels as the action payload',
+    );
 
     // The auto row → CleanseChoice(null): cast, engine default.
     await t.tap(find.text('open'));
     await t.pumpAndSettle();
     await t.tap(find.text('Whichever runs longest'));
     await t.pumpAndSettle();
-    expect(picked, isNotNull,
-        reason: 'auto is an ANSWER, not a dismissal');
-    expect(picked!.statusId, isNull,
-        reason: 'null id = the engine\'s documented default pick');
+    expect(picked, isNotNull, reason: 'auto is an ANSWER, not a dismissal');
+    expect(
+      picked!.statusId,
+      isNull,
+      reason: 'null id = the engine\'s documented default pick',
+    );
 
     // Tapping outside → plain null: the cast is CANCELLED, charge unspent.
     await t.tap(find.text('open'));
     await t.pumpAndSettle();
     await t.tapAt(const Offset(5, 5));
     await t.pumpAndSettle();
-    expect(picked, isNull,
-        reason: '⚠️ the mutant this kills: a dismissal defaulting to auto '
-            'would spend 2 charge on a mis-tap');
+    expect(
+      picked,
+      isNull,
+      reason:
+          '⚠️ the mutant this kills: a dismissal defaulting to auto '
+          'would spend 2 charge on a mis-tap',
+    );
   });
 }

@@ -223,60 +223,99 @@ void main() {
 
     test('the four tiers are ×0.80 / ×1.00 / ×1.20 / ×1.40', () {
       expect(Quality.rough.statPercent, 80);
-      expect(Quality.standard.statPercent, 100,
-          reason: 'Standard IS the baseline — anything else silently '
-              'rebalances every drop in the game');
+      expect(
+        Quality.standard.statPercent,
+        100,
+        reason:
+            'Standard IS the baseline — anything else silently '
+            'rebalances every drop in the game',
+      );
       expect(Quality.ornate.statPercent, 120);
       expect(Quality.master.statPercent, 140);
     });
 
     test('rounding is half AWAY from zero, not toward it', () {
-      expect(wand.scaledBy(Quality.rough).damagePerCast, 2,
-          reason: '2 × 0.80 = 1.6 → 2; truncation says 1, which would make '
-              'a Rough wand worth half a Standard one');
-      expect(wand.scaledBy(Quality.master).maxHpBonus, 17,
-          reason: '12 × 1.40 = 16.8 → 17; binary floating point computes '
-              '16.799999999999997, so a truncating implementation says 16');
       expect(
-        const ItemModifiers(accuracyBonus: 5).scaledBy(Quality.ornate)
-            .accuracyBonus,
+        wand.scaledBy(Quality.rough).damagePerCast,
+        2,
+        reason:
+            '2 × 0.80 = 1.6 → 2; truncation says 1, which would make '
+            'a Rough wand worth half a Standard one',
+      );
+      expect(
+        wand.scaledBy(Quality.master).maxHpBonus,
+        17,
+        reason:
+            '12 × 1.40 = 16.8 → 17; binary floating point computes '
+            '16.799999999999997, so a truncating implementation says 16',
+      );
+      expect(
+        const ItemModifiers(
+          accuracyBonus: 5,
+        ).scaledBy(Quality.ornate).accuracyBonus,
         6,
-        reason: '5 × 1.20 = 6 exactly — an off-by-one here is a whole stat');
-      expect(const ItemModifiers(dodge: -3).scaledBy(Quality.ornate).dodge, -4,
-          reason: '-3 × 1.20 = -3.6 → -4. Toward-zero truncation says -3, '
-              'which would make Ornate an IMPROVEMENT on a penalty');
-      expect(const ItemModifiers(dodge: -3).scaledBy(Quality.rough).dodge, -2,
-          reason: '-3 × 0.80 = -2.4 → -2, the shrink a Rough item deserves');
+        reason: '5 × 1.20 = 6 exactly — an off-by-one here is a whole stat',
+      );
+      expect(
+        const ItemModifiers(dodge: -3).scaledBy(Quality.ornate).dodge,
+        -4,
+        reason:
+            '-3 × 1.20 = -3.6 → -4. Toward-zero truncation says -3, '
+            'which would make Ornate an IMPROVEMENT on a penalty',
+      );
+      expect(
+        const ItemModifiers(dodge: -3).scaledBy(Quality.rough).dodge,
+        -2,
+        reason: '-3 × 0.80 = -2.4 → -2, the shrink a Rough item deserves',
+      );
     });
 
     test('Standard and null are the untouched definition', () {
       expect(wand.scaledBy(Quality.standard).maxHpBonus, 12);
-      expect(wand.scaledBy(null).damagePerCast, 2,
-          reason: '⭐ a drop rolls an aspect and a pre-ruling save has no '
-              'quality field at all — both must keep the numbers they have '
-              'always had, or every old save silently changes');
+      expect(
+        wand.scaledBy(null).damagePerCast,
+        2,
+        reason:
+            '⭐ a drop rolls an aspect and a pre-ruling save has no '
+            'quality field at all — both must keep the numbers they have '
+            'always had, or every old save silently changes',
+      );
     });
 
     test('zero stays zero at every tier', () {
       for (final q in Quality.values) {
-        expect(wand.scaledBy(q).critChance, 0,
-            reason: 'quality multiplies power; it never invents a stat the '
-                'definition does not have ($q)');
-        expect(ItemModifiers.none.scaledBy(q).isEmpty, isTrue,
-            reason: 'a Master rock is still a rock ($q)');
+        expect(
+          wand.scaledBy(q).critChance,
+          0,
+          reason:
+              'quality multiplies power; it never invents a stat the '
+              'definition does not have ($q)',
+        );
+        expect(
+          ItemModifiers.none.scaledBy(q).isEmpty,
+          isTrue,
+          reason: 'a Master rock is still a rock ($q)',
+        );
       }
     });
 
     test('⚠️ beltSlots is exempt at every tier', () {
       const belt = ItemModifiers(beltSlots: 2, maxHpBonus: 10);
       for (final q in Quality.values) {
-        expect(belt.scaledBy(q).beltSlots, 2,
-            reason: 'the one deliberately non-combat axis (ITEMS §6b.2) — a '
-                'Master belt granting 3 slots turns a crafting roll into a '
-                'carrying-capacity roll ($q)');
+        expect(
+          belt.scaledBy(q).beltSlots,
+          2,
+          reason:
+              'the one deliberately non-combat axis (ITEMS §6b.2) — a '
+              'Master belt granting 3 slots turns a crafting roll into a '
+              'carrying-capacity roll ($q)',
+        );
       }
-      expect(belt.scaledBy(Quality.master).maxHpBonus, 14,
-          reason: 'exempting the field must not exempt the item');
+      expect(
+        belt.scaledBy(Quality.master).maxHpBonus,
+        14,
+        reason: 'exempting the field must not exempt the item',
+      );
     });
 
     test('every combat field is scaled — none forgotten', () {
@@ -298,21 +337,24 @@ void main() {
         beltSlots: 10,
       );
       final m = ten.scaledBy(Quality.master);
-      expect([
-        m.accuracyBonus,
-        m.dodge,
-        m.critChance,
-        m.critDamage,
-        m.deflectChance,
-        m.deflectAmount,
-        m.maxHpBonus,
-        m.damagePerCast,
-        m.damagePerCharge,
-        m.shieldStrengthPercent,
-        m.healingReceivedPercent,
-        m.regrowPercent,
-      ], everyElement(14),
-          reason: 'a combat field that reads 10 was never scaled');
+      expect(
+        [
+          m.accuracyBonus,
+          m.dodge,
+          m.critChance,
+          m.critDamage,
+          m.deflectChance,
+          m.deflectAmount,
+          m.maxHpBonus,
+          m.damagePerCast,
+          m.damagePerCharge,
+          m.shieldStrengthPercent,
+          m.healingReceivedPercent,
+          m.regrowPercent,
+        ],
+        everyElement(14),
+        reason: 'a combat field that reads 10 was never scaled',
+      );
       expect(m.beltSlots, 10);
     });
   });
@@ -468,15 +510,19 @@ void main() {
       expect(
         Carrying.beltSlotsFor(),
         0,
-        reason: 'two free slots with an empty Belt slot read as a bug, and '
+        reason:
+            'two free slots with an empty Belt slot read as a bug, and '
             'made the belt that grants slots look like it did nothing',
       );
       expect(Carrying.baseBeltSlots, 0);
     });
 
     test('the belt grows, but is clamped', () {
-      expect(Carrying.beltSlotsFor(fromProgression: 3, fromGear: 2), 5,
-          reason: 'capacity is gear plus progression and nothing else');
+      expect(
+        Carrying.beltSlotsFor(fromProgression: 3, fromGear: 2),
+        5,
+        reason: 'capacity is gear plus progression and nothing else',
+      );
       expect(
         Carrying.beltSlotsFor(fromProgression: 50),
         Carrying.maxBeltSlots,

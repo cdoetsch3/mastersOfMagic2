@@ -50,9 +50,7 @@ GameState _gameCarrying(String defId, {int level = 10, Quality? quality}) {
   final profile = PlayerProfile.newPlayer()
     ..xp = _xpFor(level)
     ..itemInstances['i1'] = _inst('i1', defId, quality: quality)
-    ..backpack = Backpack.of([
-      InventorySlot(defId: defId, instanceId: 'i1'),
-    ]);
+    ..backpack = Backpack.of([InventorySlot(defId: defId, instanceId: 'i1')]);
   return GameState(_MemStorage(), profile);
 }
 
@@ -121,7 +119,8 @@ void main() {
       expect(
         lines,
         contains('Crit damage 155% (+5)'),
-        reason: 'a crit is 150% before gear — MageState.critDamage starts at 50',
+        reason:
+            'a crit is 150% before gear — MageState.critDamage starts at 50',
       );
     });
 
@@ -169,7 +168,8 @@ void main() {
       expect(
         Equipping.describeTotals(everything, level: 1),
         hasLength(Equipping.describe(everything).length),
-        reason: 'a stat the item dialog shows and the panel does not is a '
+        reason:
+            'a stat the item dialog shows and the panel does not is a '
             'stat the player is told about once and then never again',
       );
     });
@@ -177,8 +177,10 @@ void main() {
 
   group('rules', () {
     test('materials cannot be worn; low levels cannot wear high gear', () {
-      expect(Equipping.refusal(WhisperingWoodsItems.oakLog, playerLevel: 60),
-          isNotNull);
+      expect(
+        Equipping.refusal(WhisperingWoodsItems.oakLog, playerLevel: 60),
+        isNotNull,
+      );
       // The Charlock is equip 14 — a level-13 is refused, a 14 is not.
       expect(
         Equipping.refusal(AshfallValeItems.theCharlock, playerLevel: 13),
@@ -196,8 +198,11 @@ void main() {
       final game = _gameCarrying('oak_wand');
       expect(await game.equipFromBackpack(0), isNull);
       expect(game.profile.equipped[EquipSlot.mainHand], 'i1');
-      expect(game.profile.backpack.countOf('oak_wand'), 0,
-          reason: 'equipping must not duplicate the item');
+      expect(
+        game.profile.backpack.countOf('oak_wand'),
+        0,
+        reason: 'equipping must not duplicate the item',
+      );
       expect(game.equipmentTotals.damagePerCast, 2);
     });
 
@@ -215,8 +220,11 @@ void main() {
       final game = _gameCarrying('birch_wand', level: 5); // equip 10
       expect(await game.equipFromBackpack(0), contains('10'));
       expect(game.profile.equipped, isEmpty);
-      expect(game.profile.backpack.countOf('birch_wand'), 1,
-          reason: 'a refusal must not eat the item');
+      expect(
+        game.profile.backpack.countOf('birch_wand'),
+        1,
+        reason: 'a refusal must not eat the item',
+      );
     });
   });
 
@@ -235,34 +243,45 @@ void main() {
       ];
       game.profile.backpack = Backpack.of(filler);
       expect(await game.unequip(EquipSlot.mainHand), contains('full'));
-      expect(game.profile.equipped[EquipSlot.mainHand], 'i1',
-          reason: 'a refused unequip must leave the item worn');
+      expect(
+        game.profile.equipped[EquipSlot.mainHand],
+        'i1',
+        reason: 'a refused unequip must leave the item worn',
+      );
     });
   });
 
   group('equip from the Storeroom', () {
-    test('wears stored gear and stows the displaced piece in exchange',
-        () async {
-      final game = _gameCarrying('oak_wand');
-      await game.equipFromBackpack(0);
-      game.profile.itemInstances['i2'] = _inst('i2', 'oak_quarterstaff');
-      game.profile.storerooms['hearthwood'] =
-          const Storeroom(instanceIds: ['i2']);
+    test(
+      'wears stored gear and stows the displaced piece in exchange',
+      () async {
+        final game = _gameCarrying('oak_wand');
+        await game.equipFromBackpack(0);
+        game.profile.itemInstances['i2'] = _inst('i2', 'oak_quarterstaff');
+        game.profile.storerooms['hearthwood'] = const Storeroom(
+          instanceIds: ['i2'],
+        );
 
-      expect(await game.equipFromStoreroom('i2'), isNull);
-      expect(game.profile.equipped[EquipSlot.mainHand], 'i2');
-      final room = game.profile.storerooms['hearthwood']!;
-      expect(room.instanceIds, ['i1'],
-          reason: 'the wand must be stowed, not vanished');
-      expect(game.profile.backpack.used, 0,
-          reason: 'a wardrobe swap must not touch the pack');
-    });
+        expect(await game.equipFromStoreroom('i2'), isNull);
+        expect(game.profile.equipped[EquipSlot.mainHand], 'i2');
+        final room = game.profile.storerooms['hearthwood']!;
+        expect(room.instanceIds, [
+          'i1',
+        ], reason: 'the wand must be stowed, not vanished');
+        expect(
+          game.profile.backpack.used,
+          0,
+          reason: 'a wardrobe swap must not touch the pack',
+        );
+      },
+    );
 
     test('refuses gear stored in another town', () async {
       final game = _gameCarrying('oak_wand');
       game.profile.itemInstances['i2'] = _inst('i2', 'oak_quarterstaff');
-      game.profile.storerooms['pennycross'] =
-          const Storeroom(instanceIds: ['i2']);
+      game.profile.storerooms['pennycross'] = const Storeroom(
+        instanceIds: ['i2'],
+      );
       // The player is in Hearthwood; the staff is in Pennycross.
       expect(await game.equipFromStoreroom('i2'), isNotNull);
       expect(game.profile.equipped, isEmpty);
@@ -270,22 +289,28 @@ void main() {
   });
 
   group('deposit all (backpack only, never equipped)', () {
-    test('empties the whole pack into the Storeroom and reports the count',
-        () async {
-      final profile = PlayerProfile.newPlayer()
-        ..backpack = Backpack.of(const [
-          InventorySlot(defId: 'oak_log'),
-          InventorySlot(defId: 'oak_log'),
-          InventorySlot(defId: 'bindweed_fibre'),
-        ]);
-      final game = GameState(_MemStorage(), profile);
+    test(
+      'empties the whole pack into the Storeroom and reports the count',
+      () async {
+        final profile = PlayerProfile.newPlayer()
+          ..backpack = Backpack.of(const [
+            InventorySlot(defId: 'oak_log'),
+            InventorySlot(defId: 'oak_log'),
+            InventorySlot(defId: 'bindweed_fibre'),
+          ]);
+        final game = GameState(_MemStorage(), profile);
 
-      expect(await game.depositAll('hearthwood'), 3);
-      expect(game.profile.backpack.used, 0);
-      final room = game.profile.storerooms['hearthwood']!;
-      expect(room.stacks['oak_log'], 2, reason: 'fungibles collapse to counts');
-      expect(room.stacks['bindweed_fibre'], 1);
-    });
+        expect(await game.depositAll('hearthwood'), 3);
+        expect(game.profile.backpack.used, 0);
+        final room = game.profile.storerooms['hearthwood']!;
+        expect(
+          room.stacks['oak_log'],
+          2,
+          reason: 'fungibles collapse to counts',
+        );
+        expect(room.stacks['bindweed_fibre'], 1);
+      },
+    );
 
     test('⚠️ never touches equipped gear — the whole ruling', () async {
       final game = _gameCarrying('oak_wand');
@@ -297,11 +322,16 @@ void main() {
       final moved = await game.depositAll('hearthwood');
 
       expect(moved, 1, reason: 'only the loose log moves');
-      expect(game.profile.equipped[EquipSlot.mainHand], 'i1',
-          reason: 'the worn wand must still be equipped');
-      expect(game.profile.storerooms['hearthwood']?.instanceIds ?? const [],
-          isNot(contains('i1')),
-          reason: 'equipped gear must never reach the Storeroom');
+      expect(
+        game.profile.equipped[EquipSlot.mainHand],
+        'i1',
+        reason: 'the worn wand must still be equipped',
+      );
+      expect(
+        game.profile.storerooms['hearthwood']?.instanceIds ?? const [],
+        isNot(contains('i1')),
+        reason: 'equipped gear must never reach the Storeroom',
+      );
     });
 
     test('an empty pack is a no-op that moves nothing', () async {
@@ -311,44 +341,62 @@ void main() {
   });
 
   group('a run begins at the GEARED maximum', () {
-    test('the robe\'s health is in the pool the first encounter loads with',
-        () async {
-      // ⚠️ The bug this kills: beginAdventure seeded the run from
-      // MageState.scaledMaxHp(level) alone, while the duel builds the same
-      // mage as curve + gear. The player walked into encounter one already
-      // missing exactly their gear bonus — reported as "148 / 159 when
-      // combat loaded".
-      final game = _gameCarrying('bindweed_robe'); // +6 max health
-      expect(await game.equipFromBackpack(0), isNull,
-          reason: 'guard: the robe must actually be worn');
-      final bonus = game.equipmentTotals.maxHpBonus;
-      expect(bonus, greaterThan(0),
-          reason: 'guard: a zero-bonus item would make every assertion below '
-              'pass against the broken implementation too');
+    test(
+      'the robe\'s health is in the pool the first encounter loads with',
+      () async {
+        // ⚠️ The bug this kills: beginAdventure seeded the run from
+        // MageState.scaledMaxHp(level) alone, while the duel builds the same
+        // mage as curve + gear. The player walked into encounter one already
+        // missing exactly their gear bonus — reported as "148 / 159 when
+        // combat loaded".
+        final game = _gameCarrying('bindweed_robe'); // +6 max health
+        expect(
+          await game.equipFromBackpack(0),
+          isNull,
+          reason: 'guard: the robe must actually be worn',
+        );
+        final bonus = game.equipmentTotals.maxHpBonus;
+        expect(
+          bonus,
+          greaterThan(0),
+          reason:
+              'guard: a zero-bonus item would make every assertion below '
+              'pass against the broken implementation too',
+        );
 
-      final run = await game.beginAdventure(
-        World.byId('whispering_woods'),
-        rng: Random(1),
-      );
+        final run = await game.beginAdventure(
+          World.byId('whispering_woods'),
+          rng: Random(1),
+        );
 
-      final curveOnly = MageState.scaledMaxHp(game.profile.level);
-      expect(run.playerHp, game.maxHp,
-          reason: 'the run must start full against the SAME pool the duel and '
-              'the ration both read');
-      expect(run.playerHp, curveOnly + bonus);
-      expect(run.playerHp, isNot(curveOnly),
-          reason: 'seeding from the bare level curve is the whole bug');
-    });
+        final curveOnly = MageState.scaledMaxHp(game.profile.level);
+        expect(
+          run.playerHp,
+          game.maxHp,
+          reason:
+              'the run must start full against the SAME pool the duel and '
+              'the ration both read',
+        );
+        expect(run.playerHp, curveOnly + bonus);
+        expect(
+          run.playerHp,
+          isNot(curveOnly),
+          reason: 'seeding from the bare level curve is the whole bug',
+        );
+      },
+    );
 
-    test('an ungeared mage is unaffected — the fix adds nothing from nowhere',
-        () async {
-      final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
-      final run = await game.beginAdventure(
-        World.byId('whispering_woods'),
-        rng: Random(1),
-      );
-      expect(run.playerHp, MageState.scaledMaxHp(game.profile.level));
-    });
+    test(
+      'an ungeared mage is unaffected — the fix adds nothing from nowhere',
+      () async {
+        final game = GameState(_MemStorage(), PlayerProfile.newPlayer());
+        final run = await game.beginAdventure(
+          World.byId('whispering_woods'),
+          rng: Random(1),
+        );
+        expect(run.playerHp, MageState.scaledMaxHp(game.profile.level));
+      },
+    );
   });
 
   group('take all from the Storeroom', () {
@@ -391,9 +439,15 @@ void main() {
       expect(full.profile.storerooms['hearthwood']!.stacks['oak_log'], 5);
 
       final game = gameWithStored(5);
-      expect(await game.takeAllFromStoreroom('hearthwood', 'bindweed_fibre'), 0);
-      expect(await game.takeAllFromStoreroom('pennycross', 'oak_log'), 0,
-          reason: 'another town\'s Storeroom is not reachable from here');
+      expect(
+        await game.takeAllFromStoreroom('hearthwood', 'bindweed_fibre'),
+        0,
+      );
+      expect(
+        await game.takeAllFromStoreroom('pennycross', 'oak_log'),
+        0,
+        reason: 'another town\'s Storeroom is not reachable from here',
+      );
       expect(game.profile.backpack.used, 0);
     });
   });
@@ -412,9 +466,13 @@ void main() {
         equipped: {EquipSlot.belt: 'b'},
         instances: {'b': _inst('b', 'tuskhide_belt', quality: Quality.master)},
       );
-      expect(totals.beltSlots, 2,
-          reason: 'beltSlots is the non-combat axis (§6b.2): 2 × 1.4 = 2.8 → '
-              '3 would be a crafting roll deciding carrying capacity');
+      expect(
+        totals.beltSlots,
+        2,
+        reason:
+            'beltSlots is the non-combat axis (§6b.2): 2 × 1.4 = 2.8 → '
+            '3 would be a crafting roll deciding carrying capacity',
+      );
     });
   });
 
@@ -423,20 +481,33 @@ void main() {
       // Sporecap Mantle is +12 HP / +2 accuracy.
       final def = ItemCatalogue.byId('sporecap_mantle');
       expect(
-        Equipping.modifiersOf(def, _inst('m', 'sporecap_mantle',
-            quality: Quality.master)).maxHpBonus,
+        Equipping.modifiersOf(
+          def,
+          _inst('m', 'sporecap_mantle', quality: Quality.master),
+        ).maxHpBonus,
         17,
-        reason: '12 × 1.40 → 17; reading def.modifiers straight says 12');
+        reason: '12 × 1.40 → 17; reading def.modifiers straight says 12',
+      );
       expect(
-        Equipping.modifiersOf(def, _inst('m', 'sporecap_mantle',
-            quality: Quality.rough)).accuracyBonus,
+        Equipping.modifiersOf(
+          def,
+          _inst('m', 'sporecap_mantle', quality: Quality.rough),
+        ).accuracyBonus,
         2,
-        reason: '2 × 0.80 = 1.6 → 2');
-      expect(Equipping.modifiersOf(def).maxHpBonus, 12,
-          reason: 'no instance — the Workbench preview of a thing not yet '
-              'made shows the honest base');
-      expect(Equipping.modifiersOf(WhisperingWoodsItems.oakLog).isEmpty, isTrue,
-          reason: 'a log grants nothing, quality or not');
+        reason: '2 × 0.80 = 1.6 → 2',
+      );
+      expect(
+        Equipping.modifiersOf(def).maxHpBonus,
+        12,
+        reason:
+            'no instance — the Workbench preview of a thing not yet '
+            'made shows the honest base',
+      );
+      expect(
+        Equipping.modifiersOf(WhisperingWoodsItems.oakLog).isEmpty,
+        isTrue,
+        reason: 'a log grants nothing, quality or not',
+      );
     });
 
     test('each worn piece scales on its OWN roll before they are summed', () {
@@ -451,10 +522,14 @@ void main() {
         },
       );
       expect(totals.maxHpBonus, 17, reason: '12 × 1.40 → 17');
-      expect(totals.accuracyBonus, 7,
-          reason: '⚠️ 3 (2 × 1.40) + 4 (5 × 0.80) — scaling the SUM by either '
-              'roll gives 9 or 5, and one Master ring must never lift a whole '
-              'wardrobe');
+      expect(
+        totals.accuracyBonus,
+        7,
+        reason:
+            '⚠️ 3 (2 × 1.40) + 4 (5 × 0.80) — scaling the SUM by either '
+            'roll gives 9 or 5, and one Master ring must never lift a whole '
+            'wardrobe',
+      );
       expect(totals.damagePerCharge, 1, reason: '1 × 0.80 = 0.8 → 1');
     });
 
@@ -463,9 +538,13 @@ void main() {
         equipped: {EquipSlot.robeTop: 'a'},
         instances: {'a': _inst('a', 'sporecap_mantle')},
       );
-      expect(totals.maxHpBonus, 12,
-          reason: 'a drop rolls an aspect, not a quality — treating null as '
-              'anything but Standard rebalances every dropped item');
+      expect(
+        totals.maxHpBonus,
+        12,
+        reason:
+            'a drop rolls an aspect, not a quality — treating null as '
+            'anything but Standard rebalances every dropped item',
+      );
     });
 
     test('the stat lines quote the scaled numbers', () {
@@ -475,18 +554,26 @@ void main() {
           _inst('m', 'sporecap_mantle', quality: Quality.master),
         ),
       );
-      expect(lines, contains('+17 max health'),
-          reason: 'a tooltip quoting the base while the duel uses the roll is '
-              'the disagreement the one-writer rule exists to prevent');
+      expect(
+        lines,
+        contains('+17 max health'),
+        reason:
+            'a tooltip quoting the base while the duel uses the roll is '
+            'the disagreement the one-writer rule exists to prevent',
+      );
     });
 
     test('the duel-facing totals scale too, through the same seam', () async {
       // ⭐ equipmentTotals is what reaches DuelController.playerGear.
       final game = _gameCarrying('oak_wand', quality: Quality.master);
       expect(await game.equipFromBackpack(0), isNull);
-      expect(game.equipmentTotals.damagePerCast, 3,
-          reason: '2 × 1.40 = 2.8 → 3; an unscaled duel is quality that '
-              'changes the tooltip and nothing else');
+      expect(
+        game.equipmentTotals.damagePerCast,
+        3,
+        reason:
+            '2 × 1.40 = 2.8 → 3; an unscaled duel is quality that '
+            'changes the tooltip and nothing else',
+      );
     });
   });
 
@@ -498,8 +585,11 @@ void main() {
       );
       expect(lines.single.label, 'Accuracy');
       expect(lines.single.total, '88%');
-      expect(lines.single.base, Equipping.baseHitPercent,
-          reason: 'the muted 80 inside the parenthesis');
+      expect(
+        lines.single.base,
+        Equipping.baseHitPercent,
+        reason: 'the muted 80 inside the parenthesis',
+      );
       expect(lines.single.bonus, 8);
     });
 
@@ -509,30 +599,47 @@ void main() {
         const ItemModifiers(accuracyBonus: -4),
         level: 1,
       );
-      expect(lines.single.total, '76%',
-          reason: 'the total honestly shrinks — 80 base minus 4');
-      expect(lines.single.bonus, -4,
-          reason: '⚠️ the mutant this kills: an abs() anywhere in the seam, '
-              'which would print a stat LOSS as a gain');
+      expect(
+        lines.single.total,
+        '76%',
+        reason: 'the total honestly shrinks — 80 base minus 4',
+      );
+      expect(
+        lines.single.bonus,
+        -4,
+        reason:
+            '⚠️ the mutant this kills: an abs() anywhere in the seam, '
+            'which would print a stat LOSS as a gain',
+      );
     });
 
-    test('base-less stats print the bonus AS the total, no parenthesis data',
-        () {
-      final lines = Equipping.statTotals(
-        const ItemModifiers(damagePerCharge: 3),
-        level: 1,
-      );
-      expect(lines.single.total, '+3');
-      expect(lines.single.base, isNull,
-          reason: 'no baseline exists, so a parenthesis would be the bonus '
-              'wearing a disguise');
-    });
+    test(
+      'base-less stats print the bonus AS the total, no parenthesis data',
+      () {
+        final lines = Equipping.statTotals(
+          const ItemModifiers(damagePerCharge: 3),
+          level: 1,
+        );
+        expect(lines.single.total, '+3');
+        expect(
+          lines.single.base,
+          isNull,
+          reason:
+              'no baseline exists, so a parenthesis would be the bonus '
+              'wearing a disguise',
+        );
+      },
+    );
 
     test('bonusColour: green gives, red takes', () {
       expect(bonusColour(5), AppColors.green);
-      expect(bonusColour(-5), AppColors.ember,
-          reason: 'the one function that decides how every future negative '
-              'reads — pinned before any item uses it');
+      expect(
+        bonusColour(-5),
+        AppColors.ember,
+        reason:
+            'the one function that decides how every future negative '
+            'reads — pinned before any item uses it',
+      );
     });
   });
 }

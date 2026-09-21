@@ -54,24 +54,40 @@ void main() {
     await game.resetProfile();
 
     final fresh = PlayerProfile.newPlayer();
-    expect(game.profile.name, 'Christian',
-        reason: 'identity survives — it is a character reset, not an exit');
-    expect(game.profile.xp, fresh.xp,
-        reason: '⚠️ the mutant this kills: a reset that forgets combat XP');
+    expect(
+      game.profile.name,
+      'Christian',
+      reason: 'identity survives — it is a character reset, not an exit',
+    );
+    expect(
+      game.profile.xp,
+      fresh.xp,
+      reason: '⚠️ the mutant this kills: a reset that forgets combat XP',
+    );
     expect(game.profile.gold, fresh.gold);
-    expect(game.profile.skillXp, isEmpty,
-        reason: 'skill ledgers are part of the character, not the account');
+    expect(
+      game.profile.skillXp,
+      isEmpty,
+      reason: 'skill ledgers are part of the character, not the account',
+    );
     expect(game.profile.backpack.used, 0);
     expect(game.profile.belt.loaded, isEmpty);
-    expect(game.profile.storerooms, isEmpty,
-        reason: '⚠️ Storerooms survive DEATH by ruling — but a reset is not '
-            'a death, it is a new character, and a new character owns nothing');
+    expect(
+      game.profile.storerooms,
+      isEmpty,
+      reason:
+          '⚠️ Storerooms survive DEATH by ruling — but a reset is not '
+          'a death, it is a new character, and a new character owns nothing',
+    );
     expect(game.profile.equipped.values.whereType<String>(), isEmpty);
     expect(game.profile.itemInstances, isEmpty);
 
     final reloaded = (await storage.load())!;
-    expect(reloaded.xp, fresh.xp,
-        reason: 'an unreloadable reset is a reset that undoes itself');
+    expect(
+      reloaded.xp,
+      fresh.xp,
+      reason: 'an unreloadable reset is a reset that undoes itself',
+    );
     expect(reloaded.name, 'Christian');
   });
 
@@ -96,12 +112,18 @@ void main() {
     );
     await tester.tap(find.text('go'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('no way to undo'), findsOneWidget,
-        reason: 'the ruled warning, verbatim in spirit');
+    expect(
+      find.textContaining('no way to undo'),
+      findsOneWidget,
+      reason: 'the ruled warning, verbatim in spirit',
+    );
     await tester.tap(find.text('Keep my character'));
     await tester.pumpAndSettle();
-    expect(game.profile.xp, 50000,
-        reason: '⚠️ the mutant this kills: a cancel that resets anyway');
+    expect(
+      game.profile.xp,
+      50000,
+      reason: '⚠️ the mutant this kills: a cancel that resets anyway',
+    );
     expect(game.profile.itemInstances, isNotEmpty);
   });
 

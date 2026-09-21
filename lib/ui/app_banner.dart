@@ -170,7 +170,9 @@ class _AppBannerHostState extends State<_AppBannerHost>
               begin: const Offset(0, -0.35),
               end: Offset.zero,
             ).animate(_curve),
-            child: Center(child: AppBanner(text: widget.text, color: color)),
+            child: Center(
+              child: AppBanner(text: widget.text, color: color),
+            ),
           ),
         ),
       ),

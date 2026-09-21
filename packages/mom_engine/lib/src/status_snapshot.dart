@@ -71,8 +71,13 @@ class StatusSnapshot {
     // Consecutive-cast streak (only the elements that build toward something
     // are worth a pip; the HUD decides which those are).
     if (m.streakElement != null && m.streakCount > 0) {
-      out.add(StatusView(
-          id: 'streak', stacks: m.streakCount, element: m.streakElement));
+      out.add(
+        StatusView(
+          id: 'streak',
+          stacks: m.streakCount,
+          element: m.streakElement,
+        ),
+      );
     }
 
     // Statuses proper.
@@ -83,76 +88,117 @@ class StatusSnapshot {
           // The Flora streak itself is already shown by the 'streak' pip above.
           out.add(const StatusView(id: 'photosynthesis', stacks: 1));
         case ArcaneKnowledgeStatus(:final stacks, :final bonusPercent):
-          out.add(StatusView(
-              id: 'arcaneKnowledge', stacks: stacks, magnitude: bonusPercent));
+          out.add(
+            StatusView(
+              id: 'arcaneKnowledge',
+              stacks: stacks,
+              magnitude: bonusPercent,
+            ),
+          );
         case CreepingDarkStatus(:final stacks):
           out.add(StatusView(id: 'creepingDark', stacks: stacks));
         case AstralAlignmentStatus(:final stacks, :final piercePercent):
-          out.add(StatusView(
+          out.add(
+            StatusView(
               id: 'astralAlignment',
               stacks: stacks,
-              magnitude: piercePercent));
+              magnitude: piercePercent,
+            ),
+          );
         case IgniteStatus(:final perTick, :final turnsLeft):
-          out.add(StatusView(
-              id: 'ignite', turnsLeft: turnsLeft, magnitude: perTick));
+          out.add(
+            StatusView(id: 'ignite', turnsLeft: turnsLeft, magnitude: perTick),
+          );
         case BlindStatus(:final turnsLeft):
           out.add(StatusView(id: 'blind', turnsLeft: turnsLeft));
         case RegrowStatus(:final percentPerTurn):
           out.add(StatusView(id: 'regrow', magnitude: percentPerTurn));
         case HealOverTimeStatus(:final percentPerTurn, :final turnsLeft):
-          out.add(StatusView(
+          out.add(
+            StatusView(
               id: 'healOverTime',
               turnsLeft: turnsLeft,
-              magnitude: percentPerTurn));
+              magnitude: percentPerTurn,
+            ),
+          );
 
         // The banked stat stances (§7a). Each carries its own magnitude
         // because the SET is one status at two price points — the pip must
         // show which one is running, or Lightfoot and Twinkle Toes are
         // indistinguishable on the HUD.
         case LightfootStatus(:final dodge, :final turnsLeft):
-          out.add(StatusView(
-              id: 'lightfoot', turnsLeft: turnsLeft, magnitude: dodge));
+          out.add(
+            StatusView(id: 'lightfoot', turnsLeft: turnsLeft, magnitude: dodge),
+          );
         case DivertStatus(
-            :final activationPercent,
-            :final deflectedPercent,
-            :final turnsLeft
-          ):
-          out.add(StatusView(
+          :final activationPercent,
+          :final deflectedPercent,
+          :final turnsLeft,
+        ):
+          out.add(
+            StatusView(
               id: 'divert',
               turnsLeft: turnsLeft,
               magnitude: activationPercent,
-              secondaryMagnitude: deflectedPercent));
+              secondaryMagnitude: deflectedPercent,
+            ),
+          );
         case TruesightStatus(:final accuracy, :final turnsLeft):
-          out.add(StatusView(
-              id: 'truesight', turnsLeft: turnsLeft, magnitude: accuracy));
+          out.add(
+            StatusView(
+              id: 'truesight',
+              turnsLeft: turnsLeft,
+              magnitude: accuracy,
+            ),
+          );
         case KeenStatus(:final critChance, :final turnsLeft):
-          out.add(StatusView(
-              id: 'keen', turnsLeft: turnsLeft, magnitude: critChance));
+          out.add(
+            StatusView(id: 'keen', turnsLeft: turnsLeft, magnitude: critChance),
+          );
         case HeavyhandStatus(:final critDamage, :final turnsLeft):
-          out.add(StatusView(
-              id: 'heavyhand', turnsLeft: turnsLeft, magnitude: critDamage));
+          out.add(
+            StatusView(
+              id: 'heavyhand',
+              turnsLeft: turnsLeft,
+              magnitude: critDamage,
+            ),
+          );
         // The bank's DoTs and debuffs (§7a). One arm per SHAPE, not per spell:
         // the DoT arm reads the status's own id, so Agony, Torment and the
         // next burn all draw their pip without another case here.
         case BankDotStatus(:final id, :final turnsLeft, :final damagePerTick):
-          out.add(StatusView(
-              id: id, turnsLeft: turnsLeft, magnitude: damagePerTick));
+          out.add(
+            StatusView(id: id, turnsLeft: turnsLeft, magnitude: damagePerTick),
+          );
         case MurkStatus(:final turnsLeft, :final accuracyPercent):
-          out.add(StatusView(
-              id: 'murk', turnsLeft: turnsLeft, magnitude: accuracyPercent));
+          out.add(
+            StatusView(
+              id: 'murk',
+              turnsLeft: turnsLeft,
+              magnitude: accuracyPercent,
+            ),
+          );
         case WitherStatus(:final turnsLeft, :final healingReceivedPercent):
-          out.add(StatusView(
+          out.add(
+            StatusView(
               id: 'wither',
               turnsLeft: turnsLeft,
-              magnitude: healingReceivedPercent));
+              magnitude: healingReceivedPercent,
+            ),
+          );
         case BlightStatus(:final turnsLeft):
           out.add(StatusView(id: 'blight', turnsLeft: turnsLeft));
 
         // The banked SPECIAL stances (§7a). ⚠️ Keen and Heavyhand are covered
         // above: Bloodlust grants the stat lane's classes, not copies.
         case SteadfastStatus(:final percent, :final turnsLeft):
-          out.add(StatusView(
-              id: 'steadfast', turnsLeft: turnsLeft, magnitude: percent));
+          out.add(
+            StatusView(
+              id: 'steadfast',
+              turnsLeft: turnsLeft,
+              magnitude: percent,
+            ),
+          );
         case ComposureStatus(:final turnsLeft):
           out.add(StatusView(id: 'composure', turnsLeft: turnsLeft));
         case DeathWishStatus(:final turnsLeft):
@@ -160,10 +206,13 @@ class StatusSnapshot {
         case ReflectStatus(:final turnsLeft):
           out.add(StatusView(id: 'reflect', turnsLeft: turnsLeft));
         case MendingStatus(:final percentPerTurn, :final turnsLeft):
-          out.add(StatusView(
+          out.add(
+            StatusView(
               id: 'mending',
               turnsLeft: turnsLeft,
-              magnitude: percentPerTurn));
+              magnitude: percentPerTurn,
+            ),
+          );
       }
     }
 

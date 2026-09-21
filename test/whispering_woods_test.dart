@@ -58,11 +58,9 @@ void main() {
       final loc = World.byId(zone);
       for (final e in all) {
         expect(e.zoneId, zone);
-        expect(
-          e.elements,
-          [MagicElement.flora],
-          reason: '${e.id} — a pure zone means one element (ENEMIES §2h)',
-        );
+        expect(e.elements, [
+          MagicElement.flora,
+        ], reason: '${e.id} — a pure zone means one element (ENEMIES §2h)');
         expect(loc.elements, contains(e.elements.single));
       }
     });

@@ -16,7 +16,9 @@ void main() {
     test('charging from 0 requires an element', () {
       expect(
         () => duel.resolveTurn(
-            const ChargeAction(), const ChargeAction(MagicElement.pyro)),
+          const ChargeAction(),
+          const ChargeAction(MagicElement.pyro),
+        ),
         throwsArgumentError,
       );
     });
@@ -25,8 +27,10 @@ void main() {
       alice.charge = 2;
       alice.element = MagicElement.pyro;
       expect(
-        () => duel.resolveTurn(const ChargeAction(MagicElement.arcane),
-            const ChargeAction(MagicElement.pyro)),
+        () => duel.resolveTurn(
+          const ChargeAction(MagicElement.arcane),
+          const ChargeAction(MagicElement.pyro),
+        ),
         throwsArgumentError,
       );
     });
@@ -36,7 +40,9 @@ void main() {
       alice.element = MagicElement.pyro;
       expect(
         () => duel.resolveTurn(
-            const ChargeAction(), const ChargeAction(MagicElement.pyro)),
+          const ChargeAction(),
+          const ChargeAction(MagicElement.pyro),
+        ),
         throwsArgumentError,
       );
     });
@@ -45,16 +51,20 @@ void main() {
       alice.charge = 1;
       alice.element = MagicElement.pyro;
       expect(
-        () => duel.resolveTurn(CastAction(Spellbook.cataclysm),
-            const ChargeAction(MagicElement.aqua)),
+        () => duel.resolveTurn(
+          CastAction(Spellbook.cataclysm),
+          const ChargeAction(MagicElement.aqua),
+        ),
         throwsArgumentError,
       );
     });
 
     test('casting at 0 charge requires an element', () {
       expect(
-        () => duel.resolveTurn(CastAction(Spellbook.flick),
-            const ChargeAction(MagicElement.aqua)),
+        () => duel.resolveTurn(
+          CastAction(Spellbook.flick),
+          const ChargeAction(MagicElement.aqua),
+        ),
         throwsArgumentError,
       );
     });
@@ -62,8 +72,10 @@ void main() {
 
   group('charge cycle', () {
     test('charging builds toward 5 and locks the element', () {
-      duel.resolveTurn(const ChargeAction(MagicElement.pyro),
-          const ChargeAction(MagicElement.aqua));
+      duel.resolveTurn(
+        const ChargeAction(MagicElement.pyro),
+        const ChargeAction(MagicElement.aqua),
+      );
       expect(alice.charge, 1);
       expect(alice.element, MagicElement.pyro);
       duel.resolveTurn(const ChargeAction(), const ChargeAction());
@@ -75,15 +87,19 @@ void main() {
       alice.charge = 3;
       alice.element = MagicElement.pyro;
       duel.resolveTurn(
-          CastAction(Spellbook.bolt), const ChargeAction(MagicElement.aqua));
+        CastAction(Spellbook.bolt),
+        const ChargeAction(MagicElement.aqua),
+      );
       expect(alice.charge, 0);
       expect(alice.element, isNull, reason: 'new cycle: element re-chosen');
       expect(bruno.hp, inInclusiveRange(86, 89), reason: 'Bolt rolls 11-14');
     });
 
     test('0-cost spells are castable immediately with a fresh element', () {
-      duel.resolveTurn(CastAction(Spellbook.flick, MagicElement.pyro),
-          const ChargeAction(MagicElement.aqua));
+      duel.resolveTurn(
+        CastAction(Spellbook.flick, MagicElement.pyro),
+        const ChargeAction(MagicElement.aqua),
+      );
       expect(bruno.hp, inInclusiveRange(94, 96), reason: 'Flick rolls 4-6');
       expect(alice.charge, 0);
     });
@@ -99,7 +115,9 @@ void main() {
       // the chip is exactly the un-multiplied blast, whatever the rolls are.
       bruno.element = MagicElement.solar;
       duel.resolveTurn(
-          CastAction(Spellbook.blast), CastAction(Spellbook.bulwark));
+        CastAction(Spellbook.blast),
+        CastAction(Spellbook.bulwark),
+      );
       expect(bruno.hp, 100, reason: 'a 3-charge shield absorbs any Blast');
       expect(bruno.shield!.remaining, inInclusiveRange(39 - 26, 51 - 20));
     });
@@ -108,32 +126,46 @@ void main() {
       alice.charge = 2;
       alice.element = MagicElement.pyro;
       duel.resolveTurn(
-          CastAction(Spellbook.quicken), const ChargeAction(MagicElement.aero));
+        CastAction(Spellbook.quicken),
+        const ChargeAction(MagicElement.aero),
+      );
       alice.charge = 2;
       alice.element = MagicElement.pyro;
       bruno.charge = 3;
       duel.resolveTurn(
-          CastAction(Spellbook.blast), CastAction(Spellbook.bulwark));
-      expect(bruno.hp, inInclusiveRange(74, 80),
-          reason: 'attack resolves before the shield');
-      expect(bruno.shield!.remaining, inInclusiveRange(39, 51),
-          reason: 'shield up afterwards, untouched');
+        CastAction(Spellbook.blast),
+        CastAction(Spellbook.bulwark),
+      );
+      expect(
+        bruno.hp,
+        inInclusiveRange(74, 80),
+        reason: 'attack resolves before the shield',
+      );
+      expect(
+        bruno.shield!.remaining,
+        inInclusiveRange(39, 51),
+        reason: 'shield up afterwards, untouched',
+      );
     });
 
-    test('a mage killed at an earlier priority does not resolve later casts',
-        () {
-      alice.charge = 2;
-      alice.element = MagicElement.pyro;
-      alice.quickenPriority = 2;
-      bruno.charge = 2;
-      bruno.element = MagicElement.aqua;
-      bruno.hp = 20;
-      duel.resolveTurn(
-          CastAction(Spellbook.blast), CastAction(Spellbook.blast));
-      expect(bruno.alive, isFalse);
-      expect(alice.hp, 100, reason: "Bruno died before his regular attack");
-      expect(duel.winner, alice);
-    });
+    test(
+      'a mage killed at an earlier priority does not resolve later casts',
+      () {
+        alice.charge = 2;
+        alice.element = MagicElement.pyro;
+        alice.quickenPriority = 2;
+        bruno.charge = 2;
+        bruno.element = MagicElement.aqua;
+        bruno.hp = 20;
+        duel.resolveTurn(
+          CastAction(Spellbook.blast),
+          CastAction(Spellbook.blast),
+        );
+        expect(bruno.alive, isFalse);
+        expect(alice.hp, 100, reason: "Bruno died before his regular attack");
+        expect(duel.winner, alice);
+      },
+    );
 
     test('equal-priority mutual kills are a draw', () {
       alice.charge = 2;
@@ -143,7 +175,9 @@ void main() {
       bruno.element = MagicElement.aqua;
       bruno.hp = 10;
       duel.resolveTurn(
-          CastAction(Spellbook.blast), CastAction(Spellbook.blast));
+        CastAction(Spellbook.blast),
+        CastAction(Spellbook.blast),
+      );
       expect(duel.isOver, isTrue);
       expect(duel.isDraw, isTrue);
       expect(duel.winner, isNull);
@@ -156,11 +190,16 @@ void main() {
       alice.element = MagicElement.umbra;
       alice.hp = 50;
       duel.resolveTurn(
-          CastAction(Spellbook.sap), const ChargeAction(MagicElement.aero));
+        CastAction(Spellbook.sap),
+        const ChargeAction(MagicElement.aero),
+      );
       expect(bruno.hp, inInclusiveRange(89, 91));
       final dealt = 100 - bruno.hp;
-      expect(alice.hp - 50, (dealt * 0.5).round(),
-          reason: 'drains half of the health damage, not all of it');
+      expect(
+        alice.hp - 50,
+        (dealt * 0.5).round(),
+        reason: 'drains half of the health damage, not all of it',
+      );
     });
 
     test('lifesteal does not heal for damage soaked by shields', () {
@@ -169,7 +208,9 @@ void main() {
       alice.hp = 50;
       bruno.shield = ActiveShield.elemental(MagicElement.aero, 100);
       duel.resolveTurn(
-          CastAction(Spellbook.sap), const ChargeAction(MagicElement.aero));
+        CastAction(Spellbook.sap),
+        const ChargeAction(MagicElement.aero),
+      );
       expect(bruno.hp, 100);
       expect(alice.hp, 50, reason: 'nothing reached health, nothing healed');
     });
@@ -180,69 +221,98 @@ void main() {
     group('lifesteal pays for health lost, not damage rolled', () {
       test("the designer's case: 16 into a 10hp mage heals 5, not 8", () {
         const leech16 = Spell(
-            id: 'leech16',
-            name: 'Leech16',
-            chargeCost: 0,
-            priority: 9,
-            effect: DamageEffect(16, 16, lifesteal: 0.5));
+          id: 'leech16',
+          name: 'Leech16',
+          chargeCost: 0,
+          priority: 9,
+          effect: DamageEffect(16, 16, lifesteal: 0.5),
+        );
         alice.hp = 50;
         bruno.hp = 10;
-        final r = duel.resolveTurn(const CastAction(leech16, MagicElement.umbra),
-            const ChargeAction(MagicElement.aero));
+        final r = duel.resolveTurn(
+          const CastAction(leech16, MagicElement.umbra),
+          const ChargeAction(MagicElement.aero),
+        );
         expect(bruno.hp, 0);
-        expect(alice.hp, 55,
-            reason: '⚠️ kills healing off pre-clamp damage (would be 58)');
-        expect(r.events.whereType<HealedEvent>().single.amount, 5,
-            reason: '⚠️ kills healing off pre-clamp damage (would be 8)');
-        expect(r.events.whereType<DamageEvent>().single.toHp, 10,
-            reason: '⚠️ kills an event that reports 16 against a 10hp mage');
+        expect(
+          alice.hp,
+          55,
+          reason: '⚠️ kills healing off pre-clamp damage (would be 58)',
+        );
+        expect(
+          r.events.whereType<HealedEvent>().single.amount,
+          5,
+          reason: '⚠️ kills healing off pre-clamp damage (would be 8)',
+        );
+        expect(
+          r.events.whereType<DamageEvent>().single.toHp,
+          10,
+          reason: '⚠️ kills an event that reports 16 against a 10hp mage',
+        );
       });
 
       test('a fully-shielded lifesteal hit heals exactly 0', () {
         const drain40 = Spell(
-            id: 'drain40',
-            name: 'Drain40',
-            chargeCost: 0,
-            priority: 9,
-            effect: DamageEffect(40, 40, lifesteal: 0.5));
+          id: 'drain40',
+          name: 'Drain40',
+          chargeCost: 0,
+          priority: 9,
+          effect: DamageEffect(40, 40, lifesteal: 0.5),
+        );
         alice.hp = 50;
         // Aero shield vs an Umbra hit is 100% (neutral), so 40 of a 100-point
         // shield is soaked and not one point reaches health.
         bruno.shield = ActiveShield.elemental(MagicElement.aero, 100);
-        final r = duel.resolveTurn(const CastAction(drain40, MagicElement.umbra),
-            const ChargeAction(MagicElement.aero));
+        final r = duel.resolveTurn(
+          const CastAction(drain40, MagicElement.umbra),
+          const ChargeAction(MagicElement.aero),
+        );
         expect(bruno.hp, 100);
         expect(bruno.shield!.remaining, 60);
-        expect(alice.hp, 50,
-            reason: '⚠️ kills healing off rolled or shield-absorbed damage');
-        expect(r.events.whereType<HealedEvent>(), isEmpty,
-            reason: 'no health lost, so no heal event at all');
+        expect(
+          alice.hp,
+          50,
+          reason: '⚠️ kills healing off rolled or shield-absorbed damage',
+        );
+        expect(
+          r.events.whereType<HealedEvent>(),
+          isEmpty,
+          reason: 'no health lost, so no heal event at all',
+        );
       });
 
       test('a multi-hit kill mid-sequence heals only for the real loss', () {
         // 3 × 10 into a 16hp mage: 10 lost, then 6, then nothing — 16 total,
         // so 8 healed. A naive sum of the rolls would say 30 → 15.
         const flurrySteal = Spell(
-            id: 'flurrySteal',
-            name: 'Flurry Steal',
-            chargeCost: 0,
-            priority: 9,
-            effect: DamageEffect(10, 10, hits: 3, lifesteal: 0.5));
+          id: 'flurrySteal',
+          name: 'Flurry Steal',
+          chargeCost: 0,
+          priority: 9,
+          effect: DamageEffect(10, 10, hits: 3, lifesteal: 0.5),
+        );
         alice.hp = 50;
         bruno.hp = 16;
         final r = duel.resolveTurn(
-            const CastAction(flurrySteal, MagicElement.umbra),
-            const ChargeAction(MagicElement.aero));
+          const CastAction(flurrySteal, MagicElement.umbra),
+          const ChargeAction(MagicElement.aero),
+        );
         expect(bruno.hp, 0);
-        expect(alice.hp, 58,
-            reason: '⚠️ kills summing per-hit damage instead of hp removed '
-                '(would be 65)');
+        expect(
+          alice.hp,
+          58,
+          reason:
+              '⚠️ kills summing per-hit damage instead of hp removed '
+              '(would be 65)',
+        );
         expect(r.events.whereType<HealedEvent>().single.amount, 8);
         expect(
-            r.events.whereType<DamageEvent>().map((e) => e.toHp).toList(),
-            [10, 6, 0],
-            reason: '⚠️ kills per-hit events that ignore the remaining hp — '
-                'the corpse-hit must report 0, not 10');
+          r.events.whereType<DamageEvent>().map((e) => e.toHp).toList(),
+          [10, 6, 0],
+          reason:
+              '⚠️ kills per-hit events that ignore the remaining hp — '
+              'the corpse-hit must report 0, not 10',
+        );
       });
     });
 
@@ -251,7 +321,9 @@ void main() {
       alice.charge = 3;
       alice.element = MagicElement.geo;
       duel.resolveTurn(
-          CastAction(Spellbook.empower), const ChargeAction(MagicElement.aero));
+        CastAction(Spellbook.empower),
+        const ChargeAction(MagicElement.aero),
+      );
       alice.charge = 1;
       alice.element = MagicElement.geo;
       duel.resolveTurn(CastAction(Spellbook.bolt), const ChargeAction());
@@ -264,7 +336,9 @@ void main() {
       alice.element = MagicElement.pyro;
       bruno.shield = ActiveShield.elemental(MagicElement.aero, 100);
       duel.resolveTurn(
-          CastAction(Spellbook.phase), const ChargeAction(MagicElement.aero));
+        CastAction(Spellbook.phase),
+        const ChargeAction(MagicElement.aero),
+      );
       alice.charge = 1;
       alice.element = MagicElement.pyro;
       duel.resolveTurn(CastAction(Spellbook.bolt), const ChargeAction());
@@ -276,9 +350,14 @@ void main() {
       alice.charge = 4;
       alice.element = MagicElement.electro;
       duel.resolveTurn(
-          CastAction(Spellbook.barrage), const ChargeAction(MagicElement.aero));
-      expect(bruno.hp, inInclusiveRange(60, 72),
-          reason: '4 charges at 7-10 per charge is 28-40');
+        CastAction(Spellbook.barrage),
+        const ChargeAction(MagicElement.aero),
+      );
+      expect(
+        bruno.hp,
+        inInclusiveRange(60, 72),
+        reason: '4 charges at 7-10 per charge is 28-40',
+      );
       expect(alice.charge, 0);
     });
 
@@ -291,7 +370,9 @@ void main() {
       // shield_math_test, not here — this test is only about multi-hit.)
       bruno.shield = ActiveShield.elemental(MagicElement.solar, 10);
       duel.resolveTurn(
-          CastAction(Spellbook.volley), const ChargeAction(MagicElement.aero));
+        CastAction(Spellbook.volley),
+        const ChargeAction(MagicElement.aero),
+      );
       // Volley rolls 7-10 x4 (28-40 total); the 10-point shield absorbs 10
       // raw, everything past it strikes health — so 110 - total.
       expect(bruno.shield, isNull);
@@ -302,8 +383,10 @@ void main() {
   group('duel lifecycle', () {
     test('a defeated mage ends the duel with a winner', () {
       bruno.hp = 4;
-      duel.resolveTurn(CastAction(Spellbook.flick, MagicElement.pyro),
-          const ChargeAction(MagicElement.aqua));
+      duel.resolveTurn(
+        CastAction(Spellbook.flick, MagicElement.pyro),
+        const ChargeAction(MagicElement.aqua),
+      );
       expect(duel.isOver, isTrue);
       expect(duel.winner, alice);
       expect(duel.isDraw, isFalse);
@@ -324,8 +407,10 @@ void main() {
     test('resolving a turn after the duel ends throws', () {
       bruno.hp = 0;
       expect(
-        () => duel.resolveTurn(const ChargeAction(MagicElement.pyro),
-            const ChargeAction(MagicElement.aqua)),
+        () => duel.resolveTurn(
+          const ChargeAction(MagicElement.pyro),
+          const ChargeAction(MagicElement.aqua),
+        ),
         throwsStateError,
       );
     });

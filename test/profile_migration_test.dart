@@ -19,36 +19,44 @@ void main() {
     expect(World.canonicalId('pennycross'), 'pennycross');
   });
 
-  test('a save on the old id loads onto the new one, everywhere it appears',
-      () {
-    final legacy = <String, dynamic>{
-      'name': 'Old Timer',
-      'locationId': 'aldermere',
-      'discoveredLocationIds': ['aldermere', 'whispering_woods'],
-      'zoneClears': {'aldermere': 2},
-      'storerooms': {
-        'aldermere': {
-          'stacks': {'oak_log': 5},
+  test(
+    'a save on the old id loads onto the new one, everywhere it appears',
+    () {
+      final legacy = <String, dynamic>{
+        'name': 'Old Timer',
+        'locationId': 'aldermere',
+        'discoveredLocationIds': ['aldermere', 'whispering_woods'],
+        'zoneClears': {'aldermere': 2},
+        'storerooms': {
+          'aldermere': {
+            'stacks': {'oak_log': 5},
+          },
         },
-      },
-    };
+      };
 
-    final p = PlayerProfile.fromJson(legacy);
+      final p = PlayerProfile.fromJson(legacy);
 
-    expect(p.locationId, 'hearthwood', reason: 'the live location id');
-    expect(p.discoveredLocationIds, contains('hearthwood'));
-    expect(p.discoveredLocationIds, isNot(contains('aldermere')));
-    expect(p.zoneClears['hearthwood'], 2, reason: 'clears follow the rename');
-    expect(p.storerooms['hearthwood']?.stacks['oak_log'], 5,
-        reason: 'a Storeroom must not be orphaned on a dead id');
-  });
+      expect(p.locationId, 'hearthwood', reason: 'the live location id');
+      expect(p.discoveredLocationIds, contains('hearthwood'));
+      expect(p.discoveredLocationIds, isNot(contains('aldermere')));
+      expect(p.zoneClears['hearthwood'], 2, reason: 'clears follow the rename');
+      expect(
+        p.storerooms['hearthwood']?.stacks['oak_log'],
+        5,
+        reason: 'a Storeroom must not be orphaned on a dead id',
+      );
+    },
+  );
 
   test('the migrated location can actually be travelled from', () {
     final p = PlayerProfile.fromJson({'locationId': 'aldermere'});
     // ⭐ The regression itself: routing from the canonical id resolves.
     final route = Travel.route(p.locationId, 'whispering_woods');
-    expect(route, isNotNull,
-        reason: 'travel was broken because the dead id had no route');
+    expect(
+      route,
+      isNotNull,
+      reason: 'travel was broken because the dead id had no route',
+    );
   });
 
   test('a trip in flight when the rename landed keeps working', () {

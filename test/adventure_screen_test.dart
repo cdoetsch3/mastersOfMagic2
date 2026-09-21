@@ -64,7 +64,8 @@ void main() {
       expect(
         find.text("Forager's Ration"),
         findsNWidgets(2),
-        reason: 'a ration missing from either Supplies or the Pack is a panel '
+        reason:
+            'a ration missing from either Supplies or the Pack is a panel '
             'that stopped reading the backpack',
       );
       expect(
@@ -140,36 +141,38 @@ void main() {
       );
     }
 
-    testWidgets('⭐ the rarest drop is listed first, whatever order it fell in',
-        (tester) async {
-      final game = await _onAdventure();
-      justWon(game, const [
-        InventorySlot(defId: 'oak_log'),
-        InventorySlot(defId: 'flora_crystal'),
-        InventorySlot(defId: 'heartwood_stave', instanceId: 'inst-1'),
-      ]);
-      await _pump(tester, game);
+    testWidgets(
+      '⭐ the rarest drop is listed first, whatever order it fell in',
+      (tester) async {
+        final game = await _onAdventure();
+        justWon(game, const [
+          InventorySlot(defId: 'oak_log'),
+          InventorySlot(defId: 'flora_crystal'),
+          InventorySlot(defId: 'heartwood_stave', instanceId: 'inst-1'),
+        ]);
+        await _pump(tester, game);
 
-      final rows = tester
-          .widgetList<Text>(find.byType(Text))
-          .map((t) => t.data)
-          .whereType<String>()
-          .where(
-            (s) => const [
-              'Oak Log',
-              'Flora Crystal',
-              'Heartwood Staff',
-            ].contains(s),
-          )
-          .toList();
-      expect(
-        rows,
-        ['Heartwood Staff', 'Flora Crystal', 'Oak Log'],
-        reason:
-            'rendering in drop order buries the epic under a log — the row '
-            'that decides the choice has to be the one on top',
-      );
-    });
+        final rows = tester
+            .widgetList<Text>(find.byType(Text))
+            .map((t) => t.data)
+            .whereType<String>()
+            .where(
+              (s) => const [
+                'Oak Log',
+                'Flora Crystal',
+                'Heartwood Staff',
+              ].contains(s),
+            )
+            .toList();
+        expect(
+          rows,
+          ['Heartwood Staff', 'Flora Crystal', 'Oak Log'],
+          reason:
+              'rendering in drop order buries the epic under a log — the row '
+              'that decides the choice has to be the one on top',
+        );
+      },
+    );
 
     testWidgets('a win opens the picker, defaulting to the epic', (
       tester,
@@ -248,9 +251,13 @@ void main() {
             'drops to be merged into the next batch — one question at a time',
       );
       expect(find.text('Return to town'), findsNothing);
-      expect(find.text('Use'), findsNothing,
-          reason: 'the supplies panel is a second decision competing with the '
-              'one where something can be lost');
+      expect(
+        find.text('Use'),
+        findsNothing,
+        reason:
+            'the supplies panel is a second decision competing with the '
+            'one where something can be lost',
+      );
 
       await tester.tap(find.text('Take 1'));
       await tester.pumpAndSettle();

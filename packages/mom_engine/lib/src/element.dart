@@ -64,11 +64,11 @@ enum MagicElement {
   arcane;
 
   MagicTier get tier => switch (this) {
-        aqua || pyro || flora => MagicTier.primal,
-        electro || aero || geo => MagicTier.kinetic,
-        solar || lunar || astral => MagicTier.celestial,
-        sanctus || umbra || arcane => MagicTier.ethereal,
-      };
+    aqua || pyro || flora => MagicTier.primal,
+    electro || aero || geo => MagicTier.kinetic,
+    solar || lunar || astral => MagicTier.celestial,
+    sanctus || umbra || arcane => MagicTier.ethereal,
+  };
 
   /// Elements whose shields this element deals double damage to (and, at the
   /// effect layer, the element this one "wins" the tier interaction against).
@@ -151,12 +151,12 @@ int shieldMultiplierPercent(MagicElement? attack, MagicElement shieldElement) {
 /// "½×"), or null at 100% so callers can omit it. Shared by the battle log
 /// and the duel screen so both read identically.
 String? shieldMultiplierTag(int percent) => switch (percent) {
-      200 => '2×',
-      150 => '1.5×',
-      75 => '¾×',
-      50 => '½×',
-      _ => null,
-    };
+  200 => '2×',
+  150 => '1.5×',
+  75 => '¾×',
+  50 => '½×',
+  _ => null,
+};
 
 /// The four phases of the moon (Lunar — TYPE_EFFECTS_DESIGN §4b.2). A single
 /// **global, public, deterministic** clock derived from the turn counter, not
@@ -166,19 +166,18 @@ enum MoonPhase { newMoon, waxing, full, waning }
 /// The global moon phase on [turnNumber]. Turn 1 is New Moon, then the cycle
 /// runs New → Waxing → Full → Waning every four turns (`turnNumber % 4`).
 MoonPhase moonPhaseForTurn(int turnNumber) => switch (turnNumber % 4) {
-      1 => MoonPhase.newMoon,
-      2 => MoonPhase.waxing,
-      3 => MoonPhase.full,
-      _ => MoonPhase.waning, // 0
-    };
+  1 => MoonPhase.newMoon,
+  2 => MoonPhase.waxing,
+  3 => MoonPhase.full,
+  _ => MoonPhase.waning, // 0
+};
 
 /// The **additive** damage percent a Lunar attack gets in [phase] (folded in
 /// alongside Arcane Knowledge, before multipliers — §5.2 step 5). Deliberately
 /// minimal for now: only the **Full Moon** matters (+20%); every other phase
 /// is neutral. Richer phase effects (troughs, shield/heal bonuses, a veil)
 /// were considered and shelved as too strong — TYPE_EFFECTS §4b.2.
-int lunarAttackPercent(MoonPhase phase) =>
-    phase == MoonPhase.full ? 20 : 0;
+int lunarAttackPercent(MoonPhase phase) => phase == MoonPhase.full ? 20 : 0;
 
 /// How an element is written in player-facing text.
 ///
@@ -188,4 +187,3 @@ int lunarAttackPercent(MoonPhase phase) =>
 extension MagicElementName on MagicElement {
   String get displayName => name[0].toUpperCase() + name.substring(1);
 }
-
