@@ -26,16 +26,56 @@ final Set<String> _spellIds = Spellbook.all.map((s) => s.id).toSet();
 ///
 /// ⭐ Elements and spells are **two separate pools**, each with its own cap
 /// (5 and 10). Filling one has no effect on the other.
+///
+/// ⭐ **Spells are SPARSE, everything else is dense** (ruling, 2026-09-21:
+/// "if I remove the Q, the Q should be empty"). [spellSlots] is keyed by
+/// keyboard position and may hold nulls; [spellIds] hands every reader that
+/// only cares *which* spells the dense list it always got.
+///
+/// ⚠️ **Elements stay dense on purpose.** The ruling names spells, and the
+/// 1-5 element keys are nowhere near the muscle memory QWERT is — an element
+/// is chosen by what it is, not by where its finger goes. Holes there would
+/// be complexity bought for nobody.
 class LoadoutPreset {
   String name;
   List<String> elementIds;
-  List<String> spellIds;
 
+  /// Spells by **keyboard slot**: index 0 is Q, 4 is T, 5 is A, 9 is G. A
+  /// null is an *empty slot*, never a gap to be closed — removing Q must
+  /// leave R on R, and the next spell added goes back into Q.
+  ///
+  /// Fixed length: [Loadout.maxSpellSlots], or shorter once [clampToCaps] has
+  /// cut it to a tighter budget.
+  List<String?> spellSlots;
+
+  /// [spellIds] packs into slot 0 upward; pass [spellSlots] instead to place
+  /// spells (and holes) exactly.
   LoadoutPreset({
     required this.name,
     required this.elementIds,
-    required this.spellIds,
-  });
+    List<String> spellIds = const [],
+    List<String?>? spellSlots,
+  }) : spellSlots = spellSlots == null
+           ? _packSlots(spellIds)
+           : List<String?>.of(spellSlots);
+
+  /// A dense id list laid into a full-length slot list from slot 0 up.
+  static List<String?> _packSlots(List<String> ids) {
+    final slots = List<String?>.filled(Loadout.maxSpellSlots, null);
+    for (var i = 0; i < ids.length && i < slots.length; i++) {
+      slots[i] = ids[i];
+    }
+    return slots;
+  }
+
+  /// A detached copy. ⚠️ The loadout editor mutates one of these and saves
+  /// it — never the preset the screen is currently drawing, whose slots a
+  /// refused edit must leave exactly as they were.
+  LoadoutPreset copy() => LoadoutPreset(
+    name: name,
+    elementIds: List.of(elementIds),
+    spellSlots: List.of(spellSlots),
+  );
 
   factory LoadoutPreset.starter(String name) => LoadoutPreset(
     name: name,
@@ -65,12 +105,51 @@ class LoadoutPreset {
     ],
   );
 
+  /// The spells this preset holds, in slot order, **without the holes** — the
+  /// answer to "which spells", which is what every reader outside the key
+  /// mapping wants: validity, the catalogue check, the ladder, the Academy.
+  List<String> get spellIds => [for (final id in spellSlots) ?id];
+
   int get elementCount => elementIds.length;
   int get spellCount => spellIds.length;
+
+  // ---- Slot mutations ---------------------------------------------------
+
+  /// Empties the slot holding [id], **leaving the hole**; returns whether a
+  /// slot held it. ⚠️ Never compacts: that is the whole ruling.
+  bool removeSpell(String id) {
+    final at = spellSlots.indexOf(id);
+    if (at < 0) return false;
+    spellSlots[at] = null;
+    return true;
+  }
+
+  /// Puts [id] in the FIRST empty slot — so the Q just emptied is the Q the
+  /// next spell fills. Returns false, changing nothing, when none is free.
+  bool addSpell(String id) {
+    final free = spellSlots.indexOf(null);
+    if (free < 0) return false;
+    spellSlots[free] = id;
+    return true;
+  }
+
+  /// Writes [id] (or null, to empty it) into slot [index] — what a drag of
+  /// one tray chip onto another will want. Out of range is a refused no-op.
+  bool setSpellAt(int index, String? id) {
+    if (index < 0 || index >= spellSlots.length) return false;
+    spellSlots[index] = id;
+    return true;
+  }
 
   /// Truncates each pool to its own cap. Migrates saves written when the pools
   /// were merged and either could run larger — a preset with 8 elements, say,
   /// loses the last three rather than crashing on load.
+  ///
+  /// ⚠️ The spell pool loses its **last slots**, holes included — it does not
+  /// compact first. A budget of 4 over `[a, null, c, null, e]` keeps
+  /// `[a, null, c, null]` and drops `e`; compacting would hand back `[a, c,
+  /// e, null]` and move the player's D onto their W, which is the habit this
+  /// whole shape exists to protect.
   ///
   /// [elementBudget]/[spellBudget] default to the absolute ceilings; callers
   /// pass `Progression.usableElementsAtLevel(level)` and the spell equivalent
@@ -82,8 +161,8 @@ class LoadoutPreset {
     if (elementIds.length > elementBudget) {
       elementIds = elementIds.sublist(0, elementBudget);
     }
-    if (spellIds.length > spellBudget) {
-      spellIds = spellIds.sublist(0, spellBudget);
+    if (spellSlots.length > spellBudget) {
+      spellSlots = spellSlots.sublist(0, spellBudget);
     }
   }
 
@@ -112,25 +191,61 @@ class LoadoutPreset {
       .map(MagicElement.values.byName)
       .toList();
 
-  /// Spells this preset resolves to. Unknown ids are dropped, not thrown on —
-  /// symmetric with [elements]; see [unknownSpellIds].
+  /// Spells this preset resolves to, densely. Unknown ids are dropped, not
+  /// thrown on — symmetric with [elements]; see [unknownSpellIds].
   List<Spell> get spells =>
       spellIds.where(_spellIds.contains).map(Spellbook.byId).toList();
 
-  Loadout toLoadout() => Loadout(elements: elements, spells: spells);
+  /// Spells **by slot**, null where the slot is empty *or* where a stale id no
+  /// longer resolves. The [E] tray and any future drag/drop draw exactly this.
+  List<Spell?> get spellsBySlot => [
+    for (final id in spellSlots)
+      (id != null && _spellIds.contains(id)) ? Spellbook.byId(id) : null,
+  ];
+
+  /// ⚠️ **Carries the slot positions across**, so the arena's Q stays the
+  /// spell in slot 0 even when slot 0 was emptied and refilled. A dense
+  /// `Loadout` built from [spells] alone is what slid R onto E.
+  Loadout toLoadout() {
+    final spells = <Spell>[];
+    final slotIndices = <int>[];
+    for (var i = 0; i < spellSlots.length; i++) {
+      final id = spellSlots[i];
+      if (id == null || !_spellIds.contains(id)) continue;
+      spells.add(Spellbook.byId(id));
+      slotIndices.add(i);
+    }
+    return Loadout(
+      elements: elements,
+      spells: spells,
+      spellSlotIndices: slotIndices,
+    );
+  }
 
   bool get isValid => elementIds.isNotEmpty && spellIds.isNotEmpty;
 
+  /// ⭐ **Both keys are written, always.** `spellSlots` is the truth, but the
+  /// dense `spellIds` stays beside it so a cloud profile saved here and read
+  /// by an older client still finds the loadout it knows how to parse — it
+  /// loses the holes, not the spells. Drop the old key only once no shipped
+  /// build reads it.
   Map<String, dynamic> toJson() => {
     'name': name,
     'elementIds': elementIds,
     'spellIds': spellIds,
+    'spellSlots': spellSlots,
   };
 
+  /// A save without `spellSlots` — every save written before this ruling —
+  /// packs its dense `spellIds` from slot 0 up, which is exactly where those
+  /// spells were.
   factory LoadoutPreset.fromJson(Map<String, dynamic> json) => LoadoutPreset(
     name: json['name'] as String? ?? 'Loadout',
     elementIds: (json['elementIds'] as List?)?.cast<String>().toList() ?? [],
     spellIds: (json['spellIds'] as List?)?.cast<String>().toList() ?? [],
+    spellSlots: (json['spellSlots'] as List?)
+        ?.map((e) => e as String?)
+        .toList(),
   );
 }
 

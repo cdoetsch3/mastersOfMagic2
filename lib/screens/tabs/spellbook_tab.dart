@@ -159,16 +159,14 @@ class _SpellbookTabState extends State<SpellbookTab> {
                     // [C]
                     showLocked: _showLocked,
                     onShowLocked: (v) => setState(() => _showLocked = v),
-                    // [E]
-                    equipped: [
-                      for (final id in preset.spellIds) Spellbook.byId(id),
-                    ],
+                    // [E] Every slot, holes and all — see [_SpellToolbar.slots].
+                    slots: preset.spellsBySlot,
                     onUnequip: canEdit
                         ? (spell) => _setSpells(
                             game,
                             p,
                             preset,
-                            List.of(preset.spellIds)..remove(spell.id),
+                            (preset.copy()..removeSpell(spell.id)).spellSlots,
                           )
                         : null,
                   ),
@@ -187,19 +185,21 @@ class _SpellbookTabState extends State<SpellbookTab> {
     );
   }
 
-  /// Writes a new spell list into the active preset (shared by tile toggles
-  /// and the [E] tray's unequip).
+  /// Writes a new **slot list** into the active preset (shared by tile toggles
+  /// and the [E] tray's unequip). ⚠️ Slots, not ids: a list that had been
+  /// compacted on the way in would undo the whole ruling right here.
   void _setSpells(
     GameState game,
     PlayerProfile p,
     LoadoutPreset preset,
-    List<String> ids,
+    List<String?> slots,
   ) {
-    if (ids.isEmpty) return;
+    // At least one spell, still — an all-empty loadout is not a loadout.
+    if (slots.every((id) => id == null)) return;
     final next = LoadoutPreset(
       name: preset.name,
       elementIds: preset.elementIds,
-      spellIds: ids,
+      spellSlots: slots,
     );
     if (_academy) {
       game.saveAcademyPreset(next);
@@ -215,10 +215,12 @@ class _SpellbookTabState extends State<SpellbookTab> {
     LoadoutPreset preset,
     List<String> ids,
   ) {
+    // ⚠️ Slots, not ids — editing an ELEMENT must not quietly compact the
+    // spell row underneath it.
     final next = LoadoutPreset(
       name: preset.name,
       elementIds: ids,
-      spellIds: preset.spellIds,
+      spellSlots: preset.spellSlots,
     );
     if (_academy) {
       game.saveAcademyPreset(next);
@@ -610,7 +612,10 @@ class _SpellbookTabState extends State<SpellbookTab> {
     Spell spell,
     bool canEdit,
   ) {
-    final slot = preset.spellIds.indexOf(spell.id);
+    // ⚠️ The SLOT list, so the key chip shows the key this spell actually
+    // answers to — an index into the dense id list would label the spell after
+    // a hole with the hole's letter.
+    final slot = preset.spellSlots.indexOf(spell.id);
     final selected = slot >= 0;
     final unlocked = _spellUnlocked(p, spell);
     final unlockLevel = Progression.unlockLevelOf(spell);
@@ -621,14 +626,14 @@ class _SpellbookTabState extends State<SpellbookTab> {
     final kind = spellKindOf(spell);
     void toggle() {
       if (!canEdit || !unlocked) return;
-      final ids = List.of(preset.spellIds);
+      final next = preset.copy();
       if (selected) {
-        if (ids.length <= 1) return;
-        ids.remove(spell.id);
-      } else if (ids.length < _spellBudget(p)) {
-        ids.add(spell.id);
+        if (preset.spellCount <= 1) return; // keep at least one
+        next.removeSpell(spell.id); // nulls the slot, never compacts
+      } else if (preset.spellCount < _spellBudget(p)) {
+        if (!next.addSpell(spell.id)) return; // every slot taken
       }
-      _setSpells(game, p, preset, ids);
+      _setSpells(game, p, preset, next.spellSlots);
     }
 
     final nameColor = !unlocked ? AppColors.textFaint : AppColors.text;
@@ -858,10 +863,11 @@ class _EditableName extends StatelessWidget {
     if (name != null && name.trim().isNotEmpty) {
       game.savePreset(
         game.profile.activePresetIndex,
+        // ⚠️ Slots, not ids — a RENAME must not rearrange the loadout.
         LoadoutPreset(
           name: name.trim(),
           elementIds: preset.elementIds,
-          spellIds: preset.spellIds,
+          spellSlots: preset.spellSlots,
         ),
       );
     }
@@ -908,8 +914,10 @@ class _SpellToolbar extends StatelessWidget {
   // [C]
   final bool showLocked;
   final ValueChanged<bool> onShowLocked;
-  // [E]
-  final List<Spell> equipped;
+  // [E] **Every slot, in key order, holes included** — null is an empty slot.
+  // ⚠️ Drawing only the filled ones is what let a removal slide the whole row
+  // one place left, taking each remaining spell's key with it.
+  final List<Spell?> slots;
   final ValueChanged<Spell>? onUnequip;
 
   const _SpellToolbar({
@@ -926,7 +934,7 @@ class _SpellToolbar extends StatelessWidget {
     required this.counts,
     required this.showLocked,
     required this.onShowLocked,
-    required this.equipped,
+    required this.slots,
     required this.onUnequip,
   });
 
@@ -1031,8 +1039,14 @@ class _SpellToolbar extends StatelessWidget {
     ),
   );
 
+  /// [E] The loadout row: one chip per SLOT, in key order.
+  ///
+  /// ⭐ **An empty slot is drawn, not skipped** (ruling, 2026-09-21). Removing
+  /// the Q leaves a Q-shaped hole where it was, the spells after it keep both
+  /// their keys and their place in the row, and the hole is visibly the next
+  /// thing an equip will fill.
   Widget _tray() {
-    if (equipped.isEmpty) {
+    if (slots.every((s) => s == null)) {
       return const Align(
         alignment: Alignment.centerLeft,
         child: Text(
@@ -1043,46 +1057,63 @@ class _SpellToolbar extends StatelessWidget {
     }
     return _chipRow([
       _rowLabel('IN LOADOUT'),
-      for (var i = 0; i < equipped.length; i++)
-        Tooltip(
-          message: onUnequip == null
-              ? equipped[i].name
-              : 'Tap to remove ${equipped[i].name}',
-          child: InkWell(
-            onTap: onUnequip == null ? null : () => onUnequip!(equipped[i]),
+      for (var i = 0; i < slots.length; i++) _trayCell(i, slots[i]),
+    ]);
+  }
+
+  static String _keyLabel(int slot) =>
+      slot < _spellKeyLabels.length ? _spellKeyLabels[slot] : '•';
+
+  Widget _trayCell(int slot, Spell? spell) {
+    final key = Text(
+      _keyLabel(slot),
+      style: TextStyle(
+        color: spell == null ? AppColors.textFaint : AppColors.gold,
+        fontSize: 10,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+    if (spell == null) {
+      return Container(
+        key: ValueKey('tray-slot-$slot'),
+        // The same height and rounding as a filled chip, so the row keeps one
+        // baseline; only the name is missing.
+        padding: const EdgeInsets.fromLTRB(9, 3, 9, 3),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.borderDim),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: key,
+      );
+    }
+    return Tooltip(
+      // Keyed by SLOT, so a cell stays the same cell as it empties and fills.
+      key: ValueKey('tray-slot-$slot'),
+      message: onUnequip == null ? spell.name : 'Tap to remove ${spell.name}',
+      child: InkWell(
+        onTap: onUnequip == null ? null : () => onUnequip!(spell),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(6, 3, 9, 3),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2B2150),
+            border: Border.all(color: AppColors.gold),
             borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(6, 3, 9, 3),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2B2150),
-                border: Border.all(color: AppColors.gold),
-                borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              key,
+              const SizedBox(width: 5),
+              Text(
+                spell.name,
+                style: const TextStyle(color: AppColors.text, fontSize: 11.5),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    i < _spellKeyLabels.length ? _spellKeyLabels[i] : '•',
-                    style: const TextStyle(
-                      color: AppColors.gold,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    equipped[i].name,
-                    style: const TextStyle(
-                      color: AppColors.text,
-                      fontSize: 11.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ],
           ),
         ),
-    ]);
+      ),
+    );
   }
 
   Widget _searchBox() => TextField(
@@ -1152,12 +1183,15 @@ class _PinnedToolbar extends SliverPersistentHeaderDelegate {
       oldDelegate.child.sort != child.sort ||
       oldDelegate.child.query != child.query ||
       oldDelegate.child.showLocked != child.showLocked ||
-      oldDelegate.child.equipped.length != child.equipped.length ||
-      !_sameIds(oldDelegate.child.equipped, child.equipped);
+      !_sameSlots(oldDelegate.child.slots, child.slots);
 
-  static bool _sameIds(List<Spell> a, List<Spell> b) {
-    for (var i = 0; i < a.length && i < b.length; i++) {
-      if (a[i].id != b[i].id) return false;
+  /// ⚠️ Slot by slot, nulls compared too: with a fixed-length slot list, an
+  /// unequip changes no LENGTH — only one entry going null — so a comparison
+  /// that skipped nulls would leave the tray showing a removed spell.
+  static bool _sameSlots(List<Spell?> a, List<Spell?> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i]?.id != b[i]?.id) return false;
     }
     return true;
   }

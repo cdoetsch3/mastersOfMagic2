@@ -16,10 +16,47 @@ class Loadout {
   /// Element slots, in order. Key "1" activates the first.
   final List<MagicElement> elements;
 
-  /// Spell slots, in order. QWERT = 1-5, ASDFG = 6-10.
+  /// The spells brought, **densely** — no holes. QWERT = 1-5, ASDFG = 6-10
+  /// only while [slotIndices] is the default; ask [spellAtSlot] for the key
+  /// mapping instead of indexing this list.
   final List<Spell> spells;
 
-  const Loadout({required this.elements, required this.spells});
+  /// Which key slot each entry of [spells] sits in, ascending — or null for
+  /// the dense default, where `spells[i]` is slot `i`.
+  ///
+  /// ⭐ **A parallel index, rather than making [spells] a `List<Spell?>`.**
+  /// A player who empties their Q must keep R on R (ruling, 2026-09-21), so a
+  /// loadout has to be able to carry a hole. Nullable spells would have
+  /// reached every one of the ~30 places that build or read a `Loadout` — the
+  /// whole ladder roster, the AI personas, the engine's `LadderAi` — for a
+  /// hole only the *player's* preset can ever produce. A null default here
+  /// leaves every one of those call sites dense, correct and untouched.
+  final List<int>? _slotIndices;
+
+  const Loadout({
+    required this.elements,
+    required this.spells,
+    List<int>? spellSlotIndices,
+  }) : _slotIndices = spellSlotIndices;
+
+  /// The key slot of each entry of [spells], ascending. Identity for a dense
+  /// loadout, which is every loadout that is not a player's edited preset.
+  List<int> get slotIndices =>
+      _slotIndices ?? [for (var i = 0; i < spells.length; i++) i];
+
+  /// The spell bound to key [slot] (0 = Q … 9 = G), or null when that slot is
+  /// empty. ⚠️ **The one right way to answer "what does Q cast".** Indexing
+  /// [spells] by the key is what shifted R onto E when Q was removed.
+  Spell? spellAtSlot(int slot) {
+    final indices = _slotIndices;
+    if (indices == null) {
+      return slot >= 0 && slot < spells.length ? spells[slot] : null;
+    }
+    for (var i = 0; i < indices.length && i < spells.length; i++) {
+      if (indices[i] == slot) return spells[i];
+    }
+    return null;
+  }
 
   // ---- Capacity ------------------------------------------------------
   //

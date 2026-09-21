@@ -765,10 +765,10 @@ class _DuelScreenState extends State<DuelScreen>
     ];
     final spellSlot = spellKeys.indexOf(key);
     if (spellSlot >= 0) {
-      if (spellSlot < c.loadout.spells.length) {
-        final spell = c.loadout.spells[spellSlot];
-        if (c.canAct(spell)) _tapSpell(spell);
-      }
+      // ⚠️ By SLOT, never by position in the spell list: a loadout whose Q was
+      // emptied still answers Q with nothing and R with R (ruling 2026-09-21).
+      final spell = c.loadout.spellAtSlot(spellSlot);
+      if (spell != null && c.canAct(spell)) _tapSpell(spell);
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -1360,15 +1360,16 @@ class _DuelScreenState extends State<DuelScreen>
   }
 
   Widget _actionBar(BuildContext context) {
-    final spells = c.loadout.spells;
+    // ⚠️ One cell per KEY, asked for by key — an empty slot 0 draws an empty Q
+    // and leaves every other tab where the player's hand expects it.
+    Widget spellCell(int slot) {
+      final spell = c.loadout.spellAtSlot(slot);
+      return spell == null ? _emptySlot(slot) : _spellButton(spell, slot);
+    }
+
     Widget spellRow(int offset) => Row(
       children: [
-        for (var i = offset; i < offset + 5; i++)
-          Expanded(
-            child: i < spells.length
-                ? _spellButton(spells[i], i)
-                : _emptySlot(i),
-          ),
+        for (var i = offset; i < offset + 5; i++) Expanded(child: spellCell(i)),
       ],
     );
     return Container(
@@ -1565,6 +1566,7 @@ class _DuelScreenState extends State<DuelScreen>
 
   Widget _emptySlot(int slot) {
     return Container(
+      key: ValueKey('spell-slot-$slot'),
       height: 46,
       margin: const EdgeInsets.symmetric(horizontal: 2),
       decoration: BoxDecoration(
@@ -1588,6 +1590,9 @@ class _DuelScreenState extends State<DuelScreen>
     // The same card the Spellbook floats on hover (designer, 2026-08-29):
     // one description of a spell everywhere, never a plainer tooltip twin.
     return HoverCard(
+      // Keyed by SLOT, not by spell: the tab at a key is the thing the player
+      // (and the test) reaches for, whatever is — or is not — sitting in it.
+      key: ValueKey('spell-slot-$slot'),
       card: (_) => SpellDetailCard(spell: spell, showDone: false),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 2),
