@@ -1011,6 +1011,31 @@ phone width.
 formatter would change, so drift is caught per release. Rule: format with
 this SDK only; never hand-match style around the formatter.
 
+## ✅ Playtest batch 2 · 2026-09-21 (release 6, Opus lanes, all merged)
+
+Eight more notes after the road/shop pass; two rulings by AskUserQuestion
+(flat heal ladder 25/30/60/75 + 10×3; Barrage's first-hit gear lump stays,
+the log explains it). Merged 4183a36 · a357a8b · 11049ee · fd0afad · (this)
+— 1868 app / 572 engine tests, both analyzers at zero, format clean.
+1. Shop item dialog carries the tier/event chips at every width.
+2. Home 'Today' goal cards and `_QuestCard` deleted; returns much later.
+3. **Heals are flat** — `ItemEffect.heal`/`healPerTurn`; engine belt effect
+   flat too (`ConsumableEffect.healNow`); `HealOverTimeStatus` flat; Regrow/
+   Mending/Photosynthesis stay percentages (documented asymmetry).
+4. Travel clock ceilings seconds — 0:00 lands with the bar, trip unchanged.
+5. **Pennycross is the gate** (`gateItemIds`, `profile.openedGates`, proofs
+   carried once, never consumed; `travelTo` returns its refusal).
+6. Road pack: Use · Belt · Drop in fixed cells; Supplies section gone;
+   belt drinking via the slot dialog's 'Drink'.
+7. Barrage spike = per-cast gear lump on hit 1 then crit — log now says
+   '(+11 gear)' beside the existing CRIT marker.
+8. **Loadout slots hold their keys** — sparse `spellSlots`, dense
+   `spellIds` derived and still written for old clients; `Loadout.
+   spellAtSlot` via a parallel index list (bots/personas untouched).
+⚠️ Christian verifies: the road Pack rows and 'Drink' in the belt dialog,
+'Gate open' on the Pennycross card, empty keyed cells in the [E] tray and
+the duel's Q tab when slot 0 is empty, the log's '(+N gear)' tag.
+
 ## Deferred / banked — do not build without an explicit ask
 
 - **📝 Creature sprites: the system works, the ART does not.** Built

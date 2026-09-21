@@ -220,8 +220,8 @@ abstract final class ContentExport {
   };
 
   static Map<String, Object?> _effect(ItemEffect e) => {
-    if (e.healPercent != 0) 'healPercent': e.healPercent,
-    if (e.healPerTurnPercent != 0) 'healPerTurnPercent': e.healPerTurnPercent,
+    if (e.heal != 0) 'heal': e.heal,
+    if (e.healPerTurn != 0) 'healPerTurn': e.healPerTurn,
     if (e.healTurns != 0) 'healTurns': e.healTurns,
   };
 

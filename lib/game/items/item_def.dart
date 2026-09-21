@@ -463,48 +463,55 @@ final class EquipmentDef extends ItemDef
 /// balanced against spells.
 @immutable
 class ItemEffect {
-  /// Health restored, as a **percentage of max** rather than a flat number, so
-  /// one item does not trivialise level 2 and become worthless by level 20.
-  final int healPercent;
+  /// Health restored the moment it is used — a **flat number** (ruling
+  /// 2026-09-21).
+  ///
+  /// ⭐ **A potion is a fixed object, not a fraction of you.** The old
+  /// percent-of-max reading made one bottle heal a different amount in every
+  /// hand, which is the opposite of what a player expects from a thing they
+  /// can hold, buy, price and stack. Zone progression does the scaling the
+  /// percentage was there to do: a higher-zone potion is simply a bigger
+  /// potion, and each zone's ration is tuned against the health a character
+  /// arriving there actually has.
+  ///
+  /// ⚠️ Consequently there is **no cap and no floor to compute** — the number
+  /// here is the number restored, clamped only by the drinker's missing
+  /// health. Reintroducing a `maxHp` term anywhere downstream re-opens the
+  /// ruling.
+  final int heal;
 
-  /// The Tonic shape (ITEMS §9b.8): heal [healPerTurnPercent] at the end of
-  /// each of the next [healTurns] turns. ⚠️ **In a duel only.** Outside
-  /// combat the whole amount applies at once — [healFor] already includes it,
-  /// so callers between encounters need no special case.
-  final int healPerTurnPercent;
+  /// The Tonic shape (ITEMS §9b.8): heal [healPerTurn] — flat, same ruling —
+  /// at the end of each of the next [healTurns] turns. ⚠️ **In a duel only.**
+  /// Outside combat the whole amount applies at once — [healFor] already
+  /// includes it, so callers between encounters need no special case.
+  final int healPerTurn;
   final int healTurns;
 
-  const ItemEffect({
-    this.healPercent = 0,
-    this.healPerTurnPercent = 0,
-    this.healTurns = 0,
-  }) : assert(
-         (healPerTurnPercent == 0) == (healTurns == 0),
-         'over-time needs both a rate and a duration',
-       );
+  const ItemEffect({this.heal = 0, this.healPerTurn = 0, this.healTurns = 0})
+    : assert(
+        (healPerTurn == 0) == (healTurns == 0),
+        'over-time needs both a rate and a duration',
+      );
 
   static const none = ItemEffect();
 
-  bool get isNothing => healPercent == 0 && healPerTurnPercent == 0;
+  bool get isNothing => heal == 0 && healPerTurn == 0;
 
-  /// The total this restores for a mage with [maxHp] — flat plus the full
-  /// over-time amount, which is what out-of-combat use applies. At least 1 if
-  /// it heals at all: an item that does nothing reads as a bug.
-  int healFor(int maxHp) {
-    final percent = healPercent + healPerTurnPercent * healTurns;
-    if (percent == 0) return 0;
-    final amount = (maxHp * percent / 100).round();
-    return amount < 1 ? 1 : amount;
-  }
+  /// The total this restores — the lump plus the full over-time amount, which
+  /// is what out-of-combat use applies.
+  ///
+  /// ⚠️ **Takes no max health, deliberately.** It used to, and a parameter
+  /// the body ignores is a lie the next caller believes; the ruling is that
+  /// nothing about the drinker changes what the bottle holds.
+  int healFor() => heal + healPerTurn * healTurns;
 
   /// One line for a tooltip, built from the effect rather than written per
   /// item — ⭐ so a number changed here cannot disagree with its own text.
   String get describe {
-    if (healPerTurnPercent > 0) {
-      return 'Restores $healPerTurnPercent% health per turn for '
-          '$healTurns turns';
+    if (healPerTurn > 0) {
+      return 'Restores $healPerTurn health a turn for $healTurns turns';
     }
-    return healPercent > 0 ? 'Restores $healPercent% health' : 'No effect';
+    return heal > 0 ? 'Restores $heal health' : 'No effect';
   }
 }
 

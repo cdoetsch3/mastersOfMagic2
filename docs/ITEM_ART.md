@@ -191,7 +191,7 @@ earth, one dull amber.
 
 ### Consumables
 
-**Forager's Ration** — *common · consumable · restores 25% health*
+**Forager's Ration** — *common · consumable · restores 25 health*
 `assets/items/whispering_woods/foragers_ration.png`
 > A dense fist-sized block of pressed trail food on a square of waxed cloth,
 > the cloth folded back off the top and tied underneath with twine. Dark
@@ -373,7 +373,7 @@ to hold against them.
 
 ### Consumables
 
-**Sapwort Draught** — *common · beltable · restores 20% health*
+**Sapwort Draught** — *common · beltable · restores 30 health*
 `assets/items/glimmerbrook/sapwort_draught.png`
 > A small squat glass bottle the size of a fist, stoppered with a whittled wood
 > plug and sealed with a twist of green twine. The liquid inside is a cloudy
@@ -635,7 +635,7 @@ orange, one vivid new green.
 
 ### Consumables
 
-**Brookmint Tonic** — *common · beltable · 9% health per turn for 3 turns*
+**Brookmint Tonic** — *common · beltable · 10 health a turn for 3 turns*
 `assets/items/ashfall_vale/brookmint_tonic.png`
 > A tall narrow glass bottle the height of a hand, stoppered with cork and
 > sealed over with dark wax. The liquid is a clear vivid green, and ⭐ **it is
@@ -739,7 +739,7 @@ silver-grey, bronze warm gold-brown.
 
 ### Consumables
 
-**Hardtack** — *common · consumable · heals 35%*
+**Hardtack** — *common · consumable · heals 60*
 `assets/items/old_quarry/hardtack.png`
 > A single flat brick of dense pale biscuit, cracked at one corner, about the
 > size of a deck of cards. Dry matte tan-grey surface, faint grain lines
@@ -992,7 +992,7 @@ tan fibre, one hairline vein of white-blue light.
 
 ### Consumables
 
-**Saltwort Draught** — *common · beltable · 30% health*
+**Saltwort Draught** — *common · beltable · 75 health*
 `assets/items/stormcliff_coast/saltwort_draught.png`
 > A short, wide glass bottle the height of a hand, corked and sealed with dark
 > wax. The liquid inside is a cloudy, briny blue-grey with fine white sediment

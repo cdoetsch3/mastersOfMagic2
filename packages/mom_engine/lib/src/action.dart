@@ -59,27 +59,28 @@ class CastAction extends MageAction {
 /// clients still resolve the identical heal — the catalogue lookup happens on
 /// the app side of [decodeAction], exactly once per client.
 ///
-/// ⚠️ Percentages of the drinker's **max HP**, never flat numbers, for the
-/// same reason [ItemEffect] is: one potion must not trivialise level 2 and
-/// then be worthless by level 20.
+/// ⚠️ **Flat health, never a percentage of the drinker** (ruling 2026-09-21).
+/// A potion is a fixed object: it holds what it holds, and a bigger potion is
+/// a later zone's potion. The engine therefore needs no max-HP term to resolve
+/// a drink — only the cap at full health, which [MageState.heal] already owns.
 class ConsumableEffect {
   /// The item's player-facing name. ⭐ Carried because the battle log says
   /// "drinks Sapwort Draught", not "drinks an item" — and the engine has no
   /// other way to learn it.
   final String name;
 
-  /// Percent of max HP restored the instant it resolves.
-  final int healNowPercent;
+  /// Health restored the instant it resolves.
+  final int healNow;
 
-  /// The Tonic shape (ITEMS §9b.8): [hotPercentPerTurn] of max HP at the end
-  /// of each of [hotTurns] turns, the first tick on the turn it is drunk.
-  final int hotPercentPerTurn;
+  /// The Tonic shape (ITEMS §9b.8): [healPerTurn] health at the end of each of
+  /// [hotTurns] turns, the first tick on the turn it is drunk.
+  final int healPerTurn;
   final int hotTurns;
 
   const ConsumableEffect({
     required this.name,
-    this.healNowPercent = 0,
-    this.hotPercentPerTurn = 0,
+    this.healNow = 0,
+    this.healPerTurn = 0,
     this.hotTurns = 0,
   });
 

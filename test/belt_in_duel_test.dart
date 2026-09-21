@@ -37,17 +37,24 @@ void main() {
       final effect = consumableEffectFor(_draught)!;
       expect(effect.name, 'Sapwort Draught', reason: 'the log says the name');
       expect(
-        effect.healNowPercent,
-        20,
-        reason: 'restating the 20 here is how a tooltip and a heal drift apart',
+        effect.healNow,
+        30,
+        reason:
+            'the catalogue\'s flat 30 (ruling 2026-09-21), carried across '
+            'unchanged — restating it here is how a tooltip and a heal '
+            'drift apart, and a seam still dividing by 100 lands on 0',
       );
       expect(effect.hotTurns, 0);
     });
 
     test('the Tonic arrives as a heal-over-time, not a lump', () {
       final effect = consumableEffectFor(_tonic)!;
-      expect(effect.healNowPercent, 0);
-      expect(effect.hotPercentPerTurn, 9);
+      expect(effect.healNow, 0);
+      expect(
+        effect.healPerTurn,
+        10,
+        reason: 'the ruled 10 a turn, flat — 9 is the pre-ruling percentage',
+      );
       expect(effect.hotTurns, 3);
     });
 
@@ -229,10 +236,11 @@ void main() {
       await controller.submitTurn(drink!);
       expect(
         controller.battleLog,
-        contains('You drink Sapwort Draught — healed 20'),
+        contains('You drink Sapwort Draught — healed 30'),
         reason:
             '"You drinks" is the third-person template leaking; the log '
-            'is written to the player, and the number is what landed',
+            'is written to the player, and the number is what landed — the '
+            'ruled flat 30, not 30% of anybody',
       );
     });
 
@@ -244,7 +252,7 @@ void main() {
       controller.player.element = MagicElement.pyro;
       final drink = await controller.spendBeltItem(_draught);
       await controller.submitTurn(drink!);
-      expect(controller.player.hp, 60);
+      expect(controller.player.hp, 70, reason: '40 + the Draught\'s flat 30');
       expect(
         controller.player.charge,
         3,
@@ -453,7 +461,7 @@ class _PotionBrain implements DuelAi {
   MageAction chooseAction(MageState self, MageState enemy, Random rng) =>
       const UseItemAction(
         _draught,
-        ConsumableEffect(name: 'Sapwort Draught', healNowPercent: 20),
+        ConsumableEffect(name: 'Sapwort Draught', healNow: 30),
       );
 }
 

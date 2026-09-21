@@ -51,40 +51,43 @@ Future<GameState> _onAdventure() async {
 
 void main() {
   group('supplies between fights', () {
-    testWidgets('a carried ration is listed, with the health it heals against', (
-      tester,
-    ) async {
-      final game = await _onAdventure();
-      game.profile.backpack = game.profile.backpack.withAdded(
-        const InventorySlot(defId: 'foragers_ration'),
-      )!;
-      game.run!.playerHp = 40;
-      await _pump(tester, game);
+    testWidgets(
+      'a carried ration is listed, with the health it heals against',
+      (tester) async {
+        final game = await _onAdventure();
+        game.profile.backpack = game.profile.backpack.withAdded(
+          const InventorySlot(defId: 'foragers_ration'),
+        )!;
+        game.run!.playerHp = 40;
+        await _pump(tester, game);
 
-      // ⚠️ ONCE since the 2026-09-21 amendment ("just add a 'Use' button to
-      // the 'Pack'"). It was listed twice — Supplies to drink it, the Pack to
-      // free its slot — and a second match here means that section is back.
-      expect(
-        find.text("Forager's Ration"),
-        findsOneWidget,
-        reason:
-            'one carried ration is one row; a ration missing entirely is a '
-            'Pack that stopped reading the backpack, and two is the deleted '
-            'Supplies section printing echoes again',
-      );
-      expect(
-        find.textContaining('Restores 25% health'),
-        findsOneWidget,
-        reason: 'the row must say what using it does, built from the effect',
-      );
-      expect(
-        find.textContaining('Health 40 / ${game.maxHp}'),
-        findsOneWidget,
-        reason:
-            'without the pool it heals against, "25%" is half an answer and a '
-            'refusal at full health looks like a broken button',
-      );
-    });
+        // ⚠️ ONCE since the 2026-09-21 amendment ("just add a 'Use' button to
+        // the 'Pack'"). It was listed twice — Supplies to drink it, the Pack to
+        // free its slot — and a second match here means that section is back.
+        expect(
+          find.text("Forager's Ration"),
+          findsOneWidget,
+          reason:
+              'one carried ration is one row; a ration missing entirely is a '
+              'Pack that stopped reading the backpack, and two is the deleted '
+              'Supplies section printing echoes again',
+        );
+        expect(
+          find.textContaining('Restores 25 health'),
+          findsOneWidget,
+          reason:
+              'the row must say what using it does, built from the effect — '
+              'and with no %, which the 2026-09-21 ruling removed',
+        );
+        expect(
+          find.textContaining('Health 40 / ${game.maxHp}'),
+          findsOneWidget,
+          reason:
+              'without the pool it heals against, "25" is half an answer and a '
+              'refusal at full health looks like a broken button',
+        );
+      },
+    );
 
     testWidgets('tapping Use actually heals, from this screen', (tester) async {
       final game = await _onAdventure();

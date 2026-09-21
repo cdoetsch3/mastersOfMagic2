@@ -296,7 +296,11 @@ class AdventureRun {
     // ⭐ The Wickerbound Ring's promise (ITEMS §9b.8): healing received
     // multiplies potions too, in and out of combat — same rounding as the
     // engine's one door, MageState.heal.
-    var amount = effect.healFor(maxHp);
+    //
+    // ⚠️ [maxHp] is no longer an input to the heal itself (ruling 2026-09-21:
+    // potions are flat). It still bounds the result — `_heal` clamps to it —
+    // so a full-health refusal is decided by the pool, never by the bottle.
+    var amount = effect.healFor();
     if (amount > 0 && healingReceivedPercent != 0) {
       amount = (amount * (100 + healingReceivedPercent) / 100).round();
     }

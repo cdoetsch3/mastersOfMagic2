@@ -795,8 +795,28 @@ class DuelController extends ChangeNotifier {
       return '${enemy.name} channels an unknown element '
           '(charge ${event.newCharge})';
     }
-    return toSecondPerson(event.toString());
+    return gearBonusTagged(toSecondPerson(event.toString()), event);
   }
+
+  /// Appends the gear parenthetical to a damage line: "…: 32 damage (+11
+  /// gear)".
+  ///
+  /// ⭐ **The answer to "why was that one 32?"** Gear's flat damage is per
+  /// CAST, so a Barrage puts the whole lump on its first hit and nothing on
+  /// the rest (ruled: it stays that way). The number is therefore correct and
+  /// unexplainable from the line itself, which is how it got reported as a
+  /// bug. Naming the bonus turns an anomaly into a rule the player can learn.
+  ///
+  /// ⚠️ **No crit word here, on purpose.** [DamageEvent.toString] already
+  /// leads the same line with `CRIT`, so a second marker in the parenthetical
+  /// would have one hit announcing its crit twice — the parenthetical carries
+  /// only the part the line was missing. A crit with gear reads "CRIT, 32
+  /// damage (+11 gear)".
+  @visibleForTesting
+  static String gearBonusTagged(String line, DuelEvent event) =>
+      event is DamageEvent && event.gearBonus > 0
+      ? '$line (+${event.gearBonus} gear)'
+      : line;
 
   /// The engine writes log lines in the third person from each mage's name
   /// ("Morwen casts…"). The local player is named **You**, so those same

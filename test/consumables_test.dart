@@ -33,18 +33,41 @@ void main() {
       }
     });
 
-    test('healing is a percentage, so it scales with the character', () {
-      const effect = ItemEffect(healPercent: 25);
-      expect(effect.healFor(100), 25);
-      expect(effect.healFor(400), 100);
-      // ⚠️ Never zero when it heals at all — that reads as a bug.
-      expect(effect.healFor(1), 1);
+    test('healing is FLAT — the bottle holds what it holds', () {
+      // ⭐ Ruling 2026-09-21. `healFor` takes no max health at all, so there
+      // is nothing for a percentage to be a percentage OF: the signature is
+      // itself the pin, and a mutant reintroducing a scale term cannot even
+      // compile against this call.
+      const effect = ItemEffect(heal: 25);
+      expect(
+        effect.healFor(),
+        25,
+        reason: 'a 25 restores 25, to a level 1 and to a level 40 alike',
+      );
+      expect(
+        const ItemEffect(healPerTurn: 10, healTurns: 3).healFor(),
+        30,
+        reason:
+            'out of combat a Tonic pays its whole course at once — 10 a '
+            'tick summed, not one tick and not a percentage',
+      );
+      expect(const ItemEffect().healFor(), 0, reason: 'nothing heals nothing');
     });
 
     test(
       'an effect describes itself, so text cannot drift from the number',
       () {
-        expect(const ItemEffect(healPercent: 25).describe, contains('25%'));
+        expect(
+          const ItemEffect(heal: 25).describe,
+          'Restores 25 health',
+          reason:
+              '⚠️ no % anywhere (ruling 2026-09-21) — the old text promised '
+              'a fraction of the reader',
+        );
+        expect(
+          const ItemEffect(healPerTurn: 10, healTurns: 3).describe,
+          'Restores 10 health a turn for 3 turns',
+        );
         expect(const ItemEffect().describe, 'No effect');
       },
     );

@@ -671,12 +671,13 @@ void main() {
   // Wither & Blight — the anti-heal lane
   // =========================================================================
   group('Wither & Blight', () {
-    /// A 10%-of-max heal at the end of every turn — the shape of a Tonic, a
-    /// Regrow and Photosynthesis alike, and all of them route through the one
-    /// healing door.
+    /// A 10-health heal at the end of every turn — the shape of a Tonic, a
+    /// Regrow and Photosynthesis alike (the latter two still read a percent
+    /// of max; ⚠️ Bruno's 100 max is what makes all three land on 10 here),
+    /// and all of them route through the one healing door.
     void loadHot() {
       bruno.hp = 50;
-      bruno.statuses.add(HealOverTimeStatus(percentPerTurn: 10, turnsLeft: 5));
+      bruno.statuses.add(HealOverTimeStatus(healPerTurn: 10, turnsLeft: 5));
     }
 
     test('Wither halves healing received', () {
@@ -779,7 +780,7 @@ void main() {
     );
 
     test('Wither and Blight both tax the potion lane', () {
-      const tonic = ConsumableEffect(name: 'Tonic', healNowPercent: 20);
+      const tonic = ConsumableEffect(name: 'Tonic', healNow: 20);
       bruno.hp = 50;
       bruno.statuses.add(WitherStatus(turns: 10));
       final duel = engine();

@@ -96,7 +96,7 @@ abstract final class WhisperingWoodsItems {
     rarity: Rarity.common,
     lore: 'Filling. That is the whole of its reputation.',
     // ⭐ Between encounters only — eating mid-duel would be a free turn.
-    effect: ItemEffect(healPercent: 25),
+    effect: ItemEffect(heal: 25),
     value: 4,
   );
   // ---- equipment ------------------------------------------------------

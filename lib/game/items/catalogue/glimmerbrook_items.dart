@@ -105,9 +105,12 @@ abstract final class GlimmerbrookItems {
     lore:
         'Tastes like the underside of a leaf. Apprentices carry two and use '
         'neither, which is its own kind of lesson.',
-    // ⚠️ Weaker than a ration on purpose: this one costs a TURN, and the
-    // opponent committed blind, so its value is the timing, not the number.
-    effect: ItemEffect(healPercent: 20),
+    // ⚠️ **Not priced against the number** (ruling 2026-09-21). Flat heals
+    // make this look like a straight upgrade on a zone-1 ration, and it is
+    // not: this one costs a TURN, and the opponent committed blind, so what
+    // it sells is the timing. The 30 is Glimmerbrook's health pool, not a
+    // power budget.
+    effect: ItemEffect(heal: 30),
     value: 12,
   );
 

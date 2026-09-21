@@ -824,14 +824,15 @@ void main() {
       alice.hp = 40;
       alice.statuses
         ..add(RegrowStatus(2))
-        ..add(HealOverTimeStatus(percentPerTurn: 9, turnsLeft: 3));
+        ..add(HealOverTimeStatus(healPerTurn: 9, turnsLeft: 3));
       final duel = engine();
       castBy(duel, alice, Spellbook.mend);
       expect(
         alice.hp,
         54,
         reason:
-            '⚠️ 2 (Regrow) + 9 (Tonic) + 3 (Mending) = 14. Kills a '
+            '⚠️ 2 (Regrow, 2% of 100) + 9 (Tonic, flat) + 3 (Mending, 3% '
+            'of 100) = 14 — three lanes, two units. Kills a '
             'replace-on-cast keyed on shape rather than on id, which would '
             'have Mending evict the Tonic it is supposed to sit beside',
       );

@@ -484,14 +484,14 @@ class DuelEngine {
   void _drink(MageState mage, ConsumableEffect effect, List<DuelEvent> events) {
     var healed = 0;
     var bite = 0;
-    if (effect.healNowPercent > 0) {
-      // ⭐ At least 1, matching ItemEffect.healFor and RegrowStatus — a potion
-      // that visibly does nothing reads as a bug. The signed delta is what
-      // [MageState.heal] actually did: it scales by healing-received (gear and
-      // Wither), caps at full, and under Blight it BITES — so the event
-      // reports what landed rather than what the label promised.
-      final amount = (mage.maxHp * effect.healNowPercent / 100).round();
-      final delta = mage.heal(amount < 1 ? 1 : amount);
+    if (effect.healNow > 0) {
+      // ⭐ **Flat** (ruling 2026-09-21): the bottle's own number, with no max-HP
+      // term and so no rounding and no 1-HP floor to apply — a catalogue that
+      // ships a positive heal has already promised at least 1. The signed delta
+      // is what [MageState.heal] actually did: it scales by healing-received
+      // (gear and Wither), caps at full, and under Blight it BITES — so the
+      // event reports what landed rather than what the label promised.
+      final delta = mage.heal(effect.healNow);
       healed = delta > 0 ? delta : 0;
       bite = delta < 0 ? -delta : 0;
     }
@@ -501,7 +501,7 @@ class DuelEngine {
     if (bite > 0) {
       events.add(EffectDamageEvent(mage, 'Blight', toShield: 0, toHp: bite));
     }
-    if (effect.hotPercentPerTurn > 0 && effect.hotTurns > 0) {
+    if (effect.healPerTurn > 0 && effect.hotTurns > 0) {
       // ⚠️ Replaces rather than stacks. A second Tonic refreshes the first:
       // two identical pips ticking side by side is not a thing the HUD can
       // express, and stacking heals-over-time was never ruled — the turn cost
@@ -510,7 +510,7 @@ class DuelEngine {
       mage.statuses.removeWhere((s) => s is HealOverTimeStatus);
       mage.statuses.add(
         HealOverTimeStatus(
-          percentPerTurn: effect.hotPercentPerTurn,
+          healPerTurn: effect.healPerTurn,
           turnsLeft: effect.hotTurns,
           source: effect.name,
         ),
@@ -1067,6 +1067,11 @@ class DuelEngine {
           shieldBroken: r.broken,
           barrierPopped: r.barrierPopped,
           crit: crit,
+          // ⭐ Hit 0 only, mirroring exactly where the lump was added above —
+          // the log's whole job here is to explain why the first hit of a
+          // Barrage is the big one. Reading `flatBonus` unconditionally would
+          // tag every hit and teach the player the opposite of the rule.
+          gearBonus: h == 0 ? flatBonus : 0,
           deflected: r.deflected,
           bypassedShield: bypassedShield,
         ),
@@ -1595,6 +1600,12 @@ class DuelEngine {
           shieldMultiplierPercent: r.multiplierPercent,
           shieldBroken: r.broken,
           barrierPopped: r.barrierPopped,
+          // ⚠️ Spelled out rather than defaulted: Fester's opening tap is not
+          // an attack roll. It never goes through [_rollsCrit], and gear's
+          // per-cast damage was already spent on the cast that got here — so
+          // both are structurally 0, not merely unset.
+          crit: false,
+          gearBonus: 0,
           deflected: r.deflected,
         ),
       );
@@ -1650,6 +1661,11 @@ class DuelEngine {
         shieldMultiplierPercent: r.multiplierPercent,
         shieldBroken: r.broken,
         barrierPopped: r.barrierPopped,
+        // ⚠️ Spelled out rather than defaulted: Scour pays out damage the
+        // burns already banked. There is no hit roll to crit and no cast to
+        // carry gear's per-cast lump, so both are structurally 0.
+        crit: false,
+        gearBonus: 0,
         deflected: r.deflected,
       ),
     );

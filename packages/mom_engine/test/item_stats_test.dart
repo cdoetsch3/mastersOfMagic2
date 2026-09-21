@@ -186,7 +186,7 @@ void main() {
     test('ticks for its duration, then leaves', () {
       alice
         ..hp = 50
-        ..statuses.add(HealOverTimeStatus(percentPerTurn: 9, turnsLeft: 3));
+        ..statuses.add(HealOverTimeStatus(healPerTurn: 9, turnsLeft: 3));
       final duel = DuelEngine(
         alice,
         bruno,
@@ -196,7 +196,14 @@ void main() {
       for (var t = 0; t < 3; t++) {
         cast(duel, dmg(1), MagicElement.flora);
       }
-      expect(alice.hp, 50 + 27, reason: '9 × 3 ticked (the caster is unhit)');
+      expect(
+        alice.hp,
+        50 + 27,
+        reason:
+            '9 health × 3 ticked (the caster is unhit) — flat since the '
+            '2026-09-21 ruling, which Alice\'s 100 max hides; the mage with '
+            'a different max lives in belt_item_test',
+      );
       cast(duel, dmg(1), MagicElement.flora);
       expect(
         alice.hp,

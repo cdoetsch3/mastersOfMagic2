@@ -359,4 +359,123 @@ void main() {
       expect(bruno.hp, 80, reason: 'no charge spent, no staff bonus');
     });
   });
+
+  // ======================================================================
+  // The log's evidence: which hit got the gear, and which hit crit
+  // ======================================================================
+  //
+  // ⭐ Ruling 2026-09-21. A player read "takes Barrage: 10, 14, 10, 11, 32"
+  // and asked what proc'd. Nothing did — gear is per cast, so the whole lump
+  // rides hit 0 — but the maths is invisible in the line. The rule stands and
+  // the EVENT now carries the evidence, which is what the app's log prints.
+  group('DamageEvent explains a big hit', () {
+    test('⭐ gearBonus rides the first hit and no other', () {
+      alice
+        ..damagePerCast = 11
+        ..charge = 3
+        ..element = MagicElement.pyro;
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
+      final hits = duel
+          .resolveTurn(CastAction(Spellbook.barrage), const ForfeitAction())
+          .events
+          .whereType<DamageEvent>()
+          .toList();
+
+      expect(hits, hasLength(3), reason: 'one hit per point of charge spent');
+      expect(
+        hits.first.gearBonus,
+        11,
+        reason:
+            'the whole per-cast lump, on the hit that actually received it '
+            '— 0 here means the event never learned why hit 0 is the big '
+            'one, which is the report this ruling answers',
+      );
+      expect(
+        hits.skip(1).map((h) => h.gearBonus),
+        everyElement(0),
+        reason:
+            '⚠️ THE pin: gear is per CAST. A mutant reading flatBonus '
+            'unconditionally tags all three hits and teaches the player the '
+            'opposite of the rule',
+      );
+    });
+
+    test('a caster with no flat damage tags nothing', () {
+      alice
+        ..charge = 2
+        ..element = MagicElement.pyro;
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
+      final hits = duel
+          .resolveTurn(CastAction(Spellbook.barrage), const ForfeitAction())
+          .events
+          .whereType<DamageEvent>();
+      expect(
+        hits.map((h) => h.gearBonus),
+        everyElement(0),
+        reason:
+            'a bare "(+0 gear)" on every line would be noise the renderer '
+            'has to filter — the event says 0, so the line says nothing',
+      );
+    });
+
+    test('⭐ crit marks the hit that crit, and only that hit', () {
+      // Execute crits at impact time once the target is under 30%, so the
+      // first hits land ordinary and a later one does not — the one shape in
+      // the game where a multi-hit spell crits partway through. ⚠️ Alice's
+      // crit chance stays 0, so nothing else can raise the flag.
+      final finisher = Spell(
+        id: 'finisher',
+        name: 'Finisher',
+        chargeCost: 0,
+        priority: 9,
+        effect: const DamageEffect(40, 40, hits: 3, executeBelowPercent: 30),
+      );
+      alice.damagePerCast = 11;
+      final duel = DuelEngine(
+        alice,
+        bruno,
+        rng: ScriptedRandom(),
+        baseMissPercent: 0,
+      );
+      alice
+        ..charge = 0
+        ..element = MagicElement.flora;
+      final hits = duel
+          .resolveTurn(
+            CastAction(finisher, MagicElement.flora),
+            const ForfeitAction(),
+          )
+          .events
+          .whereType<DamageEvent>()
+          .toList();
+
+      expect(hits, hasLength(3));
+      expect(
+        hits.map((h) => h.crit),
+        [false, false, true],
+        reason:
+            '51 then 40 leaves Bruno on 9 of 100 — under the 30% line only '
+            'for the third. A mutant hoisting the crit flag out of the loop '
+            'marks all three',
+      );
+      expect(
+        hits.map((h) => h.gearBonus),
+        [11, 0, 0],
+        reason:
+            '⚠️ the two flags are independent and land on DIFFERENT hits '
+            'here — kills any implementation that derives one from the '
+            'other, or that tags gear onto whichever hit was biggest',
+      );
+    });
+  });
 }

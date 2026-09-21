@@ -18,7 +18,7 @@ import 'item_def.dart';
 /// the catalogue does not actually sell.
 ///
 /// ⚠️ Reads the def's own [ItemEffect] rather than restating it. A duplicated
-/// "20%" here would silently disagree with the tooltip the moment either is
+/// "30" here would silently disagree with the tooltip the moment either is
 /// tuned — which is the same reason [ItemEffect.describe] exists.
 ConsumableEffect? consumableEffectFor(String defId) {
   final def = ItemCatalogue.tryById(defId);
@@ -30,8 +30,8 @@ ConsumableEffect? consumableEffectFor(String defId) {
   if (effect.isNothing) return null;
   return ConsumableEffect(
     name: ItemCatalogue.displayName(def),
-    healNowPercent: effect.healPercent,
-    hotPercentPerTurn: effect.healPerTurnPercent,
+    healNow: effect.heal,
+    healPerTurn: effect.healPerTurn,
     hotTurns: effect.healTurns,
   );
 }

@@ -143,10 +143,14 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
     // ⭐ A Tonic that ticks invisibly is a Tonic the player believes did
     // nothing — the turn it cost is the loudest part of the transaction, so
     // the payout has to be on screen for the turns it lasts.
+    //
+    // ⚠️ **No % after the number** (ruling 2026-09-21): a Tonic's tick is flat
+    // health, unlike the Mending and Regrow pips below it, which are still
+    // percentages of the holder.
     badges.add(
       StatusBadge(
         'Tonic',
-        sub: '${hot.magnitude}%/t · ${hot.turnsLeft}t',
+        sub: '${hot.magnitude}/t · ${hot.turnsLeft}t',
         color: MagicElement.flora.style.color,
         kind: BadgeKind.buff,
       ),

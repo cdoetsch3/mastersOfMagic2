@@ -26,10 +26,7 @@ void main() {
   });
 
   group('belt items cross the wire as an ID, never as numbers', () {
-    const draught = ConsumableEffect(
-      name: 'Sapwort Draught',
-      healNowPercent: 20,
-    );
+    const draught = ConsumableEffect(name: 'Sapwort Draught', healNow: 30);
     ConsumableEffect? lookup(String id) =>
         id == 'sapwort_draught' ? draught : null;
 
@@ -39,8 +36,8 @@ void main() {
         'U|sapwort_draught',
         reason:
             '⚠️ the EFFECT must not ride along — a wire that carried the '
-            'heal would let a doctored client drink a 900% potion, and the '
-            'commitment hash would happily cover it',
+            'heal would let a doctored client drink a 900-health potion, '
+            'and the commitment hash would happily cover it',
       );
     });
 
@@ -53,8 +50,8 @@ void main() {
       final use = decoded as UseItemAction;
       expect(use.itemId, 'sapwort_draught');
       expect(
-        use.effect.healNowPercent,
-        20,
+        use.effect.healNow,
+        30,
         reason:
             'the receiving client resolves the numbers from its OWN '
             'catalogue — that resolution is the whole point of the id',

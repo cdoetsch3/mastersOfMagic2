@@ -104,7 +104,7 @@ abstract final class StormcliffCoastItems {
     lore:
         'Bitter, briny, and it clears the head fast. Galehaven sailors carry '
         'two and swear by both.',
-    effect: ItemEffect(healPercent: 30),
+    effect: ItemEffect(heal: 75),
     value: 30,
   );
 

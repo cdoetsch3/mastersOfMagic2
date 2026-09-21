@@ -495,7 +495,7 @@ void main() {
     test('never touches a buff, however long it has left', () {
       alice.statuses.addAll([
         IgniteStatus(4), // 3 turns, debuff
-        HealOverTimeStatus(percentPerTurn: 1, turnsLeft: 40), // buff
+        HealOverTimeStatus(healPerTurn: 1, turnsLeft: 40), // buff
       ]);
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.cleanse, MagicElement.geo);
@@ -594,7 +594,7 @@ void main() {
           IgniteStatus(4),
           BlindStatus(),
           ArcaneKnowledgeStatus(3),
-          HealOverTimeStatus(percentPerTurn: 5, turnsLeft: 4),
+          HealOverTimeStatus(healPerTurn: 5, turnsLeft: 4),
         ]);
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.purify, MagicElement.geo);
@@ -681,7 +681,7 @@ void main() {
     });
 
     test('a turn-timed buff from another lane gains it too', () {
-      alice.statuses.add(HealOverTimeStatus(percentPerTurn: 1, turnsLeft: 3));
+      alice.statuses.add(HealOverTimeStatus(healPerTurn: 1, turnsLeft: 3));
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.meditate, MagicElement.geo);
       expect(
@@ -800,7 +800,7 @@ void main() {
       expect(IgniteStatus(1), isA<TurnTimed>());
       expect(BlindStatus(), isA<TurnTimed>());
       expect(
-        HealOverTimeStatus(percentPerTurn: 1, turnsLeft: 1),
+        HealOverTimeStatus(healPerTurn: 1, turnsLeft: 1),
         isA<TurnTimed>(),
       );
       expect(

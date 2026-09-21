@@ -108,7 +108,7 @@ abstract final class OldQuarryItems {
     lore:
         'Baked hard enough to survive a quarry cart, and eaten the same '
         'way — in pieces, with effort.',
-    effect: ItemEffect(healPercent: 35),
+    effect: ItemEffect(heal: 60),
     value: 9,
   );
 

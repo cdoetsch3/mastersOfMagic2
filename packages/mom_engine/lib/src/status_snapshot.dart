@@ -113,12 +113,14 @@ class StatusSnapshot {
           out.add(StatusView(id: 'blind', turnsLeft: turnsLeft));
         case RegrowStatus(:final percentPerTurn):
           out.add(StatusView(id: 'regrow', magnitude: percentPerTurn));
-        case HealOverTimeStatus(:final percentPerTurn, :final turnsLeft):
+        // ⚠️ `magnitude` here is flat health a turn, not a percent (ruling
+        // 2026-09-21) — the pip must not print a % after it.
+        case HealOverTimeStatus(:final healPerTurn, :final turnsLeft):
           out.add(
             StatusView(
               id: 'healOverTime',
               turnsLeft: turnsLeft,
-              magnitude: percentPerTurn,
+              magnitude: healPerTurn,
             ),
           );
 

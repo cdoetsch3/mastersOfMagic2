@@ -80,6 +80,21 @@ class DamageEvent extends DuelEvent {
   /// crit bonus; the flag is for the log/HUD.
   final bool crit;
 
+  /// Gear's flat damage (`damagePerCast + damagePerCharge × cost`) folded into
+  /// **this** hit. 0 on every hit that did not receive it.
+  ///
+  /// ⭐ **Reported because the rule is invisible and looks like a bug.** Gear
+  /// damage is per CAST, not per hit (ruled), so a multi-hit spell adds the
+  /// whole lump to its first hit and nothing to the rest: "takes Barrage: 10,
+  /// 14, 10, 11, 32". From the player's chair that last number is unexplained,
+  /// and the first guess is always "my gear randomly procced". The rule
+  /// stands; the log owes an explanation, and inferring one by diffing hits is
+  /// impossible once crit and the damage roll are also in the number.
+  ///
+  /// ⚠️ The value is the bonus **before** the crit multiplier, which is the
+  /// number the gear tooltip promises — not its share of the printed damage.
+  final int gearBonus;
+
   /// Damage the defender's Deflection removed from this hit before it landed
   /// (Phase 3b). 0 when nothing deflected.
   final int deflected;
@@ -106,6 +121,7 @@ class DamageEvent extends DuelEvent {
     this.shieldBroken = false,
     this.barrierPopped = false,
     this.crit = false,
+    this.gearBonus = 0,
     this.deflected = 0,
     this.bypassedShield = false,
   });

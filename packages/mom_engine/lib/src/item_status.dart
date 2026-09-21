@@ -48,14 +48,18 @@ class RegrowStatus extends TurnStatus {
   bool advanceAndCheckExpiry(MageState holder) => false;
 }
 
-/// A finite heal-over-time — the Tonic shape (ITEMS §9b.8: 9% × 3 turns).
+/// A finite heal-over-time — the Tonic shape (ITEMS §9b.8: 10 health × 3
+/// turns).
 ///
-/// 📝 Nothing in the duel APPLIES this yet: using a belt item as a turn
-/// action is unbuilt. The primitive ships first so the belt work lands on a
-/// tested tick instead of inventing one under UI pressure.
+/// ⭐ **Flat health per turn, not a percentage** (ruling 2026-09-21). The only
+/// thing that grants this is a belt consumable, and a potion is a fixed object
+/// — so unlike [RegrowStatus] (worn gear) and `MendingStatus` (a spell), which
+/// stay percentages of the holder, this one carries the bottle's own number.
+/// ⚠️ That asymmetry is the ruling, not an oversight: the three lanes are
+/// priced against different things.
 class HealOverTimeStatus extends TurnStatus implements TurnTimed {
-  /// Percent of max HP restored at the end of each remaining turn.
-  final int percentPerTurn;
+  /// Health restored at the end of each remaining turn.
+  final int healPerTurn;
 
   /// What granted it — the log line says the item's name, not "a status".
   final String source;
@@ -64,7 +68,7 @@ class HealOverTimeStatus extends TurnStatus implements TurnTimed {
   int turnsLeft;
 
   HealOverTimeStatus({
-    required this.percentPerTurn,
+    required this.healPerTurn,
     required this.turnsLeft,
     this.source = 'Tonic',
   });
@@ -80,11 +84,12 @@ class HealOverTimeStatus extends TurnStatus implements TurnTimed {
 
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) {
-    if (phase != TurnPhase.end || turnsLeft <= 0 || percentPerTurn <= 0) {
+    if (phase != TurnPhase.end || turnsLeft <= 0 || healPerTurn <= 0) {
       return const [];
     }
-    final heal = (holder.maxHp * percentPerTurn / 100).round();
-    return [StatusHeal(heal < 1 ? 1 : heal, lane: Lane.heal, source: source)];
+    // ⚠️ No max-HP term and so no 1-HP floor: the tick IS the number, and a
+    // catalogue shipping a positive rate has already promised at least 1.
+    return [StatusHeal(healPerTurn, lane: Lane.heal, source: source)];
   }
 
   @override

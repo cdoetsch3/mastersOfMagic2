@@ -64,7 +64,7 @@ abstract final class AshfallValeItems {
     lore:
         'Drink it and count. The cold goes down, turns around, and comes '
         'back up as warmth over the next little while.',
-    effect: ItemEffect(healPerTurnPercent: 9, healTurns: 3),
+    effect: ItemEffect(healPerTurn: 10, healTurns: 3),
     value: 25,
   );
 

@@ -251,7 +251,7 @@ void main() {
             'Pack without Use sends the player to a panel that is gone',
       );
       expect(
-        find.textContaining('Restores 25% health'),
+        find.textContaining('Restores 25 health'),
         findsOneWidget,
         reason:
             'the effect line came along with the button; a mutant that drops '

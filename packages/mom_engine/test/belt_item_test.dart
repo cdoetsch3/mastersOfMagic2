@@ -11,11 +11,21 @@ library;
 import 'package:mom_engine/mom_engine.dart';
 import 'package:test/test.dart';
 
-/// The catalogue's two real shapes, as the app resolves them.
-const _draught = ConsumableEffect(name: 'Sapwort Draught', healNowPercent: 20);
+/// The two shapes a potion comes in — a lump and a trickle.
+///
+/// ⚠️ **Numbers of their own, NOT the catalogue's.** The engine is handed
+/// figures and never looks an item up, so pinning Sapwort's shipped 30 here
+/// would couple this suite to app-side tuning it is not testing. The app's
+/// `belt_in_duel_test` is where the real catalogue numbers are pinned.
+///
+/// ⚠️ Flat health since the 2026-09-21 ruling: these are what the bottles
+/// hold, not percentages of whoever drinks them. Every mage below has 100 max
+/// HP, where the two readings agree — the test that tells them apart is
+/// deliberately run on a mage who does not.
+const _draught = ConsumableEffect(name: 'Sapwort Draught', healNow: 20);
 const _tonic = ConsumableEffect(
   name: 'Brookmint Tonic',
-  hotPercentPerTurn: 9,
+  healPerTurn: 9,
   hotTurns: 3,
 );
 
@@ -34,15 +44,16 @@ void main() {
   });
 
   group('the instant heal', () {
-    test('is a percent of MAX health, not of what is missing', () {
+    test('is the bottle\'s number, not a share of anything', () {
       alice.hp = 50; // of 100
       duel.resolveTurn(_drink(_draught), const ChargeAction(MagicElement.geo));
       expect(
         alice.hp,
         70,
         reason:
-            '20% of the 100 max — reading it off missing health would '
-            'make the same potion better the closer to death you are',
+            'the flat 20 (ruling 2026-09-21) — reading it off MISSING '
+            'health would make the same potion better the closer to death '
+            'you are',
       );
     });
 
@@ -55,7 +66,7 @@ void main() {
         70,
         reason:
             '20 × 1.5 = 30 — a potion that skipped MageState.heal would '
-            'heal a flat 20 and quietly make the stat lie',
+            'restore the bare 20 and quietly make the stat lie',
       );
     });
 
@@ -82,24 +93,37 @@ void main() {
       expect(used.item, 'Sapwort Draught', reason: 'the log names the item');
     });
 
-    test('a heal that rounds to nothing still heals 1', () {
+    test('⭐ the SAME potion restores the same health in any hand', () {
+      // ⚠️ THE pin for the 2026-09-21 ruling, and the only test in this file
+      // run off a 100 max — at 100 the flat and percent readings agree, so
+      // every assertion above is blind to the difference. Here they diverge
+      // hard in both directions.
       final tiny = MageState(name: 'Tiny', maxHp: 20)..hp = 1;
-      final other = MageState(name: 'Other');
-      DuelEngine(
-        tiny,
-        other,
-        elementEffects: false,
-        baseMissPercent: 0,
-      ).resolveTurn(
-        _drink(const ConsumableEffect(name: 'Dram', healNowPercent: 1)),
-        const ChargeAction(MagicElement.geo),
-      );
+      final huge = MageState(name: 'Huge', maxHp: 400)..hp = 1;
+      for (final mage in [tiny, huge]) {
+        DuelEngine(
+          mage,
+          MageState(name: 'Other'),
+          elementEffects: false,
+          baseMissPercent: 0,
+        ).resolveTurn(
+          _drink(const ConsumableEffect(name: 'Dram', healNow: 15)),
+          const ChargeAction(MagicElement.geo),
+        );
+      }
       expect(
         tiny.hp,
-        2,
+        16,
         reason:
-            'matches ItemEffect.healFor and RegrowStatus — an item that '
-            'visibly does nothing reads as a bug',
+            'the whole 15, capped by nothing — a percent reading restores '
+            '3 here and the Dram is worthless to a small mage',
+      );
+      expect(
+        huge.hp,
+        16,
+        reason:
+            '⚠️ the twin that kills the percent mutant outright: 15% of '
+            '400 is 60, so a surviving percentage reads 61 rather than 16',
       );
     });
   });
@@ -135,7 +159,7 @@ void main() {
 
     // ⚠️ DEFLAKED 2026-08-28 (pre-existing; unrelated to the §7a work that
     // found it). This asserted `alice.hp < 100` after a full-health Alice drank
-    // a 20%-of-max Draught into a Blast — and Blast rolls 20–26, so on the ~1
+    // a 20-health Draught into a Blast — and Blast rolls 20–26, so on the ~1
     // roll in 7 that came up exactly 20 the potion healed the damage back to
     // 100 and the test failed. The potion landing AFTER the attack is the
     // documented ruling, so the fix is the assertion, not the engine: read the
@@ -332,14 +356,42 @@ void main() {
         ticks,
         3,
         reason:
-            '9% × 3 turns, first tick on the turn it is drunk — a fourth '
-            'tick means advanceAndCheckExpiry is off by one',
+            '9 health × 3 turns, first tick on the turn it is drunk — a '
+            'fourth tick means advanceAndCheckExpiry is off by one',
       );
-      expect(healedTotal, 27, reason: '9 per tick off a 100 max');
+      expect(
+        healedTotal,
+        27,
+        reason:
+            '9 flat a tick (ruling 2026-09-21) — a percent tick would read '
+            'the 100 max and happen to agree, which is why the divergent '
+            'max-HP pin lives in the instant-heal group',
+      );
       expect(
         alice.statuses.whereType<HealOverTimeStatus>(),
         isEmpty,
         reason: 'it expires rather than lingering as a permanent Regrow',
+      );
+    });
+
+    test('⭐ each tick is flat too, on a mage whose max is not 100', () {
+      // ⚠️ The over-time twin of the instant-heal pin: HealOverTimeStatus
+      // used to read a percent of max, and every other Tonic assertion runs
+      // at a 100 max where that mutant is invisible.
+      final huge = MageState(name: 'Huge', maxHp: 400)..hp = 1;
+      final duel = DuelEngine(
+        huge,
+        MageState(name: 'Other'),
+        elementEffects: false,
+        baseMissPercent: 0,
+      );
+      duel.resolveTurn(_drink(_tonic), const ChargeAction(MagicElement.geo));
+      expect(
+        huge.hp,
+        10,
+        reason:
+            'one 9-health tick on the turn it is drunk — a surviving '
+            'percentage ticks 36 off the 400 max and reads 37',
       );
     });
 

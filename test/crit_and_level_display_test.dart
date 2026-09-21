@@ -293,6 +293,111 @@ void main() {
     });
   });
 
+  // ======================================================================
+  // Gear's flat damage, named in the log (ruling 2026-09-21)
+  // ======================================================================
+  //
+  // ⭐ A player read "takes Barrage: 10, 14, 10, 11, 32" and asked what
+  // proc'd. Nothing did: gear damage is per CAST, so the whole lump rides the
+  // first hit. The rule stands and the log now says so — the same class of
+  // failure as the crit above, an engine fact the UI never asked for.
+  group('the log explains a big first hit', () {
+    final target = MageState(name: 'Morwen');
+
+    DamageEvent hit({int gearBonus = 0, bool crit = false, int toHp = 10}) =>
+        DamageEvent(
+          target,
+          Spellbook.bolt,
+          toShield: 0,
+          toHp: toHp,
+          crit: crit,
+          gearBonus: gearBonus,
+        );
+
+    String render(DamageEvent e) =>
+        DuelController.gearBonusTagged(e.toString(), e);
+
+    test('⭐ a gear-boosted hit names the bonus', () {
+      expect(
+        render(hit(gearBonus: 11, toHp: 21)),
+        endsWith('21 damage (+11 gear)'),
+        reason:
+            'the 21 is unexplainable on its own, which is the report this '
+            'ruling answers — a renderer that drops the tag restores it',
+      );
+    });
+
+    test('⚠️ an ordinary hit stays plain', () {
+      expect(
+        render(hit()),
+        endsWith('10 damage'),
+        reason:
+            'kills the renderer that always appends — "(+0 gear)" on every '
+            'line of every duel is noise that would bury the one line that '
+            'matters',
+      );
+    });
+
+    test('⭐ a crit with gear says both, and says crit exactly once', () {
+      final line = render(hit(crit: true, gearBonus: 11, toHp: 32));
+      expect(
+        line,
+        endsWith('32 damage (+11 gear)'),
+        reason: 'the gear half rides the end of the line',
+      );
+      expect(
+        line,
+        contains('CRIT'),
+        reason: 'and the crit half is the marker the line already carried',
+      );
+      expect(
+        'CRIT'.allMatches(line).length,
+        1,
+        reason:
+            '⚠️ THE pin: DamageEvent.toString already leads with CRIT, so '
+            'putting '
+            'the word in the parenthetical too would have one hit announce '
+            'its crit twice',
+      );
+    });
+
+    test('a non-damage event is passed through untouched', () {
+      final event = HealedEvent(target, 5);
+      expect(
+        DuelController.gearBonusTagged(event.toString(), event),
+        event.toString(),
+        reason:
+            'the tag reads a DamageEvent field; anything else must not be '
+            'rewritten on its way to the log',
+      );
+    });
+
+    test('⭐ and it survives the trip into the real battle log', () async {
+      // End to end through the controller, with a wand's worth of flat
+      // damage on the player's gear.
+      final c = DuelController(
+        loadout: Loadout.starter,
+        driver: LocalAiDriver(persona: AiRoster.all.first, rng: Random(3)),
+        playerGear: const ItemModifiers(
+          damagePerCast: 11,
+          accuracyBonus: ElementTuning.baseMissPercent,
+        ),
+      );
+      addTearDown(c.dispose);
+
+      c.selectElement(c.loadout.elements.first);
+      await c.submitTurn(c.castAction(Spellbook.flick));
+
+      expect(
+        c.battleLog.where((line) => line.contains('(+11 gear)')),
+        isNotEmpty,
+        reason:
+            'the event carries it and the renderer prints it — a break at '
+            'either end leaves the player back where the report started',
+      );
+    });
+  });
+
   test('the float still carries the shield-bypass tag after extraction', () {
     // ⚠️ Kills the regression the merge caught: extracting the float builder
     // dropped 'ignores shields', silently undoing the Murmur legibility fix.

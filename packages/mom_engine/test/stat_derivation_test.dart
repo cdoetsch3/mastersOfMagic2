@@ -97,8 +97,7 @@ void main() {
         AstralAlignmentStatus(): StatusPolarity.buff,
         PendingAbsolutionStatus(): StatusPolarity.neutral,
         RegrowStatus(2): StatusPolarity.buff,
-        HealOverTimeStatus(percentPerTurn: 9, turnsLeft: 3):
-            StatusPolarity.buff,
+        HealOverTimeStatus(healPerTurn: 9, turnsLeft: 3): StatusPolarity.buff,
       };
       for (final MapEntry(key: status, value: expected) in ruled.entries) {
         expect(
