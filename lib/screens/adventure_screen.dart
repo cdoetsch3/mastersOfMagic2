@@ -5,6 +5,7 @@ import '../game/duel_controller.dart';
 import '../game/enemies/enemy_def.dart';
 import '../game/game_state.dart';
 import '../game/skills.dart';
+import '../game/items/carrying.dart';
 import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
@@ -12,6 +13,7 @@ import '../game/opponent_driver.dart';
 import '../game/world.dart';
 import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
+import '../ui/belt_bay.dart';
 import 'duel_screen.dart';
 import 'level_up_screen.dart';
 import '../ui/item_display.dart' show rarityColour;
@@ -101,6 +103,10 @@ class _AdventureScreenState extends State<AdventureScreen> {
                         onGather: () => _gather(game),
                       ),
                     ],
+                    // ⭐ **The road's inventory management** (playtest ruling,
+                    // 2026-09-21): drink it, re-hang it, or destroy it — the
+                    // three things a player mid-quest could not do, in the
+                    // order they will want them.
                     if (!run.isOver) ...[
                       const SizedBox(height: 14),
                       _Supplies(
@@ -108,6 +114,25 @@ class _AdventureScreenState extends State<AdventureScreen> {
                         run: run,
                         busy: _busy,
                         onUse: (id) => _use(game, id),
+                        onUseBelt: (id) => _useFromBelt(game, id),
+                      ),
+                      // ⭐ The town editor itself, not a copy of it (see
+                      // [BeltBay]) — so a belt re-packed on the road behaves
+                      // exactly like one packed at home. ⚠️ Shown on the same
+                      // condition as in town: a beltless character reading
+                      // 'Belt — 0/0' on the road has nothing to explain it.
+                      if (game.beltCapacity > 0 ||
+                          game.profile.belt.loaded.isNotEmpty) ...[
+                        const SizedBox(height: 14),
+                        const SectionLabel('Belt'),
+                        GamePanel(child: BeltBay(game: game)),
+                      ],
+                      const SizedBox(height: 14),
+                      _Pack(
+                        game: game,
+                        busy: _busy,
+                        onDrop: (i) => _drop(game, i),
+                        onBelt: (id) => _belt(game, id),
                       ),
                     ],
                   ],
@@ -215,6 +240,87 @@ class _AdventureScreenState extends State<AdventureScreen> {
     // ⚠️ Refusals are shown too — "You are already at full health." must be
     // seen, because a silent no-op reads as the button being broken.
     _say(outcome.message);
+    setState(() {});
+  }
+
+  /// The belt's twin of [_use]. ⚠️ Same `setState`: `useBeltItem` moves the
+  /// belt out from under the belt bay AND the supplies panel, and a rail that
+  /// still draws a potion you just drank is the bug this rebuild prevents.
+  Future<void> _useFromBelt(GameState game, String defId) async {
+    final outcome = await game.useBeltItem(defId);
+    if (!mounted) return;
+    _say(outcome.message);
+    setState(() {});
+  }
+
+  /// Hangs a pack item on the belt, mid-quest.
+  ///
+  /// ⭐ Re-loading between fights is the other half of the 2026-09-21 ruling:
+  /// the belt is not a thing you pack once in town and then watch empty.
+  Future<void> _belt(GameState game, String defId) async {
+    final refusal = await game.loadOntoBelt(defId);
+    if (!mounted) return;
+    if (refusal != null) {
+      _say(refusal, color: AppColors.ember);
+    } else {
+      final def = ItemCatalogue.tryById(defId);
+      _say(
+        'On your belt: '
+        '${def == null ? defId : ItemCatalogue.displayName(def, null)}.',
+      );
+    }
+    setState(() {});
+  }
+
+  /// Destroys one pack slot, after asking once.
+  ///
+  /// ⚠️ **One confirm, and it is the whole ceremony** (ruling 2026-09-21).
+  /// There is no undo, no recovered pile and no refund, so the dialog says
+  /// that in plain words — and then the drop is instant, because a second
+  /// confirmation would train the player to tap through the first.
+  Future<void> _drop(GameState game, int index) async {
+    final slot = game.profile.backpack.slots[index];
+    if (slot == null) return;
+    final name = _lootName(
+      slot,
+      slot.instanceId == null
+          ? null
+          : game.profile.itemInstances[slot.instanceId],
+    );
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.panel,
+        title: Text(
+          'Drop $name?',
+          style: const TextStyle(color: AppColors.text, fontSize: 16),
+        ),
+        content: const Text(
+          'It is destroyed. Nothing comes back.',
+          style: TextStyle(color: AppColors.textDim, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Keep'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.ember),
+            child: const Text('Drop'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final refusal = await game.discardFromBackpack(index);
+    if (!mounted) return;
+    // ⚠️ The receipt is not optional: an item leaving a twenty-slot grid is
+    // invisible, and a drop nobody confirmed out loud reads as a lost save.
+    _say(
+      refusal ?? 'Dropped $name.',
+      color: refusal == null ? null : AppColors.ember,
+    );
     setState(() {});
   }
 
@@ -728,30 +834,51 @@ class _GatherCard extends StatelessWidget {
 /// actually heals, so the two cannot disagree).
 ///
 /// ⚠️ Between encounters only (ITEMS §6b.2). Using something here is free; the
-/// belt is what costs a turn mid-duel.
+/// belt is what costs a turn mid-duel — which is why the belt group below
+/// carries no warning and no cost.
+///
+/// ⭐ **Both containers, one panel** (ruling 2026-09-21). A potion on the belt
+/// was drinkable only inside a duel, so a player who belted their last two
+/// draughts had no way to top up between fights without first unloading them.
+/// The pack group comes first because it is the bigger one; the belt group is
+/// named rather than merged, because *where* a potion is decides what drinking
+/// it costs later.
+///
+/// ⚠️ **Never collapses to nothing.** It used to vanish when the pack held no
+/// consumables, which is the press-stability trap: using your last ration made
+/// the panel — and everything under it — jump. Empty, it says so.
 class _Supplies extends StatelessWidget {
   final GameState game;
   final AdventureRun run;
   final bool busy;
   final ValueChanged<String> onUse;
+  final ValueChanged<String> onUseBelt;
 
   const _Supplies({
     required this.game,
     required this.run,
     required this.busy,
     required this.onUse,
+    required this.onUseBelt,
   });
+
+  /// Collapses a list of def ids to "two Sapwort Draughts", dropping anything
+  /// that is not actually drinkable. ⭐ Asks the interface, never the id.
+  static Map<String, int> _drinkable(Iterable<String> defIds) {
+    final counts = <String, int>{};
+    for (final defId in defIds) {
+      final def = ItemCatalogue.tryById(defId);
+      if (def is Usable && !(def as Usable).effect.isNothing) {
+        counts[defId] = (counts[defId] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final counts = <String, int>{};
-    for (final slot in game.profile.backpack.contents) {
-      final def = ItemCatalogue.tryById(slot.defId);
-      if (def is Usable && !(def as Usable).effect.isNothing) {
-        counts[slot.defId] = (counts[slot.defId] ?? 0) + 1;
-      }
-    }
-    if (counts.isEmpty) return const SizedBox.shrink();
+    final pack = _drinkable(game.profile.backpack.contents.map((s) => s.defId));
+    final belt = _drinkable(game.profile.belt.loaded);
     final max = game.maxHp;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -767,16 +894,203 @@ class _Supplies extends StatelessWidget {
                 style: const TextStyle(color: AppColors.text, fontSize: 13),
               ),
               const SizedBox(height: 4),
-              for (final e in counts.entries)
-                _ConsumableRow(
-                  def: ItemCatalogue.byId(e.key),
-                  count: e.value,
-                  onUse: busy ? null : () => onUse(e.key),
+              if (pack.isEmpty && belt.isEmpty)
+                const Text(
+                  'Nothing to drink.',
+                  style: TextStyle(color: AppColors.textFaint, fontSize: 12),
                 ),
+              if (pack.isNotEmpty) ...[
+                const _SupplyGroupLabel('From your pack'),
+                for (final e in pack.entries)
+                  _ConsumableRow(
+                    def: ItemCatalogue.byId(e.key),
+                    count: e.value,
+                    onUse: busy ? null : () => onUse(e.key),
+                  ),
+              ],
+              if (belt.isNotEmpty) ...[
+                const _SupplyGroupLabel('On your belt'),
+                for (final e in belt.entries)
+                  _ConsumableRow(
+                    def: ItemCatalogue.byId(e.key),
+                    count: e.value,
+                    // ⚠️ The belt's own door (`useBeltItem`), not `useItem` —
+                    // routing this at the pack would refuse ("You are not
+                    // carrying that") for a potion the player can see.
+                    onUse: busy ? null : () => onUseBelt(e.key),
+                  ),
+              ],
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Which container a supplies row came out of. ⭐ Plain text, not a
+/// [SectionLabel]: these are rows *inside* one panel, and a second wall of
+/// uppercase would read as a second panel.
+class _SupplyGroupLabel extends StatelessWidget {
+  final String text;
+
+  const _SupplyGroupLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 6, bottom: 2),
+    child: Text(
+      text,
+      style: const TextStyle(color: AppColors.textDim, fontSize: 11.5),
+    ),
+  );
+}
+
+/// Everything carried, and the two things that can be done with it on the
+/// road: hang it on the belt, or destroy it.
+///
+/// ⭐ **Because the road has no shop** (playtest ruling, 2026-09-21). A pack
+/// filled with gathered dust is a run that cannot pick up the boss drop, and
+/// the only lever a player had was to walk home. Dropping destroys — no
+/// refund, no pile to come back to — which is the one version of this that
+/// needs no new storage and no new explanation.
+///
+/// ⚠️ **The slot count is in the header**, because the pressure is the whole
+/// reason this panel exists and "20 / 20" is the sentence that explains an
+/// abandoned epic.
+///
+/// ⚠️ Both trailing buttons sit in fixed-width boxes so the two columns line
+/// up down the list, and a full belt **greys its button rather than hiding
+/// it** — the same rule the town dialog follows (2026-08-17): a 'Belt' that
+/// vanishes when the belt is full teaches the player that the item was never
+/// beltable.
+class _Pack extends StatelessWidget {
+  final GameState game;
+  final bool busy;
+  final ValueChanged<int> onDrop;
+  final ValueChanged<String> onBelt;
+
+  /// Wide enough for both labels at their widest, so the two columns line up
+  /// down the whole list.
+  static const double _actionWidth = 74;
+
+  const _Pack({
+    required this.game,
+    required this.busy,
+    required this.onDrop,
+    required this.onBelt,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final slots = game.profile.backpack.slots;
+    final used = game.profile.backpack.used;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionLabel('Pack · $used / ${Carrying.backpackSlots} slots'),
+        GamePanel(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (used == 0)
+                const Text(
+                  'Your pack is empty.',
+                  style: TextStyle(color: AppColors.textFaint, fontSize: 12),
+                ),
+              for (var i = 0; i < slots.length; i++)
+                if (slots[i] != null)
+                  _PackRow(
+                    slot: slots[i]!,
+                    instance: game.profile.itemInstances[slots[i]!.instanceId],
+                    // ⭐ The same refusal string the town dialog greys out
+                    // with, so a full belt says one thing everywhere.
+                    beltRefusal: Carrying.beltRefusal(
+                      ItemCatalogue.tryById(slots[i]!.defId),
+                      used: game.profile.belt.used,
+                      capacity: game.beltCapacity,
+                    ),
+                    actionWidth: _actionWidth,
+                    onDrop: busy ? null : () => onDrop(i),
+                    onBelt: busy ? null : () => onBelt(slots[i]!.defId),
+                  ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PackRow extends StatelessWidget {
+  final InventorySlot slot;
+  final ItemInstance? instance;
+
+  /// Null when this item can be belted right now; otherwise why it cannot.
+  /// ⚠️ Non-null for everything that was never beltable at all, too — the
+  /// [Beltable] test below is what tells those two apart.
+  final String? beltRefusal;
+
+  final double actionWidth;
+  final VoidCallback? onDrop;
+  final VoidCallback? onBelt;
+
+  const _PackRow({
+    required this.slot,
+    required this.instance,
+    required this.beltRefusal,
+    required this.actionWidth,
+    required this.onDrop,
+    required this.onBelt,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final def = ItemCatalogue.tryById(slot.defId);
+    final beltable = def is Beltable;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          ItemIcon(
+            defId: slot.defId,
+            size: 22,
+            gap: 8,
+            fallback: const SizedBox.shrink(),
+          ),
+          Expanded(
+            child: Text(
+              _lootName(slot, instance),
+              // ⭐ Rarity on sight (ITEMS §8) — the cue that stops a player
+              // destroying the one row worth carrying home.
+              style: TextStyle(color: _lootColour(slot.defId), fontSize: 13),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          // ⚠️ Drawn for everything [Beltable], enabled or not. An item that
+          // *could* be belted but cannot right now has to say which — hiding
+          // the button makes a full belt look like an unbeltable log.
+          if (beltable)
+            SizedBox(
+              width: actionWidth,
+              child: Tooltip(
+                message: beltRefusal ?? 'Hang it on your belt',
+                child: TextButton(
+                  onPressed: beltRefusal == null ? onBelt : null,
+                  child: const Text('Belt'),
+                ),
+              ),
+            ),
+          SizedBox(
+            width: actionWidth,
+            child: TextButton(
+              onPressed: onDrop,
+              style: TextButton.styleFrom(foregroundColor: AppColors.ember),
+              child: const Text('Drop'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

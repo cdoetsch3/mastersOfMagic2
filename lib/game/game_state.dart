@@ -768,6 +768,80 @@ class GameState extends ChangeNotifier {
     return outcome;
   }
 
+  /// Drinks one [defId] **off the belt**, between encounters.
+  ///
+  /// ⭐ The twin of [useItem], and deliberately a separate door: the belt is
+  /// not the pack, so the carried check reads the belt and the spend unloads a
+  /// belt slot rather than emptying a pack slot. Everything in between — the
+  /// effect, the healing-received multiplier, the refusal at full health — is
+  /// the same `AdventureRun.use`, so a potion cannot heal differently for
+  /// hanging on your hip.
+  ///
+  /// ⚠️ **Free between fights** (ITEMS §6b.2). The belt only costs a turn
+  /// *mid-duel* — see [consumeBeltItem], which is the in-combat door. Charging
+  /// a turn here would charge it against nothing.
+  ///
+  /// ⚠️ Unloads **one** copy, and only when the use was actually consumed: two
+  /// draughts on the belt means one drink leaves one, and a refusal leaves
+  /// both. A refusal that still emptied the slot would be the game drinking
+  /// your potion for you.
+  Future<UseOutcome> useBeltItem(String defId) async {
+    final r = run;
+    if (r == null) return const UseOutcome.refused('Not on an adventure.');
+    final outcome = r.use(
+      defId,
+      maxHp: maxHp,
+      carried: profile.belt.loaded.contains(defId),
+      healingReceivedPercent: equipmentTotals.healingReceivedPercent,
+    );
+    if (outcome.consumed) {
+      // ⚠️ One write for both halves — the potion leaving the belt and the HP
+      // it bought must never land on disk separately.
+      await _mutate(() {
+        profile.belt = profile.belt.withUnloaded(defId);
+      });
+    }
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Destroys the backpack slot at [index]. **Nothing comes back.**
+  ///
+  /// ⭐ **The road's answer to a full pack** (playtest ruling, 2026-09-21). A
+  /// player who filled twenty slots with dust had no way to make room for the
+  /// boss drop, because selling needs a shop and a shop needs a town. So the
+  /// road gets destruction and only destruction: no refund, no Storeroom, no
+  /// "drop it here and come back" pile to implement and then explain.
+  ///
+  /// ⚠️ **Refused in town**, with the answer rather than a shrug — in town the
+  /// shop pays for the same slot, and a player who burns a staff standing in
+  /// front of a buyer was failed by the UI, not by themselves.
+  ///
+  /// ⚠️ **The instance dies with the slot** (the one-pool rule, ITEMS §10.3a).
+  /// A rolled item's `ItemInstance` lives in `profile.itemInstances`, not in
+  /// the slot; dropping the slot and leaving the instance leaks a staff into
+  /// the save forever, growing every file that ever dropped one.
+  ///
+  /// Returns a player-facing refusal, or null when the item is gone.
+  Future<String?> discardFromBackpack(int index) async {
+    final r = run;
+    // ⚠️ The gate is the *run*, not the location: the road is where there is
+    // no shop, and a finished run is already standing in town in every way
+    // that matters.
+    if (r == null || r.isOver) return 'Sell it in town.';
+    if (index < 0 || index >= profile.backpack.slots.length) {
+      return 'There is nothing there.';
+    }
+    final slot = profile.backpack.slots[index];
+    if (slot == null) return 'There is nothing there.';
+    await _mutate(() {
+      profile.backpack = profile.backpack.withRemovedAt(index);
+      final id = slot.instanceId;
+      if (id != null) profile.itemInstances.remove(id);
+    });
+    return null;
+  }
+
   /// Walks out early.
   ///
   /// ⭐ **Ends the run and nothing else** — and since the 2026-08-17 ruling

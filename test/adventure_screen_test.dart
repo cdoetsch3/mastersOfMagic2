@@ -58,7 +58,15 @@ void main() {
       game.run!.playerHp = 40;
       await _pump(tester, game);
 
-      expect(find.text("Forager's Ration"), findsOneWidget);
+      // ⚠️ Twice since the 2026-09-21 ruling, and deliberately: Supplies lists
+      // it as something to drink, the Pack lists it as a slot to free. A
+      // single match here would mean one of the two panels lost it.
+      expect(
+        find.text("Forager's Ration"),
+        findsNWidgets(2),
+        reason: 'a ration missing from either Supplies or the Pack is a panel '
+            'that stopped reading the backpack',
+      );
       expect(
         find.textContaining('Restores 25% health'),
         findsOneWidget,
