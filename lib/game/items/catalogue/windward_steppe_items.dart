@@ -104,6 +104,7 @@ abstract final class WindwardSteppeItems {
     slot: EquipSlot.mainHand,
     form: 'Quarterstaff',
     material: 'Yew',
+    twoHanded: true,
     modifiers: ItemModifiers(damagePerCharge: 3, accuracyBonus: 7),
     salvage: [SalvageYield('yew_log', 1, 2)],
     equipLevel: 20,

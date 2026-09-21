@@ -81,8 +81,36 @@ class GameState extends ChangeNotifier {
     );
     // ⚠️ …and saves made when a beltless character had two free belt slots.
     state.settleBeltOverflow();
+    // ⚠️ …and saves from before a staff took both hands (ruling 2026-09-21).
+    state.settleTwoHanded();
     await state._persist();
     return state;
+  }
+
+  /// Takes the offhand off a character wearing a two-hander over it — a
+  /// wardrobe that no equip path can produce any more, but that a save from
+  /// before the ruling still holds.
+  ///
+  /// ⭐ Idempotent and gentle: the knot goes to the pack when there is room,
+  /// and otherwise stays where it is (a boot must never destroy an item); the
+  /// next equip of anything resolves it through the normal displaced path.
+  /// 📝 Wearing both is not a desync risk — gear totals are summed from the
+  /// map — it is the illegal state the both-hands rule exists to forbid.
+  void settleTwoHanded() {
+    final main = wornDef(EquipSlot.mainHand);
+    final offId = profile.equipped[EquipSlot.offHand];
+    if (main == null || !main.twoHanded || offId == null) return;
+    final offDefId = profile.itemInstances[offId]?.defId;
+    if (offDefId == null) {
+      profile.equipped.remove(EquipSlot.offHand); // dangling: nothing to keep
+      return;
+    }
+    final next = profile.backpack.withAdded(
+      InventorySlot(defId: offDefId, instanceId: offId),
+    );
+    if (next == null) return;
+    profile.backpack = next;
+    profile.equipped.remove(EquipSlot.offHand);
   }
 
   /// Reacts to sign-in/out. Signed in → load (or create) the cloud profile
@@ -855,11 +883,30 @@ class GameState extends ChangeNotifier {
   int get maxHp =>
       MageState.scaledMaxHp(profile.level) + equipmentTotals.maxHpBonus;
 
+  /// The [EquipmentDef] currently worn in [slot], or null for an empty slot
+  /// (or a dangling instance id, which wears nothing).
+  ///
+  /// ⭐ **The wardrobe question `Equipping` cannot answer for itself** — its
+  /// rules are pure over a def, and the both-hands rule needs to know what is
+  /// already on. Public because the Inventory tab asks the same question to
+  /// grey out the same button.
+  EquipmentDef? wornDef(EquipSlot slot) {
+    final id = profile.equipped[slot];
+    if (id == null) return null;
+    final def = ItemCatalogue.tryById(profile.itemInstances[id]?.defId ?? '');
+    return def is EquipmentDef ? def : null;
+  }
+
   /// Equips the item in backpack slot [index].
   ///
   /// Returns a player-facing refusal, or null on success. ⭐ **A swap, not a
   /// move**: whatever was worn in that slot lands in the vacated backpack
   /// slot, so equipping can never fail for space.
+  ///
+  /// ⚠️ **Except a two-hander** (ruling, Christian 2026-09-21). A staff
+  /// displaces the offhand as well as the main hand, and the offhand has no
+  /// vacated slot of its own to land in — so this is the one equip that can
+  /// be refused for space, and it is refused *before* anything moves.
   Future<String?> equipFromBackpack(int index) async {
     final slot = profile.backpack.slots[index];
     final inst = slot?.instanceId == null
@@ -868,25 +915,56 @@ class GameState extends ChangeNotifier {
     final def = ItemCatalogue.tryById(inst?.defId ?? '');
     final no = Equipping.refusal(def, playerLevel: profile.level);
     if (no != null) return no;
-    final equipSlot = (def! as EquipmentDef).slot;
+    final equipDef = def! as EquipmentDef;
+    final equipSlot = equipDef.slot;
+    final handsNo = Equipping.handsRefusal(
+      def: equipDef,
+      wornMainHand: wornDef(EquipSlot.mainHand),
+    );
+    if (handsNo != null) return handsNo;
+
+    // ⭐ **Computed before a single mutation.** The whole next pack is built
+    // here and only assigned once it is known to fit, so a refusal leaves the
+    // wardrobe and the pack exactly as they were — the alternative is a staff
+    // half-equipped over a knot with nowhere to go.
+    final displaced = _displacedBy(equipDef);
+    var pack = profile.backpack.withRemovedAt(index);
+    for (final wornId in displaced) {
+      final wornDefId = profile.itemInstances[wornId]?.defId;
+      // ⚠️ A dangling id is nothing to carry — it is dropped from the
+      // wardrobe below either way.
+      if (wornDefId == null) continue;
+      final next = pack.withAdded(
+        InventorySlot(defId: wornDefId, instanceId: wornId),
+      );
+      // ⚠️ The FIRST add can never fail — the item being equipped just
+      // vacated a slot. Only a two-hander's second casualty, the offhand, can
+      // run out of room, which is why this refusal names it.
+      if (next == null) return Equipping.noRoomForOffhandMessage;
+      pack = next;
+    }
+
     await _mutate(() {
-      final wasWorn = profile.equipped[equipSlot];
-      var pack = profile.backpack.withRemovedAt(index);
-      if (wasWorn != null) {
-        final wornDef = profile.itemInstances[wasWorn]?.defId;
-        if (wornDef != null) {
-          pack =
-              pack.withAdded(
-                InventorySlot(defId: wornDef, instanceId: wasWorn),
-              ) ??
-              pack;
-        }
-      }
       profile.backpack = pack;
+      // ⭐ The offhand leaves the doll, not just the totals: a staff worn over
+      // an invisible knot would still be a knot the duel could read.
+      if (equipDef.twoHanded) profile.equipped.remove(EquipSlot.offHand);
       profile.equipped[equipSlot] = slot!.instanceId!;
     });
     return null;
   }
+
+  /// The worn instance ids that wearing [def] takes off, in the order they
+  /// are stowed: whatever held its own slot, then — for a two-hander — the
+  /// offhand it leaves no room for.
+  ///
+  /// ⭐ **One list, both equip paths**, so the pack and the Storeroom can
+  /// never disagree about what a staff costs you.
+  List<String> _displacedBy(EquipmentDef def) => [
+    if (profile.equipped[def.slot] != null) profile.equipped[def.slot]!,
+    if (def.twoHanded && profile.equipped[EquipSlot.offHand] != null)
+      profile.equipped[EquipSlot.offHand]!,
+  ];
 
   /// Takes off whatever is in [slot], into the backpack.
   Future<String?> unequip(EquipSlot slot) async {
@@ -914,6 +992,10 @@ class GameState extends ChangeNotifier {
   /// ⭐ The Storeroom-as-wardrobe move (ITEMS §10.3c): in a city you can dress
   /// from storage without a backpack shuffle. ⚠️ Town-only by nature — the
   /// Storeroom is per city, and you are not in one on the road.
+  ///
+  /// ⭐ A two-hander stows the displaced **offhand** here too (ruling
+  /// 2026-09-21) — and unlike the backpack path this can never be refused for
+  /// space, because a Storeroom is unbounded (ITEMS §10.3c).
   Future<String?> equipFromStoreroom(String instanceId) async {
     final here = profile.locationId;
     if (!profile.location.isTown) return 'Storerooms are in town.';
@@ -926,22 +1008,28 @@ class GameState extends ChangeNotifier {
     );
     final no = Equipping.refusal(def, playerLevel: profile.level);
     if (no != null) return no;
-    final equipSlot = (def! as EquipmentDef).slot;
+    final equipDef = def! as EquipmentDef;
+    final equipSlot = equipDef.slot;
+    final handsNo = Equipping.handsRefusal(
+      def: equipDef,
+      wornMainHand: wornDef(EquipSlot.mainHand),
+    );
+    if (handsNo != null) return handsNo;
+    final displaced = _displacedBy(equipDef);
     await _mutate(() {
       final taken = room.withWithdrawn(
         InventorySlot(defId: def.id, instanceId: instanceId),
       );
       var nextRoom = taken.room;
-      final wasWorn = profile.equipped[equipSlot];
-      if (wasWorn != null) {
-        final wornDef = profile.itemInstances[wasWorn]?.defId;
-        if (wornDef != null) {
-          nextRoom = nextRoom.withDeposited(
-            InventorySlot(defId: wornDef, instanceId: wasWorn),
-          );
-        }
+      for (final wornId in displaced) {
+        final wornDefId = profile.itemInstances[wornId]?.defId;
+        if (wornDefId == null) continue;
+        nextRoom = nextRoom.withDeposited(
+          InventorySlot(defId: wornDefId, instanceId: wornId),
+        );
       }
       profile.storerooms[here] = nextRoom;
+      if (equipDef.twoHanded) profile.equipped.remove(EquipSlot.offHand);
       profile.equipped[equipSlot] = instanceId;
     });
     return null;

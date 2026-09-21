@@ -401,6 +401,22 @@ final class EquipmentDef extends ItemDef
 
   final ItemModifiers modifiers;
 
+  /// ⭐ **Both hands are on it** (ruling, Christian 2026-09-21): a two-handed
+  /// main hand and an offhand cannot be worn at the same time. Equipping one
+  /// takes the offhand off into the pack; equipping an offhand over one is
+  /// refused. The rule lives on the definition rather than on [form] so the
+  /// engine never has to know that "Quarterstaff" is a two-hander and a
+  /// "Wand" is not.
+  ///
+  /// ⚠️ **Only [EquipSlot.mainHand] may set it** — asserted below. A
+  /// two-handed hat is not a thing the equip rules could mean anything by,
+  /// and a silent one would quietly disable the offhand slot forever.
+  ///
+  /// 📝 Not exported over the wire: it constrains what a wardrobe may BE, and
+  /// both clients resolve the wardrobe they are sent, not the rules that
+  /// built it.
+  final bool twoHanded;
+
   @override
   final int socketCount;
 
@@ -415,6 +431,7 @@ final class EquipmentDef extends ItemDef
     required this.form,
     required this.material,
     this.modifiers = ItemModifiers.none,
+    this.twoHanded = false,
     this.setId,
     this.setTier,
     this.socketCount = 0,
@@ -426,7 +443,10 @@ final class EquipmentDef extends ItemDef
     // (§9b.5). Crafted gear must leave this null so the material+form
     // grammar composes the name.
     super.properName,
-  });
+  }) : assert(
+         !twoHanded || slot == EquipSlot.mainHand,
+         'only a main-hand item can be two-handed',
+       );
 
   @override
   bool get isFungible => false;

@@ -24,7 +24,6 @@ import 'app_banner.dart';
 import 'app_theme.dart';
 import 'item_icon.dart';
 
-
 /// One dialog for every item interaction — what it is, what it does, and
 /// what you can do with it here. [actions] whose `run` returns a refusal
 /// string surface it; null means done.
@@ -87,9 +86,14 @@ Future<void> showItemDialog(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ⭐ **Where it goes, before what it does** — and for a two-hander
+          // that line is 'Main hand · two-handed' (ruling 2026-09-21), so the
+          // player meets the rule on the staff rather than on the refusal
+          // when they try to keep their knot. `Equipping.slotLabel` is the
+          // one writer for both words.
           if (def is EquipmentDef)
             Text(
-              'Level ${def.equipLevel}',
+              '${Equipping.slotLabel(def)} · Level ${def.equipLevel}',
               style: const TextStyle(color: AppColors.textDim, fontSize: 12),
             ),
           for (final line in lines)

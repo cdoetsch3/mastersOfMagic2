@@ -77,6 +77,7 @@ abstract final class AshfallValeItems {
     slot: EquipSlot.mainHand,
     form: 'Quarterstaff',
     material: 'Birch',
+    twoHanded: true,
     modifiers: ItemModifiers(damagePerCharge: 2, accuracyBonus: 6),
     salvage: [SalvageYield('birch_log', 1, 2)],
     equipLevel: 10,

@@ -114,6 +114,7 @@ abstract final class WhisperingWoodsItems {
     salvage: [SalvageYield('oak_log', 1, 1)],
     value: 20,
   );
+
   /// ⭐ **Rare — the mini-boss chase.** Beats the Standard crafted robe
   /// (+6 HP) outright, which is what rare means before sockets and riders
   /// exist. ⚠️ Dodge/deflection are Q2 mechanics (§9b.8) — nothing in this
@@ -148,6 +149,7 @@ abstract final class WhisperingWoodsItems {
     slot: EquipSlot.mainHand,
     form: 'Quarterstaff',
     material: 'Heartwood',
+    twoHanded: true,
     modifiers: ItemModifiers(
       damagePerCharge: 3,
       accuracyBonus: 7,
@@ -167,6 +169,11 @@ abstract final class WhisperingWoodsItems {
   // SPELL COST (commitment), the wand PER CAST (tempo). Crossover at 2
   // charges. The staff out-accurates wand + knot combined on purpose — part
   // of the two-hander's budget is sureness.
+  //
+  // ⭐ **And since 2026-09-21 the two-hander really is one**: every
+  // Quarterstaff sets [EquipmentDef.twoHanded], so it is bought at the price
+  // of the offhand rather than alongside it. ⚠️ Wands stay one-handed — the
+  // wand+knot pairing is the other half of the lane choice.
 
   static const oakQuarterstaff = EquipmentDef(
     id: 'oak_quarterstaff',
@@ -175,6 +182,7 @@ abstract final class WhisperingWoodsItems {
     slot: EquipSlot.mainHand,
     form: 'Quarterstaff',
     material: 'Oak',
+    twoHanded: true,
     modifiers: ItemModifiers(damagePerCharge: 1, accuracyBonus: 5),
     salvage: [SalvageYield('oak_log', 1, 2)],
     value: 30,

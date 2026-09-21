@@ -105,6 +105,7 @@ abstract final class ThunderspirePeaksItems {
     slot: EquipSlot.mainHand,
     form: 'Quarterstaff',
     material: 'Rowan',
+    twoHanded: true,
     modifiers: ItemModifiers(
       damagePerCharge: 4,
       accuracyBonus: 8,

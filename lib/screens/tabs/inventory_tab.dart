@@ -164,19 +164,6 @@ class _PaperDoll extends StatelessWidget {
 
   const _PaperDoll({required this.game});
 
-  static const _labels = {
-    EquipSlot.hat: 'Hat',
-    EquipSlot.robeTop: 'Robe top',
-    EquipSlot.robeBottom: 'Robe bottom',
-    EquipSlot.gloves: 'Gloves',
-    EquipSlot.boots: 'Boots',
-    EquipSlot.neck: 'Neck',
-    EquipSlot.ring: 'Ring',
-    EquipSlot.mainHand: 'Main hand',
-    EquipSlot.offHand: 'Off hand',
-    EquipSlot.belt: 'Belt',
-  };
-
   @override
   Widget build(BuildContext context) {
     final armour = EquipSlot.values.where((s) => s.carriesSet);
@@ -204,7 +191,7 @@ class _PaperDoll extends StatelessWidget {
             children: [
               for (final slot in armour)
                 _EquipSlotChip(
-                  label: _labels[slot] ?? slot.name,
+                  label: Equipping.slotName(slot),
                   slot: slot,
                   instanceId: game.profile.equipped[slot],
                   game: game,
@@ -230,7 +217,7 @@ class _PaperDoll extends StatelessWidget {
               // grid like every other slot (the old two-line lecture is gone).
               for (final slot in rest)
                 _EquipSlotChip(
-                  label: _labels[slot] ?? slot.name,
+                  label: Equipping.slotName(slot),
                   slot: slot,
                   instanceId: game.profile.equipped[slot],
                   game: game,
@@ -342,7 +329,7 @@ class _EquipSlotChip extends StatelessWidget {
     for (var i = 0; i < game.profile.backpack.slots.length; i++)
       if (game.profile.backpack.slots[i]?.instanceId != null &&
           (ItemCatalogue.tryById(game.profile.backpack.slots[i]!.defId)
-                  is EquipmentDef) &&
+              is EquipmentDef) &&
           (ItemCatalogue.tryById(game.profile.backpack.slots[i]!.defId)!
                       as EquipmentDef)
                   .slot ==
@@ -407,58 +394,68 @@ class _EquipSlotChip extends StatelessWidget {
     Color colour,
   ) {
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label.toUpperCase(),
-            style: TextStyle(
-              color: filled ? AppColors.textFaint : AppColors.textFaint
-                  .withValues(alpha: 0.6),
-              fontSize: 9,
-              letterSpacing: 0.8,
-            ),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          // ⭐ 'MAIN HAND · TWO-HANDED' while a staff is worn (ruling
+          // 2026-09-21) — the doll is where the player notices the off-hand
+          // chip has gone dead, so it is where the reason belongs.
+          // ⚠️ Two lines allowed rather than clipped: the suffix IS the
+          // explanation, and an ellipsis in the middle of it explains
+          // nothing.
+          (def is EquipmentDef ? Equipping.slotLabel(def) : label)
+              .toUpperCase(),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: filled
+                ? AppColors.textFaint
+                : AppColors.textFaint.withValues(alpha: 0.6),
+            fontSize: 9,
+            letterSpacing: 0.8,
           ),
-          const SizedBox(height: 2),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ⭐ The icon leads the name, and takes its own 6px of breathing
-              // room with it when there is no PNG — see [ItemIcon.gap]. An
-              // empty slot has no item and therefore never asks for one.
-              if (filled)
-                ItemIcon(
-                  defId: def!.id,
-                  size: 18,
-                  gap: 6,
-                  fallback: const SizedBox.shrink(),
-                ),
-              Expanded(
-                child: Text(
-                  filled
-                      ? ItemCatalogue.displayName(def!, inst)
+        ),
+        const SizedBox(height: 2),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ⭐ The icon leads the name, and takes its own 6px of breathing
+            // room with it when there is no PNG — see [ItemIcon.gap]. An
+            // empty slot has no item and therefore never asks for one.
+            if (filled)
+              ItemIcon(
+                defId: def!.id,
+                size: 18,
+                gap: 6,
+                fallback: const SizedBox.shrink(),
+              ),
+            Expanded(
+              child: Text(
+                filled
+                    ? ItemCatalogue.displayName(def!, inst)
+                    : candidates.isEmpty
+                    ? 'Empty'
+                    : slot == EquipSlot.belt && candidates.length == 1
+                    ? '＋ ${ItemCatalogue.displayName(ItemCatalogue.byId(game.profile.backpack.slots[candidates.first]!.defId))}'
+                    : '＋ Equip',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: filled
+                      ? colour
                       : candidates.isEmpty
-                      ? 'Empty'
-                      : slot == EquipSlot.belt && candidates.length == 1
-                      ? '＋ ${ItemCatalogue.displayName(ItemCatalogue.byId(game.profile.backpack.slots[candidates.first]!.defId))}'
-                      : '＋ Equip',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: filled
-                        ? colour
-                        : candidates.isEmpty
-                        ? AppColors.textFaint
-                        : slot == EquipSlot.belt
-                        ? AppColors.gold
-                        : AppColors.textDim,
-                    fontSize: 11,
-                  ),
+                      ? AppColors.textFaint
+                      : slot == EquipSlot.belt
+                      ? AppColors.gold
+                      : AppColors.textDim,
+                  fontSize: 11,
                 ),
               ),
-            ],
-          ),
-        ],
-      );
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget _wrapTap(
@@ -497,7 +494,13 @@ class _EquipSlotChip extends StatelessWidget {
   Future<void> _pickCandidate(BuildContext context, List<int> indices) async {
     final gs = GameStateScope.read(context);
     if (indices.length == 1) {
-      await gs.equipFromBackpack(indices.first);
+      final no = await gs.equipFromBackpack(indices.first);
+      // ⚠️ A refusal the player never sees is a button that looks broken —
+      // and since the both-hands rule (2026-09-21) this button really can be
+      // refused: '＋ Equip' on the off-hand chip while a staff is worn.
+      if (no != null && context.mounted) {
+        showAppBanner(context, no, color: AppColors.ember);
+      }
       return;
     }
     if (!context.mounted) return;
@@ -525,7 +528,10 @@ class _EquipSlotChip extends StatelessWidget {
                 ),
                 onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  await gs.equipFromBackpack(i);
+                  final no = await gs.equipFromBackpack(i);
+                  if (no != null && context.mounted) {
+                    showAppBanner(context, no, color: AppColors.ember);
+                  }
                 },
               ),
           ],
@@ -758,10 +764,7 @@ class _BeltSlot extends StatelessWidget {
           context,
           def: def,
           actions: [
-            (
-              label: 'Take off belt',
-              run: () => game.unloadFromBelt(def.id),
-            ),
+            (label: 'Take off belt', run: () => game.unloadFromBelt(def.id)),
           ],
         ),
         child: box,
@@ -812,6 +815,15 @@ class _BackpackGrid extends StatelessWidget {
                   capacity: game.beltCapacity,
                 )
               : null;
+          // ⭐ And why it cannot be WORN right now — the both-hands rule
+          // (2026-09-21), quoted from the same writer `equipFromBackpack`
+          // refuses with, so the dead button and the banner say one thing.
+          final handsNo = def is EquipmentDef
+              ? Equipping.handsRefusal(
+                  def: def,
+                  wornMainHand: game.wornDef(EquipSlot.mainHand),
+                )
+              : null;
           // The full menu, reached by long-press (Option A) — or by tap when
           // out of town, where there is nowhere to deposit.
           void openMenu() => showItemDialog(
@@ -821,13 +833,10 @@ class _BackpackGrid extends StatelessWidget {
             actions: [
               // ⭐ Wearing beats stowing in the ordering — the rarer, more
               // deliberate act.
-              if (def is EquipmentDef)
+              if (def is EquipmentDef && handsNo == null)
                 (label: 'Equip', run: () => game.equipFromBackpack(i)),
               if (def is Beltable && beltNo == null)
-                (
-                  label: 'Load onto belt',
-                  run: () => game.loadOntoBelt(def.id),
-                ),
+                (label: 'Load onto belt', run: () => game.loadOntoBelt(def.id)),
               if (town != null)
                 (
                   label: 'Stow',
@@ -840,6 +849,7 @@ class _BackpackGrid extends StatelessWidget {
             // ⚠️ Greyed with the reason rather than hidden — otherwise a full
             // belt is indistinguishable from an item that was never beltable.
             unavailable: [
+              if (handsNo != null) (label: 'Equip', reason: handsNo),
               if (beltNo != null) (label: 'Load onto belt', reason: beltNo),
             ],
           );
@@ -1095,10 +1105,7 @@ class _StoreroomListState extends State<_StoreroomList> {
   /// were free is a success, and a bulk action that says nothing reads as
   /// having done nothing.
   Future<void> _takeAll(_StoredEntry e) async {
-    final moved = await widget.game.takeAllFromStoreroom(
-      widget.town,
-      e.defId,
-    );
+    final moved = await widget.game.takeAllFromStoreroom(widget.town, e.defId);
     if (!mounted || moved == 0) return;
     final all = moved >= e.count;
     // ⭐ Banner rather than REMOVE: the counts do move on screen, but the
@@ -1233,39 +1240,39 @@ class _StoredRow extends StatelessWidget {
     onTap: onTake,
     borderRadius: BorderRadius.circular(6),
     child: Padding(
-    padding: const EdgeInsets.symmetric(vertical: 3),
-    child: Row(
-      children: [
-        Container(width: 8, height: 8, color: colour),
-        const SizedBox(width: 8),
-        // ⭐ Beside the rarity swatch, not instead of it: the swatch answers
-        // "how good is this" at a glance and an icon does not. ⚠️ 18px sits
-        // inside the row's existing 13px-text line box, so the rows do not
-        // grow when the art lands — and with no art the gap goes too.
-        ItemIcon(
-          defId: defId,
-          size: 18,
-          gap: 8,
-          fallback: const SizedBox.shrink(),
-        ),
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(color: AppColors.text, fontSize: 13),
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Container(width: 8, height: 8, color: colour),
+          const SizedBox(width: 8),
+          // ⭐ Beside the rarity swatch, not instead of it: the swatch answers
+          // "how good is this" at a glance and an icon does not. ⚠️ 18px sits
+          // inside the row's existing 13px-text line box, so the rows do not
+          // grow when the art lands — and with no art the gap goes too.
+          ItemIcon(
+            defId: defId,
+            size: 18,
+            gap: 8,
+            fallback: const SizedBox.shrink(),
           ),
-        ),
-        Text(
-          '×$count',
-          style: const TextStyle(color: AppColors.textDim, fontSize: 12),
-        ),
-        const SizedBox(width: 8),
-        if (onWear != null)
-          TextButton(onPressed: onWear, child: const Text('Wear')),
-        TextButton(onPressed: onTake, child: const Text('Take')),
-        if (onTakeAll != null)
-          TextButton(onPressed: onTakeAll, child: const Text('Take all')),
-      ],
-    ),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(color: AppColors.text, fontSize: 13),
+            ),
+          ),
+          Text(
+            '×$count',
+            style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+          ),
+          const SizedBox(width: 8),
+          if (onWear != null)
+            TextButton(onPressed: onWear, child: const Text('Wear')),
+          TextButton(onPressed: onTake, child: const Text('Take')),
+          if (onTakeAll != null)
+            TextButton(onPressed: onTakeAll, child: const Text('Take all')),
+        ],
+      ),
     ),
   );
 }

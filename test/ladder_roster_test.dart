@@ -562,6 +562,59 @@ void main() {
       },
     );
 
+    /// ⭐ **Bots wear legal wardrobes, not merely stat-bearing ones** (ruling,
+    /// Christian 2026-09-21). A player cannot hold a quarterstaff and an
+    /// offhand at once — `GameState.equipFromBackpack` takes the offhand off —
+    /// so a bot that did would be fighting with a wardrobe the ladder's own
+    /// rules say cannot exist, and LADDER_DESIGN §1 law 5 (bots are mages, not
+    /// monsters) would quietly stop being true.
+    ///
+    /// ⚠️ This also pins the Peak tier: 'Peak bots fill exactly the 9 combat
+    /// slots' below includes BOTH hands, so a Peak wardrobe can never take a
+    /// two-handed main hand. Give one a staff and the two tests disagree,
+    /// which is the argument you want to have in review.
+    test('no bot holds a two-handed main hand AND an offhand', () {
+      for (final bot in LadderRoster.all) {
+        final defs = [
+          for (final piece in bot.gear)
+            ItemCatalogue.byId(piece.itemId) as EquipmentDef,
+        ];
+        final twoHander = defs
+            .where((d) => d.slot == EquipSlot.mainHand && d.twoHanded)
+            .map((d) => d.id)
+            .toList();
+        final offHand = defs
+            .where((d) => d.slot == EquipSlot.offHand)
+            .map((d) => d.id)
+            .toList();
+        expect(
+          twoHander.isNotEmpty && offHand.isNotEmpty,
+          isFalse,
+          reason:
+              '${bot.id} wears ${twoHander.join(', ')} (two-handed) together '
+              'with ${offHand.join(', ')} — a wardrobe no player could equip',
+        );
+      }
+    });
+
+    test('⚠️ and the guard above can actually fail', () {
+      // A mutant that reads `twoHanded` off the wrong def, or an empty
+      // `where`, would pass the roster test on an empty roster too. This
+      // pins the two facts the guard is built out of.
+      expect(
+        (ItemCatalogue.byId('rowan_quarterstaff') as EquipmentDef).twoHanded,
+        isTrue,
+        reason:
+            'two bots hold this staff — the guard is only meaningful if '
+            'the catalogue calls it two-handed',
+      );
+      expect(
+        (ItemCatalogue.byId('rowan_knot') as EquipmentDef).slot,
+        EquipSlot.offHand,
+        reason: 'and only if the pieces it pairs against are offhands',
+      );
+    });
+
     test('no bot repeats a slot', () {
       for (final bot in LadderRoster.all) {
         final slots = <EquipSlot>[];

@@ -64,6 +64,71 @@ abstract final class Equipping {
     return null;
   }
 
+  /// What a player is told when an offhand meets a two-handed main hand.
+  ///
+  /// ⭐ **One string, three readers** — [handsRefusal], and through it both
+  /// `GameState` equip paths and the Inventory tab's greyed-out Equip button.
+  /// A screen that explains the rule in its own words is a screen that can
+  /// drift from the rule.
+  static const String bothHandsMessage = 'Both hands are on your staff.';
+
+  /// What a player is told when a two-handed main hand has nowhere to put the
+  /// offhand it displaces. ⚠️ Names the fix, not just the problem: the pack is
+  /// full *and* an offhand is coming off, and "Your pack is full." alone would
+  /// send them to the wrong screen.
+  static const String noRoomForOffhandMessage =
+      'Your pack is full — take off your offhand first.';
+
+  /// Why [def] cannot be worn **alongside what is already in the hands** —
+  /// null when it can (ruling, Christian 2026-09-21).
+  ///
+  /// ⭐ **Separate from [refusal] on purpose.** [refusal] judges an item
+  /// against the *player* (level, kind) and needs nothing but the def; this
+  /// one judges it against the *wardrobe*, which [refusal]'s callers do not
+  /// all have. Splitting them is what lets the Inventory tab grey a button
+  /// with the identical words `GameState` would refuse with, instead of
+  /// discovering the refusal only after the tap.
+  ///
+  /// ⚠️ **Only an offhand is ever refused here.** The other direction — a
+  /// two-hander going on over a worn offhand — is allowed and *displaces* the
+  /// offhand into the pack, because refusing there would make a staff
+  /// unequippable rather than expensive. That swap needs storage, which is a
+  /// `GameState` question, not a pure one.
+  static String? handsRefusal({
+    required EquipmentDef def,
+    required EquipmentDef? wornMainHand,
+  }) {
+    if (def.slot != EquipSlot.offHand) return null;
+    if (wornMainHand?.twoHanded ?? false) return bothHandsMessage;
+    return null;
+  }
+
+  /// The slot as the player reads it, in the one place that decides the
+  /// wording.
+  ///
+  /// ⭐ **A two-hander says so**: 'Main hand · two-handed', so the player
+  /// meets the rule on the item that causes it rather than on the refusal
+  /// that enforces it.
+  static String slotLabel(EquipmentDef def) =>
+      def.twoHanded ? '${slotName(def.slot)} · two-handed' : slotName(def.slot);
+
+  /// The player-facing name of an equipment slot. ⚠️ Spelled out rather than
+  /// prettified from [EquipSlot.name]: 'robeTop' does not become 'Robe top' by
+  /// any rule worth writing, and a slot added without a word here should read
+  /// oddly in review, not silently in the game.
+  static String slotName(EquipSlot slot) => switch (slot) {
+    EquipSlot.hat => 'Hat',
+    EquipSlot.robeTop => 'Robe top',
+    EquipSlot.robeBottom => 'Robe bottom',
+    EquipSlot.gloves => 'Gloves',
+    EquipSlot.boots => 'Boots',
+    EquipSlot.neck => 'Neck',
+    EquipSlot.ring => 'Ring',
+    EquipSlot.mainHand => 'Main hand',
+    EquipSlot.offHand => 'Off hand',
+    EquipSlot.belt => 'Belt',
+  };
+
   /// The stat lines a worn item (or a total) shows, in a fixed order.
   ///
   /// ⭐ **One writer for every stats panel** — built from the modifiers so a
@@ -152,98 +217,99 @@ abstract final class Equipping {
   /// "total" would be the bonus in disguise, so the panel prints the bonus
   /// AS the total and no parenthesis). Base-zero stats (crit: §9b.8, crits
   /// exist only through gear) keep a parenthesis but hide the pointless 0.
-  static List<GearStatLine> statTotals(ItemModifiers m, {required int level}) => [
-    if (m.maxHpBonus != 0)
-      (
-        label: 'Max health',
-        total: '${MageState.scaledMaxHp(level) + m.maxHpBonus}',
-        base: MageState.scaledMaxHp(level),
-        bonus: m.maxHpBonus,
-      ),
-    if (m.accuracyBonus != 0)
-      (
-        label: 'Accuracy',
-        total: '${baseHitPercent + m.accuracyBonus}%',
-        base: baseHitPercent,
-        bonus: m.accuracyBonus,
-      ),
-    if (m.critChance != 0)
-      (
-        label: 'Crit chance',
-        total: '${m.critChance}%',
-        base: 0,
-        bonus: m.critChance,
-      ),
-    if (m.critDamage != 0)
-      (
-        label: 'Crit damage',
-        total: '${baseCritDamagePercent + m.critDamage}%',
-        base: baseCritDamagePercent,
-        bonus: m.critDamage,
-      ),
-    if (m.dodge != 0)
-      (label: 'Dodge', total: '${m.dodge}%', base: 0, bonus: m.dodge),
-    if (m.deflectChance != 0)
-      (
-        label: 'Deflect chance',
-        total: '${m.deflectChance}%',
-        base: 0,
-        bonus: m.deflectChance,
-      ),
-    if (m.deflectAmount != 0)
-      (
-        label: 'Deflect amount',
-        total: '${m.deflectAmount}%',
-        base: null,
-        bonus: m.deflectAmount,
-      ),
-    if (m.damagePerCast != 0)
-      (
-        label: 'Damage per cast',
-        total: '${m.damagePerCast >= 0 ? '+' : ''}${m.damagePerCast}',
-        base: null,
-        bonus: m.damagePerCast,
-      ),
-    if (m.damagePerCharge != 0)
-      (
-        label: 'Damage per charge',
-        total: '${m.damagePerCharge >= 0 ? '+' : ''}${m.damagePerCharge}',
-        base: null,
-        bonus: m.damagePerCharge,
-      ),
-    if (m.shieldStrengthPercent != 0)
-      (
-        label: 'Shield strength',
-        total:
-            '${m.shieldStrengthPercent >= 0 ? '+' : ''}'
-            '${m.shieldStrengthPercent}%',
-        base: null,
-        bonus: m.shieldStrengthPercent,
-      ),
-    if (m.healingReceivedPercent != 0)
-      (
-        label: 'Healing received',
-        total:
-            '${m.healingReceivedPercent >= 0 ? '+' : ''}'
-            '${m.healingReceivedPercent}%',
-        base: null,
-        bonus: m.healingReceivedPercent,
-      ),
-    if (m.regrowPercent != 0)
-      (
-        label: 'Regrow',
-        total: '${m.regrowPercent}%/turn',
-        base: null,
-        bonus: m.regrowPercent,
-      ),
-    if (m.beltSlots != 0)
-      (
-        label: 'Belt slots',
-        total: '${m.beltSlots >= 0 ? '+' : ''}${m.beltSlots}',
-        base: null,
-        bonus: m.beltSlots,
-      ),
-  ];
+  static List<GearStatLine> statTotals(ItemModifiers m, {required int level}) =>
+      [
+        if (m.maxHpBonus != 0)
+          (
+            label: 'Max health',
+            total: '${MageState.scaledMaxHp(level) + m.maxHpBonus}',
+            base: MageState.scaledMaxHp(level),
+            bonus: m.maxHpBonus,
+          ),
+        if (m.accuracyBonus != 0)
+          (
+            label: 'Accuracy',
+            total: '${baseHitPercent + m.accuracyBonus}%',
+            base: baseHitPercent,
+            bonus: m.accuracyBonus,
+          ),
+        if (m.critChance != 0)
+          (
+            label: 'Crit chance',
+            total: '${m.critChance}%',
+            base: 0,
+            bonus: m.critChance,
+          ),
+        if (m.critDamage != 0)
+          (
+            label: 'Crit damage',
+            total: '${baseCritDamagePercent + m.critDamage}%',
+            base: baseCritDamagePercent,
+            bonus: m.critDamage,
+          ),
+        if (m.dodge != 0)
+          (label: 'Dodge', total: '${m.dodge}%', base: 0, bonus: m.dodge),
+        if (m.deflectChance != 0)
+          (
+            label: 'Deflect chance',
+            total: '${m.deflectChance}%',
+            base: 0,
+            bonus: m.deflectChance,
+          ),
+        if (m.deflectAmount != 0)
+          (
+            label: 'Deflect amount',
+            total: '${m.deflectAmount}%',
+            base: null,
+            bonus: m.deflectAmount,
+          ),
+        if (m.damagePerCast != 0)
+          (
+            label: 'Damage per cast',
+            total: '${m.damagePerCast >= 0 ? '+' : ''}${m.damagePerCast}',
+            base: null,
+            bonus: m.damagePerCast,
+          ),
+        if (m.damagePerCharge != 0)
+          (
+            label: 'Damage per charge',
+            total: '${m.damagePerCharge >= 0 ? '+' : ''}${m.damagePerCharge}',
+            base: null,
+            bonus: m.damagePerCharge,
+          ),
+        if (m.shieldStrengthPercent != 0)
+          (
+            label: 'Shield strength',
+            total:
+                '${m.shieldStrengthPercent >= 0 ? '+' : ''}'
+                '${m.shieldStrengthPercent}%',
+            base: null,
+            bonus: m.shieldStrengthPercent,
+          ),
+        if (m.healingReceivedPercent != 0)
+          (
+            label: 'Healing received',
+            total:
+                '${m.healingReceivedPercent >= 0 ? '+' : ''}'
+                '${m.healingReceivedPercent}%',
+            base: null,
+            bonus: m.healingReceivedPercent,
+          ),
+        if (m.regrowPercent != 0)
+          (
+            label: 'Regrow',
+            total: '${m.regrowPercent}%/turn',
+            base: null,
+            bonus: m.regrowPercent,
+          ),
+        if (m.beltSlots != 0)
+          (
+            label: 'Belt slots',
+            total: '${m.beltSlots >= 0 ? '+' : ''}${m.beltSlots}',
+            base: null,
+            bonus: m.beltSlots,
+          ),
+      ];
 }
 
 /// One stat line for the "From equipment" panel — see [Equipping.statTotals].
