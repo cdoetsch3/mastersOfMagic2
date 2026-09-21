@@ -983,6 +983,33 @@ ratings vs seeds (§6); ~2 s at default, `LADDER_PROBE_DEEP=1` for N=20.
 poorly (ρ 0.35, Sable −332). Two new §8 decisions (7, 8) for Christian
 before any seed moves. Doc pointers landed (e06ee6f).
 
+## ✅ Playtest batch 2026-09-21 (release 6 opens; Opus lanes, all merged)
+
+Nine notes after "substantial playtesting", rulings taken by AskUserQuestion
+first, then four Opus lanes + one change by hand. Merged e000454 · 5a8712e ·
+50c690e · afcbbd3 · bca0a18 (1793 app / 568 engine tests).
+1. **Inventory on the road** — Drop (destroys, one confirm; in town: "Sell it
+   in town."), drink from pack AND belt between fights, belt re-packable via
+   the extracted `lib/ui/belt_bay.dart` + a Belt button per pack row.
+2–4. Bloodlust 25t · Death Wish 25t · Overkill 3c.
+5. **Crafting reads this town's storeroom** (`materialCount`/`materialSplit`);
+   pack first, storeroom second; an output that won't fit is stowed there.
+6. **Quarterstaffs are two-handed** — displace the offhand (refused before
+   moving if no room), offhand over a staff refused; boot settles old saves.
+7. Torment 9→8 ticks (Torment+Scour too strong); EV line 11.6→11.1.
+8. **Waterlogged takes Haste** through the Tailwind element-grab seam.
+9. **Shop phone layout** — measured, not guessed: the worded row needs
+   ~740 dp, so below 760 the chips hide, the sort box is icon-only (fixed
+   28 px), gaps tighten. ⚠️ Christian ruled "~480"; the number moved because
+   the test measured overflow at 480. Verify on his phone.
+⚠️ **Christian verifies in-browser**: the Pack/Supplies/Belt panels on the
+road, the two-line 'MAIN HAND · TWO-HANDED' doll chip (reported taller
+than its row-mates), the craft row's '(1 stored)' suffix, the shop at
+phone width.
+📝 **`dart format` is not clean repo-wide** under SDK 3.13.2 (mage.dart,
+events.dart, inventory_tab.dart reformat untouched); lanes hand-matched
+style. Decide: reformat wholesale in one commit, or pin the formatter.
+
 ## Deferred / banked — do not build without an explicit ask
 
 - **📝 Creature sprites: the system works, the ART does not.** Built
