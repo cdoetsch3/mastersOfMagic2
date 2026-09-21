@@ -77,9 +77,12 @@ class _CraftScreenState extends State<CraftScreen> {
   bool _isLocked(GameState game, RecipeDef r) =>
       game.profile.skillLevel(r.skill.name) < r.skillLevel;
 
+  /// ⭐ [GameState.materialCount], never the backpack directly: the shelf's
+  /// "hide missing" filter and the craft gate must answer the same question,
+  /// or a recipe the town's Storeroom can afford gets hidden as unmakeable.
   bool _isMissing(GameState game, RecipeDef r) {
     for (final i in r.inputs) {
-      if (game.profile.backpack.countOf(i.defId) < i.count) return true;
+      if (game.materialCount(i.defId) < i.count) return true;
     }
     return false;
   }
@@ -347,15 +350,13 @@ class _RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final def = ItemCatalogue.tryById(recipe.outputId);
-    final name = def == null
-        ? recipe.outputId
-        : ItemCatalogue.displayName(def);
+    final name = def == null ? recipe.outputId : ItemCatalogue.displayName(def);
     final skillLevel = game.profile.skillLevel(recipe.skill.name);
     final locked = skillLevel < recipe.skillLevel;
     final shortfalls = <String>[];
     var haveAll = true;
     for (final i in recipe.inputs) {
-      if (game.profile.backpack.countOf(i.defId) < i.count) {
+      if (game.materialCount(i.defId) < i.count) {
         haveAll = false;
         final inputDef = ItemCatalogue.tryById(i.defId);
         shortfalls.add(
@@ -423,9 +424,7 @@ class _RecipeCard extends StatelessWidget {
                     // needs, or what I have? Naming the verb ("Unlocks at")
                     // puts the requirement first and makes the row a goal.
                     child: Text(
-                      locked
-                          ? 'Unlocks at $gateLabel'
-                          : gateLabel,
+                      locked ? 'Unlocks at $gateLabel' : gateLabel,
                       style: TextStyle(
                         color: locked ? AppColors.gold : AppColors.teal,
                         fontSize: 10,
@@ -515,6 +514,21 @@ class _RecipeCard extends StatelessWidget {
     final name = def == null
         ? outcome.defId!
         : ItemCatalogue.displayName(def, outcome.instance);
+    // ⭐ The note wins the banner when there is one: "where did it go?" beats
+    // "+12 XP" for a player whose pack was full, and the note already names
+    // the item. ⚠️ A level-up still gets said — it is the one thing worth
+    // more than the destination.
+    final note = outcome.note;
+    if (note != null) {
+      banner.show(
+        outcome.leveledTo != null
+            ? '$note ${Skills.displayName(outcome.skillKey!)} is now level '
+                  '${outcome.leveledTo}!'
+            : note,
+        color: outcome.leveledTo != null ? AppColors.gold : null,
+      );
+      return;
+    }
     // ⭐ Banner: the rolled NAME is the payoff of a craft and appears nowhere
     // else on this screen — the item lands in a backpack a tab away.
     banner.show(
@@ -528,16 +542,29 @@ class _RecipeCard extends StatelessWidget {
   }
 }
 
+/// One input line: what the recipe wants, and what the player has to hand.
+///
+/// ⭐ **Counts through [GameState.materialCount]**, the same reader the gate
+/// uses, and names the split when the town's Storeroom is part of the answer
+/// — otherwise a player with 3 stored logs reads "0 / 3" above a live Craft
+/// button and files a bug.
 class _NeedRow extends StatelessWidget {
   final GameState game;
   final RecipeInput input;
+
+  /// ⚠️ **Fixed, because the trailing cell's text changes width.** The count
+  /// moves as the player crafts and '(1 stored)' appears and vanishes with it;
+  /// a cell sized to its content would shove the row — and the press-stability
+  /// rule is that nothing the player presses may move when a count changes.
+  static const double _countCellWidth = 132;
 
   const _NeedRow({required this.game, required this.input});
 
   @override
   Widget build(BuildContext context) {
     final def = ItemCatalogue.tryById(input.defId);
-    final have = game.profile.backpack.countOf(input.defId);
+    final split = game.materialSplit(input.defId);
+    final have = split.pack + split.stored;
     final enough = have >= input.count;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 1),
@@ -549,11 +576,21 @@ class _NeedRow extends StatelessWidget {
               style: const TextStyle(color: AppColors.textDim, fontSize: 12),
             ),
           ),
-          Text(
-            '$have / ${input.count}${enough ? ' ✓' : ''}',
-            style: TextStyle(
-              color: enough ? AppColors.teal : AppColors.ember,
-              fontSize: 12,
+          SizedBox(
+            width: _countCellWidth,
+            child: Text(
+              '$have / ${input.count}${enough ? ' ✓' : ''}'
+              '${split.stored > 0 ? ' (${split.stored} stored)' : ''}',
+              textAlign: TextAlign.right,
+              // ⚠️ One line, always: wrapping would change the row's HEIGHT,
+              // which moves the buttons below it just as surely as width does.
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.fade,
+              style: TextStyle(
+                color: enough ? AppColors.teal : AppColors.ember,
+                fontSize: 12,
+              ),
             ),
           ),
         ],

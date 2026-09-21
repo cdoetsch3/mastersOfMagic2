@@ -376,17 +376,53 @@ class GameState extends ChangeNotifier {
 
   // ---- Crafting ---------------------------------------------------------
 
-  /// Makes [recipe]'s output from backpack materials: checks the gate,
+  /// How many [defId] a craft may count on: what is carried, plus what this
+  /// town's Storeroom holds when standing in a town.
+  ///
+  /// ⭐ **One reader for the craft gate and for every "have N" the Workbench
+  /// prints**, so they cannot disagree. A row that reads "3 / 3 ✓" above a
+  /// refusal that reads "Needs 1 more Oak Log" is the exact bug this exists to
+  /// make unrepresentable.
+  ///
+  /// ⚠️ **Town-only, resolved exactly as [equipFromStoreroom] resolves it**
+  /// (`profile.location.isTown`): a Storeroom is per city (ITEMS §10.3c), so
+  /// on the road this is the backpack and nothing else. 📝 Stacks only — a
+  /// Storeroom's `instanceIds` are distinct physical things, never the
+  /// fungible inputs a recipe names.
+  int materialCount(String defId) {
+    final split = materialSplit(defId);
+    return split.pack + split.stored;
+  }
+
+  /// [materialCount] split into its two sources, for a UI that wants to say
+  /// *where* the materials are ("3 / 3 ✓ (1 stored)").
+  ({int pack, int stored}) materialSplit(String defId) {
+    final pack = profile.backpack.countOf(defId);
+    if (!profile.location.isTown) return (pack: pack, stored: 0);
+    final stored = profile.storerooms[profile.locationId]?.stacks[defId] ?? 0;
+    return (pack: pack, stored: stored);
+  }
+
+  /// Makes [recipe]'s output from the materials to hand: checks the gate,
   /// consumes the inputs, mints the item, pays skill XP.
   ///
   /// ⭐ **Works anywhere** (ITEMS §9b.2 — stations are convenience, never a
-  /// gate). Inputs come from the backpack only for now; 📝 pulling from the
-  /// local Storeroom in town is a later nicety.
+  /// gate). ⭐ **Inputs come from the backpack *and*, in town, from this
+  /// town's Storeroom** (ruling 2026-09-21) — [materialCount] is the one
+  /// reader of "how many do I have". Consumption is **pack first, Storeroom
+  /// second**: the pack is what the player carries into the field, so
+  /// emptying it first frees the slots the output wants.
   ///
-  /// ⚠️ **Space is safe by arithmetic**: every recipe consumes ≥1 slot of
-  /// fungible inputs and yields exactly 1 slot, so a craft never overflows a
-  /// pack that could afford its inputs. The assert guards the recipe that
-  /// would break the theorem.
+  /// ⚠️ **Space is no longer safe by arithmetic.** Every recipe consumes ≥1
+  /// slot of fungible inputs and yields exactly 1 slot, so a craft whose
+  /// inputs all came from the pack can never overflow it — but an input drawn
+  /// from the Storeroom frees no slot, so such a craft can *net* a pack slot
+  /// and the output may not fit. When it does not, the output is deposited
+  /// into this town's Storeroom instead (you are standing in one, and it is
+  /// unbounded) and [CraftOutcome.note] says so. ⚠️ The output is never
+  /// silently dropped: a crafted item that vanishes is the worst failure
+  /// available here. The assert still guards the recipe that would break the
+  /// arithmetic for a pure-pack craft.
   ///
   /// ⭐ **The performance seam is live** (ruling 2026-08-18, quality affects
   /// stats): [performance] is the crafting act's grade (0–1) and feeds the
@@ -410,7 +446,7 @@ class GameState extends ChangeNotifier {
       );
     }
     for (final input in recipe.inputs) {
-      final short = input.count - profile.backpack.countOf(input.defId);
+      final short = input.count - materialCount(input.defId);
       if (short > 0) {
         final def = ItemCatalogue.tryById(input.defId);
         final name = def == null ? input.defId : ItemCatalogue.displayName(def);
@@ -446,12 +482,35 @@ class GameState extends ChangeNotifier {
 
     final levelBefore = profile.skillLevel(skillKey);
     final gained = Skills.xpForRecipe(recipe);
+    // ⚠️ Read once, before the write: the Storeroom this craft may draw from
+    // and stow into is the one under the character's feet, and nothing inside
+    // [_mutate] may move them.
+    final here = profile.locationId;
+    final inTown = profile.location.isTown;
     ItemInstance? minted;
+    var stowed = false;
     await _mutate(() {
       var pack = profile.backpack;
+      var room = profile.storerooms[here];
       for (final input in recipe.inputs) {
-        for (var n = 0; n < input.count; n++) {
+        // ⭐ Pack first, Storeroom second — see the doc comment. Reversing
+        // these two loops would hoard the pack and starve the output of slots.
+        var need = input.count;
+        while (need > 0 && pack.countOf(input.defId) > 0) {
           pack = pack.withRemovedFirst(input.defId);
+          need--;
+        }
+        while (need > 0 && inTown) {
+          final took = (room ?? const Storeroom()).withWithdrawn(
+            InventorySlot(defId: input.defId),
+          );
+          // ⚠️ Gated above on the same `stacks` this reads, so a short
+          // withdrawal cannot happen; the break is defensive, and it errs
+          // toward the player (the craft completes having consumed less)
+          // rather than toward a throw inside a save.
+          if (took.taken == null) break;
+          room = took.room;
+          need--;
         }
       }
       for (var n = 0; n < recipe.outputCount; n++) {
@@ -474,9 +533,20 @@ class GameState extends ChangeNotifier {
             instanceId: minted!.instanceId,
           );
         }
-        pack = pack.withAdded(slot) ?? pack;
+        final next = pack.withAdded(slot);
+        if (next != null) {
+          pack = next;
+        } else if (inTown) {
+          // ⚠️ The pack only fills here when inputs came out of storage — the
+          // arithmetic covers every other craft. Stow rather than drop.
+          room = (room ?? const Storeroom()).withDeposited(slot);
+          stowed = true;
+        }
       }
       profile.backpack = pack;
+      // ⚠️ Only when this craft touched it — an untouched town must not grow
+      // an empty Storeroom entry in every save.
+      if (room != null) profile.storerooms[here] = room;
       profile.skillXp[skillKey] = (profile.skillXp[skillKey] ?? 0) + gained;
     });
     final levelAfter = profile.skillLevel(skillKey);
@@ -486,6 +556,10 @@ class GameState extends ChangeNotifier {
       skillKey: skillKey,
       leveledTo: levelAfter > levelBefore ? levelAfter : null,
       instance: minted,
+      note: stowed
+          ? 'Made ${ItemCatalogue.displayName(outputDef, minted)} — stowed in '
+                'your storeroom (pack full).'
+          : null,
     );
   }
 
@@ -1634,12 +1708,21 @@ class CraftOutcome {
   /// The tier the craft rolled (§9b.9d), for a panel that wants only that.
   Quality? get quality => instance?.quality;
 
+  /// Player-facing news about a *successful* craft that the usual banner
+  /// would not carry — today, only "the output went to your storeroom".
+  ///
+  /// ⚠️ **Not a refusal.** The craft happened; this says where the item
+  /// landed. A UI that ignores it leaves the player hunting a pack that never
+  /// received the item (ruling 2026-09-21).
+  final String? note;
+
   const CraftOutcome.refused(this.refusal)
     : defId = null,
       xp = 0,
       skillKey = null,
       leveledTo = null,
-      instance = null;
+      instance = null,
+      note = null;
 
   const CraftOutcome.made({
     required this.defId,
@@ -1647,6 +1730,7 @@ class CraftOutcome {
     required this.skillKey,
     this.leveledTo,
     this.instance,
+    this.note,
   }) : refusal = null;
 
   bool get succeeded => refusal == null;
