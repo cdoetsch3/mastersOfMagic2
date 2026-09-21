@@ -1020,7 +1020,8 @@ class GameState extends ChangeNotifier {
   /// The health pool the player actually fights with: the level curve plus
   /// whatever the worn gear adds.
   ///
-  /// ⭐ **One definition, read by both [useItem] and the Supplies panel**, so
+  /// ⭐ **One definition, read by both [useItem] and the Pack panel's Health
+  /// line** (the adventure screen, above its Use buttons), so
   /// the "61 / 120" on screen is the same 120 a ration heals against. Two call
   /// sites computing this apart is how "the potion did nothing" gets reported
   /// as a bug when the player was simply already full.

@@ -8,6 +8,9 @@
 /// ⚠️ Since the 2026-08-17 ruling the say happens **after every fight**, not at
 /// the end of the run, and dying costs the whole backpack — so the panels this
 /// file drives are the victory picker and the defeat notice.
+///
+/// ⚠️ And since 2026-09-21 the way to eat is a Use button on the **Pack** row
+/// itself; there is no Supplies section any more.
 library;
 
 import 'dart:math';
@@ -58,15 +61,16 @@ void main() {
       game.run!.playerHp = 40;
       await _pump(tester, game);
 
-      // ⚠️ Twice since the 2026-09-21 ruling, and deliberately: Supplies lists
-      // it as something to drink, the Pack lists it as a slot to free. A
-      // single match here would mean one of the two panels lost it.
+      // ⚠️ ONCE since the 2026-09-21 amendment ("just add a 'Use' button to
+      // the 'Pack'"). It was listed twice — Supplies to drink it, the Pack to
+      // free its slot — and a second match here means that section is back.
       expect(
         find.text("Forager's Ration"),
-        findsNWidgets(2),
+        findsOneWidget,
         reason:
-            'a ration missing from either Supplies or the Pack is a panel '
-            'that stopped reading the backpack',
+            'one carried ration is one row; a ration missing entirely is a '
+            'Pack that stopped reading the backpack, and two is the deleted '
+            'Supplies section printing echoes again',
       );
       expect(
         find.textContaining('Restores 25% health'),
@@ -255,8 +259,8 @@ void main() {
         find.text('Use'),
         findsNothing,
         reason:
-            'the supplies panel is a second decision competing with the '
-            'one where something can be lost',
+            'the Pack panel is a second decision competing with the one '
+            'where something can be lost',
       );
 
       await tester.tap(find.text('Take 1'));

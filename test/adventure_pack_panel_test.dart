@@ -1,10 +1,12 @@
 /// The adventure screen's answer to "I filled up on dust and can't drop
 /// anything" (playtest ruling, 2026-09-21).
 ///
-/// ⭐ Three panels between fights: Supplies drinks from **both** containers,
-/// the Belt bay re-packs, and the Pack destroys. `quest_inventory_test.dart`
-/// pins the rules; this file pins that the screen actually reaches them —
-/// the same split `adventure_screen_test.dart` uses for the loot picker.
+/// ⭐ Two panels between fights since the same day's amendment ("just add a
+/// 'Use' button to the 'Pack', no need for a separate 'Supplies' section"):
+/// the **Pack** uses, belts and destroys, and the **Belt bay** re-packs and
+/// drinks. `quest_inventory_test.dart` pins the rules; this file pins that
+/// the screen actually reaches them — the same split
+/// `adventure_screen_test.dart` uses for the loot picker.
 library;
 
 import 'dart:math';
@@ -19,6 +21,7 @@ import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:masters_of_magic_2/screens/adventure_screen.dart';
+import 'package:masters_of_magic_2/ui/app_theme.dart';
 import 'package:masters_of_magic_2/ui/belt_bay.dart';
 
 final _woods = World.byId('whispering_woods');
@@ -48,6 +51,14 @@ Future<GameState> _onAdventure() async {
 final _confirmDrop = find.descendant(
   of: find.byType(AlertDialog),
   matching: find.text('Drop'),
+);
+
+/// The loaded belt slot, by the initial its box falls back to while
+/// `assets/items/` is empty — 'S' for Sapwort Draught, as `loop_ui_test` taps
+/// it. Scoped to the bay so a pack row starting with S cannot stand in.
+final _beltSlot = find.descendant(
+  of: find.byType(BeltBay),
+  matching: find.text('S'),
 );
 
 void main() {
@@ -195,86 +206,225 @@ void main() {
     });
   });
 
-  group('supplies from both containers', () {
-    testWidgets('⭐ a belt potion is drinkable between fights', (tester) async {
-      final game = await _onAdventure();
-      // Nothing drinkable in the pack, so the one 'Use' on screen is the
-      // belt's — the point of the test.
-      game.profile.belt = const Belt(loaded: ['sapwort_draught']);
-      game.run!.playerHp = 40;
-      await _pump(tester, game);
-
-      expect(
-        find.text('On your belt'),
-        findsOneWidget,
-        reason:
-            'a belted potion the player cannot reach between fights is the '
-            'second half of the complaint',
-      );
-
-      await tester.tap(find.text('Use'));
-      await tester.pumpAndSettle();
-
-      expect(
-        game.profile.belt.loaded,
-        isEmpty,
-        reason:
-            'the row must call useBeltItem — routing it at useItem refuses '
-            '("You are not carrying that") for a potion in plain sight',
-      );
-      expect(
-        game.run!.playerHp,
-        greaterThan(40),
-        reason: 'a Use that unloads without healing is theft',
-      );
-      expect(find.textContaining('You recover'), findsOneWidget);
-    });
-
-    testWidgets('⚠️ the panel stays put when there is nothing to drink', (
-      tester,
-    ) async {
-      final game = await _onAdventure();
-      await _pump(tester, game);
-
-      expect(
-        find.text('Nothing to drink.'),
-        findsOneWidget,
-        reason:
-            'it used to vanish when empty, so drinking your last ration made '
-            'the Belt and Pack panels jump up the screen mid-tap',
-      );
-      expect(
-        // ⚠️ Not a bare 'Health' — the progress card says "Health carried in"
-        // at the top of the same screen.
-        find.textContaining('Health 100 / '),
-        findsOneWidget,
-        reason: 'the health line is the panel and must survive an empty pack',
-      );
-    });
-
-    testWidgets('both containers are named when both hold something', (
+  group('one list, not two', () {
+    testWidgets('⭐ a carried ration is listed ONCE, with Use on its row', (
       tester,
     ) async {
       final game = await _onAdventure();
       game.profile.backpack = game.profile.backpack.withAdded(
         const InventorySlot(defId: 'foragers_ration'),
       )!;
-      game.profile.belt = const Belt(loaded: ['sapwort_draught']);
       game.run!.playerHp = 40;
       await _pump(tester, game);
 
-      expect(find.text('From your pack'), findsOneWidget);
       expect(
-        find.text('On your belt'),
+        find.text("Forager's Ration"),
         findsOneWidget,
         reason:
-            'where a potion is decides what drinking it costs later, so the '
-            'two groups are named rather than merged',
+            'the Supplies section printed every drinkable a second time, so '
+            "the player's pack read as a list of its own echoes — the "
+            "designer's whole note",
       );
       expect(
+        find.textContaining('SUPPLIES'),
+        findsNothing,
+        reason: 'a section header left behind is a section left behind',
+      );
+      for (final gone in const [
+        'From your pack',
+        'On your belt',
+        'Nothing to drink.',
+      ]) {
+        expect(
+          find.text(gone),
+          findsNothing,
+          reason:
+              '"$gone" only ever labelled the two supply groups; with one '
+              'list there is nothing left for it to tell apart',
+        );
+      }
+      expect(
         find.widgetWithText(TextButton, 'Use'),
+        findsOneWidget,
+        reason:
+            'the ration is drinkable, so its own row carries the verb — a '
+            'Pack without Use sends the player to a panel that is gone',
+      );
+      expect(
+        find.textContaining('Restores 25% health'),
+        findsOneWidget,
+        reason:
+            'the effect line came along with the button; a mutant that drops '
+            'it leaves "Use" meaning nothing in particular',
+      );
+    });
+
+    testWidgets('tapping the row Use heals, and empties the slot', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      game.profile.backpack = game.profile.backpack.withAdded(
+        const InventorySlot(defId: 'foragers_ration'),
+      )!;
+      game.run!.playerHp = 40;
+      await _pump(tester, game);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Use'));
+      await tester.pumpAndSettle();
+
+      expect(
+        game.run!.playerHp,
+        greaterThan(40),
+        reason: 'the row never called GameState.useItem — the whole point',
+      );
+      expect(
+        game.profile.backpack.countOf('foragers_ration'),
+        0,
+        reason: 'a heal that does not spend the ration duplicates it',
+      );
+      expect(
+        find.text("Forager's Ration"),
+        findsNothing,
+        reason:
+            'a Pack still drawing the drunk row did not rebuild, and the '
+            'next tap would drink a ration that is already gone',
+      );
+      expect(find.textContaining('You recover'), findsOneWidget);
+    });
+
+    testWidgets('⭐ the Health line sits inside the Pack, above its rows', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      game.profile.backpack = game.profile.backpack.withAdded(
+        const InventorySlot(defId: 'foragers_ration'),
+      )!;
+      game.run!.playerHp = 40;
+      await _pump(tester, game);
+
+      // ⚠️ Not a bare 'Health' — the progress card says "Health carried in"
+      // at the top of the same screen.
+      final health = find.textContaining('Health 40 / ${game.maxHp}');
+      expect(
+        health,
+        findsOneWidget,
+        reason:
+            'without the pool it heals against, "25%" is half an answer and '
+            'a refusal at full health looks like a broken button',
+      );
+      // The Pack's own body — the GamePanel under its section label, not the
+      // Column that merely holds both.
+      final packBody = find.descendant(
+        of: find
+            .ancestor(
+              of: find.textContaining('PACK ·'),
+              matching: find.byType(Column),
+            )
+            .first,
+        matching: find.byType(GamePanel),
+      );
+      expect(packBody, findsOneWidget);
+      expect(
+        find.descendant(of: packBody, matching: health),
+        findsOneWidget,
+        reason:
+            'it is the number every Use on this panel is decided against; a '
+            'mutant that leaves it floating above the panel — or strands it '
+            'in a panel of its own — re-opens the section the ruling deleted',
+      );
+      expect(
+        tester.getTopLeft(health).dy,
+        greaterThan(tester.getTopLeft(find.textContaining('PACK ·')).dy),
+        reason: 'under the header it belongs to, not loose above it',
+      );
+      expect(
+        tester.getTopLeft(health).dy,
+        lessThan(tester.getTopLeft(find.text("Forager's Ration")).dy),
+        reason: 'above the rows it informs, not buried under them',
+      );
+    });
+
+    testWidgets('⚠️ an empty pack keeps its panel, and its Health line', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      await _pump(tester, game);
+
+      expect(
+        find.text('Your pack is empty.'),
+        findsOneWidget,
+        reason:
+            'a panel that vanishes when empty makes the Belt bay under it '
+            'jump up the screen mid-tap',
+      );
+      expect(
+        find.textContaining('Health 100 / '),
+        findsOneWidget,
+        reason:
+            'the health line belongs to the panel, not to the rows — using '
+            'your last ration must not take it away with the row',
+      );
+    });
+
+    testWidgets('⚠️ a row missing a button still reserves its cell', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      // Three shapes of row, on purpose: the draught is Usable AND Beltable,
+      // the ration is Usable only, the log is neither.
+      game.profile.backpack = game.profile.backpack
+          .withAdded(const InventorySlot(defId: 'sapwort_draught'))!
+          .withAdded(const InventorySlot(defId: 'foragers_ration'))!
+          .withAdded(const InventorySlot(defId: 'oak_log'))!;
+      await _pump(tester, game);
+
+      final uses = find.widgetWithText(TextButton, 'Use');
+      final drops = find.widgetWithText(TextButton, 'Drop');
+      expect(drops, findsNWidgets(3));
+      expect(
+        uses,
         findsNWidgets(2),
-        reason: 'one Use per container — a merged list loses one of them',
+        reason:
+            'a log is not Usable, and a Use on its row would be a button '
+            'whose only outcome is a refusal',
+      );
+      expect(
+        find.widgetWithText(TextButton, 'Belt'),
+        findsOneWidget,
+        reason: 'only the draught is Beltable',
+      );
+      expect(
+        tester.getTopLeft(uses.at(1)).dx,
+        tester.getTopLeft(uses.at(0)).dx,
+        reason:
+            "the ration has no Belt button, so unless its row reserves that "
+            'cell its Use slides a whole column right — and the Use the '
+            'player aimed at on the row above is now a Belt',
+      );
+      // ⚠️ The name cell is Expanded, so it swallows any cell a row fails to
+      // reserve: where the trailing block STARTS is the only thing that says
+      // whether the columns really line up.
+      double trailingStartsAt(String name) => tester
+          .getTopRight(
+            find
+                .ancestor(of: find.text(name), matching: find.byType(Column))
+                .first,
+          )
+          .dx;
+      expect(
+        trailingStartsAt('Oak Log'),
+        trailingStartsAt('Sapwort Draught'),
+        reason:
+            'a log row that reserves neither Use nor Belt gives its name 148 '
+            'extra pixels and starts its buttons there — the columns stop '
+            'being columns, which is the press-stability rule',
+      );
+      expect(
+        tester.getTopLeft(drops.at(2)).dx,
+        tester.getTopLeft(drops.at(0)).dx,
+        reason:
+            'Drop is the one button on every row; a per-row action width '
+            'would move it under the finger between rows',
       );
     });
   });
@@ -387,6 +537,127 @@ void main() {
             'not exist',
       );
       expect(find.widgetWithText(TextButton, 'Drop'), findsOneWidget);
+    });
+
+    testWidgets('⭐ a belted potion is drunk from its own slot', (tester) async {
+      final game = await _onAdventure();
+      // ⚠️ A worn belt, so the bay survives the drink: with capacity 0 the
+      // whole bay is gone the moment the last slot empties (the town's own
+      // condition) and "did it rebuild?" has nothing left to ask.
+      game.profile.itemInstances['b'] = const ItemInstance(
+        instanceId: 'b',
+        defId: 'fawnhide_belt',
+      );
+      game.profile.equipped[EquipSlot.belt] = 'b';
+      game.profile.belt = const Belt(loaded: ['sapwort_draught']);
+      game.run!.playerHp = 40;
+      await _pump(tester, game);
+
+      await tester.tap(_beltSlot);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.widgetWithText(TextButton, 'Drink'),
+        findsOneWidget,
+        reason:
+            'with Supplies gone the slot IS the door — a belted potion with '
+            'no way to drink it between fights is the ruling half-done',
+      );
+
+      await tester.tap(find.widgetWithText(TextButton, 'Drink'));
+      await tester.pumpAndSettle();
+
+      expect(
+        game.profile.belt.loaded,
+        isEmpty,
+        reason:
+            'the action must call useBeltItem — routed at useItem it refuses '
+            '("You are not carrying that") for a potion in plain sight',
+      );
+      expect(
+        game.run!.playerHp,
+        greaterThan(40),
+        reason: 'a Drink that unloads without healing is theft',
+      );
+      expect(
+        find.textContaining('Belt — 0/'),
+        findsOneWidget,
+        reason: 'the bay that still draws the drunk potion never rebuilt',
+      );
+      expect(
+        find.textContaining('You recover'),
+        findsOneWidget,
+        reason:
+            'the bay owns no banner, so a screen that does not report the '
+            'outcome leaves the tap looking like nothing happened',
+      );
+    });
+
+    testWidgets('⚠️ a full-health Drink is refused out loud, not swallowed', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      game.profile.belt = const Belt(loaded: ['sapwort_draught']);
+      await _pump(tester, game); // full health
+
+      await tester.tap(_beltSlot);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, 'Drink'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('already at full health'),
+        findsOneWidget,
+        reason: 'a silent no-op reads as the game being broken',
+      );
+      expect(game.profile.belt.loaded, [
+        'sapwort_draught',
+      ], reason: 'a refusal that still empties the slot drinks it for you');
+    });
+  });
+
+  group('the belt bay in town', () {
+    testWidgets('⚠️ Drink is greyed with the reason, never hidden', (
+      tester,
+    ) async {
+      // No run at all — the inventory tab's belt, not the road's.
+      final game = GameState(_Mem(), PlayerProfile.newPlayer());
+      game.profile.belt = const Belt(loaded: ['sapwort_draught']);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: BeltBay(game: game)),
+        ),
+      );
+
+      await tester.tap(_beltSlot);
+      await tester.pumpAndSettle();
+
+      final drink = find.widgetWithText(TextButton, 'Drink');
+      expect(
+        drink,
+        findsOneWidget,
+        reason:
+            'a Drink that is simply absent in town teaches the player that '
+            'belted potions cannot be drunk at all — the 2026-08-17 rule',
+      );
+      expect(
+        tester.widget<TextButton>(drink).onPressed,
+        isNull,
+        reason:
+            'useBeltItem with no run answers "Not on an adventure." — a '
+            'refusal is not a menu item',
+      );
+      expect(
+        find.textContaining('Only between fights'),
+        findsOneWidget,
+        reason: 'the reason has to be readable without a hover',
+      );
+      expect(
+        find.text('Take off belt'),
+        findsOneWidget,
+        reason: 'the unload the town dialog always had must survive',
+      );
+      expect(game.profile.belt.loaded, ['sapwort_draught']);
     });
   });
 }

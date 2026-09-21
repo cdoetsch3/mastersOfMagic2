@@ -1002,7 +1002,7 @@ first, then four Opus lanes + one change by hand. Merged e000454 · 5a8712e ·
    ~740 dp, so below 760 the chips hide, the sort box is icon-only (fixed
    28 px), gaps tighten. ⚠️ Christian ruled "~480"; the number moved because
    the test measured overflow at 480. Verify on his phone.
-⚠️ **Christian verifies in-browser**: the Pack/Supplies/Belt panels on the
+⚠️ **Christian verifies in-browser**: the Pack and Belt panels on the
 road, the two-line 'MAIN HAND · TWO-HANDED' doll chip (reported taller
 than its row-mates), the craft row's '(1 stored)' suffix, the shop at
 phone width.
