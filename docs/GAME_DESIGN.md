@@ -399,7 +399,9 @@ MoM2 adds **spell slots** unlocked via leveling.
 - 💡 **Consumables** — potions purchasable/usable.
 - 💡 **Enchantments** — enhance equipment.
 - 💡 **Crafting** — craft equipment from raw materials.
-- ✅ **Daily & weekly quests** for bonus XP.
+- ✅ **Daily & weekly quests** for bonus XP. 📝 removed 2026-09-21; returns
+  much later — the Home tab's placeholder 'Today' cards are gone (they
+  counted nothing); the design stays, unbuilt.
 
 ### Economy / freemium
 - ✅ Gold = primary currency (earned in-game).
@@ -1589,8 +1591,9 @@ always-a-legal-action invariant and the forfeit-counter rule in §1.
     ❓ Ruling needed: presumably a **bank/backpack split** — unlimited (or
     large) storage at home/town, the 20-item backpack (+ craftable pouches)
     being what you *carry on a run*. Define explicitly.
-  - **Home** (center): dashboard — quests, resume adventure, PvP queue, timers,
-    currencies, events.
+  - **Home** (center): dashboard — resume adventure, PvP queue, timers,
+    currencies, events. (Daily/weekly goals: 📝 removed 2026-09-21; returns
+    much later.)
   - **Spellbook**: spell collection, unlocks (studying timers), loadout presets.
   - **Social**: friends & challenges (stub for now).
 - ✅ Duels are landscape; menu orientation decided via mockups (avoid forcing the

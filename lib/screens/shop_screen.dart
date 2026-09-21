@@ -862,9 +862,13 @@ void _sortShelf<T>(
 /// ⭐ **Phones hide them** (Christian, 2026-09-21: "shop UI labels too big,
 /// remove on phone layout"). Below [chipBreakpoint] the 'Native −25%' and
 /// 'Price spike +N%' chips collided with the STOCK column; the PRICE column
-/// already shows the number they explain, and the item dialog (tap the name)
-/// still carries the words. Width is the only input — a tablet in portrait
-/// keeps them. Public so the test can pin both sides of the line.
+/// already shows the number they explain. Width is the only input — a tablet
+/// in portrait keeps them. Public so the test can pin both sides of the line.
+///
+/// ⭐ **Where the words went** (ruling 2026-09-21, the same day): hiding them
+/// here is only tolerable because the item dialog now carries them — tap the
+/// row's name and the chips are under it, at EVERY width. This flag governs
+/// the ROW alone; the dialog's `tags` are unconditional.
 bool shopChipsFit(BuildContext context) =>
     MediaQuery.sizeOf(context).width >= chipBreakpoint;
 
@@ -1479,7 +1483,18 @@ class _BuyRow extends StatelessWidget {
             // inspecting one is not a way to buy it.
             Expanded(
               child: _InfoTap(
-                onTap: () => showItemDialog(context, def: def),
+                // ⭐ The chips ride into the dialog at EVERY width (ruling
+                // 2026-09-21), not only when the row hid them: the dialog
+                // has room, and a tag that appears or vanishes with the
+                // window is a worse rule than one that is always there.
+                onTap: () => showItemDialog(
+                  context,
+                  def: def,
+                  tags: [
+                    _TierChip(mod: locationMod),
+                    if (eventMod != 1.0) _EventChip(eventMod: eventMod),
+                  ],
+                ),
                 child: Row(
                   children: [
                     _ItemGlyph(defId: itemId, name: name),
@@ -1752,7 +1767,20 @@ class _SellStackRow extends StatelessWidget {
             // stepper on the right keeps its own gestures untouched.
             Expanded(
               child: _InfoTap(
-                onTap: () => showItemDialog(context, def: def),
+                // ⭐ Same tags as the Buy row, at every width (ruling
+                // 2026-09-21). ⚠️ Still gated on [stocked], exactly as the
+                // row's own chips are: an item this town does not trade
+                // prices against the flat vendor sink, so `locationMod` is
+                // the 1.0 placeholder above — printing 'Standard' for it
+                // would invent a tier the price never used.
+                onTap: () => showItemDialog(
+                  context,
+                  def: def,
+                  tags: [
+                    if (stocked) _TierChip(mod: locationMod),
+                    if (eventMod != 1.0) _EventChip(eventMod: eventMod),
+                  ],
+                ),
                 child: Row(
                   children: [
                     _ItemGlyph(defId: itemId, name: name),

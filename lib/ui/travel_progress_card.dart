@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../game/active_trip.dart';
 import '../game/game_state.dart';
 import '../game/world.dart';
 import 'app_theme.dart';
@@ -39,17 +40,6 @@ class _TravelProgressCardState extends State<TravelProgressCard> {
   void dispose() {
     _ticker?.cancel();
     super.dispose();
-  }
-
-  /// mm:ss under an hour, h:mm above it — a two-hour countdown ticking
-  /// seconds is noise, and a 40-second one needs them.
-  String _remaining(Duration d) {
-    if (d.inHours >= 1) {
-      return '${d.inHours}h ${(d.inMinutes % 60).toString().padLeft(2, '0')}m';
-    }
-    final m = d.inMinutes;
-    final s = d.inSeconds % 60;
-    return '$m:${s.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -92,7 +82,10 @@ class _TravelProgressCardState extends State<TravelProgressCard> {
                 ),
               ),
               Text(
-                _remaining(trip.remainingAt(now)),
+                // ⭐ [formatRemaining] rounds the seconds UP, so this clock
+                // reads 0:00 at the same instant the bar below reaches 1.0
+                // and not a second earlier (ruling 2026-09-21).
+                formatRemaining(trip.remainingAt(now)),
                 style: const TextStyle(
                   color: AppColors.teal,
                   fontSize: 15,

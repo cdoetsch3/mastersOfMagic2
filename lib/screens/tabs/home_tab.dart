@@ -10,8 +10,15 @@ import '../skills_screen.dart';
 import '../home_shell.dart';
 import '../matchmaking_screen.dart';
 
-/// Center dashboard: progress, quests, the PvP entry point, and shortcuts
-/// into the rest of the app. The engagement hub.
+/// Center dashboard: progress, the PvP entry point, and shortcuts into the
+/// rest of the app. The engagement hub.
+///
+/// 📝 **No daily/weekly goals here** (ruling 2026-09-21). The 'Today' section
+/// and its two placeholder cards ('Win 3 duels', 'Reach level 3') were
+/// static props — nothing counted, nothing paid out — and the real feature
+/// "will be implemented at a much later date". Removed rather than left
+/// showing 0 / 3 forever; when goals return they return as a system, not as
+/// two `const` widgets.
 class HomeTab extends StatelessWidget {
   final ValueChanged<int> onSelectTab;
   const HomeTab({super.key, required this.onSelectTab});
@@ -45,21 +52,6 @@ class HomeTab extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(14, 4, 14, 8),
             children: [
               _XpCard(p: p),
-              const SizedBox(height: 14),
-              const SectionLabel('Today'),
-              const _QuestCard(
-                icon: Icons.wb_sunny,
-                title: 'Win 3 duels',
-                subtitle: 'Daily quest · reward 50 gold',
-                progress: '0 / 3',
-              ),
-              const SizedBox(height: 8),
-              const _QuestCard(
-                icon: Icons.school,
-                title: 'Reach level 3',
-                subtitle: 'Weekly quest · unlocks a 2nd loadout',
-                progress: 'in progress',
-              ),
               const SizedBox(height: 14),
               const SectionLabel('Continue'),
               GamePanel(
@@ -359,54 +351,6 @@ class _FindDuelButton extends StatelessWidget {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => MatchmakingScreen(loadout: preset.toLoadout()),
-      ),
-    );
-  }
-}
-
-class _QuestCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String progress;
-  const _QuestCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.progress,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GamePanel(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(
-        children: [
-          Icon(icon, color: AppColors.gold, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(color: AppColors.text, fontSize: 14),
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: AppColors.textDim,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            progress,
-            style: const TextStyle(color: AppColors.textFaint, fontSize: 12),
-          ),
-        ],
       ),
     );
   }

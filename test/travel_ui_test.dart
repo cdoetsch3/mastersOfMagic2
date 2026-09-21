@@ -6,6 +6,7 @@ import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/game/travel.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:masters_of_magic_2/screens/tabs/map_tab.dart';
+import 'package:masters_of_magic_2/ui/travel_progress_card.dart';
 
 class _MemStorage implements ProfileStorage {
   PlayerProfile? stored;
@@ -138,6 +139,76 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     final second = World.byId(trip.stops[1]).name;
     expect(find.textContaining('On the road from $second'), findsOneWidget);
+  });
+
+  // ⭐ Ruling 2026-09-21: "it ends at 0:00 instead of the 0:00 hitting before
+  // the bar reaches the end". Pumped against the CARD rather than the tab, so
+  // the clock can sit a fraction of a second short of arrival — the tab's
+  // ticker settles the trip on the next tick and takes the card with it.
+  testWidgets('the clock reaches 0:00 only when the bar is full', (
+    tester,
+  ) async {
+    final game = GameState(_MemStorage(), PlayerProfile.newPlayer(), now: now);
+    await game.beginTravel('whispering_woods');
+    final arrivesAt = game.profile.trip!.arrivesAt;
+
+    // A fresh widget instance each time: the card reads the clock in build,
+    // and nothing else would ask it to rebuild at a chosen instant.
+    Future<void> pumpAt(DateTime at) async {
+      clock = at;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GameStateScope(
+            state: game,
+            child: Scaffold(body: TravelProgressCard(game: game)),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    double barValue() => tester
+        .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator))
+        .value!;
+
+    await pumpAt(arrivesAt.subtract(const Duration(milliseconds: 300)));
+    expect(
+      find.text('0:01'),
+      findsOneWidget,
+      reason:
+          'the floor mutant (the shipped behaviour before this ruling) reads '
+          '0:00 here, 300 ms before arrival',
+    );
+    expect(
+      barValue(),
+      lessThan(1.0),
+      reason:
+          'and it reads it while the bar is still short of the end — the '
+          'disagreement the ruling is about',
+    );
+
+    await pumpAt(arrivesAt);
+    expect(
+      find.text('0:00'),
+      findsOneWidget,
+      reason:
+          'a fix that lengthened the TRIP by a second (rather than ceiling '
+          'the display) would still read 0:01 at arrivesAt',
+    );
+    expect(
+      barValue(),
+      1.0,
+      reason:
+          'the bar and the clock must land on the same instant; this also '
+          'pins that the fix did not move arrivesAt itself',
+    );
+    expect(
+      game.profile.trip!.isCompleteAt(arrivesAt),
+      isTrue,
+      reason:
+          'the trip is unchanged by a display rule — a +1 s added to the '
+          'journey would leave it incomplete at its own arrivesAt',
+    );
   });
 
   testWidgets('a drag below the map scrolls the page', (tester) async {

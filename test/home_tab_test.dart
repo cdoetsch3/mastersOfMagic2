@@ -94,4 +94,55 @@ void main() {
           '"Ladder 1200 · Academy 1550" here instead',
     );
   });
+
+  // ⭐ Ruling 2026-09-21: the daily/weekly goal cards were placeholders that
+  // counted nothing, and the feature "will be implemented at a much later
+  // date". They are gone from the tab — the section label with them, since a
+  // 'Today' heading over nothing is worse than either.
+  testWidgets('the Today goals section is gone, Continue stays', (
+    tester,
+  ) async {
+    await _pumpHomeTab(tester, PlayerProfile.newPlayer());
+
+    // ⚠️ UPPERCASE on purpose: `SectionLabel` renders `text.toUpperCase()`,
+    // so asserting find.text('Today') would pass against a tab that still
+    // shows the heading — a vacuous green.
+    expect(
+      find.text('TODAY'),
+      findsNothing,
+      reason:
+          'a removal that deletes the two _QuestCards but leaves '
+          "SectionLabel('Today') behind would strand an empty heading "
+          'between the XP card and Continue',
+    );
+    expect(
+      find.text('Win 3 duels'),
+      findsNothing,
+      reason:
+          'the daily card itself — a mutant that only removes the weekly '
+          "('Reach level 3') card still shows this one",
+    );
+    expect(
+      find.text('Reach level 3'),
+      findsNothing,
+      reason:
+          'the weekly card — the mirror mutant, removing only the daily one',
+    );
+    expect(
+      find.textContaining('quest'),
+      findsNothing,
+      reason:
+          "'Daily quest · reward 50 gold' / 'Weekly quest · unlocks a 2nd "
+          "loadout' were the cards' sublines; a removal that kept a subline "
+          '(or re-added the cards under new titles) fails here',
+    );
+    expect(
+      find.text('CONTINUE'),
+      findsOneWidget,
+      reason:
+          'the section BELOW the goals must survive — an over-eager deletion '
+          'that took the Continue label with the Today one is the mutant '
+          'this kills',
+    );
+  });
 }

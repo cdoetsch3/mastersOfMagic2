@@ -33,12 +33,19 @@ import 'item_icon.dart';
 /// "Load onto belt" that vanishes when the belt is full teaches the player
 /// nothing, and they conclude the item is not beltable. A dead button plus
 /// "Your belt is full." teaches them the rule and where to fix it.
+///
+/// [tags] are small chips the CALLING screen contributes — the Shop's tier
+/// and spike/sale chips today. ⭐ **Widgets, not data** (ruling 2026-09-21):
+/// the chips already exist as private widgets on the screen that understands
+/// them, and this dialog has no business knowing what a location tier is. It
+/// gives them a row and nothing else.
 Future<void> showItemDialog(
   BuildContext context, {
   required ItemDef def,
   ItemInstance? instance,
   List<({String label, Future<String?> Function() run})> actions = const [],
   List<({String label, String reason})> unavailable = const [],
+  List<Widget> tags = const [],
 }) async {
   // ⚠️ **The instance's numbers, not the definition's** — quality scales
   // stats (ruling 2026-08-18), and a tooltip quoting the base while the duel
@@ -86,6 +93,19 @@ Future<void> showItemDialog(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ⭐ **Directly under the name, above everything the item IS**
+          // (ruling 2026-09-21): the tags qualify the thing itself — on a
+          // phone the Shop's rows hide their chips for want of width, and
+          // this dialog is where 'Native −25%' has to be readable instead.
+          // ⚠️ A [Wrap], not a Row: two chips plus a long rarity name would
+          // overflow a narrow dialog, and the point of moving them here was
+          // that they no longer have to fit on one line.
+          if (tags.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Wrap(spacing: 6, runSpacing: 4, children: tags),
+            ),
+          ],
           // ⭐ **Where it goes, before what it does** — and for a two-hander
           // that line is 'Main hand · two-handed' (ruling 2026-09-21), so the
           // player meets the rule on the staff rather than on the refusal

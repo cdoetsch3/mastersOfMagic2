@@ -177,3 +177,35 @@ class ActiveTrip {
   String toString() =>
       'ActiveTrip(${stops.join(" > ")}, ${totalMinutes}m from $departedAt)';
 }
+
+/// The countdown as the travel card prints it: `m:ss` under an hour, `Nh MMm`
+/// above it — a two-hour countdown ticking seconds is noise, and a
+/// forty-second one needs them.
+///
+/// ⭐ **Seconds are rounded UP, and that is the whole ruling** (Christian,
+/// 2026-09-21: the timer must end "at 0:00 instead of the 0:00 hitting before
+/// the bar reaches the end"). Flooring printed 0:00 for the entire last second
+/// of every journey while the bar still had a sliver to walk — the two halves
+/// of the same card disagreeing about whether you had arrived. With a ceiling,
+/// 0.4 s left reads 0:01, and 0:00 first appears at the very instant
+/// [ActiveTrip.isCompleteAt] flips and [ActiveTrip.progressAt] reaches 1.
+///
+/// ⚠️ **A display rule, NOT a longer trip.** The tempting fix — adding a flat
+/// second to the journey — would move [ActiveTrip.arrivesAt], and that is the
+/// timestamp arrival, settling and every other caller derive from. The trip is
+/// untouched; only the string changes. Anything that needs the real remainder
+/// must keep asking [ActiveTrip.remainingAt].
+String formatRemaining(Duration d) {
+  // ⚠️ Microseconds, not `inSeconds`: the latter has already floored, which is
+  // exactly the bug. A negative remainder (a clock nudged past arrival) is 0,
+  // never '-1:59'.
+  final seconds = d.isNegative
+      ? 0
+      : (d.inMicroseconds / Duration.microsecondsPerSecond).ceil();
+  if (seconds >= Duration.secondsPerHour) {
+    final hours = seconds ~/ Duration.secondsPerHour;
+    final minutes = (seconds % Duration.secondsPerHour) ~/ 60;
+    return '${hours}h ${minutes.toString().padLeft(2, '0')}m';
+  }
+  return '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
+}

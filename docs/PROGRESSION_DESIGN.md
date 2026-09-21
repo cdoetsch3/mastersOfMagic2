@@ -137,8 +137,8 @@ plateaus and a duelist who also crafts feels accelerated, not obligated.
 
 | Source | XP shape | Notes |
 |---|---|---|
-| **Daily quests** (exists) | ~1 even-match win each | "Win 3 duels" etc.; the daily session anchor |
-| **Weekly quests** (exists) | ~5 wins | Bigger arc ("Reach level 3", "Win with 3 elements") |
+| **Daily quests** (📝 removed 2026-09-21; returns much later) | ~1 even-match win each | "Win 3 duels" etc.; the daily session anchor |
+| **Weekly quests** (📝 removed 2026-09-21; returns much later) | ~5 wins | Bigger arc ("Reach level 3", "Win with 3 elements") |
 | **Crafting** | small XP per craft, **daily cap** (~2 wins' worth) | Transmute/salvage loops; cap prevents mindless grinding |
 | **Enchanting** | medium XP, consumes materials | Material cost is the natural rate limiter — can be uncapped |
 | **First-time bonuses** | one-shot chunks | First win vs each AI persona, first clear of each campaign node, first win with each element |

@@ -1585,6 +1585,68 @@ void main() {
         );
       });
 
+      // ⭐ Ruling 2026-09-21 (the other half of the phone ruling): the row may
+      // hide the words, but the ITEM DIALOG must carry them — otherwise a
+      // phone player has no way left to learn why the price is what it is.
+      testWidgets('on a phone the tier chip lives in the item dialog', (
+        tester,
+      ) async {
+        final eventDay = _dayWith(event: true, itemId: _oak);
+        final game = _game(_MemStorage(), now: _atEpochDay(eventDay));
+        await _pump(tester, game, width: 390);
+
+        // The row is silent — the premise of this test.
+        expect(find.textContaining('Native'), findsNothing);
+
+        await _tapRowInfo(tester, _rowFor(_oak), _name(_oak));
+
+        expect(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.text('Native −25%'),
+          ),
+          findsOneWidget,
+          reason:
+              'a mutant that passes `tags` only when the chips already FIT '
+              '(reusing shopChipsFit at the call site) leaves the phone '
+              'player with no explanation of the price anywhere on screen',
+        );
+        expect(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.textContaining('Price spike'),
+          ),
+          findsOneWidget,
+          reason:
+              'the event chip travels with the tier chip — a mutant passing '
+              'only [_TierChip] drops the one that MOVED the price today',
+        );
+        await _closeItemDialog(tester);
+      });
+
+      testWidgets('the dialog carries the tags on a wide screen too', (
+        tester,
+      ) async {
+        final eventDay = _dayWith(event: true, itemId: _oak);
+        final game = _game(_MemStorage(), now: _atEpochDay(eventDay));
+        await _pump(tester, game, width: 900);
+
+        await _tapRowInfo(tester, _rowFor(_oak), _name(_oak));
+
+        expect(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.text('Native −25%'),
+          ),
+          findsOneWidget,
+          reason:
+              'the inverse mutant — tags passed only BELOW the breakpoint — '
+              'would make the dialog inconsistent with itself between two '
+              'window sizes; the ruling is that it always shows them',
+        );
+        await _closeItemDialog(tester);
+      });
+
       testWidgets('at 760 wide (the line itself) the chips are back', (
         tester,
       ) async {

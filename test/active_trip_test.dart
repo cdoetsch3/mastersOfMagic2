@@ -288,4 +288,86 @@ void main() {
     await game.tick();
     expect(storage.writes, writes + 1);
   });
+
+  /// ⭐ Ruling 2026-09-21: the countdown must reach 0:00 exactly when the bar
+  /// reaches the end, so it CEILS the seconds. The trip itself is unchanged —
+  /// these assertions are about the string, not about `arrivesAt`.
+  group('formatRemaining rounds up so the clock lands with the bar', () {
+    test('a fraction of a second still reads as a second', () {
+      expect(
+        formatRemaining(const Duration(milliseconds: 400)),
+        '0:01',
+        reason:
+            'the bug itself: a floor prints 0:00 here while the bar still '
+            'has 0.4 s of walking left',
+      );
+    });
+
+    test('0:00 is reserved for actually having arrived', () {
+      expect(
+        formatRemaining(Duration.zero),
+        '0:00',
+        reason:
+            'a naive ceil-then-add-one (or a +1 s applied to the duration) '
+            'would print 0:01 at the very instant of arrival, so the clock '
+            'would never show 0:00 at all',
+      );
+    });
+
+    test('a whole number of seconds is not pushed up a step', () {
+      expect(
+        formatRemaining(const Duration(seconds: 61)),
+        '1:01',
+        reason:
+            'ceil must be a no-op on an exact second — a +1 s implementation '
+            'reads 1:02 here',
+      );
+    });
+
+    test('the carry into the minute is computed after rounding', () {
+      expect(
+        formatRemaining(const Duration(milliseconds: 60500)),
+        '1:01',
+        reason:
+            'a floor mutant says 1:00; a mutant that ceils the SECONDS field '
+            'alone (60.5 s → 1 min + ceil(0.5 s)) happens to agree here but '
+            'not at the 119.5 s case below',
+      );
+      expect(
+        formatRemaining(const Duration(milliseconds: 119500)),
+        '2:00',
+        reason:
+            'rounding up must carry into the minutes — 119.5 s is 120 s, and '
+            'a per-field ceil prints 1:60',
+      );
+    });
+
+    test('a clock nudged past arrival never prints a negative countdown', () {
+      expect(
+        formatRemaining(const Duration(seconds: -5)),
+        '0:00',
+        reason:
+            'without the isNegative guard, ceil(-5) prints "0:-5"; '
+            'remainingAt clamps, but this formatter is public and must not '
+            'depend on its caller for that',
+      );
+    });
+
+    test('an hour or more switches to Nh MMm, still rounded up', () {
+      expect(
+        formatRemaining(const Duration(minutes: 90)),
+        '1h 30m',
+        reason:
+            'the long-haul shape survives the rewrite — a mm:ss-only '
+            'formatter prints 90:00 for a mounted cross-map journey',
+      );
+      expect(
+        formatRemaining(const Duration(milliseconds: 3599500)),
+        '1h 00m',
+        reason:
+            'rounding up crosses the hour line: 3599.5 s is 3600 s, and a '
+            'mutant testing the RAW duration against an hour prints 59:60',
+      );
+    });
+  });
 }
