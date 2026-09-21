@@ -112,7 +112,8 @@ void main() {
         'glance': 1, 'divert': 3,
         'truesight': 1, 'hawkeye': 3,
         'keen': 2, 'ardent': 4,
-        'heavyhand': 2, 'overkill': 4,
+        // ✅ Overkill re-ruled 4 → 3, 2026-09-21.
+        'heavyhand': 2, 'overkill': 3,
       };
       expect({for (final s in Spellbook.stances) s.id: s.chargeCost}, ruled,
           reason: '⚠️ the price points ARE the design — a stance mispriced by '

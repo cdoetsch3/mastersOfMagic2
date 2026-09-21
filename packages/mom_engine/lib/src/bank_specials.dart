@@ -137,7 +137,7 @@ bool blanksIncomingCrits(MageState defender) =>
 
 // ---- Bloodlust — the licensed two-status exception -----------------------
 
-/// Bloodlust's **Keen**: +20% crit chance for 12 turns.
+/// Bloodlust's **Keen**: +20% crit chance for 25 turns.
 ///
 /// ⭐ A price point on the stat lane's [KeenStatus], deliberately — not a
 /// second crit-chance status of this lane's own. §7a licenses Bloodlust to
@@ -146,14 +146,18 @@ bool blanksIncomingCrits(MageState defender) =>
 /// a standing Ardent (+25%) is genuinely overwritten by this weaker, shorter
 /// burst. The exception buys a window, not a floor.
 ///
+/// ✅ Re-ruled 2026-09-21: 12 → 25 turns, on both statuses. Still shorter than
+/// Ardent's 30, so the collision above still costs you the longer stance — the
+/// window is just wide enough now to be worth the 5 charge it asks for.
+///
 /// ⚠️ A top-level function so the tear-off is a constant expression and the
 /// [Spell] can stay `const`.
-KeenStatus bloodlustKeen() => KeenStatus(critChance: 20, turns: 12);
+KeenStatus bloodlustKeen() => KeenStatus(critChance: 20, turns: 25);
 
-/// Bloodlust's **Heavyhand**: +40 crit damage for 12 turns. See
+/// Bloodlust's **Heavyhand**: +40 crit damage for 25 turns. See
 /// [bloodlustKeen] for why this lives here and grants the stat lane's class.
 HeavyhandStatus bloodlustHeavyhand() =>
-    HeavyhandStatus(critDamage: 40, turns: 12);
+    HeavyhandStatus(critDamage: 40, turns: 25);
 
 // ---- Death Wish — the desperation stance --------------------------------
 
@@ -164,7 +168,7 @@ abstract interface class GuaranteedCritSource {
 }
 
 /// **Death Wish** (2c): while the holder's OWN health is below 15% of max,
-/// every attack they land crits. 10 turns.
+/// every attack they land crits. 25 turns.
 ///
 /// ⚠️ **Below, strictly** — at exactly 15% the guarantee is not yet on. Kept as
 /// integer cross-multiplication (`hp * 100 < maxHp * 15`) rather than a double
@@ -176,8 +180,11 @@ class DeathWishStatus extends BankedStance implements GuaranteedCritSource {
 
   DeathWishStatus({required int turns}) : super(turns);
 
-  /// The 2-cost price point: 10 turns.
-  static DeathWishStatus deathWish() => DeathWishStatus(turns: 10);
+  /// The 2-cost price point: 25 turns.
+  ///
+  /// ✅ Re-ruled 2026-09-21: 10 → 25 turns. A stance you cast healthy as
+  /// insurance has to still be running when the insurance is needed.
+  static DeathWishStatus deathWish() => DeathWishStatus(turns: 25);
 
   @override
   String get id => 'deathWish';

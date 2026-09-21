@@ -211,8 +211,11 @@ abstract final class Spellbook {
       priority: SpellPriority.auxDefense,
       effect: StanceEffect(
           [StanceGrant('heavyhand', HeavyhandStatus.heavyhand)]));
+  /// **Overkill** — the long, heavy Heavyhand. *(✅ Re-ruled 2026-09-21: 4 → 3
+  /// charge. Crit damage is worth nothing until something is critting, so the
+  /// 4-charge price asked a two-spell combo to pay a one-spell premium.)*
   static const overkill = Spell(
-      id: 'overkill', name: 'Overkill', chargeCost: 4,
+      id: 'overkill', name: 'Overkill', chargeCost: 3,
       priority: SpellPriority.auxDefense,
       effect: StanceEffect(
           [StanceGrant('heavyhand', HeavyhandStatus.overkill)]));
@@ -264,14 +267,17 @@ abstract final class Spellbook {
       effect: DotAttackEffect(10, 13,
           dotId: 'agony', dotName: 'Agony', damagePerTick: 7, ticks: 3));
 
-  /// The long burn: 45 over nine turns behind a small hit. The biggest surplus
-  /// in the book and the longest exposure to the duel ending first — Scour is
-  /// how you collect early.
+  /// The long burn: 40 over eight turns behind a small hit. The biggest
+  /// surplus in the book and the longest exposure to the duel ending first —
+  /// Scour is how you collect early.
+  ///
+  /// ✅ Re-ruled 2026-09-21: 9 → 8 ticks (Torment + Scour was too strong). The
+  /// tick stays 5, so the collected payout drops 45 → 40.
   static const torment = Spell(
       id: 'torment', name: 'Torment', chargeCost: 3,
       priority: SpellPriority.attack,
       effect: DotAttackEffect(8, 10,
-          dotId: 'torment', dotName: 'Torment', damagePerTick: 5, ticks: 9));
+          dotId: 'torment', dotName: 'Torment', damagePerTick: 5, ticks: 8));
 
   /// Feeds whatever is burning: +3 ticks to EVERY DoT on the target, Ignite
   /// included, behind a small hit.
@@ -370,10 +376,10 @@ abstract final class Spellbook {
           [StanceGrant('composure', ComposureStatus.composure)]));
 
   /// **Bloodlust** — ⭐ §7a's licensed exception to one-status-per-axis: one
-  /// spell, TWO statuses. Twelve turns of +20% crit chance and +40 crit
+  /// spell, TWO statuses. Twenty-five turns of +20% crit chance and +40 crit
   /// damage, and because law 5 applies per status it OVERRIDES a standing
   /// Ardent or Overkill rather than adding to them. The exception buys a
-  /// burst window, not a floor.
+  /// window, not a floor. *(✅ 12 → 25 turns, 2026-09-21.)*
   static const bloodlust = Spell(
       id: 'bloodlust', name: 'Bloodlust', chargeCost: 5,
       priority: SpellPriority.auxDefense,

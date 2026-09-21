@@ -64,12 +64,13 @@ void main() {
   /// single seed measures noise rather than skill — and swapping seats removes
   /// any turn-order advantage. Tuning against one seed produced a ladder that
   /// reordered itself every run.
-  double winRate(int a, int b) {
+  double winRate(int a, int b,
+      {List<int> seeds = const [1, 7, 23], int duels = 300}) {
     var total = 0.0;
     var samples = 0;
-    for (final seed in const [1, 7, 23]) {
-      total += rawRate(a, b, 300, seed);
-      total += 100 - rawRate(b, a, 300, seed + 100);
+    for (final seed in seeds) {
+      total += rawRate(a, b, duels, seed);
+      total += 100 - rawRate(b, a, duels, seed + 100);
       samples += 2;
     }
     return total / samples;
@@ -117,13 +118,23 @@ void main() {
     });
 
     test('the big competence jumps are decisive', () {
+      // ⚠️ **A WIDER sample than the default harness, deliberately** (added
+      // 2026-09-21). The 2→3 step measures ~60% and the floor is 60.0, so the
+      // assertion sits inside the default 3-seed/300-duel harness's own noise
+      // band (±~1.2 points at 1800 duels). The 2026-09-21 tick/cost re-rules
+      // made that concrete: on the narrow harness the step read 61.6% before
+      // and 59.3% after — a "regression" that reversed at 12,000 duels
+      // (60.0% before, 61.2% after). The step did not move; the ruler did.
+      // 6 seeds × 1000 duels is ~±0.45, which is smaller than every margin
+      // below, so a failure here is content and not the seed.
       for (final (low, high, floor) in const [
         (1, 2, 65.0), // a habit beats flailing
         (2, 3, 60.0), // using the charge system at all
         (5, 9, 60.0), // counter-aware -> predictive
         (1, 10, 90.0), // top vs bottom
       ]) {
-        final r = winRate(high, low);
+        final r = winRate(high, low,
+            seeds: const [1, 7, 23, 31, 47, 59], duels: 1000);
         expect(r, greaterThan(floor),
             reason: 'level $high scored ${r.toStringAsFixed(1)}% against level '
                 '$low, below the $floor% this step should clear');

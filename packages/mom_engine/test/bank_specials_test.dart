@@ -299,9 +299,12 @@ void main() {
       expect(alice.effectiveCritChance, 20,
           reason: '⚠️ kills a grant that never reaches the derivation seam');
       expect(alice.effectiveCritDamage, 90, reason: '50 base + 40');
-      expect(only<KeenStatus>(alice).turnsLeft, 11,
-          reason: '12 turns, one of them the turn it was cast');
-      expect(only<HeavyhandStatus>(alice).turnsLeft, 11);
+      expect(only<KeenStatus>(alice).turnsLeft, 24,
+          reason: '⚠️ 25 turns, one of them the turn it was cast (re-ruled '
+              '2026-09-21: 12 → 25). Kills a duration left on the old 12');
+      expect(only<HeavyhandStatus>(alice).turnsLeft, 24,
+          reason: '⚠️ and BOTH statuses moved — a mutant that retuned only '
+              'Keen leaves the pair on different clocks');
     });
 
     test('⭐ it OVERRIDES both existing instances, even stronger ones', () {
@@ -319,9 +322,11 @@ void main() {
           reason: '⚠️ kills BOTH rejected merges at once: stacking reads 45, '
               'and keeping-the-better-half reads 25. Law 5 is last cast wins, '
               'so the burst window can genuinely cost you a longer stance');
-      expect(only<KeenStatus>(alice).turnsLeft, 11,
+      expect(only<KeenStatus>(alice).turnsLeft, 24,
           reason: '⚠️ and the clock is replaced too, not kept at 29 — '
-              'magnitude and duration always travel together');
+              'magnitude and duration always travel together. Still SHORTER '
+              "than Ardent's 30 after the 2026-09-21 re-rule, so the override "
+              'genuinely costs you the longer stance');
     });
 
     test('the crit it buys is still blanked by Composure', () {

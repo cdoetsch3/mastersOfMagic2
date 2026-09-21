@@ -219,6 +219,12 @@ shrugs off Aqua.**
   (slower). Includes charges. ✅ Does **not stack** — a second trigger
   refreshes, never +20.
 - ✅ **Blocked** entirely if the opponent holds ≥1 Photosynthesis stack.
+- ✅ **Takes Haste** *(ruled 2026-09-21)*: if the waterlogged mage holds the
+  Haste token, it passes to the Aqua caster. Slowing a mage and leaving them
+  the same-priority tiebreak was the two halves of one idea disagreeing.
+  ⚠️ It only TAKES — with nobody holding Haste, nobody gains it; blocked by
+  Photosynthesis or grace, nothing moves; and Cleansing the Waterlogged does
+  **not** hand the initiative back.
 
 **Analysis (priority table: instant 1 · shield 3 · channel 4 · quick 5 ·
 aux 7 · regular 9):** at +10, every waterlogged action — even an instant
@@ -1132,7 +1138,7 @@ fraction caps at **90%**. There is always a sliver that lands.
 | Spell | Cost · prio | Grants |
 |---|---|---|
 | **Heavyhand** | 2 · aux | Heavyhand +30 crit damage, 12 turns |
-| **Overkill** | 4 · aux | Heavyhand +50 crit damage, 30 turns |
+| **Overkill** | 3 · aux | Heavyhand +50 crit damage, 30 turns *(✅ re-ruled 2026-09-21: 4 → 3 charge — crit damage pays nothing until something is critting, so the premium was being charged to a two-spell combo)* |
 
 **Mending** — heal over time, `N% max HP/turn` (spell lane; a Tonic and
 Photosynthesis are other lanes and tick alongside). *(Retuned 2026-08-26 —
@@ -1201,7 +1207,7 @@ which is why the caps exist).
 **Bloodlust** — the kept-open clause in action: one spell, TWO statuses.
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Bloodlust** | 5 · aux | Keen +20% AND Heavyhand +40, 12 turns — the all-in window, overriding both existing instances |
+| **Bloodlust** | 5 · aux | Keen +20% AND Heavyhand +40, 25 turns — the all-in window, overriding both existing instances *(✅ re-ruled 2026-09-21: 12 → 25 turns; still under Ardent's 30, so the override still costs you the longer stance)* |
 
 **Death Wish** — binary: your attacks ALWAYS crit while your own health
 is below 15%. *(New 2026-08-26; ✅ name and cost ruled same day — two
@@ -1211,7 +1217,7 @@ insurance, or bleeding as a gambit. Blanked by the target's Composure
 like every other crit.
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Death Wish** | 2 · aux | Death Wish, 10 turns |
+| **Death Wish** | 2 · aux | Death Wish, 25 turns *(✅ re-ruled 2026-09-21: 10 → 25 — a stance cast healthy as insurance has to still be running when the insurance is needed)* |
 
 ### NEXT-ATTACK BUFFS — the Phase pattern ✅ (ruled 2026-08-26)
 
@@ -1242,7 +1248,7 @@ concurrently; recasting one refreshes it, law 5.)*
 | Spell | Cost | Effect |
 |---|---|---|
 | **Agony** | 2 | 10–13 damage + **Agony** status: 7 damage/turn for 3 turns. The quick bleed — fully paid out in 3 turns (~32.5 total vs Blast's ~23; the delay is the price of the surplus). *(✅ Renamed from "Rend"; tick settled at 7 via the +1/+1 ruling 2026-08-28 — the +2 version made it an every-loadout auto-include.)* |
-| **Torment** | 3 | 8–10 damage + **Torment** status: 5 damage/turn for 9 turns. The long burn (~54 total vs Surge's ~35) — big surplus, long exposure to the duel ending first, and the fat target Cleanse exists to answer. Scour is how you collect early. *(✅ Tick settled at 5 via the +1/+1 ruling 2026-08-28.)* |
+| **Torment** | 3 | 8–10 damage + **Torment** status: 5 damage/turn for 8 turns. The long burn (~49 total vs Surge's ~35) — big surplus, long exposure to the duel ending first, and the fat target Cleanse exists to answer. Scour is how you collect early. *(✅ Tick settled at 5 via the +1/+1 ruling 2026-08-28; ✅ re-ruled 2026-09-21: 9→8 ticks, Torment+Scour was too strong — the tick holds, the payout drops 45 → 40.)* |
 | **Execute** | 4 | 31–39 damage (the 3-cost band — the rider is the discount); **100% crit when the target is below 30% HP**. The finisher that makes Heavyhand worth holding. |
 
 ✅ Agony/Torment ticks RULED at 7/5 (2026-08-28, the "+1/+1" call — the
@@ -1281,16 +1287,18 @@ takes a turn and the cast takes one more):**
   on fresh Agony **13/turn** (the narrow timing-window jackpot), both
   at once ~20/turn for the one cast after a full banked opener.
 - **The dream line** (bank 5 → Torment → Agony → Fester catches both →
-  Scour collects) ≈ 127 damage by turn 11 ≈ **11.6/turn — just above
-  Cataclysm cycling**, from L20–30 spells, gated by a 5-turn bank,
+  Scour collects) ≈ 122 damage by turn 11 ≈ **11.1/turn — still just above
+  Cataclysm cycling, by less than it was**, from L20–30 spells, gated by a 5-turn bank,
   perfect sequencing, back-loading, and Cleanse/Purify exposure. That
   is the intended ceiling: the dedicated archetype narrowly beats the
   generic nuke plan and only while unanswered. (The +2/+2 tick draft
   hit 13.2/turn — 21% OVER Cataclysm — and made Agony a universal
   auto-include at 11.8/turn solo; +1/+1 was chosen instead.)
 - Solo pieces: Agony ~10.8/turn invested with a 2-turn tail; Torment
-  ~13.5 raw, ~10 after discounting duel-end and Cleanse risk across
-  its 9-turn exposure.
+  ~12.3 raw, ~9 after discounting duel-end and Cleanse risk across
+  its 8-turn exposure. *(✅ re-ruled 2026-09-21: 9→8 ticks, Torment+Scour
+  was too strong — Torment now pays 40 over time, ~49 with the 8–10 hit,
+  and the dream line below collects 40 rather than 45 off it.)*
 - Fester-only spam sustains ~7.5/turn (net +1 tick inventory per
   cycle keeps Torment immortal but feeble) — below Ruin, ended by one
   Cleanse. Not degenerate.

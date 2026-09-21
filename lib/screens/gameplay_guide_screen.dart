@@ -45,7 +45,9 @@ class GameplayGuideScreen extends StatelessWidget {
                       'When both mages act at the same priority, the Haste '
                       'holder resolves first — so a lethal hit can land before '
                       'the reply. Grab Haste with Jolt or Hasty (or ride an '
-                      'Aero Tailwind streak).',
+                      'Aero Tailwind streak). An Aqua Waterlogged TAKES it: '
+                      'slow the holder and the initiative comes with them — '
+                      'and Cleansing the Waterlogged does not win it back.',
                 ),
                 SizedBox(height: 18),
                 _PhaseStrip(),

@@ -101,6 +101,9 @@ class _RecordingEvents extends ListBase<DuelEvent> {
 ///    the opponent (the holder resolves first, the other's grant lands last),
 ///    and among different priorities the slower grant wins.
 ///  - Channeling never grants or moves Haste.
+///  - Two ELEMENT effects also move it, after the above and overriding it:
+///    an Aero Tailwind streak grabs it, and a landed Waterlogged takes it off
+///    the mage it slowed (§2.1, ruled 2026-09-21).
 class DuelEngine {
   final MageState mage1;
   final MageState mage2;
@@ -136,10 +139,15 @@ class DuelEngine {
   /// find a zeroed bar and silently do nothing.
   List<_Entry> _turnEntries = const [];
 
-  /// The mage grabbing Haste via Tailwind this turn (last grab wins if both
-  /// somehow qualify). Applied after normal Haste transfer — the wind always
-  /// wins the turn's initiative scramble.
-  MageState? _tailwindGrab;
+  /// The mage seizing Haste via an ELEMENT effect this turn — an Aero
+  /// Tailwind streak, or an Aqua caster whose Waterlogged landed on the
+  /// current holder. Last grab wins if both somehow qualify.
+  ///
+  /// ⭐ **One mechanism, deliberately.** Applied after [_updateHaste], so an
+  /// element grab always wins the turn's initiative scramble, and both element
+  /// effects report through the same [HasteChangedEvent] insertion below —
+  /// the HUD's Haste indicator has exactly one path to watch.
+  MageState? _elementHasteGrab;
 
   /// The universal miss floor every harmful cast rolls against (ITEMS
   /// §9b.8). Defaults to the tuned value; ⚠️ **tests of OTHER mechanics pass
@@ -329,14 +337,15 @@ class DuelEngine {
 
     _updateHaste(entries, startHolder, events);
 
-    // Tailwind overrides the normal Haste scramble: the wind takes the token.
-    final grab = _tailwindGrab;
-    _tailwindGrab = null;
+    // An element grab overrides the normal Haste scramble: the wind takes the
+    // token, and so does an Aqua caster who just waterlogged its holder.
+    final grab = _elementHasteGrab;
+    _elementHasteGrab = null;
     if (grab != null && !grab.hasHaste) {
       mage1.hasHaste = identical(grab, mage1);
       mage2.hasHaste = identical(grab, mage2);
-      // Same as the normal transfer: report it right after the Aero cast the
-      // wind came from, not at end of turn.
+      // Same as the normal transfer: report it right after the cast the grab
+      // came from, not at end of turn.
       final from = entries
           .where((e) => !e.isChannel && identical(e.caster, grab))
           .map((e) => e.endEventIndex);
@@ -1098,6 +1107,16 @@ class DuelEngine {
             e.add(BuffAppliedEvent(
                 target, 'Waterlogged — next action slowed',
                 statusId: 'waterlogged'));
+            // ⭐ Ruled 2026-09-21: the water also takes the initiative. Slowing
+            // a mage who holds Haste and leaving them the same-priority
+            // tiebreak was the two halves of one idea disagreeing.
+            //
+            // ⚠️ INSIDE this `if`, and gated on the target actually holding
+            // it. Blocked by Photosynthesis or grace → nothing moves; nobody
+            // holding it → still nobody (Waterlogged never ESTABLISHES Haste,
+            // it only takes it). And Cleansing the Waterlogged later does not
+            // hand it back — the token moved, the debuff did not carry it.
+            if (target.hasHaste) _elementHasteGrab = caster;
           }
         }
         // An Aqua elemental shield cleanses the caster's Ignite.
@@ -1136,7 +1155,7 @@ class DuelEngine {
         // wind always wins the turn's initiative scramble).
         if (caster.streakElement == MagicElement.aero &&
             caster.streakCount >= ElementTuning.tailwindStreak) {
-          _tailwindGrab = caster;
+          _elementHasteGrab = caster;
         }
       case MagicElement.geo:
         // Stagger — every 4th consecutive Geo cast blunts the opponent's

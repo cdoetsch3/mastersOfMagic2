@@ -117,15 +117,19 @@ void main() {
           reason: 'the status expires with its last tick');
     });
 
-    test('Torment is the long burn — 9 ticks of 5', () {
+    test('Torment is the long burn — 8 ticks of 5', () {
       final duel = engine();
       cast(duel, Spellbook.torment);
-      for (var i = 0; i < 8; i++) {
+      for (var i = 0; i < 7; i++) {
         idle(duel);
       }
-      expect(bruno.hp, 100 - 8 - 45,
-          reason: '8–10 on the hit, then 9 × 5 over nine turns');
-      expect(dotOn(bruno, 'torment'), isNull, reason: 'nine ticks, no more');
+      expect(bruno.hp, 100 - 8 - 40,
+          reason: '⚠️ 8–10 on the hit, then 8 × 5 over eight turns (re-ruled '
+              '2026-09-21: 9→8 ticks). A mutant left at 9 ticks has only paid '
+              '35 by here and reads 57');
+      expect(dotOn(bruno, 'torment'), isNull,
+          reason: '⚠️ eight ticks, no more — a 9-tick Torment is still live '
+              'here and owes one more 5');
     });
 
     test('⭐ Agony, Torment and Ignite tick concurrently on one target', () {

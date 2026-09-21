@@ -114,7 +114,9 @@ abstract final class StatusCatalog {
       id: 'waterlogged',
       name: 'Waterlogged',
       description:
-          'Your next action resolves dead last, whatever its normal priority.',
+          'Your next action resolves dead last, whatever its normal priority, '
+          'and takes Haste from a mage who holds it. Cleansing it does not '
+          'hand the initiative back.',
       trigger: 'Every 3rd consecutive Aqua cast. Photosynthesis prevents it.',
       kind: StatusKind.debuff,
       element: MagicElement.aqua,
@@ -197,7 +199,9 @@ abstract final class StatusCatalog {
           'You hold the initiative: when both mages act at the same priority, '
           'your spell resolves first — so a lethal hit can land before the '
           'reply.',
-      trigger: 'Casting Hasty or Jolt, or riding an Aero Tailwind streak.',
+      trigger:
+          'Casting Hasty or Jolt, riding an Aero Tailwind streak, or '
+          'Waterlogging the mage who held it.',
       kind: StatusKind.buff,
       element: null,
       lingers: true,
@@ -353,7 +357,7 @@ abstract final class StatusCatalog {
       id: 'torment',
       name: 'Torment',
       description:
-          'Bleeds for 5 at the end of each of your next nine turns. The long '
+          'Bleeds for 5 at the end of each of your next eight turns. The long '
           'burn: more damage in total than the quick one, and far longer for '
           'the duel to end first.',
       trigger: 'Being hit by Torment — even a hit a shield soaks.',
@@ -429,7 +433,7 @@ abstract final class StatusCatalog {
       id: 'deathWish',
       name: 'Death Wish',
       description:
-          'For 10 turns, every attack you land is a critical hit while your '
+          'For 25 turns, every attack you land is a critical hit while your '
           'own health is below 15% of maximum. Their Composure still blanks '
           'them.',
       trigger: 'Casting Death Wish.',
