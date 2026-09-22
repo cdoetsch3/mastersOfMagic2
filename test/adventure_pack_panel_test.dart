@@ -476,7 +476,12 @@ void main() {
       expect(find.textContaining('You recover'), findsOneWidget);
     });
 
-    testWidgets('⭐ the Health line sits inside the Pack, above its rows', (
+    /// ⭐ The health line lived here for exactly one day (2026-09-21, morning)
+    /// before the same day's mockup ruling moved it into the Next-fight card.
+    /// `adventure_screen_test.dart` pins where it went; this pins that it did
+    /// not stay behind as well — printing the pool twice on one screen is what
+    /// the ruling was written to stop.
+    testWidgets('⭐ the Pack prints no health of its own any more', (
       tester,
     ) async {
       final game = await _onAdventure();
@@ -486,16 +491,6 @@ void main() {
       game.run!.playerHp = 40;
       await _pump(tester, game);
 
-      // ⚠️ Not a bare 'Health' — the progress card says "Health carried in"
-      // at the top of the same screen.
-      final health = find.textContaining('Health 40 / ${game.maxHp}');
-      expect(
-        health,
-        findsOneWidget,
-        reason:
-            'without the pool it heals against, "25%" is half an answer and '
-            'a refusal at full health looks like a broken button',
-      );
       // The Pack's own body — the GamePanel under its section label, not the
       // Column that merely holds both.
       final packBody = find.descendant(
@@ -509,28 +504,39 @@ void main() {
       );
       expect(packBody, findsOneWidget);
       expect(
-        find.descendant(of: packBody, matching: health),
-        findsOneWidget,
+        find.descendant(
+          of: packBody,
+          matching: find.textContaining('Health 40 / ${game.maxHp}'),
+        ),
+        findsNothing,
         reason:
-            'it is the number every Use on this panel is decided against; a '
-            'mutant that leaves it floating above the panel — or strands it '
-            'in a panel of its own — re-opens the section the ruling deleted',
+            'a mutant that reverts the move leaves the pool stated twice on '
+            'one screen, which is the duplication the mockup deleted',
       );
       expect(
-        tester.getTopLeft(health).dy,
-        greaterThan(tester.getTopLeft(find.textContaining('PACK ·')).dy),
-        reason: 'under the header it belongs to, not loose above it',
+        find.descendant(
+          of: packBody,
+          matching: find.textContaining('nothing to heal'),
+        ),
+        findsNothing,
+        reason:
+            'the full-health note belongs beside the bar on the Next-fight '
+            'card; a copy here is a second reading to keep in step',
       );
       expect(
-        tester.getTopLeft(health).dy,
-        lessThan(tester.getTopLeft(find.text("Forager's Ration")).dy),
-        reason: 'above the rows it informs, not buried under them',
+        find.descendant(
+          of: packBody,
+          matching: find.textContaining('/ ${game.maxHp}'),
+        ),
+        findsNothing,
+        reason:
+            'nothing on this panel quotes the pool now, however it is worded '
+            '— a mutant that keeps the reading and only drops the word '
+            '"Health" would slip past a check on that word alone',
       );
     });
 
-    testWidgets('⚠️ an empty pack keeps its panel, and its Health line', (
-      tester,
-    ) async {
+    testWidgets('⚠️ an empty pack keeps its panel', (tester) async {
       final game = await _onAdventure();
       await _pump(tester, game);
 
@@ -540,13 +546,6 @@ void main() {
         reason:
             'a panel that vanishes when empty makes the Belt bay under it '
             'jump up the screen mid-tap',
-      );
-      expect(
-        find.textContaining('Health 100 / '),
-        findsOneWidget,
-        reason:
-            'the health line belongs to the panel, not to the rows — using '
-            'your last ration must not take it away with the row',
       );
     });
 

@@ -26,13 +26,19 @@ import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:masters_of_magic_2/screens/adventure_screen.dart';
 import 'package:masters_of_magic_2/ui/app_banner.dart';
+import 'package:masters_of_magic_2/ui/app_theme.dart';
 
 final _woods = World.byId('whispering_woods');
 
 /// ⚠️ A ListView only builds what fits, and both panels under test sit below
 /// the fold on the default 800x600 viewport.
-Future<void> _pump(WidgetTester tester, GameState game) async {
-  await tester.binding.setSurfaceSize(const Size(900, 2400));
+Future<void> _pump(
+  WidgetTester tester,
+  GameState game, {
+  // ⚠️ Narrow deliberately in one place: see 'full health earns the note'.
+  double width = 900,
+}) async {
+  await tester.binding.setSurfaceSize(Size(width, 2400));
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
     MaterialApp(
@@ -52,43 +58,44 @@ Future<GameState> _onAdventure() async {
 
 void main() {
   group('supplies between fights', () {
-    testWidgets(
-      'a carried ration is listed, with the health it heals against',
-      (tester) async {
-        final game = await _onAdventure();
-        game.profile.backpack = game.profile.backpack.withAdded(
-          const InventorySlot(defId: 'foragers_ration'),
-        )!;
-        game.run!.playerHp = 40;
-        await _pump(tester, game);
+    testWidgets('a carried ration is listed, with the health it heals against', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      game.profile.backpack = game.profile.backpack.withAdded(
+        const InventorySlot(defId: 'foragers_ration'),
+      )!;
+      game.run!.playerHp = 40;
+      await _pump(tester, game);
 
-        // ⚠️ ONCE since the 2026-09-21 amendment ("just add a 'Use' button to
-        // the 'Pack'"). It was listed twice — Supplies to drink it, the Pack to
-        // free its slot — and a second match here means that section is back.
-        expect(
-          find.text("Forager's Ration"),
-          findsOneWidget,
-          reason:
-              'one carried ration is one row; a ration missing entirely is a '
-              'Pack that stopped reading the backpack, and two is the deleted '
-              'Supplies section printing echoes again',
-        );
-        expect(
-          find.textContaining('Restores 25 health'),
-          findsOneWidget,
-          reason:
-              'the row must say what using it does, built from the effect — '
-              'and with no %, which the 2026-09-21 ruling removed',
-        );
-        expect(
-          find.textContaining('Health 40 / ${game.maxHp}'),
-          findsOneWidget,
-          reason:
-              'without the pool it heals against, "25" is half an answer and a '
-              'refusal at full health looks like a broken button',
-        );
-      },
-    );
+      // ⚠️ ONCE since the 2026-09-21 amendment ("just add a 'Use' button to
+      // the 'Pack'"). It was listed twice — Supplies to drink it, the Pack to
+      // free its slot — and a second match here means that section is back.
+      expect(
+        find.text("Forager's Ration"),
+        findsOneWidget,
+        reason:
+            'one carried ration is one row; a ration missing entirely is a '
+            'Pack that stopped reading the backpack, and two is the deleted '
+            'Supplies section printing echoes again',
+      );
+      expect(
+        find.textContaining('Restores 25 health'),
+        findsOneWidget,
+        reason:
+            'the row must say what using it does, built from the effect — '
+            'and with no %, which the 2026-09-21 ruling removed',
+      );
+      // ⚠️ The pool the "25" lands in moved to the Next-fight card on
+      // 2026-09-21 (mockup option A); the group below is where it is pinned.
+      expect(
+        find.text('Your health'),
+        findsOneWidget,
+        reason:
+            'without the pool it heals against, "25" is half an answer — the '
+            'reading has to be on the screen somewhere while a Use is offered',
+      );
+    });
 
     testWidgets('tapping Use actually heals, from this screen', (tester) async {
       final game = await _onAdventure();
@@ -355,6 +362,223 @@ void main() {
         reason: 'a picker with no rows is a button that asks for nothing',
       );
       expect(find.text('Fight'), findsOneWidget);
+    });
+  });
+
+  /// ⭐ **Health belongs to the card that asks the question** (ruling,
+  /// Christian 2026-09-21, mockup option A): the Next-fight card, between the
+  /// enemy and the Fight button. It used to be a bare 'Health carried in: N' on
+  /// the progress card and a second line at the top of the Pack —
+  /// `adventure_pack_panel_test.dart` pins that neither came back.
+  group('health on the next-fight card', () {
+    /// The Next-fight card itself: the [GamePanel] nearest the Fight button.
+    /// ⚠️ Anchored on the button rather than on the health text, so a mutant
+    /// that draws the block in a panel of its own cannot satisfy the finder by
+    /// being found at all.
+    Finder theCard() => find
+        .ancestor(of: find.text('Fight'), matching: find.byType(GamePanel))
+        .first;
+
+    /// The Pack's own body, the way `adventure_pack_panel_test` anchors it.
+    Finder thePack() => find.descendant(
+      of: find
+          .ancestor(
+            of: find.textContaining('PACK ·'),
+            matching: find.byType(Column),
+          )
+          .first,
+      matching: find.byType(GamePanel),
+    );
+
+    testWidgets('⭐ the reading sits on the card, and nowhere else', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      game.run!.playerHp = 40;
+      await _pump(tester, game);
+
+      final numbers = find.text('40 / ${game.maxHp}');
+      for (final (finder, what) in [
+        (find.text('Your health'), 'the label'),
+        (numbers, 'the numbers'),
+      ]) {
+        expect(
+          find.descendant(of: theCard(), matching: finder),
+          findsOneWidget,
+          reason:
+              '$what has to be inside the Next-fight card — a block left '
+              'floating between panels is the layout the mockup replaced',
+        );
+        expect(
+          find.descendant(of: thePack(), matching: finder),
+          findsNothing,
+          reason:
+              '$what stated on the Pack as well is the duplication this '
+              'ruling deleted',
+        );
+      }
+      expect(
+        find.textContaining('Health carried in'),
+        findsNothing,
+        reason:
+            'the progress card\'s old line is the one the bar replaces; left '
+            'in, the screen states health twice with different words',
+      );
+      expect(
+        numbers,
+        findsOneWidget,
+        reason:
+            'exactly one reading on the whole screen — a second copy anywhere '
+            'is one more thing to keep in step after a heal',
+      );
+
+      // ⚠️ Between the enemy and the buttons, in that order: label, then bar,
+      // then the press. A block that lands under the buttons is read after the
+      // decision it exists to inform.
+      final label = tester.getTopLeft(find.text('Your health')).dy;
+      final bar = tester
+          .getTopLeft(
+            find.descendant(
+              of: theCard(),
+              matching: find.byType(LinearProgressIndicator),
+            ),
+          )
+          .dy;
+      final fight = tester.getTopLeft(find.text('Fight')).dy;
+      expect(
+        label,
+        lessThan(bar),
+        reason: 'the bar is the label\'s picture; above it, it labels nothing',
+      );
+      expect(
+        bar,
+        lessThan(fight),
+        reason:
+            'health read after the Fight button is health read after the '
+            'decision — the whole reason the mockup moved it here',
+      );
+      expect(
+        label,
+        greaterThan(tester.getTopLeft(find.textContaining('Lv ')).dy),
+        reason:
+            'under the thing being fought, not above it: the card names the '
+            'enemy first and answers "can I take it" second',
+      );
+    });
+
+    testWidgets('⭐ the bar is filled to what is actually left', (tester) async {
+      LinearProgressIndicator barOf(WidgetTester t) => t.widget(
+        find.descendant(
+          of: theCard(),
+          matching: find.byType(LinearProgressIndicator),
+        ),
+      );
+
+      final hurt = await _onAdventure();
+      hurt.run!.playerHp = 40;
+      await _pump(tester, hurt);
+      expect(
+        barOf(tester).value,
+        closeTo(40 / hurt.maxHp, 1e-9),
+        reason:
+            'the bar is the reading taken without parsing two numbers; a '
+            'constant — or a fraction of the wrong pool — makes it a lie',
+      );
+      expect(
+        barOf(tester).valueColor?.value,
+        healthColour(40 / hurt.maxHp),
+        reason:
+            'a bar wired to one fixed colour throws away the warning the '
+            'bands exist to give',
+      );
+
+      // ⚠️ A second reading, because one pins nothing against a mutant that
+      // happens to agree at 0.4.
+      final worse = await _onAdventure();
+      worse.run!.playerHp = 15;
+      await _pump(tester, worse);
+      expect(
+        barOf(tester).value,
+        closeTo(15 / worse.maxHp, 1e-9),
+        reason: 'the fill has to track hp, not be computed once and frozen',
+      );
+      expect(
+        barOf(tester).valueColor?.value,
+        AppColors.ember,
+        reason: '15 of 100 is a quarter-dead player being shown a calm bar',
+      );
+    });
+
+    testWidgets(
+      '⚠️ full health earns the note without moving the Fight button',
+      (tester) async {
+        // ⚠️ **Phone width on purpose.** At 900 px the row has slack enough to
+        // swallow a note that reserves nothing, and the mutant this test
+        // exists to kill walks away clean. At 520 the note either sits in its
+        // own fixed cell or it steals the label's space, wraps the row onto a
+        // second line and carries the buttons down with it.
+        const narrow = 520.0;
+        final hurt = await _onAdventure();
+        hurt.run!.playerHp = 40;
+        await _pump(tester, hurt, width: narrow);
+        expect(
+          find.text(' — nothing to heal'),
+          findsNothing,
+          reason:
+              'printed at 40 of 100 the note is simply false — it explains a '
+              'Use that will be refused, and nothing is refusing one here',
+        );
+        final hurtSpot = tester.getTopLeft(find.text('Fight'));
+
+        final full = await _onAdventure();
+        expect(
+          full.run!.playerHp,
+          full.maxHp,
+          reason: 'a fresh run starts at the cap — the fixture, not the test',
+        );
+        await _pump(tester, full, width: narrow);
+        expect(
+          find.text(' — nothing to heal'),
+          findsOneWidget,
+          reason:
+              'at full health a Use will be refused, and an unexplained '
+              'refusal reads as a broken button',
+        );
+        expect(
+          tester.getTopLeft(find.text('Fight')),
+          hurtSpot,
+          reason:
+              'press stability: the note appears the instant a ration tops '
+              'the player up, and a trailing cell sized to its own text moves '
+              'the Fight button out from under a finger already falling',
+        );
+      },
+    );
+
+    group('the colour bands', () {
+      // ⭐ Green above half, gold from a quarter to a half, ember below — and
+      // ⚠️ each boundary belongs to the LOWER band, so a bar that has just
+      // reached a threshold shows the warning rather than one fight's grace.
+      for (final (frac, want, band) in [
+        (1.0, AppColors.green, 'untouched'),
+        (0.6, AppColors.green, 'comfortable'),
+        (0.5, AppColors.gold, 'exactly half — the boundary, and it warns'),
+        (0.4, AppColors.gold, 'wounded'),
+        (0.25, AppColors.gold, 'exactly a quarter — still gold, not ember'),
+        (0.2, AppColors.ember, 'nearly out'),
+        (0.0, AppColors.ember, 'dead on its feet'),
+      ]) {
+        test('$frac is $band', () {
+          expect(
+            healthColour(frac),
+            want,
+            reason:
+                'a mutant swapping > for >= at either edge repaints this '
+                'case — and the whole point of the bands is which side of a '
+                'threshold the player is told they are on',
+          );
+        });
+      }
     });
   });
 

@@ -103,6 +103,7 @@ class _AdventureScreenState extends State<AdventureScreen> {
                     else
                       _NextFight(
                         run: run,
+                        maxHp: game.maxHp,
                         busy: _busy,
                         onFight: () => _fight(game, run),
                         onLeave: () => _leave(game),
@@ -127,7 +128,6 @@ class _AdventureScreenState extends State<AdventureScreen> {
                       const SizedBox(height: 14),
                       _Pack(
                         game: game,
-                        run: run,
                         busy: _busy,
                         onUse: (id) => _use(game, id),
                         onDrop: (i) => _drop(game, i),
@@ -431,25 +431,56 @@ class _Progress extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Health carried in: ${run.playerHp}',
-            style: const TextStyle(color: AppColors.textDim, fontSize: 12),
-          ),
         ],
       ),
     );
   }
 }
 
+/// The colour a health bar is filled with at [frac] of its pool.
+///
+/// ⭐ **Three bands** (ruling, Christian 2026-09-21): green above half, gold
+/// from a quarter to a half, ember below a quarter. The bar is the only reading
+/// of health on this card that can be taken without parsing two numbers, so the
+/// colour has to carry the same warning the numbers do.
+///
+/// ⚠️ **Each boundary belongs to the lower band.** Exactly 50% is gold and
+/// exactly 25% is ember's neighbour rather than ember itself — a threshold that
+/// reads as "still fine" at the moment it is reached is a threshold that warns
+/// one fight too late. `>` at the top of a band and `>=` at its floor is the
+/// whole rule; a mutant swapping either one shows a green bar to a player who
+/// is half dead.
+///
+/// 📝 Pure and top-level on purpose: the bands are the testable part, and a
+/// helper buried in a widget can only be checked by reading pixels back.
+Color healthColour(double frac) {
+  if (frac > 0.5) return AppColors.green;
+  if (frac >= 0.25) return AppColors.gold;
+  return AppColors.ember;
+}
+
 class _NextFight extends StatelessWidget {
   final AdventureRun run;
+
+  /// The pool the bar is drawn against — `GameState.maxHp`, the same figure
+  /// the ration heals towards, so the card and the heal cannot disagree.
+  final int maxHp;
+
   final bool busy;
   final VoidCallback onFight;
   final VoidCallback onLeave;
 
+  /// Reserved for ' — nothing to heal', whether or not it is showing.
+  ///
+  /// ⚠️ **The cell is what keeps the buttons still** (press-stability rule).
+  /// The note appears the instant a ration tops the player up, and a cell that
+  /// sizes to its own text would re-flow the row — and with it the Fight button
+  /// underneath — under a finger already on the way down.
+  static const double _noteWidth = 116;
+
   const _NextFight({
     required this.run,
+    required this.maxHp,
     required this.busy,
     required this.onFight,
     required this.onLeave,
@@ -492,6 +523,65 @@ class _NextFight extends StatelessWidget {
               color: AppColors.textDim,
               fontSize: 12.5,
               height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 14),
+          // ⭐ **Health belongs to the decision, not to the luggage** (ruling,
+          // Christian 2026-09-21, mockup option A). It used to be printed twice
+          // and in neither of the right places: a bare number on the progress
+          // card and a line at the top of the Pack. The question this card asks
+          // is "fight it or walk", and the state that answers it now sits
+          // between the thing being fought and the buttons that answer.
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Your health',
+                  style: TextStyle(color: AppColors.textDim, fontSize: 12.5),
+                ),
+              ),
+              Text(
+                '${run.playerHp} / $maxHp',
+                textAlign: TextAlign.right,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 12.5,
+                  // ⚠️ Tabular, so the numbers hold their columns as a fight
+                  // takes the player from 143 to 98.
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
+              ),
+              SizedBox(
+                width: _noteWidth,
+                child: Text(
+                  // ⚠️ Only at full: the note exists to explain a Use button
+                  // that will refuse, and printed at 40/148 it would be a lie.
+                  run.playerHp >= maxHp ? ' — nothing to heal' : '',
+                  // ⚠️ One line, always. Wrapping is the other way this row
+                  // could grow and push the buttons down.
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.clip,
+                  style: const TextStyle(
+                    color: AppColors.textDim,
+                    fontSize: 12.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              // ⚠️ Clamped, and a zero pool reads empty rather than dividing
+              // by it: a profile mid-migration must not take the card down.
+              value: maxHp <= 0 ? 0.0 : (run.playerHp / maxHp).clamp(0.0, 1.0),
+              minHeight: 7,
+              backgroundColor: AppColors.borderDim,
+              valueColor: AlwaysStoppedAnimation(
+                healthColour(maxHp <= 0 ? 0.0 : run.playerHp / maxHp),
+              ),
             ),
           ),
           const SizedBox(height: 14),
@@ -956,12 +1046,13 @@ class _GatherCard extends StatelessWidget {
 /// reason this panel exists and "20 / 20" is the sentence that explains an
 /// abandoned epic.
 ///
-/// ⚠️ **The Health line comes with the Use button**, at the top of the panel.
-/// "Restores 25% health" is only half an answer; a player at 118/120 needs to
-/// see the 118 to understand why the ration will be refused. It is the number
-/// every Use decision on this panel is made against, so it sits above the
-/// rows rather than in a section of its own. (`GameState.maxHp` is the same
-/// pool the use actually heals, so the two cannot disagree.)
+/// ⚠️ **Health is NOT on this panel** (ruling, Christian 2026-09-21, mockup
+/// option A). It was, for a day — "Restores 25 health" is half an answer
+/// without the pool it lands in — but the card that asks the actual question
+/// is the next fight's, and health was being printed on three panels at once.
+/// It lives in [_NextFight] now, above the Fight button, and a Use refused at
+/// full health is explained by the ' — nothing to heal' note there. 📝 Do not
+/// re-add a line here: two readings of one number is how this ruling started.
 ///
 /// ⚠️ All three trailing buttons sit in fixed-width boxes, and a row missing
 /// one **reserves the cell** rather than closing the gap — otherwise Drop
@@ -972,7 +1063,6 @@ class _GatherCard extends StatelessWidget {
 /// teaches the player that the item was never beltable.
 class _Pack extends StatelessWidget {
   final GameState game;
-  final AdventureRun run;
   final bool busy;
   final ValueChanged<String> onUse;
   final ValueChanged<int> onDrop;
@@ -984,7 +1074,6 @@ class _Pack extends StatelessWidget {
 
   const _Pack({
     required this.game,
-    required this.run,
     required this.busy,
     required this.onUse,
     required this.onDrop,
@@ -995,7 +1084,6 @@ class _Pack extends StatelessWidget {
   Widget build(BuildContext context) {
     final slots = game.profile.backpack.slots;
     final used = game.profile.backpack.used;
-    final max = game.maxHp;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1004,12 +1092,6 @@ class _Pack extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Health ${run.playerHp} / $max'
-                '${run.playerHp >= max ? ' — nothing to heal' : ''}',
-                style: const TextStyle(color: AppColors.text, fontSize: 13),
-              ),
-              const SizedBox(height: 4),
               if (used == 0)
                 const Text(
                   'Your pack is empty.',
