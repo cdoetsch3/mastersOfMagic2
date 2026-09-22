@@ -39,7 +39,7 @@ definitions, 21 recipes, 13 gather nodes.
 | Archetype coefficients | `lib/game/enemies/enemy_archetype.dart` |
 | The HP curve | `MageState.scaledMaxHp` = `round(100 × 1.04^(L−1))` |
 | Raw move damage stays in the Whispering Woods band | CONTENT_CHECKLIST, "the one rule that governs every future zone's numbers" |
-| Yew at equip 20 (Windward Steppe), Rowan at 25 (Thunderspire) | ITEMS §9b.6 |
+| Yew at equip 20 (Windward Steppe), Rowan at 25 (Thunderspire) — ⚠️ Rowan moved to **19** with the 2026-09-21 re-band (Thunderspire 17–22) | ITEMS §9b.6 |
 | Craft XP = `Σ input counts × (4 + 2 × gate)` | `Skills.xpForRecipe` |
 | Node XP = `9 + 2 × (zone.minLevel − 1)` | `GatherNodes`, ITEMS §9b.7b |
 | Hides and motes are **kill-only**, never a node | ITEMS §9b.7b |
@@ -1059,9 +1059,9 @@ substitution is deleted; `groundfault_grips` drops off the boss pool and the
 | `iron_ore` | Material | common | Metalworking t4 | 1 | — | 13 📝 |
 | `hum_quartz` ⏳ | Material | uncommon | Enchanting t4 · **banks for Meridian, L36** | 1 | — | 28 📝 |
 | `iron_ingot` | Material | common | Metalworking t4 output | 1 | — | 70 📝 |
-| `rowan_quarterstaff` | Equipment | common | mainHand · Quarterstaff / Rowan · **1 socket** ✅ §9b.6 | 25 | `damagePerCharge: 4, accuracyBonus: 8, critChance: 3, critDamage: 8` | 330 |
-| `rowan_wand` | Equipment | common | mainHand · Wand / Rowan · **1 socket** | 25 | `damagePerCast: 5, accuracyBonus: 3, critChance: 4, critDamage: 6` | 280 |
-| `rowan_knot` | Equipment | common | offHand · Knot / Rowan · **1 socket** | 25 | `accuracyBonus: 6, critChance: 2` | 230 |
+| `rowan_quarterstaff` | Equipment | common | mainHand · Quarterstaff / Rowan · **1 socket** ✅ §9b.6 · two-handed | 19 *(was 25; re-band 2026-09-21)* | `damagePerCharge: 4, accuracyBonus: 8, critChance: 3, critDamage: 8` | 330 |
+| `rowan_wand` | Equipment | common | mainHand · Wand / Rowan · **1 socket** | 19 *(was 25)* | `damagePerCast: 5, accuracyBonus: 3, critChance: 4, critDamage: 6` | 280 |
+| `rowan_knot` | Equipment | common | offHand · Knot / Rowan · **1 socket** | 19 *(was 25)* | `accuracyBonus: 6, critChance: 2` | 230 |
 | `countstone_pendant` | Equipment | **rare** | neck · Pendant / Hum Quartz · `properName` · untradeable | 26 | `critChance: 10, critDamage: 12` 📝 | 300 |
 | `groundfault_grips` | Equipment | **epic** | gloves · Grips / Groundfault · `properName` — **"Groundfault Grips"** (Christian, 2026-08-20) · untradeable | 28 | `accuracyBonus: 5, damagePerCast: 4` 📝 | 790 |
 
