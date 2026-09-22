@@ -968,6 +968,43 @@ abstract final class GatherNodes {
         'thickest.',
   );
 
+  // ---- The Unwritten Library (ETHEREAL_CONTRACT §6) ---------------------
+  // ⭐ Two nodes, not three: the hybrid's third material — `blankspine_vellum`
+  // — is a **hide**, and a hide never gets a node (§3.1, and this file's own
+  // no-second-source rule).
+
+  /// Potions ← Foraging (§6a.1). XP is `9 + 2 × (54 − 1)` = 115.
+  static const ulNightinkWell = GatherNodeDef(
+    id: 'ul_nightink_well',
+    zoneId: 'the_unwritten_library',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'nightink',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.rateDrag, 'draw', reps: 4),
+    xp: 115,
+    flavor:
+        'The well is full and nothing fills it. Draw steadily; it does not '
+        'like haste.',
+  );
+
+  /// ⚠️ **The second gather node in the game to use `placement`**, after the
+  /// Glass Archive's `ga_noon_shelf` — and both are *"choose which one"*,
+  /// which is precisely what the engine's own doc says it is for (§6).
+  static const ulColophonShelf = GatherNodeDef(
+    id: 'ul_colophon_shelf',
+    zoneId: 'the_unwritten_library',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'colophon_stone',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.placement, 'choose', complexity: 4),
+    xp: 115,
+    flavor:
+        'Every book\'s last page is cut from one of these, and every book is '
+        'still being written.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -1021,6 +1058,8 @@ abstract final class GatherNodes {
     uwUmbralweaveDrift,
     uwThoughtglassFace,
     uwShoulderDrift,
+    ulNightinkWell,
+    ulColophonShelf,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

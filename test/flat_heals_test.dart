@@ -52,6 +52,7 @@ const _ruled = <String, int>{
   'duskcap_tonic': 102, // 34 a turn × 3
   'sunbleach_tonic': 126, // 42 a turn × 3
   'censer_draught': 295,
+  'nightink_draught': 320,
 };
 
 /// Total XP landing exactly on [level] (xpToNext is 100 + 50·(n−1)).

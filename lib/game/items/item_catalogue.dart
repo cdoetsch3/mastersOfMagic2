@@ -23,6 +23,7 @@ import 'catalogue/the_molten_deep_items.dart';
 import 'catalogue/the_shattered_orrery_items.dart';
 import 'catalogue/the_sunless_reach_items.dart';
 import 'catalogue/the_umbral_wastes_items.dart';
+import 'catalogue/the_unwritten_library_items.dart';
 import 'catalogue/thornmire_items.dart';
 import 'catalogue/thunderspire_peaks_items.dart';
 import 'catalogue/tidewrack_shoals_items.dart';
@@ -71,6 +72,7 @@ abstract final class ItemCatalogue {
     'the_collapsed_academy': CollapsedAcademyItems.all,
     'the_reliquary_deep': ReliquaryDeepItems.all,
     'the_umbral_wastes': UmbralWastesItems.all,
+    'the_unwritten_library': UnwrittenLibraryItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists
