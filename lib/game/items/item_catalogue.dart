@@ -14,6 +14,7 @@ import 'catalogue/old_quarry_items.dart';
 import 'catalogue/stormcliff_coast_items.dart';
 import 'catalogue/the_mirrormere_items.dart';
 import 'catalogue/the_molten_deep_items.dart';
+import 'catalogue/the_shattered_orrery_items.dart';
 import 'catalogue/thornmire_items.dart';
 import 'catalogue/thunderspire_peaks_items.dart';
 import 'catalogue/whispering_woods_items.dart';
@@ -51,6 +52,7 @@ abstract final class ItemCatalogue {
     'thunderspire_peaks': ThunderspirePeaksItems.all,
     'the_molten_deep': TheMoltenDeepItems.all,
     'the_mirrormere': MirrormereItems.all,
+    'the_shattered_orrery': ShatteredOrreryItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists

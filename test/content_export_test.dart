@@ -27,14 +27,26 @@ void main() {
   });
 
   test('every id any table references resolves in a catalogue', () {
-    // 📝 The NEXT parallel wave arrived: the Celestial quarter's seven zones
-    // are being authored in parallel worktrees, and The Mirrormere's tables
-    // reference two consumables the Kiln Desert lane owns
-    // (CELESTIAL_CONTRACT §7.3 lists them as that zone's only non-local ids).
-    // ⚠️ **Empty this set again the moment the wave lands** — it is a merge
-    // window, not a licence, and every id left in it is an id nothing in the
-    // suite is checking.
-    const crossBuilderIds = <String>{'pilgrims_ration', 'glasswort_draught'};
+    // 📝 **The next parallel wave arrived** (Celestial/Ethereal, 2026-09-22)
+    // and the machinery is doing the job it was kept for. Each id below is
+    // referenced by a zone that has landed and defined by a zone that has
+    // not — the merge window, exactly as `hardtack` was at C2a.
+    //
+    // ⚠️ **Empty this set once the wave is merged.** An exemption that
+    // outlives its merge window is a permanently unresolvable drop that the
+    // test now blesses.
+    //
+    //  - `astral_*` — the Starfall Basin lane (CELESTIAL_CONTRACT §3.2);
+    //    referenced by The Shattered Orrery, which pays both mote ladders.
+    //  - `pilgrims_ration` — The Kiln Desert lane (§3.3); the quarter's
+    //    shared drop-only ration, referenced by every Celestial zone.
+    const crossBuilderIds = <String>{
+      'astral_dust',
+      'astral_shard',
+      'astral_crystal',
+      'pilgrims_ration',
+      'glasswort_draught',
+    };
     final missing = <String>[];
     void check(String? id, String where) {
       if (id != null &&

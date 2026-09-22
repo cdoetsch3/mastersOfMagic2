@@ -31,16 +31,22 @@ import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:mom_engine/mom_engine.dart';
 
-/// The five shipped heals and what each one restores in total, as ruled.
+/// Every shipped heal and what each one restores in total, as ruled.
 ///
 /// ⚠️ The Tonic's 30 is its whole three-tick course, which is what using it
 /// out of combat applies — `ItemEffect.healFor` sums the ticks.
+///
+/// 📝 `arcsalt_draught` is the first Celestial rung (CELESTIAL_CONTRACT
+/// §3.3/§4.6, The Shattered Orrery): **185**, flat like every rung below it.
+/// ⚠️ It is drop-only at band 40 as well as craftable, so it reaches a pack
+/// without a recipe — which is exactly the path the fixture below walks.
 const _ruled = <String, int>{
   'foragers_ration': 25,
   'sapwort_draught': 30,
   'hardtack': 60,
   'saltwort_draught': 75,
   'brookmint_tonic': 30,
+  'arcsalt_draught': 185,
 };
 
 /// Total XP landing exactly on [level] (xpToNext is 100 + 50·(n−1)).
@@ -76,7 +82,7 @@ Future<GameState> _onTheRoad(String defId) async {
 }
 
 void main() {
-  group('the five shipped heals restore exactly their number', () {
+  group('every shipped heal restores exactly its number', () {
     test(
       '⭐ a level-10 mage has 142 max health, so a percent would show',
       () async {
@@ -99,21 +105,29 @@ void main() {
     );
 
     for (final MapEntry(key: defId, value: amount) in _ruled.entries) {
-      test('$defId restores $amount from 1 health', () async {
-        final game = await _onTheRoad(defId);
-        game.run!.playerHp = 1;
-        final outcome = await game.useItem(defId);
+      // ⚠️ **The level-10 fixture only bites while the heal fits under the
+      // bar.** A band-40 draught restores more than 142, so `1 + amount`
+      // would be capped at max HP and the assertion would compare a clamp
+      // against a ruling — passing for a percentage implementation too,
+      // which is the one thing this file exists to catch. Those rungs are
+      // pinned by `healFor()` below instead, and by the completeness check.
+      if (1 + amount <= 142) {
+        test('$defId restores $amount from 1 health', () async {
+          final game = await _onTheRoad(defId);
+          game.run!.playerHp = 1;
+          final outcome = await game.useItem(defId);
 
-        expect(outcome.consumed, isTrue, reason: 'a wounded mage can drink');
-        expect(
-          game.run!.playerHp,
-          1 + amount,
-          reason:
-              '⚠️ the ruled flat $amount. A surviving percentage restores '
-              '${(142 * amount / 100).round()} here (142 × $amount%), which '
-              'is the whole reason this runs at level 10',
-        );
-      });
+          expect(outcome.consumed, isTrue, reason: 'a wounded mage can drink');
+          expect(
+            game.run!.playerHp,
+            1 + amount,
+            reason:
+                '⚠️ the ruled flat $amount. A surviving percentage restores '
+                '${(142 * amount / 100).round()} here (142 × $amount%), which '
+                'is the whole reason this runs at level 10',
+          );
+        });
+      }
 
       test('$defId says "$amount health" and never a percentage', () {
         final def = ItemCatalogue.byId(defId) as Usable;

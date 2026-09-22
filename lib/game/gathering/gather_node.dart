@@ -516,6 +516,53 @@ abstract final class GatherNodes {
         'in two.',
   );
 
+  // ---- The Shattered Orrery (Astral + Electro, band 40-44) ---------------
+  //
+  // ⭐ THREE nodes, and all three are salvage (CELESTIAL_CONTRACT §4.6): the
+  // zone has no wood, no fibre and no hide, so §9b.8's 3-per-hybrid rule is
+  // met entirely out of a broken machine. ⚠️ Nothing here "grows back" — the
+  // next run's roll is simply the next piece of the mechanism.
+
+  static const soScrapRing = GatherNodeDef(
+    id: 'so_scrap_ring',
+    zoneId: 'the_shattered_orrery',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'orrery_scrap',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.sweetSpot, 'strike', reps: 5),
+    xp: 87,
+    flavor: 'A fallen ring, still turning, and shedding teeth as it goes.',
+  );
+
+  static const soArcsaltEarthing = GatherNodeDef(
+    id: 'so_arcsalt_earthing',
+    zoneId: 'the_shattered_orrery',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'arcsalt',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.rateDrag, 'scrape', reps: 3),
+    xp: 87,
+    flavor:
+        'Where the machine has been putting its charge for four centuries. '
+        'Scrape between the flashes.',
+  );
+
+  static const soLensShatter = GatherNodeDef(
+    id: 'so_lens_shatter',
+    zoneId: 'the_shattered_orrery',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'sidereal_glass',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'lift', complexity: 4),
+    xp: 87,
+    flavor:
+        'A ring came down here and most of what it was made of is still '
+        'edge-up.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -544,6 +591,9 @@ abstract final class GatherNodes {
     mdFiresaltCrust,
     mmBloodwoodGrove,
     mmMirrorflaxShallows,
+    soScrapRing,
+    soArcsaltEarthing,
+    soLensShatter,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {
