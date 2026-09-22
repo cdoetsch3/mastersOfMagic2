@@ -844,7 +844,7 @@ _miniDrops  always: geo_shard ×1 · astral_shard ×1 · geo_dust 2–4 · astra
                     · geo_crystal chance 0.25 · astral_crystal chance 0.25
             main:   corebiter_hide 35 (2–4) · deepstratum_ore 30 (2–4) · nadir_garnet 30 (1–2)
                     · stonefall_signet 5
-_bossDrops  always: the_buried_third ×1  ⭐ GUARANTEED — the gate fragment, §3.4
+_bossDrops  always: the_dark_third ×1  ⭐ GUARANTEED — the gate fragment, §3.4
                     · geo_crystal 1–2 · astral_crystal 1–2 · geo_shard 1–2
                     · astral_shard 1–2 · geo_dust 4–8 · astral_dust 4–8
             main:   corebiter_hide 35 (4–8) · deepstratum_ore 20 (3–6) · nadir_garnet 15 (2–4)
@@ -1365,7 +1365,7 @@ _miniDrops  always: sanctus_shard ×1 · umbra_shard ×1 · sanctus_dust 2–4 �
                     · sanctus_crystal chance 0.25 · umbra_crystal chance 0.25
             main:   unleft_linen 35 (2–4) · censer_resin 30 (2–4) · reliquary_gold 30 (1–2)
                     · censer_pendant 5
-_bossDrops  always: the_warm_third ×1  ⭐ GUARANTEED — the gate fragment, §3.4
+_bossDrops  always: the_written_third ×1  ⭐ GUARANTEED — the gate fragment, §3.4
                     · sanctus_crystal 1–2 · umbra_crystal 1–2 · sanctus_shard 1–2
                     · umbra_shard 1–2 · sanctus_dust 4–8 · umbra_dust 4–8
             main:   unleft_linen 35 (4–8) · censer_resin 20 (3–6) · reliquary_gold 15 (2–4)
@@ -2020,11 +2020,11 @@ CELESTIAL_CONTRACT's 121:
 | Zone | Ids referenced | All defined? |
 |---|---|---|
 | hallowmarch | `sanctus_*` `spiritwood_log` `goldenrood` `climbers_ration` `votive_pendant` `the_maintained_road` | ✅ all local |
-| the_buried_sky | `geo_*` ✅ **Q2** `astral_*` ✅ **Q3** `deepstratum_ore` `nadir_garnet` `corebiter_hide` `climbers_ration` `goldenrood_draught` `the_dark_third` `stonefall_signet` `bedrock_greaves` | ✅ `geo_*` → `old_quarry_items.dart`, `astral_*` → `starfall_basin_items.dart` |
+| the_buried_sky | `geo_*` ✅ **Q2** `astral_*` ✅ **Q3** `deepstratum_ore` `nadir_garnet` `corebiter_hide` `climbers_ration` `goldenrood_draught` `stonefall_signet` `bedrock_greaves` | ✅ `geo_*` → `old_quarry_items.dart`, `astral_*` → `starfall_basin_items.dart` |
 | the_umbral_wastes | `umbra_*` `umbralweave` `thoughtglass` `climbers_ration` `goldenrood_draught` `the_considered_ring` `the_deliberate_dark` | ✅ |
-| the_sealed_garden | `flora_*` ✅ **Q1** `sanctus_*` `worldroot` `orchard_amber` `thornpenitent_hide` `climbers_ration` `worldroot_tonic` `the_kept_third` `the_gardeners_loop` `the_season_at_once` | ✅ `flora_*` → `whispering_woods_items.dart` |
+| the_sealed_garden | `flora_*` ✅ **Q1** `sanctus_*` `worldroot` `orchard_amber` `thornpenitent_hide` `climbers_ration` `worldroot_tonic` `the_gardeners_loop` `the_season_at_once` | ✅ `flora_*` → `whispering_woods_items.dart` |
 | the_collapsed_academy | `arcane_*` ✅ **Q3** `aetherwood_log` `mana_slag` `climbers_ration` `chalkline_signet` `the_unbuilt_stair` | ✅ `arcane_*` → `the_glass_archive_items.dart` |
-| the_reliquary_deep | `sanctus_*` `umbra_*` `censer_resin` `reliquary_gold` `unleft_linen` `climbers_ration` `censer_draught` `the_written_third` `censer_pendant` `the_unconsecrated` | ✅ |
+| the_reliquary_deep | `sanctus_*` `umbra_*` `censer_resin` `reliquary_gold` `unleft_linen` `climbers_ration` `censer_draught` `censer_pendant` `the_unconsecrated` | ✅ |
 | the_unwritten_library | `umbra_*` `arcane_*` `nightink` `colophon_stone` `blankspine_vellum` `climbers_ration` `nightink_draught` `censer_draught` `colophon_signet` `the_open_colophon` | ✅ |
 | the_eclipsed_citadel | ⭐ **all twelve dust/shard/crystal families** `eclipse_iron` `corona_pearl` `climbers_ration` `nightink_draught` `the_eclipsed_band` `the_last_thing_in_the_way` `the_corona` | ✅ — ⚠️ resolves across **eleven catalogue files in four quarters**, which is the widest reference in the game |
 
