@@ -104,10 +104,25 @@ void main() {
       );
     });
 
-    test('the zone band is 17–22, and nothing else', () {
+    test('the zone band is 23–28, and nothing else', () {
+      // ⭐ Swapped with Thunderspire Peaks (ruling, Christian 2026-09-21): the
+      // coast is now the top of the Kinetic climb, not its first step — see
+      // `test/world_bands_test.dart`.
       final loc = World.byId(zone);
-      expect(loc.minLevel, 17);
-      expect(loc.maxLevel, 22);
+      expect(
+        loc.minLevel,
+        23,
+        reason:
+            'kills the mutant that drops the floor '
+            'back to 17 and re-inverts the road out of Forgeholm',
+      );
+      expect(
+        loc.maxLevel,
+        28,
+        reason:
+            'kills the mutant that moves the floor '
+            'alone and leaves the quarter without a 28 ceiling',
+      );
     });
   });
 

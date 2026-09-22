@@ -123,7 +123,7 @@ abstract final class KineticRecipes {
     ],
   );
 
-  // ---- Woodcarving: Rowan (equip 25, Thunderspire Peaks) -----------------
+  // ---- Woodcarving: Rowan (equip 19, Thunderspire Peaks) -----------------
   //
   // ⭐ Tier 4: crafting's first crit (§2.5) and the wood ladder's first
   // socket, both on the ITEM side — this file only carries the recipe.

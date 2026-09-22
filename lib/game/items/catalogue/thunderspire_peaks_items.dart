@@ -1,5 +1,11 @@
-/// Everything Thunderspire Peaks can yield (Lv 23–28, Electro + Aero hybrid —
+/// Everything Thunderspire Peaks can yield (Lv 17–22, Electro + Aero hybrid —
 /// KINETIC_CONTRACT §4.5).
+///
+/// ⚠️ **The band moved, and the equip levels moved with it** (ruling,
+/// Christian 2026-09-21). Thunderspire traded bands with the Stormcliff Coast
+/// so that difficulty climbs along the road out of Forgeholm; every equip
+/// level here dropped by 6 and keeps its old place inside the band (Rowan at
+/// the floor+2, the pendant at +3, the epic at the ceiling).
 ///
 /// ⭐ Hybrid zone: **three** materials (§3.1, §9b.8 ruling 7) — Rowan Log
 /// feeds Woodcarving, Iron Ore feeds Metalworking, Hum Quartz feeds
@@ -11,12 +17,16 @@
 ///
 /// ⭐ **Rowan is where crafting gets crit, and where sockets arrive** (§2.5,
 /// §9b.6). Yew (Windward Steppe, equip 20) carries no crit at all — this is
-/// the first *crafted* crit in the game, one quarter after the player first
-/// *meets* crit on an enemy. Every Rowan piece also carries the wood ladder's
-/// first gem socket, left empty on purpose (§6d gems are not this quarter).
+/// still the first *crafted* crit in the game. ⚠️ **The re-band put it in
+/// front of the drop it used to trail**: Rowan now equips at 19 and the
+/// Fulgurite Pendant at 26, so crafting *buys* crit before the player first
+/// *meets* it on an enemy — the reverse of §2.5's intended order. Flagged
+/// rather than patched; which of the two moves is the design decision.
+/// Every Rowan piece also carries the wood ladder's first gem socket, left
+/// empty on purpose (§6d gems are not this quarter).
 ///
 /// ✅ **RULED — this zone gets an epic too (§8.7).** `groundfault_grips`,
-/// named by Christian (2026-08-20), drops off the boss pool at equip 28.
+/// named by Christian (2026-08-20), drops off the boss pool at equip 22.
 library;
 
 import '../item_def.dart';
@@ -24,7 +34,7 @@ import '../item_def.dart';
 abstract final class ThunderspirePeaksItems {
   // ---- materials ------------------------------------------------------
 
-  /// ✅ §9b.6 — the wood ladder's tier-4 log; Rowan equips at 25.
+  /// ✅ §9b.6 — the wood ladder's tier-4 log; Rowan equips at 19.
   /// `value: 120` — ECONOMY_CONTRACT §8.2.
   static const rowanLog = MaterialDef(
     id: 'rowan_log',
@@ -114,7 +124,7 @@ abstract final class ThunderspirePeaksItems {
     ),
     socketCount: 1,
     salvage: [SalvageYield('rowan_log', 1, 2)],
-    equipLevel: 25,
+    equipLevel: 19,
     value: 330,
   );
 
@@ -136,7 +146,7 @@ abstract final class ThunderspirePeaksItems {
     ),
     socketCount: 1,
     salvage: [SalvageYield('rowan_log', 1, 1)],
-    equipLevel: 25,
+    equipLevel: 19,
     value: 280,
   );
 
@@ -153,7 +163,7 @@ abstract final class ThunderspirePeaksItems {
     modifiers: ItemModifiers(accuracyBonus: 6, critChance: 2),
     socketCount: 1,
     salvage: [SalvageYield('rowan_log', 1, 1)],
-    equipLevel: 25,
+    equipLevel: 19,
     value: 230,
   );
 
@@ -174,7 +184,7 @@ abstract final class ThunderspirePeaksItems {
     material: 'Hum Quartz',
     modifiers: ItemModifiers(critChance: 10, critDamage: 12),
     tradability: Tradability.untradeable,
-    equipLevel: 26,
+    equipLevel: 20,
     value: 300,
   );
 
@@ -182,7 +192,7 @@ abstract final class ThunderspirePeaksItems {
   /// Grips by Christian (2026-08-20). 📝 `accuracyBonus: 5, damagePerCast: 4`
   /// — the Electro identity is on-hit damage plus the accuracy to land it,
   /// in-band with the quarter's other epics. Dropper: the boss pool, equip
-  /// 28, zone max, matching the other epics' top-of-band placement.
+  /// 22, zone max, matching the other epics' top-of-band placement.
   static const groundfaultGrips = EquipmentDef(
     id: 'groundfault_grips',
     properName: 'Groundfault Grips',
@@ -197,7 +207,7 @@ abstract final class ThunderspirePeaksItems {
     material: 'Groundfault',
     modifiers: ItemModifiers(accuracyBonus: 5, damagePerCast: 4),
     tradability: Tradability.untradeable,
-    equipLevel: 28,
+    equipLevel: 22,
     value: 790,
   );
 

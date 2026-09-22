@@ -500,9 +500,12 @@ abstract final class LadderRoster {
         ],
       ),
       gearTier: GearTier.kitted,
+      // 📝 Wore the Fulgurite Pendant until the 2026-09-21 re-band lifted it
+      // to equip 26; the Countstone Pendant is the nearest legal neck piece
+      // at the same rarity (rare, equip 20 after the same swap).
       gear: const [
         BotGearPiece(itemId: 'sporecap_mantle', quality: Quality.standard),
-        BotGearPiece(itemId: 'fulgurite_pendant', quality: Quality.standard),
+        BotGearPiece(itemId: 'countstone_pendant', quality: Quality.standard),
         BotGearPiece(itemId: 'overseers_seal', quality: Quality.standard),
         BotGearPiece(itemId: 'seawrack_hood', quality: Quality.standard),
         BotGearPiece(itemId: 'yew_wand', quality: Quality.standard),
@@ -544,9 +547,12 @@ abstract final class LadderRoster {
         ],
       ),
       gearTier: GearTier.kitted,
+      // 📝 Same swap as Rook's: the Fulgurite Pendant went to equip 26 in the
+      // 2026-09-21 re-band, one past her L23, so the Countstone Pendant (rare,
+      // equip 20) takes the slot.
       gear: const [
         BotGearPiece(itemId: 'sporecap_mantle', quality: Quality.standard),
-        BotGearPiece(itemId: 'fulgurite_pendant', quality: Quality.standard),
+        BotGearPiece(itemId: 'countstone_pendant', quality: Quality.standard),
         BotGearPiece(itemId: 'leanstone_charm', quality: Quality.standard),
         BotGearPiece(itemId: 'seawrack_hood', quality: Quality.standard),
         BotGearPiece(itemId: 'seawrack_boots', quality: Quality.standard),
@@ -584,6 +590,11 @@ abstract final class LadderRoster {
       // 📝 hat/boots/gloves have no rare-or-better piece at L25 (hat epic
       // arrives L29, gloves epic L28) — common stands in; offHand has no
       // rare/epic at any level (see the GearTier doc).
+      // 📝 **mainHand joined that list on 2026-09-21.** Garrick held Uplight,
+      // which the Stormcliff re-band lifted from equip 22 to 28 — three
+      // levels past him. Rowan Wand is the nearest legal main hand (equip 19,
+      // the top of the crafted wand ladder he can reach) and keeps the hand
+      // one-handed, which his Rowan Knot offhand requires.
       gear: const [
         BotGearPiece(itemId: 'tussock_hood', quality: Quality.ornate),
         BotGearPiece(itemId: 'the_long_lean', quality: Quality.ornate),
@@ -591,7 +602,7 @@ abstract final class LadderRoster {
         BotGearPiece(itemId: 'tussock_gloves', quality: Quality.ornate),
         BotGearPiece(itemId: 'the_holdfast', quality: Quality.ornate),
         BotGearPiece(itemId: 'rimebound_ring', quality: Quality.ornate),
-        BotGearPiece(itemId: 'uplight', quality: Quality.ornate),
+        BotGearPiece(itemId: 'rowan_wand', quality: Quality.ornate),
         BotGearPiece(itemId: 'rowan_knot', quality: Quality.ornate),
       ],
     ),

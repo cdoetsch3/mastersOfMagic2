@@ -1,4 +1,4 @@
-/// The Thunderspire Peaks bestiary — Lv 23–28, Electro + Aero hybrid
+/// The Thunderspire Peaks bestiary — Lv 17–22, Electro + Aero hybrid
 /// (KINETIC_CONTRACT §4.5).
 ///
 /// ⭐ **Theme: you are inside the storm, and it is building to something.**

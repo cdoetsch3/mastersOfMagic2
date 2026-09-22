@@ -557,8 +557,13 @@ abstract final class World {
       kind: LocationKind.route,
       tier: MagicTier.kinetic,
       elements: [MagicElement.electro],
-      minLevel: 17,
-      maxLevel: 22,
+      // ⭐ **The top of the Kinetic climb** (ruling, Christian 2026-09-21).
+      // The coast and Thunderspire traded bands: the Peaks used to sit at
+      // 23-28 while every zone the road reached past them was lower, so
+      // leaving Forgeholm meant clearing the hardest ground in the quarter to
+      // get at the easiest. `test/world_bands_test.dart` holds the new order.
+      minLevel: 23,
+      maxLevel: 28,
       blurb:
           "Where the western ocean's weather hits a wall and has nowhere "
           'to go.',
@@ -634,8 +639,12 @@ abstract final class World {
       tier: MagicTier.kinetic,
       // Electro ▸ Aero — where coastal storm meets steppe wind.
       elements: [MagicElement.electro, MagicElement.aero],
-      minLevel: 23,
-      maxLevel: 28,
+      // ⭐ **Forgeholm's way on, and now the softest ground past it** (ruling,
+      // Christian 2026-09-21 — swapped with Stormcliff Coast, which took the
+      // 23-28 band). The city opens at 15 and the quarry behind it is 15-19;
+      // a 23-28 door out of it was a wall, not a road.
+      minLevel: 17,
+      maxLevel: 22,
       blurb: 'The summit line where coastal storm meets steppe wind.',
       arrival:
           'You are inside the weather rather than under it. The cloud is '
@@ -876,9 +885,14 @@ abstract final class World {
           'for a few hours and the meltwater runs beside you the whole way. '
           'Every mile or so there is a marker, and every marker has been '
           'maintained.',
+      // ⭐ **The causeway now hands the climber to the Wastes, not to the
+      // Reliquary** (ruling, Christian 2026-09-21). The old road ran
+      // Hallowmarch 45-49 → Reliquary Deep 52-56 → Umbral Wastes 47-51, which
+      // made the hardest place on the mountain the corridor you walked to
+      // reach an easier one.
       edges: [
         TravelEdge('rimeholt', 6),
-        TravelEdge('the_reliquary_deep', 8),
+        TravelEdge('the_umbral_wastes', 8),
         TravelEdge('vespergate', 6),
         TravelEdge('the_sealed_garden', 6),
       ],
@@ -896,8 +910,14 @@ abstract final class World {
           'You round the shoulder and the light stops. Not dusk — an '
           'absence with an edge to it. The ice here has never melted and holds '
           'its shape like something that has been thought about.',
-      // Reached through the Reliquary, or over the upper icefall to Vespergate.
-      edges: [TravelEdge('the_reliquary_deep', 8), TravelEdge('vespergate', 8)],
+      // ⭐ The middle of the north road: the causeway rounds the shoulder out
+      // of Hallowmarch into here, the Reliquary's door is at the top of the
+      // ice above, and the upper icefall drops away to Vespergate.
+      edges: [
+        TravelEdge('hallowmarch', 8),
+        TravelEdge('the_reliquary_deep', 8),
+        TravelEdge('vespergate', 8),
+      ],
     ),
     GameLocation(
       id: 'the_reliquary_deep',
@@ -908,14 +928,18 @@ abstract final class World {
       elements: [MagicElement.sanctus, MagicElement.umbra],
       minLevel: 52,
       maxLevel: 56,
-      blurb:
-          'A vault bored through the mountain from the lit side to the dark.',
+      // ⚠️ **Entered from the ice, and only from the ice** (ruling, Christian
+      // 2026-09-21). The vault was bored from the lit flank, but the south
+      // door is not a road any more — the way in is the north face, above the
+      // Umbral Wastes, at the top of the climb rather than partway up it.
+      blurb: 'A vault bored through the mountain, open now at the dark end.',
       arrival:
-          'The door is on the warm flank and the far end opens onto the '
-          'ice. In between, a corridor that someone consecrated and someone '
-          'else did not leave alone. It is warmer in the middle than at either '
-          'end.',
-      edges: [TravelEdge('hallowmarch', 8), TravelEdge('the_umbral_wastes', 8)],
+          'The way in is a hole in the ice on the north face, and it goes '
+          'inward and downward toward a warm flank you never reach. A '
+          'corridor that someone consecrated and someone else did not leave '
+          'alone. It gets warmer the further you go, and the far door has '
+          'been shut for longer than the order that shut it lasted.',
+      edges: [TravelEdge('the_umbral_wastes', 8)],
     ),
     GameLocation(
       id: 'vespergate',

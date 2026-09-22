@@ -640,8 +640,8 @@ is 50, not the 29 previously printed.
 | **Aqua** | 4 | 40 | Glimmerbrook 3–8 · Thornmire 8–13 · Frostfell Pass 21–26 · Tidewrack Shoals 36–40 |
 | **Flora** | 4 | 53 | Whispering Woods 1–5 · Thornmire 8–13 · Ashfall Vale 10–14 · The Sealed Garden 49–53 |
 | **Pyro** | 3 | 29 | Cinderpeak Foothills 6–11 · Ashfall Vale 10–14 · The Molten Deep 25–29 |
-| **Electro** | 3 | 44 | Stormcliff Coast 17–22 · Thunderspire Peaks 23–28 · The Shattered Orrery 40–44 |
-| **Aero** | 3 | 28 | Windward Steppe 19–24 · Frostfell Pass 21–26 · Thunderspire Peaks 23–28 |
+| **Electro** | 3 | 44 | Thunderspire Peaks 17–22 · Stormcliff Coast 23–28 · The Shattered Orrery 40–44 |
+| **Aero** | 3 | **26** | Thunderspire Peaks 17–22 · Windward Steppe 19–24 · Frostfell Pass 21–26 |
 | **Geo** | 3 | 50 | Old Quarry 15–19 · The Molten Deep 25–29 · The Buried Sky 46–50 |
 | **Solar** | 3 | 47 | The Kiln Desert 30–34 · The Sunless Reach 38–42 · The Glass Archive 43–47 |
 | **Lunar** | 3 | 42 | The Mirrormere 32–37 · Tidewrack Shoals 36–40 · The Sunless Reach 38–42 |
@@ -653,9 +653,18 @@ is 50, not the 29 previously printed.
 ⭐ **The headline: count was never really the problem — spread is.** The target
 of 3–4 zones per element is already nearly met; the range is 2–4, and no
 element is starved outright. ⚠️ **But Flora is the only element whose zones
-all end early.** Every other element reaches at least band 28; Flora stops at
+all end early.** Every other element reaches at least band 26; Flora stops at
 **14**. A player who falls for Flora in the tutorial has 46 levels with nothing
 to look forward to, while an Aqua player gets a zone in every quarter.
+
+⚠️ **That floor was 28 until the 2026-09-21 re-band, and Aero is what moved
+it.** Thunderspire Peaks (Electro ▸ Aero) came down to 17–22, so Aero's
+ceiling is now Frostfell Pass at **26** and all three of its zones sit inside
+17–26 — the tightest clump any element has. Electro was unharmed; it still
+reaches 44 at the Shattered Orrery. ❓ **Open:** the re-band was ruled on the
+road's difficulty curve, not on element coverage, and this is the one thing it
+cost. The answer, if one is wanted, is a late Aero zone — not a looser guard
+(`test/world_test.dart` carries the same note).
 
 ⚠️ **The second finding, and it is the one that matters more:** the **Ethereal
 quarter is the thinnest stretch of the game** — 5 zones drawing on only 3
@@ -1102,7 +1111,7 @@ not locked.
 > its pin sits on the `ironspine` polyline in `world_map_geometry.dart`, and
 > that is a content constraint rather than a drawing preference.
 
-#### Stormcliff Coast · pure · Electro · Lv 17–22
+#### Stormcliff Coast · pure · Electro · Lv 23–28
 > **Blurb** — Where the western ocean's weather hits a wall and has nowhere to go.
 >
 > **Arrival** — The cliffs take the whole Atlantic of it. Spray comes up further
@@ -1140,7 +1149,7 @@ not locked.
 > **Here** — Aqua **and** Aero motes. ❄️ **Ice** exists nowhere else — every
 > recipe that wants it wants this place. ⭐ The road north *must* use the pass.
 
-#### Thunderspire Peaks · hybrid · Electro + Aero *(Electro ▸ Aero)* · Lv 23–28
+#### Thunderspire Peaks · hybrid · Electro + Aero *(Electro ▸ Aero)* · Lv 17–22
 > **Blurb** — The summit line where coastal storm meets steppe wind.
 >
 > **Arrival** — You are inside the weather rather than under it. The cloud is
@@ -1289,14 +1298,18 @@ not locked.
 > at polar latitude simply never sees the sun.
 
 #### The Reliquary Deep · hybrid · Sanctus + Umbra *(Sanctus ▸ Umbra)* · Lv 52–56
-> **Blurb** — A vault bored through the mountain from the lit side to the dark.
+> **Blurb** — A vault bored through the mountain, open now at the dark end.
 >
-> **Arrival** — The door is on the warm flank and the far end opens onto the
-> ice. In between, a corridor that someone consecrated and someone else did not
-> leave alone. It is warmer in the middle than at either end.
+> **Arrival** — The way in is a hole in the ice on the north face, and it goes
+> inward and downward toward a warm flank you never reach. A corridor that
+> someone consecrated and someone else did not leave alone. It gets warmer the
+> further you go, and the far door has been shut for longer than the order that
+> shut it lasted.
 >
 > **Here** — Sanctus **and** Umbra motes. ⭐ **Literally between its two
 > parents** — through the rock rather than across the ground. ⚠️ Interior art.
+> ⚠️ **Entered from the Umbral Wastes only** since the 2026-09-21 re-route —
+> the south door is lore, not a road.
 
 #### *The upper icefall* · no zone
 > Deliberately empty. Pure ascent between the Wastes and the crossing, so the
@@ -1421,3 +1434,91 @@ at 2 800 m; altitude explicitly divorced from difficulty; Tidewrack-by-sea and
 the Molten Deep's descent kept as deliberate exceptions; Hallowmarch released
 from being a marsh. Full gazetteer with first-draft player-facing text for all
 32 places.
+
+---
+
+### Band order along the forced route (ruled 2026-09-21)
+
+⭐ **Difficulty must ascend along the forced route.** Walking *away* from a town
+must never hand the player an easier zone than the one they just cleared. Two
+places in the shipped graph broke that, and both are fixed.
+
+#### 1. Thunderspire Peaks ⇄ Stormcliff Coast — the bands swap
+
+Forgeholm opens at 15 and the quarry behind it is 15–19, but the city's way on
+was **Thunderspire Peaks at 23–28** — and all three zones past it (Stormcliff
+17–22, Windward Steppe 19–24, Frostfell Pass 21–26) were *lower*. The player
+had to clear the hardest ground in the quarter to reach the easiest.
+
+| Zone | Was | Now |
+|---|---|---|
+| **Thunderspire Peaks** | 23–28 | **17–22** |
+| **Stormcliff Coast** | 17–22 | **23–28** |
+
+⭐ **Enemy levels needed no edit** — `adventure.dart` ramps them from the zone's
+own band at run time, so the re-band carries the bestiary with it.
+
+⭐ **Each catalogue's `equipLevel`s moved with its zone**, keeping their
+position inside the band: Thunderspire's five dropped 6 (Rowan 25 → **19**,
+Countstone Pendant 26 → **20**, Groundfault Grips 28 → **22**) and Stormcliff's
+two in-band pieces rose 6 (Fulgurite Pendant 20 → **26**, Uplight 22 → **28**).
+⚠️ **The Seawrack set did not move** — all five pieces equip at 16, which was
+already below the old 17–22 floor, so they were outside the band and stay put.
+Gather-node XP follows `9 + 2 × (minLevel − 1)` and swapped with the bands
+(Stormcliff 41 → 53, Thunderspire 53 → 41).
+
+⚠️ **Two knock-on effects, both flagged rather than patched:**
+ * **Aero's ceiling fell from 28 to 26.** Thunderspire was Aero's only zone
+   reaching 28; its three zones now all sit inside 17–26 (see §4c's table).
+ * **Rowan now buys crit before Fulgurite meets it.** §2.5 wanted the player to
+   *meet* crit on a drop before *crafting* it; at Rowan 19 / Fulgurite 26 that
+   order is reversed.
+
+#### 2. The Umbral Wastes move onto the road
+
+The north road ran **Hallowmarch 45–49 → The Reliquary Deep 52–56 → The Umbral
+Wastes 47–51**: the hardest place on the mountain was the corridor you walked
+*through* to reach an easier one. The Wastes now sit between the two.
+
+| Place | Roads now |
+|---|---|
+| **Hallowmarch** | Rimeholt · **The Umbral Wastes** · Vespergate · The Sealed Garden |
+| **The Umbral Wastes** | Hallowmarch · The Reliquary Deep · Vespergate |
+| **The Reliquary Deep** | The Umbral Wastes *(only)* |
+
+Travel durations are unchanged at 8 minutes a leg. ⚠️ **The Reliquary is now
+entered from the ice and only from the ice** — the vault is still bored from
+the lit flank, but the south door is lore rather than a road, and its blurb and
+arrival text say so.
+
+#### The rule the test enforces
+
+`test/world_bands_test.dart` walks **outward from every town** along route and
+dungeon nodes and fails if any step drops to a lower `minLevel`, printing the
+offending path.
+
+⚠️ **"Outward" has to be defined or the rule is unusable.** The road network is
+a web, not a tree: every zone has a way back, and a way back is *supposed* to
+descend. So the walk follows only edges that lead **strictly further from
+Hearthwood** — one more leg of road than the place it left. Return roads, loops
+and side doors do not increase that distance and are not promises about
+difficulty. A companion test asserts the walk is not vacuous, so tightening
+"outward" cannot make the guard pass by checking nothing.
+
+📝 Verified by running it against the pre-change graph, where it failed on
+exactly the two spots above and nothing else:
+
+```
+Forgeholm → Thunderspire Peaks (23-28) → Stormcliff Coast (17-22)
+Forgeholm → Thunderspire Peaks (23-28) → Windward Steppe (19-24)
+Forgeholm → Thunderspire Peaks (23-28) → Frostfell Pass (21-26)
+Rimeholt   → Hallowmarch (45-49) → The Reliquary Deep (52-56) → The Umbral Wastes (47-51)
+Vespergate → Hallowmarch (45-49) → The Reliquary Deep (52-56) → The Umbral Wastes (47-51)
+```
+
+⚠️ **Ladder bots wear catalogue items, so a re-band can strip one.** Three were
+left holding gear above their level and were re-dressed with the nearest legal
+piece of the same rarity: **Rook** (L21) and **Isolde** (L23) trade the
+Fulgurite Pendant for the **Countstone Pendant** (rare, equip 20), and
+**Garrick** (L25) trades Uplight for the **Rowan Wand** (equip 19, and
+one-handed, which his Rowan Knot offhand requires).

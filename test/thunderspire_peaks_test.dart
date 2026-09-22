@@ -122,10 +122,25 @@ void main() {
       );
     });
 
-    test('the zone band is 23–28, and nothing else', () {
+    test('the zone band is 17–22, and nothing else', () {
+      // ⭐ Swapped with the Stormcliff Coast (ruling, Christian 2026-09-21) so
+      // the road out of Forgeholm climbs instead of dropping — see
+      // `test/world_bands_test.dart`.
       final loc = World.byId(zone);
-      expect(loc.minLevel, 23);
-      expect(loc.maxLevel, 28);
+      expect(
+        loc.minLevel,
+        17,
+        reason:
+            'kills the mutant that re-raises the '
+            'floor to 23 and puts the pothole back',
+      );
+      expect(
+        loc.maxLevel,
+        22,
+        reason:
+            'kills the mutant that moves the floor '
+            'alone and leaves a 17-28 band six levels too wide',
+      );
     });
 
     test('the Adept is the ruled swap, and it is the zone\'s only Adept', () {
@@ -613,7 +628,13 @@ void main() {
       }
       final grips = ItemCatalogue.byId('groundfault_grips') as EquipmentDef;
       expect(grips.slot, EquipSlot.gloves);
-      expect(grips.equipLevel, 28);
+      expect(
+        grips.equipLevel,
+        22,
+        reason:
+            'the epic sits at zone max, which the 2026-09-21 re-band moved '
+            'from 28 to 22',
+      );
       expect(
         grips.modifiers,
         const ItemModifiers(accuracyBonus: 5, damagePerCast: 4),
@@ -664,14 +685,20 @@ void main() {
       );
     });
 
-    test('all three Rowan weapons equip at 25, carry a crit pair and a '
+    test('all three Rowan weapons equip at 19, carry a crit pair and a '
         'socket', () {
       // ⚠️ Kills the crit-left-off-crafted mutant: a Rowan piece with a
       // zero crit line silently reverts the quarter's whole "crit debuts on
       // crafted gear here" premise.
       for (final id in ['rowan_quarterstaff', 'rowan_wand', 'rowan_knot']) {
         final def = ItemCatalogue.byId(id) as EquipmentDef;
-        expect(def.equipLevel, 25, reason: '$id should equip at 25 (§9b.6)');
+        expect(
+          def.equipLevel,
+          19,
+          reason:
+              '$id should equip at 19 — §9b.6\'s floor+2, carried down by '
+              'the 2026-09-21 re-band',
+        );
         expect(
           def.modifiers.critChance,
           greaterThan(0),

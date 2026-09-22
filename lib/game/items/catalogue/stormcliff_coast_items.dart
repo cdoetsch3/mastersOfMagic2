@@ -1,4 +1,15 @@
-/// Everything the Stormcliff Coast can yield (Lv 17–22, Electro).
+/// Everything the Stormcliff Coast can yield (Lv 23–28, Electro).
+///
+/// ⚠️ **The band moved, and the chase moved with it** (ruling, Christian
+/// 2026-09-21). The coast traded bands with Thunderspire Peaks so that
+/// difficulty climbs along the road out of Forgeholm; the two drop-only
+/// pieces rose by 6 and keep their old place inside the band (the pendant at
+/// floor+3, the epic at the ceiling).
+///
+/// ⚠️ **The Seawrack set did NOT move.** All five pieces equip at 16, which
+/// was already a rung *below* the old 17-22 floor — outside the band, so the
+/// ruling leaves them where they are. The gap is now six levels wide: a
+/// crafted set the player can wear long before the coast is survivable.
 ///
 /// ⭐ Pure zone: two materials (KINETIC_CONTRACT §3.1, §9b.8 ruling 7).
 /// Seawrack Fibre feeds Tailoring; Saltwort feeds Potions & Alchemy. Neither
@@ -198,8 +209,10 @@ abstract final class StormcliffCoastItems {
 
   // ---- equipment: the chase ---------------------------------------------
 
-  /// ⭐ Drop-only jewelry — the player's first *meeting* with crit, ahead of
-  /// where crafting can buy it (Rowan, equip 25, §2.5).
+  /// ⭐ Drop-only jewelry — the player's first *meeting* with crit. ⚠️ It
+  /// used to arrive ahead of where crafting could buy it; the 2026-09-21
+  /// re-band reversed that, because Rowan came down to equip 19 as this came
+  /// up to 26 (§2.5). See the note on `thunderspire_peaks_items.dart`.
   static const fulguritePendant = EquipmentDef(
     id: 'fulgurite_pendant',
     properName: 'Fulgurite Pendant',
@@ -213,7 +226,7 @@ abstract final class StormcliffCoastItems {
     material: 'Fulgurite',
     modifiers: ItemModifiers(critChance: 8, critDamage: 10),
     tradability: Tradability.untradeable,
-    equipLevel: 20,
+    equipLevel: 26,
     value: 280,
   );
 
@@ -239,7 +252,7 @@ abstract final class StormcliffCoastItems {
     ),
     socketCount: 1,
     tradability: Tradability.untradeable,
-    equipLevel: 22,
+    equipLevel: 28,
     value: 760,
   );
 

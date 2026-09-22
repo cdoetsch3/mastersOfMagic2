@@ -4,7 +4,7 @@
 /// equips at 20 here** — the weapon ladder's tier-3 wood (§9b.6) — and
 /// **no crit anywhere in this catalogue**: crit stays off the crafted
 /// tier-3 (Yew/Seawrack) entirely this quarter, arriving instead on Rowan
-/// (equip 25, Thunderspire) per §2.5.
+/// (equip 19, Thunderspire) per §2.5.
 library;
 
 import 'package:mom_engine/mom_engine.dart';

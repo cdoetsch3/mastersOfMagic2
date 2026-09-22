@@ -326,11 +326,13 @@ abstract final class GatherNodes {
     flavor: 'A dip where the wind passes over rather than through.',
   );
 
-  // ---- Stormcliff Coast (Electro, band 17–22) ----------------------------
+  // ---- Stormcliff Coast (Electro, band 23–28) ----------------------------
   //
   // ⭐ Pure zone, two world-held materials (KINETIC_CONTRACT §3.1, §6):
   // Seawrack Fibre off the tideline, Saltwort off the spray-line. Neither is
   // a hide or a mote, so both get a node — unlike Old Quarry's Tuskhide.
+  // ⭐ XP is `9 + 2 × (zone.minLevel − 1)` = `9 + 2 × 22` = 53 — it rose with
+  // the band when the coast and Thunderspire swapped (ruling 2026-09-21).
 
   static const wrackline = GatherNodeDef(
     id: 'sc_wrackline',
@@ -342,7 +344,7 @@ abstract final class GatherNodes {
     // rateDrag: long fibre comes out at ONE speed or it snaps, same contract
     // as Thornmire's retting.
     step: GestureStep(GestureEngine.rateDrag, 'draw'),
-    xp: 41,
+    xp: 53,
     flavor:
         'The tideline\'s own rope, laid out and salt-cured by the weather. '
         'Draw it steadily and it comes free in lengths.',
@@ -356,7 +358,7 @@ abstract final class GatherNodes {
     min: 2,
     max: 3,
     step: GestureStep(GestureEngine.trace, 'pick', complexity: 2),
-    xp: 41,
+    xp: 53,
     flavor:
         'It grows where the spray reaches and nowhere the spray does not — a '
         'ledge you can find with your eyes shut, once you know the smell.',
@@ -395,11 +397,13 @@ abstract final class GatherNodes {
     flavor: 'Ice in the rock that the black walls have never warmed.',
   );
 
-  // ---- Thunderspire Peaks (Electro + Aero, band 23–28) -------------------
+  // ---- Thunderspire Peaks (Electro + Aero, band 17–22) -------------------
   //
   // ⭐ Hybrid zone, three world-held materials (KINETIC_CONTRACT §3.1/§6):
   // Rowan Log, Iron Ore and Hum Quartz. Nothing here is a hide or a mote, so
   // all three get a node.
+  // ⭐ XP is `9 + 2 × (zone.minLevel − 1)` = `9 + 2 × 16` = 41 — it fell with
+  // the band when the peaks and Stormcliff swapped (ruling 2026-09-21).
 
   static const tpRowanStand = GatherNodeDef(
     id: 'tp_rowan_stand',
@@ -409,7 +413,7 @@ abstract final class GatherNodes {
     min: 2,
     max: 4,
     step: GestureStep(GestureEngine.releaseTiming, 'chop', reps: 4),
-    xp: 53,
+    xp: 41,
     flavor: 'Mountain ash above the treeline, which should not be possible.',
   );
 
@@ -421,7 +425,7 @@ abstract final class GatherNodes {
     min: 2,
     max: 4,
     step: GestureStep(GestureEngine.sweetSpot, 'strike', reps: 4),
-    xp: 53,
+    xp: 41,
     flavor:
         'Rust-red rock that the storm has been finding for a very long '
         'time.',
@@ -438,7 +442,7 @@ abstract final class GatherNodes {
     min: 2,
     max: 3,
     step: GestureStep(GestureEngine.bandKeeper, 'ring'),
-    xp: 53,
+    xp: 41,
     flavor: 'Quartz with a note in it. Strike it wrong and the note stops.',
   );
 

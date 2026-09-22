@@ -1,4 +1,4 @@
-/// The Stormcliff Coast bestiary — Lv 17–22, Electro (KINETIC_CONTRACT §4.2).
+/// The Stormcliff Coast bestiary — Lv 23–28, Electro (KINETIC_CONTRACT §4.2).
 ///
 /// ⭐ **Theme: everything here is a path to the ground, including you.** The
 /// coast is not a target, it is a **conductor** — from the arrival text,
