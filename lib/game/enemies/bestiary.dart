@@ -11,6 +11,7 @@ import 'enemy_def.dart';
 import 'frostfell_pass.dart';
 import 'glimmerbrook.dart';
 import 'old_quarry.dart';
+import 'starfall_basin.dart';
 import 'stormcliff_coast.dart';
 import 'the_mirrormere.dart';
 import 'the_kiln_desert.dart';
@@ -47,6 +48,7 @@ abstract final class Bestiary {
     ...ShatteredOrreryBestiary.all,
     ...KilnDesertBestiary.all,
     ...TidewrackShoalsBestiary.all,
+    ...StarfallBasinBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>

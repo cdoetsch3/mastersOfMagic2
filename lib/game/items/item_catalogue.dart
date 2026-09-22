@@ -11,6 +11,7 @@ import 'catalogue/cinderpeak_items.dart';
 import 'catalogue/frostfell_pass_items.dart';
 import 'catalogue/glimmerbrook_items.dart';
 import 'catalogue/old_quarry_items.dart';
+import 'catalogue/starfall_basin_items.dart';
 import 'catalogue/stormcliff_coast_items.dart';
 import 'catalogue/the_mirrormere_items.dart';
 import 'catalogue/the_kiln_desert_items.dart';
@@ -57,6 +58,7 @@ abstract final class ItemCatalogue {
     'the_shattered_orrery': ShatteredOrreryItems.all,
     'the_kiln_desert': KilnDesertItems.all,
     'tidewrack_shoals': TidewrackShoalsItems.all,
+    'starfall_basin': StarfallBasinItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists

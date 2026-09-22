@@ -634,6 +634,44 @@ abstract final class GatherNodes {
         'uncovered empty.',
   );
 
+  // ---- Starfall Basin · 34–39 · Astral (CELESTIAL_CONTRACT §6) ---------
+  //
+  // ⭐ **The only zone in the game with two Mining nodes and nothing else.**
+  // Starfall has no cloth, no wood and no herb — everything here came down
+  // and nothing grew — so both of its materials are prised out of craters.
+  // ⚠️ `sb_fallstone_crater` is **Enchanting ← Mining**, the one mapping
+  // §6a.1's table does not print. The precedent is already shipped: `amber`
+  // is a Jewelry material gathered by Mining because gems are Mining's half,
+  // and a fallstone comes out of a crater floor with the same tool.
+
+  static const sbSkyironField = GatherNodeDef(
+    id: 'sb_skyiron_field',
+    zoneId: 'starfall_basin',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'skyiron_ore',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.sweetSpot, 'strike', reps: 5),
+    xp: 75,
+    flavor:
+        'The bottom of a shallow bowl, and the thing in it did not come '
+        'from the bowl.',
+  );
+
+  static const sbFallstoneCrater = GatherNodeDef(
+    id: 'sb_fallstone_crater',
+    zoneId: 'starfall_basin',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'fallstone',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'pry', complexity: 3),
+    xp: 75,
+    flavor:
+        'Deeper than the others, with something at the bottom that weighs '
+        'right and looks wrong.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -669,6 +707,8 @@ abstract final class GatherNodes {
     kdGlasspanFlat,
     tsWrackcottonFlat,
     tsNacreBed,
+    sbSkyironField,
+    sbFallstoneCrater,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

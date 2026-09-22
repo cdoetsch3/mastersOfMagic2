@@ -439,7 +439,7 @@ void main() {
       // ⭐ Lunar is the seventh family, defined in `the_mirrormere_items.dart`
       // (CELESTIAL_CONTRACT §3.2 — the mote lives with the zone that first
       // yields it). ⚠️ Each Celestial zone that lands adds three more.
-      expect(motes.length, 24, reason: '8 elements × 3 shipped tiers');
+      expect(motes.length, 27, reason: '9 elements × 3 shipped tiers');
       const perTier = {
         MoteTier.dust: 2,
         MoteTier.shard: 25,
