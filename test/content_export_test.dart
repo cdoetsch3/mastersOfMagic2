@@ -44,7 +44,20 @@ void main() {
     // main, so every id resolves for real again. The Ethereal wave will
     // need this window once more (sanctus_* / umbra_* land with Hallowmarch
     // and the Umbral Wastes); empty it again the moment that wave lands.
-    const crossBuilderIds = <String>{};
+    // ⚠️ Ethereal merge window (2026-09-22): sanctus_* / umbra_* land with
+    // Hallowmarch and the Umbral Wastes; the two consumables with
+    // Hallowmarch and the Unwritten Library. Empty again when the wave lands.
+    const crossBuilderIds = <String>{
+      'sanctus_dust',
+      'sanctus_shard',
+      'sanctus_crystal',
+      'umbra_dust',
+      'umbra_shard',
+      'umbra_crystal',
+      'climbers_ration',
+      'goldenrood_draught',
+      'nightink_draught',
+    };
     final missing = <String>[];
     void check(String? id, String where) {
       if (id != null &&

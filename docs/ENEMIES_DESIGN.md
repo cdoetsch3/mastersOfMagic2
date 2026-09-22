@@ -733,7 +733,7 @@ nowhere else.** Each was checked against both of its zone's counters.
 
 | Zone | Creature | Off-element move | Legal because |
 |---|---|---|---|
-| **The Buried Sky** | The Long Count | one **lunar** | Geo is countered by Aero, Astral by Solar. Lunar is neither — and a long count counts moons |
+| ~~**The Buried Sky**~~ | ~~The Long Count~~ | ~~one lunar~~ | ❌ **Withdrawn 2026-09-22 (build manager).** The reasoning was inverted: the tier-3 wheel runs Solar → Lunar → Astral → Solar, so Lunar IS Astral's counter, and §2h's law wins. The Long Count is pure Astral. §2e.2 now names THREE creatures |
 | **The Glass Archive** | Burnt Index | one **pyro** | Solar is countered by Astral, Arcane by Umbra. The index burned |
 | **The Sealed Garden** | Cherub of the Turning Blade | one **solar** | ⚠️ **NOT pyro** — Flora's counter. The flaming sword is written as light, not fire, for exactly this reason |
 | **The Collapsed Academy** | The Fourth Item | one **astral** | Arcane is countered by Umbra. The fourth item is not in any language you have |
@@ -961,7 +961,7 @@ nothing. Stated in both places so nobody "fixes" the overlap later.
 | **Stonefall Herald** | Mini | Champion | geo + astral | mote · material | It arrives a little before the rock does, every time, and has never once been early for anything else | A clean skill check |
 | **Bedrock Colossus** | Mini | Redoubt | geo | mote · material | The last layer, the one with nothing under it, standing up | Attrition — there is no going around it |
 | **Nadir** | Mini | Executioner | geo | mote · material | The lowest point of the shaft, which is a place and is also looking at you | One misplay ends you |
-| **The Long Count** | Mini | Hexer | astral | mote | A tally kept in a notation nobody now reads, still being added to, and the number is about you | It punishes a bad loadout. ⚠️ Carries the zone's **one off-element move** — lunar (§2e.2) |
+| **The Long Count** | Mini | Hexer | astral | mote | A tally kept in a notation nobody now reads, still being added to, and the number is about you | It punishes a bad loadout. *(The lunar off-element grant was withdrawn 2026-09-22 — it was Astral's own counter.)* |
 | **The Overburden** ✅ | **Boss** | Juggernaut | geo | mote · unique | ⭐ *What buries.* A real mining term for the rock sitting on top of a seam, and it happens to mean exactly the right thing | Endurance — it is not fast and it does not need to be |
 | **The Buried Constellation** ✅ | **Boss** | Aspect | astral | mote · unique | ⭐ *What survives.* An old star-pattern still alight down here, refusing to be past tense | **Astral Alignment taken to an extreme**: by the end, the shield you are holding is not where the damage is going |
 
@@ -986,7 +986,7 @@ Ids are zone-tagged `bs_*`.
 | **Stonefall Herald** | 3 · cost 1–4 | **Call It Down** (1 · pri 5 · `DamageEffect`) · **Bring the Face Away** (4 · pri 9 · `DamageEffect`) · **Brace the Shaft** (3 · pri 3 · `ShieldEffect`) |
 | **Bedrock Colossus** | 3 · cost 2–4 | **Settle** (2 · pri 9 · `DamageEffect`) · **Take the Weight** (4 · pri 3 · `ShieldEffect`) · **Close the Seam** (3 · pri 9 · `DamageEffect(lifesteal: 0.4)`) — ⭐ the Redoubt's heal, using the lever the engine actually has |
 | **Nadir** | 2 · cost 3–5 | **Bottom Out** (3 · pri 9 · `DamageEffect`) · **Finish the Descent** (5 · pri 9 · `DamageEffect(executeBelowPercent: 30)`) — ⭐⭐ the Executioner's lesson written into the effect |
-| **The Long Count** | 3 · cost 1–3 | **Mark the Age** (1 · pri 4 · `DamageEffect`) · **Count Back** (2 · pri 1 · `DamageEffect`, **lunar** — the off-element) · **Older Than the Sky** (3 · pri 2 · `DamageEffect(ignoresShields: true)`) — ⭐ the Hexer's signature is priority, not status: it lands before your shield does |
+| **The Long Count** | 3 · cost 1–3 | **Mark the Age** (1 · pri 4 · `DamageEffect`) · **Count Back** (2 · pri 1 · `DamageEffect`) · **Older Than the Sky** (3 · pri 2 · `DamageEffect(ignoresShields: true)`) — ⭐ the Hexer's signature is priority, not status: it lands before your shield does |
 | **The Overburden** | 3 · cost 3–5 | **Press Down** (3 · pri 9 · `DamageEffect`) · **Pack the Roof** (4 · pri 3 · `ShieldEffect`) · **Bring the Whole Column** (5 · pri 9 · `DamageEffect`) |
 | **The Buried Constellation** | 3 · cost 1–4 | **Still Alight** (1 · pri 9 · `DamageEffect`) · **Rise Where It Should Not** (2 · pri 9 · `DamageEffect(ignoresShields: true)`) · **The Pattern Holds** (4 · pri 9 · `DamageEffect(hits: 3, ignoresShields: true)`) — ⭐ **the Aspect's whole kit walks through shields**, because that is what Astral Alignment does, taken further than the player has met it |
 

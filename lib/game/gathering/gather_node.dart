@@ -780,6 +780,44 @@ abstract final class GatherNodes {
         'the writing is not.',
   );
 
+  // ---- The Buried Sky (Geo + Astral, band 46–50) ------------------------
+
+  /// ⭐ The hybrid's **three** materials would normally be three nodes, but
+  /// `corebiter_hide` is kill-only (ETHEREAL_CONTRACT §3.1) — so the zone
+  /// authors two, one per gatherable material, both Mining. ⚠️ A third node
+  /// yielding `deepstratum_ore` exists in **Hallowmarch** (`hm_causeway_quarry`
+  /// — the only cross-zone node in the game), and it belongs to that lane.
+  static const bsStratumSeam = GatherNodeDef(
+    id: 'bs_stratum_seam',
+    zoneId: 'the_buried_sky',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'deepstratum_ore',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.sweetSpot, 'strike', reps: 5),
+    xp: 99,
+    flavor:
+        'The lowest band the shaft reaches, and the shaft was going '
+        'somewhere.',
+  );
+
+  /// ⭐ `alignCommit` is the gem-setter's own engine — *"line something up,
+  /// commit once"* — and prying a pocket open is the one act you do not get
+  /// to repeat.
+  static const bsNadirPocket = GatherNodeDef(
+    id: 'bs_nadir_pocket',
+    zoneId: 'the_buried_sky',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'nadir_garnet',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'pry', complexity: 4),
+    xp: 99,
+    flavor:
+        'A pocket of red in the black. Held to a lamp the flecks make a '
+        'shape.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -823,6 +861,8 @@ abstract final class GatherNodes {
     gaShadelineLichen,
     gaRoofSpoil,
     gaNoonShelf,
+    bsStratumSeam,
+    bsNadirPocket,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {
