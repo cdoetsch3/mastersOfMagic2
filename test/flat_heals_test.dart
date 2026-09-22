@@ -53,6 +53,7 @@ const _ruled = <String, int>{
   'sunbleach_tonic': 126, // 42 a turn × 3
   'censer_draught': 295,
   'nightink_draught': 320,
+  'worldroot_tonic': 159, // 53 a turn × 3
   'goldenrood_draught': 225,
   'climbers_ration': 195,
 };

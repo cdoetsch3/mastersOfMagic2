@@ -1062,6 +1062,63 @@ abstract final class GatherNodes {
         'than the road is.',
   );
 
+  // ---- The Sealed Garden (Flora + Sanctus, band 49–53) ------------------
+
+  /// ⭐ **Everything here is harvested from OUTSIDE the wall**, which is the
+  /// whole zone in one fact: the garden has been reaching out for centuries
+  /// and nobody has been let in. ⚠️ The hybrid's third material,
+  /// `thornpenitent_hide`, is kill-only and correctly has no node.
+  static const sgWorldrootUndercut = GatherNodeDef(
+    id: 'sg_worldroot_undercut',
+    zoneId: 'the_sealed_garden',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'worldroot',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.trace, 'dig', complexity: 4),
+    xp: 105,
+    flavor:
+        'Dug from under the wall on the outside, where something inside has '
+        'been reaching.',
+  );
+
+  /// ⭐ `alignCommit` — *"line something up, commit once"* is prising sap off
+  /// a living bough without taking the bough with it.
+  static const sgAmberBough = GatherNodeDef(
+    id: 'sg_amber_bough',
+    zoneId: 'the_sealed_garden',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'orchard_amber',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'pry', complexity: 4),
+    xp: 105,
+    flavor:
+        'Sap on a bough nobody has pruned in four centuries, and the bough '
+        'is still right.',
+  );
+
+  /// ⚠️ **A SECOND node on `worldroot`, and it is a throughput fix rather
+  /// than a second source** (ETHEREAL_CONTRACT §6): worldroot feeds four or
+  /// more recipes and one node per run section cannot keep a level-50 crafter
+  /// supplied. ⭐ Both nodes yield the same id, so the library's
+  /// no-second-source rule — which is about the *fiction*, not the node count
+  /// — is untouched. 📝 Cut this one if one-node-per-material is a rule
+  /// rather than a habit; nothing else depends on it.
+  static const sgWallsideRoot = GatherNodeDef(
+    id: 'sg_wallside_root',
+    zoneId: 'the_sealed_garden',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'worldroot',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.trace, 'dig', complexity: 3),
+    xp: 105,
+    flavor:
+        'Against the wall itself, where whatever is inside is pushing '
+        'hardest.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -1120,6 +1177,9 @@ abstract final class GatherNodes {
     hmSpiritwoodStand,
     hmGoldenroodVerge,
     hmCausewayQuarry,
+    sgWorldrootUndercut,
+    sgAmberBough,
+    sgWallsideRoot,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

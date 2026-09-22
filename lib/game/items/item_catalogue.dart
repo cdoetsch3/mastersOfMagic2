@@ -20,6 +20,7 @@ import 'catalogue/the_buried_sky_items.dart';
 import 'catalogue/the_collapsed_academy_items.dart';
 import 'catalogue/the_glass_archive_items.dart';
 import 'catalogue/the_reliquary_deep_items.dart';
+import 'catalogue/the_sealed_garden_items.dart';
 import 'catalogue/the_molten_deep_items.dart';
 import 'catalogue/the_shattered_orrery_items.dart';
 import 'catalogue/the_sunless_reach_items.dart';
@@ -75,6 +76,7 @@ abstract final class ItemCatalogue {
     'the_umbral_wastes': UmbralWastesItems.all,
     'the_unwritten_library': UnwrittenLibraryItems.all,
     'hallowmarch': HallowmarchItems.all,
+    'the_sealed_garden': SealedGardenItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists
