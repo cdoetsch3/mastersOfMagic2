@@ -563,6 +563,40 @@ abstract final class GatherNodes {
         'edge-up.',
   );
 
+  // ---- The Kiln Desert (Solar, band 30–34) -------------------------------
+  // ⭐ Two nodes, and for once both materials get one: the Kiln Desert has no
+  // hide and no cloth at all (CELESTIAL_CONTRACT §4.1), so nothing here is
+  // kill-only and the 2-per-pure-zone budget is spent entirely on the world.
+  // ⭐ XP is `9 + 2 × (zone.minLevel − 1)` = `9 + 2 × 29` = 67.
+
+  static const kdIronwoodStand = GatherNodeDef(
+    id: 'kd_ironwood_stand',
+    zoneId: 'the_kiln_desert',
+    skill: GatherSkill.felling,
+    yieldsDefId: 'ironwood_log',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.releaseTiming, 'chop', reps: 5),
+    xp: 67,
+    flavor:
+        'Four trees in eleven miles, and every one of them older than the '
+        'road.',
+  );
+
+  static const kdGlasspanFlat = GatherNodeDef(
+    id: 'kd_glasspan_flat',
+    zoneId: 'the_kiln_desert',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'glasswort',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.trace, 'pick', complexity: 3),
+    xp: 67,
+    flavor:
+        'The only green thing out here grows in the one place with no water '
+        'at all.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -594,6 +628,8 @@ abstract final class GatherNodes {
     soScrapRing,
     soArcsaltEarthing,
     soLensShatter,
+    kdIronwoodStand,
+    kdGlasspanFlat,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

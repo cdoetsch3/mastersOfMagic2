@@ -306,7 +306,7 @@ void main() {
       }
       expect(
         ItemCatalogue.all.length,
-        133,
+        146,
         reason:
             'the Primal quarter is 18/9/8/9/8 (52) plus the Kinetic '
             'pure zones 9/13/15 (37) plus The Molten Deep 6 plus The '

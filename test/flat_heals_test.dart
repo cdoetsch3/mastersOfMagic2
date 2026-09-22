@@ -47,6 +47,8 @@ const _ruled = <String, int>{
   'saltwort_draught': 75,
   'brookmint_tonic': 30,
   'arcsalt_draught': 185,
+  'pilgrims_ration': 110,
+  'glasswort_draught': 125,
 };
 
 /// Total XP landing exactly on [level] (xpToNext is 100 + 50·(n−1)).

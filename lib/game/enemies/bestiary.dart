@@ -13,6 +13,7 @@ import 'glimmerbrook.dart';
 import 'old_quarry.dart';
 import 'stormcliff_coast.dart';
 import 'the_mirrormere.dart';
+import 'the_kiln_desert.dart';
 import 'the_molten_deep.dart';
 import 'the_shattered_orrery.dart';
 import 'thornmire.dart';
@@ -43,6 +44,7 @@ abstract final class Bestiary {
     ...TheMoltenDeepBestiary.all,
     ...MirrormereBestiary.all,
     ...ShatteredOrreryBestiary.all,
+    ...KilnDesertBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>
