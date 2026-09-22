@@ -10,7 +10,6 @@ import 'enemies/enemy_def.dart';
 import 'firestore_rest.dart';
 import 'items/belt_potions.dart';
 import 'items/item_def.dart';
-import 'ladder/think_time.dart';
 import 'mage_apparel.dart';
 
 /// What one turn's exchange produced: the opponent's action, plus (for
@@ -131,10 +130,15 @@ class LocalAiDriver implements OpponentDriver {
   /// unaffected — only ladder construction ever passes a real one.
   final ItemModifiers gear;
 
-  /// ⭐ LADDER §4.2 — when set, [exchangeTurn] waits this long before
-  /// returning the brain's action, so a bot never answers instantly. Null
-  /// (every non-ladder caller: campaign, practice) means no delay at all.
-  final ThinkTime? thinkTime;
+  /// ⭐ Whether this driver stands in for a LADDER bot — the one fact that
+  /// makes the duel RATED (LADDER §2). Set ONLY by `launchAiDuel`'s bot path;
+  /// campaign and practice drivers leave it false even when the persona
+  /// happens to share an id with a borrowed bot (Wick, Brightgale, …).
+  /// 📝 Replaced the per-move think-time that used to double as this flag:
+  /// Christian removed the pause (2026-09-21, "remove the arbitrary pause
+  /// when playing against an AI in ladder mode"), so a bot answers as fast
+  /// as the engine does and the flag is explicit instead of implied.
+  final bool ladderBot;
 
   /// ⭐ LADDER §2 — this bot's Elo on whichever ladder it was drawn from.
   /// Defaults to 1200 (the Academy seed / the [OpponentDriver] floor) so
@@ -150,7 +154,7 @@ class LocalAiDriver implements OpponentDriver {
     this.enemy,
     this.levelOverride,
     this.gear = ItemModifiers.none,
-    this.thinkTime,
+    this.ladderBot = false,
     this.rating = 1200,
     Random? rng,
   }) : rng = rng ?? Random();
@@ -213,11 +217,6 @@ class LocalAiDriver implements OpponentDriver {
         'enemies do not carry items.',
       );
     }
-    // ⭐ LADDER §4.2 — a bot "thinks" before committing, redrawn every turn.
-    // Null for every non-ladder caller (campaign, practice), so nothing
-    // about those duels changes.
-    final delay = thinkTime?.next(rng);
-    if (delay != null) await Future<void>.delayed(delay);
     return TurnExchange(action);
   }
 

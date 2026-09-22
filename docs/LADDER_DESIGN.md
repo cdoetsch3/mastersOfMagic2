@@ -19,7 +19,7 @@ GAME_DESIGN §5 with the actual numbers.
    both fit the band, the human wins. A bot is what the search settles for,
    never what it prefers.
 3. ✅ **No disclosure.** A bot has a name, a title, a look, a level, a rating,
-   a win/loss record, and a think-time. Nothing player-facing says "AI". This
+   a win/loss record. Nothing player-facing says "AI". This
    holds in both ladders.
 4. ✅ **Bot matches count for everything** a human match would: rating, record,
    XP, gold, quest credit on the geared ladder; rating and record on Academy.
@@ -125,7 +125,7 @@ search runs a widening schedule against **both** populations:
 | archetype | code | supplies **intelligence** and the offensive core's shape (move count, cost band) |
 | loadout | code, hand-written | roster test: legal for level; offensive core matches archetype cost band; rest of the pool is shields/aux by tier |
 | gear | code: item ids + Quality | derived to `ItemModifiers` exactly as a player's equipment is, so bots track item balance for free |
-| thinkTime | code: mean 3 s, σ 0.8, clamp 1–5 (✅) | per move, redrawn each turn |
+| ~~thinkTime~~ | — | ❌ removed 2026-09-21 (see §4.2) |
 | seed rating (×2) | formula §2 | written to Firestore on first read |
 | rating, wins, losses (×2) | **Firestore** `bots/{id}` | the only mutable state |
 
@@ -150,13 +150,15 @@ user (anonymous included, for Academy); writable only on the six mutable
 fields, with `|Δrating| ≤ 40` (the max a K-40 game can move) and record
 fields +1 only.
 
-### 4.2 Think time (✅ 1–5 s around 3)
+### 4.2 Think time ❌ (removed 2026-09-21)
 
-`LocalAiDriver` draws a delay per move from a clamped normal (mean 3.0,
-σ 0.8, floor 1.0, ceiling 5.0) before committing. The duel screen shows the
-same "waiting for opponent" state it shows for a human. ❓ Should the delay
-correlate with the position (longer when the bot is low or the player sits on
-a big charge)? Cheap to add later; draft says flat.
+Built as ruled (a clamped normal, 1–5 s around 3, per move), then removed on
+Christian's instruction: "remove the arbitrary pause when playing against an
+AI in ladder mode." A bot answers as fast as the engine does. The rated-duel
+marker that used to ride on the pause is now an explicit
+`LocalAiDriver.ladderBot` flag. ⚠️ Law 3 still holds for everything else —
+the search narration's fixed 1.2 s "Found someone!" hold stays, because that
+is where a bot's instant resolution would otherwise show.
 
 ## 5. The roster (❓ red-pen this)
 
@@ -287,7 +289,7 @@ Lanes, engine-first:
    dials were never live.
 2. **Bots:** `LadderBot` definitions with archetype + gear ids; roster test
    extended (legality, cost band, gear at level, seed formula); `LocalAiDriver`
-   returns real gear for bots and draws think-time.
+   returns real gear for bots.
 3. **Ratings plumbing:** profile fields; `FirestoreRest.increment`; `bots/*`
    seeding on first read; rating update at duel end for both ladders; rules.
 4. **Search:** ticket `rating`; widening schedule; bot pick with weighting and
@@ -305,7 +307,7 @@ Roughly one batch. Lanes 1–4 are subagent-shaped; 5–6 are mine.
 2. Geared starting rating from level (§2) — or flat 1200 with a level fence?
 3. Room-code duels unrated (§3)?
 4. The roster (§5): names, titles, archetype choices, gear tiers.
-5. Bot think-time flat, or position-aware (§4.2)?
+5. ~~Bot think-time flat, or position-aware (§4.2)?~~ Moot — removed.
 6. Does a player's rating show on the *home* tab or only on the profile?
    (Built: home card + duel header; revisit if it clutters.)
 7. **Geared seed slope** (§6.1): steepen to ~50/level, or add a level fence?

@@ -68,11 +68,11 @@ RatedOutcome rate({
 }
 
 /// Finds the [LadderBot] a [LocalAiDriver] is standing in for, or null when
-/// [driver] isn't one (a practice-roster persona happens to share an id with
-/// a borrowed bot, e.g. Wick — this still resolves it, which is fine: the
-/// CALLER decides whether this was a rated match at all).
+/// [driver] isn't one. ⭐ Keyed on [LocalAiDriver.ladderBot], never on the
+/// persona id alone — a practice bout against Wick shares his id with the
+/// ladder's Wick and must never move a rating.
 LadderBot? _ladderBotBehind(OpponentDriver driver) {
-  if (driver is! LocalAiDriver) return null;
+  if (driver is! LocalAiDriver || !driver.ladderBot) return null;
   for (final bot in LadderRoster.all) {
     if (bot.id == driver.persona.id) return bot;
   }

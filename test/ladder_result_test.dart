@@ -15,7 +15,6 @@ import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/ladder/ladder_bots.dart';
 import 'package:masters_of_magic_2/game/ladder/ladder_result.dart';
-import 'package:masters_of_magic_2/game/ladder/think_time.dart';
 import 'package:masters_of_magic_2/game/opponent_driver.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
@@ -275,12 +274,12 @@ void main() {
         final live = wick.seedGeared + 295;
         final profile = PlayerProfile.newPlayer()..ratingGeared = live;
         final game = GameState(_Mem(), profile);
-        // ⭐ thinkTime set — exactly what marks this as a LADDER bot driver
+        // ⭐ ladderBot set — exactly what marks this as a LADDER bot driver
         // rather than a practice-roster persona (see duel_launcher.dart).
         final driver = LocalAiDriver(
           persona: wick.toPersona(),
           gear: wick.gearModifiers,
-          thinkTime: ThinkTime.standard,
+          ladderBot: true,
         );
 
         // The BOT wins this duel (won: false — the player lost).

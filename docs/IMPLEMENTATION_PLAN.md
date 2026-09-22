@@ -946,7 +946,8 @@ are still his to overturn.
 
 **Wave A ✅ (Sonnet lanes, merged eaba9f1 · 73f8df6 · 7cd296b+dca82a8 · df91cd8):**
 - `Elo` + `LadderSeeds` in the engine (27 tests; §5 seed numbers pinned).
-- `LocalAiDriver(gear:, thinkTime:)`; `ThinkTime` clamped normal; the
+- `LocalAiDriver(gear:, ladderBot:)` (the 1–5 s `ThinkTime` pause was built,
+  then removed 2026-09-21 on Christian's instruction); the
   persona's dormant aggression/caution dials deleted.
 - `FirestoreRest.increment` (`:commit` field transforms), eight rating
   fields on the profile, `applyRatedResult` (geared record stays with

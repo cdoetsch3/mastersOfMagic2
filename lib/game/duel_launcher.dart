@@ -9,17 +9,16 @@ import 'game_state.dart';
 import 'items/item_def.dart';
 import 'ladder/ladder_bots.dart';
 import 'ladder/ladder_result.dart';
-import 'ladder/think_time.dart';
 import 'loadout.dart';
 import 'opponent_driver.dart';
 
 /// Finds the [LadderBot] behind [driver], or null when it isn't one —
-/// [LocalAiDriver.thinkTime] is set ONLY by the ladder path ([launchAiDuel]'s
+/// [LocalAiDriver.ladderBot] is set ONLY by the ladder path ([launchAiDuel]'s
 /// [LadderBot] branch below), so a practice-roster fight against a persona
 /// that happens to share an id with a borrowed bot (Wick, Brightgale,
 /// Thornwall, Morwen, Al'Dorian) is correctly NOT treated as rated.
 LadderBot? _ladderBotBehind(OpponentDriver driver) {
-  if (driver is! LocalAiDriver || driver.thinkTime == null) return null;
+  if (driver is! LocalAiDriver || !driver.ladderBot) return null;
   for (final bot in LadderRoster.all) {
     if (bot.id == driver.persona.id) return bot;
   }
@@ -136,8 +135,8 @@ Future<void> launchDuel(
 /// ⚠️ **Exactly one of [persona]/[bot] is expected.** The practice roster
 /// (AiRoster) passes [persona] alone — no gear, no think-time, unrated. LADDER
 /// matchmaking passes [bot] alone: its wardrobe ([LadderBot.gearModifiers])
-/// and [ThinkTime.standard] both ride along, and [bot]'s presence is exactly
-/// what [_ladderBotBehind] reads back out to decide the duel is rated.
+/// rides along and [LocalAiDriver.ladderBot] is set, which is exactly what
+/// [_ladderBotBehind] reads back out to decide the duel is rated.
 Future<void> launchAiDuel(
   BuildContext context, {
   required Loadout loadout,
@@ -166,7 +165,7 @@ Future<void> launchAiDuel(
       gear: bot == null
           ? ItemModifiers.none
           : (academy ? ItemModifiers.none : bot.gearModifiers),
-      thinkTime: bot == null ? null : ThinkTime.standard,
+      ladderBot: bot != null,
       rating: bot == null
           ? 1200
           : rating ?? (academy ? bot.seedAcademy : bot.seedGeared),

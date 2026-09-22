@@ -1,5 +1,5 @@
 /// `LocalAiDriver`'s two LADDER seams (LADDER §4): a bot's wardrobe
-/// (`gear`) and its per-move delay (`thinkTime`).
+/// (`gear`) and the rated-bot marker (`ladderBot`).
 ///
 /// ⭐ Mutation-verified: every assertion names the wrong implementation it
 /// kills — gear that never reaches the wire, gear that leaks onto a bestiary
@@ -12,7 +12,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/ai_personas.dart';
 import 'package:masters_of_magic_2/game/enemies/whispering_woods.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
-import 'package:masters_of_magic_2/game/ladder/think_time.dart';
 import 'package:masters_of_magic_2/game/opponent_driver.dart';
 import 'package:mom_engine/mom_engine.dart';
 
@@ -58,59 +57,35 @@ void main() {
     );
   });
 
-  group('thinkTime', () {
-    test(
-      'a non-null thinkTime delays exchangeTurn by at least its minimum',
-      () async {
-        final driver = LocalAiDriver(
-          persona: AiRoster.all.first,
-          thinkTime: const ThinkTime(
-            meanSeconds: 0.05,
-            sigmaSeconds: 0.0,
-            minSeconds: 0.05,
-            maxSeconds: 0.05,
-          ),
-          rng: Random(1),
-        );
-        driver.bind(MageState(name: 'You'), MageState(name: 'Foe'));
+  group('ladderBot flag (the rated marker; the think-time pause is gone)', () {
+    test('defaults to false for every campaign/practice caller', () {
+      final driver = LocalAiDriver(persona: AiRoster.all.first);
+      expect(
+        driver.ladderBot,
+        isFalse,
+        reason:
+            'a mutant defaulting to true would rate every practice bout '
+            'against Wick as a ladder match',
+      );
+    });
 
-        final stopwatch = Stopwatch()..start();
-        await driver.exchangeTurn(1, const ForfeitAction());
-        stopwatch.stop();
-
-        expect(
-          stopwatch.elapsedMilliseconds,
-          greaterThanOrEqualTo(50),
-          reason:
-              'a driver that ignores thinkTime (or awaits it AFTER '
-              'returning, e.g. fire-and-forget) would answer before the 50ms '
-              'floor this ThinkTime enforces',
-        );
-      },
-    );
-
-    test(
-      'a null thinkTime (every campaign/practice caller) adds no delay',
-      () async {
-        final driver = LocalAiDriver(
-          persona: AiRoster.all.first,
-          rng: Random(1),
-        );
-        driver.bind(MageState(name: 'You'), MageState(name: 'Foe'));
-
-        final stopwatch = Stopwatch()..start();
-        await driver.exchangeTurn(1, const ForfeitAction());
-        stopwatch.stop();
-
-        expect(
-          stopwatch.elapsedMilliseconds,
-          lessThan(20),
-          reason:
-              'campaign and practice duels never set thinkTime — a driver '
-              'that draws a delay unconditionally would slow down every '
-              'existing duel, not just the ladder',
-        );
-      },
-    );
+    test('exchangeTurn answers without any injected delay', () async {
+      final driver = LocalAiDriver(
+        persona: AiRoster.all.first,
+        ladderBot: true,
+        rng: Random(1),
+      );
+      driver.bind(MageState(name: 'You'), MageState(name: 'Foe'));
+      final sw = Stopwatch()..start();
+      await driver.exchangeTurn(1, const ForfeitAction());
+      sw.stop();
+      expect(
+        sw.elapsedMilliseconds,
+        lessThan(200),
+        reason:
+            'Christian removed the 1–5 s bot pause (2026-09-21); a mutant '
+            'that still sleeps on a ladder bot fails here',
+      );
+    });
   });
 }
