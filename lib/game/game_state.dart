@@ -208,6 +208,73 @@ class GameState extends ChangeNotifier {
         '${_listPhrase(names)}.';
   }
 
+  /// Why the road to [toId] will not carry this character, or null if it will.
+  /// **Pure** — same contract as [gateRefusal], so the Map tab can call it on
+  /// every build.
+  ///
+  /// ⭐ **RULING (Christian, 2026-09-21): you cannot travel THROUGH a node you
+  /// have not cleared.** *"I can travel to it, and I can travel back where I
+  /// came from FROM it, but I shouldn't be able to travel to any other nodes
+  /// through it until having beaten its boss at least once."* An uncleared
+  /// zone is a dead end you may enter and must leave the way you entered — so
+  /// Forgeholm is behind Old Quarry's boss, not behind a walk past it.
+  ///
+  /// Two halves, and they are genuinely different questions:
+  ///  * **(a) the middle of the route.** Any stop that is neither the origin
+  ///    nor the destination must be cleared. This is the Pennycross →
+  ///    Forgeholm case: point-to-point travel would otherwise walk the whole
+  ///    quarry without stopping in it.
+  ///  * **(b) the ground you are standing on.** An uncleared origin offers
+  ///    exactly one exit — [PlayerProfile.arrivedFromId], the door you came in
+  ///    by. This is the Old-Quarry-to-Molten-Deep case, where the uncleared
+  ///    node is a *stop* rather than a waypoint and (a) can never see it.
+  ///
+  /// ⭐ **Towns are never gates**, in either half. A town has no boss to beat,
+  /// so `clearCountFor` would be zero forever and every road through
+  /// Pennycross would shut — the rule would eat the world.
+  ///
+  /// ⚠️ **"Cleared" is [PlayerProfile.clearCountFor] > 0 — the boss, once.**
+  /// Not discovery: walking into the quarry is exactly what this rule means to
+  /// stop being enough.
+  ///
+  /// 📝 **A legacy save has no [PlayerProfile.arrivedFromId].** A character who
+  /// was standing in an uncleared zone when this shipped cannot be asked which
+  /// way they came, and stranding them is not an option — so under (b) a null
+  /// lets them reach any **town** and refuses the other zones. That is the
+  /// conservative reading: it can only cost a walk back to civilisation, never
+  /// hand out a quarter of the map. One arrival writes the field and the
+  /// normal rule takes over.
+  String? passageRefusal(String toId) {
+    final fromId = profile.locationId;
+    final route = Travel.route(fromId, toId);
+    if (route == null || route.isTrivial) return null;
+
+    // (a) The middle of the route. `stops` already has exactly the shape this
+    // needs — origin first, destination last — so no accessor was added.
+    for (final id in route.stops.sublist(1, route.stops.length - 1)) {
+      if (_isUnclearedZone(id)) {
+        return 'The road runs through ${World.byId(id).name}, and you have '
+            'not cleared it.';
+      }
+    }
+
+    // (b) The ground you are standing on.
+    if (!_isUnclearedZone(fromId)) return null;
+    final origin = World.byId(fromId).name;
+    final cameFrom = profile.arrivedFromId;
+    if (cameFrom == null) {
+      if (World.byId(toId).isTown) return null;
+      return 'Clear $origin first, or go back to a town.';
+    }
+    if (toId == cameFrom) return null;
+    return 'Clear $origin first, or go back the way you came '
+        '(${World.byId(cameFrom).name}).';
+  }
+
+  /// A place the passage rule can shut: not a town, and never cleared.
+  bool _isUnclearedZone(String id) =>
+      !World.byId(id).isTown && !profile.hasCleared(id);
+
   /// "A", "A and B", "A, B and C" — so a refusal naming two missing proofs
   /// reads like a sentence instead of a comma-separated dump.
   static String _listPhrase(List<String> parts) {
@@ -242,7 +309,11 @@ class GameState extends ChangeNotifier {
   Future<bool> beginTravel(String toId, {String? mountId}) async {
     settleTravel();
     if (profile.trip != null || toId == profile.locationId) return false;
+    // ⚠️ Gate first, then passage — the guard's sentence is the more specific
+    // of the two, and a player short of three proofs should hear about the
+    // proofs rather than about the quarry behind them.
     if (gateRefusal(toId) != null) return false;
+    if (passageRefusal(toId) != null) return false;
     final route = Travel.route(profile.locationId, toId);
     if (route == null || route.isTrivial) return false;
 
@@ -280,6 +351,12 @@ class GameState extends ChangeNotifier {
     // somewhere they have never seen.
     profile.discoveredLocationIds.addAll(trip.stopsSeenAt(at));
     if (!trip.isCompleteAt(at)) return false;
+    // ⭐ The door you came in by, recorded **on arrival** (ruling 2026-09-21).
+    // The trip's ORIGIN, not the last leg's start: a route that ran
+    // Pennycross → Old Quarry → Forgeholm was only legal because the quarry
+    // was cleared, and what an uncleared *destination* owes you a way back to
+    // is where you set out from. See [passageRefusal] (b).
+    profile.arrivedFromId = trip.fromId;
     profile.locationId = trip.toId;
     profile.trip = null;
     return true;
@@ -313,11 +390,16 @@ class GameState extends ChangeNotifier {
   /// honest; a gate is different, because the tile looks live and the player
   /// is owed a reason. Null means "under way, or nothing to say".
   ///
+  /// ⭐ **Two refusals now, in the order [beginTravel] enforces them**: the
+  /// guard at the gate, then the road through an uncleared zone
+  /// ([passageRefusal]). Callers still get one sentence or null, so nothing
+  /// downstream had to learn the difference.
+  ///
   /// ⚠️ Returned, not thrown. `interactive_world_map`'s `_travel` already
   /// catches around this call to report a *save* failure as a modal, and a
   /// thrown refusal would arrive there wearing that alert's words.
   Future<String?> travelTo(String locationId) async {
-    final refusal = gateRefusal(locationId);
+    final refusal = gateRefusal(locationId) ?? passageRefusal(locationId);
     if (refusal != null) return refusal;
     if (!canTravelTo(locationId)) return null;
     await beginTravel(locationId);

@@ -280,6 +280,26 @@ class PlayerProfile {
   /// depends on the clock, so it cannot be a stored field.
   ActiveTrip? trip;
 
+  /// The place the last completed journey **set out from** — the door you came
+  /// in by (ruling, Christian 2026-09-21: you cannot travel *through* a node
+  /// you have not cleared).
+  ///
+  /// ⭐ **The trip's ORIGIN, not merely any neighbour.** An uncleared zone lets
+  /// you turn around; it does not let you pick whichever exit you like. Old
+  /// Quarry has three roads off it, and "back the way you came" means the one
+  /// you walked in on — so this stores a single id rather than being inferred
+  /// from [location]'s connections, which would open all three.
+  ///
+  /// ⚠️ Null on a fresh character and on every save written before the passage
+  /// rule — see `GameState.passageRefusal`, which reads a null here as "we do
+  /// not know which way you came" and falls back to letting you reach a town.
+  ///
+  /// 📝 Only [GameState.settleTravel] writes this, on arrival. Cancelling
+  /// mid-route deliberately does not: a cancel drops you at a stop the passage
+  /// rule already required to be cleared (or a town), so the rule that reads
+  /// this field never fires there and a stale value cannot be observed.
+  String? arrivedFromId;
+
   /// The adventure in progress, if any.
   ///
   /// ⭐ **A run survives the app closing.** It used to live in `GameState`
@@ -460,6 +480,7 @@ class PlayerProfile {
     this.resonancePrisms = 0,
     String? locationId,
     this.trip,
+    this.arrivedFromId,
     this.run,
     Set<String>? discoveredLocationIds,
     Set<String>? openedGates,
@@ -556,6 +577,7 @@ class PlayerProfile {
     'resonancePrisms': resonancePrisms,
     'locationId': locationId,
     'trip': trip?.toJson(),
+    if (arrivedFromId != null) 'arrivedFromId': arrivedFromId,
     'run': run?.toJson(),
     'discoveredLocationIds': discoveredLocationIds.toList(),
     'openedGates': openedGates.toList(),
@@ -613,6 +635,12 @@ class PlayerProfile {
       locationId: json['locationId'] == null
           ? null
           : World.canonicalId(json['locationId'] as String),
+      // ⚠️ Absent reads as null, and null is NOT "came from nowhere, go
+      // anywhere": `GameState.passageRefusal` treats it as a legacy save
+      // standing somewhere unknown and lets it reach a town only.
+      arrivedFromId: json['arrivedFromId'] == null
+          ? null
+          : World.canonicalId(json['arrivedFromId'] as String),
       trip: ActiveTrip.fromJson(json['trip'] as Map<String, dynamic>?),
       // Absent on saves from before runs were persisted — and absent, on a
       // run whose zone or creatures no longer resolve, is exactly right: the

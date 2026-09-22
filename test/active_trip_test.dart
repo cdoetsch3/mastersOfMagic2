@@ -21,6 +21,22 @@ class _MemStorage implements ProfileStorage {
   Future<void> clear() async => stored = null;
 }
 
+/// A mage who has beaten every zone's boss.
+///
+/// ⚠️ **Needed since the passage ruling (Christian, 2026-09-21): you cannot
+/// travel THROUGH a node you have not cleared.** The trips below are chosen
+/// for their *shape* — several legs, a stop to cancel at — and a character who
+/// had cleared nothing could not legally start one, so every timing assertion
+/// here would quietly become an assertion about the refusal. The rule itself
+/// is owned by `passage_test.dart`.
+PlayerProfile _veteran() {
+  final profile = PlayerProfile.newPlayer();
+  for (final l in World.locations) {
+    if (!l.isTown) profile.zoneClears[l.id] = 1;
+  }
+  return profile;
+}
+
 void main() {
   final noon = DateTime.utc(2026, 1, 1, 12);
   late DateTime clock;
@@ -28,8 +44,7 @@ void main() {
 
   setUp(() => clock = noon);
 
-  GameState fresh() =>
-      GameState(_MemStorage(), PlayerProfile.newPlayer(), now: now);
+  GameState fresh() => GameState(_MemStorage(), _veteran(), now: now);
 
   group('a trip is a function of the clock', () {
     ActiveTrip tripTo(String to) =>

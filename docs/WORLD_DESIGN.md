@@ -377,6 +377,32 @@ town-by-town; you pick a destination and pay the summed duration. ✅ **Journey
 stops at every town on the way**, which is where you heal — so the long road is
 naturally broken into survivable stages.
 
+✅ **RULING (Christian, 2026-09-21): you cannot travel THROUGH an uncleared
+node.** *"I can travel to it, and I can travel back where I came from FROM it,
+but I shouldn't be able to travel to any other nodes through it until having
+beaten its boss at least once."* An uncleared zone is a **dead end you may
+enter**: you walk in, and the only road out is the one you walked in on. So
+Pennycross → Forgeholm is refused while the Old Quarry lies between them, and
+standing in the quarry you may go back to Pennycross but not on to Forgeholm or
+down into the Molten Deep. Beat the boss once and all three open.
+
+⭐ **This is the counterweight to point-to-point travel.** Summing a route's
+legs is what makes a long trip painless — and it is also what would let a level
+15 character stroll past every zone in the quarter to the far side of the map.
+The clear requirement puts the cost back *in the world* rather than in the
+travel UI: the map opens because you fought through it, not because you can
+afford the minutes.
+
+⚠️ **Towns are never gates.** A town has no boss, so a "cleared" test would fail
+on it forever and shut every crossroads in the game. Only routes and dungeons
+can block passage.
+
+⚠️ **"Cleared" is the boss beaten at least once** (`zoneClears` > 0), not
+discovery. Walking into a zone is precisely what this rule stops being enough.
+"The way you came" is the **origin of the journey that brought you here**, a
+single recorded door — not any neighbour, which would open all three of the
+quarry's roads the moment you arrived on one of them.
+
 ⚠️ **Code implication: this needs pathfinding.** Direct town-to-town travel means
 computing a route and its total duration over the edge graph, not just reading
 one edge. Together with §4b.1's `TravelEdge` refactor, that is the shape of the

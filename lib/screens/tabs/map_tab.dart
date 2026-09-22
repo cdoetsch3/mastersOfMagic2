@@ -80,6 +80,11 @@ class _MapTabState extends State<MapTab> {
                   // names the proof you are short of, which is information;
                   // a dead tile is not.
                   gateRefusal: game.gateRefusal(id),
+                  // ⚠️ **Not still-tappable, unlike the gate.** A gate tells
+                  // you what to go and fetch, so the tap is worth making; the
+                  // passage rule's answer is on the card already, and a tile
+                  // that banners what it is printing is noise.
+                  passageRefusal: game.passageRefusal(id),
                   onTravel: () => _travel(context, game, id),
                 ),
             ],
@@ -357,13 +362,22 @@ class _TravelCard extends StatelessWidget {
   /// (or when the gate is prose only). Passed in rather than read here so the
   /// card stays a pure function of what it is handed.
   final String? gateRefusal;
+
+  /// `GameState.passageRefusal` for this destination — null when the road is
+  /// walkable. Non-null **disables** the card and prints the sentence on it.
+  final String? passageRefusal;
   const _TravelCard({
     required this.location,
     required this.onTravel,
     this.travelLabel,
     this.enabled = true,
     this.gateRefusal,
+    this.passageRefusal,
   });
+
+  /// Whether the card can be pressed: not mid-journey, and not walled off by
+  /// the passage rule.
+  bool get _live => enabled && passageRefusal == null;
 
   @override
   Widget build(BuildContext context) {
@@ -374,9 +388,9 @@ class _TravelCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Opacity(
-        opacity: enabled ? 1 : 0.45,
+        opacity: _live ? 1 : 0.45,
         child: GamePanel(
-          onTap: enabled ? onTravel : null,
+          onTap: _live ? onTravel : null,
           child: Row(
             children: [
               Icon(_kindIcon(location.kind), color: AppColors.teal, size: 20),
@@ -435,6 +449,23 @@ class _TravelCard extends StatelessWidget {
                           ],
                         ),
                       ),
+                    // ⭐ The reason, on the card, in full. The passage rule is
+                    // the one refusal a player cannot work out by looking —
+                    // "you have not cleared the Old Quarry" is a fact about
+                    // the road BEHIND this tile, so a chip reading "Blocked"
+                    // would be the question rather than the answer.
+                    if (passageRefusal != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Text(
+                          passageRefusal!,
+                          style: const TextStyle(
+                            color: AppColors.textFaint,
+                            fontSize: 11.5,
+                            height: 1.3,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -442,10 +473,19 @@ class _TravelCard extends StatelessWidget {
                 children: [
                   Text(
                     travelLabel ?? 'Travel',
-                    style: const TextStyle(color: AppColors.teal, fontSize: 12),
+                    style: TextStyle(
+                      // ⚠️ Recoloured, not removed. The walk still costs what
+                      // it costs, and dropping the label would make a blocked
+                      // road look like a road with no length.
+                      color: _live ? AppColors.teal : AppColors.textFaint,
+                      fontSize: 12,
+                    ),
                   ),
                   const SizedBox(width: 2),
-                  const Icon(Icons.chevron_right, color: AppColors.teal),
+                  Icon(
+                    Icons.chevron_right,
+                    color: _live ? AppColors.teal : AppColors.textFaint,
+                  ),
                 ],
               ),
             ],
