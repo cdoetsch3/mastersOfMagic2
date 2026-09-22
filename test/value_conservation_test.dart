@@ -69,10 +69,11 @@ const Map<String, String> _exemptions = {
   'craft_tussock_leggings': '§8.6 minor overage — Master-profitable.',
 };
 
-/// ❓ **Celestial recipes awaiting the designer's §8.7 ruling** (CELESTIAL
-/// _CONTRACT §5.5/§8.7, 2026-09-22). The contract audited every one of these
-/// in advance and left the numbers UNPATCHED "so the designer can see the
-/// shape rather than a patched table". Three shapes:
+/// ❓ **Celestial and Ethereal recipes awaiting the designer's §8.7 ruling**
+/// (CELESTIAL_CONTRACT §5.5/§8.7 and ETHEREAL_CONTRACT §5.4, 2026-09-22). The
+/// contracts audited every one of these in advance and left the numbers
+/// UNPATCHED "so the designer can see the shape rather than a patched table".
+/// Three shapes:
 ///  - under Standard by 16–62 (the two ingots and the Drownling belt);
 ///  - zero margin — Σ(inputs) == Standard (the two cloth sets, the
 ///    Palimpsest belt);
@@ -103,6 +104,44 @@ const Map<String, String> _pendingRuling = {
   'craft_celestial_totem':
       '§3.4/§8.7: a KeyDef is worth 0 by construction; conservation has no '
       'window to check, and the gate is not a market.',
+
+  // ---- ETHEREAL §5.4, the fourth quarter's own audit (2026-09-22).
+  // ⭐ Its table verdicts every row "inside its window or safely over it"
+  // and NO row under Standard — a cleaner audit than either earlier
+  // quarter's, because every value was back-solved rather than inherited.
+  // ⚠️ But "safely over" and "⭐ Σ = output" are both non-clean under the
+  // strict `Standard < Σ < Ornate` rule this file applies, so the eighteen
+  // rows §5.4 marks either way are held here, unpatched, with the rest.
+  // Two shapes only this quarter — nothing is under Standard:
+  //  - over Ornate by ~4% (the two quarterstaves);
+  //  - zero margin — Σ(inputs) == Standard (sixteen rows).
+  'craft_spiritwood_quarterstaff':
+      '§5.4: over Ornate 4% — Master-profitable. A staff takes three logs '
+      'where a wand takes two and the WAND is what the log value was '
+      'solved against; ECONOMY §8.2 blesses this direction explicitly.',
+  'craft_aetherwood_quarterstaff':
+      '§5.4: over Ornate 4% — Master-profitable, same three-logs-per-staff '
+      'shape as Yew, Rowan, Ironwood, Bloodwood, Ebony and Spiritwood.',
+  'craft_aetherwood_wand': '§5.4: zero margin (Σ == Standard).',
+  'craft_umbralweave_hood': '§5.4: zero margin (Σ == Standard).',
+  'craft_umbralweave_robe': '§5.4: zero margin (Σ == Standard).',
+  'craft_umbralweave_leggings': '§5.4: zero margin (Σ == Standard).',
+  'craft_umbralweave_boots': '§5.4: zero margin (Σ == Standard).',
+  'craft_umbralweave_gloves': '§5.4: zero margin (Σ == Standard).',
+  'craft_corebiter_belt': '§5.4: zero margin (Σ == Standard).',
+  'craft_unleft_hood': '§5.4: zero margin (Σ == Standard).',
+  'craft_unleft_robe': '§5.4: zero margin (Σ == Standard).',
+  'craft_unleft_leggings': '§5.4: zero margin (Σ == Standard).',
+  'craft_unleft_boots': '§5.4: zero margin (Σ == Standard).',
+  'craft_unleft_gloves': '§5.4: zero margin (Σ == Standard).',
+  'craft_penitent_belt': '§5.4: zero margin (Σ == Standard).',
+  'craft_blankspine_belt': '§5.4: zero margin (Σ == Standard).',
+  'craft_worldroot_tonic':
+      '⚠️ §5.4 verdicts this row ✅, but 3 × worldroot(55) = 165 is exactly '
+      'worldroot_tonic\'s Standard (165) — zero margin, not a clean pass. '
+      'The Sealed Garden lane flagged it; the contract\'s ✅ is the '
+      'mis-verdict, so it is held here rather than patched.',
+  'craft_corona_torc': '§5.4: zero margin (Σ == Standard).',
 };
 
 /// The 3 ids whose exemption is "at the Standard boundary," not "over
@@ -135,7 +174,7 @@ void main() {
     return _Audit(sum, output.value, 1.2 * output.value);
   }
 
-  group('ECONOMY_CONTRACT §8: value conservation, all 41 recipes', () {
+  group('ECONOMY_CONTRACT §8: value conservation, every recipe', () {
     test('every recipe id in the exemption list actually exists', () {
       final allIds = RecipeBook.all.map((r) => r.id).toSet();
       for (final id in _exemptions.keys) {

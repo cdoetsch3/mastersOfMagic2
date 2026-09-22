@@ -155,7 +155,15 @@ void main() {
       // (Rimepelt, Emberhide) = 12 more.
       // Celestial (CELESTIAL_CONTRACT §5): 5 Mirrorflax + 5 Wrackcotton +
       // 2 belts (Drownling, Palimpsest) = 12 more.
-      expect(all.length, 36, reason: '12 Primal + 12 Kinetic + 12 Celestial');
+      // ⭐ Ethereal (ETHEREAL_CONTRACT §5): 5 Umbralweave + 5 Unleft + THREE
+      // belts (Corebiter, Penitent, Blankspine) = 13 — the one quarter that
+      // breaks the 12 pattern, because §5.3 gives the belt ladder its last
+      // three rungs (7, 8, 9 slots) here.
+      expect(
+        all.length,
+        49,
+        reason: '12 Primal + 12 Kinetic + 12 Celestial + 13 Ethereal',
+      );
       for (var i = 1; i < all.length; i++) {
         expect(
           all[i].skillLevel,

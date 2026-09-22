@@ -20,6 +20,7 @@ import 'package:masters_of_magic_2/game/items/recipe_book.dart';
 import 'package:masters_of_magic_2/game/items/recipe_def.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
+import 'package:masters_of_magic_2/game/skills.dart';
 import 'package:masters_of_magic_2/screens/craft_screen.dart';
 
 /// ⚠️ Derived from the catalogue, never typed out. A test that hardcodes
@@ -149,21 +150,37 @@ void main() {
         findsOneWidget,
         reason: 'tailoring owns recipes, so it must offer a chip',
       );
-      // ⚠️ Metalworking debuted in the Kinetic quarter (KINETIC_CONTRACT
-      // §5) and now owns recipes — Jewelry is the skill still waiting on
-      // its own maker (Rimeholt, L45, §8.1), so it is the one this
-      // assertion needs.
+      // ⭐ **This assertion used to name a skill with no recipes and check
+      // its chip was absent.** Metalworking got one in the Kinetic quarter,
+      // Enchanting in the Celestial, and ⭐ **Jewelry in the Ethereal**
+      // (ETHEREAL_CONTRACT §5.3, Rimeholt L45) — which was the last one,
+      // so no hand-picked empty skill exists to point at any more.
+      // ⚠️ The law is unchanged and is now checked from both sides at once:
+      // the chip row is exactly the skills that own recipes, derived. A
+      // chip row that drifts from RecipeBook — either offering a filter
+      // that can only ever show an empty shelf, or hiding a skill the
+      // player can actually craft with — fails here.
+      final owning = <CraftSkill>{for (final r in RecipeBook.all) r.skill};
+      for (final s in CraftSkill.values) {
+        expect(
+          find.text(Skills.displayName(s.name)),
+          owning.contains(s) ? findsOneWidget : findsNothing,
+          reason: owning.contains(s)
+              ? '${s.name} owns ${RecipeBook.forSkill(s).length} recipes but '
+                    'offers no chip — the player cannot narrow to a lane '
+                    'that exists'
+              : 'a chip whose filter can only ever show an empty shelf '
+                    'teaches the player the screen is broken',
+        );
+      }
       expect(
-        RecipeBook.all.any((r) => r.skill == CraftSkill.jewelry),
-        isFalse,
-        reason: 'the assertion below is only meaningful while this holds',
-      );
-      expect(
-        find.text('Jewelry'),
-        findsNothing,
+        owning,
+        CraftSkill.values.toSet(),
         reason:
-            'a chip whose filter can only ever show an empty shelf '
-            'teaches the player the screen is broken',
+            '⭐ every one of the six skills owns at least one recipe, true '
+            'for the first time since Jewelry\'s debut. ⚠️ If a seventh '
+            'skill is ever added, the loop above is what checks it stays '
+            'chipless until it has a maker',
       );
     });
   });

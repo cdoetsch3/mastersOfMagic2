@@ -34,7 +34,7 @@ GameState _game() => GameState(_MemStorage(), PlayerProfile.newPlayer());
 
 void main() {
   group('§14d.2 — consumable ingredients are DERIVED, never listed', () {
-    test('the shipped set is exactly the seven brewing herbs', () {
+    test('the shipped set is exactly the eleven brewing herbs', () {
       // The verbatim derived list, pinned so a silent content change (a new
       // potion, or a herb quietly dropped from a recipe) shows up as a diff
       // here rather than as a shelf that behaves oddly in play.
@@ -42,16 +42,24 @@ void main() {
         ShopCatalogue.consumableIngredientIds.toList()..sort(),
         // ⭐ §14d.2 derives this from RecipeBook, so the Celestial quarter's
         // four brewing herbs joined the shelves the day its recipes landed
-        // (2026-09-22). All four potions clean-pass conservation, so no
-        // arbitrage opens through a shelf.
+        // (2026-09-22), and the Ethereal quarter's four the same day.
+        // ⚠️ Three of the four Ethereal potions clean-pass conservation;
+        // `worldroot_tonic` is zero-margin (ETHEREAL §5.4, held in
+        // `value_conservation_test`'s `_pendingRuling`), so buying Worldroot
+        // off a shelf and vendoring the Tonic breaks even rather than losing
+        // — it still mints nothing, since a shelf sells at or above base.
         [
           'arcsalt',
           'brookmint',
+          'censer_resin',
           'duskcap',
           'glasswort',
+          'goldenrood',
+          'nightink',
           'saltwort',
           'sapwort',
           'sunbleach_lichen',
+          'worldroot',
         ],
         reason:
             'sapwort→sapwort_draught, brookmint→brookmint_tonic, '
