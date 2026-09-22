@@ -1039,6 +1039,33 @@ the log explains it). Merged 4183a36 · a357a8b · 11049ee · fd0afad · (this)
 'Gate open' on the Pennycross card, empty keyed cells in the [E] tray and
 the duel's Q tab when slot 0 is empty, the log's '(+N gear)' tag.
 
+## ✅ Playtest batch 3 · 2026-09-21 (release 6, Opus lanes, all merged)
+
+Nine notes + four mid-turn rulings. Merged f01f319 · f6f5e1c · 3ef2762 ·
+17efc45 · c0c8fae · 2a4a9c7 · c4d374e · d46212e — 1945 app / 572 engine,
+analyzers zero, format clean. Mockups: claude.ai/artifact/WNPy87RSg99he5JJC5LhZz.
+1. Enter submits every auth form (last field of each).
+2. Base prices on pack + loot rows (fixed 'Ng' cell).
+3. Commons drop without a confirm; uncommon+ keep the dialog.
+4. Health → the Next-fight card (mockup 1A): 'Your health · N / M' + bar.
+5. Profile screen (mockup 2A): header pill → hero + Skills / Achievements /
+   Bestiary / Item library / How dueling works / Account. Three placeholders
+   share `ComingSoonScreen`. Skills left the Home tab.
+6. **Passage rule**: no route THROUGH an uncleared zone; from inside one,
+   only back to `arrivedFromId`. Towns free. Pennycross guard speaks first.
+7. **Re-band**: Thunderspire 17–22 ↔ Stormcliff 23–28; Umbral road moved
+   before the Reliquary. `test/world_bands_test.dart` guards every outward
+   step. ❓ Knock-ons for Christian: Aero's ceiling is now 26 (a late Aero
+   zone is the real fix); Rowan crit gear (19) unlocks before Fulgurite
+   drops it (26), reversing §2.5's intended order.
+8. Twenty loading tips; the mechanic is a "DoT" everywhere it's explained
+   (Ignite keeps 'burn').
+9. Result card: Ranking '+12 · 1432' / '−8 · 1180' / 'unrated'.
+Also: Practice vs AI section removed from the lobby.
+⚠️ Christian verifies in-browser: the pill + Profile screen, the health
+bar on the road, the Ranking row, dimmed travel cards inside an uncleared
+zone, the Umbral/Reliquary arrival text.
+
 ## Deferred / banked — do not build without an explicit ask
 
 - **📝 Creature sprites: the system works, the ART does not.** Built
