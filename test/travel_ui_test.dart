@@ -30,6 +30,9 @@ PlayerProfile _veteran() {
   final profile = PlayerProfile.newPlayer();
   for (final l in World.locations) {
     if (!l.isTown) profile.zoneClears[l.id] = 1;
+    // ⚠️ …and every guarded gate stands open (Pennycross's proofs, Rimeholt's
+    // totem) — a veteran has shown them all once.
+    if (l.gateItemIds.isNotEmpty) profile.openedGates.add(l.id);
   }
   return profile;
 }

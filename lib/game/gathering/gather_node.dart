@@ -723,6 +723,63 @@ abstract final class GatherNodes {
         'get the line.',
   );
 
+  // ---- The Glass Archive (Solar + Arcane, band 43–47) --------------------
+
+  /// ⭐ The hybrid's **three** materials would normally be three nodes, but
+  /// one of them — `palimpsest_vellum` — is a kill-only hide, so the Archive
+  /// authors a node for the lichen and **two** for the glass. ⚠️ That second
+  /// glass node is the one place CELESTIAL_CONTRACT §6 knowingly breaks its
+  /// own one-node-per-material habit, and the fiction is what earns it:
+  /// aetherglass can be annealed off a roof or chosen out of the noon
+  /// writing, and those are two different acts. 📝 Cut [gaNoonShelf] if
+  /// one-node-per-material is a rule rather than a habit — nothing else
+  /// depends on it.
+  static const gaShadelineLichen = GatherNodeDef(
+    id: 'ga_shadeline_lichen',
+    zoneId: 'the_glass_archive',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'sunbleach_lichen',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.trace, 'peel', complexity: 3),
+    xp: 93,
+    flavor:
+        'The one strip of hillside the lenses never sweep, and the only '
+        'thing alive on it.',
+  );
+
+  /// ⭐ `bandKeeper` is glass-working's own engine — *"keep a value inside a
+  /// drifting band"* is literally annealing.
+  static const gaRoofSpoil = GatherNodeDef(
+    id: 'ga_roof_spoil',
+    zoneId: 'the_glass_archive',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'aetherglass',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.bandKeeper, 'anneal'),
+    xp: 93,
+    flavor: 'Roof glass, off a roof. Let it cool too fast and you get sand.',
+  );
+
+  /// ⚠️ **The first gather node ever to use `placement`**, and the fiction
+  /// names its own engine: *"Choose WHERE — judgment of spacing, not motor
+  /// skill."* Choosing which plate of the archive to take is exactly that.
+  /// 📝 Swap to `alignCommit` if a fourth gather engine is unwelcome.
+  static const gaNoonShelf = GatherNodeDef(
+    id: 'ga_noon_shelf',
+    zoneId: 'the_glass_archive',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'aetherglass',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.placement, 'choose', complexity: 4),
+    xp: 93,
+    flavor:
+        'Around midday the whole shelf is writing. Take a plate from where '
+        'the writing is not.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -763,6 +820,9 @@ abstract final class GatherNodes {
     srEbonyStand,
     srDuskcapShelf,
     srOpalSeam,
+    gaShadelineLichen,
+    gaRoofSpoil,
+    gaNoonShelf,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

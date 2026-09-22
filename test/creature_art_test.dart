@@ -68,6 +68,21 @@ const _primalZones = <String>[
 /// The one zone whose art has actually shipped.
 const _zoneWithArt = 'whispering_woods';
 
+/// 🚧 **Zones whose roster has landed but whose BESTIARY_ART.md block has
+/// not yet been folded in.** The Celestial/Ethereal wave's zone lanes are
+/// forbidden from editing `docs/BESTIARY_ART.md` (it is shared, and eight
+/// worktrees editing one file is eight conflicts), so each lane stages its
+/// eleven descriptions in `docs/art/bestiary/<zone_id>.md` in that file's
+/// exact format instead.
+///
+/// ⚠️ **The merge coordinator empties this set** when it pastes the staged
+/// blocks in, and the `_primalZones` list above, the pubspec asset
+/// directories and the entry count in the sibling test all move at the same
+/// time. A zone left in here forever is eleven creatures that can never be
+/// generated, with nothing else to say so.
+const _awaitingArtDescription =
+    <String>{}; // per-zone art files are read directly
+
 /// ⚠️ **Not a creature.** `assets/creatures/<zone>/manifest.json` is written by
 /// `tool/pixelate.py` alongside the sprites; `.gitkeep` is what keeps an
 /// as-yet-empty zone directory alive through a clone. Both live in the same
@@ -162,7 +177,7 @@ void main() {
       }
       expect(
         Bestiary.all.length,
-        187,
+        198,
         reason:
             'the Primal quarter (5 x 11 = 55) plus the three Kinetic '
             'pure zones (3 x 11) plus The Molten Deep (11) plus The '
@@ -369,7 +384,7 @@ void main() {
           .toList();
       expect(
         noGrid.length,
-        176,
+        187,
         reason:
             'eleven zones x 11 have no pixel grid — if this number moves, '
             'either a roster changed or a zone grew grids, and the loop below '
@@ -546,7 +561,7 @@ void main() {
     test('the parser still finds the entries it is anchored on', () {
       expect(
         described.length,
-        187,
+        198,
         reason:
             'the entry format changed (or the file moved) and the coverage '
             'check below has quietly become a comparison of two empty sets — '
@@ -562,7 +577,10 @@ void main() {
     });
 
     test('every creature in the Primal quarter is described', () {
-      final roster = Bestiary.all.map((e) => e.name).toSet();
+      final roster = Bestiary.all
+          .where((e) => !_awaitingArtDescription.contains(e.zoneId))
+          .map((e) => e.name)
+          .toSet();
       expect(
         described.toSet(),
         roster,

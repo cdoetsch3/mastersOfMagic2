@@ -862,6 +862,9 @@ abstract final class World {
           'stone and rope and hide, dug in against a slope that goes up out of '
           'sight. Everyone you meet is either arriving or leaving; nobody is '
           'from here.',
+      // ⭐ CELESTIAL_CONTRACT §3.4: the one crafted totem, shown to the gate
+      // (the mechanism Pennycross shipped with; nothing is consumed).
+      gateItemIds: ['celestial_totem'],
       edges: [
         TravelEdge('meridian', 6),
         TravelEdge('the_mirrormere', 6),
