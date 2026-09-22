@@ -705,7 +705,16 @@ convenience.** A run draws one boss of two (§3d). A gate part that only dropped
 from the boss you did not draw would turn a mandatory progression item into a
 coin flip, which is the one place the boss pool must not reach.
 
-❓ **For the item lane to confirm:** the essence/fragment ids themselves. The
+✅ **Confirmed against the contracts (2026-09-22):** Celestial —
+`solar_essence` · `lunar_essence` · `astral_essence`, crafted into the one
+`celestial_totem` that Rimeholt asks for; Ethereal — `the_kept_third`
+(Hallowmarch) · `the_dark_third` (Umbral Wastes) · `the_written_third`
+(Collapsed Academy). ⚠️ A `hide` role in a zone whose contract defines no
+hide item resolves to the zone's second gatherable material
+(ETHEREAL_CONTRACT §3.5). ⚠️ Procarius's `key` (the Crown frame) has no
+item yet and drops nothing.
+
+❓ **Superseded — for the item lane to confirm:** the essence/fragment ids themselves. The
 Kinetic Sigil's mechanism was deferred once already (KINETIC_CONTRACT §8.6),
 so the Celestial and Ethereal parts may land the same way — the roster says
 *which boss owes one*, not what it is called.
