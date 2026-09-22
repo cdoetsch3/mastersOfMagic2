@@ -436,7 +436,10 @@ void main() {
       '(ruling 2026-08-25)', () {
     test('one value per tier, uniform across every element', () {
       final motes = ItemCatalogue.all.whereType<MoteDef>().toList();
-      expect(motes.length, 18, reason: '6 elements × 3 shipped tiers');
+      // ⭐ Lunar is the seventh family, defined in `the_mirrormere_items.dart`
+      // (CELESTIAL_CONTRACT §3.2 — the mote lives with the zone that first
+      // yields it). ⚠️ Each Celestial zone that lands adds three more.
+      expect(motes.length, 21, reason: '7 elements × 3 shipped tiers');
       const perTier = {
         MoteTier.dust: 2,
         MoteTier.shard: 25,

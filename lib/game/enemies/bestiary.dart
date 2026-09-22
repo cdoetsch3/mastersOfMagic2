@@ -12,6 +12,7 @@ import 'frostfell_pass.dart';
 import 'glimmerbrook.dart';
 import 'old_quarry.dart';
 import 'stormcliff_coast.dart';
+import 'the_mirrormere.dart';
 import 'the_molten_deep.dart';
 import 'thornmire.dart';
 import 'thunderspire_peaks.dart';
@@ -39,6 +40,7 @@ abstract final class Bestiary {
     ...FrostfellPassBestiary.all,
     ...ThunderspirePeaksBestiary.all,
     ...TheMoltenDeepBestiary.all,
+    ...MirrormereBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>

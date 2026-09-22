@@ -42,6 +42,15 @@ import 'package:mom_engine/mom_engine.dart';
 /// the first Kinetic zone lands. Old Quarry and Windward Steppe are being
 /// authored in parallel worktrees and will need the same addition; the merge
 /// coordinator should reconcile the three additions into one list.
+///
+/// 🚧 **Celestial builder note:** The Mirrormere is deliberately NOT listed
+/// yet. The per-zone loops below also require a `assets/creatures/<zone>/`
+/// directory in pubspec and a **backdrop brief inside BESTIARY_ART.md**, and
+/// a zone lane may not edit that shared file (its descriptions land in
+/// `docs/art/bestiary/<zone_id>.md`). ⚠️ The merge coordinator adds the zone
+/// here in the same pass that folds its descriptions and backdrop brief in —
+/// the roster-total assertion below already counts it, so the zone cannot go
+/// unnoticed in the meantime.
 const _primalZones = <String>[
   'whispering_woods',
   'glimmerbrook',
@@ -153,12 +162,13 @@ void main() {
       }
       expect(
         Bestiary.all.length,
-        121,
+        132,
         reason:
             'the Primal quarter (5 x 11 = 55) plus the three Kinetic '
-            'pure zones (3 x 11) plus The Molten Deep (11); a zone landing '
-            'in Bestiary.all needs its own pubspec directory and '
-            'description section before its art can load',
+            'pure zones (3 x 11) plus The Molten Deep (11) plus The '
+            'Mirrormere (11); a zone landing in Bestiary.all needs its own '
+            'pubspec directory and description section before its art can '
+            'load',
       );
     });
 
@@ -359,9 +369,9 @@ void main() {
           .toList();
       expect(
         noGrid.length,
-        110,
+        121,
         reason:
-            'eight zones x 11 have no pixel grid — if this number moves, '
+            'eleven zones x 11 have no pixel grid — if this number moves, '
             'either a roster changed or a zone grew grids, and the loop below '
             'is no longer testing what it says it is',
       );
@@ -510,15 +520,33 @@ void main() {
     // silently stopped matching would otherwise make the coverage test pass by
     // finding nothing and comparing nothing.
     final doc = File('docs/BESTIARY_ART.md').readAsStringSync();
-    final described = RegExp(
-      r'^\*\*([^*]+)\*\* — \*',
-      multiLine: true,
-    ).allMatches(doc).map((m) => m.group(1)!).toList();
+
+    /// ⭐ **A zone built after 2026-09-22 writes its eleven descriptions to
+    /// `docs/art/bestiary/<zone_id>.md` instead of appending to the shared
+    /// file**, so parallel zone lanes stop colliding on one document; the
+    /// merge coordinator folds them into BESTIARY_ART.md after each wave.
+    /// ⚠️ The entry format is identical on purpose — this parser is the
+    /// contract, and a per-zone file that drifts from it fails the
+    /// both-directions check below exactly as a bad section would.
+    final perZone = Directory('docs/art/bestiary');
+    final sources = <String>[
+      doc,
+      if (perZone.existsSync())
+        for (final f in perZone.listSync().whereType<File>())
+          if (f.path.endsWith('.md')) f.readAsStringSync(),
+    ];
+    final described = [
+      for (final src in sources)
+        ...RegExp(
+          r'^\*\*([^*]+)\*\* — \*',
+          multiLine: true,
+        ).allMatches(src).map((m) => m.group(1)!),
+    ];
 
     test('the parser still finds the entries it is anchored on', () {
       expect(
         described.length,
-        121,
+        132,
         reason:
             'the entry format changed (or the file moved) and the coverage '
             'check below has quietly become a comparison of two empty sets — '

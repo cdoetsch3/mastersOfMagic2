@@ -27,11 +27,14 @@ void main() {
   });
 
   test('every id any table references resolves in a catalogue', () {
-    // 📝 The cross-builder exemption set is empty again: `hardtack` (the one
-    // id ever in it) landed with old_quarry_items.dart at the C2a merge. The
-    // machinery stays for the NEXT parallel wave, where it will be needed for
-    // exactly one merge window again.
-    const crossBuilderIds = <String>{};
+    // 📝 The NEXT parallel wave arrived: the Celestial quarter's seven zones
+    // are being authored in parallel worktrees, and The Mirrormere's tables
+    // reference two consumables the Kiln Desert lane owns
+    // (CELESTIAL_CONTRACT §7.3 lists them as that zone's only non-local ids).
+    // ⚠️ **Empty this set again the moment the wave lands** — it is a merge
+    // window, not a licence, and every id left in it is an id nothing in the
+    // suite is checking.
+    const crossBuilderIds = <String>{'pilgrims_ration', 'glasswort_draught'};
     final missing = <String>[];
     void check(String? id, String where) {
       if (id != null &&

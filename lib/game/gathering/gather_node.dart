@@ -481,6 +481,41 @@ abstract final class GatherNodes {
         'behind on its way out.',
   );
 
+  // ---- The Mirrormere (Lunar, band 32–37) --------------------------------
+  //
+  // ⭐ Two nodes, the pure-zone count (§9b.8 ruling 7): the wood and the
+  // fibre. ⚠️ `lunar_essence` is a gate part and kill-only — a node for it
+  // would turn the Celestial Totem into a gathering errand.
+  // ⭐ XP is `9 + 2 × (zone.minLevel − 1)` = `9 + 2 × 31` = 71.
+
+  static const mmBloodwoodGrove = GatherNodeDef(
+    id: 'mm_bloodwood_grove',
+    zoneId: 'the_mirrormere',
+    skill: GatherSkill.felling,
+    yieldsDefId: 'bloodwood_log',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.releaseTiming, 'chop', reps: 5),
+    xp: 71,
+    flavor:
+        'They lean out over the water and the water shows them leaning '
+        'back.',
+  );
+
+  static const mmMirrorflaxShallows = GatherNodeDef(
+    id: 'mm_mirrorflax_shallows',
+    zoneId: 'the_mirrormere',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'mirrorflax',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.rateDrag, 'draw', reps: 3),
+    xp: 71,
+    flavor:
+        'Retted where the lake does not move. Pull steadily or you pull it '
+        'in two.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -507,6 +542,8 @@ abstract final class GatherNodes {
     tpHummingFace,
     mdObsidianFlow,
     mdFiresaltCrust,
+    mmBloodwoodGrove,
+    mmMirrorflaxShallows,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

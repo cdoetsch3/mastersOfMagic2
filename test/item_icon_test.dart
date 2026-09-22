@@ -306,10 +306,11 @@ void main() {
       }
       expect(
         ItemCatalogue.all.length,
-        110,
+        126,
         reason:
             'the Primal quarter is 18/9/8/9/8 (52) plus the Kinetic '
-            'pure zones 9/13/15 (37) plus The Molten Deep 6; if this number '
+            'pure zones 9/13/15 (37) plus The Molten Deep 6 plus The '
+            'Mirrormere 16 (CELESTIAL_CONTRACT §7.1); if this number '
             'moved, docs/ITEM_ART.md is now short an entry (or carries a '
             'stale one) and nothing else in the suite would say so',
       );
