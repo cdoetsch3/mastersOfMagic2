@@ -206,7 +206,7 @@ String spellEffectLine(Spell spell) {
       :final ticks,
       :final dotName,
     ) =>
-      '$minAmount-$maxAmount damage, then $dotName bleeds $damagePerTick/turn '
+      '$minAmount-$maxAmount damage, then $dotName ticks $damagePerTick/turn '
           'for $ticks turns',
     DebuffGrantEffect(:final debuff, :final magnitude, :final turns) =>
       switch (debuff) {
@@ -217,9 +217,9 @@ String spellEffectLine(Spell spell) {
           'Their heals deal damage instead, for $turns turns',
       },
     FesterEffect(:final damage, :final bonusTicks) =>
-      '$damage damage; every burn on them gains $bonusTicks more ticks',
+      '$damage damage; every DoT on them gains $bonusTicks more ticks',
     ScourEffect() =>
-      'Every burn on them pays out all remaining ticks NOW, as one hit',
+      'Every DoT on them pays out all remaining ticks NOW, as one hit',
     DispelEffect() => "Strips the enemy's buffs",
     ShatterEffect() => 'No damage. Destroys their shield, Barriers and Divert',
     DamageEffect(
@@ -354,8 +354,8 @@ const Map<String, String> spellDescriptions = {
   'renewal': 'The long healing — half your health back, given time.',
   'agony': 'A quick bleed: pays out fast, hurts the whole way.',
   'torment': 'The slow knife. Eight turns of it — unless they Cleanse.',
-  'fester': 'Feed whatever burns on them. Every wound runs longer.',
-  'scour': 'Collect early: every bleed pays out at once, as one blow.',
+  'fester': 'Feed every DoT on them. Every wound runs longer.',
+  'scour': 'Collect early: every DoT pays out at once, as one blow.',
   'murk': 'A thin haze over their aim.',
   'miasma': 'A rolling fog they cannot see through, for twenty turns.',
   'wither': 'Half of every heal they drink, gone.',

@@ -262,7 +262,7 @@ List<StatusBadge> badgesFromSnapshot(StatusSnapshot snap) {
 
 /// The subtitle for a catalogue-drawn pip, from the snapshot's own numbers.
 ///
-/// Per-id units where the bare number would mislead: a burn is damage per
+/// Per-id units where the bare number would mislead: a DoT is damage per
 /// turn, Mending is percent per turn, the percent stances say so, and the
 /// Divert pair shows both halves. Everything else reads `±magnitude · Nt`,
 /// or just the clock when there is no magnitude.

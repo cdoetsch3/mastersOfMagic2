@@ -593,6 +593,126 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
   }
 }
 
+/// The loading-screen tips: one is shown per quick-match search, so the ~10s
+/// wait teaches a mechanic instead of feeling dead.
+///
+/// ⭐ **Top-level and [visibleForTesting], not a private static.** The widget
+/// that shows them is private to this library, so this is the only seam a
+/// test can reach — and the list's shape is exactly what needs pinning: the
+/// full count, titles unique (a copy-paste that duplicates one shrinks the
+/// rotation silently), and every body short enough to read in the wait.
+///
+/// 📝 Vocabulary (ruling 2026-09-21): the generic damage-over-time mechanic
+/// is a **DoT**. "Burn" belongs to Ignite alone, because Ignite is fire.
+///
+/// ⚠️ Every claim here is checked against the engine, not written from
+/// memory — charge costs come from `Spellbook`, thresholds from the effect
+/// that enforces them.
+@visibleForTesting
+const List<({String title, String body})> searchTips = [
+  (
+    title: 'Haste',
+    body:
+        'Casting first seizes Haste — it wins any tie when you both play the same-speed spell.',
+  ),
+  (
+    title: 'Priority',
+    body:
+        'Shields (3) go up before regular attacks (9). A Quickened attack (2) can beat a shield.',
+  ),
+  (
+    title: 'Elements',
+    body:
+        'Elements only matter for shields: a countering attack deals DOUBLE to a shield of the element it beats.',
+  ),
+  (
+    title: 'Channel',
+    body:
+        'Channeling resolves at priority 4 — a faster Discharge or Overload can punish you mid-charge.',
+  ),
+  (
+    title: 'Discharge',
+    body:
+        'Discharge (7) wipes all enemy charge and, being faster, fizzles a same-turn Barrage (9).',
+  ),
+  (
+    title: 'Overload',
+    body:
+        "Overload deals damage per point of the enemy's charge — brutal against a fully-charged mage.",
+  ),
+  (
+    title: 'Air',
+    body:
+        'Air is the untouchable wind: its shields can never be double-broken, but its attacks never crack shields.',
+  ),
+  (
+    title: 'Bluffing',
+    body:
+        "You can see what your opponent is charging — but not whether they'll strike, shield, or keep charging.",
+  ),
+  (
+    title: 'Barrier',
+    body:
+        'Barrier blocks one hit completely, then shatters — a great answer to a big incoming Cataclysm.',
+  ),
+  (
+    title: 'Lifesteal',
+    body:
+        'Sap, Leech, and Drain heal you for the damage that reaches health — not damage soaked by a shield.',
+  ),
+  (
+    title: 'Waterlogged',
+    body:
+        'Waterlogged takes Haste from the mage who holds it — and Cleansing it does not hand the initiative back.',
+  ),
+  (
+    title: 'Scour',
+    body:
+        'Scour cashes in every DoT on your enemy at once. Stack Torment first, then collect.',
+  ),
+  (
+    title: 'Fester',
+    body:
+        'Fester adds three ticks to every DoT already on them, for one charge.',
+  ),
+  (
+    title: 'Cleanse',
+    body:
+        'Cleanse strips one debuff you choose; Purify strips them all, '
+        'for five.',
+  ),
+  (
+    title: 'Shatter',
+    body:
+        'Shatter breaks shields and Barrier and deals no damage. Cast it the turn before the big one.',
+  ),
+  (
+    title: 'Reflect',
+    body:
+        'Reflect returns everything you deflect, in full. It does nothing without Divert underneath it.',
+  ),
+  (
+    title: 'Death Wish',
+    body:
+        'Death Wish guarantees crits below 15% health. Cast it healthy, as insurance.',
+  ),
+  (
+    title: 'Bloodlust',
+    body:
+        "Bloodlust replaces Keen and Heavyhand rather than adding to them — don't stack it on Ardent.",
+  ),
+  (
+    title: 'Meditate',
+    body:
+        'Meditate adds five turns to every timed buff you hold. Cast it when the most are running.',
+  ),
+  (
+    title: 'Execute',
+    body:
+        'Execute crits against anyone under 30%. Save the four charges for the finish.',
+  ),
+];
+
 /// The quick-match waiting screen: a status line that advances with the
 /// search (LADDER_DESIGN §3), plus one gameplay tip so the ~10s wait teaches
 /// a mechanic instead of feeling dead. A single tip (varied per search) —
@@ -612,65 +732,12 @@ class _SearchingView extends StatefulWidget {
 }
 
 class _SearchingViewState extends State<_SearchingView> {
-  static const List<({String title, String body})> _tips = [
-    (
-      title: 'Haste',
-      body:
-          'Casting first seizes Haste — it wins any tie when you both play the same-speed spell.',
-    ),
-    (
-      title: 'Priority',
-      body:
-          'Shields (3) go up before regular attacks (9). A Quickened attack (2) can beat a shield.',
-    ),
-    (
-      title: 'Elements',
-      body:
-          'Elements only matter for shields: a countering attack deals DOUBLE to a shield of the element it beats.',
-    ),
-    (
-      title: 'Channel',
-      body:
-          'Channeling resolves at priority 4 — a faster Discharge or Overload can punish you mid-charge.',
-    ),
-    (
-      title: 'Discharge',
-      body:
-          'Discharge (7) wipes all enemy charge and, being faster, fizzles a same-turn Barrage (9).',
-    ),
-    (
-      title: 'Overload',
-      body:
-          "Overload deals damage per point of the enemy's charge — brutal against a fully-charged mage.",
-    ),
-    (
-      title: 'Air',
-      body:
-          'Air is the untouchable wind: its shields can never be double-broken, but its attacks never crack shields.',
-    ),
-    (
-      title: 'Bluffing',
-      body:
-          "You can see what your opponent is charging — but not whether they'll strike, shield, or keep charging.",
-    ),
-    (
-      title: 'Barrier',
-      body:
-          'Barrier blocks one hit completely, then shatters — a great answer to a big incoming Cataclysm.',
-    ),
-    (
-      title: 'Lifesteal',
-      body:
-          'Sap, Leech, and Drain heal you for the damage that reaches health — not damage soaked by a shield.',
-    ),
-  ];
-
   // Deterministic-but-varied tip pick without dart:math in the widget.
-  late final int _i = DateTime.now().microsecondsSinceEpoch % _tips.length;
+  late final int _i = DateTime.now().microsecondsSinceEpoch % searchTips.length;
 
   @override
   Widget build(BuildContext context) {
-    final tip = _tips[_i];
+    final tip = searchTips[_i];
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(

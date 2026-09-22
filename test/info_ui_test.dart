@@ -132,6 +132,94 @@ void main() {
     expect(find.text('RESOLUTION ORDER'), findsOneWidget);
   });
 
+  /// ⭐ Ruling 2026-09-21: the generic damage-over-time mechanic is a **DoT**,
+  /// never a "burn" — an aqua Torment is not on fire, and calling it a burn
+  /// reads as a claim about Ignite. Every assertion below names a different
+  /// place the old word lived, so a sweep that stopped after the heading (or
+  /// after the body) fails here rather than shipping half-renamed.
+  ///
+  /// ⚠️ Deliberately NOT a blanket "no 'burn' anywhere" check: the status
+  /// list underneath renders Ignite's own catalogue text, and Ignite KEEPS
+  /// the word.
+  ///
+  /// ⚠️ The guide is a LAZY [ListView] taller than any surface, so the test
+  /// scrolls it end to end and collects every [Text] it built on the way.
+  /// Asserting against a live finder would make each `findsNothing` vacuous —
+  /// an unswept section below the fold is simply never instantiated.
+  testWidgets('the gameplay guide calls the mechanic a DoT, not a burn', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(400, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(const MaterialApp(home: GameplayGuideScreen()));
+    await tester.pumpAndSettle();
+
+    final rendered = <String>{};
+    void collect() {
+      for (final text in tester.widgetList<Text>(find.byType(Text))) {
+        if (text.data case final data?) rendered.add(data);
+      }
+    }
+
+    collect();
+    for (var i = 0; i < 40; i++) {
+      await tester.drag(find.byType(ListView), const Offset(0, -600));
+      await tester.pump();
+      collect();
+    }
+    bool says(String fragment) => rendered.any((t) => t.contains(fragment));
+
+    expect(
+      rendered,
+      contains('Elements carry effects'),
+      reason:
+          'the LAST section must have been built, or every negative below is '
+          'vacuous — this is the guard on the scroll sweep above',
+    );
+    expect(
+      rendered,
+      contains('DoTs'),
+      reason:
+          'the section heading is the word the player learns first — a '
+          'reword that touched only the body leaves it saying the old thing',
+    );
+    expect(
+      rendered,
+      isNot(contains('Burns and bleeds')),
+      reason:
+          'kills a mutant that ADDED a DoTs section instead of renaming the '
+          'burns one, leaving both words taught at once',
+    );
+    expect(
+      says('Fester adds three ticks to every DoT on them'),
+      isTrue,
+      reason:
+          'the body is where the mechanic is actually explained; a '
+          'title-only rename leaves "every burn on them" here',
+    );
+    expect(
+      says('Recasting a DoT refreshes it'),
+      isTrue,
+      reason:
+          'the refresh-not-stack rule is a second mechanic sentence — one '
+          'replaced occurrence in the body must not pass for all of them',
+    );
+    expect(
+      rendered,
+      contains('DoTs & heals'),
+      reason:
+          'the End column of the resolution strip is outside the section, so '
+          'a sweep scoped to the section body leaves "burns & heals"',
+    );
+    expect(
+      says('heals land FIRST, then DoTs tick'),
+      isTrue,
+      reason:
+          'the end-of-turn ordering note is the fourth site — and its '
+          'wording is the one a player reads while dying to a tick',
+    );
+  });
+
   testWidgets('the gameplay guide also lays out on a narrow screen', (
     tester,
   ) async {

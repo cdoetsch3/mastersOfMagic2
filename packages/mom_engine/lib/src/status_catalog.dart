@@ -345,7 +345,7 @@ abstract final class StatusCatalog {
       name: 'Agony',
       description:
           'Bleeds for 7 at the end of each of your next three turns, starting '
-          'with the one it lands on. Casting it again refreshes the bleed '
+          'with the one it lands on. Casting it again refreshes the DoT '
           'rather than stacking it.',
       trigger: 'Being hit by Agony — even a hit a shield soaks.',
       kind: StatusKind.debuff,
@@ -357,7 +357,7 @@ abstract final class StatusCatalog {
       name: 'Torment',
       description:
           'Bleeds for 5 at the end of each of your next eight turns. The long '
-          'burn: more damage in total than the quick one, and far longer for '
+          'DoT: more damage in total than the quick one, and far longer for '
           'the duel to end first.',
       trigger: 'Being hit by Torment — even a hit a shield soaks.',
       kind: StatusKind.debuff,
@@ -498,7 +498,7 @@ abstract final class StatusCatalog {
       id: 'cleansed',
       name: 'Cleansed',
       description:
-          'One debuff of your choosing has been lifted off you — a burn, a '
+          'One debuff of your choosing has been lifted off you — a DoT, a '
           'blindness, whatever you named. Only one: Cleanse is for the big '
           'commitments, not the chip.',
       trigger: 'Casting Cleanse with at least one debuff on you.',
@@ -544,8 +544,8 @@ abstract final class StatusCatalog {
       id: 'fester',
       name: 'Fester',
       description:
-          'Every burn on you lasts three ticks longer — whatever lit it. Cast '
-          'on the turn of a burn\'s last tick, it still catches it.',
+          'Every DoT on you lasts three ticks longer — whatever lit it. Cast '
+          'on the turn of a DoT\'s last tick, it still catches it.',
       trigger: 'The enemy casting Fester.',
       kind: StatusKind.moment,
       element: null,
@@ -555,7 +555,7 @@ abstract final class StatusCatalog {
       id: 'scour',
       name: 'Scour',
       description:
-          'Every burn on you pays out all its remaining ticks at once, as a '
+          'Every DoT on you pays out all its remaining ticks at once, as a '
           'single hit, and is consumed — one shield to get through, one chance '
           'to deflect.',
       trigger: 'The enemy casting Scour.',
@@ -610,7 +610,7 @@ abstract final class StatusCatalog {
       id: 'absolution',
       name: 'Absolution',
       description:
-          'Strips one debuff from you at random, before end-of-turn burns can '
+          'Strips one debuff from you at random, before end-of-turn DoTs can '
           'tick.',
       trigger: 'An Absolution resolving with a debuff to remove.',
       kind: StatusKind.moment,

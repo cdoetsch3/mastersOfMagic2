@@ -1620,7 +1620,7 @@ class DuelEngine {
         target,
         dots.isEmpty
             ? 'Nothing is festering'
-            : 'Festering — +$bonusTicks ticks on ${dots.length} burn'
+            : 'Festering — +$bonusTicks ticks on ${dots.length} DoT'
                   '${dots.length == 1 ? '' : 's'}',
         statusId: 'fester',
       ),
@@ -1645,7 +1645,7 @@ class DuelEngine {
         target,
         dots.isEmpty
             ? 'Nothing to scour'
-            : 'Scoured — ${dots.length} burn${dots.length == 1 ? '' : 's'} '
+            : 'Scoured — ${dots.length} DoT${dots.length == 1 ? '' : 's'} '
                   'collected for $total',
         statusId: 'scour',
       ),

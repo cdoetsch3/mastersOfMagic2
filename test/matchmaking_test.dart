@@ -220,4 +220,79 @@ void main() {
       );
     });
   });
+
+  /// The loading-screen tips (ruling 2026-09-21: ten more, twenty in all).
+  ///
+  /// ⭐ The picker is `microsecondsSinceEpoch % searchTips.length`, so the
+  /// list's SHAPE is the whole contract: a short list narrows the rotation, a
+  /// duplicated title wastes a slot, and an over-long body overruns the panel
+  /// in the ~10s a search lasts.
+  group('the loading-screen tips', () {
+    test('there are twenty of them', () {
+      expect(
+        searchTips.length,
+        20,
+        reason:
+            'ten shipped tips plus the ten from the 2026-09-21 ruling — a '
+            'paste that dropped an entry, or one that duplicated the old '
+            'list instead of extending it, lands on a different count',
+      );
+    });
+
+    test('every title is distinct', () {
+      final titles = searchTips.map((t) => t.title).toList();
+      expect(
+        titles.toSet().length,
+        titles.length,
+        reason:
+            'the picker indexes blind, so a repeated title is a tip the '
+            'player sees twice as often and a subject they never see — '
+            'kills a copy-paste that duplicated a record and edited only '
+            'its body',
+      );
+    });
+
+    test('no body runs past 160 characters', () {
+      for (final tip in searchTips) {
+        expect(
+          tip.body.length,
+          lessThanOrEqualTo(160),
+          reason:
+              'the panel shows one tip for a ~10s wait: "${tip.title}" is '
+              '${tip.body.length} characters — kills a mutant that pasted a '
+              'paragraph of rules text in as a tip',
+        );
+      }
+    });
+
+    test('every title and body actually says something', () {
+      for (final tip in searchTips) {
+        expect(
+          tip.title.trim(),
+          isNotEmpty,
+          reason: 'an empty title renders a bare bulb icon and no heading',
+        );
+        expect(
+          tip.body.trim().length,
+          greaterThan(20),
+          reason:
+              '"${tip.title}" — a placeholder or truncated body would still '
+              'satisfy the length cap above, so pin the floor too',
+        );
+      }
+    });
+
+    test('the mechanic is called a DoT, never a burn', () {
+      for (final tip in searchTips) {
+        expect(
+          tip.body.toLowerCase(),
+          isNot(contains('burn')),
+          reason:
+              '"${tip.title}" — ruling 2026-09-21: "burn" is Ignite\'s word '
+              'alone, and no tip is about Ignite. A tip written in the old '
+              'vocabulary would teach the confusion the ruling removes',
+        );
+      }
+    });
+  });
 }

@@ -99,8 +99,8 @@ int _stanceTurns(List<StanceGrant> grants) => grants.fold(0, (longest, g) {
 String _numbersLabel(Spell spell) => switch (spell.effect) {
   // ⚠️ Subtype arms before their parents, same as [_numbers].
   DotAttackEffect(:final dotName, :final ticks) =>
-    'damage now, then the $dotName bleed at the end of each of your next '
-        '$ticks turns. Recasting refreshes it — burns never stack',
+    'damage now, then the $dotName tick at the end of each of your next '
+        '$ticks turns. Recasting refreshes it — DoTs never stack',
   DebuffGrantEffect(:final debuff, :final turns) => switch (debuff) {
     BankDebuff.murk =>
       'to their accuracy for $turns turns — stacks with '
@@ -113,11 +113,11 @@ String _numbersLabel(Spell spell) => switch (spell.effect) {
           'entirely while both are up',
   },
   FesterEffect(:final damage) =>
-    'ticks added to every burn on them, behind a $damage-damage hit — '
-        'Ignite included, and it catches a burn on its final tick',
+    'ticks added to every DoT on them, behind a $damage-damage hit — '
+        'Ignite included, and it catches a DoT on its final tick',
   ScourEffect() =>
     'paid out at once as ONE hit — one shield to meet, one deflect roll — '
-        'and the burns are consumed',
+        'and the DoTs are consumed',
   DispelEffect() =>
     'stripped from them — buffs, pending riders and Grace alike. Arcane '
         'Knowledge is never stripped',

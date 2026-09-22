@@ -55,7 +55,7 @@ const Map<MagicElement, ElementLore> elementLore = {
     trigger: 'your 5th Flora cast in a row',
     description:
         'The first four casts do nothing. From the 5th onward you '
-        'heal 1% of max HP at end of turn — before any burn lands — and you '
+        'heal 1% of max HP at end of turn — before any DoT lands — and you '
         'can\'t be Waterlogged. Cast any other element and it ends. '
         'Charging doesn\'t count; only casts build the streak.',
     beatsEffect: 'Photosynthesis blocks their Waterlogged',
@@ -134,7 +134,7 @@ const Map<MagicElement, ElementLore> elementLore = {
     effectName: 'Absolution',
     trigger: 'every 3rd consecutive Sanctus cast',
     description:
-        'Purges one random debuff from you, before end-of-turn burns '
+        'Purges one random debuff from you, before end-of-turn DoTs '
         'tick. Nothing to purge? Bank Grace — the next debuff on you is blocked '
         '(max 1). Every Absolution also sears 5 Creeping Dark off the enemy.',
     beatsEffect: 'Absolution sears their Creeping Dark (−5)',

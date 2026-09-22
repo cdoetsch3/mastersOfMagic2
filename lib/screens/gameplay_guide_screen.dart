@@ -101,17 +101,17 @@ class GameplayGuideScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 18),
                 _Section(
-                  title: 'Burns and bleeds',
+                  title: 'DoTs',
                   body:
-                      'Ignite, Agony and Torment tick at the end of every '
-                      'turn. A tick is damage, not a hit: your shield eats it '
-                      'first and Divert can deflect it, but it never misses '
-                      'and never crits. Recasting a burn refreshes it rather '
-                      'than stacking. Fester adds three ticks to every burn '
-                      'on them; Scour makes every burn pay out all at once as '
-                      'one hit and clears them; Wither halves the healing they '
-                      'receive, and Blight turns their heals into damage — '
-                      'potions and lifesteal included.',
+                      'Ignite, Agony and Torment are DoTs: they tick at the '
+                      'end of every turn. A tick is damage, not a hit: your '
+                      'shield eats it first and Divert can deflect it, but it '
+                      'never misses and never crits. Recasting a DoT refreshes '
+                      'it rather than stacking. Fester adds three ticks to '
+                      'every DoT on them; Scour makes every DoT pay out all at '
+                      'once as one hit and clears them; Wither halves the '
+                      'healing they receive, and Blight turns their heals into '
+                      'damage — potions and lifesteal included.',
                 ),
                 SizedBox(height: 18),
                 _StatusList(),
@@ -120,7 +120,7 @@ class GameplayGuideScreen extends StatelessWidget {
                   title: 'Elements carry effects',
                   body:
                       'Every element has a side-effect that fires as you '
-                      'cast it — burns, charge theft, blinding, and more. Each '
+                      'cast it — DoTs, charge theft, blinding, and more. Each '
                       'also beats one element in its tier: you hit that '
                       'shield for DOUBLE, and only HALF into the element that '
                       'beats you. Across tiers the swing is gentler — 1.5× or '
@@ -266,9 +266,9 @@ class _PriorityLadder extends StatelessWidget {
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'End of turn: heals land FIRST, then burns tick '
+                    'End of turn: heals land FIRST, then DoTs tick '
                     '— so a Mending or Photosynthesis heal resolves before '
-                    'an Ignite or Torment burn can finish you.',
+                    'an Ignite or Torment tick can finish you.',
                     style: TextStyle(
                       color: AppColors.textDim,
                       fontSize: 12,
@@ -407,7 +407,7 @@ class _PhaseStrip extends StatelessWidget {
               const SizedBox(width: 8),
               phase('Main', 'your locked-in moves', AppColors.gold),
               const SizedBox(width: 8),
-              phase('End', 'burns & heals', AppColors.ember),
+              phase('End', 'DoTs & heals', AppColors.ember),
             ],
           ),
         ),
