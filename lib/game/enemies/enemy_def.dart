@@ -60,6 +60,29 @@ class EnemyDef {
   /// `OpponentDriver.opponentCombatStats`, never through `opponentGear`.
   final EnemyCombatStats combatStats;
 
+  /// ⭐ **A mage brings a Spellbook loadout, not a creature kit**
+  /// (ENEMIES_DESIGN §3.4). The Ethereal band is scholars, wardens and
+  /// archmages; those fight you with *your own tools*, which is a genuinely
+  /// different duel from a creature's two or three verbs. When this is true,
+  /// [moves] is a level-legal selection from [Spellbook] rather than moves
+  /// authored for this creature.
+  ///
+  /// ⚠️ **It is a licence, not a decoration.** Three laws every zone test
+  /// enforces on creatures are *off* for a mage, and only because the
+  /// Spellbook already answers them its own way:
+  ///  - the archetype's `moveCount` / cost band (§3.2) — a loadout is ten
+  ///    slots, not two or three;
+  ///  - the zone move-id prefix — the ids are `bolt`, `ruin`, `aegis`;
+  ///  - the contract's raw-damage ceiling (§1.3) — the Spellbook is priced
+  ///    for players, and Cataclysm's 59–72 is over the creature ceiling by
+  ///    construction.
+  ///
+  /// ⚠️ In exchange a mage owes the one law a creature does not: every entry
+  /// must be in `Spellbook.all` and unlocked at or below the encounter level
+  /// (`Progression.plannedUnlockLevelOf`). ⭐ Defaults false, so every
+  /// creature already shipped stays a creature without being edited.
+  final bool isMage;
+
   const EnemyDef({
     required this.id,
     required this.name,
@@ -71,6 +94,7 @@ class EnemyDef {
     required this.moves,
     this.drops = DropTable.empty,
     this.combatStats = EnemyCombatStats.none,
+    this.isMage = false,
   });
 
   /// Max HP for this creature at [level], off the shared level baseline.

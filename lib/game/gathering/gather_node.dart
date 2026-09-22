@@ -818,6 +818,43 @@ abstract final class GatherNodes {
         'shape.',
   );
 
+  /// ⭐ **The last rung of the wood ladder, nine tiers after Oak** — and the
+  /// only wood in the game that was never a tree (ETHEREAL §4.5). ⚠️ The
+  /// flavour says *"take one; there will be another"* because that is the
+  /// zone's whole premise — over-completion, not ruin — and not because the
+  /// node replenishes differently from any other.
+  static const caAetherwoodStair = GatherNodeDef(
+    id: 'ca_aetherwood_stair',
+    zoneId: 'the_collapsed_academy',
+    skill: GatherSkill.felling,
+    yieldsDefId: 'aetherwood_log',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.releaseTiming, 'chop', reps: 5),
+    xp: 107,
+    flavor:
+        'A staircase with more treads than it has height. Take one; there '
+        'will be another.',
+  );
+
+  /// ⭐ The zone's SECOND material, which is also what its `hide` drop role
+  /// resolves to (§3.5 rule 1) — the Academy has no kill-only hide.
+  /// ⚠️ Mining rather than Felling: skill follows the material's CONSUMING
+  /// skill (§6a.1), and slag feeds Metalworking.
+  static const caSlagVault = GatherNodeDef(
+    id: 'ca_slag_vault',
+    zoneId: 'the_collapsed_academy',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'mana_slag',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.sweetSpot, 'strike', reps: 5),
+    xp: 107,
+    flavor:
+        'What ran out of the floor when the school stopped, pooled in the '
+        'vault below it.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -863,6 +900,8 @@ abstract final class GatherNodes {
     gaNoonShelf,
     bsStratumSeam,
     bsNadirPocket,
+    caAetherwoodStair,
+    caSlagVault,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {
