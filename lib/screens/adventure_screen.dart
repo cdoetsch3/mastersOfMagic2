@@ -31,6 +31,18 @@ class AdventureScreen extends StatefulWidget {
 }
 
 class _AdventureScreenState extends State<AdventureScreen> {
+  /// The rarity from which destroying something is worth interrupting for.
+  ///
+  /// ⭐ **Green and up** (ruling, Christian 2026-09-21): "if it's less than
+  /// green rarity, you don't need to confirm the drop." Green is
+  /// [Rarity.uncommon] — the colour `rarityColour` gives it — so commons fall
+  /// below the line and nothing else does.
+  ///
+  /// ⚠️ **One owner for the threshold.** [_drop] is the only reader; moving
+  /// the line later is a one-word edit here rather than a hunt through the
+  /// screen for a stray `Rarity.` comparison.
+  static const Rarity confirmDropFrom = Rarity.uncommon;
+
   bool _busy = false;
 
   /// How many backpack slots the last defeat emptied.
@@ -284,47 +296,61 @@ class _AdventureScreenState extends State<AdventureScreen> {
     setState(() {});
   }
 
-  /// Destroys one pack slot, after asking once.
+  /// Destroys one pack slot — after asking, when the item is worth an ask.
   ///
   /// ⚠️ **One confirm, and it is the whole ceremony** (ruling 2026-09-21).
   /// There is no undo, no recovered pile and no refund, so the dialog says
   /// that in plain words — and then the drop is instant, because a second
   /// confirmation would train the player to tap through the first.
+  ///
+  /// ⭐ **Commons skip the ask entirely** (ruling, Christian 2026-09-21, see
+  /// [confirmDropFrom]). The pack that fills up is a pack full of dust and
+  /// logs, and a dialog on every one of them is precisely the training that
+  /// makes the dialog on the epic worthless. The banner still reports the
+  /// drop, so a common never leaves silently.
   Future<void> _drop(GameState game, int index) async {
     final slot = game.profile.backpack.slots[index];
     if (slot == null) return;
+    final def = ItemCatalogue.tryById(slot.defId);
     final name = _lootName(
       slot,
       slot.instanceId == null
           ? null
           : game.profile.itemInstances[slot.instanceId],
     );
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppColors.panel,
-        title: Text(
-          'Drop $name?',
-          style: const TextStyle(color: AppColors.text, fontSize: 16),
-        ),
-        content: const Text(
-          'It is destroyed. Nothing comes back.',
-          style: TextStyle(color: AppColors.textDim, fontSize: 13),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Keep'),
+    // ⚠️ An id the catalogue no longer knows still asks. Unknown is not the
+    // same as worthless, and on a save a content patch moved out from under
+    // the player the cautious branch is the only honest one.
+    final worthAsking =
+        def == null || def.rarity.index >= confirmDropFrom.index;
+    if (worthAsking) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: AppColors.panel,
+          title: Text(
+            'Drop $name?',
+            style: const TextStyle(color: AppColors.text, fontSize: 16),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.ember),
-            child: const Text('Drop'),
+          content: const Text(
+            'It is destroyed. Nothing comes back.',
+            style: TextStyle(color: AppColors.textDim, fontSize: 13),
           ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Keep'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              style: TextButton.styleFrom(foregroundColor: AppColors.ember),
+              child: const Text('Drop'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true || !mounted) return;
+    }
     final refusal = await game.discardFromBackpack(index);
     if (!mounted) return;
     // ⚠️ The receipt is not optional: an item leaving a twenty-slot grid is
@@ -601,6 +627,66 @@ Color _lootColour(String defId) {
   return def == null ? AppColors.textFaint : rarityColour(def.rarity);
 }
 
+/// The base worth of one slot, in gold.
+///
+/// ⚠️ An id the catalogue no longer knows is worth 0 here, which [_ValueCell]
+/// prints as '—' — the same answer it gives a quest key, and the only honest
+/// one for a thing whose price nothing in the build knows.
+int _lootValue(String defId) => ItemCatalogue.tryById(defId)?.value ?? 0;
+
+/// What a row is worth, in its own reserved column.
+///
+/// ⭐ **A price on every row** (ruling, Christian 2026-09-21): "Pack should
+/// include base prices of items, same when deciding what to keep or leave."
+/// The Pack and the victory picker are the two screens where a player decides
+/// what a slot is worth, and both asked that question with the number missing.
+///
+/// ⚠️ **The BASE value, and it is labelled as nothing else.** A town's buy and
+/// sell figures move with tier, spikes and sales (`shop_screen.dart`); this
+/// number does not move at all, and calling it a price here would promise a
+/// quote no vendor has to honour. It is the same figure — and the same
+/// `'{n}g'` glyph — the shop's own `_PriceCell` and the item tooltip's Value
+/// line print, so the three cannot read as different currencies. 📝 There is
+/// no shared gold formatter to reach for yet; if one lands, these are its
+/// first three callers.
+///
+/// ⚠️ **Fixed width, tabular figures.** The point of a column is that it holds
+/// still: a cell sized to its own text puts '4g' and '150g' in different
+/// places, and the press-stability rule applied to a number is that the number
+/// does not wander as the names beside it change length.
+///
+/// ⚠️ **0 prints '—', never '0g'.** Every [KeyDef] is worth nothing by
+/// construction — a quest gate is not merchandise — and `showItemDialog` makes
+/// the same call when it drops its Value line entirely: '0g' reads as a bug
+/// report rather than as "this is not for sale".
+class _ValueCell extends StatelessWidget {
+  final int value;
+
+  /// Wide enough for the catalogue's dearest item (820g) plus the glyph, with
+  /// room for the four-digit item that has not been written yet.
+  static const double width = 52;
+
+  /// ⚠️ Gold, stepped back: the price is a fact the row offers, not the thing
+  /// the eye should land on — that is still the rarity-coloured name.
+  static final Color _goldDim = AppColors.gold.withValues(alpha: 0.72);
+
+  const _ValueCell({required this.value});
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: width,
+    child: Text(
+      value > 0 ? '${value}g' : '—',
+      textAlign: TextAlign.right,
+      style: TextStyle(
+        color: _goldDim,
+        fontSize: 12,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      ),
+    ),
+  );
+}
+
 /// The victory picker: what the fight just dropped, and which of it fits.
 ///
 /// ⭐ **Every win, immediately** (designer's ruling, 2026-08-17). The loot is
@@ -759,11 +845,27 @@ class _LootChoiceRow extends StatelessWidget {
                 ),
               ),
             ),
-            if (dimmed)
-              const Text(
-                'no room',
-                style: TextStyle(color: AppColors.textFaint, fontSize: 11),
-              ),
+            // ⭐ Right after the name, so "is it worth a slot?" is answered on
+            // the same line it is asked — see [_ValueCell].
+            _ValueCell(value: _lootValue(slot.defId)),
+            const SizedBox(width: 8),
+            // ⚠️ Reserved, not omitted. 'no room' appears the moment the
+            // selection fills the pack, and an unreserved label would drag
+            // every OTHER row's price cell sideways as it arrived — the price
+            // column has to survive the ticking that makes it matter.
+            SizedBox(
+              width: 52,
+              child: dimmed
+                  ? const Text(
+                      'no room',
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        color: AppColors.textFaint,
+                        fontSize: 11,
+                      ),
+                    )
+                  : null,
+            ),
           ],
         ),
       ),
@@ -1014,6 +1116,10 @@ class _PackRow extends StatelessWidget {
               ],
             ),
           ),
+          // ⭐ Right after the name and before the verbs — what the row is
+          // worth is part of reading the row, not part of acting on it. See
+          // [_ValueCell] for why it is a fixed cell.
+          _ValueCell(value: _lootValue(slot.defId)),
           // ⚠️ Reserved, not omitted — see [_Pack]. An empty box of exactly
           // the same width is what keeps Drop in one column down the list.
           SizedBox(

@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
+import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
@@ -99,8 +100,10 @@ void main() {
       tester,
     ) async {
       final game = await _onAdventure();
+      // ⚠️ Green, not a log: since the 2026-09-21 threshold ruling a common
+      // has no dialog left to test (see 'the drop that does not ask').
       game.profile.backpack = game.profile.backpack.withAdded(
-        const InventorySlot(defId: 'oak_log'),
+        const InventorySlot(defId: 'flora_crystal'),
       )!;
       await _pump(tester, game);
 
@@ -108,7 +111,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('Drop Oak Log?'),
+        find.text('Drop Flora Crystal?'),
         findsOneWidget,
         reason: 'the confirm has to name what is about to be destroyed',
       );
@@ -120,7 +123,7 @@ void main() {
             'this dialog exists to prevent',
       );
       expect(
-        game.profile.backpack.countOf('oak_log'),
+        game.profile.backpack.countOf('flora_crystal'),
         1,
         reason: 'opening the dialog must not already have dropped it',
       );
@@ -128,7 +131,7 @@ void main() {
       await tester.tap(find.text('Keep'));
       await tester.pumpAndSettle();
       expect(
-        game.profile.backpack.countOf('oak_log'),
+        game.profile.backpack.countOf('flora_crystal'),
         1,
         reason: 'Keep that drops anyway makes the dialog a lie',
       );
@@ -139,7 +142,7 @@ void main() {
     ) async {
       final game = await _onAdventure();
       game.profile.backpack = game.profile.backpack.withAdded(
-        const InventorySlot(defId: 'oak_log'),
+        const InventorySlot(defId: 'flora_crystal'),
       )!;
       await _pump(tester, game);
 
@@ -149,19 +152,19 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        game.profile.backpack.countOf('oak_log'),
+        game.profile.backpack.countOf('flora_crystal'),
         0,
         reason: 'the screen never called GameState.discardFromBackpack',
       );
       expect(
-        find.text('Oak Log'),
+        find.text('Flora Crystal'),
         findsNothing,
         reason:
             'a panel that keeps drawing the dropped row did not rebuild — '
             'the setState this screen needs after every pack mutation',
       );
       expect(
-        find.text('Dropped Oak Log.'),
+        find.text('Dropped Flora Crystal.'),
         findsOneWidget,
         reason:
             'an item leaving a twenty-slot grid is invisible; the banner is '
@@ -202,6 +205,187 @@ void main() {
         game.profile.itemInstances.containsKey('inst-1'),
         isFalse,
         reason: 'the instance leaks unless the screen went through GameState',
+      );
+    });
+  });
+
+  /// ⭐ "When dropping an item during the campaign, if it's less than green
+  /// rarity, you don't need to confirm the drop." (Christian, 2026-09-21.)
+  group('the drop that does not ask', () {
+    testWidgets('⭐ a common is destroyed on the tap, with no dialog at all', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      game.profile.backpack = game.profile.backpack.withAdded(
+        const InventorySlot(defId: 'oak_log'),
+      )!;
+      await _pump(tester, game);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Drop'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('It is destroyed. Nothing comes back.'),
+        findsNothing,
+        reason:
+            'a mutant that still confirms every drop is the ruling not '
+            'landing — a pack of dust is cleared one dialog at a time again',
+      );
+      expect(
+        find.byType(AlertDialog),
+        findsNothing,
+        reason:
+            'no dialog of ANY wording: a reworded confirm is still a confirm',
+      );
+      expect(
+        game.profile.backpack.countOf('oak_log'),
+        0,
+        reason:
+            'skipping the ask must skip to the DROP — a mutant that returns '
+            'early instead makes Drop do nothing for commons',
+      );
+      expect(
+        find.text('Dropped Oak Log.'),
+        findsOneWidget,
+        reason:
+            'the ask goes, the receipt stays: an item leaving a twenty-slot '
+            'grid with no banner reads as a lost save',
+      );
+    });
+
+    testWidgets('⚠️ green and above still stop to ask', (tester) async {
+      final game = await _onAdventure();
+      // ⚠️ Uncommon IS the threshold, so this is the row that pins which side
+      // of it green falls on — a mutant using `>` drops a crystal outright.
+      game.profile.backpack = game.profile.backpack.withAdded(
+        const InventorySlot(defId: 'flora_crystal'),
+      )!;
+      await _pump(tester, game);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Drop'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byType(AlertDialog),
+        findsOneWidget,
+        reason:
+            'the threshold is "less than green"; a mutant that lets uncommon '
+            'through destroys a 150g crystal on a stray tap',
+      );
+
+      await tester.tap(find.text('Keep'));
+      await tester.pumpAndSettle();
+      expect(
+        game.profile.backpack.countOf('flora_crystal'),
+        1,
+        reason: 'Keep that drops anyway makes the surviving dialog a lie',
+      );
+    });
+
+    testWidgets('⚠️ an epic asks too — the rule is a floor, not a band', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      game.profile.itemInstances['inst-1'] = const ItemInstance(
+        instanceId: 'inst-1',
+        defId: 'heartwood_stave',
+      );
+      game.profile.backpack = game.profile.backpack.withAdded(
+        const InventorySlot(defId: 'heartwood_stave', instanceId: 'inst-1'),
+      )!;
+      await _pump(tester, game);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Drop'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Drop Heartwood Staff?'),
+        findsOneWidget,
+        reason:
+            'a mutant comparing for equality with uncommon would wave the '
+            'boss drop straight through',
+      );
+      expect(game.profile.backpack.countOf('heartwood_stave'), 1);
+    });
+  });
+
+  /// ⭐ "Pack should include base prices of items, same when deciding what to
+  /// keep or leave." (Christian, 2026-09-21.)
+  group('what a row is worth', () {
+    testWidgets('⭐ every pack row prints its base value in gold', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      game.profile.backpack = game.profile.backpack
+          .withAdded(const InventorySlot(defId: 'oak_log'))!
+          .withAdded(const InventorySlot(defId: 'foragers_ration'))!
+          .withAdded(const InventorySlot(defId: 'sapwort_draught'))!;
+      await _pump(tester, game);
+
+      // ⚠️ Built from the catalogue, never typed out: a test holding its own
+      // copy of 13 passes forever after the economy retunes the log.
+      for (final id in const [
+        'oak_log',
+        'foragers_ration',
+        'sapwort_draught',
+      ]) {
+        expect(
+          find.text('${ItemCatalogue.byId(id).value}g'),
+          findsOneWidget,
+          reason:
+              'the player decides what a slot is worth on this panel, and '
+              '$id is the row that has to answer it — a mutant printing the '
+              'quality-scaled or vendor figure prints a different number',
+        );
+      }
+    });
+
+    testWidgets("⚠️ a valueless item shows '—', never '0g'", (tester) async {
+      final game = await _onAdventure();
+      game.profile.backpack = game.profile.backpack.withAdded(
+        const InventorySlot(defId: 'proof_of_the_woods'),
+      )!;
+      await _pump(tester, game);
+
+      expect(
+        ItemCatalogue.byId('proof_of_the_woods').value,
+        0,
+        reason: 'the fixture stops being a fixture if the proof is ever priced',
+      );
+      expect(
+        find.text('0g'),
+        findsNothing,
+        reason:
+            "'0g' on a quest gate reads as a bug report rather than as 'this "
+            "is not merchandise' — the call showItemDialog already makes",
+      );
+      expect(
+        find.text('—'),
+        findsOneWidget,
+        reason:
+            'the cell is reserved either way; a blank one would let the row '
+            'look like the price simply failed to load',
+      );
+    });
+
+    testWidgets('⚠️ the price holds its column whatever the name is', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      // ⚠️ Different name lengths AND different digit counts — a cell sized
+      // to its own text moves for either of those.
+      game.profile.backpack = game.profile.backpack
+          .withAdded(const InventorySlot(defId: 'oak_log'))!
+          .withAdded(const InventorySlot(defId: 'foragers_ration'))!;
+      await _pump(tester, game);
+
+      expect(
+        tester.getTopLeft(find.text('4g')).dx,
+        tester.getTopLeft(find.text('13g')).dx,
+        reason:
+            "the ration's price is one digit and the log's is two, so an "
+            'unreserved cell puts them in different columns — the number '
+            'wanders down the list and stops reading as a price at all',
       );
     });
   });

@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/carrying.dart';
+import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
@@ -180,6 +181,48 @@ void main() {
         );
       },
     );
+
+    /// ⭐ "Pack should include base prices of items, **same when deciding what
+    /// to keep or leave**" (Christian, 2026-09-21) — and this is the leaving
+    /// half: what is abandoned here is abandoned for good.
+    testWidgets('⭐ every row says what it is worth before it is left behind', (
+      tester,
+    ) async {
+      final game = await _onAdventure();
+      justWon(game, const [
+        InventorySlot(defId: 'oak_log'),
+        InventorySlot(defId: 'heartwood_stave', instanceId: 'inst-1'),
+      ]);
+      await _pump(tester, game);
+
+      expect(
+        find.textContaining('Taking'),
+        findsOneWidget,
+        reason:
+            'the fixture has to actually be the picker for this to mean '
+            'anything',
+      );
+      // ⚠️ From the catalogue, so a retune cannot leave this test agreeing
+      // with a number the screen no longer shows.
+      for (final id in const ['oak_log', 'heartwood_stave']) {
+        expect(
+          find.text('${ItemCatalogue.byId(id).value}g'),
+          findsOneWidget,
+          reason:
+              'the picker is where a slot is spent or abandoned, and $id is '
+              'the row that has to price it — a mutant that fits the cell to '
+              'the Pack only leaves this choice made blind',
+        );
+      }
+      expect(
+        tester.getTopLeft(find.text('13g')).dx,
+        tester.getTopLeft(find.text('600g')).dx,
+        reason:
+            "'Oak Log' and 'Heartwood Staff' are different lengths and their "
+            'prices different widths, so an unreserved cell scatters the '
+            'column the player is comparing down',
+      );
+    });
 
     testWidgets('a win opens the picker, defaulting to the epic', (
       tester,
