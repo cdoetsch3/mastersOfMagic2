@@ -40,13 +40,11 @@ void main() {
     //    referenced by The Shattered Orrery, which pays both mote ladders.
     //  - `pilgrims_ration` — The Kiln Desert lane (§3.3); the quarter's
     //    shared drop-only ration, referenced by every Celestial zone.
-    const crossBuilderIds = <String>{
-      'astral_dust',
-      'astral_shard',
-      'astral_crystal',
-      'pilgrims_ration',
-      'glasswort_draught',
-    };
+    // ✅ Emptied 2026-09-22: the Celestial wave's seven zones are all on
+    // main, so every id resolves for real again. The Ethereal wave will
+    // need this window once more (sanctus_* / umbra_* land with Hallowmarch
+    // and the Umbral Wastes); empty it again the moment that wave lands.
+    const crossBuilderIds = <String>{};
     final missing = <String>[];
     void check(String? id, String where) {
       if (id != null &&
