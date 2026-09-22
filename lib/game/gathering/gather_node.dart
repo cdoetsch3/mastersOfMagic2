@@ -672,6 +672,57 @@ abstract final class GatherNodes {
         'right and looks wrong.',
   );
 
+  // ---- The Sunless Reach (Solar + Lunar, band 38–42, CELESTIAL §6) -------
+  //
+  // ⭐ Hybrid zone, three materials (§3.1's 3-per-hybrid rule) — and ⚠️ **all
+  // three are world-held**, which makes this the first hybrid in the game to
+  // author the full three nodes. Nothing here is a hide: the zone's `hide`
+  // drop role resolves to Duskcap instead (ETHEREAL_CONTRACT §3.5.1).
+  // ⭐ XP is `9 + 2 × (zone.minLevel − 1)` = `9 + 2 × 37` = 83.
+
+  static const srEbonyStand = GatherNodeDef(
+    id: 'sr_ebony_stand',
+    zoneId: 'the_sunless_reach',
+    skill: GatherSkill.felling,
+    yieldsDefId: 'ebony_log',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.releaseTiming, 'chop', reps: 5),
+    xp: 83,
+    flavor: 'Black trunks on black rock. You find them by walking into them.',
+  );
+
+  static const srDuskcapShelf = GatherNodeDef(
+    id: 'sr_duskcap_shelf',
+    zoneId: 'the_sunless_reach',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'duskcap',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.trace, 'pick', complexity: 3),
+    xp: 83,
+    flavor:
+        'They fruit along the line the light stops at, in a row, like '
+        'something planted them.',
+  );
+
+  /// ⚠️ `complexity: 4` — the highest any node asks, and the fiction names
+  /// why: the value is in the boundary, and the boundary is what a bad split
+  /// destroys.
+  static const srOpalSeam = GatherNodeDef(
+    id: 'sr_opal_seam',
+    zoneId: 'the_sunless_reach',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'eclipse_opal',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'split', complexity: 4),
+    xp: 83,
+    flavor:
+        'Split it wrong and you get two dull halves. Split it right and you '
+        'get the line.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -709,6 +760,9 @@ abstract final class GatherNodes {
     tsNacreBed,
     sbSkyironField,
     sbFallstoneCrater,
+    srEbonyStand,
+    srDuskcapShelf,
+    srOpalSeam,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

@@ -17,6 +17,7 @@ import 'catalogue/the_mirrormere_items.dart';
 import 'catalogue/the_kiln_desert_items.dart';
 import 'catalogue/the_molten_deep_items.dart';
 import 'catalogue/the_shattered_orrery_items.dart';
+import 'catalogue/the_sunless_reach_items.dart';
 import 'catalogue/thornmire_items.dart';
 import 'catalogue/thunderspire_peaks_items.dart';
 import 'catalogue/tidewrack_shoals_items.dart';
@@ -59,6 +60,7 @@ abstract final class ItemCatalogue {
     'the_kiln_desert': KilnDesertItems.all,
     'tidewrack_shoals': TidewrackShoalsItems.all,
     'starfall_basin': StarfallBasinItems.all,
+    'the_sunless_reach': SunlessReachItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists

@@ -17,6 +17,7 @@ import 'the_mirrormere.dart';
 import 'the_kiln_desert.dart';
 import 'the_molten_deep.dart';
 import 'the_shattered_orrery.dart';
+import 'the_sunless_reach.dart';
 import 'thornmire.dart';
 import 'thunderspire_peaks.dart';
 import 'tidewrack_shoals.dart';
@@ -49,6 +50,7 @@ abstract final class Bestiary {
     ...KilnDesertBestiary.all,
     ...TidewrackShoalsBestiary.all,
     ...StarfallBasinBestiary.all,
+    ...SunlessReachBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>
