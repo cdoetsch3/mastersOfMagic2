@@ -31,26 +31,24 @@ import 'package:masters_of_magic_2/game/enemies/enemy_def.dart';
 import 'package:masters_of_magic_2/ui/creature_art.dart';
 import 'package:mom_engine/mom_engine.dart';
 
-/// The five Primal zones, in level order.
+/// The eleven zones whose **art pipeline** is open: a declared
+/// `assets/creatures/<zone>/` directory in pubspec and a backdrop brief in
+/// BESTIARY_ART.md. The Primal quarter and the Kinetic quarter, in level
+/// order.
 ///
 /// ⚠️ Written out rather than derived from `Bestiary.all`, so that a zone
 /// whose bestiary is deleted or renamed fails here instead of quietly
-/// shrinking every "for every zone" loop below to four.
+/// shrinking every "for every zone" loop below.
 ///
-/// 🚧 **Kinetic builder note:** this list is meant to be "every zone with a
-/// described roster," not strictly Primal — Stormcliff Coast is added here as
-/// the first Kinetic zone lands. Old Quarry and Windward Steppe are being
-/// authored in parallel worktrees and will need the same addition; the merge
-/// coordinator should reconcile the three additions into one list.
-///
-/// 🚧 **Celestial builder note:** The Mirrormere is deliberately NOT listed
-/// yet. The per-zone loops below also require a `assets/creatures/<zone>/`
-/// directory in pubspec and a **backdrop brief inside BESTIARY_ART.md**, and
-/// a zone lane may not edit that shared file (its descriptions land in
-/// `docs/art/bestiary/<zone_id>.md`). ⚠️ The merge coordinator adds the zone
-/// here in the same pass that folds its descriptions and backdrop brief in —
-/// the roster-total assertion below already counts it, so the zone cannot go
-/// unnoticed in the meantime.
+/// ⚠️ **Not "every zone with a described roster" any more.** As of 2026-09-22
+/// all 26 zones are described — the Celestial and Ethereal quarters are
+/// written in BESTIARY_ART.md and checked by the coverage test at the bottom
+/// of this file — but none of the fifteen new zones has a pubspec asset
+/// directory or a backdrop brief, because the art is generated a quarter at a
+/// time. 📝 So this list is the *art* front, not the *description* front, and
+/// the two moved apart on purpose. A zone joins it when its quarter's PNGs
+/// are commissioned: pubspec line, directory on disk, backdrop brief, all in
+/// the same pass.
 const _primalZones = <String>[
   'whispering_woods',
   'glimmerbrook',
@@ -67,21 +65,6 @@ const _primalZones = <String>[
 
 /// The one zone whose art has actually shipped.
 const _zoneWithArt = 'whispering_woods';
-
-/// 🚧 **Zones whose roster has landed but whose BESTIARY_ART.md block has
-/// not yet been folded in.** The Celestial/Ethereal wave's zone lanes are
-/// forbidden from editing `docs/BESTIARY_ART.md` (it is shared, and eight
-/// worktrees editing one file is eight conflicts), so each lane stages its
-/// eleven descriptions in `docs/art/bestiary/<zone_id>.md` in that file's
-/// exact format instead.
-///
-/// ⚠️ **The merge coordinator empties this set** when it pastes the staged
-/// blocks in, and the `_primalZones` list above, the pubspec asset
-/// directories and the entry count in the sibling test all move at the same
-/// time. A zone left in here forever is eleven creatures that can never be
-/// generated, with nothing else to say so.
-const _awaitingArtDescription =
-    <String>{}; // per-zone art files are read directly
 
 /// ⚠️ **Not a creature.** `assets/creatures/<zone>/manifest.json` is written by
 /// `tool/pixelate.py` alongside the sprites; `.gitkeep` is what keeps an
@@ -179,11 +162,11 @@ void main() {
         Bestiary.all.length,
         286,
         reason:
-            'the Primal quarter (5 x 11 = 55) plus the three Kinetic '
-            'pure zones (3 x 11) plus The Molten Deep (11) plus The '
-            'Mirrormere (11); a zone landing in Bestiary.all needs its own '
-            'pubspec directory and description section before its art can '
-            'load',
+            '26 zones x 11 — Primal (5), Kinetic (6), Celestial (7), '
+            'Ethereal (7) and The Eclipsed Citadel (1). Every one of them '
+            'needs a description section in BESTIARY_ART.md before its art '
+            'can be generated, and its own pubspec directory before that art '
+            'can load',
       );
     });
 
@@ -523,7 +506,7 @@ void main() {
   });
 
   group('the descriptions the art is generated from', () {
-    // ⭐ **Parsed, not pinned.** A const list of 44 names would pass forever
+    // ⭐ **Parsed, not pinned.** A const list of 286 names would pass forever
     // without anyone opening the document, which is the opposite of the point:
     // the failure being guarded against is a creature reaching the roster with
     // nothing to hand a generator. The doc turns out to be safely parseable —
@@ -534,29 +517,24 @@ void main() {
     // ⚠️ The parse is checked **in both directions** below. A regex that
     // silently stopped matching would otherwise make the coverage test pass by
     // finding nothing and comparing nothing.
+    /// ⭐ **One document, and only one.** The Celestial/Ethereal wave staged
+    /// its fifteen zone blocks in `docs/art/bestiary/<zone_id>.md` so that
+    /// fifteen worktrees would not collide on one shared file, and this test
+    /// read that directory alongside BESTIARY_ART.md for the duration. The
+    /// blocks were folded in and the directory deleted on 2026-09-22, so the
+    /// second source is gone again.
+    ///
+    /// ⚠️ **Do not re-add a fallback that reads a staging directory if it
+    /// happens to exist.** That is what made the split survivable, and it is
+    /// also what would let a description live in two places that disagree —
+    /// the count below would still be 286 with one creature described twice
+    /// and another not at all, because the duplicate check runs on names, not
+    /// on files. A future wave stages the same way and then *empties* it.
     final doc = File('docs/BESTIARY_ART.md').readAsStringSync();
-
-    /// ⭐ **A zone built after 2026-09-22 writes its eleven descriptions to
-    /// `docs/art/bestiary/<zone_id>.md` instead of appending to the shared
-    /// file**, so parallel zone lanes stop colliding on one document; the
-    /// merge coordinator folds them into BESTIARY_ART.md after each wave.
-    /// ⚠️ The entry format is identical on purpose — this parser is the
-    /// contract, and a per-zone file that drifts from it fails the
-    /// both-directions check below exactly as a bad section would.
-    final perZone = Directory('docs/art/bestiary');
-    final sources = <String>[
-      doc,
-      if (perZone.existsSync())
-        for (final f in perZone.listSync().whereType<File>())
-          if (f.path.endsWith('.md')) f.readAsStringSync(),
-    ];
-    final described = [
-      for (final src in sources)
-        ...RegExp(
-          r'^\*\*([^*]+)\*\* — \*',
-          multiLine: true,
-        ).allMatches(src).map((m) => m.group(1)!),
-    ];
+    final described = RegExp(
+      r'^\*\*([^*]+)\*\* — \*',
+      multiLine: true,
+    ).allMatches(doc).map((m) => m.group(1)!).toList();
 
     test('the parser still finds the entries it is anchored on', () {
       expect(
@@ -576,11 +554,13 @@ void main() {
       );
     });
 
-    test('every creature in the Primal quarter is described', () {
-      final roster = Bestiary.all
-          .where((e) => !_awaitingArtDescription.contains(e.zoneId))
-          .map((e) => e.name)
-          .toSet();
+    test('every creature in the game is described', () {
+      // ⭐ **All 26 zones, with no exemption list.** The set of
+      // not-yet-described zones was emptied when the Celestial and Ethereal
+      // blocks were folded in, and the filter went with it — an exemption set
+      // that is always empty is a door left open for the next wave to skip
+      // through.
+      final roster = Bestiary.all.map((e) => e.name).toSet();
       expect(
         described.toSet(),
         roster,
@@ -593,10 +573,18 @@ void main() {
       );
     });
 
-    test('every zone still ends with its arena backdrop brief', () {
+    test('every zone with an open art pipeline ends with its backdrop brief', () {
       // 📝 Backdrops are the sibling pipeline (`test/arena_backdrop_test.dart`
       // checks the code path); this only checks the description exists, since
-      // both quarters of the work are generated from this one file.
+      // both halves of the work are generated from this one file.
+      //
+      // ⚠️ **Only `_primalZones`, and that is the known gap.** Four of the
+      // fifteen Celestial/Ethereal zones arrived with a backdrop brief (The
+      // Glass Archive, Hallowmarch, The Sealed Garden, The Unwritten Library)
+      // and eleven did not. Widening this loop to `Bestiary.all` would fail
+      // today for a reason nobody is about to fix — the gap is tracked in
+      // IMPLEMENTATION_PLAN's zone matrices as `Backdrop 📝 desc` instead, and
+      // a zone joins this list when its quarter's art is commissioned.
       for (final zone in _primalZones) {
         expect(
           doc,

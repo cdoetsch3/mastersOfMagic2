@@ -20,7 +20,7 @@ bestiary is a mage**, and the art has to stop saying otherwise.
 archetype · element*` on one line followed by a blockquote, a backdrop is an
 `### Arena backdrop` heading with a `` `assets/backgrounds/<zone>.png` ``
 filename line and one blockquote, and the house-style paragraph below is
-quoted verbatim into all 66 creature prompts. Reword the prose freely; change
+quoted verbatim into all 286 creature prompts. Reword the prose freely; change
 those shapes and the tool silently finds fewer creatures, which
 `test/creature_art_test.dart` and `tool/test_artgen.py` both fail on.
 
@@ -1165,47 +1165,1552 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 
 ---
 
-## ⚠️ Still to describe — 209 creatures
-## ⚠️ Still to describe — 198 creatures
+## The Kiln Desert · Lv 30–34 · Solar
 
-The **Primal quarter (55)** and **Old Quarry (11)** are written. The rest of
-the Kinetic quarter, and the Celestial and Ethereal quarters, have full
-rosters in ENEMIES_DESIGN §2e — names, ranks, archetypes and premises — but
-no physical descriptions yet.
-The **Primal quarter (55)** and **Windward Steppe (11)**, the first Kinetic
-zone, are written. The rest of the Kinetic quarter and all of Celestial and
-Ethereal have full rosters in ENEMIES_DESIGN §2e — names, ranks, archetypes
-and premises — but no physical descriptions yet.
-The **Primal quarter (55)** and **Stormcliff Coast (11)** are written. The
-rest of Kinetic and all of Celestial and Ethereal have full rosters in
-ENEMIES_DESIGN §2e / KINETIC_CONTRACT §4 — names, ranks, archetypes and
-premises — but no physical descriptions yet.
-The **Primal quarter (55)** and **Frostfell Pass (11)**, the quarter's first
-hybrid zone, are written. The rest of Kinetic and all of Celestial and
-Ethereal have full rosters in ENEMIES_DESIGN §2e / KINETIC_CONTRACT §4 —
-names, ranks, archetypes and premises — but no physical descriptions yet.
-The **Primal quarter (55)** and **Thunderspire Peaks (11)** are written. The
-rest of Kinetic and all of Celestial and Ethereal have full rosters in
-ENEMIES_DESIGN §2e / KINETIC_CONTRACT §4 — names, ranks, archetypes and
-premises — but no physical descriptions yet.
-The **Primal quarter (55)** and **The Molten Deep (11)**, a hybrid zone, are
-written. 🚧 Landed alongside Frostfell Pass and Thunderspire Peaks in
-parallel worktrees — this paragraph and the table row below are this
-builder's own count and will need the merge coordinator's reconciliation
-against the other two.
+> ⭐ *Burning and freezing at once.* ⚠️ **A contradiction, not a heat.**
+> Everything here should read as sun-bleached and frost-bitten in the same
+> object — pale, salt-crusted, hard-edged, with shadows cut too sharply for
+> the light that is supposedly making them. Nothing is soft, nothing is damp,
+> and nothing here has a body worth skinning.
 
-| Quarter | Zones | Creatures | Status |
-|---|---|---|---|
-| **Primal** 1–14 | 5 | 55 | ✅ described |
-| Kinetic 15–29 | 6 | 66 | 1/6 zones described (Old Quarry) |
-| Kinetic 15–29 | 6 | 66 | 🔶 Windward Steppe (11) described, 5 zones (55) left |
-| Kinetic 15–29 | 6 | 66 | 🚧 1/6 zones — Stormcliff Coast (11) described |
-| Kinetic 15–29 | 6 | 66 | 🚧 4/6 zones (44) described — Old Quarry, Windward Steppe, Stormcliff Coast, Frostfell Pass |
-| Kinetic 15–29 | 6 | 66 | 🚧 1/6 zones — Thunderspire Peaks (11) described |
-| Kinetic 15–29 | 6 | 66 | 🚧 The Molten Deep (11) described, 2 hybrids left |
-| Celestial 30–47 | 7 | 77 | ⬜ |
-| Ethereal 45–60 | 7 | 77 | ⬜ |
-| The Eclipsed Citadel | 1 | ❓ | needs its own structure first (§2e) |
+### Commons
 
-⭐ **The Primal quarter is the one that matters first** — it is the only
-content shipped, and it is the player's first impression.
+**Shadeless** — *common · Adept · Solar*
+> A lean human figure the height of a person, wrapped in sun-bleached pale
+> linen from crown to ankle with no face visible, the cloth stiff and white
+> with salt. The ground beneath and behind it is bare and unshaded — nothing
+> falls from it at all. Standing upright, weight even, arms loose at its
+> sides.
+
+**Sunstruck Pilgrim** — *common · Blighter · Solar*
+> A stooped traveller a head shorter than a person, swaddled in layers of
+> cracked grey-brown road cloth burnt through in patches to blistered red
+> skin, a broad flat sunhat collapsed at the brim. Both arms extended
+> straight ahead at chest height, hands open. Walking, head tipped slightly
+> back.
+
+**Glasspan Crawler** — *common · Bruiser · Solar*
+> A low slab-bodied creature about knee height and twice as long as a person,
+> its back a single fused crust of white salt shot through with bottle-green
+> glass, cracked into plates. Six short thick legs beneath. Blunt squared
+> front end with no head, pushing forward at a steady walk.
+
+**Mirage** — *common · Glasswing · Solar*
+> A tall thin humanoid shape the height of a person made of rippling heat
+> distortion rather than matter — the pale desert behind it visible through it
+> and bent sideways, edges dissolving into shimmer. Only a darker vertical
+> core holds a definite outline. Upright, poised, barely there.
+
+**Kiln Moth** — *common · Lasher · Solar*
+> A moth with a wingspan as wide as a person's outstretched arms, wings
+> ash-paper grey and translucent, every edge charred black and crumbling. Thick
+> furred body the colour of cold cinders, feathered antennae. Wings held
+> half-open, angled forward.
+
+### Mini-bosses
+
+**Sun Templar** — *mini · Champion · Solar*
+> A suit of mirror-polished pale gold plate armour a head taller than a
+> person, standing empty — the visor's eye-slit shows nothing but more
+> daylight behind it. Long tabard bleached to bone white. Upright, one hand
+> resting on a plain straight pole-standard.
+
+**Prism Sentinel** — *mini · Redoubt · Solar*
+> A standing wedge of clear sand-glass twice the height of a person and
+> broad at the base, cut into dozens of flat facets at differing angles, each
+> face catching the light differently with thin rainbow fringes at the edges.
+> No limbs and no face. Planted, motionless.
+
+**Saltmarch Wraith** — *mini · Executioner · Solar*
+> A column of fine white salt dust the height of two people, holding the
+> loose silhouette of a file of hooded walkers stacked one behind another
+> inside it, faces suggested and never resolved. Trailing grit at the base.
+> Leaning forward, mid-stride.
+
+**The Shadeless Hour** — *mini · Hexer · Solar*
+> An extremely tall, extremely thin humanoid absence the height of two people
+> and no wider than an arm, rendered as a hard-edged vertical gap in the
+> image with the pale desert visible through it, slightly displaced. Long
+> thin limbs, no features. Standing straight, arms hanging.
+
+### Bosses
+
+**The Cold Shadow** — *boss · Juggernaut · Solar*
+> An enormous low mass of flat matte black the size of a rock shelf, three
+> times the length of a person and chest high, with a perfectly hard
+> unfeathered edge all the way round as though cut from the ground. Faint
+> white frost rimes the pale salt at its border. Lying low, spread wide.
+
+**Solar Deity** — *boss · Aspect · Solar*
+> A standing column of hard white-gold light roughly the height and breadth
+> of a person, brightest at its core and never blurring at its outline, with
+> the suggestion of shoulders and a raised head but no face or limbs. The pale
+> ground beneath it is scorched to a ring. Upright, still, radiant.
+
+---
+
+## The Mirrormere · Lv 32–37 · Lunar
+
+> ⭐ *The reflection is bigger than the thing, and it is looking back.*
+> ⚠️ **Not ghosts and not water elementals.** Everything here should read as
+> *something seen on a still surface that has stopped agreeing with what cast
+> it* — pale, silver-grey and cold-white, flat or slightly too smooth, sized
+> against a person and then, on the bosses, sized wrongly on purpose. Colour
+> is near-monochrome throughout: silver, bone-white, lake-grey and the dark of
+> deep water. ⚠️ **No warm light anywhere except Bloodwood's red**, and that
+> belongs to the items, not the creatures.
+
+### Commons
+
+**Mirror Wraith** — *common · Adept · Lunar*
+> A standing human figure the height of an adult, made of flat lake-light —
+> silver-white, edgeless, with no features cut into the face and no depth to
+> the body, like a reflection lifted off the water and stood upright. Squared
+> shoulders, arms loose at the sides. Standing balanced and still, weight
+> evenly on both feet.
+
+**Stillface** — *common · Blighter · Lunar*
+> A flat upright oval of unbroken water about the width of a person's
+> shoulders and as tall as a door, held vertical with nothing behind it. Its
+> surface is mirror-smooth pale silver, the rim a thin darker meniscus curling
+> inward. No limbs, no base. Hanging level at head height, perfectly
+> motionless.
+
+**Undershine** — *common · Glasswing · Lunar*
+> A long tapering brightness roughly the length of a person and a quarter as
+> wide, cold white at its core fading to pale blue at the trailing edge, with
+> two thin fin-like sheets of light spread either side. It is seen through a
+> hand's depth of dark water, so its edges are soft. Travelling flat and
+> horizontal, nose slightly down.
+
+**Ripplecut** — *common · Skirmisher · Lunar*
+> A single raised line of water about an arm's length, low and sharp like the
+> wake of something just below, rising to a thin blade-edged crest at its
+> leading point. Dark lake-grey with one hard white highlight along the crest.
+> No body is visible. Angled forward, mid-travel, leaning into the cut.
+
+**Palefish Shoal** — *common · Lasher · Lunar*
+> Several hundred finger-length fish holding one loose person-sized cloud just
+> under the surface, each one colourless and translucent with a faint silver
+> spine showing through. The shoal's outline is soft and constantly ragged at
+> the edges. Hanging as a loose vertical column, all heads pointed the same
+> way.
+
+### Mini-bosses
+
+**The Second You** — *mini · Champion · Lunar*
+> A fully solid human figure of exactly adult height, opaque and dripping,
+> wet-dark all over as though just walked out of deep water, with the same
+> build and the same clothing silhouette as a traveller but no face — the head
+> smooth and blank. Standing squared and forward, weight shifted onto the
+> front foot.
+
+**Herald of the Waxing** — *mini · Redoubt · Lunar*
+> A broad kneeling figure half again a person's height, carved from pale grey
+> stone. One entire side is finished and polished smooth, the other still
+> rough-hewn and blocky, with a hard vertical line dividing the two down the
+> centre of the body and face. Kneeling low and squat, arms braced on the
+> ground.
+
+**Stalker of the New Moon** — *mini · Executioner · Lunar*
+> A tall narrow human silhouette a head above adult height and unnaturally
+> thin, rendered as pure black absence — no surface, no highlight, no detail,
+> a hole cut in the scene in the shape of a walking person. Long arms, long
+> stride. Mid-step, leaning forward, one arm already extended.
+
+**The Waning Wraith** — *mini · Hexer · Lunar*
+> A person-height figure of thin silver light, narrow and upright, with a
+> clean curved bite missing from one whole side of it — head, shoulder and
+> ribs cut away along one smooth crescent arc. The remaining edge is bright
+> and sharp; the cut edge fades to nothing. Standing turned three-quarters, the
+> missing side toward the viewer.
+
+### Bosses
+
+**The Moon Below** — *boss · Tyrant · Lunar*
+> An enormous disc of cold white light lying flat just beneath a dark water
+> surface, wide enough to fill the frame behind a person standing at the
+> shore — many times a person's height across. Its face carries grey maria
+> markings arranged into something that reads, uncomfortably, as watching.
+> Level, submerged, tilted very slightly up toward the near shore.
+
+**Luna Plena, the Full Moon** — *boss · Aspect · Lunar*
+> A full moon hung low over the lake at the size the water had been showing
+> it — a vast pale sphere, many times a person's height, close enough that its
+> craters read as real relief rather than markings. It is bright enough to
+> throw a second, contradictory shadow from everything on the shore. Hanging
+> square-on, face fully lit, no crescent anywhere.
+
+---
+
+## Starfall Basin · Lv 34–39 · Astral
+
+> ⭐ *Things fell here, and the sky is still aiming.* ⚠️ **Arrival, not
+> residence.** Everything here should read as something that came down rather
+> than grew up — hard edges, fusion crust, a direction of travel still legible
+> in the shape. Nothing organic, nothing rooted, nothing weathered soft.
+> Palette is Astral: blue-black, indigo, and hard white points.
+
+### Commons
+
+**Crater Revenant** — *common · Adept · Astral*
+> A human figure of ordinary height standing at the bottom of a shallow pale
+> bowl, in the remains of travelling clothes gone grey and stiff. Skin and
+> cloth alike are dusted with fine blue-black grit that does not fall off.
+> Squared shoulders, hands open and low, weight evenly on both feet.
+
+**Sky-Iron Husk** — *common · Sentinel · Astral*
+> An upright hollow shell of dark pitted metal the height of a person, shaped
+> like a torso and legs with nothing inside, its outer surface scabbed with a
+> thin black fusion crust and split open down one side to show an empty
+> interior. Standing square, motionless, faintly heat-hazed at the edges.
+
+**Fallpoint** — *common · Glasswing · Astral*
+> A narrow vertical streak of hard white light about the height of a person,
+> thin as a drawn line at the top and flaring where it meets the ground,
+> surrounded by a faint indigo blur. No body, no limbs, no face. Angled
+> slightly off vertical, as though still descending.
+
+**Scatterling** — *common · Lasher · Astral*
+> A loose waist-high spread of forty or fifty angular blue-black fragments
+> hanging in rough formation with clear air between them, each shard
+> thumb-sized to fist-sized with bright white flecks inside. No single
+> outline. Low, wide, drifting apart and back together.
+
+**Cold Ejecta** — *common · Skirmisher · Astral*
+> A single dense chunk of dark pitted rock about the size of a curled dog,
+> travelling low and flat above the ground with a faint indigo trail behind
+> it. One face is smooth and scorched, the other broken and bright grey.
+> Nose-forward, never still, never touching down.
+
+### Mini-bosses
+
+**The Zodiac Ascendant** — *mini · Champion · Astral*
+> A wheel of twelve figures turning on edge, twice the height of a person,
+> each figure drawn as a constellation of hard white points joined by fine
+> indigo lines. The rim is a complete circle; the interior is open dark.
+> Upright, slowly rotating, the topmost figure brightest.
+
+**Constellation Warden** — *mini · Redoubt · Astral*
+> A broad humanoid figure half again the height of a person, its whole body
+> an outline of fixed white points connected by thin indigo lines with empty
+> night between them. Heavy-shouldered, wide-stanced. Planted, arms slightly
+> out, facing forward and unmoving.
+
+**Rift Walker** — *mini · Executioner · Astral*
+> A tall narrow figure a head and a half above a person, its silhouette a
+> clean vertical tear in the air showing deep indigo depth rather than a
+> surface, edged in a hard white line. Long-limbed, no features. Mid-stride,
+> one leg already gone from view.
+
+**Echo of the Between** — *mini · Hexer · Astral*
+> A person-height figure repeated three or four times in fading offset
+> copies, the leading copy sharpest and the trailing ones thinning into
+> blue-black haze. Slender, robed, no visible face. Leaning forward, the
+> copies strung out behind it like a delay.
+
+### Bosses
+
+**The Next One** — *boss · Juggernaut · Astral*
+> An enormous dark mass filling the upper half of the frame, its underside
+> curved and pitted and lit along one leading edge in hard white, with a long
+> indigo tail of shed material streaming back and up. Easily four storeys of
+> visible bulk. Overhead, oncoming, no ground contact.
+
+**What Landed** — *boss · Tyrant · Astral*
+> A compact curled form the size of a crouching person at the centre of a
+> deep bowl, smooth and unmarked and matte blue-black, with a faint indigo
+> sheen along one curve. No crust, no damage, no scorching. Low, gathered,
+> and turned precisely toward the viewer.
+
+---
+
+## Tidewrack Shoals · Lv 36–40 · Lunar + Aqua
+
+> ⭐ *The sea is on a schedule it did not choose, and it keeps uncovering
+> things.* The fusion is **obedience** — Aqua doing what Lunar says. ⚠️ This
+> zone assigns its element per creature, not "both" by default: some things
+> here are pure water (Aqua), some are pure clock (Lunar), and only the three
+> the roster names both are visibly tide AND moon at once. Wet slate, bleached
+> shell-white, weed-black and a cold pale grey-green throughout; ⚠️ everything
+> here is either **just uncovered** or **about to be covered again** — nothing
+> is dry and nothing is deep.
+
+### Commons
+
+**Tidewrack Drowned** — *common · Adept · Lunar+Aqua*
+> A drowned soldier the height of a tall person, standing fully upright in
+> ankle-deep water, body bulked out by sodden layered cloth gone the colour of
+> wet slate. A plain corroded helm with no face visible under the brim; one
+> arm holds a short weathered blade low and level. Shoulders square, chin up,
+> weight forward — a parade stance, kept.
+
+**Wrackcrab** — *common · Sentinel · Aqua*
+> A broad flat crab as wide across as a cartwheel and barely knee-high, its
+> shell a single low dome crusted over with pale fibrous weed and small white
+> shells until almost no shell shows. Eight short thick legs splayed wide, two
+> heavy blunt claws folded flat against the front. Hunkered down, clamped to
+> the sand.
+
+**Lowwater Thing** — *common · Blighter · Aqua*
+> A wide shallow body of standing water roughly a person's height and three
+> times as broad, holding a low humped shape with no head and no limbs — just
+> a raised leading edge that stands an inch or two proud of the flat. Warm
+> grey-green and faintly cloudy, with a thin rim of scum along the advancing
+> edge. Low, spread, creeping.
+
+**Gullbone Flock** — *common · Lasher · Lunar*
+> Two dozen long-winged seabirds flying as one loose mass about the size of a
+> cart, wings narrow and sharply crooked, bodies bleached bone-white with pale
+> grey backs and black wingtips. No single bird is the centre of the shape.
+> Banked hard together mid-turn, all at the same angle.
+
+**Spindrift** — *common · Skirmisher · Aqua*
+> A torn sheet of sea-spray about the height of a person and twice as wide,
+> held flat and streaming horizontally a hand's width above wet sand, thin
+> enough at the trailing edge to see the ground through it. White-grey shading
+> to near-transparent. Stretched forward, leaning into its own travel.
+
+### Mini-bosses
+
+**Tidal Empress** — *mini · Champion · Lunar+Aqua*
+> A tall crowned woman a head and a half above human height, standing on open
+> wet flat in a long heavy gown of deep blue-green that pools around her feet.
+> Behind her the sea stands as a smooth vertical wall twice her height, not
+> breaking. A thin pale circlet of shell sits on her brow. Still, hands at her
+> sides, facing forward.
+
+**Leviathan** — *mini · Redoubt · Aqua*
+> An immense smooth back breaking shallow water for the length of a jetty,
+> dark slate-grey above and fading pale beneath, the visible ridge running out
+> of frame at both ends so no whole body is shown. Skin scarred in long pale
+> rakes and scattered with barnacle clusters. Barely moving, half-grounded,
+> most of it still under.
+
+**Maelstrom Horror** — *mini · Executioner · Aqua*
+> A turning column of water three times a person's height, wide as a boat at
+> the top and narrowing to a dark throat at the sand, its walls smooth and
+> ribbed with spiral bands of grey-green and white foam. Nothing solid inside
+> it. Leaning slightly, drawing inward at the base.
+
+**The Turning** — *mini · Hexer · Lunar*
+> A tall thin upright seam standing on the open flat at roughly a person's
+> height, where the water on one side runs out and the water on the other side
+> runs in — a visible vertical line with opposite currents meeting along it.
+> No body, no face, only the seam and the pale moon-white glow along its
+> length. Motionless while everything around it reverses.
+
+### Bosses
+
+**Kraken** — *boss · Juggernaut · Aqua*
+> An enormous cephalopod lying uncovered across the open flats, its mantle
+> alone the size of a house and its arms sprawled out further than the frame,
+> the whole mass deep purple-grey and glistening with wet weed and sand. One
+> flat eye the width of a shield, open. Heaped rather than reared — grounded,
+> filling the ground between here and anywhere.
+
+**The Undertow** — *boss · Aspect · Lunar*
+> Not a body: a broad sheet of shin-deep water running hard away from the
+> viewer across the whole width of the frame, its surface drawn into long
+> parallel grooves and the sand beneath it visibly scouring out into hollows.
+> Cold pale grey-green, lit as if from far overhead by something not in shot.
+> Featureless, low, and entirely in motion away.
+
+---
+
+## The Sunless Reach · Lv 38–42 · Solar + Lunar
+
+> ⭐⭐ *Identical ground, opposite worlds, one line between them.* ⚠️ **The
+> fusion is a boundary, not a blend.** Nothing here is dusk, twilight or
+> gradient — every creature is either hard-lit or wholly unlit, and the few
+> that are both carry the division as a **straight visible edge with no
+> falloff across it**. The rock is the same black scarp stone on both sides.
+> Palette: bleached desert white and hard yellow-white glare against flat
+> lightless black, with pale cold moon-grey as the only third value.
+
+### Commons
+
+**Eclipse Herald** — *common · Adept · Solar+Lunar*
+> A robed humanoid figure a head taller than a person, seen in profile and
+> facing right, walking at an even pace. Its whole right side is lit hard
+> white as if by a low sun and its whole left side is flat unlit black, with
+> a single straight vertical division running head to hem and no blending
+> anywhere along it. Heavy plain travelling robe, hood up, face in shadow.
+
+**Crestline Warden** — *common · Bruiser · Solar*
+> A broad, heavy-shouldered humanoid the height of a doorway and half again
+> as wide as a person, built of sun-scoured pale stone the colour of bleached
+> bone, its surfaces cracked and flaked from long exposure. No neck, a blunt
+> squared head, forearms thicker than its thighs. Planted, leaning forward,
+> shoulder turned as if about to push.
+
+**Nightglare** — *common · Blighter · Solar*
+> A hard knot of white light about the size of a human head, hanging at chest
+> height with no body beneath it, its edge sharp rather than diffuse and a
+> short flare of glare trailing back from it to the left. No limbs, no face,
+> no visible source. Hanging motionless, oriented right.
+
+**Coldlight Swarm** — *common · Lasher · Lunar*
+> A loose cloud of several hundred pale grey-white motes, each the size of a
+> fingernail, holding a rough dog-sized mass drawn out toward the right, with
+> individual motes drifting free at its trailing edge. No solid core, no
+> silhouette that stays fixed. Low to the ground, streaming rightward.
+
+**Shadowpitch Stalker** — *common · Skirmisher · Lunar*
+> A low, lean quadruped a little longer than a person is tall, its whole body
+> a flat unbroken black that takes no highlight anywhere, so it reads as a
+> hole in the picture rather than an animal. Long neck, narrow head lowered
+> level with the shoulders, four thin legs. Mid-stride, body stretched out,
+> facing right.
+
+### Mini-bosses
+
+**Solar Archon** — *mini · Champion · Solar*
+> An armoured humanoid figure half again the height of a person, plated head
+> to foot in mirror-polished pale metal so bright the plates read as white
+> rather than silver, with a tall plain crested helm and no visible face
+> beneath it. Standing upright and square, shoulders back, facing right.
+
+**The Crest** — *mini · Redoubt · Solar+Lunar*
+> A single upright slab of black scarp stone roughly thirty feet long and
+> twice the height of a person, standing on its long edge like a wall pulled
+> up out of the ground. Its upper face is lit hard white, its lower face is
+> flat black, and the two meet along the top edge in one dead-straight line
+> with no gradient. Immobile, planted, its long axis running rightward.
+
+**Both-Sided Thing** — *mini · Executioner · Solar+Lunar*
+> A humanoid figure of ordinary person height, split top to bottom down its
+> exact centre line — the right half bleached the pale grey-white of desert
+> floor stone, the left half flat lightless black — with a hard seam between
+> them and no blending at all. Both halves are the same shape. Turned
+> three-quarters to the right, weight forward, arms low and loose.
+
+**Duskmarch** — *mini · Hexer · Lunar*
+> A tall, very thin humanoid silhouette of uniform flat black, person-height
+> but barely a hand's width deep, like a shadow standing up off the ground
+> without anything casting it. No features, no highlights, edges perfectly
+> crisp. Walking steadily in profile, facing right, one leg forward.
+
+### Bosses
+
+**The Last Light** — *boss · Aspect · Solar*
+> A towering wedge of hard white-gold light four storeys tall, broad at the
+> base and narrowing to a blade-thin top edge, with a faint suggestion of
+> shoulders and a raised head read into its upper third. Its edges are knife
+> sharp against the white ground, marked out by a thin darker rim. Standing
+> upright, leaning very slightly rightward.
+
+**The First Dark** — *boss · Aspect · Lunar*
+> A colossal mass of total flat black four storeys tall, roughly humanoid and
+> heavily hunched, with no surface detail, no highlights and no texture
+> anywhere on it — a silhouette rather than a body. Its outline is smooth and
+> unbroken, with no edges or points. Standing, shoulders forward, head low
+> and turned right.
+
+---
+
+## The Shattered Orrery · Lv 40–44 · Astral + Electro
+
+> ⭐ *A broken machine still computing, and nobody knows what toward.*
+> ⚠️ **Mechanism, not weather.** Every silhouette here should read as a
+> *part* — something turned, wound, geared or wired — at a scale meant for a
+> building. Brass and worked metal gone yellow-brown with a blue tarnish
+> bloom; the light is arc-white and hard-edged, never a glow. Nothing organic,
+> nothing grown, nothing soft.
+
+### Commons
+
+**Orrery Automaton** — *common · Adept · Astral+Electro*
+> An upright brass figure the height of a person, built as a jointed armature
+> rather than a body — segmented limbs of tarnished yellow-brown brass over a
+> visible internal train of small gears, with a smooth featureless dome for a
+> head and a single ring of incised marks around it. Fine blue-white arcs
+> cross the gaps at every joint. Standing squarely, weight even, one arm
+> raised as if partway through an adjustment.
+
+**Gear-Ghost** — *common · Glasswing · Astral*
+> A wheel-shaped absence about the width of a cartwheel, standing on edge in
+> the air with nothing in the middle — its rim and teeth drawn only as thin
+> pale blue-white lines of light, brightest along the short arc where teeth
+> would be meshing and fading to nothing on the far side. No mass, no
+> shadow. Hanging upright, mid-turn.
+
+**Armature** — *common · Bruiser · Electro*
+> A single torn-loose support arm half again the height of a person, standing
+> upright on its ragged hub end — a tapering beam of dull yellow-brown brass
+> wrapped along its length in close copper windings, with a bright sheared
+> break face at the base. The windings carry a hot white-blue glow that is
+> strongest near the top. Planted, leaning slightly back, top-heavy.
+
+**Arcflock** — *common · Lasher · Electro*
+> Two dozen small white-blue discharges holding a loose ovoid formation about
+> head height and the width of two people, each one a short jagged spark no
+> longer than a finger, none of them in the same place twice. No body, no
+> outline — only the shape the density makes. Hovering, drifting, constantly
+> reshuffling.
+
+**Errant Ring** — *common · Skirmisher · Astral*
+> A thin metal ring the width of a doorway, rolling upright on its edge —
+> tarnished brass banded with a pale inlaid track of incised star-marks
+> around its outer face, slightly out of true so it wobbles as it turns. A
+> worn groove in the floor beneath it. Tilted off vertical, caught in the
+> moment of correcting.
+
+### Mini-bosses
+
+**Sidereal Fault** — *mini · Champion · Astral*
+> A vertical seam in the air as tall as a three-storey building and no thicker
+> than a hand, edges drawn hard and bright like a cut in glass. Through it,
+> the same field of stars as around it, shifted visibly sideways. Cold pale
+> blue-white light along the cut, darkness inside. Standing dead upright,
+> perfectly still.
+
+**Escapement** — *mini · Redoubt · Electro*
+> A toothed escape wheel the width of a person's armspan, mounted alone in a
+> heavy square brass frame twice a person's height, with a two-armed pallet
+> poised against its teeth. Dull tarnished brass, the tooth tips polished
+> bright by four centuries of contact. Arc-light flares white at the point of
+> catch. Stationary, locked, one tooth from releasing.
+
+**Long Division** — *mini · Executioner · Astral+Electro*
+> A hanging column of worked figures as tall and wide as a wall, written in
+> lines of thin arc-white light, each line shorter than the one above it and
+> the whole column drifting slowly downward. Faint blue-brass afterimages
+> where finished lines have scrolled past. Vertical, narrow, tapering toward
+> the floor and never reaching it.
+
+**The Remainder** — *mini · Hexer · Astral*
+> A single irregular lump of set-aside figure about the size of a person,
+> hanging at chest height off to one side of nothing — a dense knot of pale
+> numerals compacted into a rough mass, brighter at the core than the edges,
+> with loose digits still orbiting it slowly. Hunched, compact, waiting.
+
+### Bosses
+
+**The Calculation** — *boss · Juggernaut · Electro*
+> The entire working of the machine seen at once, filling a chamber from floor
+> to broken roof — a nested set of eight or nine brass rings the size of
+> bridges, each on a different axis and each turning at its own rate, hubs and
+> gear trains visible where they cross. Tarnished yellow-brown metal with
+> white-blue arcs jumping between every ring. A person at the base reaches the
+> height of the lowest hub. Vast, layered, indifferent.
+
+**The Answer** — *boss · Tyrant · Astral*
+> A single standing arrangement of light about the size of a person, at the
+> exact centre where the rings once crossed — a closed, symmetrical figure of
+> fine white-gold lines, self-contained and resolved, with nothing orbiting it
+> and nothing unfinished at its edges. It casts a hard shadow the machine
+> around it does not. Upright, centred, entirely motionless.
+
+---
+
+## The Glass Archive · Lv 43–47 · Solar + Arcane
+
+> ⭐ *They wrote it in light, and light does not keep.* The fusion is **an
+> archive readable only at noon, which the reading destroys** — Solar's Blind
+> and Arcane's Knowledge read together. ⚠️ This zone assigns its element per
+> creature, not "both" by default: the lens-and-glare things are Solar, the
+> written things are Arcane, and only the roster's two hybrids are visibly
+> both. Palette throughout: colourless plate glass, brass, bone-white vellum,
+> hard white glare and one cool violet note. ⚠️ **Nothing here is warm or
+> golden** — the light is white and flat, not sunset. Nothing is ruined,
+> either; everything is intact and simply unreadable.
+
+### Commons
+
+**Glasswright** — *common · Adept · Solar+Arcane*
+> A lean humanoid figure of person height built from fitted rectangular
+> plate-glass panes held in a dark lead armature, in profile, head and body
+> turned toward the right edge of the image. Colourless glass throughout with
+> one faint violet flaw running through the chest pane. A heavy leather
+> apron shape hangs from the armature at the waist. Standing squared up,
+> weight even, hands open at its sides.
+
+**Noonmark** — *common · Glasswing · Solar*
+> A person-sized wedge of hard flat white light standing upright on a bare
+> hillside, edged as cleanly as a cast shadow, with no body inside it at all.
+> Pure white at the core fading to nothing at the outer edge, where two thin
+> blade-shaped planes read as half-open wings. Weightless, angled slightly
+> forward, facing right.
+
+**Palimpsest** — *common · Blighter · Arcane*
+> A single standing sheet of pale cream vellum roughly person height,
+> upright and slightly curling at its edges, scraped visibly thin in patches
+> where older grey script shows through the newer. Layer on layer of
+> overlapping handwriting in grey and faint violet covers it entirely. No
+> limbs and no head — just the sheet, turned edge-on toward the right.
+
+**Readerless** — *common · Lasher · Arcane*
+> Several dozen loose written vellum leaves travelling together at about
+> chest height in a rough person-wide drift, none of them touching, none of
+> them bound. Pale cream pages with grey script, every one face-up. No single
+> silhouette holds still. Spilling forward and to the right.
+
+**Lensfly** — *common · Skirmisher · Solar*
+> A hand-span of ground brass-rimmed lens carried on four thin jointed brass
+> legs, low and flat to the ground like a beetle, its round glass face
+> tilted up and to the right. Colourless glass, dull brass, one hard white
+> point of glare caught in the lens. Poised mid-scuttle, legs splayed,
+> facing right.
+
+### Mini-bosses
+
+**The Last Reader** — *mini · Champion · Solar+Arcane*
+> A seated humanoid figure a head taller than a person would be standing,
+> robed in overlapping panes of smoked grey glass, a brass reading-frame
+> braced across its lap with one vellum sheet still in it. Smoked glass,
+> dark brass, cream vellum. Rising from the seat without setting the frame
+> down, one hand still flat on the page, facing right.
+
+**Aperture** — *mini · Redoubt · Solar*
+> A freestanding upright ring of overlapping brass leaves twice the height of
+> a person, standing on the bare hillside with nothing supporting it.
+> Weathered dull brass; the narrow opening at its centre is filled with flat
+> white light much brighter than anything around it. Motionless, planted,
+> the opening turned toward the right edge.
+
+**Burnt Index** — *mini · Executioner · Solar*
+> A tall freestanding wooden card-case the height of a person, charred solid
+> black from its lower end upward, the upper half still holding neat filed
+> ranks of cream index cards and the lower half still holding its shape
+> entirely as grey ash. Black char, grey ash, cream card. Leaning forward,
+> gathering itself, facing right.
+
+**The Marginalia** — *mini · Hexer · Arcane*
+> A dense person-sized crowd of small pale annotating hands, each no larger
+> than a child's, crawling over and around one another in a loose upright
+> column, every one holding a fine pen. Bone-white hands, grey ink, faint
+> violet at the fingertips. Crowding steadily inward and to the right,
+> never still.
+
+### Bosses
+
+**What Was Written** — *boss · Tyrant · Arcane*
+> A colossal standing column of handwritten script four storeys tall,
+> holding together with no page beneath it — the writing itself is the body.
+> Grey-violet ink on nothing, denser at the base, thinning toward a top that
+> is still being written. No limbs, no face. Upright, unhurried, facing
+> right.
+
+**What Is Left Of It** — *boss · Aspect · Solar*
+> Not a body — a roughly humanoid four-storey shape of pure white glare
+> standing on a hillside of aimed lenses, its silhouette readable only as
+> the place the light has nothing further to pass through. Blinding flat
+> white at the core, hard-edged, no interior detail of any kind. Facing
+> right, motionless, painful to look at directly.
+
+### Arena backdrop
+
+`assets/backgrounds/the_glass_archive.png` — *16:9 · Solar + Arcane palette*
+> Wide 16:9 landscape painting of a terraced hillside of glass-roofed reading
+> halls seen side-on at standing eye level, environment only — no creatures,
+> no people, no text. A level shelf of pale dressed stone runs straight
+> across the frame just past mid-height. Behind it to the far left and far
+> right, cropped by the frame, the stepped ends of low halls roofed entirely
+> in colourless plate glass, every roof panel angled and still aimed. Below
+> the shelf the terraces drop away into cool violet-grey shade across the
+> bottom fifth. The centre of the frame is **open white sky at noon**, empty,
+> with nothing rising out of it and no visible sun disc. Overcast-bright,
+> flat, shadowless. **Solar + Arcane palette**, matching the creatures above:
+> colourless glass, dull brass, bone-white stone, hard white glare, one cool
+> violet note in the shade. Nothing warm, nothing golden, nothing ruined —
+> everything intact and unreadable.
+
+---
+
+## Hallowmarch · Lv 45–49 · Sanctus
+
+> ⭐ *Someone is still doing the upkeep, and nobody has seen them.* A raised
+> stone causeway climbing the Vault's south flank, with a cut meltwater
+> channel running beside it the whole way and a marker every mile. ⚠️ **A
+> pure zone: every creature is single-element Sanctus**, so there is no second
+> palette to split them by — they are separated by what they are *for*, not by
+> colour. Palette throughout: pale dressed road-stone, silver-white spiritwood,
+> whitewash, plain pale metal, and one warm gold note — lamplight, small
+> flames, and the yellow goldenrood in the channel. ⚠️ **Nothing here is
+> ruined, broken, mossy or overgrown.** Everything is maintained, square and
+> recently attended to; that intactness is the whole unsettling idea and an
+> artist's instinct toward picturesque decay must be resisted.
+
+### Commons
+
+**Causeway Warden** — *common · Sentinel · Sanctus*
+> A broad armoured humanoid figure of about person height but twice a
+> person's width, standing squared up in the middle of a flat stone road,
+> facing right. Plate of pale dressed stone and plain pale metal, all of it
+> weathered to the same colour as the roadway under it, with no heraldry and
+> no ornament anywhere. Feet planted apart, arms loose at its sides, entirely
+> motionless.
+
+**Marker-Sworn** — *common · Adept · Sanctus*
+> A robed humanoid figure of ordinary person height in plain undyed
+> road-dust-grey cloth, hood back, turned three-quarters toward the right.
+> It holds a short straight wooden rule in one hand and a small open pot of
+> white lime wash in the other, the brush still in the pot. Pale cloth, pale
+> wood, one clean white smear on the sleeve. Standing easily, mid-stride
+> interrupted.
+
+**Meltwater Choir** — *common · Lasher · Sanctus*
+> A cut stone channel about a pace wide running along beside a road, its
+> water thrown up into two dozen separate standing plumes of white spray at
+> roughly chest height, spaced evenly along the channel's length. Clear water,
+> white foam, pale wet stone. No body, no face and no single silhouette —
+> the plumes lean together toward the right as a group.
+
+**Votive** — *common · Glasswing · Sanctus*
+> A single upright flame the size of two hands, burning at head height in
+> open air beside a pale stone road-marker, with no lamp, wick or vessel
+> beneath it. Warm gold at the core fading to near-white at the tip, its
+> outer edges drawn out into two thin leaf-shaped sheets of light that read
+> as wings. Leaning slightly to the right, as toward a draught.
+
+**Pilgrim's Remnant** — *common · Bruiser · Sanctus*
+> A bulky roped travelling pack standing upright on a stone road at about
+> chest height, fully loaded and tightly strapped, with the shoulder straps
+> hanging empty and no body in them. Worn brown canvas, pale rope, a rolled
+> grey blanket lashed across the top, a tin cup on a cord. Tilted forward as
+> though walking uphill, facing right.
+
+### Mini-bosses
+
+**Milestone** — *mini · Champion · Sanctus*
+> A squared pale stone road-marker twice the height of a person, standing
+> upright in the centre of a flat stone road, facing right. Dressed pale
+> stone, crisply cut, its upper face carrying one deeply incised numeral
+> filled with white lime. Unweathered, unchipped, freshly set — the earth
+> around its base is still disturbed.
+
+**Vestal Warden** — *mini · Redoubt · Sanctus*
+> A seated armoured humanoid figure half again as tall as a standing person,
+> filling a small arched stone roadside shelter built to hold exactly one
+> occupant, facing right out of the arch. Pale stone plate, plain pale metal,
+> hands resting on its knees. A small brass lamp burns with a steady gold
+> flame in a niche cut beside it. Immobile, filling the opening completely.
+
+**Seraph Judicant** — *mini · Executioner · Sanctus*
+> A tall winged humanoid figure a head and a half above person height, facing
+> directly right, holding an unrolled plain white writ open in both hands at
+> chest height and reading from it without lowering its head. Four narrow
+> straight wings of pale feather held rigid and half-spread, undyed white
+> vestments, a plain smooth face without expression. Poised, already turned
+> toward the viewer's side of the frame.
+
+**The Upkeep** — *mini · Hexer · Sanctus*
+> A person-sized patch of stone roadway that is visibly cleaner and paler
+> than the road on every side of it, with no figure, limbs or head anywhere
+> in it. Scrubbed pale stone against road-grey, its leading edge soft and
+> its trailing edge sharp, one thin wet gleam along the boundary. Advancing
+> low and to the right.
+
+### Bosses
+
+**The Keeper of the Road** — *boss · Juggernaut · Sanctus*
+> A colossal four-storey humanoid shape of pale road-stone, stooped forward
+> at the waist over the causeway the way a mason stoops to their work, facing
+> right. It carries a perfectly straight stone edge as long as the road is
+> wide, held level in both hands. Pale dressed stone throughout, blockish and
+> square-cut, no face and no armour detail. Unhurried, mid-stoop, in motion.
+
+**The Hierophant Eternal** — *boss · Tyrant · Sanctus*
+> A vested humanoid figure four storeys tall standing at the head of a stone
+> causeway, facing right and looking back down the road, hands folded at its
+> waist and entirely still. Heavy undyed white vestments falling straight to
+> the ground, a tall plain pale mitre, one thin band of gold at the hem. The
+> face is smooth and featureless. Upright, static, addressing nothing.
+
+### Arena backdrop
+
+`assets/backgrounds/hallowmarch.png` — *16:9 · Sanctus palette*
+> Wide 16:9 landscape painting of a raised stone causeway climbing a bare
+> sunlit mountain flank, seen side-on at standing eye level, environment only
+> — no creatures, no people, no text. The roadway runs straight across the
+> lower third of the frame on a built-up embankment of pale dressed blocks, a
+> narrow cut water channel glinting along its near edge with a band of
+> yellow goldenrood growing in it. Two pale squared road-markers stand at
+> regular intervals, upright and clean. Behind, the flank rises out of frame
+> to the right in grey-white rock; to the left the slope falls away into pale
+> cloud. Low warm sunlight from the left, long clean shadows, high thin air.
+> **Sanctus palette**: pale road-stone, whitewash, silver-white timber, plain
+> pale metal, one warm gold note in the flowers and the light. Nothing ruined,
+> nothing overgrown, nothing broken — every stone square and recently
+> attended to.
+
+---
+
+## The Buried Sky · Lv 46–50 · Geo + Astral
+
+> ⭐ *The rock remembers a sky that no longer exists.*
+> ⚠️ **Strata, not caves.** Every silhouette here should read against a wall
+> of horizontally banded stone — layer on layer, each band a different colour
+> and a different grain, dark grey through rust-brown through near-black. The
+> light set in the rock is cold, small and **point-like**: pinpricks and
+> scatters of pale blue-white, never a wash and never a beam. Nothing is
+> angry, nothing is haunted, nothing is decorative. It is a record.
+> ⚠️ **Deliberately the opposite of The Glass Archive** — no glass, no lenses,
+> no warmth, nothing transparent.
+
+### Commons
+
+**Stratum Warden** — *common · Sentinel · Geo*
+> A slab standing across the shaft, twice the height of a person and half
+> again as wide, built of five or six stacked horizontal bands of stone —
+> charcoal, rust-brown, pale grey, near-black — each band a different
+> thickness and each meeting the next at a clean flat seam. A scatter of tiny
+> cold blue-white points is set into the upper bands only. No face, no limbs;
+> the topmost band overhangs slightly like a brow. Planted square, immovable,
+> squarely blocking.
+
+**Constellate** — *common · Lasher · Astral*
+> A loose cloud of thirty or forty separate pale blue-white points holding a
+> roughly person-sized ovoid about head height, each point no bigger than a
+> spark and none of them in the same place twice. Faint hairline threads flick
+> between them and vanish. No body, no outline, no shadow — only the shape the
+> density suggests. Hovering, drifting, never resolving into a figure.
+
+**Fadelight** — *common · Glasswing · Astral*
+> A single thin figure the height of a person drawn entirely in one continuous
+> pale white-blue line, like a long exposure of something that walked past —
+> no thickness, no interior, the line fading almost to nothing at the ankles
+> and at the fingertips. Brightest at the centre of the chest, where a single
+> small hard point sits. Upright, drifting, already half gone.
+
+**Corebiter** — *common · Bruiser · Geo*
+> A low blunt quadruped the length of two people and only chest-high, built
+> like a wedge with the broad end forward — matte charcoal-black hide with a
+> fine pebbled grain and a paler grey underside, no eyes, and a wide flat
+> mouth of short blunt grinding teeth set in the front face. Rock dust caked
+> in the folds. Head down, shoulders bunched, mid-push.
+
+**Deadreckoner** — *common · Adept · Geo+Astral*
+> An upright figure a head taller than a person, its body a rough column of
+> banded grey stone and its head a smooth eyeless dome, holding both arms out
+> level in front of it as if sighting along them. A field of small cold
+> blue-white points is set deep inside the chest, visible through the stone
+> like something embedded rather than carried. Standing, weight even, taking a
+> bearing.
+
+### Mini-bosses
+
+**Stonefall Herald** — *mini · Champion · Geo+Astral*
+> A lean figure half again the height of a person, its limbs long slabs of
+> dark banded rock and its shoulders and forearms crusted with a dense scatter
+> of pale points. A narrow wedge-shaped head with no features, tipped back.
+> Loose grit and small stones hang in the air around it, caught falling and
+> not yet landed. Poised forward on the balls of its feet, one arm already
+> raised.
+
+**Bedrock Colossus** — *mini · Redoubt · Geo*
+> A vast squat torso and two tree-thick legs, three times the height of a
+> person and wider than it is tall at the shoulder, cut from one unbroken mass
+> of the darkest, densest stone in the zone — no banding at all, which is the
+> point. No head; the shoulders simply end flat. Fine cracks across the chest
+> show a dull cold light deep inside. Standing, feet apart, absorbing weight.
+
+**Nadir** — *mini · Executioner · Geo*
+> A deep funnel of stone set into the floor, the width of a room at its rim
+> and narrowing to a black point, with the rock around it drawn steeply
+> inward — and, at the centre of the point, one small unblinking cold white
+> light looking straight up. Nothing rises out of it. Sunken, still, and
+> aimed.
+
+**The Long Count** — *mini · Hexer · Astral*
+> A tall vertical slab of pale stone the height of two people and no thicker
+> than a hand, standing free, its whole face covered in dense rows of small
+> incised tally-marks running top to bottom in a notation that is not letters
+> or numerals. The lowest rows are freshly cut and faintly lit cold white; the
+> upper rows are worn almost smooth. A thin crescent of dim silver light rests
+> at the top edge. Upright, narrow, still being added to.
+
+### Bosses
+
+**The Overburden** — *boss · Juggernaut · Geo*
+> An enormous hunched mass filling the bottom of the shaft, four or five times
+> the height of a person, made of the whole column of strata compressed into a
+> single stooped shape — bands of stone visibly stacked and bowed through its
+> back and shoulders, sagging under their own weight. No head, no face; the
+> mass simply thickens where a head would be. A person at its foot reaches the
+> knee. Vast, bowed, pressing downward.
+
+**The Buried Constellation** — *boss · Aspect · Astral*
+> A single complete figure of pale blue-white points and fine connecting lines
+> standing about twice the height of a person, its pattern closed and
+> symmetrical with nothing unfinished at its edges — held inside a thin shell
+> of dark stone that has cracked open around it and fallen away in plates. The
+> points sit slightly *outside* the shell's outline in places, as though the
+> figure does not quite occupy the same space as the rock holding it. Upright,
+> centred, entirely alight.
+
+---
+
+## The Umbral Wastes · Lv 47–51 · Umbra
+
+> ⭐ *The dark here is deliberate. Something decided its shape.* ⚠️ **Not
+> absence — design.** Every silhouette should read as **cut**, not as faded:
+> edges clean enough to be a drawing, interiors that swallow light entirely,
+> and proportions that are a little too exact for anything that grew. The
+> palette is matte near-black against blue-white glacier ice, with one cold
+> indigo note and nothing warm anywhere. ⚠️ Nothing here is tattered, nothing
+> is decayed, and nothing has a body worth skinning — the dark is *neat*.
+> 📝 Deliberately NOT the Old Quarry's silhouette language: there a hole in
+> the world is animate and ragged; here a shape was imposed and held.
+
+### Commons
+
+**Umbral Devourer** — *common · Siphon · Umbra*
+> A person-sized gap in the air shaped like an open mouth turned side-on,
+> matte black and flat, with a clean lipped edge only around the opening and
+> no outline at all anywhere else. No body, no limbs, no eyes. The ice behind
+> it is visible up to the edge and then simply stops. Hanging upright at
+> chest height, opening slightly.
+
+**Edgewalker** — *common · Adept · Umbra*
+> A lean hooded human figure the height of a person in close-cut dark grey
+> travelling clothes, standing with one boot on lit blue-white ice and the
+> other on matte black ground, the dividing line running up the body so that
+> exactly half of it is shadowed. Face in shadow under the hood. Mid-stride,
+> weight forward, arms loose.
+
+**Considered Ice** — *common · Sentinel · Umbra*
+> A standing slab of black ice twice the height of a person and half as wide,
+> every face perfectly flat and every corner square, like a cut block rather
+> than a frozen one. Faint blue-white refraction shows only at the edges;
+> the interior is opaque. No limbs and no face. Planted, motionless.
+
+**Nightspill** — *common · Blighter · Umbra*
+> A low spreading sheet of matte black liquid about ankle deep and as wide as
+> three people lying end to end, running downhill over pale ice with a clean
+> advancing front edge. No head and no limbs, though several thin fingers of
+> it reach further ahead than the rest. Flowing forward, low to the ground.
+
+**Thoughtform** — *common · Glasswing · Umbra*
+> A person-height humanoid outline drawn in a single crisp black line, with
+> the blue-white ice fully visible through the empty interior. No features,
+> no thickness, no shading — only the contour, which is unnaturally precise.
+> Standing upright, arms slightly away from the sides.
+
+### Mini-bosses
+
+**Umbral Knight** — *mini · Champion · Umbra*
+> A suit of full plate armour a head taller than a person, every surface matte
+> black with no highlight anywhere, including the pauldrons and helm where
+> armour is always bright. Long black surcoat, closed visor with a narrow
+> unlit slit. Standing squared, one gauntlet resting on the hilt of a plain
+> dark longsword.
+
+**The Edge** — *mini · Redoubt · Umbra*
+> A vertical wall of pure black as wide as a mountain pass and as tall as
+> four people, perfectly flat, perfectly straight-edged, and visibly only a
+> hair thick when seen from an angle. The lit ice runs right up to its base.
+> No limbs, no face, no texture. Standing on end, entirely still.
+
+**Void Stalker** — *mini · Executioner · Umbra*
+> A lean long-limbed figure half again the height of a person, built of matte
+> black with a clean silhouette and no interior detail: narrow shoulders,
+> very long arms, a small featureless head. Crouched forward on the balls of
+> its feet, one arm reaching low and ahead, mid-stalk.
+
+**Eclipse Weaver** — *mini · Hexer · Umbra*
+> A broad flat spider-like body the size of a cart on many thin black legs,
+> the legs far longer than the body and bent high above it. Trailing behind it
+> is a broad sheet of matte black drawn taut between anchor points on the ice.
+> Moving sideways across a slope, body low, legs high.
+
+### Bosses
+
+**Nightbringer** — *boss · Tyrant · Umbra*
+> A tall robed figure half again the height of a person, the robe matte black
+> and hanging in heavy straight folds with no hem detail, the deep hood
+> entirely empty. One long pale-grey hand extended ahead, palm down, fingers
+> spread. Walking unhurried; the ice immediately in front of the hand is
+> already black.
+
+**What Was Thought About** — *boss · Aspect · Umbra*
+> A mass of pure matte black the size of a house holding one exact shape — a
+> broad-shouldered seated silhouette with a bowed head — every contour clean,
+> symmetrical and obviously chosen, with no surface texture and no light
+> falling on it at any point. A thin cold indigo line traces where its outline
+> meets the ice. Seated, still, facing the viewer.
+
+---
+
+## The Sealed Garden · Lv 49–53 · Flora + Sanctus
+
+> ⭐ *Still perfect, still guarded, still not allowed in.* ⚠️ **Nothing here is
+> ruined and nothing is overgrown** — the beds are kept, the rows are straight,
+> the fruit is on the trees and every guardian is exactly where it was put.
+> The wrongness is that it has been like this with nobody watching for
+> centuries. ⚠️ **The Sanctus naming trap applies to the ART too:** no sun
+> discs, no rays, no gold halos — the consecrated things read as *gates,
+> orchards, vows and wardens*, in pale stone, white-grey lichen and dull
+> silver. Flora reads as deep green, bark-brown, ripe fruit and pale root.
+> Palette throughout: green leaf, warm amber, pale grey stone, bark brown, one
+> clean white note on the consecrated things. ⚠️ **Everything faces right.**
+
+### Commons
+
+**Orchard Warden** — *common · Sentinel · Sanctus*
+> An upright armoured figure of person height in pale weathered grey stone,
+> standing at the foot of a single apple tree with the tree directly behind
+> it. Dark bark has grown up over both its feet and around its lower legs,
+> fixing it in place. Pale grey stone, black bark, one plain white sash across
+> the chest with no device on it. Planted, shoulders square, facing right.
+
+**Windfall** — *common · Siphon · Flora*
+> A single unbruised apple the size of two fists lying on mown grass, far too
+> large for the tree behind it, with a faint upward shimmer of warm air rising
+> from its skin. Deep red flushed to gold, flawless, with a short green stem
+> and one perfect leaf. No limbs and no face. Resting still, the stem angled
+> to the right.
+
+**Whisperling** — *common · Blighter · Flora*
+> A small coiled vine-serpent about the length of a forearm, wound twice
+> around a high branch with its head lowered toward the viewer, mouth slightly
+> open as though mid-sentence. Supple green stem-body with pale leaf-scales
+> along its back and two small amber eyes. Coiled, relaxed, head turned right
+> and tilted attentively.
+
+**Chorister Vine** — *common · Adept · Flora+Sanctus*
+> A thick flowering vine grown into the rough upright shape of a robed singer
+> a head taller than a person, its lower half still rooted into a pale stone
+> cloister column behind it. Deep green leaf, white five-petalled flowers
+> along the shoulders and hood, pale grey column. No face inside the hood.
+> Standing upright, hood turned right, mid-phrase.
+
+**Thornpenitent** — *common · Bruiser · Flora+Sanctus*
+> A massive briar mass in the unmistakable shape of a kneeling person, broader
+> than a person and about as tall kneeling as one is standing, with the briar
+> grown through the posture and holding it. Black thorn-wood, dark green
+> leaves, and a pale grey-green hide stretched over the shoulders and back
+> where the thorns emerge through it from the inside. Kneeling, head bowed,
+> turned right.
+
+### Mini-bosses
+
+**The Last Gardener** — *mini · Champion · Flora+Sanctus*
+> A human figure of ordinary person height in worn canvas working clothes gone
+> the green-brown colour of the beds, standing on a gravel path with a long
+> pruning hook held in both hands across the body. Faded canvas, bare
+> weathered hands and face, bright clean steel on the hook. Standing at ease,
+> weight back, watching to the right.
+
+**Root Matriarch** — *mini · Redoubt · Flora*
+> An enormous ancient apple-stock trunk four times the width of a person and
+> twice a person's height, hollowed and split at the front into a broad
+> vertical opening, with thick roots breaking the turf and running out of
+> frame in every direction. Silver-grey furrowed bark, black heartwood inside
+> the split, pale exposed root. Immovable, opening turned right.
+
+**Cherub of the Turning Blade** — *mini · Executioner · Sanctus*
+> A single straight double-edged sword the length of a person, turning end
+> over end in mid-air above a shut pale stone gate, caught mid-rotation and
+> blurred into a partial disc by its own speed. Clean white steel; the air
+> immediately around the hilt is faintly brighter and faintly denser than the
+> air elsewhere, with nothing else visible holding it. ⚠️ **White light, never
+> fire** — no flame, no embers, no orange anywhere. Mid-turn, edge sweeping
+> toward the right.
+
+**The Kept Vow** — *mini · Hexer · Sanctus*
+> An upright person-shaped volume of still white light standing on the path,
+> person height, its silhouette clearly a figure with its hands together and
+> nothing inside the silhouette at all. Flat even white with soft edges, no
+> features, no seams, no garment. Standing motionless, hands joined, facing
+> right.
+
+### Bosses
+
+**Guardian of the World Tree** — *boss · Juggernaut · Sanctus*
+> A colossal armoured figure four storeys tall in pale grey stone, standing
+> squarely in a stone gateway with an enormous tree filling the frame behind
+> it, its shoulders wider than the gateway's opening. Pale grey stone,
+> black shadow through the gate, deep green canopy above. Blank faceplate, no
+> weapon, both hands open and down. Absolutely still, feet planted, facing
+> right.
+
+**The Serpent in the Branches** — *boss · Tyrant · Flora*
+> An immense green serpent four storeys long draped along and through the
+> upper branches of a fruiting tree, most of its length hidden in leaf, its
+> head lowered on a long curve to viewer height at the right of the frame.
+> Deep green scales with amber banding along the underside, deep green
+> canopy, ripe red fruit hanging beside its head. Relaxed, unhurried, head
+> turned to face right and slightly toward the viewer.
+
+### Arena backdrop
+
+`assets/backgrounds/the_sealed_garden.png` — *16:9 · Flora + Sanctus palette*
+> Wide 16:9 landscape painting seen side-on at standing eye level from
+> **outside** a garden wall, environment only — no creatures, no people, no
+> text. A low pale dressed-stone wall runs straight across the frame at about
+> chest height, low enough to see over and unbroken. Beyond and above it, the
+> tops of orchard trees in full deep-green leaf carrying blossom and ripe
+> fruit **at the same time**, in even maintained rows receding to the left and
+> right. A shut pale stone gate sits just right of centre in the wall, with
+> clean straight mown grass paths visible through its bars. The near ground
+> below the wall is rough unkept meadow and bare dug earth. Soft flat overcast
+> daylight, no visible sun, no rays, no shadows with direction. **Flora +
+> Sanctus palette**: deep green leaf, warm amber and ripe red, pale grey
+> stone, bark brown, one clean white note on the gate's ironwork. Nothing is
+> ruined, nothing is overgrown, nothing is gold or radiant — everything inside
+> is kept and nothing outside is.
+
+---
+
+## The Collapsed Academy · Lv 50–54 · Arcane
+
+> ⭐ *It was not destroyed — it was continued past the point where building
+> makes sense.* ⚠️ **Over-completion, not ruin**, and every silhouette here
+> must say so: nothing is broken, nothing is rubble, nothing is charred.
+> Everything is intact, squared, finished to a high standard, and there is
+> simply too much of it going in a direction that stopped making sense. Where
+> a normal ruin would show a jagged edge, show a clean cut that continues.
+> Palette throughout: pale grey-violet planed timber, chalk white, dressed
+> pale stone, one cold violet note, and the dull bubbled grey-violet of
+> cooled slag. ⚠️ **Nothing here is warm, mossy or weathered** — no ivy, no
+> collapse, no smoke.
+
+### Commons
+
+**Unfinished Scholar** — *common · Adept · Arcane*
+> A person-height human figure in a plain dark reader's gown with a high
+> square collar, standing upright with one arm out at chest height and the
+> palm turned up, as if waiting for a page. No lectern, no book, nothing in
+> the hand. The face is in deep shadow under a flat academic cap; the gown
+> hangs correctly and is entirely undamaged. Squared up, weight even, patient.
+
+**Stairhead** — *common · Bruiser · Arcane*
+> The top four treads and the square landing of a staircase, about twice the
+> height of a person overall, in pale grey-violet planed timber with dressed
+> pale stone risers and a plain squared newel post at one corner. There is no
+> lower flight beneath it — the bottom tread simply ends in clean cut air —
+> and nothing at all at the top of it. Angled forward as if mid-climb, the
+> leading tread slightly raised.
+
+**Chalkwraith** — *common · Skirmisher · Arcane*
+> A loose upright drift of chalk dust roughly the height and width of a
+> person standing at a board, its edges constantly powdering away and
+> re-forming. Dense white at the core, thinning to nothing at the outline,
+> with one arm-shaped extension raised to head height and tapering to a
+> writing point. No face and no feet; the lower third dissolves into a
+> low-hanging haze. Leaning toward the right, poised to mark.
+
+**Marginal Note** — *common · Blighter · Arcane*
+> A narrow vertical column of very small dense handwriting, about a hand's
+> width across and the full height of a person, standing upright in the air
+> with no page, board or wall behind it. Grey-black ink with a faint cold
+> violet cast, packed line on line until the block reads as solid. Perfectly
+> straight, slightly canted forward at the top, edges ruler-clean.
+
+**Emeritus** — *common · Glasswing · Arcane*
+> A very old seated human figure, thin to the point of translucence, in a
+> heavy dark reader's gown far too large for the body inside it, on a plain
+> high-backed wooden chair. Pale grey-violet skin and white hair; the gown's
+> shoulders hold their shape though the frame beneath them does not. Turned
+> three-quarters toward the right, chin lifted, hands flat on the knees.
+
+### Mini-bosses
+
+**The Fourth Item** — *mini · Champion · Arcane*
+> A single horizontal line of writing about the length of a forearm, hanging
+> unsupported at head height, in a formal upright hand. The characters are
+> sharp and confident and belong to no readable alphabet; each one throws a
+> hard shadow onto nothing. Ink black shading to cold violet toward the end
+> of the line, where the letterforms grow slightly larger rather than
+> trailing off. Dead level, facing the viewer.
+
+**Mana Golem** — *mini · Redoubt · Arcane*
+> A broad seated humanoid mass half again the height of a person, built from
+> cooled grey-violet slag in visible poured layers, each flowed over the one
+> beneath and hardened glassy at the lip. Bubbled and porous across the
+> shoulders, smooth and flowed underneath. Blunt head with no features, arms
+> resting on the knees. A dull violet glow sits deep in a seam at the centre
+> of the chest. Planted, squat, immovable.
+
+**Arcane Chimera** — *mini · Executioner · Arcane*
+> A four-limbed animal about the size of a large hound whose parts visibly do
+> not match: three different coats across the body — short grey fur, pale
+> scaled hide, and a dark bristled shoulder — two front legs of different
+> lengths, and a long narrow head belonging to none of them. Every seam
+> between the parts is a clean straight surgical line with fine even
+> stitching. Standing low, weight forward, head turned to the right.
+
+**Spell Weaver** — *mini · Hexer · Arcane*
+> A tall narrow humanoid figure a head above person height, in close dark
+> wrappings, standing at an upright wooden loom taller than itself with both
+> arms raised into the warp. Long thin limbs, elongated fingers, a smooth
+> featureless oval head. Pale grey-violet cloth pours off the loom's base and
+> spreads across the ground past the edge of the frame. Upright, working, in
+> mid-motion.
+
+### Bosses
+
+**The Archmage** — *boss · Tyrant · Arcane*
+> An old human man of ordinary height in the plain undyed grey working robe
+> of a scholar rather than any robe of office — no trim, no chain, no staff.
+> Close-cropped white beard, deeply lined face, both hands open and empty at
+> waist height. A faint cold violet light sits in the air around the fingers
+> of the right hand only. Standing square in the middle of open floor, chin
+> level, entirely at ease.
+
+**The Last Three Items** — *boss · Aspect · Arcane*
+> Three stacked horizontal lines of writing, each about the width of a
+> person's outstretched arms, standing proud of a pale plastered wall far
+> enough to cast three hard shadows down it. The same formal hand as the
+> syllabus above them, in characters that belong to no readable alphabet and
+> grow subtly larger down the stack. Ink black with a cold violet edge-light
+> along the top of every stroke. Level, frontal, filling the frame.
+
+---
+
+## The Reliquary Deep · Lv 52–56 · Sanctus + Umbra
+
+> ⭐⭐ *Two hands worked on this, and the second has not finished.* ⚠️ **The
+> fusion is made-then-unmade, not light-versus-dark.** Everything Sanctus here
+> is finished work — dressed pale stone, gold fittings, folded cream cloth,
+> cut to a plan and cut well. Everything Umbra here is what has been done to
+> it since: smoke stain, prised fittings, missing gold, a residue where a
+> thing stood. ⚠️ **Nothing is ruined and nothing has collapsed** — this is a
+> corridor in excellent repair that is being quietly taken apart. Palette:
+> pale dressed limestone, soft yellow gold, heavy cream linen, and, against
+> them, ceiling-black smoke and a warm red-gold resin note. ⚠️ **It is a
+> lamplit interior throughout** — a bored stone corridor, never open sky,
+> never ice.
+
+### Commons
+
+**Reliquary Keeper** — *common · Adept · Sanctus*
+> A robed humanoid figure of ordinary standing height seen in profile and
+> facing right, in heavy undyed cream vestments with a plain gold band at the
+> collar. Its face is a smooth featureless oval of the same pale limestone as
+> the wall behind it. Standing squared up and steady beside a shallow empty
+> wall niche, one hand raised toward the niche and not touching it.
+
+**Censer-Wraith** — *common · Blighter · Umbra*
+> An upright column of thick standing smoke about the height of a person,
+> wider at the top and drawing down to a thin trailing point at its lower
+> end, where it joins a small pierced gold censer hanging on a chain. Dense
+> soot-black at the core, thinning to a warm brown-grey at its edges, with
+> no face and no limbs. Leaning slowly rightward, still tethered.
+
+**The Unleft** — *common · Glasswing · Umbra*
+> A person-shaped void standing upright in a flat sheet of pale floor dust —
+> the figure is the *clean* stone, sharp-edged, with undisturbed grey dust
+> everywhere around it. Absolutely no interior detail, no colour and no
+> surface: the shape is readable only by its edge. Two thin dust-free planes
+> trail from its shoulders like half-open wings. Upright, facing right.
+
+**Bone-Reliquary** — *common · Bruiser · Sanctus*
+> A gilt wooden casket the length of a tall man, standing on one end and
+> walking on the two stubby carrying-poles projecting from its base, its
+> heavy lid swung fully back on a single hinge. Warm yellow gold over
+> honey-coloured wood, with pale bone visible in neat stacked rows inside the
+> open lid. Heavy, tilted forward, mid-stride to the right.
+
+**Corridor Crawler** — *common · Skirmisher · Sanctus+Umbra*
+> A low segmented creature about the length of two people lying down, running
+> along the join where the wall meets the floor rather than down the middle,
+> with many short legs along both sides. Its upper plates are polished pale
+> limestone and its underside and legs are matte soot-black, the two meeting
+> at a hard line along its flank. Fast, flattened low, head end to the right.
+
+### Mini-bosses
+
+**Antechoir** — *mini · Champion · Sanctus*
+> A freestanding half-circle of carved stone choir stalls about twice the
+> height of a person, curved inward around an empty central space, walking on
+> the stalls' own stone feet with nothing holding the arc together. Pale
+> dressed limestone with gold inlay along every armrest; every seat inside
+> the curve is empty. Advancing, the open side of the curve turned right.
+
+**Reliquary Colossus** — *mini · Redoubt · Sanctus*
+> An enormous rectangular reliquary chest three times the height of a person
+> and wide enough to touch both walls, upright, its every face a panelled
+> door with a gold lock plate and no handle. Pale limestone panels in a heavy
+> gold frame, deeply carved and entirely undamaged. Standing flat and square,
+> filling the corridor, advancing slowly to the right.
+
+**The Second Hand** — *mini · Executioner · Umbra*
+> A single human arm and shoulder at person scale reaching out of a stone
+> wall up to the elbow, the wall closing around it seamlessly with no hole
+> and no seam. The visible skin is grey-white stone and the hand itself is
+> blackened as if smoke-stained, fingers curled and working. The wall to
+> either side of it is stripped bare of its gold in a rough scoured band.
+
+**Warm Middle** — *mini · Hexer · Sanctus+Umbra*
+> No body at all: a stretch of corridor roughly thirty paces long in which
+> the air itself is visibly shimmering with heat, the stone walls glowing a
+> faint dull red from within at the centre of the stretch and fading to
+> ordinary cold pale limestone at both ends. Empty floor, empty air, nothing
+> standing in it. The hot centre sits right of frame centre.
+
+### Bosses
+
+**What Was Consecrated** — *boss · Juggernaut · Sanctus*
+> The far end of the corridor itself advancing as one mass four storeys tall
+> — floor, both walls and ceiling together, moving as a single sealed block
+> with no gap at any edge. Pale dressed limestone banded horizontally in
+> broad soft gold, every surface carved and perfectly intact, with no face,
+> no limbs and no opening anywhere in it. Coming forward, filling the frame.
+
+**What Did Not Leave It Alone** — *boss · Tyrant · Umbra*
+> A standing humanoid figure four storeys tall assembled out of what it has
+> stripped from the corridor: prised gold strips, broken limestone carving
+> and torn cream cloth, all bound together with no visible fastening. The
+> materials are the walls' own, so it is pale and gold, but every piece of it
+> is wrenched, bent or torn at the edges. Upright, head lowered, hands busy
+> at its own chest, facing right.
+
+---
+
+## The Unwritten Library · Lv 54–58 · Umbra + Arcane
+
+> ⭐ *It is still writing, and it wants you in it.* The fusion is **authorship
+> with no author** — Arcane supplies the writing, Umbra supplies the nobody.
+> ⚠️ This zone assigns its element per creature, not "both" by default: the
+> written things are Arcane, the empty and absent things are Umbra, and only
+> the roster's two hybrids are visibly both. Palette throughout: cream and
+> bone-white vellum, dark grey-violet stone, dull black ink, and an
+> **absolute** black — not shadow, not shade, but a black with nothing in it
+> at all — plus one cold violet note where the writing is happening.
+> ⚠️ **Nothing here is ruined, burnt, dusty or cobwebbed.** Everything is
+> clean, intact and in use; the place is working, and the only thing missing
+> from it is anybody.
+
+### Commons
+
+**The Dictating Hand** — *common · Adept · Umbra+Arcane*
+> A bare human forearm and hand floating at head height with nothing above
+> the wrist and nothing behind it, holding a plain dark pen and writing on
+> air. Pale skin, black ink at the nib, a thin trail of cold violet script
+> hanging where the hand has just passed. The cut at the wrist is clean and
+> ends in flat absolute black. Turned three-quarters toward the right edge,
+> mid-stroke, unhurried.
+
+**Blankspine** — *common · Glasswing · Umbra*
+> A single bound book the height of a child, standing upright on its lower
+> edge, covers and spine in undyed cream vellum with no title, no tooling and
+> no mark of any kind. The covers are parted a finger's width and the visible
+> page edges are perfectly clean. The gap between the covers is flat absolute
+> black. Balanced on one corner, tilted forward, facing right.
+
+**Footnote** — *common · Lasher · Arcane*
+> A low flat band of very small dense handwriting travelling along the floor
+> at ankle height, about two people wide and no deeper than a hand, with
+> nothing underneath it holding it up. Dull black ink on nothing, packed
+> tight, the lines running left to right and breaking into fragments at the
+> leading edge. Spilling forward and to the right, never rising.
+
+**Erratum** — *common · Skirmisher · Arcane*
+> A single loose slip of cream paper the size of a hand, upright and edge-on,
+> travelling fast above the floor with its corners sharp and uncurled. One
+> short line of neat cold-violet script across its middle, tidier and
+> brighter than anything around it. Angled hard forward, leading corner
+> first, facing right.
+
+**Ink-Drinker** — *common · Siphon · Umbra*
+> A stooped soft-edged quadruped about the size of a large dog, its body a
+> loose dark mass with no visible legs or face, its head end pressed flat
+> against a row of book spines. Dull wet black throughout, glossier at the
+> head end than the rear. Low to the ground, back arched, side-on and moving
+> toward the right.
+
+### Mini-bosses
+
+**The Index** — *mini · Champion · Arcane*
+> A freestanding wall of small square card-drawers two people high and twice
+> as wide, standing upright with no wall behind it, dozens of its drawers
+> sliding part-way out at different depths. Dark waxed wood, dull brass pulls,
+> cream card stacked tight inside every open drawer. Squared up and facing
+> right, drawers working.
+
+**Colophon** — *mini · Redoubt · Arcane*
+> A squat block of dark grey-violet polished stone the height of a person and
+> as wide as it is tall, standing on the floor of a hall with nothing
+> supporting it. One face is cut smooth and incised with a single small deep
+> mark; the other faces are left rough. Motionless, planted, the cut face
+> turned toward the right edge.
+
+**Redaction** — *mini · Executioner · Umbra*
+> A single hard-edged horizontal bar of absolute black, about as long as a
+> person is tall and no thicker than a finger, floating upright at chest
+> height with perfectly straight parallel edges and squared ends. No interior
+> detail of any kind — flat black with no shading, no texture and no depth.
+> Angled slightly forward, mid-travel, moving right.
+
+**The Amanuensis** — *mini · Hexer · Umbra+Arcane*
+> A seated stooped figure in plain dark clerk's dress, a head and shoulders
+> taller than a person would be standing, hunched over a writing board on its
+> knees with a pen in one hand. Dark grey cloth, pale cream page, cold violet
+> script already covering it. ⚠️ Where the face would be, under the hood of
+> the collar, there is flat absolute black. Writing without looking down,
+> turned toward the right.
+
+### Bosses
+
+**The Record** — *boss · Juggernaut · Arcane*
+> A run of enormous bound volumes standing shoulder to shoulder across the
+> entire width of the frame and rising four storeys, each single volume the
+> size of a door, their spines flush and unbroken. Cream vellum and dark
+> leather bindings, dull black lettering too small to read at this distance,
+> one cold violet line running along the top edge of the run. Upright,
+> immovable, receding toward the right without an end in sight.
+
+**The Author** — *boss · Aspect · Umbra*
+> Not a body — a four-storey vertical column of absolute black filling the gap
+> between two towering shelf ranks, its edges straight where the shelves are
+> and softening to nothing above them. No silhouette, no limbs, no face, no
+> interior detail whatsoever. The only thing visible inside it is a single
+> line of cold violet script writing itself across the black at mid-height,
+> reaching the right-hand edge and starting again lower down. Facing right,
+> motionless, still writing.
+
+### Arena backdrop
+
+`assets/backgrounds/the_unwritten_library.png` — *16:9 · Umbra + Arcane palette*
+> Wide 16:9 landscape painting of a reading hall between two shelf ranks seen
+> side-on at standing eye level, environment only — no creatures, no people,
+> no legible text. A plain dark stone floor runs straight across the bottom
+> third of the frame. To the far left and far right, cropped by the frame, two
+> ranks of cream-and-leather bound shelving rise out of the top of the image
+> with no ceiling and no visible top, every shelf full and every spine
+> unlabelled. Reading tables stand along the near edge with pens laid down
+> and pages half-covered. The centre of the frame is the **gap between the
+> ranks**: absolute black, edge to edge, floor to top, with one cold violet
+> line of script hanging in it at mid-height. Even, sourceless light on the
+> shelving; no lamps, no windows, no shadows cast. **Umbra + Arcane palette**,
+> matching the creatures above: cream vellum, dark leather, grey-violet stone,
+> dull black ink, absolute black, one cold violet note. Nothing ruined,
+> nothing dusty, nothing burnt — everything clean, intact and in use, and
+> nobody in it.
+
+---
+
+## The Eclipsed Citadel · Lv 58–60 · all twelve
+
+> ⭐ *The last thing in the way.* ⚠️ **Not a place — an obstruction.** Every
+> silhouette here should read as something **between** the viewer and something
+> else: a shape that occludes rather than occupies. Nothing is ruined, nothing
+> is monstrous, and nothing is decorative — this is architecture and staff, both
+> still doing the job. Palette: black stone and black iron, cold white edge
+> light, one warm gold note reserved for the corona, and a single element accent
+> per creature. ⚠️ **The zone carries all twelve elements, so the accent is the
+> ONLY thing that says which** — build each creature out of the same black-and-
+> white material and let the accent do the work, or eleven creatures will read
+> as one creature.
+
+### Commons
+
+**The Held Door** — *common · Sentinel · Geo+Flora*
+> A single slab door of dark grey stone the height of two people, standing
+> upright in its own frame with nothing around the frame, seam sealed down the
+> middle. Green root has grown into that seam and through it, thick pale
+> tendrils holding the two halves together rather than prying them apart.
+> Motionless, square, perfectly shut.
+
+**Ashlight** — *common · Blighter · Pyro+Umbra*
+> A waist-high sconce of black iron with a fire burning in its cup, and the
+> fire is ordinary orange flame that casts no light on anything — the stone
+> around it stays black and the air above it carries grey smoke. It leans
+> forward on a single spindly bracket like something craning. Hot, smoking,
+> utterly unlit.
+
+**The Kept Watch** — *common · Bruiser · Sanctus+Solar*
+> A broad armoured figure a head taller than a person, in full dull-white plate
+> gone grey with dust, halberd grounded and both hands on it. Its helm is turned
+> hard over one pauldron to look at you while its body still faces the other
+> way. Planted, square-footed, mid-turn and hating it.
+
+**Nightcurrent** — *common · Lasher · Lunar+Electro*
+> A loose fan of a dozen pale blue-white filaments running down from the ceiling
+> ironwork to the floor, each one thin as wire and each one taut, spread across
+> about the width of a corridor. No body holds them together. Vertical,
+> travelling, arriving all at once.
+
+**The Last Applicant** — *common · Adept · Aqua+Aero+Astral+Arcane*
+> A stooped figure of ordinary human size in a travel-worn hooded robe, pack
+> still on, one hand out flat as if partway through explaining something. Four
+> small mote-lights of different colours orbit slowly at its shoulder. Standing
+> square, patient, facing you directly.
+
+### Mini-bosses
+
+**The Basin** — *mini · Champion · Flora+Aqua+Pyro*
+> A broad-shouldered figure twice the height of a person built out of packed
+> wet earth, river stone and living green, with a slow ember glow deep in the
+> chest cavity. Its arms end in blunt fists of root-bound clay. Upright,
+> forward-leaning, weight already committed.
+
+**The Range** — *mini · Redoubt · Geo+Electro+Aero*
+> A long low wall of stacked dark stone three times the width of a person and
+> twice their height, standing free with no ends — it simply stops. Thin blue
+> arcs crawl between its courses and a constant flat wind pushes off its face.
+> Broadside on, motionless, entirely in the way.
+
+**The Shelf** — *mini · Executioner · Solar+Lunar+Astral*
+> A flat rectangular plane of nothing standing on edge, person-width and twice
+> person-height, its face a cold starless dark and its four edges lit hard white
+> like a blade held up to a window. Nothing occupies its far side. Upright,
+> edge-on, razor-thin from the side.
+
+**The Climb** — *mini · Hexer · Sanctus+Umbra+Arcane*
+> A steep face of black rock filling the frame from bottom to top, with a
+> hunched humanoid shape about the size of a person picked out in it — knees
+> under chin, one arm reaching upward — visible only where the pale gold and
+> violet veining outlines it. Looming, overhead, going on past the top edge.
+
+### Bosses
+
+**Totality** — *boss · Juggernaut · All twelve*
+> An enormous smooth black form four times the height of a person, filling a
+> doorway from jamb to jamb with no gap anywhere around it, its surface flat
+> matte dark that takes no highlight at all. A thin, hard, continuous ring of
+> white light stands off its whole outline. Dead centre, motionless, total.
+
+**Procarius, the Eclipsed** — *boss · Tyrant · Arcane+Umbra+Lunar+Electro+Pyro*
+> A tall, spare man in dark layered robes with violet trim, hood down, hands
+> loose at his sides, standing alone with nothing behind him but black. A narrow
+> band of shadow crosses his eyes at exactly the height a crown would sit.
+> Upright, still, waiting without any impatience at all.
+
+---
+
+## ✅ Written — all 286 creatures
+
+Every creature in the game has a description here. The **Primal quarter (55)**,
+the **Kinetic quarter (66)**, the **Celestial quarter (77)** and the
+**Ethereal quarter plus The Eclipsed Citadel (88)** are all written, and
+`Bestiary.all` is 286 — `test/creature_art_test.dart` compares the two sets in
+both directions, so a creature added, renamed or cut without a description
+here fails immediately.
+
+📝 **This file is the single source again.** The Celestial/Ethereal wave staged
+its fifteen zone blocks in `docs/art/bestiary/<zone_id>.md`, because fifteen
+worktrees editing one shared document is fifteen conflicts. Those files were
+folded in above and deleted on 2026-09-22, and the test no longer reads that
+directory. ⚠️ A future wave may stage the same way — but the staging directory
+is temporary by construction, and leaving it in place is how a description
+ends up in two places that disagree.
+
+| Quarter | Zones | Creatures | Descriptions | Backdrop briefs |
+|---|---|---|---|---|
+| **Primal** 1–14 | 5 | 55 | ✅ | ✅ 5 |
+| Kinetic 15–29 | 6 | 66 | ✅ | ✅ 6 |
+| Celestial 30–47 | 7 | 77 | ✅ | 📝 1 of 7 (The Glass Archive) |
+| Ethereal 45–58 | 7 | 77 | ✅ | 📝 3 of 7 (Hallowmarch, The Sealed Garden, The Unwritten Library) |
+| The Eclipsed Citadel 58–60 | 1 | 11 | ✅ | ⬜ |
+
+⚠️ **Backdrops are the half that is still short.** Eleven of the fifteen new
+zones have no `### Arena backdrop` entry yet, so their arena background files
+have nothing to be generated from. `test/creature_art_test.dart` only requires
+a brief for the zones listed in its `_primalZones`, which is exactly the set
+whose asset directories are declared in pubspec — so the gap is real but
+silent, and it is tracked in IMPLEMENTATION_PLAN's zone matrices and pinned by
+name in `tool/test_artgen.py`'s `ZONES_WITH_BACKDROP`.
+
+📝 **No PNG exists for any of the fifteen new zones**, and none is expected
+yet: `assets/creatures/<zone>/` is declared in pubspec only for the eleven
+zones in `_primalZones`, and the art pipeline runs a quarter at a time. Every
+creature in the new quarters draws the elemental silhouette until its sprite
+lands.
+
+⭐ **The Primal quarter is still the one that matters first** — it is the
+player's first impression, and Whispering Woods' eleven sprites are the only
+creature art that has shipped anywhere in the game.

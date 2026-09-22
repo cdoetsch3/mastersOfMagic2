@@ -22,7 +22,7 @@ border colour.
 `tool/artgen.py` parses it on every run — an entry is `**Name** — *rarity ·
 kind · stats*` followed by its `` `assets/items/<zone>/<id>.png` `` filename
 line and one blockquote, each zone states a wrapped `**Palette:**` line, and
-the shared preamble below is quoted verbatim into all 61 icon prompts. Reword
+the shared preamble below is quoted verbatim into all 265 icon prompts. Reword
 the prose freely; change those shapes and the tool silently finds fewer icons,
 which `test/item_icon_test.dart` and `tool/test_artgen.py` both fail on.
 
@@ -85,8 +85,10 @@ Rarity is a **light** convention here, never a border and never a colour wash:
   feature, the rest of the object lit by it.
 - **Epic** — emissive *and* doing something. An Epic object is never at rest.
 
-⚠️ Nothing in the Primal quarter is Mythic or Legendary, so those two rungs of
-§8's ladder have no convention yet — that is a decision waiting, not an omission.
+⚠️ Nothing in the game is Mythic or Legendary — not in the Primal quarter and
+not at level 60, where the Citadel's best pieces are still Epic. Those two
+rungs of §8's ladder have no convention yet, and after four quarters that is a
+decision waiting, not an omission.
 
 ### Palette
 
@@ -777,10 +779,6 @@ silver-grey, bronze warm gold-brown.
 
 ---
 
-## ⚠️ Still to describe — the other three quarters (minus Old Quarry)
-
-The **Primal quarter (52 items)** and **Old Quarry (9 items)** are written,
-matching BESTIARY_ART's coverage exactly.
 ## Windward Steppe · Lv 19–24 · Aero · **15 items**
 
 > ⭐ *One direction, forever.* Everything here is shaped by having stopped
@@ -935,10 +933,6 @@ Q1's shape — only the boots and gloves carry the new stats.
 
 ---
 
-## ⚠️ Still to describe — the other three quarters
-
-The **Primal quarter (52 items)** and **Windward Steppe (15)**, the first
-Kinetic zone, are written; both match BESTIARY_ART's coverage exactly.
 ## Stormcliff Coast · Lv 17–22 · Electro · **13 items**
 
 > ⭐ *Everything here has been charged in passing, not struck.* ⚠️ Nothing in
@@ -1281,51 +1275,1278 @@ crit damage · Lv 29*
 
 ---
 
-## ⚠️ Still to describe — the rest of Kinetic and two more quarters
+## The Kiln Desert · Lv 30–34 · Solar · **13 items**
 
-The **Primal quarter (52 items)** and **Stormcliff Coast (13 items)** are
-written.
-The **Primal quarter (52 items)** and **Frostfell Pass (6 items)**, the
-quarter's first hybrid zone, are written.
-The **Primal quarter (52 items)** and **Thunderspire Peaks (9 items)** are
-written.
-The **Primal quarter (52 items)** and **The Molten Deep (6 items)**, a hybrid
-zone, are written. 🚧 Landed alongside Frostfell Pass and Thunderspire Peaks
-in parallel worktrees — this paragraph and the table row below are this
-builder's own count and will need the merge coordinator's reconciliation
-against the other two.
+> ⭐ *Burning and freezing at once.* ⚠️ **A contradiction, not a heat.**
+> Every object here is sun-bleached and salt-crusted in the same breath,
+> hard-edged, and dry all the way through. Nothing is soft, nothing is
+> damp, and there is no cloth in this zone at all — so leather, fibre and
+> weave are simply absent from the set.
 
-| Quarter | Zones | Items | Status |
-|---|---|---|---|
-| **Primal** 1–14 | 5 | 52 | ✅ described |
-| Kinetic 15–29 | 6 | 58 (target) | 1/6 zones described (Old Quarry, 9) |
-| Kinetic 15–29 | 6 | 15+❓ | 🔶 Windward Steppe described, 5 zones left |
-| Kinetic 15–29 | 6 | 58 | 🚧 1/6 zones — Stormcliff Coast (13) described |
-| Kinetic 15–29 | 6 | 58 | 🚧 4/6 zones (37) — Old Quarry, Windward Steppe, Stormcliff Coast, Frostfell Pass |
-| Kinetic 15–29 | 6 | 58 | 🚧 1/6 zones — Thunderspire Peaks (9) described |
-| Kinetic 15–29 | 6 | 58 | 🚧 The Molten Deep (6) described, 2 hybrids left |
-| Celestial 30–47 | 7 | ❓ | ⬜ no catalogue yet |
-| Ethereal 45–60 | 7 | ❓ | ⬜ no catalogue yet |
+**Palette:** bleached bone white, salt crust, dried blood-grey ironwood,
+pale gold for the Solar motes, one hard white shadow-edge on the epic.
 
-⭐ **The Primal quarter is the one that matters first** — it is the only content
-built, and it is the player's first impression. ⚠️ Unlike the bestiary, the
-later quarters (beyond Windward Steppe) have **no catalogue at all** yet, so
-there is nothing to describe rather than a described-later backlog: ITEMS
-§9b.8 covers Q1 only.
-later quarters beyond Kinetic have **no catalogue at all** yet, so there is
-nothing to describe rather than a described-later backlog: ITEMS §9b.8 covers
-Q1 only, KINETIC_CONTRACT §4 covers Q2.
+### Materials
+
+**Ironwood Log** — *common · material · Woodcarving t5*
+`assets/items/the_kiln_desert/ironwood_log.png`
+> A single short, squat log the length of a forearm, bark the colour of
+> dried blood-grey and split away at one end to show pale dense heartwood
+> with a near-invisible grain; one cut face is polished smooth by sand.
+
+**Glasswort** — *common · material · Potions & Alchemy t5*
+`assets/items/the_kiln_desert/glasswort.png`
+> A hand-sized sprig of jointed, leafless succulent stems, translucent pale
+> green shading to a salt-crusted red at the tips, laid flat with a scatter
+> of white salt grains around its base.
+
+**Solar Essence** — *rare · material · Enchanting t6 · **bound** ·
+kill-only*
+`assets/items/the_kiln_desert/solar_essence.png`
+> A closed sphere of pale-gold light the size of a plum held inside a cage
+> of three thin dark-iron bands; Rare, so the gold is a real light source
+> and the iron is lit by it.
+
+### Motes
+
+**Solar Dust** — *common · mote · dust · Solar*
+`assets/items/the_kiln_desert/solar_dust.png`
+> A small loose heap of glittering pale-gold powder, the size of a coin
+> pile, unlit and matte with one warm highlight.
+
+**Solar Shard** — *common · mote · shard · Solar*
+`assets/items/the_kiln_desert/solar_shard.png`
+> Three angular slivers of pale-gold translucent stone the size of a
+> thumbnail, fanned so one lies edge-on.
+
+**Solar Crystal** — *uncommon · mote · crystal · Solar*
+`assets/items/the_kiln_desert/solar_crystal.png`
+> A single clear six-sided crystal a thumb long, colourless at the base and
+> warming to pale gold at the tip, with one clean note of unlit gold — no
+> glow spilling off it.
+
+### Consumables
+
+**Pilgrim's Ration** — *common · consumable · restores 110 health*
+`assets/items/the_kiln_desert/pilgrims_ration.png`
+> A cloth-wrapped brick of pale pressed meal the size of a fist, twine-tied,
+> one corner unwrapped to show the dry crumbling interior.
+
+**Glasswort Draught** — *common · beltable · restores 125 health*
+`assets/items/the_kiln_desert/glasswort_draught.png`
+> A squat stoppered glass bottle the height of a hand, full of cloudy
+> pale-green liquid, its cork sealed under a wrap of salt-stiffened cloth.
+
+### Equipment
+
+**Ironwood Quarterstaff** — *common · main hand · +5 dmg/charge, +9
+accuracy, 4% crit, +10 crit damage · Lv 30 · 1 socket*
+`assets/items/the_kiln_desert/ironwood_quarterstaff.png`
+> A two-handed staff as tall as a person, dark red-grey ironwood with a
+> thick weighted butt and a dull bronze ferrule at each end; one small empty
+> round socket sits in the grip, obviously unfilled.
+
+**Ironwood Wand** — *common · main hand · +6 dmg/cast, +4 accuracy, 5% crit,
++8 crit damage · Lv 30 · 1 socket*
+`assets/items/the_kiln_desert/ironwood_wand.png`
+> A tapering one-handed wand the length of a forearm, dark ironwood polished
+> to a low sheen with a fine hairline of ember-red inlay along the taper;
+> one small empty socket at the base.
+
+**Ironwood Knot** — *common · off hand · +5 accuracy, 3% crit · Lv 30 · 1
+socket*
+`assets/items/the_kiln_desert/ironwood_knot.png`
+> A fist-sized dark burl of ironwood, worn glass-smooth by handling, with
+> one dead-flat filed facet across its face and a single empty socket in the
+> middle of it.
+
+**The Shadeless Band** — *rare · ring · +6 accuracy, +18 max HP · Lv 32*
+`assets/items/the_kiln_desert/the_shadeless_band.png`
+> A plain heavy ring of pale sand-fused glass standing upright, its outer
+> face rough and frosted, its inner face mirror-bright; Rare, so one thin
+> line of hard gold light traces the polished inside and lights the rough
+> outside from within.
+
+**The Hardest Edge** — *epic · main hand · +7 dmg/charge, +11 accuracy, 8%
+crit, +18 crit damage · Lv 34 · 1 socket*
+`assets/items/the_kiln_desert/the_hardest_edge.png`
+> A two-handed ironwood staff, near-black, with one side of its entire
+> length cut dead flat and razor-straight while the other stays round; Epic,
+> so a blade of hard white light runs along the flat face and *moves* — the
+> edge is a shadow's edge and it is sweeping slowly as though the sun were
+> going down.
+
+---
+
+## The Mirrormere · Lv 32–37 · Lunar · **16 items**
+
+> ⭐ *The reflection is bigger than the thing, and it is looking back.*
+> ⚠️ Near-monochrome throughout, and **flat or slightly too smooth** —
+> surfaces that should have depth and do not. Bloodwood's red is the only
+> warm note in the whole zone, and it belongs to the wood, not to light.
+
+**Palette:** silver, bone-white, lake-grey, deep-water dark, one
+bloodwood red; pale cold silver for the Lunar motes.
+
+### Materials
+
+**Bloodwood Log** — *common · material · Woodcarving t6*
+`assets/items/the_mirrormere/bloodwood_log.png`
+> A short split log the length of a forearm, grey weathered bark outside and
+> a deep wine-red heartwood face inside with darker rings; the red face is
+> turned toward the viewer and is matte, not wet.
+
+**Mirrorflax** — *common · material · Tailoring t5*
+`assets/items/the_mirrormere/mirrorflax.png`
+> A tied hank of long pale fibre the size of a forearm, silver-grey and
+> faintly iridescent, with one strand catching a cold white highlight along
+> its whole length.
+
+**Lunar Essence** — *rare · material · Enchanting t6 · **bound** ·
+kill-only*
+`assets/items/the_mirrormere/lunar_essence.png`
+> A sphere of pale silver light the size of a plum inside three thin dark
+> bands; Rare, so the silver lights the bands from inside.
+
+### Motes
+
+**Lunar Dust** — *common · mote · dust · Lunar*
+`assets/items/the_mirrormere/lunar_dust.png`
+> A small heap of fine silver-white powder, matte, with a single cool
+> highlight.
+
+**Lunar Shard** — *common · mote · shard · Lunar*
+`assets/items/the_mirrormere/lunar_shard.png`
+> Three flat slivers of silvered translucent stone, thumbnail-sized, one of
+> them face-on and faintly mirroring.
+
+**Lunar Crystal** — *uncommon · mote · crystal · Lunar*
+`assets/items/the_mirrormere/lunar_crystal.png`
+> A single clear six-sided crystal a thumb long, colourless at the base and
+> cooling to pale silver-blue at the tip, one unlit cold note.
+
+### Equipment
+
+**Bloodwood Quarterstaff** — *common · main hand · +6 dmg/charge, +10
+accuracy, 5% crit, +12 crit damage · Lv 35 · 1 socket*
+`assets/items/the_mirrormere/bloodwood_quarterstaff.png`
+> A two-handed staff as tall as a person, deep wine-red wood with near-black
+> figuring, a weighted butt and plain steel ferrules; one empty round socket
+> in the grip.
+
+**Bloodwood Wand** — *common · main hand · +7 dmg/cast, +4 accuracy, 6%
+crit, +10 crit damage · Lv 35 · 1 socket*
+`assets/items/the_mirrormere/bloodwood_wand.png`
+> A short tapering one-handed wand, deep red and polished, with a darker
+> spiral of grain running its length; one empty socket at the base.
+
+**Bloodwood Knot** — *common · off hand · +6 accuracy, 4% crit · Lv 35 · 1
+socket*
+`assets/items/the_mirrormere/bloodwood_knot.png`
+> A fist-sized dark-red burl worn smooth, one flat filed facet, a single
+> empty socket.
+
+**Mirrorflax Hood** — *common · hat · +5 accuracy · Lv 34*
+`assets/items/the_mirrormere/mirrorflax_hood.png`
+> A soft silver-grey hood laid flat, its brim stiffened into a perfectly
+> straight horizontal edge, doubled seams visible at the shoulders.
+
+**Mirrorflax Robe** — *common · robe top · +23 max HP · Lv 34*
+`assets/items/the_mirrormere/mirrorflax_robe.png`
+> A long silver-grey robe on an invisible form, thick and visibly layered
+> with doubled seams down both sides, the weave legible up close.
+
+**Mirrorflax Leggings** — *common · robe bottom · +16 max HP · Lv 34*
+`assets/items/the_mirrormere/mirrorflax_leggings.png`
+> Silver-grey quilted leggings laid flat, the quilting lines running in
+> visible parallel channels.
+
+**Mirrorflax Boots** — *common · boots · +5 max HP, +4 dodge · Lv 34*
+`assets/items/the_mirrormere/mirrorflax_boots.png`
+> A pair of low silver-grey boots with thick soft soles, one lifted slightly
+> as though mid-step and barely touching its own shadow.
+
+**Mirrorflax Gloves** — *common · gloves · +5 max HP, 10% deflect, 20%
+amount · Lv 34*
+`assets/items/the_mirrormere/mirrorflax_gloves.png`
+> A pair of silver-grey gloves, palms outward, the palm panels visibly
+> doubled and quilted; one faint cool grey-white line traces each palm.
+
+**The Waning Charm** — *rare · ring · +16 max HP, +9 dodge · Lv 35*
+`assets/items/the_mirrormere/the_waning_charm.png`
+> A slim silver band standing upright, thinning smoothly from a broad arc at
+> the top to almost nothing at the bottom so the circle looks incomplete;
+> Rare, so a thread of pale blue light lifts very slightly off the thin end
+> and does not quite touch it.
+
+**The Larger Reflection** — *epic · robe top · +40 max HP, +6 dodge · Lv 37*
+`assets/items/the_mirrormere/the_larger_reflection.png`
+> A long silver-grey mantle on an invisible form, the cloth reading
+> correctly at the shoulders but subtly *too big* at the hem; Epic, so the
+> hem is moving — a slow ripple travelling outward as though something below
+> were wearing the other half.
+
+---
+
+## Starfall Basin · Lv 34–39 · Astral · **9 items**
+
+> ⭐ *Everything here arrived, and the ground is the record of it.* ⚠️ The
+> objects are **impact debris and what was quarried out of it** — nothing
+> here grew and nothing here was placed. Cold, pitted, and darker than the
+> ground it came out of.
+
+**Palette:** blue-black, indigo, pitted sky-iron grey, pale ground-white,
+and hard white points for the Astral motes.
+
+### Materials
+
+**Sky-Iron Ore** — *common · material · Metalworking t5*
+`assets/items/starfall_basin/skyiron_ore.png`
+> A fist-sized lump of dark pitted metal-bearing rock, its surface scabbed
+> with a thin black fusion crust and broken open on one face to show bright
+> grey metal flecked through the stone.
+
+**Fallstone** — *uncommon · material · Enchanting t5*
+`assets/items/starfall_basin/fallstone.png`
+> A smooth ovoid stone the size of an egg, matte black-grey, with a faint
+> indigo sheen across one curve and a shallow dimple where it struck;
+> Uncommon, so the indigo is one clean unlit note.
+
+**Skysteel Ingot** — *common · material · Metalworking t5*
+`assets/items/starfall_basin/skysteel_ingot.png`
+> A single small rectangular ingot the length of a hand, cool blue-grey with
+> a faint watered figure across its top face and one bevelled corner; matte,
+> no glow.
+
+**Astral Essence** — *rare · material · Enchanting t6 · **bound** ·
+kill-only*
+`assets/items/starfall_basin/astral_essence.png`
+> A sphere of deep indigo light the size of a plum caged in three thin bands
+> of sky-iron; Rare, so the indigo is a real light source.
+
+### Motes
+
+**Astral Dust** — *common · mote · dust · Astral*
+`assets/items/starfall_basin/astral_dust.png`
+> A small heap of blue-black powder shot with points of white, loosely
+> spread rather than piled.
+
+**Astral Shard** — *common · mote · shard · Astral*
+`assets/items/starfall_basin/astral_shard.png`
+> Three angular slivers of deep indigo translucent stone with white flecks
+> inside, thumbnail-sized, fanned.
+
+**Astral Crystal** — *uncommon · mote · crystal · Astral*
+`assets/items/starfall_basin/astral_crystal.png`
+> A clear six-sided crystal a thumb long, deep indigo at the base clearing
+> to colourless, with a scatter of white points suspended inside it.
+
+### Equipment
+
+**Zodiac Pendant** — *rare · neck · 10% crit, +12 crit damage · Lv 37*
+`assets/items/starfall_basin/zodiac_pendant.png`
+> A flat disc of dark sky-iron the size of a coin on a fine chain, its rim
+> punched with small marks; Rare, so a single point of hot white light sits
+> at the top of the rim and lights the rest of the disc.
+
+**The Aimed Sky** — *epic · neck · +9 dmg/cast, 10% crit, +18 crit damage ·
+Lv 39*
+`assets/items/starfall_basin/the_aimed_sky.png`
+> A heavy dark sky-iron pendant, a flat disc with a single fine line scored
+> across it from edge to edge; Epic, so a bead of hard white light travels
+> slowly along that line, arrives at the rim, and starts again.
+
+---
+
+## Tidewrack Shoals · Lv 36–40 · Lunar + Aqua · **11 items**
+
+> ⭐ *The water goes out further than seems survivable and comes back
+> faster.* ⚠️ Everything here has been **left behind by a tide**, so every
+> object reads as wet-then-dried: salt bloom, water marks, weed still
+> clinging. The Lunar half is cold and pale; the Aqua half is dark and
+> heavy.
+
+**Palette:** wrack-brown, wet slate, pale shell nacre, cold moon-silver,
+one green-black note of deep water.
+
+### Materials
+
+**Wrackcotton** — *common · material · Tailoring t6*
+`assets/items/tidewrack_shoals/wrackcotton.png`
+> A tied bundle of pale fibrous strands the size of a forearm, sea-grey
+> fading to bleached white, with a fine dusting of dried salt and one dark
+> strand of weed still caught in it.
+
+**Nacre** — *uncommon · material · Jewelry t6*
+`assets/items/tidewrack_shoals/nacre.png`
+> A single curved plate of mother-of-pearl the size of a palm, resting
+> concave-up, pale cream with soft bands of pink and green iridescence
+> across its inner face; Uncommon, so the iridescence is one clean note,
+> unlit.
+
+**Drownling Hide** — *common · material · Tailoring t6*
+`assets/items/tidewrack_shoals/drownling_hide.png`
+> A folded hide the size of a lap blanket, slate-grey and faintly
+> translucent at the thin edges, with a fine pebbled grain; matte, no shine.
+
+### Equipment
+
+**Wrackcotton Hood** — *common · hat · +5 accuracy · Lv 39*
+`assets/items/tidewrack_shoals/wrackcotton_hood.png`
+> A pale grey hood laid flat, brim stiffened dead straight, the weave
+> visibly coarse and doubled at the crown.
+
+**Wrackcotton Robe** — *common · robe top · +32 max HP · Lv 39*
+`assets/items/tidewrack_shoals/wrackcotton_robe.png`
+> A long pale sea-grey robe on an invisible form, thick and unmistakably
+> layered, doubled seams down both sides and at the hem.
+
+**Wrackcotton Leggings** — *common · robe bottom · +22 max HP · Lv 39*
+`assets/items/tidewrack_shoals/wrackcotton_leggings.png`
+> Pale grey leggings laid flat, quilted in visible channels down to the knee
+> and smooth from there.
+
+**Wrackcotton Boots** — *common · boots · +6 max HP, +5 dodge · Lv 39*
+`assets/items/tidewrack_shoals/wrackcotton_boots.png`
+> A pair of tall pale-grey boots with soft soles and long rear laces, one
+> caught mid-step and barely touching its shadow.
+
+**Wrackcotton Gloves** — *common · gloves · +7 max HP, 14% deflect, 24%
+amount · Lv 39*
+`assets/items/tidewrack_shoals/wrackcotton_gloves.png`
+> Pale grey gloves, palms outward, palm panels visibly tripled; a cool
+> grey-white line traces each palm.
+
+**Drownling Belt** — *common · belt · +5 belt slots · Lv 38*
+`assets/items/tidewrack_shoals/drownling_belt.png`
+> A wide slate-grey hide belt laid in a loose open curve with a plain dark
+> shell buckle and **five empty loops** stitched along it, each wide enough
+> for a bottle and visibly holding nothing.
+
+**The Turning Tide** — *rare · neck · +6 dodge, +12% shield strength · Lv
+38*
+`assets/items/tidewrack_shoals/the_turning_tide.png`
+> A broad teardrop of mother-of-pearl on a plain cord, standing upright;
+> Rare, so one soft cool light runs around the shell's outer rim and lights
+> the iridescence from the edge inward.
+
+**Lowwater Tread** — *epic · boots · +24 max HP, +7 dodge, +10% shield
+strength · Lv 40*
+`assets/items/tidewrack_shoals/lowwater_tread.png`
+> A pair of tall grey drownling-hide boots, soles worn to nothing at the
+> toe, standing in a shallow wet footprint; Epic, so the footprint is
+> *filling* — a thin sheet of water creeping in around them and never quite
+> reaching the sole.
+
+---
+
+## The Sunless Reach · Lv 38–42 · Solar + Lunar · **9 items**
+
+> ⭐ *Identical ground, opposite worlds, one line between them.* ⚠️ **The
+> fusion is a boundary, not a blend** — no dusk, no gradient, no soft
+> falloff anywhere. An object is hard-lit or wholly unlit, and the few that
+> are both carry a straight visible edge across them.
+
+**Palette:** hard yellow-white glare, flat lightless black, pale cold
+moon-grey as the only third value, ebony near-black for the wood.
+
+### Materials
+
+**Ebony Log** — *common · material · Woodcarving t7*
+`assets/items/the_sunless_reach/ebony_log.png`
+> A short split log the length of a forearm, near-black throughout with a
+> fine straight grain, one end cut and polished to a dull sheen, the bark
+> dark grey and papery.
+
+**Duskcap** — *common · material · Potions & Alchemy t6*
+`assets/items/the_sunless_reach/duskcap.png`
+> A single mushroom the size of a fist, cap half bleached bone-white and
+> half deep slate-grey with a hard straight division between the two, on a
+> pale stem.
+
+**Eclipse Opal** — *uncommon · material · Jewelry t7*
+`assets/items/the_sunless_reach/eclipse_opal.png`
+> An oval polished stone the size of a thumb, one half milk-white with soft
+> fire, the other half matte black, split by a clean straight edge;
+> Uncommon, so the fire is one unlit note.
+
+### Consumables
+
+**Duskcap Tonic** — *common · beltable · 34 health a turn for 3 turns*
+`assets/items/the_sunless_reach/duskcap_tonic.png`
+> A tall narrow stoppered bottle the height of a hand holding a layered
+> liquid — pale grey above, near-black below — with a soft rounded shoulder
+> and a wax-sealed cork.
+
+### Equipment
+
+**Ebony Quarterstaff** — *common · main hand · +7 dmg/charge, +11 accuracy,
+6% crit, +14 crit damage · Lv 40 · 1 socket*
+`assets/items/the_sunless_reach/ebony_quarterstaff.png`
+> A two-handed near-black staff as tall as a person, polished to a
+> stone-like sheen, with plain dark steel ferrules and a thick weighted
+> butt; one empty round socket in the grip.
+
+**Ebony Wand** — *common · main hand · +8 dmg/cast, +5 accuracy, 7% crit,
++12 crit damage · Lv 40 · 1 socket*
+`assets/items/the_sunless_reach/ebony_wand.png`
+> A short tapering one-handed wand of near-black polished wood, its
+> silhouette very clean against the white ground; one empty socket at the
+> base.
+
+**Ebony Knot** — *common · off hand · +6 accuracy, 5% crit · Lv 40 · 1
+socket*
+`assets/items/the_sunless_reach/ebony_knot.png`
+> A fist-sized near-black burl, glass-smooth, with one flat filed facet
+> showing raw pale-grey end grain; a single empty socket.
+
+**Crestline Ring** — *rare · ring · +5 accuracy, +20 max HP, +5 dodge · Lv
+40*
+`assets/items/the_sunless_reach/crestline_ring.png`
+> A ring standing upright, one half of the band polished bright and the
+> other half matte black, meeting at two hard seams; Rare, so a thin warm
+> light traces the bright half and a thread of cool blue lifts just off the
+> dark half.
+
+**The Dividing Line** — *epic · main hand · +12 dmg/cast, +6 accuracy, 10%
+crit, +20 crit damage · Lv 42 · 1 socket*
+`assets/items/the_sunless_reach/the_dividing_line.png`
+> A slim black ebony wand held vertically; Epic, so one side of its entire
+> length is lit hard white and the other is in total shadow, with no falloff
+> between them — and the lit side is slowly *changing sides*.
+
+---
+
+## The Shattered Orrery · Lv 40–44 · Astral + Electro · **7 items**
+
+> ⭐ *Rings the size of bridges, half of them fallen, and the fallen half
+> still turning.* ⚠️ Every object is **a part off a machine that has not
+> stopped** — cut, fitted, numbered, and now loose. Nothing is organic and
+> nothing is decorative.
+
+**Palette:** tarnished brass, blue-black iron, cold indigo, and a live
+white-blue arc note where the Electro half shows.
+
+### Materials
+
+**Orrery Scrap** — *common · material · Metalworking t7*
+`assets/items/the_shattered_orrery/orrery_scrap.png`
+> A single broken gear tooth of dull yellow-brown brass the length of a
+> hand, sheared at the root with a bright ragged break face, the rest
+> tarnished and scored with fine wear lines.
+
+**Arcsalt** — *common · material · Potions & Alchemy t7*
+`assets/items/the_shattered_orrery/arcsalt.png`
+> A broken slab of white crystalline crust the size of a palm, thin and
+> plate-like, its underside stained a faint violet-black where it lifted off
+> the metal.
+
+**Sidereal Glass** — *uncommon · material · Jewelry t7*
+`assets/items/the_shattered_orrery/sidereal_glass.png`
+> A thick round lens of pale blue-green glass the size of a palm, one edge
+> chipped, lying at a slight angle so its curve catches a hard highlight;
+> Uncommon, so that highlight is the only colour note.
+
+**Starbrass Ingot** — *common · material · Metalworking t7*
+`assets/items/the_shattered_orrery/starbrass_ingot.png`
+> A small rectangular ingot the length of a hand, warm yellow-brown brass
+> with a faint blue tarnish bloom at one end and a bevelled corner; matte.
+
+### Consumables
+
+**Arcsalt Draught** — *common · beltable · restores 185 health*
+`assets/items/the_shattered_orrery/arcsalt_draught.png`
+> A heavy squat bottle of thick blue-green glass, half the height of a hand,
+> with a brass collar and stopper and a clear colourless liquid inside in
+> which a few white crystals are still settling.
+
+### Equipment
+
+**Sidereal Signet** — *rare · ring · +4 accuracy, 10% crit · Lv 42*
+`assets/items/the_shattered_orrery/sidereal_signet.png`
+> A broad flat-faced brass signet ring standing upright, its face cut with
+> fine incised marks arranged in a ring; Rare, so one of the marks is a
+> point of hot white light and the others are lit by it.
+
+**The Running Count** — *epic · gloves · +10 dmg/cast, +5 accuracy, 8% crit
+· Lv 44*
+`assets/items/the_shattered_orrery/the_running_count.png`
+> A pair of brass-plated gauntlets, palms outward, with a row of small
+> toothed wheels set along the back of each hand; Epic, so the wheels are
+> *turning* — slowly, unevenly, and never stopping.
+
+---
+
+## The Glass Archive · Lv 43–47 · Solar + Arcane · **11 items**
+
+> ⭐ *They wrote it in light, and light does not keep.* ⚠️ The light here
+> is **white and flat, never golden** — no sunset anywhere in the set.
+> Nothing is ruined either: everything is intact, well made, and simply
+> unreadable.
+
+**Palette:** colourless plate glass, brass, bone-white vellum, hard white
+glare, one cool violet note for the Arcane half.
+
+### Materials
+
+**Sunbleach Lichen** — *common · material · Potions & Alchemy t8*
+`assets/items/the_glass_archive/sunbleach_lichen.png`
+> A flat scab of lichen the size of a hand, bone-white at the centre fading
+> to pale ochre at its crinkled edge, peeled whole off pale stone, dry and
+> faintly crystalline.
+
+**Aetherglass** — *uncommon · material · Jewelry t8*
+`assets/items/the_glass_archive/aetherglass.png`
+> A thin square plate of colourless glass the size of a palm, one corner
+> broken, standing on edge; Uncommon, so a single faint violet note runs
+> along one internal flaw and nothing else is lit.
+
+**Palimpsest Vellum** — *common · material · Tailoring t7*
+`assets/items/the_glass_archive/palimpsest_vellum.png`
+> A single sheet of pale cream vellum the size of a book, lying flat with
+> its edges curling, its surface scraped visibly thin in patches where older
+> grey script shows faintly through the newer.
+
+### Motes
+
+**Arcane Dust** — *common · mote · dust · Arcane*
+`assets/items/the_glass_archive/arcane_dust.png`
+> A small heap of fine violet-grey powder, matte, with one cool highlight.
+
+**Arcane Shard** — *common · mote · shard · Arcane*
+`assets/items/the_glass_archive/arcane_shard.png`
+> Three angular slivers of translucent violet stone, thumbnail-sized, fanned
+> with one edge-on.
+
+**Arcane Crystal** — *uncommon · mote · crystal · Arcane*
+`assets/items/the_glass_archive/arcane_crystal.png`
+> A clear six-sided crystal a thumb long, colourless at the base deepening
+> to violet at the tip, one clean unlit violet note.
+
+### Consumables
+
+**Sunbleach Tonic** — *common · beltable · 42 health a turn for 3 turns*
+`assets/items/the_glass_archive/sunbleach_tonic.png`
+> A tall narrow stoppered bottle the height of a hand holding a cloudy
+> bone-white liquid, its shoulder soft and rounded, a strip of written
+> vellum tied to its neck as a label with the writing faded out.
+
+### Equipment
+
+**Palimpsest Belt** — *common · belt · +6 belt slots · Lv 45*
+`assets/items/the_glass_archive/palimpsest_belt.png`
+> A wide pale-cream vellum belt laid in a loose open curve with a plain
+> brass buckle and **six empty loops** stitched along it, faint grey script
+> visible running beneath the stitches.
+
+**The Last Reading** — *rare · neck · +5 accuracy, +20 crit damage, +30 max
+HP · Lv 45*
+`assets/items/the_glass_archive/the_last_reading.png`
+> A flat rectangular locket of pale glass on a fine chain, standing upright,
+> a folded scrap of vellum visible inside it; Rare, so one hard white point
+> of light sits at the locket's edge and throws a legible-looking line of
+> shadow-writing across the glass.
+
+**The Noon Hour** — *epic · hat · +20 crit damage, +55 max HP, 12% deflect,
+14% amount · Lv 47*
+`assets/items/the_glass_archive/the_noon_hour.png`
+> A broad circlet of pale archive glass, worn as a band, its front panel a
+> flat lens; Epic, so a band of hard white light crosses the lens and
+> *travels* — sweeping from one side to the other over several seconds,
+> leaving a faint after-image of writing behind it that fades before it can
+> be read.
+
+### The gate
+
+**Celestial Totem** — *rare · key · opens the road above Rimeholt*
+`assets/items/the_glass_archive/celestial_totem.png`
+> A hand-length rod of dark sky-iron with three small caged spheres set
+> along it — gold, silver and indigo — and a fourth empty seat at the top;
+> Rare, so all three spheres are real light sources and the iron between
+> them is lit by all three at once.
+
+---
+
+## Hallowmarch · Lv 45–49 · Sanctus · **13 items**
+
+> ⭐ *Someone is still doing the upkeep, and nobody has seen them.*
+> ⚠️ **Nothing here is ruined, mossy or overgrown.** Every object is
+> maintained, square, and recently attended to — that intactness is the
+> whole idea, and an artist's instinct toward picturesque decay must be
+> resisted. ⚠️ The Sanctus naming trap applies to the icons too: no sun
+> discs, no rays, no haloes.
+
+**Palette:** pale dressed road-stone, silver-white spiritwood, whitewash,
+plain pale metal, and one warm gold note — lamplight and goldenrood.
+
+### Materials
+
+**Spiritwood Log** — *common · material · Woodcarving t8*
+`assets/items/hallowmarch/spiritwood_log.png`
+> A short pale log the length of a forearm, bark silver-white and smooth,
+> split at one end to show near-white heartwood with a faint gold figure
+> running through it.
+
+**Goldenrood** — *common · material · Potions & Alchemy t8*
+`assets/items/hallowmarch/goldenrood.png`
+> A cut stem the length of a forearm topped with a dense plume of small gold
+> flowers, a few pale leaves along the stalk, laid flat with the cut end
+> wet.
+
+### Motes
+
+**Sanctus Dust** — *common · mote · dust · Sanctus*
+`assets/items/hallowmarch/sanctus_dust.png`
+> A small heap of fine warm-white powder with a faint gold cast, matte, one
+> soft highlight.
+
+**Sanctus Shard** — *common · mote · shard · Sanctus*
+`assets/items/hallowmarch/sanctus_shard.png`
+> Three flat slivers of translucent warm-white stone, thumbnail-sized,
+> fanned, one edge-on.
+
+**Sanctus Crystal** — *uncommon · mote · crystal · Sanctus*
+`assets/items/hallowmarch/sanctus_crystal.png`
+> A clear six-sided crystal a thumb long, colourless at the base warming to
+> pale gold at the tip, one clean unlit warm note.
+
+### Consumables
+
+**Climber's Ration** — *common · consumable · restores 195 health*
+`assets/items/hallowmarch/climbers_ration.png`
+> An oilcloth-wrapped bundle the size of two fists tied with cord, one fold
+> open to show a wedge of pale hard cheese and a dark dried strip.
+
+**Goldenrood Draught** — *common · beltable · restores 225 health*
+`assets/items/hallowmarch/goldenrood_draught.png`
+> A round-shouldered stoppered bottle the height of a hand full of clear
+> gold liquid, a band of pale stamped tin around its neck.
+
+### Equipment
+
+**Spiritwood Quarterstaff** — *common · main hand · +8 dmg/charge, +12
+accuracy, 7% crit, +16 crit damage · Lv 45 · 2 sockets*
+`assets/items/hallowmarch/spiritwood_quarterstaff.png`
+> A two-handed pale staff as tall as a person, silver-white wood with gold
+> figuring, a weighted butt and plain pale-metal ferrules; **two** small
+> empty round sockets set in the grip, clearly unfilled.
+
+**Spiritwood Wand** — *common · main hand · +9 dmg/cast, +5 accuracy, 8%
+crit, +14 crit damage · Lv 45 · 2 sockets*
+`assets/items/hallowmarch/spiritwood_wand.png`
+> A tapering one-handed pale wand the length of a forearm with a fine gold
+> vein down the taper; two empty sockets at the base.
+
+**Spiritwood Knot** — *common · off hand · +7 accuracy, 6% crit · Lv 45 · 2
+sockets*
+`assets/items/hallowmarch/spiritwood_knot.png`
+> A fist-sized silver-white burl, worn smooth, one flat filed facet, **two**
+> empty sockets side by side in the facet.
+
+**Votive Pendant** — *rare · neck · +18% shield strength, +12% healing
+received · Lv 47*
+`assets/items/hallowmarch/votive_pendant.png`
+> A small flat teardrop of pale spiritwood on a plain cord, standing
+> upright, its face carved with a single smooth channel; Rare, so a soft
+> warm light sits in the channel and lights the whole pendant from that one
+> line.
+
+**The Maintained Road** — *epic · neck · +45 max HP, +20% shield strength,
++15% healing received · Lv 49*
+`assets/items/hallowmarch/the_maintained_road.png`
+> A broad flat icon of pale wood and pale metal worn at the throat on a
+> short cord, its face a smooth unbroken bar like a length of road; Epic, so
+> a soft gold light travels slowly along that bar from one end to the other
+> and begins again without pause.
+
+### The gate
+
+**The Kept Third** — *rare · key · opens The Eclipsed Citadel*
+`assets/items/hallowmarch/the_kept_third.png`
+> A wedge-shaped plate of pale gold-veined wood the size of a palm, two
+> edges cut dead straight and one broken, a single small green shoot growing
+> from the broken edge; Rare, so a soft warm light comes from the joint
+> where the shoot meets the wood.
+
+---
+
+## The Buried Sky · Lv 46–50 · Geo + Astral · **9 items**
+
+> ⭐ *The rock remembers a sky that no longer exists.* ⚠️ **Strata, not
+> caves** — every object reads as banded, layered or counted. The light set
+> in the stone is cold, small and **point-like**: pinpricks, never a wash
+> and never a beam.
+
+**Palette:** charcoal, rust-brown, pale grey and near-black in horizontal
+bands, with cold blue-white points for the Astral half.
+
+### Materials
+
+**Deepstratum Ore** — *common · material · Metalworking t8*
+`assets/items/the_buried_sky/deepstratum_ore.png`
+> A fist-sized block of banded dark rock, near-black with two fine paler
+> grey strata running through it, one face freshly broken to show a dull
+> blue-grey metallic sheen.
+
+**Nadir Garnet** — *uncommon · material · Jewelry t8*
+`assets/items/the_buried_sky/nadir_garnet.png`
+> A deep red-black faceted stone the size of a thumb resting on one face,
+> with a scatter of tiny pale points suspended inside it; Uncommon, so the
+> red is one unlit note.
+
+**Corebiter Hide** — *common · material · Tailoring t8*
+`assets/items/the_buried_sky/corebiter_hide.png`
+> A folded hide the size of a lap blanket, matte charcoal-black with a fine
+> pebbled grain and a paler grey underside showing at the fold.
+
+**Deepsteel Ingot** — *common · material · Metalworking t8*
+`assets/items/the_buried_sky/deepsteel_ingot.png`
+> A rectangular ingot the length of a hand, dark blue-grey with a faint
+> banded figure across its top face echoing the strata, one bevelled corner;
+> matte.
+
+### Equipment
+
+**Corebiter Belt** — *common · belt · +7 belt slots · Lv 48*
+`assets/items/the_buried_sky/corebiter_belt.png`
+> A wide charcoal-black hide belt laid in a loose open curve with a plain
+> dark-steel buckle and **seven empty loops** stitched along it, each wide
+> enough for a bottle and visibly holding nothing.
+
+**Everice Band** — *common · ring · +15 max HP, +3 dodge, +12% shield
+strength · Lv 45*
+`assets/items/the_buried_sky/everice_band.png`
+> A plain ring standing upright, a clear colourless ice-like stone set flush
+> into a dark band, with one hairline milky vein through the stone; no glow
+> — it is Common, an honest working object.
+
+**Nacre Pendant** — *common · neck · +25 max HP, +6 dodge, +8% shield
+strength · Lv 46*
+`assets/items/the_buried_sky/nacre_pendant.png`
+> An oval plate of mother-of-pearl the size of a thumb set in a dark
+> obsidian backing on a fine chain, its soft pink-green iridescence unlit.
+
+**Stonefall Signet** — *rare · ring · 6% crit, +22 max HP, 18% deflect · Lv
+48*
+`assets/items/the_buried_sky/stonefall_signet.png`
+> A heavy dark ring with a broad flat garnet face, standing upright, the
+> face entirely uncut and polished flat; Rare, so a single hard red point of
+> light sits at the face's edge and throws the rest into relief.
+
+**Bedrock Greaves** — *epic · robe bottom · +45 max HP, 10% deflect, 10%
+amount · Lv 50*
+`assets/items/the_buried_sky/bedrock_greaves.png`
+> A pair of dark blue-grey plated greaves standing upright, layered in
+> overlapping banded plates like strata; Epic, so a slow cool grey-white
+> pulse travels up through the plates from the ankle and stops at the knee,
+> over and over.
+
+---
+
+## The Umbral Wastes · Lv 47–51 · Umbra · **13 items**
+
+> ⭐ *The dark here is deliberate. Something decided its shape.* ⚠️ Every
+> silhouette should read as **cut**, not as faded — edges clean enough to
+> be a drawing, interiors that swallow light entirely. Nothing is tattered
+> and nothing is decayed; the dark is *neat*.
+
+**Palette:** matte near-black against blue-white glacier ice, one cold
+indigo note, and nothing warm anywhere.
+
+### Materials
+
+**Umbralweave** — *common · material · Tailoring t8*
+`assets/items/the_umbral_wastes/umbralweave.png`
+> A folded length of near-black cloth the size of a forearm, matte and
+> swallowing light, its edges fraying into fine dark threads with one faint
+> cold blue sheen along a single fold.
+
+**Thoughtglass** — *uncommon · material · Jewelry t8*
+`assets/items/the_umbral_wastes/thoughtglass.png`
+> A faceted block of near-black translucent glass the size of a thumb, its
+> facets unnaturally regular, with a faint indigo depth at the centre;
+> Uncommon, so the indigo is one unlit note.
+
+### Motes
+
+**Umbra Dust** — *common · mote · dust · Umbra*
+`assets/items/the_umbral_wastes/umbra_dust.png`
+> A small heap of matte black powder that reads as a *shape* rather than a
+> pile, with one cold edge highlight.
+
+**Umbra Shard** — *common · mote · shard · Umbra*
+`assets/items/the_umbral_wastes/umbra_shard.png`
+> Three angular slivers of near-black translucent stone, thumbnail- sized,
+> fanned; one catches a cold blue edge.
+
+**Umbra Crystal** — *uncommon · mote · crystal · Umbra*
+`assets/items/the_umbral_wastes/umbra_crystal.png`
+> A clear six-sided crystal a thumb long, colourless at the base darkening
+> to near-black at the tip, one unlit cold indigo note.
+
+### Equipment
+
+**Umbralweave Hood** — *common · hat · +6 accuracy · Lv 48*
+`assets/items/the_umbral_wastes/umbralweave_hood.png`
+> A near-black hood laid flat, brim stiffened into a dead-level horizontal
+> edge, doubled seams visible at the shoulders.
+
+**Umbralweave Robe** — *common · robe top · +42 max HP · Lv 48*
+`assets/items/the_umbral_wastes/umbralweave_robe.png`
+> A long near-black robe on an invisible form, thick and visibly layered
+> with doubled seams, the weave legible only where the light catches an
+> edge.
+
+**Umbralweave Leggings** — *common · robe bottom · +29 max HP · Lv 48*
+`assets/items/the_umbral_wastes/umbralweave_leggings.png`
+> Near-black quilted leggings laid flat, the quilting channels catching a
+> faint cold rim light.
+
+**Umbralweave Boots** — *common · boots · +8 max HP, +6 dodge · Lv 48*
+`assets/items/the_umbral_wastes/umbralweave_boots.png`
+> A pair of tall matte-black boots with thick soft soles, one lifted as
+> though mid-step and casting almost no contact shadow.
+
+**Umbralweave Gloves** — *common · gloves · +9 max HP, 16% deflect, 22%
+amount · Lv 48*
+`assets/items/the_umbral_wastes/umbralweave_gloves.png`
+> Near-black gloves, palms outward, panels visibly tripled; a cool
+> grey-white line traces each palm.
+
+**The Considered Ring** — *rare · ring · 8% crit, +34 crit damage · Lv 49*
+`assets/items/the_umbral_wastes/the_considered_ring.png`
+> A plain black band standing upright, its inner and outer surfaces both
+> perfectly smooth and its proportions faintly, unsettlingly exact; Rare, so
+> a single hot violet point sits on the band and lights the whole ring from
+> that one place.
+
+**The Deliberate Dark** — *epic · ring · 6% crit, +28 crit damage, +20 max
+HP · Lv 51*
+`assets/items/the_umbral_wastes/the_deliberate_dark.png`
+> A heavy black ring with a deep faceted thoughtglass stone; Epic, so the
+> stone is emissive and *working* — a slow violet glow gathering at its
+> centre, reaching the facets, and going out, again and again.
+
+### The gate
+
+**The Dark Third** — *rare · key · opens The Eclipsed Citadel*
+`assets/items/the_umbral_wastes/the_dark_third.png`
+> A wedge-shaped plate of dark banded stone the size of a palm, two of its
+> edges cut dead straight and one broken, with a scatter of pale points
+> across its face; Rare, so those points are a real cold light and the stone
+> is lit by them.
+
+---
+
+## The Sealed Garden · Lv 49–53 · Flora + Sanctus · **9 items**
+
+> ⭐ *Still perfect, still guarded, still not allowed in.* ⚠️ Nothing here
+> is ruined and nothing is overgrown — the beds are kept, the rows are
+> straight and the fruit is on the trees. ⚠️ Sanctus reads as **gates,
+> orchards and vows**, in pale stone and dull silver; never as sun discs or
+> haloes.
+
+**Palette:** green leaf, warm amber, pale grey stone, bark brown, one
+clean white note on the consecrated things.
+
+### Materials
+
+**Worldroot** — *common · material · Potions & Alchemy t9*
+`assets/items/the_sealed_garden/worldroot.png`
+> A thick pale root the length of a forearm, knuckled and forked, with fine
+> gold hair-roots along it and a clean pale cut at one end still beaded with
+> sap.
+
+**Orchard Amber** — *uncommon · material · Jewelry t9*
+`assets/items/the_sealed_garden/orchard_amber.png`
+> A smooth lump of warm gold amber the size of a thumb with a single small
+> green leaf suspended whole inside it; Uncommon, so the gold is one clean
+> unlit note.
+
+**Thornpenitent Hide** — *common · material · Tailoring t9*
+`assets/items/the_sealed_garden/thornpenitent_hide.png`
+> A folded hide the size of a lap blanket, pale grey-green, with fine dark
+> thorns emerging through its surface from the inside at regular intervals.
+
+### Consumables
+
+**Worldroot Tonic** — *common · beltable · 53 health a turn for 3 turns*
+`assets/items/the_sealed_garden/worldroot_tonic.png`
+> A round-bellied stoppered bottle the height of a hand holding a thick
+> green-gold liquid in three faintly visible settled layers, a length of
+> pale root tied to its neck.
+
+### Equipment
+
+**Thornpenitent Belt** — *common · belt · +8 belt slots · Lv 52*
+`assets/items/the_sealed_garden/penitent_belt.png`
+> A wide pale grey-green hide belt laid in a loose open curve with a dark
+> thorn-wood buckle and **eight empty loops** stitched along it, with fine
+> dark thorn points just visible along the inner face.
+
+**Eclipse Opal Signet** — *common · ring · +3 accuracy, 6% crit, +10 crit
+damage, +3 dodge · Lv 50*
+`assets/items/the_sealed_garden/eclipse_signet.png`
+> A broad flat-faced ring standing upright, its face a single eclipse opal
+> cut so the light and dark halves meet exactly at the centre line of the
+> face; Common, so nothing is emissive — the stone's own halves do the work.
+
+**Orchard Amber Loop** — *common · ring · +25 max HP, +15% healing received,
++1% regrow per turn · Lv 54*
+`assets/items/the_sealed_garden/orchard_loop.png`
+> A plain pale-gold band standing upright with a round amber cabochon set
+> flush, the leaf inside it clearly visible; no glow.
+
+**The Gardener's Loop** — *rare · ring · +25 max HP, +18% healing received,
++2% regrow per turn · Lv 51*
+`assets/items/the_sealed_garden/the_gardeners_loop.png`
+> A worn gold band with a large amber stone, standing upright, a fine green
+> tendril grown around the band and into the setting; Rare, so a soft warm
+> light comes from inside the amber and lights the tendril.
+
+**The Season At Once** — *epic · robe top · +60 max HP, +15% healing
+received, +3% regrow per turn · Lv 53*
+`assets/items/the_sealed_garden/the_season_at_once.png`
+> A long vestment on an invisible form, its cloth carrying bud, leaf,
+> blossom and fruit at the same time in embroidered bands down its length;
+> Epic, so it is visibly *turning* — one band budding as the band beside it
+> drops its fruit, endlessly, never settling on a season.
+
+---
+
+## The Collapsed Academy · Lv 50–54 · Arcane · **9 items**
+
+> ⭐ *It was not destroyed — it was continued past the point where building
+> makes sense.* ⚠️ **Over-completion, not ruin.** Nothing is broken,
+> nothing is rubble, nothing is charred; everything is squared and finished
+> to a high standard, and there is simply too much of it. Where a ruin
+> would show a jagged edge, show a clean cut that continues.
+
+**Palette:** pale grey-violet planed timber, chalk white, dressed pale
+stone, one cold violet note, and the dull bubbled grey of cooled slag.
+
+### Materials
+
+**Aetherwood Log** — *common · material · Woodcarving t9*
+`assets/items/the_collapsed_academy/aetherwood_log.png`
+> A short squared beam the length of a forearm rather than a round log, pale
+> grey-violet, its four sides planed dead flat and its end grain showing
+> rings that do not quite close.
+
+**Mana Slag** — *common · material · Metalworking t9*
+`assets/items/the_collapsed_academy/mana_slag.png`
+> A fist-sized lump of frozen glassy slag, dull grey-violet, bubbled and
+> porous on top and flowed smooth underneath where it pooled.
+
+**Aethersteel Ingot** — *common · material · Metalworking t9*
+`assets/items/the_collapsed_academy/aethersteel_ingot.png`
+> A rectangular ingot the length of a hand, pale grey with a violet sheen
+> across its top face and one bevelled corner; matte.
+
+### Equipment
+
+**Aetherwood Quarterstaff** — *common · main hand · +9 dmg/charge, +12
+accuracy, 8% crit, +18 crit damage · Lv 50 · 3 sockets*
+`assets/items/the_collapsed_academy/aetherwood_quarterstaff.png`
+> A two-handed staff as tall as a person, pale grey-violet, the shaft
+> squared rather than round for its middle third, with pale metal ferrules
+> and a weighted butt; **three** empty round sockets in a row along the
+> grip.
+
+**Aetherwood Wand** — *common · main hand · +10 dmg/cast, +5 accuracy, 9%
+crit, +16 crit damage · Lv 50 · 3 sockets*
+`assets/items/the_collapsed_academy/aetherwood_wand.png`
+> A one-handed pale grey-violet wand the length of a forearm, squared in
+> section, ending in a flat cut rather than a point; three empty sockets
+> along its base.
+
+**Aetherwood Knot** — *common · off hand · +7 accuracy, 7% crit · Lv 50 · 3
+sockets*
+`assets/items/the_collapsed_academy/aetherwood_knot.png`
+> A fist-sized pale grey-violet burl, its whorls unnaturally regular, one
+> flat filed facet holding **three** empty sockets.
+
+**Chalkline Signet** — *rare · ring · 8% crit, 18% deflect, 8% amount · Lv
+52*
+`assets/items/the_collapsed_academy/chalkline_signet.png`
+> A heavy pale-grey ring with a broad flat face, standing upright, its face
+> incised with three short parallel lines and a fourth that is only
+> half-cut; Rare, so a cold violet light sits in the unfinished line and
+> lights the three finished ones.
+
+**The Unbuilt Stair** — *epic · main hand · +10 dmg/charge, +13 accuracy, 8%
+crit, +16 crit damage · Lv 54 · 3 sockets*
+`assets/items/the_collapsed_academy/the_unbuilt_stair.png`
+> A two-handed pale grey-violet staff whose upper third steps upward in
+> three squared offsets like a flight of stairs; Epic, so a band of cold
+> violet light climbs those steps one at a time and, at the top step, simply
+> keeps going into nothing before starting again at the bottom.
+
+### The gate
+
+**The Written Third** — *rare · key · opens The Eclipsed Citadel*
+`assets/items/the_collapsed_academy/the_written_third.png`
+> A wedge-shaped plate of pale stone banded with gold the size of a palm,
+> two edges cut dead straight and one broken; Rare, so a warm light comes
+> from the *centre* of the plate rather than an edge, and fades outward.
+
+---
+
+## The Reliquary Deep · Lv 52–56 · Sanctus + Umbra · **12 items**
+
+> ⭐⭐ *Two hands worked on this, and the second has not finished.*
+> ⚠️ **Made-then-unmade, not light-versus-dark.** The Sanctus objects are
+> finished work — dressed stone, gold fittings, folded cream cloth. The
+> Umbra objects are what has been done to them since: smoke stain, prised
+> fittings, missing gold, a residue where a thing stood. ⚠️ Lamplit
+> interior throughout, never open sky and never ice.
+
+**Palette:** pale dressed limestone, soft yellow gold, heavy cream linen,
+ceiling-black smoke, one warm red-gold resin note.
+
+### Materials
+
+**Censer Resin** — *common · material · Potions & Alchemy t9*
+`assets/items/the_reliquary_deep/censer_resin.png`
+> A broken lump of translucent red-gold resin the size of a thumb, glossy
+> where it fractured and dull grey with old smoke where it did not.
+
+**Reliquary Gold** — *uncommon · material · Jewelry t9*
+`assets/items/the_reliquary_deep/reliquary_gold.png`
+> A small twisted length of soft yellow gold the size of a finger, clearly
+> prised off a fitting, with a stamped pattern still legible along one
+> flattened side; Uncommon, so the gold is one unlit note.
+
+**Unleft Linen** — *common · material · Tailoring t9*
+`assets/items/the_reliquary_deep/unleft_linen.png`
+> A folded square of heavy cream linen the size of two hands, its creases
+> sharp from long folding, one edge worked with a plain dark band.
+
+### Consumables
+
+**Censer Draught** — *common · beltable · restores 295 health*
+`assets/items/the_reliquary_deep/censer_draught.png`
+> A squat round-shouldered bottle the height of a hand holding a thick
+> red-gold liquid, a band of soft stamped gold around its neck and a wax
+> seal over the stopper.
+
+### Equipment
+
+**Unleft Linen Hood** — *common · hat · +6 accuracy · Lv 53*
+`assets/items/the_reliquary_deep/unleft_hood.png`
+> A heavy cream hood laid flat, brim stiffened dead straight, a plain dark
+> band worked along the edge, doubled seams at the shoulders.
+
+**Unleft Linen Robe** — *common · robe top · +55 max HP · Lv 53*
+`assets/items/the_reliquary_deep/unleft_robe.png`
+> A long heavy cream robe on an invisible form, thick and visibly layered,
+> doubled seams down both sides, a dark band at the hem.
+
+**Unleft Linen Leggings** — *common · robe bottom · +38 max HP · Lv 53*
+`assets/items/the_reliquary_deep/unleft_leggings.png`
+> Cream quilted leggings laid flat, the quilting channels running in visible
+> parallel lines with a dark band at each ankle.
+
+**Unleft Linen Boots** — *common · boots · +10 max HP, +7 dodge · Lv 53*
+`assets/items/the_reliquary_deep/unleft_boots.png`
+> A pair of tall cream boots with thick soft soles and dark banding, one
+> lifted as though mid-step and barely touching its shadow.
+
+**Unleft Linen Gloves** — *common · gloves · +12 max HP, 18% deflect, 26%
+amount · Lv 53*
+`assets/items/the_reliquary_deep/unleft_gloves.png`
+> Heavy cream gloves, palms outward, the palm panels visibly built up in
+> four layers; a cool grey-white line traces each palm.
+
+**Aetherglass Locket** — *common · neck · +45 max HP, +12% shield strength,
++10% healing received · Lv 53*
+`assets/items/the_reliquary_deep/aetherglass_locket.png`
+> A flat rectangular locket of pale archive glass in a soft gold bezel on a
+> fine chain, standing upright, a faint suggestion of writing in the glass;
+> Common, so nothing is emissive.
+
+**Censer Pendant** — *rare · neck · +20 crit damage, +15% shield strength,
++15% healing received · Lv 54*
+`assets/items/the_reliquary_deep/censer_pendant.png`
+> A small gold censer worn as a pendant on a short chain, one half of its
+> pierced body bright and finely worked and the other half blackened and
+> crudely reworked; Rare, so a warm light comes from inside the bright half
+> and throws the reworked half into shadow.
+
+**The Unconsecrated** — *epic · boots · +32 max HP, +6 dodge, +10% healing
+received · Lv 56*
+`assets/items/the_reliquary_deep/the_unconsecrated.png`
+> A pair of tall boots of gold-banded dark leather, soles worn through at
+> the ball of the foot, standing on bare stone; Epic, so a warm gold light
+> runs up the banding from the sole and *stops* at the ankle every time,
+> never reaching the top.
+
+---
+
+## The Unwritten Library · Lv 54–58 · Umbra + Arcane · **7 items**
+
+> ⭐ *It is still writing, and it wants you in it.* ⚠️ **Nothing here is
+> ruined, burnt, dusty or cobwebbed** — everything is clean, intact and in
+> use, and the only thing missing from it is anybody. The Umbra black is an
+> **absolute** black: not shadow, not shade, a black with nothing in it.
+
+**Palette:** cream and bone-white vellum, dark grey-violet stone, dull
+black ink, absolute black, one cold violet note where the writing happens.
+
+### Materials
+
+**Nightink** — *common · material · Potions & Alchemy t10*
+`assets/items/the_unwritten_library/nightink.png`
+> A small stoppered pot of dense black liquid the size of a fist, the liquid
+> sitting proud of the rim in a meniscus that should have spilled, with one
+> cold blue sheen across its surface.
+
+**Colophon Stone** — *uncommon · material · Jewelry t10*
+`assets/items/the_unwritten_library/colophon_stone.png`
+> A flat polished tablet of dark grey-violet stone the size of a thumb, one
+> face incised with a single small mark; Uncommon, so the mark holds one
+> clean unlit violet note.
+
+**Blankspine Vellum** — *common · material · Tailoring t10*
+`assets/items/the_unwritten_library/blankspine_vellum.png`
+> A single sheet of flawless pale vellum the size of a book, lying flat and
+> perfectly clean with a hard straight edge, its corners uncurled.
+
+### Consumables
+
+**Nightink Draught** — *common · beltable · restores 320 health*
+`assets/items/the_unwritten_library/nightink_draught.png`
+> A tall narrow bottle of dark glass the height of a hand holding an opaque
+> black liquid, a pale vellum label tied at the neck with nothing written on
+> it.
+
+### Equipment
+
+**Blankspine Belt** — *common · belt · +9 belt slots · Lv 56*
+`assets/items/the_unwritten_library/blankspine_belt.png`
+> A wide pale-cream vellum belt laid in a loose open curve with a plain dark
+> buckle and **nine empty loops** stitched along it, the vellum entirely
+> unmarked.
+
+**Colophon Signet** — *rare · ring · +3 accuracy, 12% crit, +30 crit damage
+· Lv 56*
+`assets/items/the_unwritten_library/colophon_signet.png`
+> A heavy dark ring with a flat stone face, standing upright, the face cut
+> with one small deep mark; Rare, so a hot violet point burns in that mark
+> and lights the whole face.
+
+**The Open Colophon** — *epic · off hand · +12 dmg/cast, +9 accuracy, 8%
+crit · Lv 58*
+`assets/items/the_unwritten_library/the_open_colophon.png`
+> A thick codex bound in pale vellum, the size of two hands, held open in
+> mid-air at its final page; Epic, so a line of cold violet script is
+> *writing itself* across that page, one character at a time, reaching the
+> margin and continuing on the next line without ever filling it.
+
+---
+
+## The Eclipsed Citadel · Lv 58–60 · all twelve · **7 items**
+
+> ⭐ *The last thing in the way.* ⚠️ **Not a place — an obstruction.** Every
+> object reads as something **between** the viewer and something else: a
+> shape that occludes rather than occupies. Nothing is ruined and nothing is
+> decorative; this is the endgame set and it is still doing its job.
+
+**Palette:** black stone and black iron, cold white edge light, and one
+warm gold note reserved for the corona.
+
+### Materials
+
+**Eclipse Iron** — *uncommon · material · Jewelry t10*
+`assets/items/the_eclipsed_citadel/eclipse_iron.png`
+> A fist-sized block of dense black metal with one broken face, so matte it
+> reads as a silhouette, with a single hairline of cold white along the
+> break; Uncommon, so that hairline is the only note.
+
+**Corona Pearl** — *uncommon · material · Jewelry t10*
+`assets/items/the_eclipsed_citadel/corona_pearl.png`
+> A large pale pearl the size of a plum resting on a flat face, its surface
+> a soft cream-white with a faint ring of warm gold iridescence around its
+> widest circumference; Uncommon, so that ring is one unlit note.
+
+### Equipment
+
+**Corona Pearl Torc** — *common · neck · +3 accuracy, 5% crit, +45 max HP ·
+Lv 58*
+`assets/items/the_eclipsed_citadel/corona_torc.png`
+> An open circular neck torc of dark metal with a pale pearl finial at each
+> of its two open ends, standing upright; Common, so nothing is emissive —
+> the pearls carry their own soft colour.
+
+**Eclipse Iron Ring** — *common · ring · +7 dmg/cast, 6% crit, +12 crit
+damage · Lv 60*
+`assets/items/the_eclipsed_citadel/eclipse_ring.png`
+> A plain heavy band of matte black eclipse iron standing upright, utterly
+> unornamented, its silhouette perfectly circular and its surface giving
+> back no light at all except a single thin rim highlight.
+
+**The Eclipsed Band** — *rare · ring · 8% crit, +60 max HP, +6 dodge · Lv
+58*
+`assets/items/the_eclipsed_citadel/the_eclipsed_band.png`
+> A broad black band standing upright with a narrow slot cut clean through
+> its front, so the ring is a circle with a gap in its face; Rare, so a hard
+> white light shows *through* that slot from behind and lights nothing else.
+
+**The Last Thing in the Way** — *epic · gloves · +14 dmg/cast, +6 accuracy,
+10% crit, +10 crit damage · Lv 60*
+`assets/items/the_eclipsed_citadel/the_last_thing_in_the_way.png`
+> A pair of heavy black gauntlets, palms outward and fingers spread in a
+> flat halt, the plate scored with old impact marks; Epic, so a hard white
+> light builds in both palms, reaching full brightness, and goes out — over
+> and over, like something being refused and refusing again.
+
+**The Corona** — *epic · hat · +70 max HP, 16% deflect, 14% amount, +12%
+shield strength · Lv 60*
+`assets/items/the_eclipsed_citadel/the_corona.png`
+> A low coronet of dark metal set with a single large pale pearl at the
+> brow, worn as a band; Epic, so a full ring of warm gold light stands off
+> the coronet's whole circumference — a corona around a dark centre — and it
+> *breathes*, widening and narrowing without ever closing.
+
+---
+
+## ✅ Written — all 265 items
+
+Every item in `ItemCatalogue` has an icon description here. The **Primal
+quarter (52)**, the **Kinetic quarter (58)**, the **Celestial quarter (76)**
+and the **Ethereal quarter plus The Eclipsed Citadel (79)** are all written.
+
+📝 **The Celestial and Ethereal icon lines came out of the contracts, not out
+of this file.** Each zone lane wrote its items' icon briefs into
+`docs/contracts/CELESTIAL_CONTRACT.md` §4 and `ETHEREAL_CONTRACT.md` §4,
+beside the catalogue table that defines them, and they were folded in here
+verbatim on 2026-09-22. ⚠️ **This file is the one the generator reads.** A
+contract edited after the fold changes nothing on disk, so an icon reworded
+there has to be carried across by hand — or, better, reworded here and left
+alone there.
+
+| Quarter | Zones | Items | Icon descriptions | Icons (PNG) |
+|---|---|---|---|---|
+| **Primal** 1–14 | 5 | 52 | ✅ | ⬜ |
+| Kinetic 15–29 | 6 | 58 | ✅ | ⬜ |
+| Celestial 30–47 | 7 | 76 | ✅ | ⬜ |
+| Ethereal 45–58 | 7 | 72 | ✅ | ⬜ |
+| The Eclipsed Citadel 58–60 | 1 | 7 | ✅ | ⬜ |
+
+⚠️ **No icon PNG exists for any zone yet**, and `assets/items/<zone>/` is
+declared in pubspec only for the zones that have one. Every inventory tile in
+the game falls back to its wrapped name until the art lands; that is the
+whole reason `test/item_icon_test.dart` exists.
+
+⭐ **The Primal quarter is still the one that matters first** — it is the
+player's first impression, and it is the quarter whose icons should be
+generated first.
 
 ### Adding an item
 
 📝 The count in each zone heading above must equal that zone's list in
 `lib/game/items/catalogue/`. `test/item_icon_test.dart` asserts the catalogue
-total is 61, so an item added without an entry here fails the suite with a
-pointer to this file.
-total is 67 (52 Primal + 15 Windward Steppe), so an item added without an
-entry here fails the suite with a pointer to this file.
-total (65, with Stormcliff Coast landed), so an item added without an entry
-here fails the suite with a pointer to this file.
-total (98, with Old Quarry, Stormcliff Coast, Windward Steppe and
-Thunderspire Peaks all landed — 52 Primal + 9 + 13 + 15 + 9), so an item
-added without an entry here fails the suite with a pointer to this file.
+total is **265**, so an item added without an entry here fails the suite with
+a pointer to this file. ⚠️ Add the entry in the zone's own section, under the
+heading its kind belongs to, and give it a `assets/items/<zone>/<id>.png`
+line — the path, not the name, is what ties the description to the item.

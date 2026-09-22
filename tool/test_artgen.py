@@ -35,14 +35,19 @@ import artgen  # noqa: E402
 
 ROOT = artgen.ROOT
 
-# The whole Primal quarter plus whatever Kinetic has landed so far, and the
-# numbers every other check hangs off. 📝 **Local truth for this builder**:
-# Stormcliff Coast (11 creatures / 13 icons / 1 backdrop) is the only Kinetic
-# zone present in this worktree — the merge coordinator recomputes these once
-# Old Quarry and Windward Steppe land alongside it.
-EXPECTED_CREATURES = 55 + 66  # Primal + the whole Kinetic quarter
-EXPECTED_ICONS = 52 + 58  # + OQ 9, SC 13, WS 15, FF 6, TP 9, MD 6
-EXPECTED_BACKDROPS = 5 + 6
+# Every zone in the game, as of the Celestial/Ethereal wave (2026-09-22), and
+# the numbers every other check hangs off.
+#
+# ⭐ **Creatures and icons are complete; backdrops are not.** All 26 zones have
+# eleven described creatures and a full icon list, but only fifteen have an
+# `### Arena backdrop` brief — the eleven Primal/Kinetic zones plus the four
+# Celestial/Ethereal lanes that wrote one (The Glass Archive, Hallowmarch, The
+# Sealed Garden, The Unwritten Library). ⚠️ That asymmetry is the point of
+# pinning three separate numbers rather than one: a missing backdrop brief is
+# invisible in the creature count.
+EXPECTED_CREATURES = 55 + 66 + 77 + 88  # Primal + Kinetic + Celestial + Ethereal
+EXPECTED_ICONS = 52 + 58 + 76 + 79  # same four bands, per ITEM_ART.md
+EXPECTED_BACKDROPS = 5 + 6 + 1 + 3
 ICONS_PER_ZONE = {
     "thunderspire_peaks": 9,
     "frostfell_pass": 6,
@@ -55,6 +60,40 @@ ICONS_PER_ZONE = {
     "stormcliff_coast": 13,
     "windward_steppe": 15,
     "the_molten_deep": 6,
+    "the_kiln_desert": 13,
+    "the_mirrormere": 16,
+    "starfall_basin": 9,
+    "tidewrack_shoals": 11,
+    "the_sunless_reach": 9,
+    "the_shattered_orrery": 7,
+    "the_glass_archive": 11,
+    "hallowmarch": 13,
+    "the_buried_sky": 9,
+    "the_umbral_wastes": 13,
+    "the_sealed_garden": 9,
+    "the_collapsed_academy": 9,
+    "the_reliquary_deep": 12,
+    "the_unwritten_library": 7,
+    "the_eclipsed_citadel": 7,
+}
+
+# The fifteen zones that actually carry an `### Arena backdrop` entry.
+ZONES_WITH_BACKDROP = {
+    "whispering_woods",
+    "glimmerbrook",
+    "cinderpeak_foothills",
+    "thornmire",
+    "ashfall_vale",
+    "old_quarry",
+    "stormcliff_coast",
+    "windward_steppe",
+    "frostfell_pass",
+    "thunderspire_peaks",
+    "the_molten_deep",
+    "the_glass_archive",
+    "hallowmarch",
+    "the_sealed_garden",
+    "the_unwritten_library",
 }
 
 ONE_PIXEL_PNG = base64.b64decode(
@@ -137,15 +176,26 @@ class ParseTest(unittest.TestCase):
             "zone short of an icon is an item that can never get a picture",
         )
 
-    def test_every_zone_has_one_backdrop(self):
+    def test_the_zones_with_a_backdrop_brief_are_exactly_these(self):
+        # ⚠️ **This used to be "every zone has one", and it no longer is.**
+        # Eleven of the twenty-six zones have no `### Arena backdrop` entry:
+        # the Celestial/Ethereal wave's lanes wrote creature descriptions for
+        # all fifteen new zones and backdrop briefs for only four of them.
+        # Pinning the SET rather than the count keeps the gap named — widen
+        # this list when a brief lands, and the count moves with it.
         backdrops = [a for a in self.assets if a.kind == "backdrop"]
         self.assertEqual(len(backdrops), EXPECTED_BACKDROPS)
-        self.assertEqual({a.zone for a in backdrops}, set(artgen.ZONES))
+        self.assertEqual({a.zone for a in backdrops}, ZONES_WITH_BACKDROP)
         self.assertEqual(
             {a.asset_id for a in backdrops},
-            set(artgen.ZONES),
+            ZONES_WITH_BACKDROP,
             "a backdrop is identified by its zone id, because that is the "
             "filename backdropFor asks for",
+        )
+        self.assertTrue(
+            ZONES_WITH_BACKDROP <= set(artgen.ZONES),
+            "a backdrop brief under a heading artgen does not recognise as a "
+            "zone is a prompt that will never be generated",
         )
 
     def test_the_anchors_still_match_in_both_directions(self):

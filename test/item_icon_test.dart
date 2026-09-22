@@ -22,8 +22,8 @@ import 'package:masters_of_magic_2/ui/item_icon.dart';
 /// every inventory screen today asks for files that are not there. If the
 /// fallback ever stops being silent, the backpack grows twenty broken-image
 /// boxes and no other test notices; if the request path ever drifts from
-/// [itemIconFor], fifty-two PNGs land and nothing changes on screen and no
-/// other test notices that either.
+/// [itemIconFor], 265 PNGs land and nothing changes on screen and no other
+/// test notices that either.
 ///
 /// ⭐ **No manifest for icons** (unlike `assets/creatures/<zone>/`). The
 /// creature manifest earns its keep because eleven hand-written creature ids
@@ -308,12 +308,63 @@ void main() {
         ItemCatalogue.all.length,
         265,
         reason:
-            'the Primal quarter is 18/9/8/9/8 (52) plus the Kinetic '
-            'pure zones 9/13/15 (37) plus The Molten Deep 6 plus The '
-            'Mirrormere 16 (CELESTIAL_CONTRACT §7.1); if this number '
-            'moved, docs/ITEM_ART.md is now short an entry (or carries a '
-            'stale one) and nothing else in the suite would say so',
+            'Primal 52 + Kinetic 58 + Celestial 76 + Ethereal 72 + The '
+            'Eclipsed Citadel 7 (CELESTIAL_CONTRACT §7.1, ETHEREAL §7.1). '
+            'If this number moved, docs/ITEM_ART.md is now short an entry '
+            '(or carries a stale one) and nothing else in the suite would '
+            'say so — every id in the catalogue has an '
+            '`assets/items/<zone>/<id>.png` line in that file and the two '
+            'counts are meant to stay equal',
       );
+    });
+
+    test('⚠️ every item in the catalogue has an icon description', () {
+      // ⭐ **The counterpart of `creature_art_test`'s coverage check, and it
+      // did not exist until the Celestial/Ethereal wave.** The pin above says
+      // the catalogue is 265 and docs/ITEM_ART.md claims to describe all 265 —
+      // but until this test, nothing compared the two SETS. An item renamed in
+      // the catalogue and not in the doc left one item with no prompt and one
+      // prompt for no item, and both counts stayed at 265.
+      //
+      // ⚠️ **Parsed on the filename line, not the display name.** The heading
+      // above each description is a composed name (`material form`) that no
+      // field stores, so the `assets/items/<zone>/<id>.png` line is the only
+      // thing in the doc that names an id — and it is also exactly what
+      // [itemIconFor] builds, so a drift here is a drift in the deliverable.
+      final doc = File('docs/ITEM_ART.md').readAsStringSync();
+      final described = RegExp(
+        r'^`assets/items/([a-z_]+)/([a-z0-9_]+)\.png`',
+        multiLine: true,
+      ).allMatches(doc);
+
+      expect(
+        described.length,
+        ItemCatalogue.all.length,
+        reason:
+            'the filename-line anchor moved and the comparison below has '
+            'quietly become a comparison of two sets that cannot match — '
+            'every entry in ITEM_ART.md carries one `assets/items/<zone>/'
+            '<id>.png` line of its own',
+      );
+      expect(
+        {for (final m in described) m.group(2)!},
+        ItemCatalogue.all.map((d) => d.id).toSet(),
+        reason:
+            'docs/ITEM_ART.md is the ONLY input to the icon pipeline: an '
+            'item with no entry can never be generated, and an entry with no '
+            'item is a description of something renamed or cut',
+      );
+      for (final m in described) {
+        expect(
+          ItemCatalogue.zoneOf(m.group(2)!),
+          m.group(1),
+          reason:
+              '${m.group(2)} is filed under ${m.group(1)} in ITEM_ART.md but '
+              'the catalogue defines it in ${ItemCatalogue.zoneOf(m.group(2)!)}'
+              ' — the generator would write the PNG into a directory '
+              'itemIconFor never asks about',
+        );
+      }
     });
 
     test('⚠️ every byZone key is a real place', () {

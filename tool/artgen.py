@@ -97,6 +97,25 @@ ZONES = [
     "stormcliff_coast",
     "windward_steppe",
     "the_molten_deep",
+    # Celestial (Q3) and Ethereal (Q4), in band order. ⚠️ None of these has an
+    # `assets/creatures/<zone>/` directory in pubspec yet — they are here
+    # because their DESCRIPTIONS exist, which is all this tool reads. The
+    # pubspec lines land with the art.
+    "the_kiln_desert",
+    "the_mirrormere",
+    "starfall_basin",
+    "tidewrack_shoals",
+    "the_sunless_reach",
+    "the_shattered_orrery",
+    "the_glass_archive",
+    "hallowmarch",
+    "the_buried_sky",
+    "the_umbral_wastes",
+    "the_sealed_garden",
+    "the_collapsed_academy",
+    "the_reliquary_deep",
+    "the_unwritten_library",
+    "the_eclipsed_citadel",
 ]
 
 # ⭐ The palette a zone's creatures are locked to by `pixelate.py`. Hybrid
@@ -116,6 +135,30 @@ ZONE_ELEMENT = {
     # ⚠️ Hybrid zones lock to their LEAD element — The Molten Deep is Pyro
     # first (KINETIC_CONTRACT §4.6).
     "the_molten_deep": "pyro",
+    # Celestial — leads read off `world.dart`'s `elements` list.
+    "the_kiln_desert": "solar",
+    "the_mirrormere": "lunar",
+    "starfall_basin": "astral",
+    "tidewrack_shoals": "lunar",
+    "the_sunless_reach": "solar",
+    "the_shattered_orrery": "astral",
+    "the_glass_archive": "solar",
+    # Ethereal.
+    "hallowmarch": "sanctus",
+    "the_buried_sky": "geo",
+    "the_umbral_wastes": "umbra",
+    "the_sealed_garden": "flora",
+    "the_collapsed_academy": "arcane",
+    "the_reliquary_deep": "sanctus",
+    "the_unwritten_library": "umbra",
+    # ⚠️ **The Eclipsed Citadel has no lead and cannot have one** — it carries
+    # all twelve elements and its eleven creatures each pick a different
+    # accent, so no single palette agrees with the silhouette fallback the way
+    # every other zone's does. `aqua` is `MagicElement.values.first`, which is
+    # what Totality's silhouette actually draws; the other ten will disagree,
+    # and that is a known cost of the zone's premise rather than a mistake
+    # here. 📝 Generate this zone per creature with an explicit `--element`.
+    "the_eclipsed_citadel": "aqua",
 }
 
 KINDS = ("creature", "icon", "backdrop")
@@ -238,8 +281,12 @@ def slugify(name: str) -> str:
     checked against the real `EnemyDef` ids parsed out of `lib/game/enemies/`,
     so a name that stops slugifying to its own id fails the run rather than
     generating art onto a path nothing loads.
+
+    ⚠️ **An apostrophe DROPS; it does not become a separator** (ENEMIES §2e:
+    *Pilgrim's Remnant* → `pilgrims_remnant`, never `pilgrim_s_remnant`). A
+    hyphen still separates — *Sky-Iron Husk* → `sky_iron_husk`.
     """
-    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+    return re.sub(r"[^a-z0-9]+", "_", name.lower().replace("'", "")).strip("_")
 
 
 def strip_markdown(text: str) -> str:
@@ -345,10 +392,15 @@ def enemy_ids() -> dict[str, str]:
     for zone in ZONES:
         src = ROOT / "lib" / "game" / "enemies" / f"{zone}.dart"
         text = src.read_text(encoding="utf-8")
-        for eid, name in re.findall(
-            r"EnemyDef\(\s*id:\s*'([^']+)',\s*name:\s*'([^']+)'", text
+        # ⚠️ **Both quote styles.** Dart switches to `"…"` for a string with an
+        # apostrophe in it, and a single-quote-only pattern silently skipped
+        # Pilgrim's Remnant — one creature with no prompt, in a count of 286
+        # that nothing else would have noticed.
+        for eid, single, double in re.findall(
+            r"""EnemyDef\(\s*id:\s*'([^']+)',\s*name:\s*(?:'([^']*)'|"([^"]*)")""",
+            text,
         ):
-            out[name] = eid
+            out[single or double] = eid
     if not out:
         raise LookupError(
             "parsed no EnemyDef ids out of lib/game/enemies/ — the definition "

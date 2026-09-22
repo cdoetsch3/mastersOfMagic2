@@ -826,6 +826,119 @@ predates this quarter.
 vocabulary; a non-collection quarter gate), the deferred descending-dungeon
 structure (Molten Deep ships standard), and Jewelry banking until Rimeholt.
 
+### ✅ The Celestial and Ethereal wave (2026-09-22) — fifteen zones in one pass
+
+⭐ **Every zone in the game now has a roster, a catalogue and a drop table.**
+Built from CELESTIAL_CONTRACT and ETHEREAL_CONTRACT in fifteen parallel lanes:
+**165 `EnemyDef`s** (15 × 11, taking `Bestiary.all` to 286), **155 item defs**
+(taking `ItemCatalogue.all` to 265), **35 gather nodes**, fifteen zone test
+suites, and the last door in the world — `the_eclipsed_citadel`, gated on three
+Ethereal key fragments. Descriptions for all of it landed in the same pass:
+BESTIARY_ART is back to being one document (the fifteen `docs/art/bestiary/`
+staging files were folded in and deleted) and ITEM_ART carries all 265 icon
+briefs.
+
+⚠️ **Two engine seams were opened, and both are narrow on purpose.**
+- **`EnemyDef.isMage`** — a mage brings a `Spellbook` loadout instead of an
+  archetype's creature kit (ENEMIES §3.4). Exactly two creatures set it, The
+  Archmage and Procarius, and ⚠️ a zone suite must exempt them from the
+  `moves.length == archetype.moveCount` law and assert the loadout instead.
+- **`Bestiary.bossSequenceFor`** — a zone whose bosses are fought in order
+  rather than one-of-two. ⚠️ **Empty is the rule**; `_bossSequences` has one
+  entry (The Eclipsed Citadel) and should keep having one.
+
+⭐ **Three reconciliation rulings closed the gaps between the roster and the
+contracts** (build manager, 2026-09-22):
+1. **Gate fragments sit on the PURE zones** — Hallowmarch, The Umbral Wastes,
+   The Collapsed Academy — because every tier gate in the game derives that
+   way, and both bosses of a gate zone drop the fragment on the `always` line.
+2. **The `hide` drop role falls back to the zone's SECOND gatherable material**
+   where the zone defines no hide. Only five zones have a true kill-only hide;
+   everywhere else "something died" pays in the zone's own stuff.
+3. **The Long Count's off-element lunar move is withdrawn** — the tier-3 wheel
+   runs Solar → Lunar → Astral, so Lunar *is* Astral's counter and §2h forbids
+   it. The Buried Sky's Hexer is pure Astral, and §2e.2 now names three
+   creatures rather than four.
+
+❓ **Open for Christian — seven decisions this wave recorded rather than took:**
+- **Stormcliff Coast's theme** — the 2026-09-21 re-band made it the *later*
+  Electro zone, so Stormcliff and Thunderspire now de-escalate. ENEMIES §2e
+  recommends Stormcliff take **aftermath, not anticipation**; the built roster
+  already says it and the cost is a theme line plus the arrival passage.
+- **ETHEREAL §8.5 — the dead-end alternative.** Put the three fragments on The
+  Sealed Garden / The Buried Sky / The Reliquary Deep instead, so the finale
+  requires the whole quarter. Three ids move zone; nothing else changes.
+- **`saltwort_draught` 75 → ~95.** The re-band moved its home zone from 17–22
+  to 23–28, where its heal is 30% of the bar instead of the ladder's 40%. Its
+  only inconsistency, and not the Celestial contract's item to change.
+- **CELESTIAL §8.7 — four recipes fall under their conservation window.**
+  Three ore/hide values and one belt: re-price, or accept them as ECONOMY §8.5
+  outliers.
+- **ETHEREAL §8.3 — Sanctus never gets an Aspect.** Hallowmarch fields a
+  Juggernaut and a Tyrant, so the game's only pure Sanctus zone never takes
+  Sanctus's passive to an extreme. A hole, or the right reading of an element
+  whose identity is maintenance?
+- **`stationRequired` is unenforced.** `craft_celestial_totem` sets it, and it
+  is the only `true` in either quarter — but nothing in the crafting path reads
+  it yet, so a tier gate that "must not be craftable in the field" currently
+  is.
+- **The Author / the Umbral Aspect crit-damage split.** §2.4 prices one Umbra
+  Aspect at crit 15 / **+70**, the largest number on any stat block in the
+  game, and this wave shipped two Umbra Aspects. The Umbral Wastes' keeps +70;
+  The Author was dropped to **+60** so the superlative stays unique. Either
+  both carry +70, or the split stands — it was a build-manager call, not a
+  design one.
+
+### The Celestial zone matrix (Q3) — same columns, same definition of done
+
+Built 2026-09-22 from CELESTIAL_CONTRACT. Recipes are band-scoped as ever
+(`celestial_recipes.dart`). Art columns follow the Q1 convention: 📝 desc =
+generator-ready description + verified pipeline, awaiting Christian's image
+pass. ⚠️ **The Backdrop column is the wave's one real gap** — only The Glass
+Archive's lane wrote an arena-backdrop brief, so the other six zones have
+nothing to generate `assets/backgrounds/<zone>.png` from. ⬜ there means *no
+description yet*, not *no PNG yet*.
+
+| Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Backdrop | Item icon descs | Item icons (PNG) |
+|---|---|---|---|---|---|---|---|---|
+| The Kiln Desert | ✅ 11 | ✅ | ✅ 13 defs | ✅ 2 | 📝 desc | ⬜ | ✅ 13 | ⬜ |
+| The Mirrormere | ✅ 11 | ✅ | ✅ 16 defs | ✅ 2 | 📝 desc | ⬜ | ✅ 16 | ⬜ |
+| Starfall Basin | ✅ 11 | ✅ | ✅ 9 defs | ✅ 2 | 📝 desc | ⬜ | ✅ 9 | ⬜ |
+| Tidewrack Shoals | ✅ 11 | ✅ | ✅ 11 defs | ✅ 2 | 📝 desc | ⬜ | ✅ 11 | ⬜ |
+| The Sunless Reach | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | 📝 desc | ⬜ | ✅ 9 | ⬜ |
+| The Shattered Orrery | ✅ 11 | ✅ | ✅ 7 defs | ✅ 3 | 📝 desc | ⬜ | ✅ 7 | ⬜ |
+| The Glass Archive | ✅ 11 | ✅ | ✅ 11 defs | ✅ 3 | 📝 desc | 📝 desc | ✅ 11 | ⬜ |
+
+📝 Deliberate debts, ruled and recorded: the Concordance gate's shape
+(§8.6), Core motes blocking the Concordant Crown (§8.3), and nineteen empty
+gem sockets shipped across the two quarters against a Phase 8 that has slipped
+twice.
+
+### The Ethereal zone matrix (Q4) — same columns, same definition of done
+
+Built 2026-09-22 from ETHEREAL_CONTRACT, and it closes the world: The Eclipsed
+Citadel is the last **zone**, and the only thing past it is Zenith, which is a
+town with no roster and a gate (the Concordant Crown) that nothing can make
+yet. ⚠️ **The Citadel has 0 gather nodes by ruling**, not by omission — its two materials are kill-only
+(`eclipse_iron`, `corona_pearl`), because the finale is not a place you forage.
+
+| Zone | Bestiary (5+4+2) | Drop tables | Item catalogue | Gather nodes | Art (PNG) | Backdrop | Item icon descs | Item icons (PNG) |
+|---|---|---|---|---|---|---|---|---|
+| Hallowmarch | ✅ 11 | ✅ | ✅ 13 defs | ✅ 3 | 📝 desc | 📝 desc | ✅ 13 | ⬜ |
+| The Buried Sky | ✅ 11 | ✅ | ✅ 9 defs | ✅ 2 | 📝 desc | ⬜ | ✅ 9 | ⬜ |
+| The Umbral Wastes | ✅ 11 | ✅ | ✅ 13 defs | ✅ 3 | 📝 desc | ⬜ | ✅ 13 | ⬜ |
+| The Sealed Garden | ✅ 11 | ✅ | ✅ 9 defs | ✅ 3 | 📝 desc | 📝 desc | ✅ 9 | ⬜ |
+| The Collapsed Academy | ✅ 11 | ✅ | ✅ 9 defs | ✅ 2 | 📝 desc | ⬜ | ✅ 9 | ⬜ |
+| The Reliquary Deep | ✅ 11 | ✅ | ✅ 12 defs | ✅ 3 | 📝 desc | ⬜ | ✅ 12 | ⬜ |
+| The Unwritten Library | ✅ 11 | ✅ | ✅ 7 defs | ✅ 2 | 📝 desc | 📝 desc | ✅ 7 | ⬜ |
+| The Eclipsed Citadel | ✅ 11 | ✅ | ✅ 7 defs | ✅ **0** ⭐ | 📝 desc | ⬜ | ✅ 7 | ⬜ |
+
+📝 Deliberate debts, ruled and recorded: the Citadel's twelve-element drop
+shape shipped as twelve rows at `chance: 0.12` rather than a new
+`DropEntry.oneOf` (§8.4), Procarius's `key` role drops nothing because the
+Concordant Crown has no item yet (§3.4a), and The Unwritten Library's *Your
+Entry* still has no archetype and no ruling.
+
 ### The Q1 zone matrix — what each zone has, and what "done" means
 
 ⭐ **Standing direction (Christian, 2026-08-18): finish the Primal quarter

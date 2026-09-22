@@ -728,8 +728,10 @@ so the Celestial and Ethereal parts may land the same way — the roster says
 which is the row that matters, because a boss that punishes correct
 preparation makes players stop preparing.
 
-✅ **"Sparingly" now means four creatures in fifteen zones, named here and
-nowhere else.** Each was checked against both of its zone's counters.
+✅ **"Sparingly" now means three creatures in fifteen zones, named here and
+nowhere else.** Each was checked against both of its zone's counters. (It was
+four until The Long Count's grant was withdrawn below; the row is struck
+through rather than deleted so the reasoning stays visible.)
 
 | Zone | Creature | Off-element move | Legal because |
 |---|---|---|---|
@@ -740,6 +742,30 @@ nowhere else.** Each was checked against both of its zone's counters.
 
 ⚠️ **The Eclipsed Citadel is exempt** — it carries all twelve, so it has no
 off-element and no counter to avoid.
+
+📝 **How the engine actually expresses this, and why "one move" is a fiction.**
+`EnemyDef` has no per-spell element: a `Spell` carries damage, cost and
+priority, and the creature's `elements` list is what the brain charges from.
+So an off-element move is built as **an extra entry in `elements`** — the Burnt
+Index ships `[solar, pyro]` (The Glass Archive) and the Cherub of the Turning
+Blade ships `[sanctus, solar]` (The Sealed Garden), each alongside the ordinary
+`elements: _solar` / `_sanctus` its zone-mates carry.
+
+⚠️ **The consequence: the creature can charge the off-element on *any* of its
+moves, not just the named one.** Nothing in the engine ties pyro to one
+particular Burnt Index spell, and nothing could without a per-spell element
+field. What the table above is really fixing is therefore **which element the
+player must be able to see coming**, and the AI honours "one move" only
+indirectly — by counter-picking, since a `LadderAi` rung high enough to read
+the matchup will reach for the element that is currently good against you, and
+that is the move the off-element shows up on.
+
+⭐ **So read the table as a licence, not as a script.** Adding a second element
+to a creature is the whole of the implementation, and the design cost of one is
+that the zone's element identity blurs for that fight — which is exactly why
+this section caps it at three creatures and forbids the zone's own counter. 📝
+If a per-spell element is ever added, this section becomes enforceable rather
+than advisory, and the three creatures above are the migration list.
 
 ---
 
