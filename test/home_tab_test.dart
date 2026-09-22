@@ -145,4 +145,45 @@ void main() {
           'this kills',
     );
   });
+
+  // ⭐ Ruling 2026-09-21: Skills lives in the new Profile screen, which every
+  // tab reaches from the header's name pill. The home tab's shortcut to it is
+  // the duplicate, so it goes — but 'Continue' still has the map and loadout
+  // cards under it, so the label stays.
+  testWidgets('the Continue → Skills card is gone, the label stays', (
+    tester,
+  ) async {
+    await _pumpHomeTab(tester, PlayerProfile.newPlayer());
+
+    expect(
+      find.text('Skills'),
+      findsNothing,
+      reason:
+          'the card moved to the Profile — a tab that still lists it gives '
+          'the same screen two doors, which is the drift this ruling closed',
+    );
+    expect(
+      find.byIcon(Icons.handyman),
+      findsNothing,
+      reason:
+          "the card's icon: a removal that deleted only the 'Skills' label "
+          'would leave a tappable, wordless row behind',
+    );
+    expect(
+      find.text('CONTINUE'),
+      findsOneWidget,
+      reason:
+          'this is NOT the empty-heading case — the map and loadout cards '
+          'still sit under Continue, so a removal that took the label with '
+          'the card strands them under nothing',
+    );
+    expect(
+      find.textContaining('Open the map to travel'),
+      findsOneWidget,
+      reason:
+          'the card directly below the deleted one must survive — an '
+          'over-eager deletion that swallowed its neighbour is the mutant '
+          'this kills',
+    );
+  });
 }

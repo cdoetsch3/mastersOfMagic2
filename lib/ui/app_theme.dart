@@ -95,6 +95,50 @@ class GamePanel extends StatelessWidget {
   }
 }
 
+/// A round name badge: the character's initial on a gem disc.
+///
+/// ⭐ Shared by the header pill and the Profile hero so the two are the same
+/// badge at two sizes — a player should recognise what they tapped in what
+/// opened. Everything scales off [size]; nothing else needs tuning.
+class PlayerAvatar extends StatelessWidget {
+  final String name;
+  final double size;
+
+  const PlayerAvatar({super.key, required this.name, this.size = 20});
+
+  /// The glyph on the disc.
+  ///
+  /// ⚠️ A blank (or all-whitespace) name still needs one — an empty circle
+  /// reads as a rendering bug, '?' reads as "we don't know you yet". Takes a
+  /// **rune**, not `[0]`, so a name starting with an emoji or any other
+  /// surrogate pair is not cut in half.
+  static String initialOf(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return '?';
+    return String.fromCharCode(trimmed.runes.first).toUpperCase();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: size,
+    height: size,
+    decoration: const BoxDecoration(
+      shape: BoxShape.circle,
+      color: AppColors.gem,
+    ),
+    alignment: Alignment.center,
+    child: Text(
+      initialOf(name),
+      style: TextStyle(
+        color: AppColors.text,
+        fontSize: size * 0.5,
+        fontWeight: FontWeight.w600,
+        height: 1.0,
+      ),
+    ),
+  );
+}
+
 /// A fantasy gold coin (concentric disc with a small star), drawn rather than
 /// using the dollar-sign coin icon.
 class CoinIcon extends StatelessWidget {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../game/game_state.dart';
 import '../ui/app_theme.dart';
 import 'matchmaking_screen.dart';
+import 'profile_screen.dart';
 import 'tabs/home_tab.dart';
 import 'tabs/inventory_tab.dart';
 import 'tabs/map_tab.dart';
@@ -341,46 +342,134 @@ class _RailCenter extends StatelessWidget {
 
 /// Shared header used by the tab screens: character name, level, and
 /// currencies. Reads live from [GameState].
+///
+/// ⭐ The name-and-level line is a **button** (ruling 2026-09-21, mockup
+/// option A): it opens [ProfileScreen], so every tab that already draws this
+/// header carries the way into the profile for free — and no tab has to
+/// spend a card on Skills or the rules.
 class PlayerHeader extends StatelessWidget {
   final String title;
   const PlayerHeader({super.key, required this.title});
 
+  /// The header's exact height, pinned rather than left to the content.
+  ///
+  /// ⭐ **Press-stability.** The pill is taller than the plain text line it
+  /// replaced, and a header that measured itself would move every tab's
+  /// first control down — and move it again for a name long enough to wrap.
+  /// One number, one y, whatever the name and whatever the font.
+  ///
+  /// ⚠️ 52 is what the two-line text header measured before the pill (18px
+  /// title + 12px line + 10/6 padding), so nothing below it moved on the day
+  /// this shipped. The pill's own padding is what absorbed the difference —
+  /// grow that and this overflows rather than silently growing back.
+  static const double height = 52;
+
   @override
   Widget build(BuildContext context) {
     final p = GameStateScope.of(context).profile;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: AppColors.text,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+    return SizedBox(
+      height: height,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: AppColors.text,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                Text(
-                  '${p.name}  ·  Level ${p.level}',
-                  style: const TextStyle(
-                    color: AppColors.textDim,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+                  _ProfilePill(name: p.name, level: p.level),
+                ],
+              ),
             ),
+            _Currency(leading: const CoinIcon(size: 15), value: p.gold),
+            const SizedBox(width: 8),
+            _Currency(
+              leading: const Icon(
+                Icons.diamond,
+                size: 14,
+                color: AppColors.gem,
+              ),
+              value: p.resonancePrisms,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The header's Profile button: badge, name, level, chevron.
+///
+/// ⚠️ Looks like a control on purpose — the panel fill, the edge and the
+/// chevron are what say "this is tappable"; the same two facts as plain text
+/// would have read as a caption, which is what shipped.
+class _ProfilePill extends StatelessWidget {
+  final String name;
+  final int level;
+  const _ProfilePill({required this.name, required this.level});
+
+  @override
+  Widget build(BuildContext context) {
+    // ⚠️ Its **own** [Material], not a bare InkWell: the header is drawn by
+    // five tabs and by anything that pumps one, and an InkWell with no
+    // Material above it is an assertion, not a missing splash. The fill and
+    // the edge live on the Material's shape so the ink lands on top of them
+    // rather than behind an opaque Container.
+    return Material(
+      color: AppColors.panel,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: InkWell(
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute<void>(builder: (_) => const ProfileScreen())),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(3, 2, 4, 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PlayerAvatar(name: name, size: 16),
+              const SizedBox(width: 6),
+              // ⚠️ Flexible + ellipsis: a long name shortens, it does not
+              // wrap — a second line would break the pinned header height.
+              Flexible(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: AppColors.text, fontSize: 12),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Lv $level',
+                style: const TextStyle(
+                  color: AppColors.textDim,
+                  fontSize: 12,
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right,
+                size: 14,
+                color: AppColors.textDim,
+              ),
+            ],
           ),
-          _Currency(leading: const CoinIcon(size: 15), value: p.gold),
-          const SizedBox(width: 8),
-          _Currency(
-            leading: const Icon(Icons.diamond, size: 14, color: AppColors.gem),
-            value: p.resonancePrisms,
-          ),
-        ],
+        ),
       ),
     );
   }

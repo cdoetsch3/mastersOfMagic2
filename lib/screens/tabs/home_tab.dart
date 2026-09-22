@@ -6,7 +6,6 @@ import '../../game/player_profile.dart';
 import '../../game/world.dart';
 import '../../ui/app_theme.dart';
 import '../adventure_screen.dart';
-import '../skills_screen.dart';
 import '../home_shell.dart';
 import '../matchmaking_screen.dart';
 
@@ -19,6 +18,12 @@ import '../matchmaking_screen.dart';
 /// "will be implemented at a much later date". Removed rather than left
 /// showing 0 / 3 forever; when goals return they return as a system, not as
 /// two `const` widgets.
+///
+/// 📝 **No Skills card either** (ruling 2026-09-21). Skills moved into the
+/// new Profile screen, which every tab reaches from the header's name pill —
+/// a shortcut on one tab to a screen that belongs to the character was the
+/// duplicate. 'Continue' keeps its label: the map and loadout cards (and a
+/// resumable run) still sit under it.
 class HomeTab extends StatelessWidget {
   final ValueChanged<int> onSelectTab;
   const HomeTab({super.key, required this.onSelectTab});
@@ -54,30 +59,6 @@ class HomeTab extends StatelessWidget {
               _XpCard(p: p),
               const SizedBox(height: 14),
               const SectionLabel('Continue'),
-              GamePanel(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const SkillsScreen()),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.handyman, color: AppColors.teal),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        'Skills',
-                        style: TextStyle(color: AppColors.text, fontSize: 14),
-                      ),
-                    ),
-                    // ⚠️ **Nothing on the right** (designer, 2026-08-16). The
-                    // old 'Wc N · Ta N' glance named two of nine skills in an
-                    // abbreviation nobody decodes, and picking two implied
-                    // they were the important ones. The Ledger is one tap
-                    // away and shows all nine unabbreviated; the blank right
-                    // edge is the correct amount to say here.
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
               if (resumable != null) ...[
                 _ResumeAdventureCard(run: resumable),
                 const SizedBox(height: 8),
