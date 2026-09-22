@@ -22,6 +22,7 @@ import 'the_reliquary_deep.dart';
 import 'the_molten_deep.dart';
 import 'the_shattered_orrery.dart';
 import 'the_sunless_reach.dart';
+import 'the_umbral_wastes.dart';
 import 'thornmire.dart';
 import 'thunderspire_peaks.dart';
 import 'tidewrack_shoals.dart';
@@ -59,6 +60,7 @@ abstract final class Bestiary {
     ...BuriedSkyBestiary.all,
     ...CollapsedAcademyBestiary.all,
     ...ReliquaryDeepBestiary.all,
+    ...UmbralWastesBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>

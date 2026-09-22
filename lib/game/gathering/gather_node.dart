@@ -909,6 +909,65 @@ abstract final class GatherNodes {
     flavor: 'Still folded, still square, still on the altar. Nobody took it.',
   );
 
+  // ---- The Umbral Wastes · 47–51 · Umbra (ETHEREAL_CONTRACT §6) ---------
+  //
+  // ⭐ Three nodes for two materials. `uw_umbralweave_drift` and
+  // `uw_shoulder_drift` both yield `umbralweave`, and ⚠️ **that is a
+  // THROUGHPUT fix, not a second source** — §6: umbralweave is consumed by
+  // four or more recipes and one node per run section cannot keep a
+  // level-50 crafter supplied. The no-second-source rule in this library's
+  // own comment is about the *fiction* (a hide must not have a node at all),
+  // not about node count.
+  // ✅ XP is `9 + 2 × (47 − 1)` = **101** for all three.
+
+  /// ⭐ Foraging, because Umbralweave is Tailoring stock (§6a.1's mapping).
+  static const uwUmbralweaveDrift = GatherNodeDef(
+    id: 'uw_umbralweave_drift',
+    zoneId: 'the_umbral_wastes',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'umbralweave',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.rateDrag, 'draw', reps: 3),
+    xp: 101,
+    flavor:
+        'It lifts off the ice in sheets if you pull it in the dark and tears '
+        'if you do not.',
+  );
+
+  /// ⭐ Mining, because Thoughtglass is Jewelry stock — and `alignCommit` is
+  /// the engine the fiction asks for: you choose the line and then you are
+  /// committed to it, which is what splitting a decided thing is.
+  static const uwThoughtglassFace = GatherNodeDef(
+    id: 'uw_thoughtglass_face',
+    zoneId: 'the_umbral_wastes',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'thoughtglass',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'split', complexity: 4),
+    xp: 101,
+    flavor:
+        'Split it however you like. The new face comes out the same shape as '
+        'the old one.',
+  );
+
+  /// ⭐ The second Umbralweave node (§6's throughput ruling). ⚠️ Same yield,
+  /// deliberately — 📝 cut this one if one-node-per-material is a hard rule.
+  static const uwShoulderDrift = GatherNodeDef(
+    id: 'uw_shoulder_drift',
+    zoneId: 'the_umbral_wastes',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'umbralweave',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.rateDrag, 'draw', reps: 4),
+    xp: 101,
+    flavor:
+        'Round the shoulder, where the light stops and the sheets are '
+        'thickest.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -959,6 +1018,9 @@ abstract final class GatherNodes {
     rdCenserRun,
     rdGiltFitting,
     rdAltarLinen,
+    uwUmbralweaveDrift,
+    uwThoughtglassFace,
+    uwShoulderDrift,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {
