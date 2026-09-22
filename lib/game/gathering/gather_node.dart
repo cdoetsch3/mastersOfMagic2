@@ -597,6 +597,43 @@ abstract final class GatherNodes {
         'at all.',
   );
 
+  // ---- Tidewrack Shoals (Lunar + Aqua, band 36–40, CELESTIAL_CONTRACT §6)
+  //
+  // ⭐ Hybrid zone, three materials (§3.1's 3-per-hybrid rule): Wrackcotton
+  // and Nacre are world-held and each get a node; Drownling Hide is a hide
+  // and stays kill-only, so this zone authors two, not three.
+  // ⭐ XP is `9 + 2 × (zone.minLevel − 1)` = `9 + 2 × 35` = 79.
+  // ⭐ Nacre is a Jewelry material gathered by **Mining** — §6a.1's "gems are
+  // Mining's half", the same mapping `amber` already ships with.
+
+  static const tsWrackcottonFlat = GatherNodeDef(
+    id: 'ts_wrackcotton_flat',
+    zoneId: 'tidewrack_shoals',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'wrackcotton',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.rateDrag, 'draw', reps: 3),
+    xp: 79,
+    flavor:
+        'Six hours of flat, and then it is not flat any more. Draw steadily '
+        'along the grain or the whole bed comes up as mud.',
+  );
+
+  static const tsNacreBed = GatherNodeDef(
+    id: 'ts_nacre_bed',
+    zoneId: 'tidewrack_shoals',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'nacre',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'prise', complexity: 3),
+    xp: 79,
+    flavor:
+        'A shell bed the water uncovers twice a day and has never once '
+        'uncovered empty.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -630,6 +667,8 @@ abstract final class GatherNodes {
     soLensShatter,
     kdIronwoodStand,
     kdGlasspanFlat,
+    tsWrackcottonFlat,
+    tsNacreBed,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

@@ -18,6 +18,7 @@ import 'catalogue/the_molten_deep_items.dart';
 import 'catalogue/the_shattered_orrery_items.dart';
 import 'catalogue/thornmire_items.dart';
 import 'catalogue/thunderspire_peaks_items.dart';
+import 'catalogue/tidewrack_shoals_items.dart';
 import 'catalogue/whispering_woods_items.dart';
 import 'catalogue/windward_steppe_items.dart';
 import 'item_def.dart';
@@ -55,6 +56,7 @@ abstract final class ItemCatalogue {
     'the_mirrormere': MirrormereItems.all,
     'the_shattered_orrery': ShatteredOrreryItems.all,
     'the_kiln_desert': KilnDesertItems.all,
+    'tidewrack_shoals': TidewrackShoalsItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists
