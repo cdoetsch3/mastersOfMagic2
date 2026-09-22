@@ -14,6 +14,7 @@ import '../game/mage_apparel.dart';
 import '../game/mage_sprite.dart';
 import '../game/shield_aura.dart';
 import '../game/status_fx.dart';
+import '../game/ladder/ladder_result.dart' show DuelSettlement;
 import '../game/opponent_driver.dart';
 import '../game/progression.dart';
 import '../game/items/item_catalogue.dart';
@@ -53,7 +54,18 @@ class DuelScreen extends StatefulWidget {
   /// Called once when a duel ends, with how it ended. Lets the caller grant
   /// XP/gold. Draws report [DuelOutcome.lost]; a campaign escape reports
   /// [DuelOutcome.fled], which pays nothing.
-  final void Function(DuelOutcome outcome)? onResult;
+  ///
+  /// ⭐ **Hands back what the ladder did with it** (Christian, 2026-09-21),
+  /// so the result card can print the real rating change instead of a
+  /// promise. The arena never computes Elo itself — it prints whatever the
+  /// settler says it banked. A null [DuelSettlement] means there is nothing
+  /// to report (a fled duel), and the Ranking row stays silent.
+  ///
+  /// ⚠️ Awaited on the end card, not before it: the card appears the instant
+  /// the duel ends with '…' in the Ranking row, and fills in when the write
+  /// lands. Blocking the card on a network round-trip would make every duel
+  /// end in a pause.
+  final Future<DuelSettlement?> Function(DuelOutcome outcome)? onResult;
 
   /// ⭐ Health carried in from an adventure (GAME_DESIGN adventure loop). Null
   /// for a standalone duel, which starts at full.
@@ -354,11 +366,28 @@ class _DuelScreenState extends State<DuelScreen>
   /// must not look the same.
   List<String>? _loot;
 
+  /// What the ladder did with this duel, once [DuelScreen.onResult]'s future
+  /// has resolved. Null both before the settler answers and when it answers
+  /// "nothing" — [_settling] is what tells those two apart, and it is the
+  /// difference between the card showing '…' and showing a verdict.
+  DuelSettlement? _settlement;
+  bool _settling = false;
+
   // Reports the outcome exactly once per duel (win/loss/draw/forfeit).
   void _checkResult() {
     if (_resultReported || !c.gameOver) return;
     _resultReported = true;
-    widget.onResult?.call(c.outcome);
+    final settling = widget.onResult?.call(c.outcome);
+    if (settling != null) {
+      _settling = true;
+      settling.then((settlement) {
+        if (!mounted) return;
+        setState(() {
+          _settling = false;
+          _settlement = settlement;
+        });
+      });
+    }
     widget.onPlayerHpRemaining?.call(c.player.hp);
     final settle = widget.onSettle;
     if (settle == null) {
@@ -1844,9 +1873,14 @@ class _DuelScreenState extends State<DuelScreen>
                   ),
                 ],
                 // ⚠️ Ranking is a PvP concept. A campaign fight has no
-                // ladder, and showing "coming soon" there is noise about a
-                // feature that will never apply to it.
-                if (!widget.campaign && !widget.academy) ...[
+                // ladder, and a row about one there is noise about a feature
+                // that will never apply to it.
+                //
+                // ⭐ An ACADEMY bout, by contrast, absolutely rates (LADDER §1
+                // law 4) — it is only XP and gold it leaves alone. So the row
+                // shows there, right under "nothing gained, nothing lost",
+                // and the two say different true things.
+                if (!widget.campaign) ...[
                   const SizedBox(height: 8),
                   _rewardRow(
                     leading: const Icon(
@@ -1855,8 +1889,7 @@ class _DuelScreenState extends State<DuelScreen>
                       size: 22,
                     ),
                     label: 'Ranking',
-                    value: 'coming soon',
-                    muted: true,
+                    valueCell: _rankingValue(),
                   ),
                 ],
                 if (widget.campaign && won) ...[
@@ -1914,6 +1947,12 @@ class _DuelScreenState extends State<DuelScreen>
                           ),
                           onPressed: () {
                             _resultReported = false;
+                            // ⚠️ The last duel's rating change belongs to the
+                            // last duel. Left standing, the rematch's card
+                            // would open showing the previous bout's '+12'
+                            // as if it had already been settled.
+                            _settlement = null;
+                            _settling = false;
                             c.newDuel();
                             _startMoveTimer();
                           },
@@ -1932,12 +1971,90 @@ class _DuelScreenState extends State<DuelScreen>
     );
   }
 
+  /// The Ranking row's value cell (Christian, 2026-09-21): the points this
+  /// duel moved, and the rating they moved it to.
+  ///
+  /// ⚠️ **Fixed width, single line.** This cell changes AFTER the card is on
+  /// screen — '…' becomes '+12 · 1432' the moment the write lands — and a
+  /// cell that resized would shove the Home/Again buttons out from under the
+  /// player's thumb mid-press. The width is the layout's promise that
+  /// nothing below it moves.
+  ///
+  /// ⭐ A real minus sign (U+2212), not a hyphen: '−8' has to read as a
+  /// number at a glance, and it sits next to '+12' at the same weight.
+  Widget _rankingValue() {
+    const dim = TextStyle(
+      color: Color(0xFF6E6A7A),
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    );
+
+    TextSpan span;
+    if (_settling) {
+      // Still writing. NOT '±0' — "we have not heard yet" and "you gained
+      // nothing" are different pieces of news (same rule as _loot above).
+      span = const TextSpan(text: '…', style: dim);
+    } else {
+      final settlement = _settlement;
+      final delta = settlement != null && settlement.rated
+          ? settlement.ratingDelta
+          : null;
+      if (delta == null) {
+        // A room code, a practice persona, or a screen with no settler at
+        // all: the duel happened, the ladder did not notice.
+        span = const TextSpan(
+          text: 'unrated',
+          style: TextStyle(
+            color: AppColors.textDim,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        );
+      } else {
+        final sign = delta > 0
+            ? '+'
+            : delta < 0
+            ? '−'
+            : '±';
+        final colour = delta > 0
+            ? AppColors.green
+            : delta < 0
+            ? AppColors.ember
+            : AppColors.textDim;
+        span = TextSpan(
+          text: '$sign${delta.abs()}',
+          style: TextStyle(
+            color: colour,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+          children: [TextSpan(text: ' · ${settlement!.newRating}', style: dim)],
+        );
+      }
+    }
+
+    return SizedBox(
+      width: 120,
+      child: Text.rich(
+        span,
+        textAlign: TextAlign.right,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
   Widget _rewardRow({
     required Widget leading,
     required String label,
-    required String value,
+    String? value,
+    Widget? valueCell,
     bool muted = false,
   }) {
+    assert(
+      (value == null) != (valueCell == null),
+      '_rewardRow takes a plain string value OR a custom cell, never both',
+    );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -1948,18 +2065,31 @@ class _DuelScreenState extends State<DuelScreen>
         children: [
           leading,
           const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(color: Color(0xFFECE7F8), fontSize: 14),
-            ),
-          ),
           Text(
-            value,
-            style: TextStyle(
-              color: muted ? const Color(0xFF6E6A7A) : const Color(0xFFE8C547),
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+            label,
+            style: const TextStyle(color: Color(0xFFECE7F8), fontSize: 14),
+          ),
+          // ⚠️ The flex belongs to the VALUE, not the label. Labels are one
+          // word; values can be a sentence ('nothing gained, nothing lost'),
+          // and an unbounded one overflows this 340-wide card the moment the
+          // player's text scale climbs. Right-aligned inside its share, so
+          // every short value sits exactly where it always has.
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child:
+                  valueCell ??
+                  Text(
+                    value!,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      color: muted
+                          ? const Color(0xFF6E6A7A)
+                          : const Color(0xFFE8C547),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
             ),
           ),
         ],

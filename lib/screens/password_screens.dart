@@ -93,6 +93,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         label: 'Email',
         icon: Icons.mail_outline,
         keyboard: TextInputType.emailAddress,
+        action: TextInputAction.done,
         onSubmitted: _busy ? null : (_) => _send(auth),
       ),
       if (_error != null) ...[
@@ -271,18 +272,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     label: 'Current password',
                     icon: Icons.lock_outline,
                     obscure: true,
+                    action: TextInputAction.next,
                   ),
                   AuthTextField(
                     controller: _next,
                     label: 'New password',
                     icon: Icons.lock_reset,
                     obscure: true,
+                    action: TextInputAction.next,
                   ),
                   AuthTextField(
                     controller: _confirm,
                     label: 'Confirm new password',
                     icon: Icons.lock_reset,
                     obscure: true,
+                    action: TextInputAction.done,
                     onSubmitted: _busy ? null : (_) => _submit(auth),
                   ),
                   if (_error != null) ...[
@@ -340,6 +344,14 @@ class AuthTextField extends StatelessWidget {
   final TextInputType? keyboard;
   final ValueChanged<String>? onSubmitted;
 
+  /// What the Enter/Return key does here (Christian, 2026-09-21).
+  ///
+  /// ⭐ [TextInputAction.next] on every field but the last, [TextInputAction.done]
+  /// plus an [onSubmitted] on the last one, so a form can be filled and sent
+  /// from the keyboard alone. ⚠️ `done` without an [onSubmitted] just closes
+  /// the keyboard — the two go together or Enter silently does nothing.
+  final TextInputAction? action;
+
   const AuthTextField({
     super.key,
     required this.controller,
@@ -348,6 +360,7 @@ class AuthTextField extends StatelessWidget {
     this.obscure = false,
     this.keyboard,
     this.onSubmitted,
+    this.action,
   });
 
   @override
@@ -358,6 +371,7 @@ class AuthTextField extends StatelessWidget {
         controller: controller,
         obscureText: obscure,
         keyboardType: keyboard,
+        textInputAction: action,
         onSubmitted: onSubmitted,
         style: const TextStyle(color: AppColors.text),
         decoration: InputDecoration(

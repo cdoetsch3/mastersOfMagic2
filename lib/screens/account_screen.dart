@@ -129,20 +129,42 @@ class _AccountScreenState extends State<AccountScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (_createMode) _field(_name, 'Character name', icon: Icons.person),
+        if (_createMode)
+          _field(
+            _name,
+            'Character name',
+            icon: Icons.person,
+            action: TextInputAction.next,
+          ),
         _field(
           _email,
           'Email',
           icon: Icons.mail,
           keyboard: TextInputType.emailAddress,
+          action: TextInputAction.next,
         ),
-        _field(_password, 'Password', icon: Icons.lock, obscure: true),
+        // ⭐ Enter on the LAST field of the form submits it (Christian,
+        // 2026-09-21): email, tab, password, Enter signs in without ever
+        // reaching for the mouse. In create mode the last field is the
+        // confirmation below, so the password only advances focus — an Enter
+        // here would submit against an empty confirm box and answer a
+        // perfectly good password with "Passwords do not match."
+        _field(
+          _password,
+          'Password',
+          icon: Icons.lock,
+          obscure: true,
+          action: _createMode ? TextInputAction.next : TextInputAction.done,
+          onSubmitted: _createMode ? null : (_) => _submitFromKeyboard(auth),
+        ),
         if (_createMode)
           _field(
             _confirm,
             'Confirm password',
             icon: Icons.lock_outline,
             obscure: true,
+            action: TextInputAction.done,
+            onSubmitted: (_) => _submitFromKeyboard(auth),
           ),
         if (_error != null) ...[
           const SizedBox(height: 6),
@@ -225,12 +247,25 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
+  /// The keyboard's own route into [_submit].
+  ///
+  /// ⭐ **The same code path the button takes**, busy guard included, so
+  /// Enter and a tap can never validate differently or fire two sign-ins at
+  /// once. The button expresses the guard as a null `onPressed`; a text field
+  /// has no such affordance, so it checks [_busy] itself.
+  void _submitFromKeyboard(AuthService auth) {
+    if (_busy) return;
+    _submit(auth);
+  }
+
   Widget _field(
     TextEditingController controller,
     String label, {
     required IconData icon,
     bool obscure = false,
     TextInputType? keyboard,
+    TextInputAction? action,
+    ValueChanged<String>? onSubmitted,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -238,6 +273,8 @@ class _AccountScreenState extends State<AccountScreen> {
         controller: controller,
         obscureText: obscure,
         keyboardType: keyboard,
+        textInputAction: action,
+        onSubmitted: onSubmitted,
         style: const TextStyle(color: AppColors.text),
         decoration: InputDecoration(
           labelText: label,

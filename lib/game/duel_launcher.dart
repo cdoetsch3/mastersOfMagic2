@@ -69,11 +69,13 @@ Future<void> launchDuel(
         // and damage; the opponent's scales the XP the win is worth. This is
         // the only path a real player takes, so a level dropped here is
         // invisible to every test that builds DuelScreen directly.
-        onResult: (outcome) {
+        onResult: (outcome) async {
           // ⚠️ A fled duel is banked by nobody. It pays no XP, no gold, and
           // records neither a win nor a loss (2026-08-17 ruling), and it is
-          // never rated either — nobody actually finished the fight.
-          if (outcome == DuelOutcome.fled) return;
+          // never rated either — nobody actually finished the fight. Null,
+          // not `unrated`: there is no ladder verdict to report, because
+          // there was no result.
+          if (outcome == DuelOutcome.fled) return null;
           final won = outcome == DuelOutcome.won;
           // ⭐ Academy banks no XP/gold/win-count (ruled 2026-09-10) — the
           // character is untouched — but it DOES rate (LADDER §1 law 4).
@@ -97,19 +99,24 @@ Future<void> launchDuel(
           // guard.
           final bot = _ladderBotBehind(driver);
           final rated = driver is RemoteDuelDriver ? driver.rated : bot != null;
-          if (rated) {
-            settleRatedDuel(
-              game,
-              driver: driver,
-              academy: academy,
-              won: won,
-              // ⭐ Whatever the driver was built with: the wire's number for
-              // a human, the search's live-or-seed number for a bot. The
-              // header showed this same figure, so what the player saw is
-              // what the result is measured against.
-              opponentRating: driver.opponentRating,
-            );
-          }
+          if (!rated) return DuelSettlement.unrated;
+          final settled = await settleRatedDuel(
+            game,
+            driver: driver,
+            academy: academy,
+            won: won,
+            // ⭐ Whatever the driver was built with: the wire's number for
+            // a human, the search's live-or-seed number for a bot. The
+            // header showed this same figure, so what the player saw is
+            // what the result is measured against.
+            opponentRating: driver.opponentRating,
+          );
+          // ⚠️ `settleRatedDuel` has its own unrated guard and can still
+          // refuse — an unrated RemoteDuelDriver that slipped past the check
+          // above. Its "no" wins, so the card agrees with the profile.
+          return settled == null
+              ? DuelSettlement.unrated
+              : DuelSettlement.of(settled);
         },
       ),
     ),

@@ -4,11 +4,25 @@ import 'package:flutter/widgets.dart';
 /// Thin wrapper over Firebase Auth exposing just what the UI needs, with
 /// human-readable error strings. Notifies listeners on any auth change.
 class AuthService extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  /// ⚠️ **Resolved lazily, never in a field initializer.** `FirebaseAuth
+  /// .instance` throws outright when `Firebase.initializeApp` has not run,
+  /// which is every widget test — and a field initializer runs for EVERY
+  /// constructor, so even [AuthService.forTesting] could not dodge it.
+  FirebaseAuth? _instance;
+  FirebaseAuth get _auth => _instance ??= FirebaseAuth.instance;
 
   AuthService() {
     _auth.userChanges().listen((_) => notifyListeners());
   }
+
+  /// ⭐ **Test seam.** A service that has not touched Firebase, for a widget
+  /// test to subclass and answer from memory. Override [user] (everything
+  /// else about identity is derived from it) plus whichever of [signIn] /
+  /// [signUp] / [sendPasswordReset] / [changePassword] the screen calls;
+  /// anything left unoverridden still reaches for the real Firebase and will
+  /// throw, which is the point — a test cannot silently hit the network.
+  @visibleForTesting
+  AuthService.forTesting();
 
   User? get user => _auth.currentUser;
 

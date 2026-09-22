@@ -25,6 +25,40 @@ class RatedOutcome {
   });
 }
 
+/// What the duel screen is told about the ladder once a finished duel has
+/// been banked (Christian, 2026-09-21): enough to print the Ranking row on
+/// the result card and nothing more.
+///
+/// ⭐ **Three states, not two.** `rated: false` is a duel that finished and
+/// deliberately moved no rating (a room code, a practice persona) — the card
+/// says "unrated". A *null* settlement is the different claim that there is
+/// nothing to report at all (a fled duel, or a screen built with no
+/// settler), and the card keeps its own counsel. Collapsing the two would
+/// make a room-code duel look like a bug.
+class DuelSettlement {
+  /// Whether this duel moved a ladder rating at all.
+  final bool rated;
+
+  /// The points won or lost, signed. Null exactly when [rated] is false.
+  final int? ratingDelta;
+
+  /// The rating the player now holds on that ladder. Null exactly when
+  /// [rated] is false.
+  final int? newRating;
+
+  const DuelSettlement({required this.rated, this.ratingDelta, this.newRating});
+
+  /// A duel that finished and rated nothing.
+  static const unrated = DuelSettlement(rated: false);
+
+  /// The rated case, read straight off the Elo exchange that was banked — so
+  /// the card can only ever show the number the profile actually took.
+  DuelSettlement.of(RatedOutcome outcome)
+    : rated = true,
+      ratingDelta = outcome.playerDelta,
+      newRating = outcome.newPlayerRating;
+}
+
 /// LADDER_DESIGN §2's Elo, applied to one duel. ⭐ No draws exist (a duel
 /// always ends with one mage at 0), so the two scores are always `1 - 0` or
 /// `0 - 1` and [Elo.kFor] is looked up independently per side — the schedule
@@ -103,14 +137,19 @@ LadderBot? _ladderBotBehind(OpponentDriver driver) {
 /// [RemoteDuelDriver.rated] is false is a no-op, full stop — nothing is read
 /// from the profile and nothing is written. Only `Matchmaking.quickMatch`'s
 /// human path sets `rated: true`.
-Future<void> settleRatedDuel(
+///
+/// ⭐ **Returns the very [RatedOutcome] it banked**, so the result card can
+/// print the change (Christian, 2026-09-21) without recomputing the Elo and
+/// risking a number that disagrees with the profile. Null is the unrated
+/// no-op above — nothing happened, so there is nothing to report.
+Future<RatedOutcome?> settleRatedDuel(
   GameState game, {
   required OpponentDriver driver,
   required bool academy,
   required bool won,
   required int opponentRating,
 }) async {
-  if (driver is RemoteDuelDriver && !driver.rated) return;
+  if (driver is RemoteDuelDriver && !driver.rated) return null;
 
   final profile = game.profile;
   final playerRating = academy
@@ -162,4 +201,6 @@ Future<void> settleRatedDuel(
       won: !won,
     );
   }
+
+  return outcome;
 }

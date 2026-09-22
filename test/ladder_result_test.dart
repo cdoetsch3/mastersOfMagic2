@@ -310,6 +310,66 @@ void main() {
       },
     );
 
+    // ====================================================================
+    // What comes BACK, so the result card can print it (Christian,
+    // 2026-09-21). The card must never recompute the Elo itself — one of
+    // the two numbers would eventually drift, and the player would be told
+    // a rating change their profile did not take.
+    // ====================================================================
+    test(
+      'the returned outcome is exactly what the profile was given',
+      () async {
+        FirestoreRest.client = MockClient(
+          (request) async => http.Response('{}', 200),
+        );
+        final profile = PlayerProfile.newPlayer()..ratingGeared = 1300;
+        final game = GameState(_Mem(), profile);
+        final before = profile.ratingGeared!;
+        final driver = RemoteDuelDriver(
+          roomId: 'room',
+          isHost: true,
+          masterSeed: 1,
+          opponentName: 'Rival',
+          opponentLevel: 5,
+          opponentGear: ItemModifiers.none,
+          opponentRating: 1200,
+          rated: true,
+        );
+
+        final settled = await settleRatedDuel(
+          game,
+          driver: driver,
+          academy: false,
+          won: true,
+          opponentRating: 1200,
+        );
+
+        expect(
+          settled,
+          isNotNull,
+          reason:
+              'a rated duel has something to report — a mutant that kept the '
+              'old `Future<void>` shape and returned nothing would leave the '
+              'card permanently on its awaiting ellipsis',
+        );
+        expect(
+          settled!.playerDelta,
+          profile.ratingGeared! - before,
+          reason:
+              'the delta handed back IS the move the profile made — a mutant '
+              'returning a freshly-rated outcome computed off the ALREADY '
+              'updated rating would hand back a different number here',
+        );
+        expect(
+          settled.newPlayerRating,
+          profile.ratingGeared,
+          reason:
+              'and the rating beside it is the one now banked, not the one '
+              'the duel started from',
+        );
+      },
+    );
+
     test('a room-code (rated: false) driver writes nothing at all', () async {
       var networkCalls = 0;
       FirestoreRest.client = MockClient((request) async {
@@ -329,7 +389,7 @@ void main() {
         // rated defaults to false — exactly what createRoom/joinRoom send.
       );
 
-      await settleRatedDuel(
+      final settled = await settleRatedDuel(
         game,
         driver: driver,
         academy: false,
@@ -337,6 +397,14 @@ void main() {
         opponentRating: 1600,
       );
 
+      expect(
+        settled,
+        isNull,
+        reason:
+            'nothing was rated, so there is nothing to hand the card — a '
+            'mutant that returned an outcome anyway would print a rating '
+            'change a room-code duel never made',
+      );
       expect(
         profile.ratingGeared,
         null,
