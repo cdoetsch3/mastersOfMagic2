@@ -124,6 +124,13 @@ class AdventureRun {
   /// ⭐ **The pool is drawn here, once** — 2 of the 4 mini-bosses and 1 of the
   /// 2 bosses (§3d). Which ones you get is the reason a zone is worth running
   /// twice, and it is why Purge takes about 4 clears (ACHIEVEMENTS §2.3).
+  ///
+  /// ⚠️ **One zone does not draw its boss at all.** When
+  /// [Bestiary.bossSequenceFor] answers with a non-empty list, the run's boss
+  /// stage becomes that whole list, in order, one fight each — ENEMIES §2e's
+  /// ruling for The Eclipsed Citadel, where *"a finale that ends on a coin flip
+  /// has no ending."* ⭐ Everywhere else the list is empty and the draw below is
+  /// untouched.
   factory AdventureRun.roll({
     required GameLocation zone,
     required List<EnemyDef> roster,
@@ -135,6 +142,18 @@ class AdventureRun {
       ..shuffle(rng);
     final bosses = roster.where((e) => e.rank == EnemyRank.boss).toList()
       ..shuffle(rng);
+
+    // ⭐ The boss SEQUENCE, resolved against the roster this run was handed
+    // rather than against the bestiary — the roster is the authority on which
+    // defs exist, and a caller that passes a partial one (the tests do) must
+    // not get a boss the roster does not contain. ⚠️ Empty for every zone but
+    // The Eclipsed Citadel, and empty is also what an id that no longer
+    // resolves produces: the ordinary one-of-two draw below then takes over,
+    // which is the safe direction.
+    final sequence = <EnemyDef>[
+      for (final id in Bestiary.bossSequenceFor(zone.id))
+        ...bosses.where((b) => b.id == id),
+    ];
 
     final perSection = commonsPerSectionFor(zone.tier);
     final drawnMinis = minis.take(2).toList();
@@ -150,6 +169,10 @@ class AdventureRun {
       }
       if (section < 2) {
         if (section < drawnMinis.length) line.add(drawnMinis[section]);
+      } else if (sequence.isNotEmpty) {
+        // ⚠️ Appended in the sequence's own order, which is the zone's name:
+        // the body covering, then the light it covered.
+        line.addAll(sequence);
       } else if (bosses.isNotEmpty) {
         line.add(bosses.first);
       }
@@ -238,8 +261,27 @@ class AdventureRun {
   int get encounterNumber => index + 1;
   int get encounterCount => encounters.length;
 
-  /// Whether the fight now in front of the player ends the zone.
+  /// Whether the fight now in front of the player is a boss fight.
   bool get atBoss => current?.def.rank == EnemyRank.boss;
+
+  /// ⭐ **Whether the fight now in front of the player ends the zone** — the
+  /// last boss of the line, which for all but one zone is simply *the* boss.
+  ///
+  /// ⚠️ **This, not [atBoss], is what a clear is measured on.** The Eclipsed
+  /// Citadel fights its two bosses in sequence (ENEMIES §2e), and banking the
+  /// clear on the first of them would hand the player the zone — the
+  /// `zoneClears` tick, the repeat-clear content, `RunOutcome.cleared` — for
+  /// beating Totality and then leave Procarius standing in a run that had
+  /// already ended. ⭐ Derived from the LINE rather than from a flag, so a
+  /// single-boss zone (every other one) answers exactly what [atBoss] answers
+  /// and nothing about it changed.
+  bool get atFinalBoss {
+    if (!atBoss) return false;
+    for (var i = index + 1; i < encounters.length; i++) {
+      if (encounters[i].def.rank == EnemyRank.boss) return false;
+    }
+    return true;
+  }
 
   /// Banks a win, parks its drops in [unclaimed], and moves on.
   ///
@@ -252,12 +294,14 @@ class AdventureRun {
     required Map<String, ItemInstance> instances,
     required int remainingHp,
   }) {
-    final wasBoss = atBoss;
+    // ⚠️ [atFinalBoss], never [atBoss] — a two-stage finale must not end the
+    // run on its first stage. See the getter.
+    final wasFinalBoss = atFinalBoss;
     unclaimed.addAll(loot);
     unclaimedInstances.addAll(instances);
     playerHp = remainingHp;
     index++;
-    if (wasBoss) outcome = RunOutcome.cleared;
+    if (wasFinalBoss) outcome = RunOutcome.cleared;
   }
 
   /// ⚠️ Death's cost is paid on the *profile* now (`GameState.loseEncounter`

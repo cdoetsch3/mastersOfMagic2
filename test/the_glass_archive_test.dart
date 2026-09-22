@@ -411,8 +411,11 @@ void main() {
       for (final id in mine) {
         expect(id.startsWith('ga_'), isTrue, reason: '$id is not zone-tagged');
       }
+      // ⭐ Mages cast Spellbook ids by design (EnemyDef.isMage), and two
+      // mages may share one — the law is over CREATURE kits only.
       final everything = [
-        for (final e in Bestiary.all) ...e.moves.map((m) => m.id),
+        for (final e in Bestiary.all)
+          if (!e.isMage) ...e.moves.map((m) => m.id),
       ];
       expect(
         everything.toSet(),

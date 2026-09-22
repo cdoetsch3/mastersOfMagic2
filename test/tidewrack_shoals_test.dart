@@ -433,8 +433,11 @@ void main() {
           reason: '$id is not zone-tagged with the tw_ prefix',
         );
       }
+      // ⭐ Mages cast Spellbook ids by design (EnemyDef.isMage) — the law is
+      // over CREATURE kits only.
       final everyone = [
-        for (final e in Bestiary.all) ...e.moves.map((m) => m.id),
+        for (final e in Bestiary.all)
+          if (!e.isMage) ...e.moves.map((m) => m.id),
       ];
       expect(
         everyone.toSet(),

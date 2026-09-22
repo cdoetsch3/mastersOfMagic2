@@ -177,7 +177,7 @@ void main() {
       }
       expect(
         Bestiary.all.length,
-        275,
+        286,
         reason:
             'the Primal quarter (5 x 11 = 55) plus the three Kinetic '
             'pure zones (3 x 11) plus The Molten Deep (11) plus The '
@@ -384,7 +384,7 @@ void main() {
           .toList();
       expect(
         noGrid.length,
-        264,
+        275,
         reason:
             'eleven zones x 11 have no pixel grid — if this number moves, '
             'either a roster changed or a zone grew grids, and the loop below '
@@ -561,7 +561,7 @@ void main() {
     test('the parser still finds the entries it is anchored on', () {
       expect(
         described.length,
-        275,
+        286,
         reason:
             'the entry format changed (or the file moved) and the coverage '
             'check below has quietly become a comparison of two empty sets — '

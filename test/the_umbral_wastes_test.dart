@@ -467,8 +467,11 @@ void main() {
       // ⚠️ The prefix is what keeps 26 zones' move ids from colliding
       // (ETHEREAL_CONTRACT §3.5/§7.2) — proved against every shipped zone,
       // not just this one.
+      // ⭐ Mages cast Spellbook ids by design (EnemyDef.isMage), and two
+      // mages may share one — the law is over CREATURE kits only.
       final everything = [
-        for (final e in Bestiary.all) ...e.moves.map((m) => m.id),
+        for (final e in Bestiary.all)
+          if (!e.isMage) ...e.moves.map((m) => m.id),
       ];
       expect(
         everything.toSet(),

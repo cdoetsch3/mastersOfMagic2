@@ -1089,6 +1089,9 @@ abstract final class World {
           'mountain you could not climb. The Citadel is between you and it. '
           'That is what the name has always meant.',
       // ⭐ The way back IN. Beyond it: the summit, and Zenith.
+      // ⭐ ETHEREAL_CONTRACT §3.4: the three Ethereal fragments, one from each
+      // pure Ethereal zone's bosses — shown, never spent.
+      gateItemIds: ['the_kept_third', 'the_dark_third', 'the_written_third'],
       edges: [
         TravelEdge('the_unwritten_library', 8),
         TravelEdge('zenith', 12, kind: TravelEdgeKind.veil),

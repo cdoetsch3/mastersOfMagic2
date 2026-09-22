@@ -809,7 +809,11 @@ class GameState extends ChangeNotifier {
     // ⭐ Defaulting inside rollDrops (lootRng, one long-lived stream) — the
     // hygiene half of the 2026-08-17 drop audit; both shapes measured at 10%.
     final loot = rollDrops(enemy.def.drops, rng);
-    final wasBoss = r.atBoss;
+    // ⚠️ `atFinalBoss`, not `atBoss`: a zone counts as cleared when the LAST
+    // boss of the line falls. Identical to `atBoss` in every zone but The
+    // Eclipsed Citadel, whose two bosses are a sequence (ENEMIES §2e) — there,
+    // `atBoss` would bank the clear on Totality and leave Procarius unfought.
+    final wasBoss = r.atFinalBoss;
     r.recordVictory(
       loot: loot.slots,
       instances: loot.instances,

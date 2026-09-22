@@ -30,7 +30,9 @@ class EnemyEncounter {
     name: def.name,
     title: def.archetype.name,
     level: level,
-    intelligence: def.archetype.intelligence,
+    // ⚠️ `def.intelligence`, never `def.archetype.intelligence` — Procarius
+    // overrides the Tyrant's 9 with his persona's 10 (ENEMIES §2e).
+    intelligence: def.intelligence,
     apparel: _apparelFor(def),
     loadout: Loadout(elements: def.elements, spells: def.moves),
   );

@@ -24,7 +24,6 @@ const _parallelLaneIds = {
   'pilgrims_ration',
 };
 
-
 void main() {
   const zone = 'the_shattered_orrery';
   final all = ShatteredOrreryBestiary.all;

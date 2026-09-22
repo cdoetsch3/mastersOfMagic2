@@ -22,7 +22,7 @@ import 'package:mom_engine/mom_engine.dart';
 /// ⭐ Every creature in the game that is a MAGE, by id. ⚠️ Adding a row here
 /// is a design decision (ENEMIES §3.4 names exactly two candidates — the
 /// Archmage and Procarius), not a way to make this file go green.
-const _knownMages = <String>{'the_archmage'};
+const _knownMages = <String>{'the_archmage', 'procarius_the_eclipsed'};
 
 void main() {
   test('isMage defaults false for every shipped creature but the mages', () {

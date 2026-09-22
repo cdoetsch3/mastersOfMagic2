@@ -49,8 +49,35 @@ class EnemyDef {
   final String lore;
 
   /// Its own moves. ⚠️ Never a `Spellbook` entry unless the creature is
-  /// genuinely a mage.
+  /// genuinely a mage — see [isMage].
   final List<Spell> moves;
+
+  /// ⭐ **A mage brings a Spellbook loadout, not a creature kit.**
+  ///
+  /// ENEMIES §3.4: *"beasts and constructs get creature moves; humanoid
+  /// casters get `Spellbook`."* The archetype's `moveCount` / cost band
+  /// describes a **creature kit**, so it does not apply here: an archmage
+  /// fields the same five-element, ten-spell loadout a player would, and the
+  /// last fight in the game is therefore the player's own toolbox pointed
+  /// back at them.
+  ///
+  /// ⚠️ **Zone suites must exempt a mage from the move-count law**
+  /// (`moves.length == archetype.moveCount`), and assert the loadout instead.
+  /// Only two creatures in the game set this: The Archmage (The Collapsed
+  /// Academy) and Procarius, the Eclipsed (The Eclipsed Citadel).
+  final bool isMage;
+
+  /// ⚠️ **The one documented exception to "intelligence comes from the
+  /// archetype"** (ENEMIES §2e, the Procarius table).
+  ///
+  /// A creature's `LadderAi` rung is normally [EnemyArchetype.intelligence],
+  /// and that is still the default — this is null on every other creature in
+  /// the game. Procarius is a **shipped `AiPersona`** (`ai_personas.dart`)
+  /// that has run at **10** since long before the Tyrant archetype's 9
+  /// existed, and ⭐ *"a finale antagonist demoted by a table is a bug, not a
+  /// balance decision."* Read through [intelligence], never off the archetype
+  /// directly.
+  final int? intelligenceOverride;
 
   final DropTable drops;
 
@@ -59,29 +86,6 @@ class EnemyDef {
   /// it and stays stat-free by construction. Reaches the duel through
   /// `OpponentDriver.opponentCombatStats`, never through `opponentGear`.
   final EnemyCombatStats combatStats;
-
-  /// ⭐ **A mage brings a Spellbook loadout, not a creature kit**
-  /// (ENEMIES_DESIGN §3.4). The Ethereal band is scholars, wardens and
-  /// archmages; those fight you with *your own tools*, which is a genuinely
-  /// different duel from a creature's two or three verbs. When this is true,
-  /// [moves] is a level-legal selection from [Spellbook] rather than moves
-  /// authored for this creature.
-  ///
-  /// ⚠️ **It is a licence, not a decoration.** Three laws every zone test
-  /// enforces on creatures are *off* for a mage, and only because the
-  /// Spellbook already answers them its own way:
-  ///  - the archetype's `moveCount` / cost band (§3.2) — a loadout is ten
-  ///    slots, not two or three;
-  ///  - the zone move-id prefix — the ids are `bolt`, `ruin`, `aegis`;
-  ///  - the contract's raw-damage ceiling (§1.3) — the Spellbook is priced
-  ///    for players, and Cataclysm's 59–72 is over the creature ceiling by
-  ///    construction.
-  ///
-  /// ⚠️ In exchange a mage owes the one law a creature does not: every entry
-  /// must be in `Spellbook.all` and unlocked at or below the encounter level
-  /// (`Progression.plannedUnlockLevelOf`). ⭐ Defaults false, so every
-  /// creature already shipped stays a creature without being edited.
-  final bool isMage;
 
   const EnemyDef({
     required this.id,
@@ -95,7 +99,13 @@ class EnemyDef {
     this.drops = DropTable.empty,
     this.combatStats = EnemyCombatStats.none,
     this.isMage = false,
+    this.intelligenceOverride,
   });
+
+  /// The `LadderAi` rung this creature actually fights at — the archetype's,
+  /// unless [intelligenceOverride] says otherwise. ⭐ **The one door**, so a
+  /// call site cannot read the archetype and miss the exception.
+  int get intelligence => intelligenceOverride ?? archetype.intelligence;
 
   /// Max HP for this creature at [level], off the shared level baseline.
   int maxHpAt(int level) =>

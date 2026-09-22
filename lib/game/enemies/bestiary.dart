@@ -21,6 +21,7 @@ import 'the_collapsed_academy.dart';
 import 'the_glass_archive.dart';
 import 'the_reliquary_deep.dart';
 import 'the_sealed_garden.dart';
+import 'the_eclipsed_citadel.dart';
 import 'the_molten_deep.dart';
 import 'the_shattered_orrery.dart';
 import 'the_sunless_reach.dart';
@@ -67,6 +68,7 @@ abstract final class Bestiary {
     ...UnwrittenLibraryBestiary.all,
     ...HallowmarchBestiary.all,
     ...SealedGardenBestiary.all,
+    ...EclipsedCitadelBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>
@@ -78,4 +80,34 @@ abstract final class Bestiary {
     }
     return null;
   }
+
+  /// ⭐⭐ **The boss ORDER for a zone that fights all of its bosses, in
+  /// sequence, every clear — and the empty list for every other zone.**
+  ///
+  /// ⚠️ **Empty is the rule; a sequence is the exception.** Every zone in the
+  /// game draws ONE boss out of a pool of two (`AdventureRun.roll`, GAME_DESIGN
+  /// §3d) so that a clear is a coin flip and a zone is not memorised after one
+  /// run. Only The Eclipsed Citadel overrides that, because ⭐ *"a finale that
+  /// ends on a coin flip has no ending"* — half the players would never meet
+  /// Procarius, who is the game's named antagonist and its only level-60
+  /// persona (ENEMIES §2e, §4.1).
+  ///
+  /// ⭐ **Read by `adventure.dart`, which is the only caller.** When this is
+  /// non-empty the run's boss stage becomes the whole list, in order, one fight
+  /// each; `AdventureRun.atFinalBoss` then makes the zone count as cleared only
+  /// once the LAST of them falls. When it is empty — everywhere else — nothing
+  /// about the single-boss draw changes.
+  ///
+  /// ⚠️ **Ids, not defs.** A `List<EnemyDef>` here would make the bestiary and
+  /// the sequence two records of the same roster, free to drift; the ids are
+  /// resolved against the roster the run was actually given, and a name that no
+  /// longer resolves falls back to the ordinary draw rather than dropping a
+  /// boss.
+  static List<String> bossSequenceFor(String zoneId) =>
+      _bossSequences[zoneId] ?? const <String>[];
+
+  /// ⚠️ **One entry, and it should stay that way.** See [bossSequenceFor].
+  static const Map<String, List<String>> _bossSequences = {
+    'the_eclipsed_citadel': EclipsedCitadelBestiary.bossSequence,
+  };
 }

@@ -413,8 +413,11 @@ void main() {
       for (final id in mine) {
         expect(id.startsWith('sr_'), isTrue, reason: '$id is not zone-tagged');
       }
+      // ⭐ Mages cast Spellbook ids by design (EnemyDef.isMage) — the law is
+      // over CREATURE kits only.
       final everyone = [
-        for (final e in Bestiary.all) ...e.moves.map((m) => m.id),
+        for (final e in Bestiary.all)
+          if (!e.isMage) ...e.moves.map((m) => m.id),
       ];
       expect(
         everyone.toSet(),

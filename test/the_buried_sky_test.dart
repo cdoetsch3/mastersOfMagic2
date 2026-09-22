@@ -20,7 +20,6 @@ import 'package:mom_engine/mom_engine.dart';
 /// until the merge coordinator lands the sibling.
 const _parallelLaneIds = {'climbers_ration', 'goldenrood_draught'};
 
-
 void main() {
   const zone = 'the_buried_sky';
   final all = BuriedSkyBestiary.all;
