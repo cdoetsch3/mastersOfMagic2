@@ -10,6 +10,7 @@ import 'cinderpeak_foothills.dart';
 import 'enemy_def.dart';
 import 'frostfell_pass.dart';
 import 'glimmerbrook.dart';
+import 'hallowmarch.dart';
 import 'old_quarry.dart';
 import 'starfall_basin.dart';
 import 'stormcliff_coast.dart';
@@ -63,6 +64,7 @@ abstract final class Bestiary {
     ...ReliquaryDeepBestiary.all,
     ...UmbralWastesBestiary.all,
     ...UnwrittenLibraryBestiary.all,
+    ...HallowmarchBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>

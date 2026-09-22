@@ -10,6 +10,7 @@ import 'catalogue/ashfall_vale_items.dart';
 import 'catalogue/cinderpeak_items.dart';
 import 'catalogue/frostfell_pass_items.dart';
 import 'catalogue/glimmerbrook_items.dart';
+import 'catalogue/hallowmarch_items.dart';
 import 'catalogue/old_quarry_items.dart';
 import 'catalogue/starfall_basin_items.dart';
 import 'catalogue/stormcliff_coast_items.dart';
@@ -73,6 +74,7 @@ abstract final class ItemCatalogue {
     'the_reliquary_deep': ReliquaryDeepItems.all,
     'the_umbral_wastes': UmbralWastesItems.all,
     'the_unwritten_library': UnwrittenLibraryItems.all,
+    'hallowmarch': HallowmarchItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists

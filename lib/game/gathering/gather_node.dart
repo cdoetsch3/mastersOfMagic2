@@ -1005,6 +1005,63 @@ abstract final class GatherNodes {
         'still being written.',
   );
 
+  // ---- Hallowmarch · 45–49 · Sanctus (ETHEREAL_CONTRACT §6) -------------
+  // ⭐ XP is 97 throughout: `9 + 2 × (45 − 1)`.
+
+  /// ⭐ The wood, and the flavour is the zone's whole theme in one line:
+  /// planted in a row, which is a thing only somebody expecting to come back
+  /// does. ⚠️ `reps: 5` is the Felling ladder's top — a tier-8 wood.
+  static const hmSpiritwoodStand = GatherNodeDef(
+    id: 'hm_spiritwood_stand',
+    zoneId: 'hallowmarch',
+    skill: GatherSkill.felling,
+    yieldsDefId: 'spiritwood_log',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.releaseTiming, 'chop', reps: 5),
+    xp: 97,
+    flavor:
+        'Planted in a row beside the road, which means somebody expected to '
+        'come back.',
+  );
+
+  /// ⭐ `trace` is the herb's own engine — cutting a stem out of a channel is
+  /// following a path without leaving it.
+  static const hmGoldenroodVerge = GatherNodeDef(
+    id: 'hm_goldenrood_verge',
+    zoneId: 'hallowmarch',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'goldenrood',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.trace, 'cut', complexity: 4),
+    xp: 97,
+    flavor:
+        'It only grows in the cut channel, and the channel did not cut '
+        'itself.',
+  );
+
+  /// ⚠️⚠️ **The only cross-zone node in the game** (§6): it stands in
+  /// Hallowmarch and yields `deepstratum_ore`, which **The Buried Sky**
+  /// defines. ⭐ Deliberate, and it is the one exception that most earns
+  /// itself — the causeway's stone came from further down than the causeway
+  /// is, and a player who has not yet found the shaft can still start the
+  /// Metalworking ladder. 📝 §6 calls it the safest of the three optional
+  /// nodes to cut.
+  static const hmCausewayQuarry = GatherNodeDef(
+    id: 'hm_causeway_quarry',
+    zoneId: 'hallowmarch',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'deepstratum_ore',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.sweetSpot, 'strike', reps: 4),
+    xp: 97,
+    flavor:
+        'Where they got the stone for the road. It came from further down '
+        'than the road is.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -1060,6 +1117,9 @@ abstract final class GatherNodes {
     uwShoulderDrift,
     ulNightinkWell,
     ulColophonShelf,
+    hmSpiritwoodStand,
+    hmGoldenroodVerge,
+    hmCausewayQuarry,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

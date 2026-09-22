@@ -20,9 +20,6 @@ import 'package:mom_engine/mom_engine.dart';
 /// until the merge coordinator lands the sibling.
 const _parallelLaneIds = {'climbers_ration', 'goldenrood_draught'};
 
-const _skipUntilSiblings =
-    'climbers_ration and goldenrood_draught land with the hallowmarch lane — '
-    'un-skip when it is on main';
 
 void main() {
   const zone = 'the_buried_sky';
@@ -756,7 +753,7 @@ void main() {
           );
         }
       }
-    }, skip: _skipUntilSiblings);
+    });
 
     test('every main table draws exactly one entry, by weight', () {
       for (final e in all) {

@@ -24,9 +24,6 @@ const _parallelLaneIds = {
   'pilgrims_ration',
 };
 
-const _skipUntilSiblings =
-    'astral_* lands with the starfall_basin lane and pilgrims_ration with '
-    'the_kiln_desert lane — un-skip when both are on main';
 
 void main() {
   const zone = 'the_shattered_orrery';
@@ -652,7 +649,7 @@ void main() {
           );
         }
       }
-    }, skip: _skipUntilSiblings);
+    });
 
     test('every main table draws exactly one entry, by weight', () {
       for (final e in all) {

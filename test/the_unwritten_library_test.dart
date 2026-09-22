@@ -35,10 +35,6 @@ const _parallelLaneIds = <String>{
   'censer_draught',
 };
 
-const _skipUntilSiblings =
-    'umbra_* lands with the the_umbral_wastes lane, climbers_ration with '
-    'hallowmarch and censer_draught with the_reliquary_deep — un-skip when '
-    'all three are on main';
 
 void main() {
   const zone = 'the_unwritten_library';
@@ -730,7 +726,7 @@ void main() {
           );
         }
       }
-    }, skip: _skipUntilSiblings);
+    });
 
     test('⚠️ no id in the cross-lane list is one this zone authors', () {
       // Otherwise the skip above would be hiding a real local failure.

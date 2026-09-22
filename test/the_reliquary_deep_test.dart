@@ -664,22 +664,15 @@ void main() {
       }
     });
 
-    test(
-      'the cross-lane ids resolve too',
-      () {
-        for (final id in _parallelLaneIds) {
-          expect(
-            ItemCatalogue.tryById(id),
-            isNotNull,
-            reason: '$id is named by §4.6\'s tables and must exist',
-          );
-        }
-      },
-      skip:
-          'sanctus_* is defined by the Hallowmarch lane, umbra_* by The '
-          'Umbral Wastes lane and climbers_ration by Hallowmarch; delete this '
-          'skip when the Ethereal worktrees land together',
-    );
+    test('the cross-lane ids resolve too', () {
+      for (final id in _parallelLaneIds) {
+        expect(
+          ItemCatalogue.tryById(id),
+          isNotNull,
+          reason: '$id is named by §4.6\'s tables and must exist',
+        );
+      }
+    });
 
     test('⚠️ no id in the cross-lane list is one this zone authors', () {
       // Otherwise the skip above would be hiding a real local failure.

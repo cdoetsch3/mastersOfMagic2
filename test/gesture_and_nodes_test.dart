@@ -544,8 +544,18 @@ void main() {
     });
 
     test('every node yields a real, fungible, stackable material', () {
+      // ⚠️ **One id is pending a parallel worktree.** `hm_causeway_quarry`
+      // (Hallowmarch) is the only cross-zone node in the game — it yields
+      // `deepstratum_ore`, which **The Buried Sky** lane defines
+      // (ETHEREAL_CONTRACT §6, §7.4). ⭐ Exempted by NAME rather than by a
+      // `skip:` on the test, because a skip would take the law off all
+      // forty-odd other nodes to excuse one. 📝 **Delete this set and the
+      // `continue` below once the_buried_sky merges** — everything else in
+      // this loop is checked for it as normal.
+      const pendingCrossLane = <String>{}; // the Buried Sky landed
       for (final n in GatherNodes.all) {
         final def = ItemCatalogue.tryById(n.yieldsDefId);
+        if (def == null && pendingCrossLane.contains(n.yieldsDefId)) continue;
         expect(
           def,
           isNotNull,
