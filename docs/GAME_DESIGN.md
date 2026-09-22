@@ -1707,6 +1707,8 @@ firebase deploy --only hosting
 - ✅ **Matchmaking is separate from dueling**: quick match / friendly room codes /
   practice roster all just produce an `OpponentDriver`; the duel screen and engine
   never know whether the opponent is human or AI.
+  📝 removed 2026-09-21 — the practice roster is gone from the lobby; the
+  campaign map is now the only place a player picks a named AI on purpose.
 - ✅ **Commit-reveal over Firestore** (trustless): per turn both clients write
   `sha256(move|nonce)`, then reveal; each verifies the other and resolves the turn
   locally on the shared deterministic engine, seeded by `deriveTurnSeed(master, turn,

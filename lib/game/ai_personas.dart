@@ -6,8 +6,11 @@ import 'loadout.dart';
 import 'mage_apparel.dart';
 
 /// A named AI opponent with a level, look, spell kit, and tactical skill.
-/// Personas fill two roles: a practice roster, and matchmaking stand-ins
-/// when no human opponent is found.
+/// Personas fill two roles: campaign encounters on the map, and matchmaking
+/// stand-ins when no human opponent is found.
+///
+/// 📝 A third role — the lobby's "Practice vs AI" roster — was removed
+/// 2026-09-21. Nothing player-facing in matchmaking names a persona now.
 ///
 /// ⚠️ **The roster is NOT the intelligence scale.** Intelligence 1–10
 /// (GAME_DESIGN §6b) is a property every enemy carries — wild monsters,
@@ -75,9 +78,9 @@ double blunderChanceForIntelligence(int intelligence) =>
 /// The Phase-1 roster, weakest to strongest.
 ///
 /// ⭐ **The Ladder's 27-bot pool now lives in `ladder_bots.dart`
-/// (`LadderRoster`)**, not here. `AiRoster` remains the campaign/practice
-/// list — [campaignFoe], [strongestAtOrBelow] and [nearestToLevel] still
-/// read from it. `LadderRoster` borrows five of these personas by id
+/// (`LadderRoster`)**, not here. `AiRoster` remains the campaign list —
+/// [campaignFoe], [strongestAtOrBelow] and [nearestToLevel] still read from
+/// it. `LadderRoster` borrows five of these personas by id
 /// (Wick, Brightgale, Thornwall, Morwen, Al'Dorian) rather than duplicating
 /// them, so this list staying small and hand-curated is still the point.
 abstract final class AiRoster {

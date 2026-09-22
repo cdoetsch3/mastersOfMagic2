@@ -109,6 +109,8 @@ Fighting up rewards more — **but not 1:1 with the opponent's own XP value**:
 - **AI stand-in duels** (quick-match fallback, practice roster): 50% of PvP
   values — real but clearly secondary. Campaign fights pay full value
   (single-player remains the primary XP source, per GAME_DESIGN §4).
+  📝 removed 2026-09-21 — "practice roster" here; the quick-match fallback is
+  the only AI stand-in left, and the rate is unchanged.
 
 ### 2.5 Anti-farm guards 📝
 - Repeat-opponent decay in PvP: 100% / 75% / 50% / 25% XP for the 1st–4th+

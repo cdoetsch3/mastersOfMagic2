@@ -969,6 +969,8 @@ are still his to overturn.
 - Settlement: `settleRatedDuel` → `GameState.applyRatedResult` (profile
   save path) + `BotRatings.record` (additive, clamped ±300 to seed). Room
   codes unrated (`RemoteDuelDriver.rated`). Practice roster unrated.
+  📝 removed 2026-09-21 — the practice roster no longer exists; campaign
+  encounters are the remaining unrated persona duels.
 - UI: 'Searching…' → 'Almost there…' (6 s on the clock) → 'Found someone!'
   (fixed 1.2 s hold, both kinds) → 'Loading the duel…'; home card
   'Ladder N · Academy N'; duel header shows the opponent's rating;

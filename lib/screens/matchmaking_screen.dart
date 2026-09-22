@@ -6,7 +6,6 @@ import 'package:mom_engine/mom_engine.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../game/academy.dart';
-import '../game/ai_personas.dart';
 import '../game/auth_service.dart';
 import '../game/duel_launcher.dart';
 import '../game/game_state.dart';
@@ -18,11 +17,12 @@ import '../ui/search_narration.dart';
 import 'account_screen.dart';
 
 /// The matchmaking lobby: quick match (one rated queue of humans and ladder
-/// bots — LADDER_DESIGN §3), friendly duels by room code, and the AI practice
-/// roster. ⚠️ Law 3 (§1): nothing player-facing here may say a queue opponent
-/// might be a bot. The practice roster is the one place "AI" is said out
-/// loud, because there the player picks the persona on purpose. Whatever
-/// path is taken, the duel that follows is identical.
+/// bots — LADDER_DESIGN §3) and friendly duels by room code. ⚠️ Law 3 (§1):
+/// nothing player-facing here may say a queue opponent might be a bot — and
+/// since the AI practice roster was removed (2026-09-21) the lobby says "AI"
+/// NOWHERE at all, which is the strongest form of that law. The only named
+/// AI opponents a player meets on purpose are campaign encounters, picked
+/// from the map. Whatever path is taken, the duel that follows is identical.
 class MatchmakingScreen extends StatefulWidget {
   final Loadout loadout;
 
@@ -299,7 +299,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
               ? 'The Academy is open to guests — play under a temporary '
                     'name, or sign in to keep a character.'
               : 'Dueling other players needs an account so they know who '
-                    'beat them. Practice duels vs AI work without one.',
+                    'beat them. The Academy is open to guests.',
           style: const TextStyle(color: AppColors.textDim),
         ),
         actions: [
@@ -464,7 +464,6 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
   }
 
   Widget _menu() {
-    final game = GameStateScope.of(context);
     return ListView(
       shrinkWrap: true,
       padding: const EdgeInsets.all(16),
@@ -589,65 +588,6 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
             style: const TextStyle(color: AppColors.ember, fontSize: 13),
           ),
         ],
-        const SizedBox(height: 14),
-        const SectionLabel('Practice vs AI'),
-        for (final persona in AiRoster.all)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: GamePanel(
-              onTap: () => launchAiDuel(
-                context,
-                loadout: widget.loadout,
-                persona: persona,
-                campaign: false,
-              ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundColor: persona.apparel.robe,
-                    child: Text(
-                      persona.name[0],
-                      style: const TextStyle(
-                        color: AppColors.text,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${persona.name} · Lv ${persona.level}',
-                          style: const TextStyle(
-                            color: AppColors.text,
-                            fontSize: 14,
-                          ),
-                        ),
-                        Text(
-                          persona.title,
-                          style: const TextStyle(
-                            color: AppColors.textDim,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (persona.level <= game.profile.level + 1)
-                    const Icon(Icons.chevron_right, color: AppColors.textFaint)
-                  else
-                    const Icon(
-                      Icons.warning_amber,
-                      size: 16,
-                      color: AppColors.gold,
-                    ),
-                ],
-              ),
-            ),
-          ),
       ],
     );
   }
