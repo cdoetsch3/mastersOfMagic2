@@ -855,6 +855,60 @@ abstract final class GatherNodes {
         'vault below it.',
   );
 
+  // ---- The Reliquary Deep (ETHEREAL_CONTRACT §6) ------------------------
+  //
+  // ⭐⭐ **Three nodes, and no hide anywhere in the zone** — §3.1's note: the
+  // only hybrid in either quarter whose three materials are all gatherable.
+  // A corridor someone made, in a mountain, with no animals in it. ⚠️ Adding
+  // a fourth node or a hide here breaks the zone's own premise, not just a
+  // count.
+
+  /// ⭐ The `hide` drop role in this zone resolves to `reliquary_gold`
+  /// (§3.5 ruling 1), so the gold is doubly load-bearing: a node yield AND a
+  /// kill payout. That is allowed — the no-second-source rule is about hides,
+  /// which this zone has none of.
+  static const rdCenserRun = GatherNodeDef(
+    id: 'rd_censer_run',
+    zoneId: 'the_reliquary_deep',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'censer_resin',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.trace, 'scrape', complexity: 4),
+    xp: 111,
+    flavor:
+        'The censers along the warm stretch. None of them has been lit and '
+        'none is cold.',
+  );
+
+  static const rdGiltFitting = GatherNodeDef(
+    id: 'rd_gilt_fitting',
+    zoneId: 'the_reliquary_deep',
+    skill: GatherSkill.mining,
+    yieldsDefId: 'reliquary_gold',
+    min: 2,
+    max: 3,
+    step: GestureStep(GestureEngine.alignCommit, 'prise', complexity: 4),
+    xp: 111,
+    flavor:
+        'Somebody had a great deal of gold to spare on a corridor nobody was '
+        'meant to walk.',
+  );
+
+  /// ⚠️ **Linen, not a hide** — it was folded and left on an altar, so it is
+  /// something the world holds still and a node is exactly right for it.
+  static const rdAltarLinen = GatherNodeDef(
+    id: 'rd_altar_linen',
+    zoneId: 'the_reliquary_deep',
+    skill: GatherSkill.foraging,
+    yieldsDefId: 'unleft_linen',
+    min: 2,
+    max: 4,
+    step: GestureStep(GestureEngine.rateDrag, 'lift', reps: 3),
+    xp: 111,
+    flavor: 'Still folded, still square, still on the altar. Nobody took it.',
+  );
+
   /// ⚠️ Every zone list must be reachable from here — an unlisted node
   /// compiles fine and simply never spawns, the usual silent failure.
   static const all = <GatherNodeDef>[
@@ -902,6 +956,9 @@ abstract final class GatherNodes {
     bsNadirPocket,
     caAetherwoodStair,
     caSlagVault,
+    rdCenserRun,
+    rdGiltFitting,
+    rdAltarLinen,
   ];
 
   static final Map<String, GatherNodeDef> _byId = {

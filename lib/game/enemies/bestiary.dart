@@ -18,6 +18,7 @@ import 'the_kiln_desert.dart';
 import 'the_buried_sky.dart';
 import 'the_collapsed_academy.dart';
 import 'the_glass_archive.dart';
+import 'the_reliquary_deep.dart';
 import 'the_molten_deep.dart';
 import 'the_shattered_orrery.dart';
 import 'the_sunless_reach.dart';
@@ -57,6 +58,7 @@ abstract final class Bestiary {
     ...GlassArchiveBestiary.all,
     ...BuriedSkyBestiary.all,
     ...CollapsedAcademyBestiary.all,
+    ...ReliquaryDeepBestiary.all,
   ];
 
   static List<EnemyDef> forZone(String zoneId) =>

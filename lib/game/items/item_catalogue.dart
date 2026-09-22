@@ -18,6 +18,7 @@ import 'catalogue/the_kiln_desert_items.dart';
 import 'catalogue/the_buried_sky_items.dart';
 import 'catalogue/the_collapsed_academy_items.dart';
 import 'catalogue/the_glass_archive_items.dart';
+import 'catalogue/the_reliquary_deep_items.dart';
 import 'catalogue/the_molten_deep_items.dart';
 import 'catalogue/the_shattered_orrery_items.dart';
 import 'catalogue/the_sunless_reach_items.dart';
@@ -67,6 +68,7 @@ abstract final class ItemCatalogue {
     'the_glass_archive': GlassArchiveItems.all,
     'the_buried_sky': BuriedSkyItems.all,
     'the_collapsed_academy': CollapsedAcademyItems.all,
+    'the_reliquary_deep': ReliquaryDeepItems.all,
   };
 
   /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists
