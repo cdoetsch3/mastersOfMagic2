@@ -734,21 +734,15 @@ void main() {
       }
     });
 
-    test(
-      'the cross-lane ids resolve too',
-      () {
-        for (final id in _parallelLaneIds) {
-          expect(
-            ItemCatalogue.tryById(id),
-            isNotNull,
-            reason: '$id is named by §4.4\'s tables and must exist',
-          );
-        }
-      },
-      skip:
-          'sanctus_* and climbers_ration are the Hallowmarch lane\'s; '
-          'delete this skip when that worktree merges',
-    );
+    test('the cross-lane ids resolve too', () {
+      for (final id in _parallelLaneIds) {
+        expect(
+          ItemCatalogue.tryById(id),
+          isNotNull,
+          reason: '$id is named by §4.4\'s tables and must exist',
+        );
+      }
+    });
 
     test('⚠️ no id in the cross-lane list is one this zone authors', () {
       // Otherwise the skip above would be hiding a real local failure.

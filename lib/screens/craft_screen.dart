@@ -460,22 +460,30 @@ class _RecipeCard extends StatelessWidget {
                               child: const Text('Quick craft'),
                             ),
                           const SizedBox(width: 6),
-                          FilledButton(
-                            onPressed: canCraft
-                                ? () => recipe.steps.isEmpty
-                                      ? _craft(context)
-                                      : Navigator.of(context).push(
-                                          MaterialPageRoute<void>(
-                                            builder: (_) => CraftingActScreen(
-                                              recipe: recipe,
+                          // ⚠️ Flexible + ellipsis: the Celestial Totem is
+                          // the first five-input recipe, and its 'Missing …'
+                          // label overflowed the card by ~270 px unbounded.
+                          // The rows above still list every shortfall.
+                          Flexible(
+                            child: FilledButton(
+                              onPressed: canCraft
+                                  ? () => recipe.steps.isEmpty
+                                        ? _craft(context)
+                                        : Navigator.of(context).push(
+                                            MaterialPageRoute<void>(
+                                              builder: (_) => CraftingActScreen(
+                                                recipe: recipe,
+                                              ),
                                             ),
-                                          ),
-                                        )
-                                : null,
-                            child: Text(
-                              canCraft
-                                  ? 'Craft · +${Skills.xpForRecipe(recipe)} XP'
-                                  : 'Missing ${shortfalls.join(", ")}',
+                                          )
+                                  : null,
+                              child: Text(
+                                canCraft
+                                    ? 'Craft · +${Skills.xpForRecipe(recipe)} XP'
+                                    : 'Missing ${shortfalls.join(", ")}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ),
                         ],

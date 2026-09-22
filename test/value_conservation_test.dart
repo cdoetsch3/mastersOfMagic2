@@ -69,6 +69,42 @@ const Map<String, String> _exemptions = {
   'craft_tussock_leggings': '§8.6 minor overage — Master-profitable.',
 };
 
+/// ❓ **Celestial recipes awaiting the designer's §8.7 ruling** (CELESTIAL
+/// _CONTRACT §5.5/§8.7, 2026-09-22). The contract audited every one of these
+/// in advance and left the numbers UNPATCHED "so the designer can see the
+/// shape rather than a patched table". Three shapes:
+///  - under Standard by 16–62 (the two ingots and the Drownling belt);
+///  - zero margin — Σ(inputs) == Standard (the two cloth sets, the
+///    Palimpsest belt);
+///  - over Ornate (the three quarterstaffs);
+///  - the Totem, a KeyDef whose value is 0 by construction (window [0,0]).
+/// ⚠️ Each is held here as NON-clean on purpose: an entry that starts to pass
+/// cleanly is stale and must be deleted, and none may drift past the
+/// Master line (1.4 × Standard) — that is the exploit guard, not a blessing.
+/// Christian rules §8.7; the fix is three numbers or an accepted outlier.
+const Map<String, String> _pendingRuling = {
+  'craft_skysteel_ingot': '§8.7: Σ 16% under Standard — ingots never sell.',
+  'craft_starbrass_ingot': '§8.7: Σ 21% under Standard — ingots never sell.',
+  'craft_drownling_belt': '§8.7: Σ 8% under Standard.',
+  'craft_mirrorflax_hood': '§8.7: zero margin (Σ == Standard).',
+  'craft_mirrorflax_robe': '§8.7: zero margin (Σ == Standard).',
+  'craft_mirrorflax_leggings': '§8.7: zero margin (Σ == Standard).',
+  'craft_mirrorflax_boots': '§8.7: zero margin (Σ == Standard).',
+  'craft_mirrorflax_gloves': '§8.7: zero margin (Σ == Standard).',
+  'craft_wrackcotton_hood': '§8.7: zero margin (Σ == Standard).',
+  'craft_wrackcotton_robe': '§8.7: zero margin (Σ == Standard).',
+  'craft_wrackcotton_leggings': '§8.7: zero margin (Σ == Standard).',
+  'craft_wrackcotton_boots': '§8.7: zero margin (Σ == Standard).',
+  'craft_wrackcotton_gloves': '§8.7: zero margin (Σ == Standard).',
+  'craft_palimpsest_belt': '§8.7: zero margin (Σ == Standard).',
+  'craft_ironwood_quarterstaff': '§8.7: over Ornate — Master-profitable.',
+  'craft_bloodwood_quarterstaff': '§8.7: over Ornate — Master-profitable.',
+  'craft_ebony_quarterstaff': '§8.7: over Ornate — Master-profitable.',
+  'craft_celestial_totem':
+      '§3.4/§8.7: a KeyDef is worth 0 by construction; conservation has no '
+      'window to check, and the gate is not a market.',
+};
+
 /// The 3 ids whose exemption is "at the Standard boundary," not "over
 /// Ornate" — split out so the two exempt groups get the check that actually
 /// matches what the audit found for them.
@@ -129,6 +165,32 @@ void main() {
 
     for (final r in RecipeBook.all) {
       final exemptReason = _exemptions[r.id];
+      final pending = _pendingRuling[r.id];
+
+      if (pending != null) {
+        test('${r.id}: ❓ awaiting §8.7 — held non-clean, bounded', () {
+          final a = audit(r);
+          final clean = a.sum > a.standard && a.sum < a.ornate;
+          expect(
+            clean,
+            isFalse,
+            reason:
+                'this id is only listed because §8.7 measured it non-clean — '
+                'if it passes cleanly now, the ruling landed and the entry '
+                'is stale: delete it ($pending)',
+          );
+          if (a.standard > 0) {
+            expect(
+              a.sum,
+              lessThanOrEqualTo(1.4 * a.standard),
+              reason:
+                  'the Master line is the exploit guard: an input value '
+                  'drifting past it makes the craft a loss at every quality',
+            );
+          }
+        });
+        continue;
+      }
 
       if (exemptReason == null) {
         test('${r.id}: Standard < Σ(inputs) < Ornate (clean pass)', () {
@@ -199,6 +261,7 @@ void main() {
       final unexplained = <String>[];
       for (final r in RecipeBook.all) {
         if (_exemptions.containsKey(r.id)) continue;
+        if (_pendingRuling.containsKey(r.id)) continue; // ❓ §8.7
         final a = audit(r);
         if (!(a.sum > a.standard && a.sum < a.ornate)) {
           unexplained.add(r.id);

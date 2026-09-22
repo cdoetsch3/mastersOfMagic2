@@ -8,6 +8,7 @@ library;
 
 import 'item_def.dart';
 import 'recipe_def.dart';
+import 'recipes/celestial_recipes.dart';
 import 'recipes/kinetic_recipes.dart';
 import 'recipes/primal_recipes.dart';
 
@@ -15,6 +16,7 @@ abstract final class RecipeBook {
   static const List<RecipeDef> all = <RecipeDef>[
     ...PrimalRecipes.all,
     ...KineticRecipes.all,
+    ...CelestialRecipes.all,
   ];
 
   static final Map<String, RecipeDef> _byId = {for (final r in all) r.id: r};
