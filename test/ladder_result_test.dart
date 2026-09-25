@@ -425,4 +425,159 @@ void main() {
       );
     });
   });
+
+  // ====================================================================
+  // The shared resolver and the rated predicate (2026-09-25): the duel
+  // header prints the player's rating from the SAME function the settler
+  // rates from.
+  // ====================================================================
+  group('playerRatingOn — the one resolution', () {
+    test('a banked rating is used as-is, per ladder', () {
+      final profile = PlayerProfile.newPlayer()
+        ..ratingGeared = 1432
+        ..ratingAcademy = 1255;
+      expect(
+        playerRatingOn(profile, academy: false),
+        1432,
+        reason: 'geared reads ratingGeared',
+      );
+      expect(
+        playerRatingOn(profile, academy: true),
+        1255,
+        reason:
+            'academy reads ratingAcademy — a mutant ignoring the flag gives '
+            '1432 here',
+      );
+    });
+
+    test('no rating yet → the seed that ladder rates a first match from', () {
+      final profile = PlayerProfile.newPlayer();
+      expect(
+        playerRatingOn(profile, academy: true),
+        Elo.startingRating,
+        reason: 'the Academy seeds everyone at 1200',
+      );
+      expect(
+        playerRatingOn(profile, academy: false),
+        LadderSeeds.gearedPlayer(level: profile.level),
+        reason:
+            'geared seeds from LEVEL — a mutant that falls back to 1200 '
+            'here fails whenever the level seed is not 1200',
+      );
+    });
+  });
+
+  group('isRatedDuel', () {
+    test('a ladder bot rates; the same persona as practice does not', () {
+      final wick = LadderRoster.byId('wick');
+      expect(
+        isRatedDuel(LocalAiDriver(persona: wick.toPersona(), ladderBot: true)),
+        isTrue,
+        reason: 'ladderBot is the one fact that makes a bot duel rated',
+      );
+      expect(
+        isRatedDuel(LocalAiDriver(persona: wick.toPersona())),
+        isFalse,
+        reason:
+            'a practice bout against Wick shares his id — a mutant keyed on '
+            'the persona id alone would rate it',
+      );
+    });
+
+    test('a remote duel rates exactly when the wire says so', () {
+      RemoteDuelDriver remote({required bool rated}) => RemoteDuelDriver(
+        roomId: 'room',
+        isHost: true,
+        masterSeed: 1,
+        opponentName: 'Rival',
+        opponentLevel: 5,
+        opponentGear: ItemModifiers.none,
+        opponentRating: 1200,
+        rated: rated,
+      );
+      expect(
+        isRatedDuel(remote(rated: true)),
+        isTrue,
+        reason: 'a quickMatch human is rated',
+      );
+      expect(
+        isRatedDuel(remote(rated: false)),
+        isFalse,
+        reason:
+            'a room code is never rated — a mutant treating every remote '
+            'duel as rated would turn friends into a rating farm',
+      );
+    });
+  });
+
+  // ====================================================================
+  // The decided-game floor, end to end (2026-09-25: "when I beat him I got
+  // ±0").
+  // ====================================================================
+  group('settleRatedDuel — the player always moves', () {
+    final originalClient = FirestoreRest.client;
+    final originalTokenProvider = FirestoreRest.tokenProvider;
+
+    setUp(() {
+      FirestoreRest.tokenProvider = () async => null;
+    });
+
+    tearDown(() {
+      FirestoreRest.client = originalClient;
+      FirestoreRest.tokenProvider = originalTokenProvider;
+    });
+
+    test('beating a bot pinned at its floor still pays +1; the bot write '
+        'may clamp to 0', () async {
+      final requests = <http.Request>[];
+      FirestoreRest.client = MockClient((request) async {
+        requests.add(request);
+        return http.Response('{}', 200);
+      });
+
+      final wick = LadderRoster.byId('wick');
+      final floor = wick.seedGeared - 300;
+      // A veteran far above the bot: K20, expected ≈ 0.999 — raw Elo 0.
+      final profile = PlayerProfile.newPlayer()
+        ..ratingGeared = 2000
+        ..ratedGamesGeared = 60
+        ..peakGeared = 2000;
+      final game = GameState(_Mem(), profile);
+
+      final outcome = await settleRatedDuel(
+        game,
+        driver: LocalAiDriver(
+          persona: wick.toPersona(),
+          gear: wick.gearModifiers,
+          ladderBot: true,
+        ),
+        academy: false,
+        won: true,
+        opponentRating: floor,
+      );
+
+      expect(
+        outcome!.playerDelta,
+        1,
+        reason:
+            'raw 20 × (1 − 0.999) rounds to 0 — a mutant without the floor '
+            'banks ±0 for a real win, the exact bug reported',
+      );
+      expect(
+        profile.ratingGeared,
+        2001,
+        reason: 'and the profile takes the +1 the card will print',
+      );
+      expect(
+        (_lastIncrementTransforms(requests)['ratingGeared']!['increment']
+            as Map<String, dynamic>)['integerValue'],
+        '0',
+        reason:
+            'the bot\'s floored −1 would push it below seed − 300, so the '
+            'clamp cuts its write to 0 — the ONE place a decided game may '
+            'move a rating by nothing. A mutant that re-floors after the '
+            'clamp writes −1 and walks the bot out of its band',
+      );
+    });
+  });
 }

@@ -553,7 +553,8 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      await tester
+          .pumpAndSettle(); // ⚠️ was a bare pump: under full-suite load the tile was not built yet (flake seen by four lanes)
 
       await tester.longPress(find.text('Oak Knot').first);
       await tester.pumpAndSettle();

@@ -47,6 +47,13 @@ GAME_DESIGN §5 with the actual numbers.
   chess — it's a guard against the pool being a one-person population for a
   while. Recommend yes; easily removed once there are enough players.
 - Bot vs bot never happens, so bot ratings only move against humans.
+- ✅ **Decided-game floor (2026-09-25, not chess).** A win is worth at
+  least +1 and a loss costs at least −1, even when the raw Elo rounds to 0
+  (`Elo.delta`). Christian: "when I beat him I got ±0". The bot's ±300 clamp
+  may still cut a BOT's write to 0 — that is the clamp's job — but the
+  player always moves. The ±300 clamp is also applied on READ
+  (`BotRatings.standingsFrom`): a stored rating outside the band clamps, and
+  one that is missing, ≤ 0 or > 3000 reads as the seed.
 - **Starting ratings.**
   - Academy: everyone, human or bot, is level 50 with no gear, so skill is the
     only variable. Players start at **1200**. Bots seed from intelligence
@@ -149,6 +156,16 @@ absorbs next match. No locks, no "bot is busy".
 user (anonymous included, for Academy); writable only on the six mutable
 fields, with `|Δrating| ≤ 40` (the max a K-40 game can move) and record
 fields +1 only.
+
+✅ **Hardened 2026-09-25** (Hesper and Rook found at 8): an increment on a
+missing doc CREATES it with `rating = delta`, and from there `|Δ| ≤ 40`
+refused every write that could fix it. Now: a create must carry EXACTLY the
+bot's two seeds (the rules hold a seed table, pinned against `LadderRoster`
+by `test/bot_seed_rules_test.dart`); an update may also set an out-of-band
+rating (absent, or outside seed ± 300) to exactly its seed — the repair
+`BotRatings.record` makes before incrementing a corrupt doc; and the client
+aborts the record rather than increment when the create fails for any reason
+but 409. 📝 Rules ship with `tool/deploy.sh --rules`.
 
 ### 4.2 Think time ❌ (removed 2026-09-21)
 

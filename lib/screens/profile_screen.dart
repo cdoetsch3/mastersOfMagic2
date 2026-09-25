@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/game_state.dart';
 import '../ui/app_theme.dart';
+import '../ui/rating_text.dart';
 import 'account_screen.dart';
 import 'coming_soon_screen.dart';
 import 'gameplay_guide_screen.dart';
@@ -216,9 +217,9 @@ class _StatChips extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _StatChip('Ladder ${ratingGeared ?? '—'}')),
+        Expanded(child: _StatChip.rating('Ladder', ratingGeared)),
         const SizedBox(width: 8),
-        Expanded(child: _StatChip('Academy ${ratingAcademy ?? '—'}')),
+        Expanded(child: _StatChip.rating('Academy', ratingAcademy)),
         const SizedBox(width: 8),
         Expanded(child: _StatChip('Record $duelsWon–$duelsLost')),
       ],
@@ -228,7 +229,18 @@ class _StatChips extends StatelessWidget {
 
 class _StatChip extends StatelessWidget {
   final String label;
-  const _StatChip(this.label);
+
+  /// Whether this chip carries a rating after its [label]. ⚠️ Separate from
+  /// [rating] itself, because a NULL rating ('Academy —') is still a rating
+  /// chip — it just has no number yet.
+  final bool isRating;
+  final int? rating;
+
+  const _StatChip(this.label) : isRating = false, rating = null;
+
+  /// A ladder chip: '[label] N', the number in the one rating style
+  /// ([RatingText], 2026-09-25) — '—' until a first rated match.
+  const _StatChip.rating(this.label, this.rating) : isRating = true;
 
   @override
   Widget build(BuildContext context) {
@@ -240,8 +252,13 @@ class _StatChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.borderDim),
       ),
-      child: Text(
-        label,
+      // ⭐ One Text either way — 'Ladder 1420' stays a single run that
+      // ellipsizes as a unit (and that a finder can read whole).
+      child: Text.rich(
+        TextSpan(
+          text: isRating ? '$label ' : label,
+          children: [if (isRating) RatingText.span(rating, size: 12)],
+        ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(

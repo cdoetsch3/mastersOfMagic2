@@ -5,6 +5,7 @@ import '../../game/game_state.dart';
 import '../../game/player_profile.dart';
 import '../../game/world.dart';
 import '../../ui/app_theme.dart';
+import '../../ui/rating_text.dart';
 import '../adventure_screen.dart';
 import '../home_shell.dart';
 import '../matchmaking_screen.dart';
@@ -287,8 +288,15 @@ class _XpCard extends StatelessWidget {
           // character has a rating — so the card's height never shifts the
           // instant a first rated match lands (press-stability: nothing here
           // is a control, but the row above it still shouldn't jump).
-          Text(
-            'Ladder ${p.ratingGeared ?? '—'} · Academy ${p.ratingAcademy ?? '—'}',
+          Text.rich(
+            TextSpan(
+              text: 'Ladder ',
+              children: [
+                RatingText.span(p.ratingGeared, size: 11),
+                const TextSpan(text: ' · Academy '),
+                RatingText.span(p.ratingAcademy, size: 11),
+              ],
+            ),
             style: const TextStyle(
               color: AppColors.textFaint,
               fontSize: 11,

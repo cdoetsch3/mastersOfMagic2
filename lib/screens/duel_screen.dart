@@ -14,7 +14,9 @@ import '../game/mage_apparel.dart';
 import '../game/mage_sprite.dart';
 import '../game/shield_aura.dart';
 import '../game/status_fx.dart';
-import '../game/ladder/ladder_result.dart' show DuelSettlement;
+import '../game/game_state.dart' show GameStateScope;
+import '../game/ladder/ladder_result.dart'
+    show DuelSettlement, isRatedDuel, playerRatingOn;
 import '../game/opponent_driver.dart';
 import '../game/progression.dart';
 import '../game/items/item_catalogue.dart';
@@ -26,6 +28,7 @@ import '../ui/creature_art.dart';
 import '../ui/hover_card.dart';
 import '../ui/item_display.dart' show rarityColour;
 import '../ui/item_icon.dart';
+import '../ui/rating_text.dart';
 import '../ui/element_text.dart';
 import 'home_shell.dart';
 import 'spell_detail_dialog.dart';
@@ -372,6 +375,48 @@ class _DuelScreenState extends State<DuelScreen>
   /// difference between the card showing '…' and showing a verdict.
   DuelSettlement? _settlement;
   bool _settling = false;
+
+  /// Whether this duel moves a ladder rating — and so whether ratings belong
+  /// on the nameplates at all (2026-09-25). ⚠️ `campaign` is checked on its
+  /// own as well as the driver: a campaign foe is never rated, whatever the
+  /// driver it happens to be wearing.
+  bool get _rated => !widget.campaign && isRatedDuel(widget.driver);
+
+  /// The player's own rating on this duel's ladder, for their nameplate.
+  /// Null for an unrated duel, or a screen built with no [GameStateScope]
+  /// above it (the tests that build the arena bare).
+  ///
+  /// ⭐ **Snapshotted at the start of each bout**, not read live: the number
+  /// beside the player's name is the one this bout is rated FROM — the same
+  /// [playerRatingOn] [settleRatedDuel] will use — and it must not tick over
+  /// mid-card when the result banks. Re-taken on "Again", because by then
+  /// the last bout's result is the rating the rematch is measured from.
+  int? _playerRating;
+  bool _playerRatingTaken = false;
+
+  void _snapshotPlayerRating() {
+    _playerRatingTaken = true;
+    if (!_rated) {
+      _playerRating = null;
+      return;
+    }
+    // Read without subscribing — see the snapshot note above.
+    final scope =
+        context
+                .getElementForInheritedWidgetOfExactType<GameStateScope>()
+                ?.widget
+            as GameStateScope?;
+    final game = scope?.notifier;
+    _playerRating = game == null
+        ? null
+        : playerRatingOn(game.profile, academy: widget.academy);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_playerRatingTaken) _snapshotPlayerRating();
+  }
 
   // Reports the outcome exactly once per duel (win/loss/draw/forfeit).
   void _checkResult() {
@@ -1354,6 +1399,7 @@ class _DuelScreenState extends State<DuelScreen>
       // Read off the MageState rather than widget.playerLevel so the two
       // nameplates can never disagree about who is what level.
       level: c.player.level,
+      rating: _playerRating,
       hp: c.shownPlayerHp,
       maxHp: c.player.maxHp,
       charge: c.shownPlayerCharge,
@@ -1373,7 +1419,10 @@ class _DuelScreenState extends State<DuelScreen>
     return _StatusPanel(
       name: c.enemy.name,
       level: c.enemy.level,
-      rating: widget.driver.opponentRating,
+      // ⭐ Only on a rated duel (2026-09-25) — a campaign foe or a practice
+      // persona has no ladder, and its driver's 1200 default is a
+      // placeholder, not a rating anyone earned.
+      rating: _rated ? widget.driver.opponentRating : null,
       hp: c.shownEnemyHp,
       maxHp: c.enemy.maxHp,
       charge: c.shownEnemyCharge,
@@ -1953,6 +2002,7 @@ class _DuelScreenState extends State<DuelScreen>
                             // as if it had already been settled.
                             _settlement = null;
                             _settling = false;
+                            _snapshotPlayerRating();
                             c.newDuel();
                             _startMoveTimer();
                           },
@@ -2028,7 +2078,12 @@ class _DuelScreenState extends State<DuelScreen>
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
-          children: [TextSpan(text: ' · ${settlement!.newRating}', style: dim)],
+          // ⭐ The delta is the news (green/ember); the rating it landed on
+          // is printed like every other rating in the game (RatingText).
+          children: [
+            const TextSpan(text: ' · ', style: dim),
+            RatingText.span(settlement!.newRating, size: 14),
+          ],
         );
       }
     }
@@ -2196,10 +2251,14 @@ class _StatusPanel extends StatelessWidget {
   /// level-1 fawn except an HP bar the player has no baseline for.
   final int level;
 
-  /// ⭐ LADDER_DESIGN §7 item 5: the opponent's ladder rating, shown next to
+  /// ⭐ LADDER_DESIGN §7 item 5: the mage's ladder rating, shown next to
   /// their name/level exactly like a human's would be (§1 law 3 — nothing
-  /// distinguishes a bot's nameplate from a person's). Null for the player's
-  /// own panel, which has never shown a rating and isn't the ask here.
+  /// distinguishes a bot's nameplate from a person's). Since 2026-09-25 the
+  /// player's own panel carries theirs too, on the same ladder, so the two
+  /// numbers the duel is rated from sit face to face.
+  ///
+  /// ⚠️ Null on BOTH panels for an unrated duel (campaign, practice, a room
+  /// code): no pill, not a '—' — there is no ladder here to be unrated on.
   final int? rating;
   final int hp;
   final int maxHp;
@@ -2275,12 +2334,16 @@ class _StatusPanel extends StatelessWidget {
               _levelPill(),
               if (rating != null) ...[
                 const SizedBox(width: 4),
-                Text(
-                  '· $rating',
-                  style: const TextStyle(
-                    color: Color(0xFF9C93C4),
-                    fontSize: 11,
-                    fontFeatures: [FontFeature.tabularFigures()],
+                // ⭐ The one rating style (RatingText); the dot stays dim so
+                // it reads as punctuation, not part of the number.
+                Text.rich(
+                  TextSpan(
+                    text: '· ',
+                    style: const TextStyle(
+                      color: Color(0xFF9C93C4),
+                      fontSize: 11,
+                    ),
+                    children: [RatingText.span(rating, size: 11)],
                   ),
                 ),
               ],

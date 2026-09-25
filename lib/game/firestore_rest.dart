@@ -119,22 +119,37 @@ class FirestoreRest {
     }
   }
 
-  /// Creates a document only if it does not already exist. Returns false if it
-  /// already existed (precondition failed).
+  /// Creates a document only if it does not already exist. Returns true when
+  /// this call created it, false when it already existed; throws
+  /// [FirestoreRestException] for ANY other answer.
+  ///
+  /// ⭐ The REST `createDocument` endpoint already refuses an existing id with
+  /// **409 ALREADY_EXISTS** — that is the whole "if absent", no precondition
+  /// needed.
+  ///
+  /// ⚠️ **Only 409 means "exists".** This used to send a
+  /// `currentDocument.exists=false` query parameter (a `patch`/`commit`
+  /// precondition that `createDocument` does not take) and also read **400**
+  /// as "exists". 📝 Suspected root cause of the 8-rated bots (2026-09-25,
+  /// NOT verified against the live API — the local emulator accepts the
+  /// parameter, so it proves nothing either way): if production rejects it
+  /// with a 400, this never created anything, every caller heard "already
+  /// there", and `BotRatings.record`'s follow-up increment became the doc's
+  /// first write — a bot born at `rating = delta` (that last step IS
+  /// verified on the emulator under the old rules). A 400 is a bad request,
+  /// never an answer about existence, so it now throws.
   static Future<bool> createIfAbsent(
     String collection,
     String docId,
     Map<String, dynamic> data,
   ) async {
     final res = await client.post(
-      Uri.parse(
-        '$_base/$collection?documentId=$docId&currentDocument.exists=false',
-      ),
+      Uri.parse('$_base/$collection?documentId=$docId'),
       headers: await _headers(),
       body: jsonEncode({'fields': encodeFields(data)}),
     );
     if (res.statusCode == 200) return true;
-    if (res.statusCode == 409 || res.statusCode == 400) return false;
+    if (res.statusCode == 409) return false;
     throw FirestoreRestException(res.statusCode, res.body);
   }
 

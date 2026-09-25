@@ -216,4 +216,66 @@ void main() {
           'write pass silently',
     );
   });
+
+  // ==================================================================
+  // [FirestoreRest.createIfAbsent] (2026-09-25) — only "created" and
+  // "already exists" are answers; everything else is a failure the caller
+  // must see, because BotRatings.record's next write is an increment that
+  // would otherwise CREATE the doc at rating = delta.
+  // ==================================================================
+  group('createIfAbsent', () {
+    test(
+      'sends no currentDocument precondition — createDocument has none',
+      () async {
+        late http.Request captured;
+        FirestoreRest.client = MockClient((request) async {
+          captured = request;
+          return http.Response('{}', 200);
+        });
+
+        await FirestoreRest.createIfAbsent('bots', 'wick', {
+          'ratingGeared': 1107,
+        });
+
+        expect(
+          captured.url.queryParameters.keys,
+          ['documentId'],
+          reason:
+              'createDocument already refuses an existing id with 409; a '
+              '`currentDocument.exists` parameter is not one it takes. A '
+              'mutant that restores it risks a 400 on every call — the '
+              'suspected root of the 8-rated bots',
+        );
+      },
+    );
+
+    test('200 → true, 409 → false', () async {
+      FirestoreRest.client = MockClient((_) async => http.Response('{}', 200));
+      expect(
+        await FirestoreRest.createIfAbsent('bots', 'wick', {}),
+        isTrue,
+        reason: '200 is "this call created it"',
+      );
+      FirestoreRest.client = MockClient((_) async => http.Response('{}', 409));
+      expect(
+        await FirestoreRest.createIfAbsent('bots', 'wick', {}),
+        isFalse,
+        reason: '409 ALREADY_EXISTS is the one "it was already there"',
+      );
+    });
+
+    test('400 THROWS — a bad request is not "already exists"', () {
+      FirestoreRest.client = MockClient(
+        (_) async => http.Response('bad request', 400),
+      );
+      expect(
+        () => FirestoreRest.createIfAbsent('bots', 'wick', {}),
+        throwsA(isA<FirestoreRestException>()),
+        reason:
+            'the old code read 400 as "exists" — so a create that never '
+            'happened told BotRatings.record to go ahead and increment. A '
+            'mutant that restores `|| statusCode == 400` fails here',
+      );
+    });
+  });
 }

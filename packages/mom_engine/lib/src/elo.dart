@@ -27,6 +27,17 @@ abstract final class Elo {
   ///
   /// ⚠️ Rounds to nearest int with `.round()` — half-away-from-zero, not
   /// truncation. A mutant that floors instead of rounds will under-award.
+  ///
+  /// ⭐ **A decided game always moves the rating** (Christian, 2026-09-25:
+  /// "when I beat him I got ±0"): a win is worth at least +1 and a loss
+  /// costs at least −1, even when the raw Elo rounds to 0 because the
+  /// favourite was a near-certainty. Chess would hand out the 0; this game
+  /// never tells a winner their win counted for nothing. 📝 At equal K the
+  /// floor stays zero-sum — the raw winner/loser deltas are exact negatives,
+  /// so both round to 0 together and both floor together (+1 / −1).
+  ///
+  /// ⚠️ A [score] strictly between 0 and 1 (a draw — which this game does not
+  /// have) is left unfloored: there is no winner to guarantee a point to.
   static int delta({
     required int rating,
     required int opponentRating,
@@ -34,7 +45,10 @@ abstract final class Elo {
     required int k,
   }) {
     final e = expected(rating, opponentRating);
-    return (k * (score - e)).round();
+    final raw = (k * (score - e)).round();
+    if (score >= 1.0 && raw < 1) return 1;
+    if (score <= 0.0 && raw > -1) return -1;
+    return raw;
   }
 
   /// Clamp a bot's rating to ±[band] of its [seed] (§2, the anti-farm guard).

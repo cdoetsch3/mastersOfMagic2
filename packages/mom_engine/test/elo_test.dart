@@ -107,6 +107,10 @@ void main() {
         [1000, 1600],
         [1500, 1450],
         [900, 2100],
+        // ⭐ The favourite winning a near-certainty: the raw Elo rounds to 0
+        // on both sides, and the decided-game floor takes over.
+        [2100, 900],
+        [1200, 8],
       ]) {
         final a = pair[0], b = pair[1];
         const k = 32;
@@ -122,15 +126,83 @@ void main() {
           score: 0.0,
           k: k,
         );
-        expect(
-          winnerDelta,
-          -loserDelta,
-          reason:
-              'at equal K, what the winner gains the loser must lose '
-              'for $pair — a mutant that computes expected() from the '
-              'wrong side for one of the two calls breaks this',
-        );
+        // The unfloored Elo, recomputed here so the test can tell which
+        // regime it is in without trusting the code under test.
+        final rawWinner = (k * (1.0 - Elo.expected(a, b))).round();
+        if (rawWinner == 0) {
+          // ⚠️ The ONLY place the floor is allowed to show: the raw
+          // exchange was 0 – 0, and a decided game moves both sides by 1.
+          expect(
+            [winnerDelta, loserDelta],
+            [1, -1],
+            reason:
+                'raw Elo rounds to 0 for $pair, so the floor must give the '
+                'winner +1 and the loser −1 — a mutant that drops the floor '
+                'gives [0, 0], one that floors only the win gives [1, 0]',
+          );
+        } else {
+          expect(
+            winnerDelta,
+            -loserDelta,
+            reason:
+                'at equal K, what the winner gains the loser must lose '
+                'for $pair — a mutant that computes expected() from the '
+                'wrong side for one of the two calls breaks this',
+          );
+        }
       }
+    });
+
+    // ==================================================================
+    // The decided-game floor (Christian, 2026-09-25: "Hesper and Rook both
+    // ended up with only 8 ELO, so when I beat him I got ±0").
+    // ==================================================================
+    test('1200 beats 8 -> +1, never 0', () {
+      expect(
+        Elo.delta(rating: 1200, opponentRating: 8, score: 1.0, k: 40),
+        1,
+        reason:
+            'raw 40 × (1 − ~1.0) rounds to 0 — a mutant without the win '
+            'floor hands the winner ±0, the exact bug Christian hit',
+      );
+    });
+
+    test('8 loses to 1200 -> −1, never 0', () {
+      expect(
+        Elo.delta(rating: 8, opponentRating: 1200, score: 0.0, k: 20),
+        -1,
+        reason:
+            'raw 20 × (0 − ~0.0) rounds to (−)0 — a mutant without the loss '
+            'floor lets a decided loss cost nothing',
+      );
+    });
+
+    test('the floor never raises a real delta', () {
+      expect(
+        Elo.delta(rating: 1200, opponentRating: 1200, score: 1.0, k: 40),
+        20,
+        reason:
+            'a mutant that always returns the floor (±1) instead of '
+            'max(raw, 1) would give 1 here',
+      );
+      expect(
+        Elo.delta(rating: 1200, opponentRating: 1200, score: 0.0, k: 40),
+        -20,
+        reason:
+            'a mutant that clamps losses to −1 (min instead of max) would '
+            'give −1 here instead of the real −20',
+      );
+    });
+
+    test('the underdog losing a near-certainty still costs exactly 1', () {
+      expect(
+        Elo.delta(rating: 900, opponentRating: 2100, score: 0.0, k: 32),
+        -1,
+        reason:
+            'the floor is symmetric: the side that was expected to lose '
+            'and did still moves by one — a mutant flooring only wins '
+            'would leave this at 0',
+      );
     });
   });
 

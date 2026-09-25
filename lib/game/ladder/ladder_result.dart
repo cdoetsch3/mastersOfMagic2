@@ -7,6 +7,7 @@ import 'package:mom_engine/mom_engine.dart';
 
 import '../game_state.dart';
 import '../opponent_driver.dart';
+import '../player_profile.dart';
 import 'bot_ratings.dart';
 import 'ladder_bots.dart';
 
@@ -101,6 +102,29 @@ RatedOutcome rate({
   );
 }
 
+/// The rating [profile] plays at on [academy]'s ladder (LADDER_DESIGN §2):
+/// the banked one, or — before a first rated match on that ladder — the seed
+/// it WILL be rated from (Academy: [Elo.startingRating]; Geared: the level
+/// seed, [LadderSeeds.gearedPlayer]).
+///
+/// ⭐ **The one resolution.** [settleRatedDuel] rates from it and the duel
+/// header prints it (2026-09-25), so the number beside the player's name is
+/// always the number the result is measured from — a first-timer's header
+/// reads their seed, not a blank.
+int playerRatingOn(PlayerProfile profile, {required bool academy}) => academy
+    ? profile.ratingAcademy ?? Elo.startingRating
+    : profile.ratingGeared ?? LadderSeeds.gearedPlayer(level: profile.level);
+
+/// Whether a duel against [driver] moves a rating at all (LADDER §2, §3): a
+/// ladder bot, or a `quickMatch` human ([RemoteDuelDriver.rated]). A
+/// room-code duel, a practice persona and every campaign foe are unrated.
+///
+/// ⭐ The same test `launchDuel` applies before settling — the duel header
+/// uses it to decide whether ratings belong on the nameplates at all.
+bool isRatedDuel(OpponentDriver driver) => driver is RemoteDuelDriver
+    ? driver.rated
+    : _ladderBotBehind(driver) != null;
+
 /// Finds the [LadderBot] a [LocalAiDriver] is standing in for, or null when
 /// [driver] isn't one. ⭐ Keyed on [LocalAiDriver.ladderBot], never on the
 /// persona id alone — a practice bout against Wick shares his id with the
@@ -152,9 +176,7 @@ Future<RatedOutcome?> settleRatedDuel(
   if (driver is RemoteDuelDriver && !driver.rated) return null;
 
   final profile = game.profile;
-  final playerRating = academy
-      ? profile.ratingAcademy ?? Elo.startingRating
-      : profile.ratingGeared ?? LadderSeeds.gearedPlayer(level: profile.level);
+  final playerRating = playerRatingOn(profile, academy: academy);
   final playerRatedGames = academy
       ? profile.ratedGamesAcademy
       : profile.ratedGamesGeared;
@@ -187,6 +209,11 @@ Future<RatedOutcome?> settleRatedDuel(
     won: won,
   );
 
+  // ⭐ The decided-game floor (2026-09-25) already lives in [Elo.delta], so
+  // the PLAYER always moves by at least 1 — and the bot's raw delta is
+  // floored the same way. The clamp below may still cut the bot's write to 0
+  // (a bot pinned at its band edge); that is the clamp doing its job, and
+  // the only place a decided game is allowed to move a rating by nothing.
   if (bot != null) {
     final seed = academy ? bot.seedAcademy : bot.seedGeared;
     final clamped = Elo.clampToSeed(

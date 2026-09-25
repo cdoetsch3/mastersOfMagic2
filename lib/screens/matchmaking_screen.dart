@@ -3,13 +3,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mom_engine/mom_engine.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../game/academy.dart';
 import '../game/auth_service.dart';
 import '../game/duel_launcher.dart';
 import '../game/game_state.dart';
+import '../game/ladder/ladder_result.dart';
 import '../game/loadout.dart';
 import '../game/matchmaking.dart';
 import '../ui/app_banner.dart';
@@ -99,12 +99,8 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
   /// the seed the search treats as a starting point. ⭐ Same resolution
   /// `settleRatedDuel` uses at duel end, so the number the search widens
   /// around and the number the result is measured against never disagree.
-  int _myRating(GameState game) {
-    final p = game.profile;
-    return widget.academy
-        ? p.ratingAcademy ?? Elo.startingRating
-        : p.ratingGeared ?? LadderSeeds.gearedPlayer(level: p.level);
-  }
+  int _myRating(GameState game) =>
+      playerRatingOn(game.profile, academy: widget.academy);
 
   Future<void> _quickMatch() async {
     final id = _identity();

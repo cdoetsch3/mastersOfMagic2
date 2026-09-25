@@ -67,6 +67,85 @@ service cloud.firestore {
     // writes exactly as they would to a plain `update`. There is no separate
     // "transform" rule to write.
     match /bots/{botId} {
+      // ⭐ Every roster bot's two SEED ratings, mirrored from LadderRoster
+      // (lib/game/ladder/ladder_bots.dart, LADDER_DESIGN §2's formulas).
+      // ⚠️ Pinned by test/bot_seed_rules_test.dart, which parses this map
+      // and fails the moment a bot is added, removed or re-seeded in code
+      // without the same change here — and after such a change the rules
+      // must be redeployed (`tool/deploy.sh --rules`), or every create for
+      // the changed bot is refused.
+      function seeds() {
+        return {
+          'wick': {'ratingGeared': 1107, 'ratingAcademy': 960},
+          'pim': {'ratingGeared': 1161, 'ratingAcademy': 1080},
+          'tansy': {'ratingGeared': 1200, 'ratingAcademy': 1080},
+          'orrin': {'ratingGeared': 1239, 'ratingAcademy': 1140},
+          'marlow': {'ratingGeared': 1263, 'ratingAcademy': 1140},
+          'sable': {'ratingGeared': 1302, 'ratingAcademy': 1200},
+          'dunstan': {'ratingGeared': 1311, 'ratingAcademy': 1080},
+          'brightgale': {'ratingGeared': 1320, 'ratingAcademy': 1080},
+          'quill': {'ratingGeared': 1374, 'ratingAcademy': 1200},
+          'hesper': {'ratingGeared': 1413, 'ratingAcademy': 1200},
+          'rook': {'ratingGeared': 1407, 'ratingAcademy': 1080},
+          'isolde': {'ratingGeared': 1446, 'ratingAcademy': 1140},
+          'garrick': {'ratingGeared': 1470, 'ratingAcademy': 1080},
+          'thornwall': {'ratingGeared': 1521, 'ratingAcademy': 1200},
+          'nettle': {'ratingGeared': 1545, 'ratingAcademy': 1200},
+          'corvane': {'ratingGeared': 1569, 'ratingAcademy': 1140},
+          'lisbet': {'ratingGeared': 1623, 'ratingAcademy': 1380},
+          'ashbourne': {'ratingGeared': 1647, 'ratingAcademy': 1260},
+          'vale': {'ratingGeared': 1671, 'ratingAcademy': 1320},
+          'morwen': {'ratingGeared': 1710, 'ratingAcademy': 1320},
+          'tarquin': {'ratingGeared': 1704, 'ratingAcademy': 1200},
+          'seraphel': {'ratingGeared': 1758, 'ratingAcademy': 1320},
+          'halvard': {'ratingGeared': 1782, 'ratingAcademy': 1260},
+          'nyx': {'ratingGeared': 1836, 'ratingAcademy': 1380},
+          'aldorian': {'ratingGeared': 1875, 'ratingAcademy': 1440},
+          'ysolde': {'ratingGeared': 1860, 'ratingAcademy': 1380},
+          'bramwell': {'ratingGeared': 1800, 'ratingAcademy': 1320}
+        };
+      }
+
+      function isRosterBot() {
+        return botId in seeds();
+      }
+
+      // Callers check isRosterBot() first — an unknown id has no seed.
+      function seedOf(field) {
+        return seeds()[botId][field];
+      }
+
+      // LADDER §2's anti-farm band: a bot's rating lives within ±300 of its
+      // seed. The client clamps every write into it (Elo.clampToSeed), so a
+      // stored value outside it — or no value at all — can only be a write
+      // that went wrong. ⭐ Same test as BotRatings.isCorrupt on the client.
+      function outOfBand(field) {
+        return !(field in resource.data)
+          || resource.data[field] < seedOf(field) - 300
+          || resource.data[field] > seedOf(field) + 300;
+      }
+
+      // One rating field's update check. Untouched → fine. Otherwise EITHER
+      // a normal result, |Δ| ≤ 40 (the most a single K-40 game can move a
+      // rating, LADDER_DESIGN §2), OR the repair write below.
+      //
+      // ⭐ The repair (2026-09-25): a doc whose stored rating is outside the
+      // band is corrupt by definition — Hesper and Rook were found at 8,
+      // born of an increment that landed before any seed. From there the
+      // |Δ| ≤ 40 bound refused every write that could fix them, and the
+      // rating was stuck forever. So a write may set an out-of-band rating
+      // to EXACTLY that bot's seed, in one step. 🚫 Not "any in-band value":
+      // the seed is the only number a client can prove, and a healthy
+      // in-band doc can never take this branch.
+      function ratingOk(field) {
+        return !request.resource.data.diff(resource.data).affectedKeys().hasAny([field])
+          || math.abs(request.resource.data[field]
+              - resource.data.get(field, 0)) <= 40
+          || (isRosterBot()
+              && outOfBand(field)
+              && request.resource.data[field] == seedOf(field));
+      }
+
       // Any signed-in user may read the pool, anonymous guests included —
       // the Academy is the one mode a guest without an account can play.
       allow read: if request.auth != null;
@@ -75,21 +154,22 @@ service cloud.firestore {
 
       // ⭐ Every mutable field is spelled out — Firestore rules have no
       // loops — and a write may touch ONLY these six.
+      //
+      // ⭐ A bot is born at EXACTLY its seeds, both of them (2026-09-25).
+      // This used to allow any rating in 0–3000, which let a field-transform
+      // increment on a missing doc create it with `rating = delta` (a bot
+      // born at 8). A create is now only ever BotRatings.record's seed
+      // write; an increment that arrives first is refused, not banked.
       allow create: if request.auth != null
+        && isRosterBot()
         && request.resource.data.keys().hasOnly([
           'ratingGeared', 'ratingAcademy',
           'winsGeared', 'lossesGeared',
           'winsAcademy', 'lossesAcademy',
           'updatedAt',
         ])
-        // A freshly-created bot's ratings must already sit in a sane range —
-        // there is no `resource.data` yet to diff against.
-        && (!('ratingGeared' in request.resource.data)
-            || (request.resource.data.ratingGeared >= 0
-                && request.resource.data.ratingGeared <= 3000))
-        && (!('ratingAcademy' in request.resource.data)
-            || (request.resource.data.ratingAcademy >= 0
-                && request.resource.data.ratingAcademy <= 3000));
+        && request.resource.data.get('ratingGeared', -1) == seedOf('ratingGeared')
+        && request.resource.data.get('ratingAcademy', -1) == seedOf('ratingAcademy');
 
       // ⚠️ Each bound below is gated on the key actually CHANGING in this
       // write (affectedKeys), not on it merely existing in the post-write
@@ -110,15 +190,9 @@ service cloud.firestore {
           'winsAcademy', 'lossesAcademy',
           'updatedAt',
         ])
-        // |Δrating| ≤ 40 — the most a single K-40 game can move a rating
-        // (LADDER_DESIGN §2). Each check is guarded so a write that doesn't
-        // touch that field is unaffected by it.
-        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ratingGeared'])
-            || math.abs(request.resource.data.ratingGeared
-                - resource.data.get('ratingGeared', 0)) <= 40)
-        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ratingAcademy'])
-            || math.abs(request.resource.data.ratingAcademy
-                - resource.data.get('ratingAcademy', 0)) <= 40)
+        // |Δrating| ≤ 40, or the out-of-band repair — see ratingOk above.
+        && ratingOk('ratingGeared')
+        && ratingOk('ratingAcademy')
         // Win/loss counters only ever move by exactly +1 per match.
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['winsGeared'])
             || request.resource.data.winsGeared
