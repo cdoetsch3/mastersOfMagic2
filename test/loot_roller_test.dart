@@ -741,7 +741,13 @@ void main() {
         // (2026-08-17 model: unanswered victory drops accumulate on
         // run.unclaimed until the picker claims them — this walk never claims,
         // so the whole haul is still there to compare.)
-        final banked = [for (final s in game.run!.unclaimed) s.defId];
+        // ⚠️ Expanded by `count`: since the stacking ruling (2026-09-25) a
+        // run's Dust drops share one picker row, 'Pyro Dust ×n', so a row is
+        // n of the reported ids, not one.
+        final banked = [
+          for (final s in game.run!.unclaimed)
+            for (var k = 0; k < s.count; k++) s.defId,
+        ];
         expect(
           (reported..sort()).join(','),
           (banked..sort()).join(','),

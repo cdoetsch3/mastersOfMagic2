@@ -2,6 +2,7 @@ import 'package:mom_engine/mom_engine.dart';
 
 import 'economy/shop_state.dart';
 import 'items/inventory.dart';
+import 'items/item_catalogue.dart';
 import 'items/item_def.dart';
 import 'items/item_instance.dart';
 
@@ -813,7 +814,9 @@ class PlayerProfile {
   ///    gone cannot be rebuilt, and a slot that names nothing is worse than
   ///    an empty one;
   /// 2. every [itemInstances] entry that no container names is dropped — a
-  ///    staff nobody holds is a save that grows forever.
+  ///    staff nobody holds is a save that grows forever;
+  /// 3. every backpack stack whose `count` is outside 1..`stackSize` is
+  ///    clamped into it (ruling 2026-09-25), and each one counts.
   ///
   /// ⚠️ **Drops the id, never the container.** A storeroom's fungible stacks
   /// are untouched, and a storeroom left empty stays in the map (the sparse
@@ -836,6 +839,25 @@ class PlayerProfile {
           slots[i] = null;
           dropped++;
         }
+      }
+      backpack = Backpack.of(slots);
+    }
+
+    // 3. ⭐ **A stack outside 1..stackSize is clamped** (stacking ruling,
+    // Christian 2026-09-25) — 40 Dust in one slot becomes 25, a 0 becomes 1 —
+    // and counted as a repair. A slot holding more than its cap is items the
+    // pack never paid room for; clamping, not splitting, because a split
+    // could need slots the pack does not have. ⚠️ An id the catalogue no
+    // longer knows is left alone: its cap is unknown, and guessing 1 would
+    // destroy a stack a later content patch might claim again.
+    if (backpack.contents.any(_countOutOfRange)) {
+      final slots = [...backpack.slots];
+      for (var i = 0; i < slots.length; i++) {
+        final s = slots[i];
+        if (s == null || !_countOutOfRange(s)) continue;
+        final size = ItemCatalogue.byId(s.defId).stackSize;
+        slots[i] = s.withCount(s.count < 1 ? 1 : size);
+        dropped++;
       }
       backpack = Backpack.of(slots);
     }
@@ -869,6 +891,13 @@ class PlayerProfile {
     }
     return dropped;
   }
+}
+
+/// Whether [s] holds a count its def cannot — see `repairContainers` step 3.
+/// ⚠️ False for an id the catalogue no longer knows: no cap, nothing to fix.
+bool _countOutOfRange(InventorySlot s) {
+  final def = ItemCatalogue.tryById(s.defId);
+  return def != null && (s.count < 1 || s.count > def.stackSize);
 }
 
 /// ⚠️ **The migration of 2026-08-17** — the run-long loot tracker was deleted,

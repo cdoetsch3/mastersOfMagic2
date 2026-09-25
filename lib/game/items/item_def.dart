@@ -15,6 +15,8 @@ library;
 import 'package:flutter/foundation.dart';
 import 'package:mom_engine/mom_engine.dart';
 
+import 'carrying.dart';
+
 /// The six-rarity ladder (ITEMS §8). Ordered; index is meaningful.
 enum Rarity { common, uncommon, rare, epic, mythic, legendary }
 
@@ -403,6 +405,16 @@ sealed class ItemDef {
   /// needs only a `defId`. Non-fungible items carry per-instance rolls and
   /// each needs its own UUID.
   bool get isFungible;
+
+  /// How many of this share one backpack slot.
+  ///
+  /// ⭐ **1 for everything but Dust and Shards** (ruling, Christian 2026-09-25):
+  /// the caps live in [Carrying] beside every other capacity, and only
+  /// [MoteDef] overrides this. ⚠️ Stacking is a *backpack* rule — the Storeroom
+  /// already collapses every fungible to a count — and it is deliberately
+  /// narrower than fungibility: a potion or a log is fungible and still costs
+  /// a slot each, which is what keeps a gathering run bounded.
+  int get stackSize => 1;
 }
 
 // ---- the kinds ---------------------------------------------------------
@@ -640,6 +652,15 @@ final class MoteDef extends ItemDef {
 
   @override
   bool get isFungible => true;
+
+  /// ⭐ Dust 25, Shard 5, and ⚠️ a Crystal (or anything above) still 1 — the
+  /// ladder's upper rungs are rare enough that a slot each is the pressure.
+  @override
+  int get stackSize => switch (tier) {
+    MoteTier.dust => Carrying.dustStack,
+    MoteTier.shard => Carrying.shardStack,
+    _ => 1,
+  };
 }
 
 /// A rare part for a Tier III/IV set piece (ITEMS §3.5).

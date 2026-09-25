@@ -83,6 +83,8 @@ T? _byName<T extends Enum>(List<T> values, String? name) {
 /// ⭐ **One item per slot** (ITEMS §10.3a) — twenty Oak Logs occupy twenty
 /// slots. That is what makes carrying capacity a real resource, and why a
 /// gathering trip ends when you are full rather than when you are bored.
+/// ⭐ **Except motes** (ruling, Christian 2026-09-25): Dust stacks to 25 in a
+/// slot and Shards to 5 — see [count] and `ItemDef.stackSize`.
 /// ⚠️ Storage (the bank) is the other shape entirely and collapses fungibles
 /// to counts.
 @immutable
@@ -93,10 +95,35 @@ class InventorySlot {
   /// [InventorySlot.forDef]; constructing one by hand can break the invariant.
   final String? instanceId;
 
-  const InventorySlot({required this.defId, this.instanceId});
+  /// How many of [defId] this one slot holds.
+  ///
+  /// ⭐ **Only ever > 1 for a def that stacks** (`ItemDef.stackSize` > 1 — Dust
+  /// and Shards, ruled 2026-09-25), and in the backpack never above that
+  /// def's cap: `Backpack.withAdded` splits anything bigger across slots.
+  /// ⚠️ A loot row on the victory picker (`AdventureRun.unclaimed`) is the one
+  /// place a count may exceed the cap — it is a drop waiting to be split, not
+  /// a slot.
+  final int count;
+
+  const InventorySlot({required this.defId, this.instanceId, this.count = 1});
+
+  /// This slot holding [n] instead. ⚠️ The def and instance ride along
+  /// unchanged — a stack is the same thing, only more or fewer of it.
+  InventorySlot withCount(int n) =>
+      InventorySlot(defId: defId, instanceId: instanceId, count: n);
 
   /// Builds a slot, enforcing the fungibility invariant.
-  factory InventorySlot.forDef(ItemDef def, {String? instanceId}) {
+  factory InventorySlot.forDef(
+    ItemDef def, {
+    String? instanceId,
+    int count = 1,
+  }) {
+    if (count != 1 && def.stackSize <= 1) {
+      throw ArgumentError(
+        '${def.id} does not stack, so a slot of it holds exactly one — a '
+        'count of $count would be items the backpack never paid a slot for.',
+      );
+    }
     if (def.isFungible && instanceId != null) {
       throw ArgumentError(
         '${def.id} is fungible and must not carry an instance id — two of '
@@ -109,16 +136,25 @@ class InventorySlot {
         'quality, aspect, sockets and enchant have nowhere else to live.',
       );
     }
-    return InventorySlot(defId: def.id, instanceId: instanceId);
+    return InventorySlot(defId: def.id, instanceId: instanceId, count: count);
   }
 
+  /// ⚠️ `count` is written only when it is above 1, so every save written
+  /// before stacking — and every single-item slot after it — keeps exactly
+  /// the shape it always had.
   Map<String, dynamic> toJson() => {
     'defId': defId,
     if (instanceId != null) 'instanceId': instanceId,
+    if (count > 1) 'count': count,
   };
 
+  /// ⭐ An absent `count` reads as 1, so every save from before stacking loads
+  /// unchanged. ⚠️ An out-of-range count is read as written, never clamped
+  /// here — `PlayerProfile.repairContainers` is the one place that fixes it,
+  /// and it counts the fix.
   factory InventorySlot.fromJson(Map<String, dynamic> json) => InventorySlot(
     defId: json['defId'] as String,
     instanceId: json['instanceId'] as String?,
+    count: (json['count'] as num?)?.toInt() ?? 1,
   );
 }

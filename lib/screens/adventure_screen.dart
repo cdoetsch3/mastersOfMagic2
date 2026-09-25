@@ -6,6 +6,7 @@ import '../game/enemies/enemy_def.dart';
 import '../game/game_state.dart';
 import '../game/skills.dart';
 import '../game/items/carrying.dart';
+import '../game/items/inventory.dart';
 import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
@@ -18,6 +19,7 @@ import 'duel_screen.dart';
 import 'level_up_screen.dart';
 import '../ui/item_display.dart' show rarityColour;
 import '../ui/item_icon.dart';
+import '../ui/stack_count_badge.dart';
 
 /// One run through a zone: what is in front of you, how far in you are, and
 /// the only question that matters — press on, or walk out with what you have.
@@ -85,7 +87,7 @@ class _AdventureScreenState extends State<AdventureScreen> {
                       // ticks from a reused State.
                       key: ValueKey('${run.index}:${run.unclaimed.length}'),
                       run: run,
-                      free: game.profile.backpack.free,
+                      pack: game.profile.backpack,
                       initial: game.defaultVictoryChoice.toSet(),
                       busy: _busy,
                       onTake: (chosen) => _claim(game, chosen),
@@ -353,15 +355,22 @@ class _AdventureScreenState extends State<AdventureScreen> {
     // ⚠️ An id the catalogue no longer knows still asks. Unknown is not the
     // same as worthless, and on a save a content patch moved out from under
     // the player the cautious branch is the only honest one.
+    //
+    // ⭐ **A stack always asks, common or not** (stacking ruling, Christian
+    // 2026-09-25). Drop takes the whole slot, and one tap destroying 12 Dust
+    // is not the one-dust shrug the commons rule was written for — so the
+    // skip applies only to a count of 1, and the ask names the count.
     final worthAsking =
-        def == null || def.rarity.index >= confirmDropFrom.index;
+        slot.count > 1 ||
+        def == null ||
+        def.rarity.index >= confirmDropFrom.index;
     if (worthAsking) {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
           backgroundColor: AppColors.panel,
           title: Text(
-            'Drop $name?',
+            slot.count > 1 ? 'Drop all ${slot.count} $name?' : 'Drop $name?',
             style: const TextStyle(color: AppColors.text, fontSize: 16),
           ),
           content: const Text(
@@ -388,7 +397,8 @@ class _AdventureScreenState extends State<AdventureScreen> {
     // ⚠️ The receipt is not optional: an item leaving a twenty-slot grid is
     // invisible, and a drop nobody confirmed out loud reads as a lost save.
     _say(
-      refusal ?? 'Dropped $name.',
+      refusal ??
+          (slot.count > 1 ? 'Dropped ${slot.count} $name.' : 'Dropped $name.'),
       color: refusal == null ? null : AppColors.ember,
     );
     setState(() {});
@@ -409,12 +419,16 @@ class _AdventureScreenState extends State<AdventureScreen> {
     // ⚠️ The abandoned count is said out loud, and named. Losing things quietly
     // is the whole bug this picker replaced, and the panel that showed the
     // receipt is gone the moment the choice is made.
+    //
+    // ⭐ Items, not rows (stacking ruling, 2026-09-25): taking 'Pyro Dust ×7'
+    // is seven into the pack, and a stack left behind is named with its count.
     final left = result.left;
+    final took = result.taken.fold(0, (n, s) => n + s.count);
     _say(
       left.isEmpty
-          ? '${result.taken.length} into your pack.'
-          : '${result.taken.length} into your pack — left behind: '
-                '${left.map((s) => _lootName(s, null)).join(', ')}.',
+          ? '$took into your pack.'
+          : '$took into your pack — left behind: '
+                '${left.map((s) => _lootLabel(s, null)).join(', ')}.',
     );
   }
 
@@ -744,6 +758,14 @@ String _lootName(InventorySlot slot, ItemInstance? instance) {
   return def == null ? slot.defId : ItemCatalogue.displayName(def, instance);
 }
 
+/// [_lootName] plus the stack — 'Pyro Dust ×7' — for a picker row, where a
+/// drop of n Dust is one decision (stacking ruling, 2026-09-25). ⚠️ No '×1':
+/// a single item reads exactly as it always did.
+String _lootLabel(InventorySlot slot, ItemInstance? instance) {
+  final name = _lootName(slot, instance);
+  return slot.count > 1 ? '$name ×${slot.count}' : name;
+}
+
 Color _lootColour(String defId) {
   final def = ItemCatalogue.tryById(defId);
   return def == null ? AppColors.textFaint : rarityColour(def.rarity);
@@ -824,7 +846,11 @@ class _ValueCell extends StatelessWidget {
 /// dropping the overflow — cost a playtester a rare they never knew they had.
 class _VictoryLoot extends StatefulWidget {
   final AdventureRun run;
-  final int free;
+
+  /// The pack the spoils would land in. ⭐ The whole pack, not a free-slot
+  /// count (stacking ruling, 2026-09-25): whether 'Pyro Dust ×7' fits depends
+  /// on the Dust already carried, and only the pack knows that.
+  final Backpack pack;
 
   /// Rarity-first and pre-trimmed by `GameState.defaultVictoryChoice`, so
   /// tapping straight through never spends the last slot on a log.
@@ -835,7 +861,7 @@ class _VictoryLoot extends StatefulWidget {
   const _VictoryLoot({
     super.key,
     required this.run,
-    required this.free,
+    required this.pack,
     required this.initial,
     required this.busy,
     required this.onTake,
@@ -860,14 +886,35 @@ class _VictoryLootState extends State<_VictoryLoot> {
   /// rarest first, exactly `GameState.defaultVictoryChoice`'s order — and
   /// ⚠️ skips anything the player un-ticked themselves: the default is a
   /// suggestion, never an override.
+  ///
+  /// ⭐ Room is asked of the pack itself ([_fits]), so a drop that tops up a
+  /// Dust stack re-ticks the Dust row even though no slot came free.
   @override
   void didUpdateWidget(_VictoryLoot oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.free <= oldWidget.free) return;
+    if (identical(widget.pack, oldWidget.pack)) return;
     for (final i in _rows) {
-      if (_picked.length >= widget.free) break;
-      if (!_picked.contains(i) && !_declined.contains(i)) _picked.add(i);
+      if (!_picked.contains(i) && !_declined.contains(i) && _fits(i)) {
+        _picked.add(i);
+      }
     }
+  }
+
+  /// Whether row [i] still fits on top of everything already ticked.
+  ///
+  /// ⭐ **The pack answers, stacks and all** — the ticked rows are offered to
+  /// it in [_rows] order, exactly as `GameState.claimVictoryLoot` will add
+  /// them (`lootThatFits`), and then row [i]. So 'no room' is never shown on
+  /// Dust a carried stack has headroom for, and never withheld from a row the
+  /// confirm would in fact refuse.
+  bool _fits(int i) {
+    final loot = widget.run.unclaimed;
+    Backpack? pack = widget.pack;
+    for (final j in _rows) {
+      if (!_picked.contains(j) || j == i) continue;
+      pack = pack?.withAdded(loot[j]);
+    }
+    return pack?.withAdded(loot[i]) != null;
   }
 
   /// ⚠️ Computed once, not per build: the rows must not reorder under the
@@ -880,7 +927,7 @@ class _VictoryLootState extends State<_VictoryLoot> {
   @override
   Widget build(BuildContext context) {
     final loot = widget.run.unclaimed;
-    final atCapacity = _picked.length >= widget.free;
+    final free = widget.pack.free;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -893,7 +940,7 @@ class _VictoryLootState extends State<_VictoryLoot> {
               // itself.
               Text(
                 'Taking ${_picked.length} of ${loot.length} — '
-                '${widget.free} ${widget.free == 1 ? 'slot' : 'slots'} free',
+                '$free ${free == 1 ? 'slot' : 'slots'} free',
                 style: const TextStyle(color: AppColors.text, fontSize: 13),
               ),
               const SizedBox(height: 2),
@@ -911,7 +958,7 @@ class _VictoryLootState extends State<_VictoryLoot> {
                   // ⚠️ A full selection blocks *adding*, never removing —
                   // locking the rows outright would trap the player in a
                   // selection they cannot change.
-                  onTap: widget.busy || (atCapacity && !_picked.contains(i))
+                  onTap: widget.busy || (!_picked.contains(i) && !_fits(i))
                       ? null
                       : () => setState(() {
                           if (_picked.remove(i)) {
@@ -983,7 +1030,7 @@ class _LootChoiceRow extends StatelessWidget {
             ),
             Expanded(
               child: Text(
-                _lootName(slot, instance),
+                _lootLabel(slot, instance),
                 style: TextStyle(
                   // ⭐ Rarity on sight (ITEMS §8) — the one cue that makes the
                   // choice quick.
@@ -1286,12 +1333,7 @@ class _PackRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         children: [
-          ItemIcon(
-            defId: slot.defId,
-            size: 22,
-            gap: 8,
-            fallback: const SizedBox.shrink(),
-          ),
+          _StackedIcon(slot: slot, cap: def?.stackSize ?? slot.count),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1359,6 +1401,60 @@ class _PackRow extends StatelessWidget {
               style: TextButton.styleFrom(foregroundColor: AppColors.ember),
               child: const Text('Drop'),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A pack row's icon with its stack count at the bottom-right (stacking
+/// ruling, Christian 2026-09-25).
+///
+/// ⚠️ **A single item is exactly the old [ItemIcon]** — icon plus gap when
+/// the art exists, nothing at all when it does not — so every row of logs,
+/// potions and staves lays out as it always has. ⭐ **A stack reserves the
+/// icon's box even without art**, so its badge has an icon-shaped corner to
+/// sit in rather than landing on the name. Only the name can shift for it,
+/// never the value cell or the buttons, which sit in fixed cells to the
+/// right — nothing the player presses moves.
+class _StackedIcon extends StatelessWidget {
+  final InventorySlot slot;
+  final int cap;
+
+  static const double _size = 22;
+  static const double _gap = 8;
+
+  const _StackedIcon({required this.slot, required this.cap});
+
+  @override
+  Widget build(BuildContext context) {
+    if (slot.count <= 1) {
+      return ItemIcon(
+        defId: slot.defId,
+        size: _size,
+        gap: _gap,
+        fallback: const SizedBox.shrink(),
+      );
+    }
+    return SizedBox(
+      width: _size + _gap,
+      height: _size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ItemIcon(
+            defId: slot.defId,
+            size: _size,
+            gap: _gap,
+            fallback: const SizedBox.shrink(),
+          ),
+          // ⚠️ Anchored to the ICON's corner, not the gap's — the badge
+          // overhangs the art slightly so '×25' stays legible at 22px.
+          Positioned(
+            left: _size - StackCountBadge.width + 6,
+            bottom: -3,
+            child: StackCountBadge(count: slot.count, cap: cap),
           ),
         ],
       ),

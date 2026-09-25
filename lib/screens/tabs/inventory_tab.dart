@@ -14,6 +14,7 @@ import '../../ui/app_theme.dart';
 import '../../ui/belt_bay.dart';
 import '../../ui/item_display.dart';
 import '../../ui/item_icon.dart';
+import '../../ui/stack_count_badge.dart';
 import '../craft_screen.dart';
 import '../home_shell.dart';
 import '../shop_screen.dart';
@@ -792,33 +793,50 @@ class _ItemSlot extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: colour, width: 1.5),
           ),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(3),
-              // ⭐ The icon REPLACES the wrapped 9px name. A tile that showed
-              // both would show neither legibly, and the name is already on
-              // the tooltip and in the dialog one tap away.
-              //
-              // ⚠️ **No `size`** — the tile is the grid's to size (five
-              // across, whatever the window is), so a hard number would
-              // overflow it on a narrow phone. Unsized, the image takes its
-              // intrinsic 64px capped by the tile's own constraints.
-              child: ItemIcon(
-                defId: slot.defId,
-                fallback: Text(
-                  name,
-                  textAlign: TextAlign.center,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: colour, fontSize: 9, height: 1.15),
+          // ⭐ The stack's '×12' rides ON the tile (ruling 2026-09-25) — a
+          // Stack, so the badge is an overlay and the icon, the tile and the
+          // grid never reflow when a count appears, changes or goes.
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Center(child: _tileFace(name, colour)),
+              if (slot.count > 1)
+                Positioned(
+                  right: 2,
+                  bottom: 2,
+                  child: StackCountBadge(
+                    count: slot.count,
+                    cap: def?.stackSize ?? slot.count,
+                  ),
                 ),
-              ),
-            ),
+            ],
           ),
         ),
       ),
     );
   }
+
+  Widget _tileFace(String name, Color colour) => Padding(
+    padding: const EdgeInsets.all(3),
+    // ⭐ The icon REPLACES the wrapped 9px name. A tile that showed
+    // both would show neither legibly, and the name is already on
+    // the tooltip and in the dialog one tap away.
+    //
+    // ⚠️ **No `size`** — the tile is the grid's to size (five
+    // across, whatever the window is), so a hard number would
+    // overflow it on a narrow phone. Unsized, the image takes its
+    // intrinsic 64px capped by the tile's own constraints.
+    child: ItemIcon(
+      defId: slot.defId,
+      fallback: Text(
+        name,
+        textAlign: TextAlign.center,
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: colour, fontSize: 9, height: 1.15),
+      ),
+    ),
+  );
 }
 
 /// What a Storeroom row is, once names and rarities have been resolved.
@@ -941,14 +959,19 @@ class _StoreroomListState extends State<_StoreroomList> {
               colour: e.def == null
                   ? AppColors.textFaint
                   : rarityColour(e.def!.rarity),
-              onTake: full
+              // ⭐ Room, not a free slot (stacking ruling, 2026-09-25): a
+              // full pack with a short Dust stack can still take Dust.
+              onTake: game.profile.backpack.roomFor(e.defId) == 0
                   ? null
                   : () => game.withdraw(
                       widget.town,
                       InventorySlot(defId: e.defId, instanceId: e.instanceId),
                     ),
               // ⭐ Only for a real stack: "take all" of one instance is Take.
-              onTakeAll: full || e.instanceId != null || e.count < 2
+              onTakeAll:
+                  game.profile.backpack.roomFor(e.defId) == 0 ||
+                      e.instanceId != null ||
+                      e.count < 2
                   ? null
                   : () => _takeAll(e),
               // ⭐ The Storeroom-as-wardrobe move: dress straight from

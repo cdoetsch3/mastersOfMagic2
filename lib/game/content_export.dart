@@ -165,6 +165,10 @@ abstract final class ContentExport {
       case MoteDef():
         m['element'] = d.element?.name;
         m['moteTier'] = d.tier.name;
+        // ⭐ How many share a backpack slot (ruling 2026-09-25: Dust 25,
+        // Shard 5). ⚠️ Motes only — every other kind is 1 by construction,
+        // and printing a 1 on four hundred entries would be noise.
+        m['stackSize'] = d.stackSize;
       case GemDef():
         m['element'] = d.element?.name;
         m['modifiers'] = _modifiers(d.modifiers);

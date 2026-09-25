@@ -45,6 +45,18 @@ abstract final class Carrying {
   /// ✅ One item per slot, so twenty Oak Logs fill it (ITEMS §10.3a).
   static const int backpackSlots = 20;
 
+  /// How many Dust share one backpack slot.
+  ///
+  /// ⭐ **Ruled 2026-09-25 (Christian, mockup option A): dust stacks to 25, shards
+  /// to 5, and nothing else stacks.** A pack of twenty single-dust slots was a
+  /// pack a boss drop could not get into; the refinement ladder already prices
+  /// a Shard at many Dust, so the cap follows the tier. ⚠️ Motes only — a log,
+  /// a potion or a crystal is still one slot each (see `ItemDef.stackSize`).
+  static const int dustStack = 25;
+
+  /// How many Shards share one backpack slot. See [dustStack].
+  static const int shardStack = 5;
+
   /// What a character can bring into a duel with **no belt worn**: nothing.
   ///
   /// ⚠️ **Zero, ruled 2026-08-17.** This was 2, and two slots that appeared out

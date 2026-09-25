@@ -2753,6 +2753,41 @@ explicitly wants more of.
 independent property — it is a *consequence* of fungibility, and modelling both
 would let them disagree. One axis, one field: `ItemDef.isFungible`.
 
+✅ **Amended 2026-09-25 (Christian, mockup option A): Dust stacks to 25 in a
+backpack slot, Shards to 5.** Nothing else stacks — not crystals or higher
+motes, not materials, hides, consumables, keys or gear. A pack of twenty
+single-Dust slots was a pack a boss drop could not get into, and Dust is the
+one thing the game hands out by the handful.
+
+| Def | `stackSize` | Example |
+|---|---|---|
+| `MoteDef` Dust | **25** | 30 Pyro Dust = two slots, 25 + 5 |
+| `MoteDef` Shard | **5** | 7 Pyro Shards = two slots, 5 + 2 |
+| everything else | 1 | 20 Oak Logs still = 20 slots |
+
+- ⭐ `InventorySlot.count` (default 1; only ever > 1 for a stacking def) and
+  `ItemDef.stackSize` (the caps live in `Carrying.dustStack` /
+  `Carrying.shardStack`). The save writes `count` only when > 1, and a slot
+  without it reads as 1 — every existing save loads unchanged.
+- **Adding** tops up carried stacks of that def (lowest count first) before
+  opening a slot, never past the cap, and is all-or-nothing. **Removing by
+  def** takes from the smallest stack first. **Drop / Stow** take the whole
+  slot. `free` / `isFull` are still about slots; "how many" is `countOf`
+  (summed), "would it fit" is `roomFor`.
+- Every reader counts by count: crafting consumes across stacks, the shop
+  sells N of a def, the loot picker shows a drop of n Dust as one row
+  ('Pyro Dust ×7') that fits if carried stacks have the headroom, and the
+  Storeroom moves whole stacks (the pack re-forms them on the way out).
+- ⚠️ **Drop on a stack always asks**, common or not — 'Drop all 12 Pyro
+  Dust?' The commons-skip-the-confirm rule is for a count of 1.
+- ⭐ Tiles and pack rows wear a '×12' badge on the icon's bottom-right, gold at
+  a full stack; none at a count of 1.
+- ⚠️ `repairContainers` clamps a count outside 1..`stackSize` into range and
+  counts the fix.
+- ✅ The *principle* above stands: stacking is a consequence of the def, never
+  a per-instance flag, and only fungible defs can stack. What changed is that
+  fungible is now necessary but no longer the whole answer — `stackSize` is.
+
 ### 10.3b ✅ The four containers (Christian, 2026-08-02)
 
 ✅ **This supersedes §6b.2's "carry as many potions as you like".** The backpack

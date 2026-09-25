@@ -25,6 +25,7 @@ import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/screens/tabs/map_tab.dart';
 import 'package:masters_of_magic_2/game/gathering/gather_node.dart';
 import 'package:masters_of_magic_2/game/items/carrying.dart';
+import 'package:masters_of_magic_2/game/items/inventory.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
@@ -447,14 +448,15 @@ void main() {
     Future<GameState> fullPackAtPicker({bool crystal = false}) async {
       final game = GameState(_Mem(), PlayerProfile.newPlayer());
       await game.beginAdventure(_woods, rng: Random(3));
-      var pack = game.profile.backpack;
-      if (crystal) {
-        pack = pack.withAdded(const InventorySlot(defId: 'flora_crystal'))!;
-      }
-      while (pack.free > 0) {
-        pack = pack.withAdded(const InventorySlot(defId: 'flora_dust'))!;
-      }
-      game.profile.backpack = pack;
+      // ⚠️ Laid out slot by slot with `Backpack.of`, one Dust each — the shape
+      // a pre-stacking save loads as. Filling through `withAdded` would stack
+      // them 25 to a slot (ruling 2026-09-25), and a Drop on a stack asks
+      // first, which is `stacking_test.dart`'s business, not this ruling's.
+      game.profile.backpack = Backpack.of([
+        if (crystal) const InventorySlot(defId: 'flora_crystal'),
+        for (var i = crystal ? 1 : 0; i < Carrying.backpackSlots; i++)
+          const InventorySlot(defId: 'flora_dust'),
+      ]);
       game.run!.recordVictory(
         loot: const [mantle],
         instances: rolls,

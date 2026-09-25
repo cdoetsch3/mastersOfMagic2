@@ -664,7 +664,10 @@ class GameState extends ChangeNotifier {
     final roll = rng ?? Random();
     final amount = def.min + roll.nextInt(def.max - def.min + 1);
     final free = profile.backpack.free;
-    if (free < amount) {
+    // ⭐ Room, not slots (stacking ruling, 2026-09-25) — a yield that stacks
+    // tops up what is carried first. For every yield today (logs, ore,
+    // herbs) the two are the same number.
+    if (profile.backpack.roomFor(def.yieldsDefId) < amount) {
       final yieldDef = ItemCatalogue.tryById(def.yieldsDefId);
       final name = yieldDef == null
           ? def.yieldsDefId
@@ -682,7 +685,8 @@ class GameState extends ChangeNotifier {
       for (var i = 0; i < amount; i++) {
         // ⚠️ Checked above, but the pack is still asked — it is the only
         // authority on its own room, and `?? pack` here means a miscount can
-        // cost an item rather than crash on a null.
+        // cost an item rather than crash on a null. One at a time, so a
+        // stacking yield tops up exactly as a single add would.
         pack = pack.withAdded(InventorySlot(defId: def.yieldsDefId)) ?? pack;
       }
       profile.backpack = pack;
@@ -821,10 +825,13 @@ class GameState extends ChangeNotifier {
         // ⭐ Pack first, Storeroom second — see the doc comment. Reversing
         // these two loops would hoard the pack and starve the output of slots.
         var need = input.count;
-        while (need > 0 && pack.countOf(input.defId) > 0) {
-          pack = pack.withRemovedFirst(input.defId);
-          need--;
-        }
+        // ⭐ By count, across stacks (2026-09-25): 30 Dust from [25, 5] is
+        // one removal of 30, smallest stack first, and leaves nothing.
+        final fromPack = pack.countOf(input.defId) < need
+            ? pack.countOf(input.defId)
+            : need;
+        pack = pack.withRemovedFirst(input.defId, n: fromPack);
+        need -= fromPack;
         while (need > 0 && inTown) {
           final took = (room ?? const Storeroom()).withWithdrawn(
             InventorySlot(defId: input.defId),
@@ -1002,8 +1009,9 @@ class GameState extends ChangeNotifier {
   ///   things that keep you alive are the things you do not lose for dying.
   /// - **Storerooms** hold their own instance ids and are never iterated.
   ///
-  /// Returns how many slots were emptied, so the screen can say it plainly. A
-  /// penalty the player is not told about is indistinguishable from a bug.
+  /// Returns how many items were lost — ⚠️ stacks counted by their `count`
+  /// since 2026-09-25 — so the screen can say it plainly. A penalty the player
+  /// is not told about is indistinguishable from a bug.
   Future<int> loseEncounter({Random? rng}) async {
     final r = run;
     if (r == null || r.isOver) return 0;
@@ -1012,7 +1020,9 @@ class GameState extends ChangeNotifier {
     await _mutate(() {
       final worn = profile.equipped.values.toSet();
       for (final slot in profile.backpack.contents) {
-        lost++;
+        // ⭐ Items, not slots — a 25-stack of Dust is 25 things lost, and the
+        // banner says "items".
+        lost += slot.count;
         final id = slot.instanceId;
         // ⚠️ An instance the paper doll still points at must outlive the wipe —
         // removing it would leave `equipped` naming an item that no longer
@@ -1175,13 +1185,14 @@ class GameState extends ChangeNotifier {
   /// found.** A playtester once lost a rare to a silent overflow that abandoned
   /// whatever happened to be last in the list; a player who just taps confirm
   /// must never lose the item they were excited about.
+  ///
+  /// ⭐ **Trimmed by what fits, not by free slots** (stacking ruling,
+  /// 2026-09-25) — `lootThatFits` offers each row to the pack, so Dust that
+  /// tops up a carried stack is ticked even when no slot is free.
   List<int> get defaultVictoryChoice {
     final r = run;
     if (r == null) return const [];
-    return lootDisplayOrder(
-      r.unclaimed,
-      r.unclaimedInstances,
-    ).take(profile.backpack.free).toList();
+    return lootThatFits(profile.backpack, r.unclaimed, r.unclaimedInstances);
   }
 
   /// Takes the chosen part of the last victory's drops; abandons the rest.
@@ -1207,7 +1218,10 @@ class GameState extends ChangeNotifier {
     final taken = <InventorySlot>[];
     final left = <InventorySlot>[];
     await _mutate(() {
-      final wanted = lootDisplayOrder(
+      // ⭐ The clamp is `lootThatFits` — the picker's own walk — so a row the
+      // picker ticked is a row that lands, stacks and all (2026-09-25).
+      final wanted = lootThatFits(
+        profile.backpack,
         r.unclaimed,
         r.unclaimedInstances,
         // ⚠️ Filtered for range here rather than trusted: these indices come
@@ -1216,10 +1230,13 @@ class GameState extends ChangeNotifier {
           for (final i in chosen)
             if (i >= 0 && i < r.unclaimed.length) i,
         },
-      ).take(profile.backpack.free).toSet();
+      ).toSet();
 
       var pack = profile.backpack;
-      for (var i = 0; i < r.unclaimed.length; i++) {
+      // ⚠️ Added in display order — the order `lootThatFits` measured in. With
+      // stacks, the order changes what fits, so any other walk could refuse a
+      // row the clamp just promised.
+      for (final i in lootDisplayOrder(r.unclaimed, r.unclaimedInstances)) {
         final slot = r.unclaimed[i];
         // ⚠️ The pack is still asked even though `wanted` is already clamped —
         // it is the only authority on whether it has room, and belt-and-braces
@@ -1449,7 +1466,8 @@ class GameState extends ChangeNotifier {
       var room = profile.storerooms[townId] ?? const Storeroom();
       for (final slot in profile.backpack.contents) {
         room = room.withDeposited(slot);
-        moved++;
+        // ⭐ Items, not slots: a 12-stack moves 12 (2026-09-25).
+        moved += slot.count;
       }
       profile.storerooms[townId] = room;
       profile.backpack = Backpack.empty();
@@ -1468,15 +1486,19 @@ class GameState extends ChangeNotifier {
   Future<int> takeAllFromStoreroom(String townId, String defId) async {
     // ⚠️ Cheap refusals before [_mutate], so a no-op never costs a disk write.
     final have = profile.storerooms[townId]?.stacks[defId] ?? 0;
-    final free = profile.backpack.free;
-    if (have == 0 || free == 0) return 0;
+    // ⭐ Room, not free slots (stacking ruling, 2026-09-25): 40 Dust into an
+    // empty pack is 25 + 15 in two slots, and a full pack with a short Dust
+    // stack still takes the difference.
+    final space = profile.backpack.roomFor(defId);
+    if (have == 0 || space == 0) return 0;
     var moved = 0;
     await _mutate(() {
       var room = profile.storerooms[townId]!;
       var pack = profile.backpack;
       // ⭐ Goes through the same two writers a single Take does, one item at a
-      // time, so a bulk move cannot invent an item a single move would refuse.
-      while (moved < free) {
+      // time, so a bulk move cannot invent an item a single move would refuse
+      // — and the pack forms its stacks exactly as it would one by one.
+      while (moved < space) {
         final result = room.withWithdrawn(InventorySlot(defId: defId));
         final taken = result.taken;
         if (taken == null) break;
@@ -1493,8 +1515,11 @@ class GameState extends ChangeNotifier {
   }
 
   /// Takes [want] out of [townId]'s Storeroom, if the backpack has room.
+  ///
+  /// ⚠️ "Has room" is [Backpack.roomFor], not a free slot — a full pack still
+  /// takes a Dust onto a short stack (2026-09-25).
   Future<bool> withdraw(String townId, InventorySlot want) async {
-    if (profile.backpack.isFull) return false;
+    if (profile.backpack.roomFor(want.defId) < want.count) return false;
     var ok = false;
     await _mutate(() {
       final room = profile.storerooms[townId];

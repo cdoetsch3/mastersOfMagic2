@@ -25,6 +25,7 @@ import 'gathering/gather_node.dart';
 import 'enemies/enemy_encounter.dart';
 import 'items/item_catalogue.dart';
 import 'items/item_def.dart';
+import 'items/inventory.dart';
 import 'items/item_instance.dart';
 import 'world.dart';
 
@@ -338,7 +339,25 @@ class AdventureRun {
     // ⚠️ [atFinalBoss], never [atBoss] — a two-stage finale must not end the
     // run on its first stage. See the getter.
     final wasFinalBoss = atFinalBoss;
-    unclaimed.addAll(loot);
+    // ⭐ **A drop of n Dust is ONE row** — 'Pyro Dust ×7' (stacking ruling,
+    // Christian 2026-09-25). The roll still yields one entry per unit; the
+    // picker is where they become a single decision, split into stacks only
+    // when the backpack takes them (`Backpack.withAdded`).
+    for (final slot in loot) {
+      final stacks = (ItemCatalogue.tryById(slot.defId)?.stackSize ?? 1) > 1;
+      final row = !stacks || slot.instanceId != null
+          ? -1
+          : unclaimed.indexWhere(
+              (u) => u.defId == slot.defId && u.instanceId == null,
+            );
+      if (row < 0) {
+        unclaimed.add(slot);
+      } else {
+        unclaimed[row] = unclaimed[row].withCount(
+          unclaimed[row].count + slot.count,
+        );
+      }
+    }
     unclaimedInstances.addAll(instances);
     playerHp = remainingHp;
     index++;
@@ -555,6 +574,35 @@ List<int> lootDisplayOrder(
     return byName != 0 ? byName : a - b;
   });
   return order;
+}
+
+/// The rows of [loot] that [pack] can take, walked in [lootDisplayOrder] —
+/// rarest first — and restricted to [only] when given. Returned in that order.
+///
+/// ⭐ **Stacking-aware room** (ruling, Christian 2026-09-25). Each row is
+/// offered to the pack as it would be on confirm (`Backpack.withAdded`), so a
+/// 'Pyro Dust ×7' row fits a pack with no free slot when a carried stack has
+/// the headroom — and a row that does not fit is skipped rather than ending
+/// the walk, so the Dust after a too-big staff still lands.
+///
+/// ⚠️ **The one fit rule for the picker's opening ticks, its 'no room' rows
+/// and [claimVictoryLoot]'s clamp** — three readers, one walk, so the row the
+/// picker showed as taken is the row the confirm takes.
+List<int> lootThatFits(
+  Backpack pack,
+  List<InventorySlot> loot,
+  Map<String, ItemInstance> instances, {
+  Set<int>? only,
+}) {
+  final fits = <int>[];
+  var room = pack;
+  for (final i in lootDisplayOrder(loot, instances, only: only)) {
+    final next = room.withAdded(loot[i]);
+    if (next == null) continue;
+    room = next;
+    fits.add(i);
+  }
+  return fits;
 }
 
 /// ⚠️ An id no catalogue entry claims sorts below common rather than throwing —

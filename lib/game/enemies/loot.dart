@@ -48,8 +48,10 @@ final Random lootRng = Random();
 
 /// What one kill produced.
 class Loot {
-  /// One entry per *slot* it will occupy — ⭐ three logs are three entries,
-  /// because the backpack is slots rather than stacks (ITEMS §10.3a).
+  /// One entry per unit rolled — ⭐ three logs are three entries (ITEMS
+  /// §10.3a). ⚠️ Dust and Shards stack in the backpack since 2026-09-25, so
+  /// seven Dust here are seven entries that `AdventureRun.recordVictory`
+  /// folds into one picker row ('Pyro Dust ×7').
   final List<InventorySlot> slots;
 
   /// Instances minted for the non-fungibles above, by id.
