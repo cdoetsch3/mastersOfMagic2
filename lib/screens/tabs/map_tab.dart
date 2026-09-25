@@ -658,8 +658,16 @@ class _GateTag extends StatelessWidget {
 
 /// ⭐ Shows the run's length up front (GAME_DESIGN world structure) — the
 /// player should know what they are committing to before they commit.
+/// Exposed for the campaign-shape test; the map's own callers use the
+/// private name.
+@visibleForTesting
+String mapRunSubtitleForTest(GameLocation zone) => _runSubtitle(zone);
+
 String _runSubtitle(GameLocation zone) {
-  final perSection = commonsPerSectionFor(zone.tier);
-  final total = perSection * 3 + 3;
+  // ⭐ The ruled shape (2026-09-25): 2 commons · mini · 2 · mini · 2 · boss —
+  // nine fights — and the Citadel's boss slot is a SEQUENCE of two, so it is
+  // the one zone at ten. Read from the same source the run rolls from.
+  final bosses = Bestiary.bossSequenceFor(zone.id).length;
+  final total = commonsPerSection * 3 + 2 + (bosses == 0 ? 1 : bosses);
   return '$total encounters · ${zone.enemyBandLabel}';
 }

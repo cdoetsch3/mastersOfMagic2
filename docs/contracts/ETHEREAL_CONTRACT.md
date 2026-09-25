@@ -191,10 +191,11 @@ game**: survivable by playing correctly, fatal twice.
 
 ### 1.6 Adventure shape ✅
 
-`commonsPerSectionFor(MagicTier.ethereal)` governs. ⚠️ **The Eclipsed Citadel
-is explicitly exempt from the roster template** (ENEMIES §2e) and this document
-does not assume a section count for it — §6 gives it **zero** gather nodes, so
-no node/section arithmetic applies.
+✅ **Superseded 2026-09-25:** every run is 9 fights in one shape at every tier
+(KINETIC §1.6, GAME_DESIGN §3d) — the tier no longer scales it. ⚠️ **The
+Eclipsed Citadel** fights its two-boss sequence in the one boss slot (ENEMIES
+§2e) — 10 fights — and §6 gives it **zero** gather nodes, so no node
+arithmetic applies to it.
 
 ---
 

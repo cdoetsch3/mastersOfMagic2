@@ -664,10 +664,10 @@ now that real prices exist is Decision 4 (§14) — not because the flat design
 looks wrong, but because it was never tested against a price curve before.
 
 **Gold/day bounds:** there is no stamina/energy system and no daily gold
-cap (✅ ruling 10 — "the curve is the governor"). A Primal zone clear is 9
-duels (`commonsPerSectionFor(primal)=2` × 3 sections + 2 minis + 1 boss); a
-Kinetic clear is 12 (KINETIC_CONTRACT §1.6). At 30g/win, all-wins: **~270g
-per Primal clear, ~360g per Kinetic clear**, with income theoretically
+cap (✅ ruling 10 — "the curve is the governor"). A zone clear is 9
+duels at every tier (2 commons × 3 sections + 2 minis + 1 boss — ✅ ruling
+2026-09-25, GAME_DESIGN §3d; the Citadel 10). ⛔ Was: a Kinetic clear of 12.
+At 30g/win, all-wins: **~270g per clear**, with income theoretically
 unbounded by anything but real playtime. 📝 For the anti-exploit probe
 (§10), a reasonable ceiling to sanity-check against: a sustained, dedicated
 session (~80 duels) tops out near **2,400g/day** before any travel-time

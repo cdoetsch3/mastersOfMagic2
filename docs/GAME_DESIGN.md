@@ -912,17 +912,32 @@ run-through will feel like a chore.
 
 #### 3d. The shape of a zone — ✅ three sections
 
-✅ **Every zone runs in three parts:**
+✅ **RULING (Christian, 2026-09-25): every campaign run is exactly 9 fights,
+in one shape, regardless of tier:**
 
-| Section | Contents |
-|---|---|
-| **1** | 4–5 enemies → **mini-boss** |
-| **2** | 4–5 enemies → **mini-boss** |
-| **3** | a few more enemies → **final boss** |
+| Section | Contents | Then |
+|---|---|---|
+| **1** | 2 commons → **mini-boss** | gathering node |
+| **2** | 2 commons → **mini-boss** | gathering node |
+| **3** | 2 commons → **boss** | gathering node — the run's last stop |
 
-✅ **Sizes grow with the game** — the first few zones run lean, and the count
-climbs toward the late game, so a Primal route is a short outing and an
-Ethereal one is an expedition.
+Three nodes, at fixed places: immediately after mini 1, mini 2 and the boss
+(encounter indices 2, 5, 8). The boss's node is offered on the ending screen,
+above the way out — a clear ends the run the moment the boss falls, so a
+cleared run keeps that one stop open. ⚠️ **The Eclipsed Citadel** fights its
+two bosses in sequence in the one boss slot (ENEMIES §2e): 10 fights, and no
+nodes (ETHEREAL §6).
+
+✅ **A boss kill guarantees a rare-or-better piece of the zone's own gear**
+(same ruling day): one extra drop from the zone catalogue's equipment at rare
+or above — epic on a 25% roll when the zone has one, else rare — on top of the
+boss table's own rolls. One rule for every zone, keyed on the rank.
+
+⛔ **Superseded (2026-09-25):** *"Sizes grow with the game — the first few
+zones run lean, and the count climbs toward the late game."* The tier scaling
+(2 / 3 / 4 / 5 commons per section, up to 18 fights) is gone; the band and the
+roster carry the late game, not the length. The older "4–5 enemies per
+section" table was already dead before that.
 
 ✅ **Each zone keeps a POOL, and a run draws from it.** Not a fixed roster —
 **4 mini-bosses and 2 bosses** exist per zone (✅ final), and every run rolls a

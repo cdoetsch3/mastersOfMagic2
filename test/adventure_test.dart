@@ -33,7 +33,7 @@ void main() {
       expect(ranks.where((r) => r == EnemyRank.mini), hasLength(2));
       expect(ranks.where((r) => r == EnemyRank.boss), hasLength(1));
       expect(ranks.last, EnemyRank.boss, reason: 'the boss ends the run');
-      // Primal runs lean: 2 commons per section (§3d).
+      // 2 commons per section at every tier (ruling 2026-09-25, §3d).
       expect(run.encounterCount, 2 + 1 + 2 + 1 + 2 + 1);
     });
 
@@ -152,7 +152,7 @@ void main() {
       final pool = Bestiary.forZone(
         'whispering_woods',
       ).where((e) => e.rank == EnemyRank.common).length;
-      // 3 sections × the tier's commons per section (§3d).
+      // 3 sections × 2 commons, at every tier (ruling 2026-09-25, §3d).
       final slots = commonsPerSectionFor(_woods.tier) * 3;
       final cap = (slots / pool).ceil() + 1;
       for (var seed = 0; seed < 200; seed++) {

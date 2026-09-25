@@ -42,9 +42,14 @@ class HomeTab extends StatelessWidget {
     // back to it. Not a second kind of card — the same "you are mid-adventure"
     // fact, reached from a different second.
     final run = game.run;
+    // ⭐ …and a cleared run whose boss node is still standing (ruled
+    // 2026-09-25: the last node comes after the boss) — force-quitting on
+    // that screen must not lose the harvest.
     final resumable =
         run != null &&
-            ((!run.isOver && !run.isFinished) || run.unclaimed.isNotEmpty)
+            ((!run.isOver && !run.isFinished) ||
+                run.unclaimed.isNotEmpty ||
+                run.currentNode != null)
         ? run
         : null;
 

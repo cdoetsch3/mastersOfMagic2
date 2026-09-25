@@ -12,6 +12,7 @@ import '../items/item_catalogue.dart';
 import '../items/item_def.dart';
 import '../items/item_instance.dart';
 import 'drop_table.dart';
+import 'enemy_def.dart';
 
 /// **The one generator every production loot roll draws from.**
 ///
@@ -104,6 +105,105 @@ Loot rollDrops(DropTable table, [Random? rng]) {
     if (rng.nextDouble() < e.chance) ids.addAll(_expand(e, rng));
   }
 
+  return _materialise(ids, rng);
+}
+
+/// Rolls one KILL: [table]'s own drops, plus whatever the enemy's [rank]
+/// guarantees on top.
+///
+/// ✅ **RULING (Christian, 2026-09-25): a boss kill guarantees a
+/// rare-or-better piece of the zone's own gear** — see [rollBossGuarantee].
+/// ⭐ **One rule, 26 zones.** It is keyed on `rank == boss` here, never
+/// authored into a boss's table, so no zone can forget it and no table has to
+/// be re-balanced around it.
+///
+/// ⚠️ [table] is rolled FIRST and exactly as [rollDrops] rolls it, so a
+/// table's own rates — the ones `content_export` publishes — are untouched by
+/// the guarantee; it only ever adds. [zoneId] is the zone whose catalogue the
+/// guarantee draws from, i.e. the run's zone.
+///
+/// Omitting [rng] is the production call, same as [rollDrops].
+Loot rollKill(
+  DropTable table, {
+  required EnemyRank rank,
+  required String zoneId,
+  Random? rng,
+}) {
+  rng ??= lootRng;
+  final base = rollDrops(table, rng);
+  if (rank != EnemyRank.boss) return base;
+  final guaranteed = rollBossGuarantee(zoneId, rng);
+  if (guaranteed == null) return base;
+  final extra = _materialise([guaranteed], rng);
+  return Loot(
+    [...base.slots, ...extra.slots],
+    {...base.instances, ...extra.instances},
+  );
+}
+
+/// The chance a boss's guaranteed piece is drawn from the zone's EPIC gear
+/// rather than its rare gear (ruling 2026-09-25).
+const double bossEpicChance = 0.25;
+
+/// Every piece a boss of [zoneId] may guarantee: the zone catalogue's
+/// [EquipmentDef]s at [Rarity.rare] or above.
+///
+/// ⚠️ **Falls back to the zone's best rarity** when it has nothing rare or
+/// better, so the guarantee never silently pays nothing. 📝 As of 2026-09-25
+/// every one of the 26 catalogues has rare-or-better gear and the fallback is
+/// dead code by content — a test pins that, so it only ever wakes for a new
+/// zone.
+List<EquipmentDef> bossGuaranteeCandidates(String zoneId) {
+  final gear = [...?ItemCatalogue.byZone[zoneId]?.whereType<EquipmentDef>()];
+  if (gear.isEmpty) return const [];
+  final rarePlus = [
+    for (final d in gear)
+      if (d.rarity.index >= Rarity.rare.index) d,
+  ];
+  if (rarePlus.isNotEmpty) return rarePlus;
+  final best = gear.map((d) => d.rarity.index).reduce((a, b) => a > b ? a : b);
+  return [
+    for (final d in gear)
+      if (d.rarity.index == best) d,
+  ];
+}
+
+/// The def id a boss of [zoneId] guarantees, or null when the zone has no
+/// equipment at all.
+///
+/// ⭐ **Epic on a [bossEpicChance] roll when the zone has an epic, else
+/// rare.** The roll is ALWAYS drawn, whether or not the zone can answer it,
+/// so every zone consumes the same numbers from [rng] and a seeded run does
+/// not change shape with the catalogue.
+///
+/// ⚠️ **A tier the zone lacks yields to the one it has** — a zone with only
+/// an epic (Ashfall Vale, as of 2026-09-25) guarantees that epic every time,
+/// rather than rolling "rare" into an empty list and paying nothing. Mythic
+/// and legendary gear, should any zone ever author some, is reachable only
+/// through that same fallback: the ruling names rare and epic, and a boss
+/// handing out mythics by default is a decision, not a side effect.
+String? rollBossGuarantee(String zoneId, Random rng) {
+  final candidates = bossGuaranteeCandidates(zoneId);
+  final epicRoll = rng.nextDouble() < bossEpicChance;
+  if (candidates.isEmpty) return null;
+  List<EquipmentDef> at(Rarity r) => [
+    for (final d in candidates)
+      if (d.rarity == r) d,
+  ];
+  // ⚠️ The asked-for tier, then rare, then epic, and only then whatever the
+  // fallback found — so a zone that one day authors a mythic beside its rare
+  // still pays the rare, not a coin flip between the two.
+  final pool = [
+    at(epicRoll ? Rarity.epic : Rarity.rare),
+    at(Rarity.rare),
+    at(Rarity.epic),
+    candidates,
+  ].firstWhere((p) => p.isNotEmpty);
+  return pool[rng.nextInt(pool.length)].id;
+}
+
+/// Turns rolled ids into slots, minting an instance for every non-fungible.
+Loot _materialise(List<String> ids, Random rng) {
   final slots = <InventorySlot>[];
   final instances = <String, ItemInstance>{};
   for (final id in ids) {

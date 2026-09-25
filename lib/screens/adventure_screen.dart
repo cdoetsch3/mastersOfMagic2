@@ -78,7 +78,7 @@ class _AdventureScreenState extends State<AdventureScreen> {
                 children: [
                   _Progress(run: run),
                   const SizedBox(height: 14),
-                  if (choosing)
+                  if (choosing) ...[
                     _VictoryLoot(
                       // ⚠️ Keyed on the batch, so the next fight's drops get a
                       // fresh selection instead of inheriting the last one's
@@ -89,10 +89,42 @@ class _AdventureScreenState extends State<AdventureScreen> {
                       initial: game.defaultVictoryChoice.toSet(),
                       busy: _busy,
                       onTake: (chosen) => _claim(game, chosen),
-                    )
-                  else ...[
+                    ),
+                    // ⭐ **Make room without leaving the picker** (ruling,
+                    // Christian 2026-09-25): "if I have a dust and am about
+                    // to loot something but am out of room, I can drop the
+                    // dust and loot the other item." The picker's `free`
+                    // is read from the pack on every build, so a drop here
+                    // re-opens its 'no room' rows on the same frame.
+                    const SizedBox(height: 14),
+                    _PackStrip(
+                      game: game,
+                      busy: _busy,
+                      onDrop: (i) => _drop(game, i),
+                    ),
+                  ] else ...[
                     if (!run.isOver && run.atSectionStart)
                       _Beat(zone: widget.zone, section: run.section),
+                    // ⭐ **The boss's gathering spot** (ruling 2026-09-25):
+                    // a clear ends the run the instant the boss falls, so
+                    // its node is offered here, on the ending screen and
+                    // above the way out. ⚠️ With the pack strip beside it —
+                    // a spot that refuses a full pack ('The spot will
+                    // wait.') must come with the one lever that makes room.
+                    if (run.isOver && run.currentNode != null) ...[
+                      _GatherCard(
+                        node: run.currentNode!,
+                        busy: _busy,
+                        onGather: () => _gather(game),
+                      ),
+                      const SizedBox(height: 14),
+                      _PackStrip(
+                        game: game,
+                        busy: _busy,
+                        onDrop: (i) => _drop(game, i),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
                     if (run.isOver)
                       _Ending(
                         run: run,
@@ -816,6 +848,28 @@ class _VictoryLoot extends StatefulWidget {
 class _VictoryLootState extends State<_VictoryLoot> {
   late final Set<int> _picked = {...widget.initial};
 
+  /// Rows the player un-ticked by hand. ⚠️ Never re-ticked for them — see
+  /// [didUpdateWidget].
+  final Set<int> _declined = {};
+
+  /// ⭐ **Room made mid-picker is spent the way the opening ticks were**
+  /// (ruling 2026-09-25, drop-from-the-picker). A player who drops dust to
+  /// make room has already said what the room is for; leaving the row they
+  /// made it for unticked would put 'Leave it all behind' under their thumb
+  /// one tap after they fought for the slot. The fill follows [_rows] —
+  /// rarest first, exactly `GameState.defaultVictoryChoice`'s order — and
+  /// ⚠️ skips anything the player un-ticked themselves: the default is a
+  /// suggestion, never an override.
+  @override
+  void didUpdateWidget(_VictoryLoot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.free <= oldWidget.free) return;
+    for (final i in _rows) {
+      if (_picked.length >= widget.free) break;
+      if (!_picked.contains(i) && !_declined.contains(i)) _picked.add(i);
+    }
+  }
+
   /// ⚠️ Computed once, not per build: the rows must not reorder under the
   /// player's finger while they are ticking them.
   late final List<int> _rows = lootDisplayOrder(
@@ -859,11 +913,14 @@ class _VictoryLootState extends State<_VictoryLoot> {
                   // selection they cannot change.
                   onTap: widget.busy || (atCapacity && !_picked.contains(i))
                       ? null
-                      : () => setState(
-                          () => _picked.contains(i)
-                              ? _picked.remove(i)
-                              : _picked.add(i),
-                        ),
+                      : () => setState(() {
+                          if (_picked.remove(i)) {
+                            _declined.add(i);
+                          } else {
+                            _picked.add(i);
+                            _declined.remove(i);
+                          }
+                        }),
                 ),
               const SizedBox(height: 12),
               SizedBox(
@@ -1122,6 +1179,67 @@ class _Pack extends StatelessWidget {
   }
 }
 
+/// The pack, cut down to the one verb that makes room: **Drop**.
+///
+/// ⭐ **The loot picker's companion** (ruling, Christian 2026-09-25) — and the
+/// boss node's, on the ending screen. Both are moments where the only question
+/// is "what goes to make room", so the strip answers exactly that and nothing
+/// else: no Use, no Belt, no effect line. ⚠️ Same rows, same [_ValueCell] and
+/// same `_drop` (and therefore the same confirm rule — commons go at once,
+/// uncommon and up ask) as the full [_Pack], so the two cannot drift.
+class _PackStrip extends StatelessWidget {
+  final GameState game;
+  final bool busy;
+  final ValueChanged<int> onDrop;
+
+  const _PackStrip({
+    required this.game,
+    required this.busy,
+    required this.onDrop,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final slots = game.profile.backpack.slots;
+    final used = game.profile.backpack.used;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionLabel('Your pack · $used / ${Carrying.backpackSlots} slots'),
+        GamePanel(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                used == 0
+                    ? 'Your pack is empty.'
+                    : 'Drop something to make room. Nothing comes back.',
+                style: const TextStyle(
+                  color: AppColors.textFaint,
+                  fontSize: 11.5,
+                ),
+              ),
+              const SizedBox(height: 4),
+              for (var i = 0; i < slots.length; i++)
+                if (slots[i] != null)
+                  _PackRow(
+                    slot: slots[i]!,
+                    instance: game.profile.itemInstances[slots[i]!.instanceId],
+                    beltRefusal: null,
+                    actionWidth: _Pack._actionWidth,
+                    onUse: null,
+                    onDrop: busy ? null : () => onDrop(i),
+                    onBelt: null,
+                    dropOnly: true,
+                  ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _PackRow extends StatelessWidget {
   final InventorySlot slot;
   final ItemInstance? instance;
@@ -1136,6 +1254,11 @@ class _PackRow extends StatelessWidget {
   final VoidCallback? onDrop;
   final VoidCallback? onBelt;
 
+  /// [_PackStrip]'s row: the name, the value and Drop, and nothing else. ⚠️
+  /// The Use and Belt cells are omitted rather than reserved — every row in
+  /// a strip is drop-only, so Drop still lines up down the whole list.
+  final bool dropOnly;
+
   const _PackRow({
     required this.slot,
     required this.instance,
@@ -1144,6 +1267,7 @@ class _PackRow extends StatelessWidget {
     required this.onUse,
     required this.onDrop,
     required this.onBelt,
+    this.dropOnly = false,
   });
 
   @override
@@ -1154,7 +1278,8 @@ class _PackRow extends StatelessWidget {
     // grows a Use button here with no change to this file. ⚠️ And asks the
     // *effect* too: a [Usable] that heals nothing would otherwise offer a
     // button whose only outcome is a refusal.
-    final effect = def is Usable && !(def as Usable).effect.isNothing
+    final effect =
+        !dropOnly && def is Usable && !(def as Usable).effect.isNothing
         ? (def as Usable).effect
         : null;
     return Padding(
@@ -1202,29 +1327,31 @@ class _PackRow extends StatelessWidget {
           // worth is part of reading the row, not part of acting on it. See
           // [_ValueCell] for why it is a fixed cell.
           _ValueCell(value: _lootValue(slot.defId)),
-          // ⚠️ Reserved, not omitted — see [_Pack]. An empty box of exactly
-          // the same width is what keeps Drop in one column down the list.
-          SizedBox(
-            width: actionWidth,
-            child: effect != null
-                ? TextButton(onPressed: onUse, child: const Text('Use'))
-                : null,
-          ),
-          // ⚠️ Drawn for everything [Beltable], enabled or not. An item that
-          // *could* be belted but cannot right now has to say which — hiding
-          // the button makes a full belt look like an unbeltable log.
-          SizedBox(
-            width: actionWidth,
-            child: beltable
-                ? Tooltip(
-                    message: beltRefusal ?? 'Hang it on your belt',
-                    child: TextButton(
-                      onPressed: beltRefusal == null ? onBelt : null,
-                      child: const Text('Belt'),
-                    ),
-                  )
-                : null,
-          ),
+          if (!dropOnly) ...[
+            // ⚠️ Reserved, not omitted — see [_Pack]. An empty box of exactly
+            // the same width is what keeps Drop in one column down the list.
+            SizedBox(
+              width: actionWidth,
+              child: effect != null
+                  ? TextButton(onPressed: onUse, child: const Text('Use'))
+                  : null,
+            ),
+            // ⚠️ Drawn for everything [Beltable], enabled or not. An item that
+            // *could* be belted but cannot right now has to say which — hiding
+            // the button makes a full belt look like an unbeltable log.
+            SizedBox(
+              width: actionWidth,
+              child: beltable
+                  ? Tooltip(
+                      message: beltRefusal ?? 'Hang it on your belt',
+                      child: TextButton(
+                        onPressed: beltRefusal == null ? onBelt : null,
+                        child: const Text('Belt'),
+                      ),
+                    )
+                  : null,
+            ),
+          ],
           SizedBox(
             width: actionWidth,
             child: TextButton(

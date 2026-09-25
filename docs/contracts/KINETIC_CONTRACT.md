@@ -248,15 +248,46 @@ Lore is a field-note observation, never a stat line in prose.
 
 ### 1.6 Adventure shape ✅
 
-`commonsPerSectionFor(MagicTier.kinetic) == 3`, so a Kinetic run is
-**3 commons → mini → 3 commons → mini → 3 commons → boss** = 12 encounters,
-three sections, one gather node per section. ✅ Ruling 4: The Molten Deep uses
-exactly this, no dungeon structure.
+✅ **RULING (Christian, 2026-09-25): every campaign run is exactly 9 fights in
+one shape, whatever the tier** —
+**2 commons → mini → 2 commons → mini → 2 commons → boss**, with a gathering
+node **immediately after mini 1, mini 2 and the boss** (encounter indices 2, 5
+and 8). `commonsPerSection = 2` in `adventure.dart`; `commonsPerSectionFor`
+survives only for its callers and ignores the tier. ⛔ **Superseded:** the
+tier-scaled 3 commons per section this section used to specify (a 12-fight
+Kinetic run, one node drawn somewhere inside each section, never after the
+boss). ✅ Ruling 4 still holds: The Molten Deep uses exactly this shape, no
+dungeon structure.
 
-`_rampedLevel` puts commons on a ramp and elevated ranks at `zone.maxLevel`:
+⭐ **The boss node is reachable.** A clear ends the run the instant the boss
+falls, so a cleared run keeps its last stop open (`AdventureRun.currentNode`):
+the ending screen offers the boss's node above *Back to the map*, and leaving
+forfeits it like walking past any other.
+
+⚠️ **The Citadel** (Ethereal) replaces the single boss slot with its two-boss
+sequence — 10 fights — and authors no nodes (ETHEREAL §6). No Kinetic zone is
+affected.
+
+`_rampedLevel` puts commons on a ramp across the whole 9-fight line and
+elevated ranks at `zone.maxLevel`:
 
 | Zone | Common levels, in run order | Minis & boss |
 |---|---|---|
+| Old Quarry | 15 16 · 17 17 · 18 19 | 19 |
+| Stormcliff Coast | 17 18 · 19 20 · 21 21 | 22 |
+| Windward Steppe | 19 20 · 21 22 · 23 23 | 24 |
+| Frostfell Pass | 21 22 · 23 24 · 25 25 | 26 |
+| Thunderspire Peaks | 23 24 · 25 26 · 27 27 | 28 |
+| The Molten Deep | 25 26 · 27 27 · 28 29 | 29 |
+
+✅ **RULING (same day): a boss kill guarantees a rare-or-better piece of the
+zone's own gear** — one extra `EquipmentDef` from the zone's catalogue at rare
+or above, epic on a 25% roll when the zone has one, else rare; independent of
+and in addition to the boss table's own rolls. ⭐ One rule keyed on
+`rank == boss` in the loot roller (`rollKill`), never authored per table. Every
+Kinetic zone has a rare and an epic, so its bosses pay both at 75 / 25.
+
+---|---|---|
 | Old Quarry | 15 15 16 · 16 17 17 · 18 18 19 | 19 |
 | Stormcliff Coast | 17 17 18 · 19 19 20 · 21 21 22 | 22 |
 | Windward Steppe | 19 19 20 · 21 21 22 · 23 23 24 | 24 |

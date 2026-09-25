@@ -806,9 +806,16 @@ class GameState extends ChangeNotifier {
     final r = run;
     if (r == null || r.isOver) return const [];
     final enemy = r.current!;
-    // ⭐ Defaulting inside rollDrops (lootRng, one long-lived stream) — the
+    // ⭐ Defaulting inside rollKill (lootRng, one long-lived stream) — the
     // hygiene half of the 2026-08-17 drop audit; both shapes measured at 10%.
-    final loot = rollDrops(enemy.def.drops, rng);
+    // ⭐ rollKill, not rollDrops: the rank is what earns a boss its
+    // guaranteed rare-or-better piece of this zone's gear (ruling 2026-09-25).
+    final loot = rollKill(
+      enemy.def.drops,
+      rank: enemy.def.rank,
+      zoneId: r.zoneId,
+      rng: rng,
+    );
     // ⚠️ `atFinalBoss`, not `atBoss`: a zone counts as cleared when the LAST
     // boss of the line falls. Identical to `atBoss` in every zone but The
     // Eclipsed Citadel, whose two bosses are a sequence (ENEMIES §2e) — there,
@@ -983,8 +990,10 @@ class GameState extends ChangeNotifier {
     final r = run;
     // ⚠️ The gate is the *run*, not the location: the road is where there is
     // no shop, and a finished run is already standing in town in every way
-    // that matters.
-    if (r == null || r.isOver) return 'Sell it in town.';
+    // that matters — ⭐ except while the boss's spoils or the boss's gathering
+    // spot are still in front of the player (`AdventureRun.onTheRoad`, ruling
+    // 2026-09-25). The boss picker is the one most likely to meet a full pack.
+    if (r == null || !r.onTheRoad) return 'Sell it in town.';
     if (index < 0 || index >= profile.backpack.slots.length) {
       return 'There is nothing there.';
     }

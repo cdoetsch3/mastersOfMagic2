@@ -211,9 +211,10 @@ noted here only so the two lanes do not disagree about whose it is.
 
 ### 1.6 Adventure shape ✅
 
-`commonsPerSectionFor(MagicTier.celestial)` governs; ⚠️ **read it, do not
-assume it equals the Kinetic 3.** Nothing in this document depends on the
-answer — gather nodes are one per section and the node counts in §6 are per
+✅ **Superseded 2026-09-25:** every run is 9 fights in one shape at every tier
+— 2 commons, mini, 2 commons, mini, 2 commons, boss — with a node after each
+mini and after the boss (KINETIC §1.6, GAME_DESIGN §3d). Nothing in this
+document depended on the old tier-scaled count; the node counts in §6 are per
 zone, not per section.
 
 ---

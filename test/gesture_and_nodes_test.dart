@@ -175,16 +175,22 @@ void main() {
       rng: Random(seed),
     );
 
-    test('a run rolls one node per section, never after the boss', () {
+    test('a run rolls three nodes: after each mini, and after the boss', () {
+      // ✅ Ruling 2026-09-25 moved the spots from "somewhere in each section,
+      // never after the boss" to fixed stops at 2, 5 and 8. The boss's one is
+      // reachable because a cleared run keeps its last stop open.
       final run = roll(5);
-      expect(run.nodes.length, 3, reason: 'three sections, three spots');
+      expect(run.nodes.map((n) => n.afterIndex), [
+        2,
+        5,
+        8,
+      ], reason: 'mini 1 at 2, mini 2 at 5, the boss at 8 — fixed, not drawn');
       for (final n in run.nodes) {
         expect(
-          n.afterIndex,
-          lessThan(run.encounters.length - 1),
-          reason: 'a node after the boss could never be reached',
+          GatherNodes.byId(n.defId),
+          isNotNull,
+          reason: '${n.defId} must resolve',
         );
-        expect(GatherNodes.byId(n.defId), isNotNull);
       }
     });
 
@@ -891,16 +897,17 @@ void main() {
             rng: Random(seed),
           );
           expect(
-            run.nodes,
-            hasLength(3),
-            reason: '$zoneId: three sections, three spots',
+            run.nodes.map((n) => n.afterIndex),
+            [2, 5, 8],
+            reason:
+                '$zoneId: one spot after each mini and one after the boss '
+                '(ruling 2026-09-25)',
           );
           for (final n in run.nodes) {
-            expect(GatherNodes.byId(n.defId), isNotNull);
             expect(
-              n.afterIndex,
-              lessThan(run.encounters.length - 1),
-              reason: 'a node after the boss could never be reached',
+              GatherNodes.byId(n.defId),
+              isNotNull,
+              reason: '${n.defId} must resolve',
             );
             seen.add(n.defId);
           }

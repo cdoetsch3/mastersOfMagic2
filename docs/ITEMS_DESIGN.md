@@ -2154,8 +2154,9 @@ itself lives in code and the export.
   yield range, a GestureStep for the field act, XP, flavor) + **all ten Primal
   nodes** (§9b.7b): the Zone 1 pair `ww_oak_stand` / `ww_bindweed_tangle`, one
   each for the two remaining pure zones, and three each for the two hybrids.
-- **Runtime**: `AdventureRun` rolls one node per section (never after the
-  boss), serializes them with the drop-the-node-not-the-run contract, and
+- **Runtime**: `AdventureRun` rolls three nodes — ✅ since 2026-09-25 at
+  fixed stops immediately after mini 1, mini 2 and the boss (GAME_DESIGN
+  §3d; the boss's is offered on the ending screen) — serializes them with the drop-the-node-not-the-run contract, and
   `GameState.gatherNode()` does the §9b.7 one-harvest: yield **straight into
   the backpack** (ruling 2026-08-17 — materials are fungible, so there is
   nothing to choose between and no instance to register), skill XP banked on

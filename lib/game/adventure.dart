@@ -28,16 +28,26 @@ import 'items/item_def.dart';
 import 'items/item_instance.dart';
 import 'world.dart';
 
-/// How many commons stand between the milestones, by tier.
+/// How many commons stand between the milestones — **two, everywhere**.
 ///
-/// ⭐ ✅ *"Sizes grow with the game — the first few zones run lean"* (§3d). A
-/// Primal route is a short outing; an Ethereal one is an expedition.
-int commonsPerSectionFor(MagicTier? tier) => switch (tier) {
-  MagicTier.primal => 2,
-  MagicTier.kinetic => 3,
-  MagicTier.celestial => 4,
-  _ => 5,
-};
+/// ✅ **RULING (Christian, 2026-09-25): every campaign run is exactly nine
+/// fights in one shape** — 2 commons, mini, 2 commons, mini, 2 commons, boss —
+/// regardless of tier. ⛔ The tier scaling this replaced (2 / 3 / 4 / 5 for
+/// Primal / Kinetic / Celestial / Ethereal, "sizes grow with the game") is
+/// gone: a late run had grown to eighteen fights, and the length was paying
+/// for nothing the band and the roster did not already pay for.
+///
+/// ⭐ **A constant, not a table.** One number means one shape to learn, one
+/// progress bar to read, and one answer to "how long is a run".
+const int commonsPerSection = 2;
+
+/// [commonsPerSection], asked by tier.
+///
+/// ⚠️ **Kept only for its callers** — `map_tab.dart`'s run subtitle and the
+/// economy probe both read the run length through it, and those files belong
+/// to other lanes. It ignores [tier] by ruling (see [commonsPerSection]); new
+/// code should read the constant.
+int commonsPerSectionFor(MagicTier? tier) => commonsPerSection;
 
 /// Where a run currently stands.
 enum RunOutcome {
@@ -155,15 +165,15 @@ class AdventureRun {
         ...bosses.where((b) => b.id == id),
     ];
 
-    final perSection = commonsPerSectionFor(zone.tier);
     final drawnMinis = minis.take(2).toList();
     final line = <EnemyDef>[];
     final bag = _CommonsBag(commons, rng);
 
-    // ⭐ Three sections, each a run of commons capped by something bigger
-    // (§3d). The last section ends on the boss instead of a mini.
+    // ⭐ Three sections, each [commonsPerSection] commons capped by something
+    // bigger (ruling 2026-09-25). The last section ends on the boss instead of
+    // a mini.
     for (var section = 0; section < 3; section++) {
-      for (var i = 0; i < perSection; i++) {
+      for (var i = 0; i < commonsPerSection; i++) {
         final drawn = bag.draw();
         if (drawn != null) line.add(drawn);
       }
@@ -178,28 +188,30 @@ class AdventureRun {
       }
     }
 
-    // ⭐ One gathering spot per section, def and position drawn from the
-    // same rng as everything else — a run IS its roll. Zones without nodes
-    // authored simply roll none.
+    // ⭐ **Three gathering spots, at fixed places** (ruling 2026-09-25):
+    // immediately after mini 1, after mini 2, and after the boss — the reward
+    // for beating each milestone, not a coin flip somewhere inside a section.
+    // Only the def is drawn, from the same rng as everything else — a run IS
+    // its roll. Zones without nodes authored simply roll none (the Citadel,
+    // ETHEREAL §6).
+    //
+    // ⚠️ **After the LAST boss only.** The Citadel's two-stage finale is one
+    // boss slot; a node between Totality and Procarius would be a breather the
+    // sequence ruling (ENEMIES §2e) exists to deny. The boss node is reachable
+    // because [currentNode] stays open on a cleared run — see there.
     final nodeDefs = GatherNodes.forZone(zone.id);
     final nodes = <ActiveGatherNode>[];
     if (nodeDefs.isNotEmpty) {
-      var sectionStart = 0;
-      var section = 0;
-      for (var i = 0; i <= line.length; i++) {
-        final sectionEnds =
-            i == line.length || line[i].rank != EnemyRank.common;
-        if (!sectionEnds) continue;
-        if (i > sectionStart) {
-          final def =
-              nodeDefs[(section + rng.nextInt(nodeDefs.length)) %
-                  nodeDefs.length];
-          // After a random encounter within the section, never the boss.
-          final after = sectionStart + rng.nextInt(i - sectionStart);
-          nodes.add(ActiveGatherNode(defId: def.id, afterIndex: after));
-        }
-        sectionStart = i + 1;
-        section++;
+      final stops = <int>[
+        for (var i = 0; i < line.length; i++)
+          if (line[i].rank == EnemyRank.mini) i,
+        if (line.isNotEmpty && line.last.rank == EnemyRank.boss)
+          line.length - 1,
+      ];
+      for (var n = 0; n < stops.length; n++) {
+        final def =
+            nodeDefs[(n + rng.nextInt(nodeDefs.length)) % nodeDefs.length];
+        nodes.add(ActiveGatherNode(defId: def.id, afterIndex: stops[n]));
       }
     }
 
@@ -222,9 +234,23 @@ class AdventureRun {
   }
 
   /// The gathering spot standing in front of the player right now, if any:
-  /// reached (its encounter is beaten), unspent, and the run still going.
+  /// reached (its encounter is beaten), unspent, and the run still going —
+  /// **or just cleared**.
+  ///
+  /// ⭐ **A cleared run keeps its last stop** (ruling 2026-09-25). The boss's
+  /// node sits after the final fight, and a clear ends the run the instant the
+  /// boss falls ([recordVictory]), so asking `!isOver` here would roll a node
+  /// no player could ever reach. The least invasive answer is to leave the
+  /// road open exactly this far: the ending screen offers the node above its
+  /// way out, and leaving past it forfeits it like walking past any other.
+  ///
+  /// ⚠️ Death and walking out still close it. A spot behind you on a run you
+  /// left, or died on, is not in front of you.
   ActiveGatherNode? get currentNode {
-    if (isOver || isFinished) return null;
+    if (outcome == RunOutcome.died || outcome == RunOutcome.returned) {
+      return null;
+    }
+    if (outcome == RunOutcome.running && isFinished) return null;
     for (final n in nodes) {
       if (!n.spent && n.afterIndex == index - 1) return n;
     }
@@ -252,6 +278,21 @@ class AdventureRun {
   bool get atSectionStart => index == 0 || sectionAt(index - 1) != section;
 
   bool get isOver => outcome != RunOutcome.running;
+
+  /// Whether the player is still standing on the road — the run going, or
+  /// cleared with a decision still in front of them (an unanswered picker, or
+  /// the boss's gathering spot).
+  ///
+  /// ⭐ **What the road's verbs gate on, rather than [isOver].** A clear ends
+  /// the run the moment the boss falls, but the boss's spoils and the boss's
+  /// node are both still ahead of the player at that moment — and the road
+  /// has no shop, so Drop has to reach them (ruling 2026-09-25: *"I can drop
+  /// the dust and loot the other item"*). ⚠️ Death and walking out never
+  /// qualify: [recordDefeat] clears the picker and [currentNode] closes.
+  bool get onTheRoad =>
+      !isOver ||
+      (outcome == RunOutcome.cleared &&
+          (unclaimed.isNotEmpty || currentNode != null));
   bool get isFinished => index >= encounters.length;
 
   EnemyEncounter? get current =>
