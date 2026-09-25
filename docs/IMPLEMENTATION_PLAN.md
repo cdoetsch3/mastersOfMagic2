@@ -1179,9 +1179,35 @@ Also: Practice vs AI section removed from the lobby.
 bar on the road, the Ranking row, dimmed travel cards inside an uncleared
 zone, the Umbral/Reliquary arrival text.
 
-## ✅ Playtest batch 2026-09-25
+## ✅ Playtest batch 2026-09-25 (release 7, Opus lanes, all merged)
 
-* **Pennycross gate is a stop** (mockup B): `GateScreen` on arrival, Unlock spends the proofs and grants the first achievement, Papers in Order (`AchievementsScreen`, Profile 'n / N').
+Twenty-three notes + three mid-turn rulings, ten Opus lanes, all on main
+(0884352 → the stacking commit; 3327 app / 597 engine tests, analyzers zero,
+format clean). Mockups: claude.ai/artifact/5P5mLJeU99J6CKLzGJEZ7x.
+1. Death Wish < 25%. 2. Header pill, titles gone. 3. Loadout dialog centred.
+5. W/L off Home. 6. **Tip picker bug** (web ms clock × 20 → always Haste).
+7. Meditate reaches banked stances (Regrow has no clock, by ruling).
+8. Glance 25/50, Divert 50/50; sim 46–54 all elements. 9. Stagger copy.
+10. Boss guarantees rare+ zone gear (epic 25%). 11. AK hardened; Dispel
+takes Astral Alignment/Photosynthesis, which look alike. 13. **Motes
+stack** (dust 25 / shard 5). 14. Log prints resolved priority; Discharge
+is 8 (tip fixed). 15. **Gate screen** (option B), proofs spent, first
+achievement 'Papers in Order', Achievements screen. 16. **Bot born at 8**:
+increment created the doc; seeds-only create rule + read clamp + repair
+clause + ±1 floor. 17. `RatingText` (sky). 18. Own rating in duel header.
+19. Juggernaut 2.8× HP. 20. Runs are 2/mini/2/mini/2/boss, nodes after
+each mini and boss. 21. Cleared marks. 22. Drop during loot. 23. Shop
+phone row (option A). 24. **Belt Consumable potency** (5×tier+5 × shipped
+quality 0.8/1.0/1.2/1.4). 25. **Save integrity**: two causes (two-device
+last-writer-wins; an update mask that never deleted an emptied instance
+list) — saves are one atomic commit with an updateTime precondition,
+conflicts reload with a banner, load repairs and names dangling ids.
+⚠️ `tool/deploy.sh --rules` — the bots rules changed shape (seed table).
+⚠️ Christian verifies: gate screen + toast, stacks badge, phone shop row,
+belt line, rating colour, cleared marks, the header pill.
+❓ Open: §8.7 recipe pricing (36 rows), Stormcliff 'aftermath', ETHEREAL
+§8.5, Saltwort 75→95, Sanctus Aspect, stationRequired, wiki export stale
+(~40k lines), loot picker partial stacks (all-or-nothing today).
 
 ## Deferred / banked — do not build without an explicit ask
 
