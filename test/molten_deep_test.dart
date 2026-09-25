@@ -644,13 +644,21 @@ void main() {
       expect(stone.maxHpAt(29), greaterThan(warden.maxHpAt(29)));
     });
 
-    test('The Slow Stone is 1080 HP at L29 — the largest number in the '
-        'quarter (KINETIC_CONTRACT §1.2/§4.6), pinned through the statline '
-        'math so a coefficient drift is caught, not just the literal', () {
+    test('The Slow Stone is 840 HP at L29 (✅ 2026-09-25: Juggernaut HP× '
+        '3.60 → 2.80; was 1080), pinned through the statline math so a '
+        'coefficient drift is caught, not just the literal', () {
       final expected =
           (MageState.scaledMaxHp(29) * Archetypes.juggernaut.hpScale).round();
-      expect(expected, 1080);
-      expect(TheMoltenDeepBestiary.theSlowStone.maxHpAt(29), 1080);
+      expect(
+        expected,
+        840,
+        reason: '300 × 2.80 — the old 3.60 scale reads 1080',
+      );
+      expect(
+        TheMoltenDeepBestiary.theSlowStone.maxHpAt(29),
+        840,
+        reason: 'the bestiary reads the same archetype scale',
+      );
     });
 
     test('no common one-shots a character who just walked in', () {

@@ -86,6 +86,12 @@ abstract final class ElementTuning {
   };
 
   /// Stagger (Geo): every Nth consecutive Geo cast applies it.
+  ///
+  /// ⭐ "Every 4th", not "the 4th": the streak is uncapped for cadence
+  /// elements ([streakCap]), so the 4th, 8th, 12th… Geo cast in a row all
+  /// Stagger, and a cast of any other element resets the count to 1 — the
+  /// same cadence as Aqua's every-3rd Waterlogged. ✅ Copy made explicit
+  /// 2026-09-25 (Christian: "every 4th and not just #4").
   static const int staggerEveryNthCast = 4;
 
   /// Stagger: percent damage the victim's next offensive spell deals.

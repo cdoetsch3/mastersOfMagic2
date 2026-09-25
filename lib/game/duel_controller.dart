@@ -789,6 +789,11 @@ class DuelController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// One event's battle-log line.
+  ///
+  /// 📝 A cast line ends "(pri N)" — the priority that cast RESOLVED at, after
+  /// Quicken and Waterlogged (✅ ruled 2026-09-25). That suffix comes from
+  /// [SpellCastEvent.toString], so every consumer of the event agrees on it.
   String _describe(DuelEvent event) {
     // Only mask the enemy's charged element while they are Concealed.
     if (event is ChargedEvent && event.mage == enemy && enemy.concealed) {

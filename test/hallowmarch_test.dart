@@ -1269,7 +1269,12 @@ void main() {
         keeper.maxHpAt(45),
         (MageState.scaledMaxHp(45) * Archetypes.juggernaut.hpScale).round(),
       );
-      expect(keeper.maxHpAt(45), 2023);
+      expect(
+        keeper.maxHpAt(45),
+        1574,
+        reason:
+            'the Juggernaut row at HP× 2.80 (✅ 2026-09-25; was 2023 at 3.60)',
+      );
     });
 
     test('no common one-shots a character who just walked in', () {

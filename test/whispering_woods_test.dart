@@ -362,7 +362,11 @@ void main() {
       final fawn = WhisperingWoodsBestiary.listeningFawn;
       final heart = WhisperingWoodsBestiary.heartwood;
       expect(fawn.maxHpAt(1), (100 * 0.80).round());
-      expect(heart.maxHpAt(5), (MageState.scaledMaxHp(5) * 3.60).round());
+      expect(
+        heart.maxHpAt(5),
+        (MageState.scaledMaxHp(5) * 2.80).round(),
+        reason: 'the Juggernaut HP scale — 2.80 since 2026-09-25 (was 3.60)',
+      );
       expect(heart.maxHpAt(5), greaterThan(fawn.maxHpAt(5)));
     });
 

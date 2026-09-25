@@ -556,7 +556,11 @@ void main() {
       final brute = CinderpeakBestiary.ashjawBrute;
       final stone = CinderpeakBestiary.theBreathingStone;
       expect(brute.maxHpAt(6), (MageState.scaledMaxHp(6) * 1.15).round());
-      expect(stone.maxHpAt(11), (MageState.scaledMaxHp(11) * 3.60).round());
+      expect(
+        stone.maxHpAt(11),
+        (MageState.scaledMaxHp(11) * 2.80).round(),
+        reason: 'the Juggernaut HP scale — 2.80 since 2026-09-25 (was 3.60)',
+      );
       expect(stone.maxHpAt(11), greaterThan(brute.maxHpAt(11)));
     });
 

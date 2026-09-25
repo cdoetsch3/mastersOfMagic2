@@ -135,6 +135,92 @@ void main() {
       expect(alice.streakCount, 0, reason: 'a fizzle is like a charge');
     });
 
+    // ✅ 2026-09-25 — Christian: "I was expecting Discharge (7) to hit before
+    // my opponent's attack (9), but it didn't." Pinned: with nothing moving
+    // either priority, it does. (Discharge is 8 since the aux split.)
+    test('⭐ Discharge (8) resolves before a same-turn attack (9) and fizzles '
+        'it before it pays', () {
+      charge(alice, MagicElement.aqua, 2);
+      charge(bruno, MagicElement.geo, 1);
+      final r = duel.resolveTurn(
+        CastAction(Spellbook.discharge),
+        CastAction(Spellbook.bolt),
+      );
+      final order = r.events
+          .where((e) => e is SpellCastEvent || e is SpellFizzledEvent)
+          .toList();
+      expect(
+        order.first,
+        isA<SpellCastEvent>().having(
+          (e) => e.spell,
+          'spell',
+          Spellbook.discharge,
+        ),
+        reason: '⚠️ kills a sort that runs 9 before 8',
+      );
+      expect(
+        order.last,
+        isA<SpellFizzledEvent>(),
+        reason:
+            'Bruno\'s charge was wiped before his Bolt paid, so it fizzles '
+            'rather than landing',
+      );
+      expect(alice.hp, 100, reason: 'the Bolt never landed');
+      expect(
+        (order.first as SpellCastEvent).priority,
+        8,
+        reason: 'the log line reads the priority it resolved at',
+      );
+    });
+
+    test(
+      '⚠️ …but a Waterlogged Discharge resolves at 18, AFTER the attack',
+      () {
+        // The likely explanation for the report: Aqua's Waterlogged (+10) on
+        // the Discharger's next action. The log line now says so.
+        charge(alice, MagicElement.aqua, 2);
+        charge(bruno, MagicElement.geo, 1);
+        alice.priorityPenalty = 10;
+        final r = duel.resolveTurn(
+          CastAction(Spellbook.discharge),
+          CastAction(Spellbook.bolt),
+        );
+        final casts = r.events.whereType<SpellCastEvent>().toList();
+        expect(casts.map((c) => c.spell.id), [
+          'bolt',
+          'discharge',
+        ], reason: 'the Bolt at 9 now beats the Discharge at 18');
+        expect(
+          casts.map((c) => c.priority),
+          [9, 18],
+          reason:
+              '⚠️ kills an event that reports the BASE priority (8): the '
+              'player must be able to see why the order flipped',
+        );
+        expect(
+          casts.last.toString(),
+          endsWith('(pri 18)'),
+          reason: 'the battle-log line is the event\'s toString',
+        );
+        expect(alice.hp, lessThan(100), reason: 'the Bolt paid and landed');
+      },
+    );
+
+    test('a Quickened attack (2) beats a Discharge (8) too', () {
+      charge(alice, MagicElement.aqua, 2);
+      charge(bruno, MagicElement.geo, 1);
+      bruno.quickenPriority = 2;
+      final r = duel.resolveTurn(
+        CastAction(Spellbook.discharge),
+        CastAction(Spellbook.bolt),
+      );
+      final casts = r.events.whereType<SpellCastEvent>().toList();
+      expect(casts.map((c) => (c.spell.id, c.priority)), [
+        ('bolt', 2),
+        ('discharge', 8),
+      ], reason: 'the Quicken override is what the log must print, not 9');
+    });
+
     // Partial-charge retention (Static Feedback's "you'd still have 3 charge")
     // needs a single-charge strip that resolves before a priority-9 spell —
     // that arrives with Electro in Phase 4 and is tested there. Discharge

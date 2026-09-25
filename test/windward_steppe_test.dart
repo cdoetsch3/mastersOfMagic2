@@ -592,7 +592,11 @@ void main() {
       final harrier = WindwardSteppeBestiary.steppeHarrier;
       final blow = WindwardSteppeBestiary.theUnbrokenBlow;
       expect(harrier.maxHpAt(19), (MageState.scaledMaxHp(19) * 0.70).round());
-      expect(blow.maxHpAt(24), (MageState.scaledMaxHp(24) * 3.60).round());
+      expect(
+        blow.maxHpAt(24),
+        (MageState.scaledMaxHp(24) * 2.80).round(),
+        reason: 'the Juggernaut HP scale — 2.80 since 2026-09-25 (was 3.60)',
+      );
       expect(blow.maxHpAt(24), greaterThan(harrier.maxHpAt(24)));
     });
 
@@ -600,7 +604,12 @@ void main() {
       // ⭐ Cross-check against KINETIC_CONTRACT §4.3's roster table.
       expect(WindwardSteppeBestiary.steppeHarrier.maxHpAt(19), 142);
       expect(WindwardSteppeBestiary.steppeHarrier.maxHpAt(24), 172);
-      expect(WindwardSteppeBestiary.theUnbrokenBlow.maxHpAt(24), 886);
+      expect(
+        WindwardSteppeBestiary.theUnbrokenBlow.maxHpAt(24),
+        689,
+        reason:
+            'the Juggernaut row at HP× 2.80 (✅ 2026-09-25; was 886 at 3.60)',
+      );
       expect(WindwardSteppeBestiary.tempestMonarch.maxHpAt(24), 640);
     });
 

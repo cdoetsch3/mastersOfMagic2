@@ -25,11 +25,30 @@ class SpellCastEvent extends DuelEvent {
   final Spell spell;
   final MagicElement element;
 
-  const SpellCastEvent(this.caster, this.spell, this.element);
+  /// The priority this cast ACTUALLY resolved at, when the engine knows it.
+  final int? _resolvedPriority;
+
+  const SpellCastEvent(this.caster, this.spell, this.element, {int? priority})
+    : _resolvedPriority = priority;
+
+  /// The number the turn sorted this cast by: the spell's base priority, then
+  /// a Quicken override (an offensive spell resolving at 2), then any
+  /// Waterlogged penalty (+10, applied last) — exactly the `_Entry.priority`
+  /// the engine ordered the turn with.
+  ///
+  /// ⭐ Printed on the log line (✅ ruled 2026-09-25) because the base number
+  /// on the spell tab is not always the number that resolved. Christian
+  /// expected a Discharge (8) to beat an attack (9) and saw it not; a
+  /// Waterlogged Discharge resolves at 18, and nothing on screen said so.
+  ///
+  /// 📝 Falls back to [Spell.priority] for an event built without one (tests,
+  /// hand-built fixtures) — never a guess at an adjustment it was not told.
+  int get priority => _resolvedPriority ?? spell.priority;
 
   @override
   String toString() =>
-      '${caster.name} casts ${element.displayName} ${spell.name}';
+      '${caster.name} casts ${element.displayName} ${spell.name} '
+      '(pri $priority)';
 }
 
 /// A shield went up. Carries an immutable **snapshot** of the shield as raised

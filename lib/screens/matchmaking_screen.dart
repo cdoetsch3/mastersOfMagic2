@@ -634,7 +634,7 @@ const List<({String title, String body})> searchTips = [
   (
     title: 'Discharge',
     body:
-        'Discharge (7) wipes all enemy charge and, being faster, fizzles a same-turn Barrage (9).',
+        'Discharge (8) wipes all enemy charge and, being faster, fizzles a same-turn Barrage (9).',
   ),
   (
     title: 'Overload',
@@ -695,7 +695,7 @@ const List<({String title, String body})> searchTips = [
   (
     title: 'Death Wish',
     body:
-        'Death Wish guarantees crits below 15% health. Cast it healthy, as insurance.',
+        'Death Wish guarantees crits below 25% health. Cast it healthy, as insurance.',
   ),
   (
     title: 'Bloodlust',

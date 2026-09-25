@@ -152,7 +152,7 @@ void main() {
     });
 
     test('it beats a Divert STANCE, not just gear', () {
-      // Glance grants Divert 10/20 — the spell-lane source Pierce is the
+      // Glance grants Divert 25/50 — the spell-lane source Pierce is the
       // counter to, per §7a's counter-web.
       final duel = DuelEngine(
         bruno,
@@ -693,6 +693,100 @@ void main() {
       );
     });
 
+    // ✅ 2026-09-25 (Christian: "I cast it and it didn't refresh my HoTs").
+    // Mending is a BankedStance, which carried a clock without declaring
+    // [TurnTimed] — so Meditate walked straight past it.
+    test('⭐ a running Mend (the spell-lane HoT) gains five turns', () {
+      alice.statuses.add(MendingStatus.mend()); // 3%/turn, 6 turns
+      expect(
+        timedBuffsOn(alice).single,
+        isA<MendingStatus>(),
+        reason:
+            '⚠️ kills the pre-fix BankedStance: no TurnTimed, so Meditate '
+            'found nothing to feed',
+      );
+      timedBuffsOn(alice).single.extendTurns(meditateBonusTurns);
+      expect(
+        alice.statuses.whereType<MendingStatus>().single.turnsLeft,
+        11,
+        reason: '6 + 5 — the extension adds, it never resets or shortens',
+      );
+    });
+
+    test('⭐ …and through the real cast, less the cast turn\'s tick', () {
+      alice.statuses.add(MendingStatus.mend());
+      final duel = engine(CountingRandom());
+      final r = cast(duel, Spellbook.meditate, MagicElement.geo);
+      expect(
+        alice.statuses.whereType<MendingStatus>().single.turnsLeft,
+        10,
+        reason:
+            '6 + 5 − this turn\'s end-phase decrement; a Meditate that skips '
+            'Mending leaves 5',
+      );
+      expect(
+        meditateLine(r),
+        contains('1 stance'),
+        reason: 'the log counts the Mend it fed',
+      );
+    });
+
+    test('every special stance is on Meditate\'s table', () {
+      alice.statuses.addAll([
+        SteadfastStatus.steadfast(),
+        ComposureStatus(turns: 25),
+        DeathWishStatus.deathWish(),
+        MendingStatus.renewal(),
+      ]);
+      expect(
+        timedBuffsOn(alice),
+        hasLength(4),
+        reason:
+            'kills a fix that special-cases Mending instead of the whole '
+            'BankedStance family',
+      );
+    });
+
+    test('the belt Tonic extends 6 → 11 as well', () {
+      alice.statuses.add(HealOverTimeStatus(healPerTurn: 10, turnsLeft: 6));
+      timedBuffsOn(alice).single.extendTurns(meditateBonusTurns);
+      expect(
+        alice.statuses.whereType<HealOverTimeStatus>().single.turnsLeft,
+        11,
+        reason: 'the Tonic was already TurnTimed — pinned so it stays so',
+      );
+    });
+
+    test('⚠️ a Torment on the CASTER is untouched by their own Meditate', () {
+      alice.statuses
+        ..add(MendingStatus.mend())
+        ..add(
+          BankDotStatus(
+            id: 'torment',
+            name: 'Torment',
+            damagePerTick: 5,
+            ticks: 6,
+          ),
+        );
+      final duel = engine(CountingRandom());
+      cast(duel, Spellbook.meditate, MagicElement.geo);
+      expect(
+        alice.statuses
+            .whereType<BankDotStatus>()
+            .singleWhere((d) => d.id == 'torment')
+            .turnsLeft,
+        5,
+        reason:
+            '6 − this turn\'s tick and nothing more: ⚠️ kills a Meditate that '
+            'drops the polarity filter and feeds your own DoT (11 − 1 = 10)',
+      );
+      expect(
+        alice.statuses.whereType<MendingStatus>().single.turnsLeft,
+        10,
+        reason: 'the control: the buff beside it WAS fed',
+      );
+    });
+
     test('⚠️ a turn-timed DEBUFF gains nothing', () {
       alice.statuses.add(IgniteStatus(1)); // 3 turns
       final duel = engine(CountingRandom());
@@ -802,6 +896,11 @@ void main() {
       expect(
         HealOverTimeStatus(healPerTurn: 1, turnsLeft: 1),
         isA<TurnTimed>(),
+      );
+      expect(
+        MendingStatus.mend(),
+        isA<TurnTimed>(),
+        reason: '✅ 2026-09-25: the spell-lane HoT is on a clock Meditate reads',
       );
       expect(
         RegrowStatus(1),

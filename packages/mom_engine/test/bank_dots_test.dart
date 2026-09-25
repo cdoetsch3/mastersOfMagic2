@@ -40,7 +40,10 @@ class _FakeDivert extends TurnStatus implements StatModifier {
   final int deflectChance;
   final int deflectAmount;
 
-  _FakeDivert(this.deflectChance, this.deflectAmount);
+  @override
+  final bool strippable;
+
+  _FakeDivert(this.deflectChance, this.deflectAmount, {this.strippable = true});
 
   @override
   int contributionTo(CombatStat stat) => switch (stat) {
@@ -54,6 +57,27 @@ class _FakeDivert extends TurnStatus implements StatModifier {
 
   @override
   StatusPolarity get polarity => StatusPolarity.buff;
+
+  @override
+  List<StatusOp> operationsFor(TurnPhase phase, MageState holder) => const [];
+
+  @override
+  bool advanceAndCheckExpiry(MageState holder) => false;
+}
+
+/// A debuff that declares itself exempt from every remover — no shipped debuff
+/// is, which is exactly why a double is needed to see the veto.
+class _FakeDebuff extends TurnStatus {
+  @override
+  final bool strippable;
+
+  _FakeDebuff({required this.strippable});
+
+  @override
+  String get id => 'fakeDebuff';
+
+  @override
+  StatusPolarity get polarity => StatusPolarity.debuff;
 
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) => const [];
@@ -892,6 +916,117 @@ void main() {
     });
   });
 
+  // ✅ 2026-09-25 — Christian saw an Arcane Knowledge "dispelled". Pinned
+  // through real casts, the element lane on, and the HUD's own snapshot.
+  group('Arcane Knowledge is never stripped', () {
+    test(
+      '⭐ Dispel on a mage with 4 AK stacks leaves 4 — and takes a stance',
+      () {
+        alice = MageState(name: 'Alice', maxHp: 2000);
+        final duel = engine(elementEffects: true);
+        for (var i = 0; i < 4; i++) {
+          bruno
+            ..charge = Spellbook.ruin.chargeCost
+            ..element = MagicElement.arcane;
+          duel.resolveTurn(
+            const ForfeitAction(),
+            CastAction(Spellbook.ruin, MagicElement.arcane),
+          );
+        }
+        bruno.statuses.add(LightfootStatus.lightfoot());
+        expect(
+          bruno.statuses.whereType<ArcaneKnowledgeStatus>().single.stacks,
+          4,
+          reason: 'setup: four 4-charge Arcane casts earn four stacks',
+        );
+
+        final r = cast(duel, Spellbook.dispel);
+
+        expect(
+          bruno.statuses.whereType<ArcaneKnowledgeStatus>().single.stacks,
+          4,
+          reason: '⚠️ kills a Dispel that ignores the strippable veto',
+        );
+        expect(
+          bruno.bonusDamagePercent,
+          20,
+          reason: 'the mirrored bonus is untouched too — 4 × 5%',
+        );
+        expect(
+          StatusSnapshot.of(bruno)['arcaneKnowledge']?.stacks,
+          4,
+          reason: 'and the HUD pip still reads ×4',
+        );
+        expect(
+          bruno.statuses.whereType<LightfootStatus>(),
+          isEmpty,
+          reason:
+              'the control: a normal stance IS dispelled — kills a Dispel '
+              'that strips nothing at all',
+        );
+        expect(
+          r.events
+              .whereType<BuffAppliedEvent>()
+              .firstWhere((e) => e.statusId == 'dispel')
+              .description,
+          isNot(contains('arcaneKnowledge')),
+          reason: 'the log must not claim a strip that did not happen',
+        );
+      },
+    );
+
+    test('Purify and Cleanse on the holder leave it (it is a buff)', () {
+      for (final spell in [Spellbook.purify, Spellbook.cleanse]) {
+        bruno = MageState(name: 'Bruno')
+          ..statuses.add(ArcaneKnowledgeStatus(4))
+          ..statuses.add(IgniteStatus(3));
+        final duel = engine();
+        bruno
+          ..charge = spell.chargeCost
+          ..element = MagicElement.flora;
+        duel.resolveTurn(
+          const ForfeitAction(),
+          CastAction(spell, MagicElement.flora),
+        );
+        expect(
+          bruno.statuses.whereType<ArcaneKnowledgeStatus>().single.stacks,
+          4,
+          reason: '${spell.id}: a self-cleanse must never eat a buff',
+        );
+        expect(
+          bruno.statuses.whereType<IgniteStatus>(),
+          isEmpty,
+          reason: '${spell.id}: the control — the debuff beside it went',
+        );
+      }
+    });
+
+    test('the veto is one flag every remover reads', () {
+      expect(
+        isDispellable(ArcaneKnowledgeStatus(4)),
+        isFalse,
+        reason: 'Dispel\'s predicate reads strippable',
+      );
+      expect(
+        isDispellable(LightfootStatus.lightfoot()),
+        isTrue,
+        reason: 'and a stance passes it',
+      );
+      expect(
+        isShatterable(_FakeDivert(50, 50, strippable: false)),
+        isFalse,
+        reason: '⚠️ kills a Shatter that ignores the veto',
+      );
+      final holder = MageState(name: 'H')
+        ..statuses.add(_FakeDebuff(strippable: false));
+      expect(
+        debuffsOn(holder),
+        isEmpty,
+        reason: '⚠️ kills a Cleanse/Purify pool that ignores the veto',
+      );
+    });
+  });
+
   group('Shatter', () {
     test('⭐ clears shields, Barrier and Divert — and deals nothing', () {
       bruno
@@ -1132,7 +1267,7 @@ void main() {
       // Dispel strips their Lightfoot — all through polarity and
       // [StatModifier], never through a class name.
       bruno.statuses
-        ..add(DivertStatus.divert()) // 20% to deflect 40%
+        ..add(DivertStatus.divert()) // 50% to deflect 50% (✅ 2026-09-25)
         ..add(LightfootStatus.lightfoot())
         ..add(
           BankDotStatus(
@@ -1146,9 +1281,9 @@ void main() {
       final tick = idle(duel).events.whereType<EffectDamageEvent>().single;
       expect(
         tick.deflected,
-        4,
+        5,
         reason:
-            "the stance lane's Divert answers this lane's tick — 40% of "
+            "the stance lane's Divert answers this lane's tick — 50% of "
             '10, no arrangement between the two files required',
       );
 

@@ -655,9 +655,7 @@ class LadderAi implements DuelAi {
                 (enemy.statuses.any(isDivertFamily) ? 10 : 0),
           );
         case DispelEffect():
-          var count = enemy.statuses
-              .where((s) => s.polarity == StatusPolarity.buff && s.strippable)
-              .length;
+          var count = enemy.statuses.where(isDispellable).length;
           if (enemy.empowerMultiplier != null) count++;
           if (enemy.hasGrace) count++;
           consider(sp, count * 8);

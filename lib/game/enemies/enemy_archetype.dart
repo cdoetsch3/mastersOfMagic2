@@ -223,11 +223,17 @@ abstract final class Archetypes {
   );
 
   // ---- boss: the three that end a zone --------------------------------
+
+  /// ✅ Re-ruled 2026-09-25: HP× 3.60 → 2.80, DMG× stays 1.40 (product 5.04
+  /// → 3.92, now the lowest of the three bosses). Christian: players "breeze
+  /// through the campaign, get wrecked by the boss" — the wall was the HP pool,
+  /// which turned a predictable fight into a war of attrition the player's
+  /// resources could not last.
   static const juggernaut = EnemyArchetype(
     id: 'juggernaut',
     name: 'Juggernaut',
     tier: EnemyTier.boss,
-    hpScale: 3.60,
+    hpScale: 2.80,
     damageScale: 1.40,
     intelligence: 7,
     moveCount: 3,

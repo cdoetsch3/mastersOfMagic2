@@ -25,12 +25,11 @@
 /// ⚠️ **The Pyroclast collision with Old Quarry's Obsidian Golem is
 /// resolved** (ENEMIES §2f) — Pyroclast stays here, in The Molten Deep.
 ///
-/// ⚠️ **1080 HP (The Slow Stone at L29) is the largest number in the
-/// quarter by 4%** (§1.2) — transcribed verbatim from the contract's worked
-/// table, not invented: `round(scaledMaxHp(29) * Archetypes.juggernaut.hpScale)`
-/// = `round(300 * 3.60)` = `1080`. `test/molten_deep_test.dart` pins it
-/// through the statline math so a coefficient drift is caught, not just the
-/// literal.
+/// ⚠️ **840 HP (The Slow Stone at L29)** — `round(scaledMaxHp(29) *
+/// Archetypes.juggernaut.hpScale)` = `round(300 * 2.80)` = `840`. ✅ Was 1080
+/// (`300 * 3.60`, §1.2's worked table) until the Juggernaut HP× re-ruling of
+/// 2026-09-25. `test/molten_deep_test.dart` pins it through the statline math
+/// so a coefficient drift is caught, not just the literal.
 ///
 /// ⚠️ **Drops are referenced by STRING id, not by the item objects** — Dart
 /// forbids field access in a const expression. `test/molten_deep_test.dart`
@@ -448,9 +447,10 @@ abstract final class TheMoltenDeepBestiary {
   // ---- bosses -------------------------------------------------------------
 
   /// ⛰️ **The mass boss** — what has NOT melted yet. A Juggernaut pays for
-  /// its size by being predictable. ⚠️ 1080 HP at L29 is the largest number
-  /// in the quarter by 4% (§1.2) — the top of a fifteen-level quarter is
-  /// somewhere the Primal-band Juggernaut coefficient has never been fought.
+  /// its size by being predictable. ⚠️ 840 HP at L29 (✅ 1080 before the
+  /// 2026-09-25 Juggernaut re-ruling, 3.60 → 2.80 HP×) — the top of a
+  /// fifteen-level quarter is somewhere the Primal-band Juggernaut coefficient
+  /// has never been fought.
   static const theSlowStone = EnemyDef(
     id: 'the_slow_stone',
     name: 'The Slow Stone',

@@ -542,7 +542,11 @@ void main() {
       final naiad = GlimmerbrookBestiary.brookNaiad;
       final cold = GlimmerbrookBestiary.theColdBelow;
       expect(naiad.maxHpAt(3), (MageState.scaledMaxHp(3) * 1.00).round());
-      expect(cold.maxHpAt(8), (MageState.scaledMaxHp(8) * 3.60).round());
+      expect(
+        cold.maxHpAt(8),
+        (MageState.scaledMaxHp(8) * 2.80).round(),
+        reason: 'the Juggernaut HP scale — 2.80 since 2026-09-25 (was 3.60)',
+      );
       expect(cold.maxHpAt(8), greaterThan(naiad.maxHpAt(8)));
     });
 

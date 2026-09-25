@@ -182,13 +182,20 @@ abstract class TurnStatus {
   /// it. Making the compiler ask the question is the cheapest possible guard.
   StatusPolarity get polarity;
 
-  /// Whether a strip (Dispel) can take this off its holder.
+  /// Whether ANY remover can take this off its holder — Dispel, Shatter, and
+  /// the debuff pool Cleanse, Purify and Absolution draw from.
   ///
   /// ⚠️ Defaults to true, unlike [polarity], because "strippable" is the rule
   /// and the exemptions are the exception — and an exemption is never silent:
   /// it is a ruling somebody wrote down (Arcane Knowledge is "never cleared"
   /// by §4.3). A status that forgets this line is merely strippable, which is
   /// the behaviour it would have wanted anyway.
+  ///
+  /// ⭐ Every remover asks this, not just Dispel (✅ hardened 2026-09-25 after
+  /// Christian reported an Arcane Knowledge dispelled): polarity picks each
+  /// spell's pool, and this flag is the veto over all of them — so an
+  /// exemption is written once, on the status, and no future stripper can
+  /// forget it. See [isDispellable], [isShatterable] and `debuffsOn`.
   bool get strippable => true;
 
   /// Operations to perform in [phase] this turn, evaluated against the

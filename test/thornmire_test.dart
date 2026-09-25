@@ -521,7 +521,11 @@ void main() {
       final walker = ThornmireBestiary.mirewalker;
       final throat = ThornmireBestiary.mirethroat;
       expect(walker.maxHpAt(8), (MageState.scaledMaxHp(8) * 1.00).round());
-      expect(throat.maxHpAt(13), (MageState.scaledMaxHp(13) * 3.60).round());
+      expect(
+        throat.maxHpAt(13),
+        (MageState.scaledMaxHp(13) * 2.80).round(),
+        reason: 'the Juggernaut HP scale — 2.80 since 2026-09-25 (was 3.60)',
+      );
       expect(throat.maxHpAt(13), greaterThan(walker.maxHpAt(13)));
     });
 

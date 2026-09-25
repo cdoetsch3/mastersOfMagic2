@@ -1204,7 +1204,12 @@ void main() {
         juggernaut.maxHpAt(52),
         (MageState.scaledMaxHp(52) * Archetypes.juggernaut.hpScale).round(),
       );
-      expect(juggernaut.maxHpAt(52), 2660, reason: '§1.2\'s worked table');
+      expect(
+        juggernaut.maxHpAt(52),
+        2069,
+        reason:
+            'the Juggernaut row at HP× 2.80 (✅ 2026-09-25; was 2660 at 3.60)',
+      );
     });
 
     test('no common one-shots a character who just walked in', () {

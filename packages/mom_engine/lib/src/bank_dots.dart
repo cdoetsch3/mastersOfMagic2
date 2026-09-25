@@ -245,6 +245,20 @@ class ShatterEffect extends AuxOffenseEffect {
   const ShatterEffect();
 }
 
+/// Whether **Dispel** takes [status]: a buff, and not exempted by
+/// [TurnStatus.strippable] (Arcane Knowledge, §4.3).
+///
+/// ⭐ The one definition — the engine's Dispel and the ladder AI's estimate of
+/// what a Dispel would take both read it, so the two cannot drift apart.
+bool isDispellable(TurnStatus status) =>
+    status.polarity == StatusPolarity.buff && status.strippable;
+
+/// Whether **Shatter** takes [status]: the Divert family, less anything
+/// [TurnStatus.strippable] exempts. No shipped deflect status is exempt; the
+/// veto is honoured here so an exemption never has to be remembered twice.
+bool isShatterable(TurnStatus status) =>
+    isDivertFamily(status) && status.strippable;
+
 /// Whether [status] is a member of the **Divert family** — anything granting
 /// deflection, by contribution rather than by name. Shatter's target list, and
 /// the one place that definition lives.

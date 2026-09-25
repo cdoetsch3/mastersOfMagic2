@@ -364,7 +364,9 @@ Geo grounds Electro.**
   (§5.4).
 
 ### 3.3 Geo — Stagger
-- ✅ **Trigger:** every 4th consecutive Geo cast.
+- ✅ **Trigger:** every 4th consecutive Geo cast — the 4th, 8th, 12th… Geo
+  cast in a row; any other element resets the count *(✅ copy made explicit
+  2026-09-25: "every fourth Geo cast in a row", not just the 4th)*.
 - ✅ **Effect (reworked):** the opponent's **next offensive spell deals 50%
   damage**. No more replace-the-queued-action — simpler to read, and the
   outplay stays: when you can count that Stagger is coming, throw a cheap
@@ -1109,8 +1111,8 @@ fraction caps at **90%**. There is always a sliver that lands.
 **Divert** — deflection, always a PAIR `(activation %, damage deflected %)`.
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Glance** | 1 · aux | Divert 10/20, 10 turns |
-| **Divert** | 3 · aux | Divert 20/40, 15 turns |
+| **Glance** | 1 · aux | Divert **25/50**, 10 turns *(✅ re-ruled 2026-09-25: 10/20 → 25/50 — not being used much)* |
+| **Divert** | 3 · aux | Divert **50/50**, 15 turns *(✅ re-ruled 2026-09-25: 20/40 → 50/50 — not being used much)* |
 
 **Truesight** — own accuracy, `+N`; every granter also cleanses Blind on cast.
 | Spell | Cost · prio | Grants |
@@ -1189,9 +1191,9 @@ a Divert-family source under it (spell, gear, or enemy innate).
 | **Reflect** | 4 · aux | Reflect, 25 turns |
 
 ✅ Magnitude ruled 2026-08-26: **100% of the deflected amount** comes back
-(with Divert 20/40 that's an expected 8% of incoming damage returned per
-hit — modest until the deflect stat grows; at the 90/90 caps it's 81%,
-which is why the caps exist).
+(with Divert 50/50 — ✅ re-ruled 2026-09-25 from 20/40 — that's an
+expected 25% of incoming damage returned per hit; at the 90/90 caps it's
+81%, which is why the caps exist).
 
 **Steadfast** — own shield strength, `+N%`. *(Renamed from "Stalwart",
 2026-08-26.)*
@@ -1210,14 +1212,15 @@ which is why the caps exist).
 | **Bloodlust** | 5 · aux | Keen +20% AND Heavyhand +40, 25 turns — the all-in window, overriding both existing instances *(✅ re-ruled 2026-09-21: 12 → 25 turns; still under Ardent's 30, so the override still costs you the longer stance)* |
 
 **Death Wish** — binary: your attacks ALWAYS crit while your own health
-is below 15%. *(New 2026-08-26; ✅ name and cost ruled same day — two
+is below 25% *(✅ re-ruled 2026-09-25: 15% → 25% — the 15% window was too
+narrow to ever fire)*. *(New 2026-08-26; ✅ name and cost ruled same day — two
 words on the designer's whimsy license; dropped 3c → 2c because the
 stance is so situational.)* The desperation stance — cast it healthy as
 insurance, or bleeding as a gambit. Blanked by the target's Composure
 like every other crit.
 | Spell | Cost · prio | Grants |
 |---|---|---|
-| **Death Wish** | 2 · aux | Death Wish, 25 turns *(✅ re-ruled 2026-09-21: 10 → 25 — a stance cast healthy as insurance has to still be running when the insurance is needed)* |
+| **Death Wish** | 2 · aux | Death Wish, 25 turns *(✅ re-ruled 2026-09-21: 10 → 25 — a stance cast healthy as insurance has to still be running when the insurance is needed)*; crits below **25%** own HP *(✅ re-ruled 2026-09-25: 15% → 25%)* |
 
 ### NEXT-ATTACK BUFFS — the Phase pattern ✅ (ruled 2026-08-26)
 
@@ -1272,7 +1275,7 @@ which is exactly the turtle-vs-bleed texture the counter-web wants.
 | **Scour** | 1 · aux-off | ✅ *(Re-ruled 2026-08-26 — flipped from self-cleanse to detonator.)* Every DoT on the ENEMY resolves all its remaining ticks NOW as one combined hit; the DoT statuses are consumed. The collection agency for Agony/Torment/Fester patience. |
 | **Shatter** | 5 · aux-off | ✅ *(Re-ruled 2026-08-26.)* No damage. Clears ALL of the target's shields, Barrier, and Divert-family status. THE turtle counter — priced at 5 deliberately, so a turtle smart enough to bring Discharge can keep Shatter off the table by wiping the charge climb. |
 | **Dispel** | 4 · aux-off | Strip the target's buffs (polarity: buff, all strippable lanes). The meta-leash on stance-stacking itself. |
-| **Meditate** | 2 · aux | Every **turn-timed** buff you have gains +5 turns. ✅ *Boundary ruled 2026-08-26: touches only buffs on a turn timer — next-attack riders (Phase/Pierce/Unerring/Empower) and other untimed buffs are exempt, or a 2c spell starts banking Empowers.* Fester's mirror — one feeds your DoTs on them, one feeds your stances. |
+| **Meditate** | 2 · aux | Every **turn-timed** buff you have gains +5 turns. ✅ *Boundary ruled 2026-08-26: touches only buffs on a turn timer — next-attack riders (Phase/Pierce/Unerring/Empower) and other untimed buffs are exempt, or a 2c spell starts banking Empowers.* Fester's mirror — one feeds your DoTs on them, one feeds your stances. ✅ *Fixed 2026-09-25 ("I cast it and it didn't refresh my HoTs"): the special stances — Mending (Mend/Renewal) above all, plus Steadfast, Composure, Death Wish, Reflect — carried a clock but never declared it, so Meditate skipped them. They are TurnTimed now. Regrow (worn gear) is permanent and still gains nothing; your own DoTs/debuffs are never extended.* |
 
 ✅ **DoT-archetype EV note (FINAL 2026-08-28, three rounds of designer
 recalibration deep — the metric is damage per TURN, since every charge
@@ -1427,7 +1430,7 @@ rulings land):
 - Deflect activation and deflected fraction each cap at 90%.
 - Scour's combined hit equals the sum of all remaining ticks and consumes
   the statuses; Reflect returns exactly the deflected amount.
-- Death Wish crits fire only below 15% own HP, and Composure still blanks
+- Death Wish crits fire only below 25% own HP, and Composure still blanks
   them.
 - Agony, Torment, and Ignite tick concurrently on one target; recasting
   Agony refreshes it (replace, not stack).

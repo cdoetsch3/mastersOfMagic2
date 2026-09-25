@@ -153,13 +153,21 @@ class DivertStatus extends StatStanceStatus {
     required int turns,
   }) : super(turns);
 
-  /// The 1-cost price point: 10/20 for 10 turns — a sliver, as designed.
+  /// The 1-cost price point: 25/50 for 10 turns.
+  ///
+  /// ✅ Re-ruled 2026-09-25: 10/20 → 25/50 (Christian: "not being used much").
+  /// The old sliver removed an expected 2% of incoming damage — too little to
+  /// see, so too little to pick.
   static DivertStatus glance() =>
-      DivertStatus(activationPercent: 10, deflectedPercent: 20, turns: 10);
+      DivertStatus(activationPercent: 25, deflectedPercent: 50, turns: 10);
 
-  /// The 3-cost price point: 20/40 for 15 turns.
+  /// The 3-cost price point: 50/50 for 15 turns.
+  ///
+  /// ✅ Re-ruled 2026-09-25: 20/40 → 50/50 — an expected 25% of incoming
+  /// damage gone, half the hits halved. Still well inside the 90/90
+  /// [CombatClamps], so Reflect under it returns at most the same 25%.
   static DivertStatus divert() =>
-      DivertStatus(activationPercent: 20, deflectedPercent: 40, turns: 15);
+      DivertStatus(activationPercent: 50, deflectedPercent: 50, turns: 15);
 
   @override
   String get id => 'divert';

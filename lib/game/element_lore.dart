@@ -86,7 +86,7 @@ const Map<MagicElement, ElementLore> elementLore = {
   ),
   MagicElement.geo: ElementLore(
     effectName: 'Stagger',
-    trigger: 'every 4th consecutive Geo cast',
+    trigger: 'every fourth Geo cast in a row (the 4th, 8th, 12th…)',
     description:
         'The opponent\'s next offensive spell deals 50% damage — it '
         'lingers until they cast one. Whiffs against a Tailwind streak of 3+. '

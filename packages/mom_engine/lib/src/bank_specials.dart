@@ -39,11 +39,23 @@ import 'status.dart';
 /// stance covers the rest of this turn and 24 more. Every duration in §7a is
 /// written against that cadence, and it is what lets a priority-7 stance shape
 /// the priority-8 and -9 spells that follow it in the same turn.
-abstract class BankedStance extends TurnStatus implements StanceDescribing {
+///
+/// ⭐ **[TurnTimed], so Meditate reaches every one** — Steadfast, Composure,
+/// Death Wish, Reflect and, above all, Mending. ✅ Fixed 2026-09-25 (Christian:
+/// "I cast it and it didn't refresh my HoTs"): the class carried a `turnsLeft`
+/// but never *said* it had a clock, and [TurnTimed] is a marker precisely so
+/// that a clock has to be declared — so Meditate skipped Mend and Renewal while
+/// deepening the sibling [StatStanceStatus] family, which did declare it.
+abstract class BankedStance extends TurnStatus
+    implements StanceDescribing, TurnTimed {
   @override
   int turnsLeft;
 
   BankedStance(this.turnsLeft);
+
+  /// Meditate's gift. Never shortens — [TurnTimed]'s contract.
+  @override
+  void extendTurns(int turns) => turnsLeft += turns;
 
   @override
   StatusPolarity get polarity => StatusPolarity.buff;
@@ -166,16 +178,19 @@ abstract interface class GuaranteedCritSource {
   bool guaranteesCritFor(MageState holder);
 }
 
-/// **Death Wish** (2c): while the holder's OWN health is below 15% of max,
+/// **Death Wish** (2c): while the holder's OWN health is below 25% of max,
 /// every attack they land crits. 25 turns.
 ///
-/// ⚠️ **Below, strictly** — at exactly 15% the guarantee is not yet on. Kept as
-/// integer cross-multiplication (`hp * 100 < maxHp * 15`) rather than a double
+/// ✅ Re-ruled 2026-09-25: the line moved 15% → 25%. At 15% the window was
+/// one or two hits wide — the stance rarely got to fire before the duel ended.
+///
+/// ⚠️ **Below, strictly** — at exactly 25% the guarantee is not yet on. Kept as
+/// integer cross-multiplication (`hp * 100 < maxHp * 25`) rather than a double
 /// ratio: both lockstep clients must agree on the boundary, and floating point
-/// at 15.000000000000002% is not an agreement.
+/// at 25.000000000000002% is not an agreement.
 class DeathWishStatus extends BankedStance implements GuaranteedCritSource {
   /// The health threshold, in percent of max.
-  static const int thresholdPercent = 15;
+  static const int thresholdPercent = 25;
 
   DeathWishStatus({required int turns}) : super(turns);
 
@@ -241,9 +256,10 @@ class ReflectStatus extends BankedStance implements DamageReflecting {
   @override
   String get id => 'reflect';
 
-  /// Ruled 2026-08-26: the full deflected amount. With a Divert at 20/40 that
-  /// is an expected 8% of incoming damage returned per hit; at the 90/90 clamps
-  /// it is 81%, which is exactly why those clamps exist.
+  /// Ruled 2026-08-26: the full deflected amount. With a Divert at 50/50 (✅
+  /// re-ruled 2026-09-25 from 20/40) that is an expected 25% of incoming
+  /// damage returned per hit; at the 90/90 clamps it is 81%, which is exactly
+  /// why those clamps exist.
   @override
   int get returnPercent => 100;
 

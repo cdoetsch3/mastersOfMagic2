@@ -493,28 +493,34 @@ void main() {
       );
     }
 
-    test('⭐ it always crits below 15% of the holder\'s own max health', () {
-      attackAt(14, expectHp: 70);
+    test('⭐ it always crits below 25% of the holder\'s own max health', () {
+      attackAt(24, expectHp: 70);
     });
 
-    test('⭐ …and does nothing AT 15%, or above it', () {
-      attackAt(15, expectHp: 80);
+    test('⭐ …and does nothing AT 25%, or above it', () {
+      attackAt(25, expectHp: 80);
     });
 
-    test('⭐ 15% is a strict floor, checked either side of the boundary', () {
+    test('⭐ 25% is a strict floor, checked either side of the boundary', () {
       // Two mages, one test: the pair is what kills the off-by-one.
-      final low = MageState(name: 'Low')..hp = 14;
-      final high = MageState(name: 'High')..hp = 15;
+      final low = MageState(name: 'Low')..hp = 24;
+      final high = MageState(name: 'High')..hp = 25;
       for (final m in [low, high]) {
         m.statuses.add(DeathWishStatus(turns: 10));
       }
-      expect(attacksAlwaysCrit(low), isTrue);
+      expect(
+        attacksAlwaysCrit(low),
+        isTrue,
+        reason:
+            '⚠️ kills the pre-2026-09-25 line: at 15% a 24-hp mage would not '
+            'crit. ✅ Re-ruled: below 25% now',
+      );
       expect(
         attacksAlwaysCrit(high),
         isFalse,
         reason:
-            '⚠️ THE mutant: `<=` instead of `<` turns exactly 15% into a '
-            'guaranteed crit. §7a says BELOW 15%',
+            '⚠️ THE mutant: `<=` instead of `<` turns exactly 25% into a '
+            'guaranteed crit. §7a says BELOW 25%',
       );
     });
 

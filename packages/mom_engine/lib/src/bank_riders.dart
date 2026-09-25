@@ -64,6 +64,8 @@ class RemovableDebuff {
 List<RemovableDebuff> debuffsOn(MageState mage) {
   final pool = <RemovableDebuff>[];
   for (final s in mage.statusesWithPolarity(StatusPolarity.debuff)) {
+    // ⚠️ The [TurnStatus.strippable] veto, honoured by every remover.
+    if (!s.strippable) continue;
     final timer = s is TurnTimed ? (s as TurnTimed).turnsLeft : 0;
     pool.add(
       RemovableDebuff(

@@ -1271,8 +1271,10 @@ void main() {
       // and it is worth seeing the number written down.
       expect(
         guardian.maxHpAt(53),
-        greaterThan(2500),
-        reason: '§1.2\'s 3.60 scale, transcribed rather than invented',
+        greaterThan(2000),
+        reason:
+            'the 2.80 scale (✅ 2026-09-25, was 3.60 and > 2500): 769 × 2.80 '
+            '= 2153 — still above a 2.60 Tyrant\'s 1999 at the same level',
       );
     });
 

@@ -125,7 +125,7 @@ for it (Bruiser telegraphs; Juggernaut is slow).
 
 | # | Archetype | HP× | DMG× | Product | Int | Behaviour |
 |---|---|---|---|---|---|
-| 13 | **Juggernaut** | 3.60 | 1.40 | 5.04 | 7 | Enormous. Slow, unsubtle, unavoidable — an endurance test. Pays for its product by being predictable |
+| 13 | **Juggernaut** | 2.80 | 1.40 | 3.92 | 7 | Enormous. Slow, unsubtle, unavoidable — an endurance test. Pays for its product by being predictable. *(✅ re-ruled 2026-09-25: HP× 3.60 → 2.80, damage unchanged — players would "breeze through the campaign, get wrecked by the boss")* |
 | 14 | **Tyrant** | 2.60 | 1.70 | 4.42 | 9 | The real fight: high stats *and* near-perfect play. The intelligence is the threat |
 | 15 | **Aspect** | 2.60 | 1.50 | 3.90 | 8 | ⭐ **The element itself, embodied** — leans entirely on its element's passive, taken to an extreme the player has never seen. The Flora Aspect never stops healing; the Pyro Aspect burns from turn one. The boss that *is* a lesson about one element |
 

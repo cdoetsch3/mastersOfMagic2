@@ -177,7 +177,48 @@ void main() {
         charge(alice, MagicElement.geo, 1);
         duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
       }
-      expect(bruno.nextOffensiveDamageScale, 0.5);
+      expect(
+        bruno.nextOffensiveDamageScale,
+        0.5,
+        reason: 'kills a cadence that never fires on the 4th Geo cast',
+      );
+    });
+
+    test('⭐ EVERY 4th in a row — the 8th Staggers again, 5–7 do not', () {
+      // ✅ 2026-09-25 (Christian: "every 4th and not just #4"). The Geo
+      // streak is uncapped, so the modulo keeps firing.
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
+      for (var i = 1; i <= 8; i++) {
+        charge(alice, MagicElement.geo, 1);
+        duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
+        expect(
+          bruno.nextOffensiveDamageScale,
+          i % 4 == 0 ? 0.5 : 1.0,
+          reason:
+              'Geo cast #$i in a row: ⚠️ kills a `streakCount == 4` '
+              '(only-the-4th) mutant at #8, and a `>= 4` mutant at #5',
+        );
+        bruno.nextOffensiveDamageScale = 1.0; // reset to watch the next cast
+      }
+    });
+
+    test('⭐ a cast of another element starts the count over', () {
+      final duel = DuelEngine(alice, bruno, rng: Random(1), baseMissPercent: 0);
+      for (var i = 0; i < 3; i++) {
+        charge(alice, MagicElement.geo, 1);
+        duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
+      }
+      charge(alice, MagicElement.pyro, 1);
+      duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
+      charge(alice, MagicElement.geo, 1);
+      duel.resolveTurn(CastAction(Spellbook.ward), const ForfeitAction());
+      expect(
+        bruno.nextOffensiveDamageScale,
+        1.0,
+        reason:
+            '⚠️ kills a lifetime Geo-cast counter: 3 Geo + Pyro + Geo is four '
+            'Geo casts but not four IN A ROW',
+      );
     });
 
     test('a Tailwind streak of 3+ is immune (Aero weathers Geo)', () {

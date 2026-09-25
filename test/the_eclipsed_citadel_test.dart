@@ -1435,8 +1435,9 @@ void main() {
       );
       expect(
         totality.maxHpAt(60),
-        3643,
-        reason: '§1.2\'s worked table, transcribed rather than invented',
+        2834,
+        reason:
+            'the Juggernaut row at HP× 2.80 (✅ 2026-09-25; was 3643 at 3.60)',
       );
       expect(
         procarius.maxHpAt(60),

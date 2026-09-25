@@ -1176,7 +1176,12 @@ void main() {
         record.maxHpAt(58),
         (MageState.scaledMaxHp(58) * Archetypes.juggernaut.hpScale).round(),
       );
-      expect(record.maxHpAt(58), 3366);
+      expect(
+        record.maxHpAt(58),
+        2618,
+        reason:
+            'the Juggernaut row at HP× 2.80 (✅ 2026-09-25; was 3366 at 3.60)',
+      );
       expect(UnwrittenLibraryBestiary.theAuthor.maxHpAt(58), 2431);
     });
 

@@ -127,7 +127,9 @@ abstract final class StatusCatalog {
       name: 'Stagger',
       description: 'Your next offensive spell deals half damage.',
       trigger:
-          'Every 4th consecutive Geo cast. Whiffs against a Tailwind streak.',
+          'Every fourth Geo cast in a row — the 4th, 8th, 12th… — and a cast '
+          'of any other element starts the count over. Whiffs against a '
+          'Tailwind streak.',
       kind: StatusKind.debuff,
       element: MagicElement.geo,
       lingers: true,
@@ -293,8 +295,10 @@ abstract final class StatusCatalog {
       description:
           'Incoming hits sometimes glance off you. It carries two numbers: how '
           'often a deflection fires, and how much of the hit it removes — each '
-          'capped at 90%, so there is always a sliver that lands. Casting '
-          'either Divert spell replaces the other outright.',
+          'capped at 90%, so there is always a sliver that lands. Glance: '
+          'a 25% chance to deflect 50% of a hit, for 10 turns. Divert: a 50% '
+          'chance to deflect 50%, for 15. Casting either replaces the other '
+          'outright.',
       trigger: 'Casting Glance or Divert.',
       kind: StatusKind.buff,
       element: null,
@@ -433,7 +437,7 @@ abstract final class StatusCatalog {
       name: 'Death Wish',
       description:
           'For 25 turns, every attack you land is a critical hit while your '
-          'own health is below 15% of maximum. Their Composure still blanks '
+          'own health is below 25% of maximum. Their Composure still blanks '
           'them.',
       trigger: 'Casting Death Wish.',
       kind: StatusKind.buff,

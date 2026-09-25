@@ -593,7 +593,7 @@ abstract final class Spellbook {
     ]),
   );
 
-  /// **Death Wish** — every attack crits while you are under 15% health. Cast
+  /// **Death Wish** — every attack crits while you are under 25% health. Cast
   /// healthy as insurance or bleeding as a gambit, and blanked by the target's
   /// Composure like every other crit.
   static const deathWish = Spell(

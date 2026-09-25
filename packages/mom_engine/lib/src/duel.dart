@@ -693,7 +693,9 @@ class DuelEngine {
     // itself; every status frame from here on carries the new count.
     caster.recordCastForStreak(cast.element);
 
-    events.add(SpellCastEvent(caster, spell, cast.element));
+    events.add(
+      SpellCastEvent(caster, spell, cast.element, priority: cast.priority),
+    );
     // ⚠️ What this cast PAID, not the live bar — payment happens before
     // resolution now, so the live bar reads zero by the time we get here.
     final chargeSpent = cast.chargeAtCast;
@@ -1130,7 +1132,7 @@ class DuelEngine {
     MageState target, {
     required bool guaranteed,
   }) {
-    // ⭐ Death Wish (§7a): while the ATTACKER'S OWN health is below 15% of
+    // ⭐ Death Wish (§7a): while the ATTACKER'S OWN health is below 25% of
     // max, this is a crit with no roll at all. Like [guaranteed] (Execute),
     // the short-circuit is load-bearing for lockstep as well as for taste —
     // a guaranteed crit must not draw an RNG value a client without the
@@ -1682,7 +1684,7 @@ class DuelEngine {
   void _dispel(MageState target, List<DuelEvent> e) {
     final stripped = <String>[];
     target.statuses.removeWhere((s) {
-      final take = s.polarity == StatusPolarity.buff && s.strippable;
+      final take = isDispellable(s);
       if (take) stripped.add(s.id);
       return take;
     });
@@ -1724,10 +1726,10 @@ class DuelEngine {
     final had =
         target.shield != null ||
         target.barrierPoints > 0 ||
-        target.statuses.any(isDivertFamily);
+        target.statuses.any(isShatterable);
     target.shield = null;
     target.barrierPoints = 0;
-    target.statuses.removeWhere(isDivertFamily);
+    target.statuses.removeWhere(isShatterable);
     e.add(
       BuffAppliedEvent(
         target,

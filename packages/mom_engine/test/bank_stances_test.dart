@@ -290,17 +290,37 @@ void main() {
     });
 
     test('the Divert pair replaces as ONE status, both numbers together', () {
-      castBy(bruno, Spellbook.divert); // 20/40, 15 turns
-      expect(bruno.effectiveDeflectChance, 20);
-      expect(bruno.effectiveDeflectAmount, 40);
+      castBy(bruno, Spellbook.divert); // 50/50, 15 turns
+      expect(
+        [bruno.effectiveDeflectChance, bruno.effectiveDeflectAmount],
+        [50, 50],
+        reason: '✅ 2026-09-25: Divert is 50/50 (was 20/40)',
+      );
 
-      castBy(bruno, Spellbook.glance); // 10/20, 10 turns
+      castBy(bruno, Spellbook.glance); // 25/50, 10 turns
       theStance(bruno, 'divert');
       expect(
         [bruno.effectiveDeflectChance, bruno.effectiveDeflectAmount],
-        [10, 20],
+        [25, 50],
         reason:
-            '⚠️ THE mutant: half a replace. [10, 40] or [20, 20] is a '
+            '⚠️ half a replace that keeps the better ACTIVATION reads '
+            '[50, 50]',
+      );
+
+      // ⚠️ The shipped pair share a 50 amount, so a half-replace that keeps
+      // the old AMOUNT is invisible between them. An off-book Divert with a
+      // distinct amount underneath is what makes that half visible.
+      bruno.statuses
+        ..removeWhere((s) => s.id == 'divert')
+        ..add(
+          DivertStatus(activationPercent: 30, deflectedPercent: 70, turns: 15),
+        );
+      castBy(bruno, Spellbook.glance);
+      expect(
+        [bruno.effectiveDeflectChance, bruno.effectiveDeflectAmount],
+        [25, 50],
+        reason:
+            '⚠️ THE mutant: half a replace. [25, 70] or [30, 50] is a '
             'build treating the pair as two independent axes, which lets a '
             'player keep the better half of a stance they overwrote',
       );
@@ -455,7 +475,7 @@ void main() {
     test(
       '⭐ Divert is one status carrying two numbers, and the roll uses both',
       () {
-        castBy(bruno, Spellbook.glance); // 10/20
+        castBy(bruno, Spellbook.glance); // 25/50
         expect(
           bruno.statuses.whereType<StatStanceStatus>(),
           hasLength(1),
@@ -463,31 +483,42 @@ void main() {
         );
         expect(
           [bruno.effectiveDeflectChance, bruno.effectiveDeflectAmount],
-          [10, 20],
+          [25, 50],
+          reason: '✅ 2026-09-25: Glance is 25/50 (was 10/20)',
         );
 
-        newDuel(ints: [9]); // 9 < 10 → the deflect fires
+        newDuel(ints: [24]); // 24 < 25 → the deflect fires
         castBy(alice, dmg(20));
         expect(
           bruno.hp,
-          84,
+          90,
           reason:
               '⚠️ three mutants, three numbers: no status leaves hp 80 (no '
               'roll is even drawn), an activation-only status leaves hp 80 '
               'again (nothing to remove), and reading the pair correctly '
-              'removes 20% of 20 — 4 — so 16 lands',
+              'removes 50% of 20 — 10 — so 10 lands. The old 10/20 Glance '
+              'would not even have fired on a 24',
         );
       },
     );
 
     test('the deflect halves land on the right stats', () {
-      // ⚠️ Kills a swapped pair, which is invisible at 10/20 in a duel log and
-      // very visible in the win rate: 20% of hits losing 10% is not the same
-      // spell as 10% of hits losing 20%.
-      castBy(bruno, Spellbook.divert);
+      // ⚠️ Kills a swapped pair, which is invisible in a duel log and very
+      // visible in the win rate: 50% of hits losing 25% is not the same spell
+      // as 25% of hits losing 50%. Glance, not Divert — Divert's 50/50 is
+      // symmetric and cannot see a swap.
+      castBy(bruno, Spellbook.glance);
       final s = theStance(bruno, 'divert');
-      expect(s.contributionTo(CombatStat.deflectActivation), 20);
-      expect(s.contributionTo(CombatStat.deflectAmount), 40);
+      expect(
+        s.contributionTo(CombatStat.deflectActivation),
+        25,
+        reason: 'swapped pair reads 50 here',
+      );
+      expect(
+        s.contributionTo(CombatStat.deflectAmount),
+        50,
+        reason: 'swapped pair reads 25 here',
+      );
       expect(
         s.contributionTo(CombatStat.dodge),
         0,
@@ -674,17 +705,22 @@ void main() {
     });
 
     test('⭐ the snapshot carries BOTH of Divert\'s numbers', () {
-      castBy(bruno, Spellbook.divert);
+      // Glance's 25/50, because Divert's symmetric 50/50 hides a swap.
+      castBy(bruno, Spellbook.glance);
       final view = StatusSnapshot.of(bruno)['divert']!;
       expect(
         [view.magnitude, view.secondaryMagnitude],
-        [20, 40],
+        [25, 50],
         reason:
             '⚠️ THE mutant: reporting one number. The pair is the whole '
             'stance — an activation chance alone tells the player nothing '
             'about what a deflection is worth',
       );
-      expect(view.turnsLeft, 14);
+      expect(
+        view.turnsLeft,
+        9,
+        reason: 'Glance\'s 10 turns, less the landing turn',
+      );
     });
 
     test('a stance is visible to the lockstep snapshot the turn it lands', () {
