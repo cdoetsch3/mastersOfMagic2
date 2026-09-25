@@ -87,7 +87,7 @@ class _SpellbookTabState extends State<SpellbookTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const PlayerHeader(title: 'Spellbook'),
+        const PlayerHeader(),
         if (!canEdit) _lockBanner(),
         Expanded(
           // ⭐ **Slivers, so the toolbar can PIN.** The press-stability rule

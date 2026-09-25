@@ -19,7 +19,7 @@ class SocialTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const PlayerHeader(title: 'Social'),
+        const PlayerHeader(),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),

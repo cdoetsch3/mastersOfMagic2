@@ -340,28 +340,35 @@ class _RailCenter extends StatelessWidget {
   }
 }
 
-/// Shared header used by the tab screens: character name, level, and
+/// Shared header used by the tab screens: the Profile pill, and the
 /// currencies. Reads live from [GameState].
 ///
-/// ⭐ The name-and-level line is a **button** (ruling 2026-09-21, mockup
+/// ⭐ The name-and-level pill is a **button** (ruling 2026-09-21, mockup
 /// option A): it opens [ProfileScreen], so every tab that already draws this
 /// header carries the way into the profile for free — and no tab has to
 /// spend a card on Skills or the rules.
+///
+/// 📝 Ruling 2026-09-25: no screen title. The bottom nav already says which
+/// tab is open, so the 'Home'/'Inventory'/… line above the pill was a
+/// duplicate — its height went to the pill instead, "so it's more obviously
+/// clickable". The `title` parameter went with it (every caller was a
+/// `const PlayerHeader(title: …)`, so they all simply lost the argument).
 class PlayerHeader extends StatelessWidget {
-  final String title;
-  const PlayerHeader({super.key, required this.title});
+  const PlayerHeader({super.key});
 
   /// The header's exact height, pinned rather than left to the content.
   ///
-  /// ⭐ **Press-stability.** The pill is taller than the plain text line it
-  /// replaced, and a header that measured itself would move every tab's
-  /// first control down — and move it again for a name long enough to wrap.
-  /// One number, one y, whatever the name and whatever the font.
+  /// ⭐ **Press-stability.** A header that measured itself would move every
+  /// tab's first control down whenever its content changed — and move it
+  /// again for a name long enough to wrap. One number, one y, whatever the
+  /// name and whatever the font.
   ///
   /// ⚠️ 52 is what the two-line text header measured before the pill (18px
   /// title + 12px line + 10/6 padding), so nothing below it moved on the day
-  /// this shipped. The pill's own padding is what absorbed the difference —
-  /// grow that and this overflows rather than silently growing back.
+  /// the pill shipped — nor on the day the title left (2026-09-25): the
+  /// bigger pill (≈38px: a 28px avatar + 4/4 padding + the edge) sits inside
+  /// the same 52. Grow the pill past it and this overflows rather than
+  /// silently growing back.
   static const double height = 52;
 
   @override
@@ -373,24 +380,16 @@ class PlayerHeader extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Row(
           children: [
+            // ⚠️ Align, not a bare child: the pill keeps its own width (a
+            // button the size of the whole row would read as a banner, not
+            // a control) and can still shrink for a long name.
             Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: AppColors.text,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  _ProfilePill(name: p.name, level: p.level),
-                ],
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: _ProfilePill(name: p.name, level: p.level),
               ),
             ),
+            const SizedBox(width: 8),
             _Currency(leading: const CoinIcon(size: 15), value: p.gold),
             const SizedBox(width: 8),
             _Currency(
@@ -413,6 +412,9 @@ class PlayerHeader extends StatelessWidget {
 /// ⚠️ Looks like a control on purpose — the panel fill, the edge and the
 /// chevron are what say "this is tappable"; the same two facts as plain text
 /// would have read as a caption, which is what shipped.
+///
+/// 📝 Sizes (ruling 2026-09-25, when the screen title left): avatar 28,
+/// name 17 semibold, 'Lv N' 14 dim, chevron 20.
 class _ProfilePill extends StatelessWidget {
   final String name;
   final int level;
@@ -429,7 +431,7 @@ class _ProfilePill extends StatelessWidget {
       color: AppColors.panel,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(19),
         side: const BorderSide(color: AppColors.border),
       ),
       child: InkWell(
@@ -437,12 +439,12 @@ class _ProfilePill extends StatelessWidget {
           context,
         ).push(MaterialPageRoute<void>(builder: (_) => const ProfileScreen())),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(3, 2, 4, 2),
+          padding: const EdgeInsets.fromLTRB(4, 4, 6, 4),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PlayerAvatar(name: name, size: 16),
-              const SizedBox(width: 6),
+              PlayerAvatar(name: name, size: 28),
+              const SizedBox(width: 8),
               // ⚠️ Flexible + ellipsis: a long name shortens, it does not
               // wrap — a second line would break the pinned header height.
               Flexible(
@@ -450,21 +452,26 @@ class _ProfilePill extends StatelessWidget {
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: AppColors.text, fontSize: 12),
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               Text(
                 'Lv $level',
                 style: const TextStyle(
                   color: AppColors.textDim,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
+              const SizedBox(width: 2),
               const Icon(
                 Icons.chevron_right,
-                size: 14,
+                size: 20,
                 color: AppColors.textDim,
               ),
             ],

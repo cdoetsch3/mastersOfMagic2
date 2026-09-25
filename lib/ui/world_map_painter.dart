@@ -87,6 +87,11 @@ class WorldMapPainter extends CustomPainter {
   /// Places the player has been. Everything else is dimmed.
   final Set<String> seen;
 
+  /// Zones whose boss this character has beaten — a small green check badge
+  /// on the node (ruling 2026-09-25). Snapshotted like [seen], for the same
+  /// reason.
+  final Set<String> cleared;
+
   /// Highlighted by a tap, if any.
   final String? selectedId;
 
@@ -101,11 +106,13 @@ class WorldMapPainter extends CustomPainter {
     this.currentId,
     Set<String> reachable = const {},
     Set<String> seen = const {},
+    Set<String> cleared = const {},
     this.selectedId,
     this.showPins = true,
     this.showFeatureLabels = true,
   }) : reachable = Set.unmodifiable(reachable),
-       seen = Set.unmodifiable(seen);
+       seen = Set.unmodifiable(seen),
+       cleared = Set.unmodifiable(cleared);
 
   // ---- cached procedural scatter --------------------------------------
   static final List<Offset> _forest = WorldMapGeometry.scatter(
@@ -624,6 +631,7 @@ class WorldMapPainter extends CustomPainter {
       if (isHere) {
         canvas.drawCircle(at, 4.5, Paint()..color = AppColors.gold);
       }
+      if (cleared.contains(loc.id)) _paintClearedBadge(canvas, at, r);
       // Only label what matters now — 32 names at once is unreadable.
       if (loc.isTown || open || isHere) {
         _label(
@@ -739,6 +747,41 @@ class WorldMapPainter extends CustomPainter {
     return out;
   }
 
+  /// Radius of the cleared badge, in map units.
+  static const double clearedBadgeRadius = 7;
+
+  /// Where a node's cleared badge sits: on the lower-right of its rim, clear
+  /// of the name above it and of the gold "you are here" dot at its centre.
+  static Offset clearedBadgeCentre(Offset node, double nodeRadius) =>
+      node + Offset(nodeRadius * 0.75, nodeRadius * 0.75);
+
+  /// The green check badge on a cleared zone's node.
+  void _paintClearedBadge(Canvas canvas, Offset at, double r) {
+    final c = clearedBadgeCentre(at, r);
+    const b = clearedBadgeRadius;
+    canvas.drawCircle(c, b, Paint()..color = AppColors.green);
+    canvas.drawCircle(
+      c,
+      b,
+      Paint()
+        ..color = AppColors.bg
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(c.dx - b * 0.45, c.dy + b * 0.02)
+        ..lineTo(c.dx - b * 0.1, c.dy + b * 0.36)
+        ..lineTo(c.dx + b * 0.48, c.dy - b * 0.34),
+      Paint()
+        ..color = AppColors.bg
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.2
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
   @override
   bool shouldRepaint(WorldMapPainter old) =>
       old.currentId != currentId ||
@@ -749,5 +792,6 @@ class WorldMapPainter extends CustomPainter {
       // spell or a multiplayer presence update can change *which* places are
       // known without changing how many — and the map would not repaint.
       !setEquals(old.reachable, reachable) ||
-      !setEquals(old.seen, seen);
+      !setEquals(old.seen, seen) ||
+      !setEquals(old.cleared, cleared);
 }

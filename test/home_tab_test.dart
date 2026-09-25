@@ -186,4 +186,197 @@ void main() {
           'this kills',
     );
   });
+
+  // 📝 Ruling 2026-09-25: the W/L record left the Home card — it lives on the
+  // Profile screen's 'Record W–L' chip. The ratings line stays.
+  testWidgets('the XP card shows no W/L record, and keeps the ratings', (
+    tester,
+  ) async {
+    final profile = PlayerProfile.newPlayer()
+      ..duelsWon = 7
+      ..duelsLost = 3
+      ..ratingGeared = 1420;
+
+    await _pumpHomeTab(tester, profile);
+
+    expect(
+      find.text('7W · 3L'),
+      findsNothing,
+      reason: "the old line verbatim — a card that still prints it fails here",
+    );
+    expect(
+      find.textContaining(RegExp(r'\b7W\b|\b3L\b|7–3|7-3')),
+      findsNothing,
+      reason:
+          'a reworded record (7W / 3L, 7–3) is still the record on the '
+          'Home card, which is what the ruling moved to the Profile',
+    );
+    expect(
+      find.text('Ladder 1420 · Academy —'),
+      findsOneWidget,
+      reason:
+          'the line BELOW the record must survive — an over-eager deletion '
+          'that took the ratings with it is the mutant this kills',
+    );
+  });
+
+  // 📝 Ruling 2026-09-25: no screen title in the header.
+  testWidgets('the header prints no "Home" title', (tester) async {
+    await _pumpHomeTab(tester, PlayerProfile.newPlayer());
+
+    expect(
+      find.text('Home'),
+      findsNothing,
+      reason:
+          'the bottom nav names the tab; a header that still renders its '
+          "title prints 'Home' above the name pill",
+    );
+  });
+
+  group('the loadout chooser (ruling 2026-09-25: a dialog)', () {
+    const names = ['Ember Rush', 'Tide Wall', 'Storm Bluff', 'Stone Vigil'];
+
+    /// A landscape phone, and a button that opens the chooser and keeps what
+    /// it returns.
+    Future<List<int?>> pumpChooser(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(900, 400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final profile = PlayerProfile.newPlayer()
+        ..presets = [for (final n in names) LoadoutPreset.starter(n)];
+      final results = <int?>[];
+      await tester.pumpWidget(
+        GameStateScope(
+          state: GameState(_MemStorage(), profile),
+          child: MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () async =>
+                      results.add(await showPresetPicker(context)),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      return results;
+    }
+
+    Finder inDialog(Finder f) =>
+        find.descendant(of: find.byType(Dialog), matching: f);
+
+    testWidgets('it is a centred dialog, not a bottom sheet', (tester) async {
+      await pumpChooser(tester);
+
+      expect(
+        find.byType(Dialog),
+        findsOneWidget,
+        reason: 'the chooser is a Dialog now',
+      );
+      expect(
+        find.byType(BottomSheet),
+        findsNothing,
+        reason:
+            'the bottom sheet grew up from the bottom edge and cut its '
+            'later presets off in landscape — the thing this ruling removed',
+      );
+      expect(
+        inDialog(find.text('Choose your loadout')),
+        findsOneWidget,
+        reason: 'the same title, now inside the dialog',
+      );
+
+      final box = tester.getRect(
+        find
+            .descendant(
+              of: find.byType(Dialog),
+              matching: find.byType(ConstrainedBox),
+            )
+            .first,
+      );
+      expect(
+        box.top,
+        greaterThan(0),
+        reason: 'the dialog sits on screen, not above it',
+      );
+      expect(
+        box.bottom,
+        lessThan(400),
+        reason:
+            "the dialog's bottom is on screen — a sheet anchored to (and "
+            'cut off by) the bottom edge fails here',
+      );
+      expect(
+        (box.center.dy - 200).abs(),
+        lessThan(1),
+        reason:
+            'centred: a dialog pinned to the bottom of a 400px landscape '
+            'screen would have its centre well below 200',
+      );
+      expect(
+        box.height,
+        lessThanOrEqualTo(400 * 0.7 + 0.5),
+        reason:
+            'capped at 70% of the screen height so it never fills a '
+            'landscape phone edge to edge',
+      );
+    });
+
+    testWidgets('every preset is reachable by scrolling, in landscape', (
+      tester,
+    ) async {
+      final results = await pumpChooser(tester);
+
+      // ⚠️ Precondition: four presets really do overflow the capped dialog
+      // at this size — otherwise the scrolling below proves nothing.
+      expect(
+        tester
+            .state<ScrollableState>(inDialog(find.byType(Scrollable)))
+            .position
+            .maxScrollExtent,
+        greaterThan(0),
+        reason:
+            'the list must be taller than its 70% box at 900×400, or this '
+            'test would pass against a list that cannot scroll at all',
+      );
+
+      for (final n in names) {
+        await tester.scrollUntilVisible(
+          inDialog(find.text(n)),
+          40,
+          scrollable: inDialog(find.byType(Scrollable)),
+        );
+        expect(
+          inDialog(find.text(n)),
+          findsOneWidget,
+          reason:
+              '"$n" must be reachable — a list that cannot scroll leaves the '
+              'later presets below the fold with no way to them',
+        );
+        final r = tester.getRect(inDialog(find.text(n)));
+        expect(
+          r.top >= 0 && r.bottom <= 400,
+          isTrue,
+          reason: '"$n" scrolled onto the screen, not merely built off it',
+        );
+      }
+
+      // The last preset, scrolled to, is still a working choice.
+      await tester.tap(inDialog(find.text(names.last)));
+      await tester.pumpAndSettle();
+      expect(
+        results,
+        [names.length - 1],
+        reason:
+            'tapping a preset pops its index — a row wired to the wrong '
+            'index (or not wired) returns something else',
+      );
+      expect(find.byType(Dialog), findsNothing, reason: 'and closes');
+    });
+  });
 }

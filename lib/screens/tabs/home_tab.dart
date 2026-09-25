@@ -51,7 +51,7 @@ class HomeTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const PlayerHeader(title: 'Home'),
+        const PlayerHeader(),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 4, 14, 8),
@@ -274,12 +274,9 @@ class _XpCard extends StatelessWidget {
               ],
             ),
           ),
+          // 📝 Ruling 2026-09-25: no W/L line here — the record lives on the
+          // Profile screen (its 'Record W–L' chip), one tap away on the pill.
           const SizedBox(height: 6),
-          Text(
-            '${p.duelsWon}W · ${p.duelsLost}L',
-            style: const TextStyle(color: AppColors.textFaint, fontSize: 11),
-          ),
-          const SizedBox(height: 2),
           // ⭐ LADDER_DESIGN §8 item 6: a player's rating shows on the home
           // tab, not just the profile. ⚠️ Always rendered — even before this
           // character has a rating — so the card's height never shifts the
@@ -337,83 +334,117 @@ class _FindDuelButton extends StatelessWidget {
   }
 }
 
-/// A bottom sheet that lets the player pick which loadout preset to duel with
-/// (PvP rule: choose a loadout before each match). Returns the chosen index.
+/// A centred dialog that lets the player pick which loadout preset to duel
+/// with (PvP rule: choose a loadout before each match). Returns the chosen
+/// index, or null when dismissed.
+///
+/// 📝 Ruling 2026-09-25: a dialog, not a bottom sheet. The sheet grew up from
+/// the bottom edge, and in landscape its later presets were cut off below the
+/// screen with nothing to say there were more. ⭐ The list scrolls inside a
+/// box capped at 70% of the screen height, so every preset is reachable at
+/// any size.
 Future<int?> showPresetPicker(BuildContext context) {
   final game = GameStateScope.read(context);
   final p = game.profile;
-  return showModalBottomSheet<int>(
+  return showDialog<int>(
     context: context,
-    backgroundColor: AppColors.panel,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-    ),
-    builder: (context) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    builder: (context) => Dialog(
+      backgroundColor: AppColors.panel,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.gold),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 380,
+          maxHeight: MediaQuery.sizeOf(context).height * 0.7,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Choose your loadout',
-              style: TextStyle(
-                color: AppColors.text,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Text(
+                'Choose your loadout',
+                style: TextStyle(
+                  color: AppColors.text,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            const SizedBox(height: 12),
-            for (var i = 0; i < p.presets.length; i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: GamePanel(
-                  onTap: () => Navigator.of(context).pop(i),
-                  borderColor: i == p.activePresetIndex
-                      ? AppColors.gold
-                      : AppColors.border,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.menu_book,
-                        color: AppColors.sky,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              p.presets[i].name,
-                              style: const TextStyle(
-                                color: AppColors.text,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              '${p.presets[i].elementIds.length} elements · '
-                              '${p.presets[i].spellIds.length} spells',
-                              style: const TextStyle(
-                                color: AppColors.textDim,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (i == p.activePresetIndex)
-                        const Text(
-                          'active',
-                          style: TextStyle(color: AppColors.gold, fontSize: 11),
-                        ),
-                    ],
+            // ⚠️ Flexible + shrinkWrap: a short list sizes the dialog to its
+            // content, a long one fills the capped height and scrolls.
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                itemCount: p.presets.length,
+                itemBuilder: (context, i) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _PresetRow(
+                    preset: p.presets[i],
+                    active: i == p.activePresetIndex,
+                    onTap: () => Navigator.of(context).pop(i),
                   ),
                 ),
               ),
+            ),
           ],
         ),
       ),
     ),
   );
+}
+
+/// One row of [showPresetPicker].
+class _PresetRow extends StatelessWidget {
+  final LoadoutPreset preset;
+  final bool active;
+  final VoidCallback onTap;
+  const _PresetRow({
+    required this.preset,
+    required this.active,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GamePanel(
+      onTap: onTap,
+      borderColor: active ? AppColors.gold : AppColors.border,
+      child: Row(
+        children: [
+          const Icon(Icons.menu_book, color: AppColors.sky, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  preset.name,
+                  style: const TextStyle(color: AppColors.text, fontSize: 14),
+                ),
+                Text(
+                  '${preset.elementIds.length} elements · '
+                  '${preset.spellIds.length} spells',
+                  style: const TextStyle(
+                    color: AppColors.textDim,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (active)
+            const Text(
+              'active',
+              style: TextStyle(color: AppColors.gold, fontSize: 11),
+            ),
+        ],
+      ),
+    );
+  }
 }

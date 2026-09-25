@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -725,15 +726,32 @@ class _SearchingView extends StatefulWidget {
   final DateTime startedAt;
   final DateTime? matchedAt;
 
-  const _SearchingView({required this.startedAt, this.matchedAt});
+  /// Picks the tip. ⭐ Injectable so a test can seed it; null means a fresh
+  /// unseeded [Random].
+  final Random? random;
+
+  const _SearchingView({required this.startedAt, this.matchedAt, this.random});
 
   @override
   State<_SearchingView> createState() => _SearchingViewState();
 }
 
+/// ⭐ The test seam for [_SearchingView], which is private to this library:
+/// builds one with an injected [random] so the tip it shows can be pinned.
+@visibleForTesting
+Widget searchingViewForTest({
+  required DateTime startedAt,
+  DateTime? matchedAt,
+  Random? random,
+}) =>
+    _SearchingView(startedAt: startedAt, matchedAt: matchedAt, random: random);
+
 class _SearchingViewState extends State<_SearchingView> {
-  // Deterministic-but-varied tip pick without dart:math in the widget.
-  late final int _i = DateTime.now().microsecondsSinceEpoch % searchTips.length;
+  // ⚠️ Not `DateTime.now().microsecondsSinceEpoch % length` (what shipped):
+  // on web the clock has millisecond precision, so that value was always a
+  // multiple of 1000 — and 1000 % 20 == 0, so every search showed tip 0,
+  // Haste (ruling 2026-09-25).
+  late final int _i = (widget.random ?? Random()).nextInt(searchTips.length);
 
   @override
   Widget build(BuildContext context) {

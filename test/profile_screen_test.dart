@@ -18,6 +18,7 @@ import 'package:masters_of_magic_2/screens/gameplay_guide_screen.dart';
 import 'package:masters_of_magic_2/screens/home_shell.dart';
 import 'package:masters_of_magic_2/screens/profile_screen.dart';
 import 'package:masters_of_magic_2/screens/skills_screen.dart';
+import 'package:masters_of_magic_2/ui/app_theme.dart';
 
 class _MemStorage implements ProfileStorage {
   PlayerProfile? stored;
@@ -53,10 +54,7 @@ Future<void> _pumpHeader(
   Scaffold(
     body: Align(
       alignment: Alignment.topLeft,
-      child: SizedBox(
-        width: width,
-        child: const PlayerHeader(title: 'Home'),
-      ),
+      child: SizedBox(width: width, child: const PlayerHeader()),
     ),
   ),
 );
@@ -143,6 +141,100 @@ void main() {
             'a pill whose name Text can wrap (no Flexible / no ellipsis) '
             'makes a long name a second line and a taller header — the tab '
             'below would shift per character name',
+      );
+    });
+
+    // 📝 Ruling 2026-09-25: the screen title above the pill is gone — the
+    // bottom nav already names the tab — and its height went to the pill.
+    testWidgets('the header prints no screen title — only the pill and '
+        'the currencies', (tester) async {
+      final profile = PlayerProfile.newPlayer(name: 'Wilhelmina')
+        ..gold = 37
+        ..resonancePrisms = 4;
+      await _pumpHeader(tester, profile);
+
+      final texts = tester
+          .widgetList<Text>(
+            find.descendant(
+              of: find.byType(PlayerHeader),
+              matching: find.byType(Text),
+            ),
+          )
+          .map((t) => t.data)
+          .toSet();
+      expect(
+        texts,
+        {'W', 'Wilhelmina', 'Lv 1', '37', '4'},
+        reason:
+            'the avatar initial, the name, the level and the two currencies '
+            "are the header's only words — a header that still rendered a "
+            "title ('Home', 'Inventory', …) above the pill, under any "
+            'string, adds a sixth',
+      );
+    });
+
+    testWidgets('the pill is sized to be obviously clickable', (tester) async {
+      await _pumpHeader(tester, PlayerProfile.newPlayer(name: 'Wilhelmina'));
+
+      expect(
+        tester.getSize(find.byType(PlayerAvatar)),
+        const Size(28, 28),
+        reason:
+            'the avatar grew from 16 to 28 with the freed height — a pill '
+            'left at the old size is the caption-sized button this ruling '
+            'replaced',
+      );
+      final name = tester.widget<Text>(find.text('Wilhelmina'));
+      expect(
+        (name.style?.fontSize, name.style?.fontWeight),
+        (17, FontWeight.w600),
+        reason: 'the name is 17 semibold — the old 12 regular fails here',
+      );
+      final level = tester.widget<Text>(find.text('Lv 1'));
+      expect(
+        (level.style?.fontSize, level.style?.color),
+        (14, AppColors.textDim),
+        reason:
+            "'Lv N' is 14 and dim — a mutant that styled it like the name "
+            '(or left it at 12) fails here',
+      );
+      expect(
+        find.descendant(
+          of: find.byType(PlayerHeader),
+          matching: find.byIcon(Icons.chevron_right),
+        ),
+        findsOneWidget,
+        reason: 'the chevron is what says "this opens something"',
+      );
+
+      final pill = tester.getRect(
+        find.descendant(
+          of: find.byType(PlayerHeader),
+          matching: find.byType(InkWell),
+        ),
+      );
+      final header = tester.getRect(find.byType(PlayerHeader));
+      expect(
+        pill.height,
+        greaterThanOrEqualTo(36),
+        reason:
+            'a 28px avatar inside 4px padding and the edge: a pill any '
+            'shorter has not taken the height the title gave up',
+      );
+      expect(
+        pill.top >= header.top && pill.bottom <= header.bottom,
+        isTrue,
+        reason:
+            'the bigger pill must still fit inside the pinned '
+            '${PlayerHeader.height}px header — press-stability: growing it '
+            'past that would push every tab down (or overflow)',
+      );
+      expect(
+        (pill.center.dy - header.center.dy).abs(),
+        lessThan(1),
+        reason:
+            'with no title above it the pill sits centred in the header, '
+            'not top-aligned where the title used to end',
       );
     });
   });

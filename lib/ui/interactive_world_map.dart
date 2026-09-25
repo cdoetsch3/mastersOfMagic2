@@ -323,6 +323,12 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                           // why handing over the profile's live Set defeated
                           // every dirty check.
                           seen: widget.game.profile.discoveredLocationIds,
+                          // ⚠️ Through hasCleared, the one definition of
+                          // "cleared" — never the raw zoneClears map.
+                          cleared: {
+                            for (final l in World.locations)
+                              if (widget.game.profile.hasCleared(l.id)) l.id,
+                          },
                           selectedId: _selected,
                           showFeatureLabels: widget.showFeatureLabels,
                         ),

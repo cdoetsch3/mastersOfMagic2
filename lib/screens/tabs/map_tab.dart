@@ -36,7 +36,7 @@ class _MapTabState extends State<MapTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const PlayerHeader(title: 'Map'),
+        const PlayerHeader(),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
@@ -85,6 +85,7 @@ class _MapTabState extends State<MapTab> {
                   // passage rule's answer is on the card already, and a tile
                   // that banners what it is printing is noise.
                   passageRefusal: game.passageRefusal(id),
+                  cleared: game.profile.hasCleared(id),
                   onTravel: () => _travel(context, game, id),
                 ),
             ],
@@ -366,6 +367,10 @@ class _TravelCard extends StatelessWidget {
   /// `GameState.passageRefusal` for this destination — null when the road is
   /// walkable. Non-null **disables** the card and prints the sentence on it.
   final String? passageRefusal;
+
+  /// Whether this character has beaten the destination's boss
+  /// (`PlayerProfile.hasCleared`) — drawn as the green [_ClearedTag].
+  final bool cleared;
   const _TravelCard({
     required this.location,
     required this.onTravel,
@@ -373,6 +378,7 @@ class _TravelCard extends StatelessWidget {
     this.enabled = true,
     this.gateRefusal,
     this.passageRefusal,
+    this.cleared = false,
   });
 
   /// Whether the card can be pressed: not mid-journey, and not walled off by
@@ -406,13 +412,25 @@ class _TravelCard extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: AppColors.textDim,
-                        fontSize: 12,
+                    // 📝 Ruling 2026-09-25: a clearer 'Cleared' mark, ahead of
+                    // the level band. ⭐ The cell is reserved on every zone
+                    // card, cleared or not, so the band sits at one x and
+                    // the card does not reflow the day the boss falls. A
+                    // town is never cleared, so it keeps its plain 'Town'.
+                    if (location.isTown)
+                      Text(subtitle, style: _subtitleStyle)
+                    else
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: _ClearedTag.widthOf(context),
+                            child: cleared ? const _ClearedTag() : null,
+                          ),
+                          Flexible(
+                            child: Text(subtitle, style: _subtitleStyle),
+                          ),
+                        ],
                       ),
-                    ),
                     // What the new world model knows and this card used to hide:
                     // who you'll meet, what is taught here, and what bars the way.
                     if (location.elements.isNotEmpty ||
@@ -494,6 +512,54 @@ class _TravelCard extends StatelessWidget {
       ),
     );
   }
+}
+
+const TextStyle _subtitleStyle = TextStyle(
+  color: AppColors.textDim,
+  fontSize: 12,
+);
+
+/// The green check on a travel card whose boss this character has beaten.
+///
+/// ⚠️ Its width is **measured**, like [_MiniTag.widthOf] and for the same
+/// reason: a constant read off one font overflows under another.
+class _ClearedTag extends StatelessWidget {
+  const _ClearedTag();
+
+  static const String label = 'Cleared';
+  static const double _iconSize = 14;
+  static const double _gap = 3;
+
+  /// The space after the word, before the level band.
+  static const double _trail = 8;
+  static const TextStyle _style = TextStyle(
+    color: AppColors.green,
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+  );
+
+  /// The cell's fixed width — the same whether or not the tag is drawn in it.
+  static double widthOf(BuildContext context) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: label,
+        style: DefaultTextStyle.of(context).style.merge(_style),
+      ),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    return _iconSize + _gap + painter.width + _trail + 1;
+  }
+
+  @override
+  Widget build(BuildContext context) => const Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(Icons.check_circle, size: _iconSize, color: AppColors.green),
+      SizedBox(width: _gap),
+      Text(label, style: _style),
+    ],
+  );
 }
 
 IconData _kindIcon(LocationKind kind) => switch (kind) {

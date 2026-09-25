@@ -223,7 +223,7 @@ void main() {
 
   /// The loading-screen tips (ruling 2026-09-21: ten more, twenty in all).
   ///
-  /// ⭐ The picker is `microsecondsSinceEpoch % searchTips.length`, so the
+  /// ⭐ The picker is `Random().nextInt(searchTips.length)`, so the
   /// list's SHAPE is the whole contract: a short list narrows the rotation, a
   /// duplicated title wastes a slot, and an over-long body overruns the panel
   /// in the ~10s a search lasts.
