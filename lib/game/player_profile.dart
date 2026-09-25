@@ -732,6 +732,79 @@ class PlayerProfile {
     _migratePendingLoot(profile);
     return profile;
   }
+
+  /// Makes the instance pool and the containers agree again; returns how
+  /// many items were dropped (0 = the save was already consistent, and then
+  /// nothing — not one map — is touched).
+  ///
+  /// ⭐ **The cleanup after the sync race of 2026-09-25.** Two devices each
+  /// saved whole documents last-writer-wins, and Christian's save came back
+  /// with nine Hearthwood and one Pennycross storeroom ids that had no
+  /// instance behind them — rendered in the Inventory as raw ids. The race
+  /// itself is closed by the character document's version precondition
+  /// (`FirestoreProfileStorage`); this sweeps up what it already did:
+  ///
+  /// 1. every id in [backpack], [equipped] or any `storerooms[*].instanceIds`
+  ///    with no entry in [itemInstances] is dropped — an item whose rolls are
+  ///    gone cannot be rebuilt, and a slot that names nothing is worse than
+  ///    an empty one;
+  /// 2. every [itemInstances] entry that no container names is dropped — a
+  ///    staff nobody holds is a save that grows forever.
+  ///
+  /// ⚠️ **Drops the id, never the container.** A storeroom's fungible stacks
+  /// are untouched, and a storeroom left empty stays in the map (the sparse
+  /// write filter in [toJson] already omits it on the way out).
+  ///
+  /// ⚠️ **Only on a whole profile.** Direction 2 is only sound once every
+  /// container is loaded — the storerooms arrive as their own cloud documents
+  /// — so this is a method `GameState` calls after a load has assembled all
+  /// of them, never part of [fromJson] (which also sees partial fixtures).
+  /// 📝 The adventure's own `unclaimed` loot keeps a separate instance map and
+  /// never names this pool, so it is neither a container nor an orphan here.
+  int repairContainers() {
+    var dropped = 0;
+    bool known(String? id) => id == null || itemInstances.containsKey(id);
+
+    if (!backpack.contents.every((s) => known(s.instanceId))) {
+      final slots = [...backpack.slots];
+      for (var i = 0; i < slots.length; i++) {
+        if (slots[i] != null && !known(slots[i]!.instanceId)) {
+          slots[i] = null;
+          dropped++;
+        }
+      }
+      backpack = Backpack.of(slots);
+    }
+
+    for (final slot in equipped.keys.toList()) {
+      if (!known(equipped[slot])) {
+        equipped.remove(slot);
+        dropped++;
+      }
+    }
+
+    for (final town in storerooms.keys.toList()) {
+      final room = storerooms[town]!;
+      final kept = room.instanceIds.where(known).toList();
+      if (kept.length == room.instanceIds.length) continue;
+      dropped += room.instanceIds.length - kept.length;
+      storerooms[town] = Storeroom(stacks: room.stacks, instanceIds: kept);
+    }
+
+    final held = <String>{
+      for (final s in backpack.contents)
+        if (s.instanceId != null) s.instanceId!,
+      ...equipped.values,
+      for (final room in storerooms.values) ...room.instanceIds,
+    };
+    for (final id in itemInstances.keys.toList()) {
+      if (!held.contains(id)) {
+        itemInstances.remove(id);
+        dropped++;
+      }
+    }
+    return dropped;
+  }
 }
 
 /// ⚠️ **The migration of 2026-08-17** — the run-long loot tracker was deleted,

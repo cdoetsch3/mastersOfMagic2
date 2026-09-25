@@ -46,7 +46,17 @@ class FirestoreRest {
   }
 
   /// Reads a document. Returns its decoded fields, or null if missing.
-  static Future<Map<String, dynamic>?> get(String path) async {
+  static Future<Map<String, dynamic>?> get(String path) async =>
+      (await getVersioned(path))?.fields;
+
+  /// Reads a document together with its server `updateTime` — the version a
+  /// later [commit] can name as a write's `ifUpdateTime` precondition.
+  ///
+  /// ⭐ The time is kept as the **exact string the server sent** (RFC 3339,
+  /// microsecond precision), never parsed to a `DateTime`: a precondition that
+  /// was round-tripped through a lossy type would name a version that never
+  /// existed, and every conditional write would fail.
+  static Future<VersionedDoc?> getVersioned(String path) async {
     final res = await client.get(
       Uri.parse('$_base/$path'),
       headers: await _headers(),
@@ -56,7 +66,10 @@ class FirestoreRest {
       throw FirestoreRestException(res.statusCode, res.body);
     }
     final doc = jsonDecode(res.body) as Map<String, dynamic>;
-    return decodeFields(doc['fields'] as Map<String, dynamic>? ?? {});
+    return VersionedDoc(
+      decodeFields(doc['fields'] as Map<String, dynamic>? ?? {}),
+      doc['updateTime'] as String?,
+    );
   }
 
   /// Writes (merges) [data] into a document, creating it if needed. When
@@ -79,6 +92,72 @@ class FirestoreRest {
     }
   }
 
+  /// Applies [writes] as ONE atomic batch through the REST `:commit`
+  /// endpoint: every write lands, or none does.
+  ///
+  /// ⭐ **Atomic is the point** (sync race, 2026-09-25). The cloud save spans
+  /// a character document and one document per town; written one PATCH at a
+  /// time, a crash or a refused precondition between them left a storeroom
+  /// naming items the character's pool no longer held. In one commit, a
+  /// precondition that fails on any write fails the whole batch.
+  ///
+  /// ⚠️ A failed precondition throws [FirestorePreconditionException], never
+  /// the plain [FirestoreRestException], so a caller can tell "somebody else
+  /// wrote first" from "the network is down" without parsing bodies.
+  ///
+  /// Returns each write's `writeResults[i].updateTime`, index for index (null
+  /// where the response carried none). 📝 Firestore caps a commit at 500
+  /// writes; a save is a handful.
+  static Future<List<String?>> commit(List<FirestoreWrite> writes) async {
+    final res = await client.post(
+      Uri.parse('$_base:commit'),
+      headers: await _headers(),
+      body: jsonEncode({
+        'writes': [for (final w in writes) w.toJson(_documentsRoot)],
+      }),
+    );
+    final conditional = writes.any((w) => w.isConditional);
+    if (conditional && isPreconditionFailure(res.statusCode, res.body)) {
+      throw FirestorePreconditionException(res.statusCode, res.body);
+    }
+    if (res.statusCode != 200) {
+      throw FirestoreRestException(res.statusCode, res.body);
+    }
+    final results = _writeResultsOf(res.body);
+    return [
+      for (var i = 0; i < writes.length; i++)
+        i < results.length ? results[i] : null,
+    ];
+  }
+
+  static List<String?> _writeResultsOf(String body) {
+    try {
+      final doc = jsonDecode(body);
+      final results = doc is Map ? doc['writeResults'] : null;
+      if (results is! List) return const [];
+      return [
+        for (final r in results) r is Map ? r['updateTime'] as String? : null,
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Whether a conditional write's response means "the precondition did not
+  /// hold" rather than a transport or permission failure.
+  ///
+  /// ⚠️ **Three shapes, deliberately all accepted.** Firestore reports a stale
+  /// `updateTime` as `FAILED_PRECONDITION` (HTTP 400 under Google's canonical
+  /// mapping; some front ends answer 409), a violated `exists=false` as
+  /// `ALREADY_EXISTS` (409), and an `updateTime` precondition on a document
+  /// that has since been deleted as `NOT_FOUND` (404). Each one means the
+  /// same thing to a save: the server no longer holds the version this client
+  /// last saw.
+  static bool isPreconditionFailure(int status, String body) =>
+      status == 409 ||
+      status == 404 ||
+      (status == 400 && body.contains('FAILED_PRECONDITION'));
+
   /// Atomically adds [deltas] (field → integer) to a document, creating it if
   /// absent, via the REST `:commit` endpoint with `fieldTransforms`
   /// (LADDER §4.1). ⭐ Additive on the server, so two clients finishing
@@ -88,36 +167,10 @@ class FirestoreRest {
     String path,
     Map<String, int> deltas, {
     Map<String, dynamic>? set,
-  }) async {
-    final name = '$_documentsRoot/$path';
-    final writes = <Map<String, dynamic>>[
-      {
-        'transform': {
-          'document': name,
-          'fieldTransforms': [
-            for (final e in deltas.entries)
-              {
-                'fieldPath': e.key,
-                'increment': {'integerValue': e.value.toString()},
-              },
-          ],
-        },
-      },
-      if (set != null && set.isNotEmpty)
-        {
-          'update': {'name': name, 'fields': encodeFields(set)},
-          'updateMask': {'fieldPaths': set.keys.toList()},
-        },
-    ];
-    final res = await client.post(
-      Uri.parse('$_base:commit'),
-      headers: await _headers(),
-      body: jsonEncode({'writes': writes}),
-    );
-    if (res.statusCode != 200) {
-      throw FirestoreRestException(res.statusCode, res.body);
-    }
-  }
+  }) => commit([
+    FirestoreWrite.increment(path, deltas),
+    if (set != null && set.isNotEmpty) FirestoreWrite.update(path, set),
+  ]);
 
   /// Creates a document only if it does not already exist. Returns true when
   /// this call created it, false when it already existed; throws
@@ -308,4 +361,110 @@ class FirestoreRestException implements Exception {
   FirestoreRestException(this.status, this.body);
   @override
   String toString() => 'Firestore REST $status: $body';
+}
+
+/// A conditional write whose precondition did not hold — see
+/// [FirestoreRest.isPreconditionFailure].
+class FirestorePreconditionException extends FirestoreRestException {
+  FirestorePreconditionException(super.status, super.body);
+}
+
+/// One write in a [FirestoreRest.commit] batch: an update (fields plus an
+/// update mask), a delete, or an integer increment — optionally guarded by a
+/// `currentDocument` precondition.
+class FirestoreWrite {
+  /// The document path below `documents/`, e.g. `users/u1`.
+  final String path;
+
+  /// The fields of an update; null for a delete or an increment.
+  final Map<String, dynamic>? fields;
+
+  /// The update mask. Defaults to [fields]' keys.
+  ///
+  /// ⚠️ **A path named here but absent from [fields] is DELETED on the
+  /// server** — that is how a write removes a field a sparse `toJson` has
+  /// stopped emitting. A mask of only the present keys leaves the stale value
+  /// behind forever.
+  final List<String>? updateMask;
+
+  /// Field → delta, for an increment write.
+  final Map<String, int>? increments;
+
+  /// Precondition: the document's `updateTime` must still be exactly this.
+  final String? ifUpdateTime;
+
+  /// Precondition: the document must (true) or must not (false) exist.
+  final bool? ifExists;
+
+  final bool isDelete;
+
+  const FirestoreWrite.update(
+    this.path,
+    Map<String, dynamic> this.fields, {
+    this.updateMask,
+    this.ifUpdateTime,
+    this.ifExists,
+  }) : increments = null,
+       isDelete = false,
+       assert(
+         ifUpdateTime == null || ifExists == null,
+         'Firestore takes one precondition per write',
+       );
+
+  const FirestoreWrite.delete(this.path)
+    : fields = null,
+      updateMask = null,
+      increments = null,
+      ifUpdateTime = null,
+      ifExists = null,
+      isDelete = true;
+
+  const FirestoreWrite.increment(this.path, Map<String, int> this.increments)
+    : fields = null,
+      updateMask = null,
+      ifUpdateTime = null,
+      ifExists = null,
+      isDelete = false;
+
+  bool get isConditional => ifUpdateTime != null || ifExists != null;
+
+  /// The REST `Write` resource, with [root] the database's documents root.
+  Map<String, dynamic> toJson(String root) {
+    final name = '$root/$path';
+    final deltas = increments;
+    if (deltas != null) {
+      return {
+        'transform': {
+          'document': name,
+          'fieldTransforms': [
+            for (final e in deltas.entries)
+              {
+                'fieldPath': e.key,
+                'increment': {'integerValue': e.value.toString()},
+              },
+          ],
+        },
+      };
+    }
+    return {
+      if (isDelete)
+        'delete': name
+      else ...{
+        'update': {'name': name, 'fields': FirestoreRest.encodeFields(fields!)},
+        'updateMask': {'fieldPaths': updateMask ?? fields!.keys.toList()},
+      },
+      if (ifUpdateTime != null) 'currentDocument': {'updateTime': ifUpdateTime},
+      if (ifExists != null) 'currentDocument': {'exists': ifExists},
+    };
+  }
+}
+
+/// A document's fields plus the server version they were read at.
+class VersionedDoc {
+  final Map<String, dynamic> fields;
+
+  /// The `updateTime` string exactly as the server sent it, or null.
+  final String? updateTime;
+
+  const VersionedDoc(this.fields, this.updateTime);
 }

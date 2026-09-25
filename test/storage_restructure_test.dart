@@ -12,6 +12,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/economy/shop_state.dart';
+import 'package:masters_of_magic_2/game/firestore_rest.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
@@ -30,8 +31,8 @@ class _RecordingStore implements DocStore {
   final List<String> deletes = [];
   final List<String> reads = [];
 
-  /// Paths whose next write throws — for simulating a migration that dies
-  /// partway through.
+  /// Paths whose write fails its whole commit — for simulating a migration
+  /// that dies partway through.
   final Set<String> failWrites = {};
 
   @override
@@ -39,6 +40,16 @@ class _RecordingStore implements DocStore {
     reads.add(path);
     final d = docs[path];
     return d == null ? null : jsonDecode(jsonEncode(d)) as Map<String, dynamic>;
+  }
+
+  /// Per-document server versions, bumped on every write — so the fake
+  /// honours the character document's precondition the way Firestore does.
+  final Map<String, int> versions = {};
+
+  @override
+  Future<VersionedDoc?> getVersioned(String path) async {
+    final d = await get(path);
+    return d == null ? null : VersionedDoc(d, 'v${versions[path] ?? 0}');
   }
 
   @override
@@ -53,23 +64,68 @@ class _RecordingStore implements DocStore {
     };
   }
 
+  /// How many commits were applied or refused.
+  int commits = 0;
+
+  /// All or nothing, like Firestore: every write is checked before any is
+  /// applied, and an update honours its mask (a masked field absent from
+  /// the data is deleted).
   @override
-  Future<void> set(String path, Map<String, dynamic> fields) async {
-    if (failWrites.contains(path)) throw StateError('simulated outage: $path');
-    writes.add(path);
-    docs[path] = jsonDecode(jsonEncode(fields)) as Map<String, dynamic>;
+  Future<List<String?>> commit(List<FirestoreWrite> batch) async {
+    commits++;
+    for (final w in batch) {
+      if (failWrites.contains(w.path)) {
+        throw StateError('simulated outage: ${w.path}');
+      }
+      if (w.ifExists != null && docs.containsKey(w.path) != w.ifExists) {
+        throw SaveConflictException(w.path);
+      }
+      if (w.ifUpdateTime != null &&
+          w.ifUpdateTime != 'v${versions[w.path] ?? 0}') {
+        throw SaveConflictException(w.path);
+      }
+    }
+    return [
+      for (final w in batch)
+        if (w.isDelete) _delete(w.path) else _update(w),
+    ];
+  }
+
+  String? _delete(String path) {
+    deletes.add(path);
+    docs.remove(path);
+    versions.remove(path);
+    return null;
+  }
+
+  String _update(FirestoreWrite w) {
+    writes.add(w.path);
+    final fields = jsonDecode(jsonEncode(w.fields)) as Map<String, dynamic>;
+    final next = {...?docs[w.path]};
+    for (final f in w.updateMask ?? fields.keys) {
+      if (fields.containsKey(f)) {
+        next[f] = fields[f];
+      } else {
+        next.remove(f);
+      }
+    }
+    docs[w.path] = next;
+    versions[w.path] = (versions[w.path] ?? 0) + 1;
+    return 'v${versions[w.path]}';
   }
 
   @override
   Future<void> delete(String path) async {
     deletes.add(path);
     docs.remove(path);
+    versions.remove(path);
   }
 
   void forget() {
     writes.clear();
     deletes.clear();
     reads.clear();
+    commits = 0;
   }
 }
 
@@ -273,30 +329,32 @@ void main() {
       expect(store.deletes, isNot(contains(_legacyPath)));
     });
 
-    test(
-      'the character document is written LAST — it is the commit marker',
-      () async {
-        final store = _RecordingStore();
-        store.docs[_legacyPath] =
-            jsonDecode(jsonEncode(_veteran().toJson())) as Map<String, dynamic>;
+    test('the migration lands in ONE commit — the character document and '
+        'every town together', () async {
+      final store = _RecordingStore();
+      store.docs[_legacyPath] =
+          jsonDecode(jsonEncode(_veteran().toJson())) as Map<String, dynamic>;
 
-        await FirestoreProfileStorage(_uid, store: store).load();
+      await FirestoreProfileStorage(_uid, store: store).load();
 
-        expect(
-          store.writes.last,
+      expect(
+        store.commits,
+        1,
+        reason:
+            '⚠️ the mutant this kills: a document-at-a-time migration, '
+            'which can die with the character document written and '
+            'storerooms missing — a half-converted save that looks finished',
+      );
+      expect(
+        store.writes,
+        containsAll(<String>[
           _charPath,
-          reason:
-              '⚠️ the mutant this kills: the marker written first, which '
-              'makes a half-converted save look finished and strands every '
-              'storeroom that had not been written yet',
-        );
-        expect(
-          store.writes.indexOf('$_roomsPath/hearthwood'),
-          lessThan(store.writes.indexOf(_charPath)),
-          reason: 'parts before the whole',
-        );
-      },
-    );
+          '$_roomsPath/hearthwood',
+          '$_roomsPath/pennycross',
+        ]),
+        reason: 'the one commit carries the whole converted save',
+      );
+    });
 
     test('re-running on an already-migrated account writes NOTHING', () async {
       final store = _RecordingStore();
@@ -325,21 +383,21 @@ void main() {
       );
     });
 
-    test('a migration that dies partway RESUMES, and rewrites only what it '
-        'did not get to', () async {
+    test('a migration that dies partway leaves NOTHING, and the next sign-in '
+        'converts in full', () async {
       final store = _RecordingStore();
       store.docs[_legacyPath] =
           jsonDecode(jsonEncode(_veteran().toJson())) as Map<String, dynamic>;
 
-      // The outage hits the second storeroom, so the first one is on disk and
-      // the character document — the marker — never is.
+      // The outage hits one storeroom, and the batch fails as a whole.
       store.failWrites.add('$_roomsPath/pennycross');
       await FirestoreProfileStorage(_uid, store: store).load();
-      expect(store.docs.containsKey('$_roomsPath/hearthwood'), isTrue);
       expect(
-        store.docs.containsKey(_charPath),
-        isFalse,
-        reason: 'no marker, so this is not yet a save',
+        store.docs.keys.where((k) => k.startsWith('users/')),
+        isEmpty,
+        reason:
+            '⚠️ the mutant this kills: a non-atomic migration that lands '
+            'the documents before the failing one — a half-converted save',
       );
 
       // Next sign-in, network healthy.
@@ -357,13 +415,16 @@ void main() {
       );
       expect(
         store.writes,
-        isNot(contains('$_roomsPath/hearthwood')),
+        containsAll(<String>[
+          _charPath,
+          '$_roomsPath/hearthwood',
+          '$_roomsPath/pennycross',
+        ]),
         reason:
-            '⚠️ the mutant this kills: a resume that starts over and '
-            'rewrites the documents that already landed',
+            'nothing landed the first time, so the resume writes the whole '
+            'save — in one commit again',
       );
-      expect(store.writes, contains('$_roomsPath/pennycross'));
-      expect(store.writes.last, _charPath);
+      expect(store.commits, 1, reason: 'the resumed migration is one batch');
     });
 
     test(

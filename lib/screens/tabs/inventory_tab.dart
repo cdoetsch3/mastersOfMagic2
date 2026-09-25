@@ -1036,9 +1036,13 @@ class _StoreroomListState extends State<_StoreroomList> {
     return def == null ? defId : ItemCatalogue.displayName(def, null);
   }
 
+  /// ⚠️ A dangling id (no instance in the pool) reads 'Unknown item', never
+  /// the id itself — raw ids on tiles were the visible symptom of the sync
+  /// race of 2026-09-25. `PlayerProfile.repairContainers` makes the state
+  /// unreachable after a load; this is the defensive floor beneath it.
   String _instanceName(String id) {
     final inst = widget.game.profile.itemInstances[id];
-    if (inst == null) return id;
+    if (inst == null) return 'Unknown item';
     final def = ItemCatalogue.tryById(inst.defId);
     return def == null ? inst.defId : ItemCatalogue.displayName(def, inst);
   }

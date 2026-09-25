@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../game/game_state.dart';
+import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
 import 'matchmaking_screen.dart';
 import 'profile_screen.dart';
@@ -52,10 +53,24 @@ class _HomeShellState extends State<HomeShell> {
 
   void _select(int i) => setState(() => _index = i);
 
+  /// The game whose [GameState.notice] this shell shows — captured once, so
+  /// [dispose] can unhook the same notifier it hooked.
+  GameState? _noticeSource;
+
   @override
   void initState() {
     super.initState();
     HomeShell.tabRequest.addListener(_onTabRequest);
+    // ⭐ Save-level news (a sync conflict, a repair) has no screen of its own;
+    // the shell is the one surface alive for every such moment. Post-frame,
+    // because the banner needs the overlay — and a notice raised during boot
+    // is already waiting by then, so it is shown straight away.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _noticeSource = GameStateScope.read(context)
+        ..notice.addListener(_onNotice);
+      _onNotice();
+    });
     final code = widget.pendingJoinCode;
     if (code != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -81,9 +96,19 @@ class _HomeShellState extends State<HomeShell> {
     }
   }
 
+  /// Shows a pending notice once, then clears it so a rebuild never repeats it.
+  void _onNotice() {
+    final source = _noticeSource;
+    final text = source?.notice.value;
+    if (source == null || text == null || !mounted) return;
+    source.notice.value = null;
+    showAppBanner(context, text);
+  }
+
   @override
   void dispose() {
     HomeShell.tabRequest.removeListener(_onTabRequest);
+    _noticeSource?.notice.removeListener(_onNotice);
     super.dispose();
   }
 

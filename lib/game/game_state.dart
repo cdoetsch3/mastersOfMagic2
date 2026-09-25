@@ -67,10 +67,31 @@ class GameState extends ChangeNotifier {
     settleTravel();
   }
 
+  /// One-shot player-facing news about the save itself — a sync conflict, a
+  /// repair — that no screen asked for. `HomeShell` shows it as a banner and
+  /// clears it.
+  ///
+  /// ⭐ **A notifier, not a return value**, because the moments that produce
+  /// it (boot, sign-in, any save) have no screen of their own to report to.
+  final ValueNotifier<String?> notice = ValueNotifier<String?>(null);
+
+  /// The banner after a refused save — see [_reloadAfterConflict].
+  static const String conflictNotice =
+      'Your save changed on another device — reloaded.';
+
+  /// The banner after [PlayerProfile.repairContainers] dropped [count] items.
+  static String repairNotice(int count) =>
+      '$count ${count == 1 ? 'item' : 'items'} could not be recovered from an '
+      'earlier sync conflict.';
+
+  /// True while [_reloadAfterConflict] runs — its own guard against a loop.
+  bool _reloading = false;
+
   static Future<GameState> boot(ProfileStorage storage) async {
     final loaded = await storage.load();
     final state = GameState(storage, loaded ?? PlayerProfile.newPlayer());
     state.loading = false;
+    state._repair();
     // Migrate saves made when presets could hold more slots.
     for (final preset in state.profile.presets) {
       preset.clampToCaps();
@@ -122,21 +143,20 @@ class GameState extends ChangeNotifier {
     if (uid != null) {
       final cloud = FirestoreProfileStorage(uid);
       final loaded = await cloud.load();
+      storage = cloud;
       if (loaded != null) {
         // Adopt the existing cloud profile (progress from another session).
-        profile = loaded;
-        for (final preset in profile.presets) {
-          preset.clampToCaps();
-        }
-        // ⚠️ A cloud save is as old as a local one — same migration, same
-        // reason (settleBeltOverflow is idempotent, so this is free).
-        settleBeltOverflow();
+        _adopt(loaded);
+        // ⚠️ Only a repair is worth a write here: adopting is a read.
+        if (_repair()) await _persist();
       } else {
         // First time on this account — seed the cloud with the current
-        // (guest) profile so nothing is lost.
-        await cloud.save(profile);
+        // (guest) profile so nothing is lost. ⚠️ The seed is conditional on
+        // the account having no character yet, so a load that failed on a
+        // flaky network is refused here rather than overwriting a real save
+        // with the guest's — and [_persist] reloads the real one instead.
+        await _persist();
       }
-      storage = cloud;
     } else {
       final local = LocalProfileStorage();
       storage = local;
@@ -145,7 +165,69 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _persist() => storage.save(profile);
+  Future<void> _persist() async {
+    try {
+      await storage.save(profile);
+    } on SaveConflictException {
+      await _reloadAfterConflict();
+    }
+  }
+
+  /// Another device saved since this one loaded, so this save was refused
+  /// whole (`FirestoreProfileStorage.save`). Take the cloud's world.
+  ///
+  /// ⚠️ **The mutation in flight is lost, and that is correct**: it was made
+  /// against a stale world — spending gold the other device already spent,
+  /// depositing an item it already sold.
+  ///
+  /// ⚠️ **No loop.** A repair's follow-up save can itself be refused (a third
+  /// save landed meanwhile); that refusal arrives while [_reloading] is set
+  /// and is dropped. The next ordinary save retries against the version this
+  /// reload fetched.
+  Future<void> _reloadAfterConflict() async {
+    if (_reloading) return;
+    _reloading = true;
+    try {
+      final fresh = await storage.load();
+      // Unreachable cloud: keep what is in memory; the next save asks again.
+      if (fresh == null) return;
+      _adopt(fresh);
+      final repaired = profile.repairContainers();
+      notice.value = repaired > 0
+          ? '$conflictNotice ${repairNotice(repaired)}'
+          : conflictNotice;
+      notifyListeners();
+      if (repaired > 0) await _persist();
+    } finally {
+      _reloading = false;
+    }
+  }
+
+  /// Takes [loaded] as the profile, with the load-time migrations every
+  /// cloud read needs (a cloud save is as old as a local one; each is
+  /// idempotent, so running them again is free).
+  void _adopt(PlayerProfile loaded) {
+    profile = loaded;
+    for (final preset in profile.presets) {
+      preset.clampToCaps();
+    }
+    settleBeltOverflow();
+  }
+
+  /// [PlayerProfile.repairContainers], with its one banner. Returns whether
+  /// anything changed, i.e. whether the caller must persist.
+  bool _repair() {
+    final dropped = profile.repairContainers();
+    if (dropped == 0) return false;
+    notice.value = repairNotice(dropped);
+    return true;
+  }
+
+  @override
+  void dispose() {
+    notice.dispose();
+    super.dispose();
+  }
 
   Future<void> _mutate(void Function() change) async {
     change();
