@@ -14,7 +14,11 @@
 /// assertions that are this screen's own house rule written as a test.
 library;
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/economy/shop_catalogue.dart';
 import 'package:masters_of_magic_2/game/economy/shop_pricing.dart';
@@ -151,6 +155,7 @@ Future<void> _pump(
   WidgetTester tester,
   GameState game, {
   double width = 900,
+  String? fontFamily,
 }) async {
   // ⚠️ The VIEW size, not `setSurfaceSize`: the latter resizes the layout
   // but `MediaQuery.sizeOf` keeps reporting the default 800 dp, so a
@@ -161,6 +166,9 @@ Future<void> _pump(
   addTearDown(tester.view.resetDevicePixelRatio);
   await tester.pumpWidget(
     MaterialApp(
+      // ⚠️ Null unless a test asks for real glyph metrics ([_roboto]) — every
+      // other test keeps the default theme it was written against.
+      theme: fontFamily == null ? null : ThemeData(fontFamily: fontFamily),
       home: GameStateScope(
         state: game,
         child: const ShopScreen(townId: _townId),
@@ -172,6 +180,59 @@ Future<void> _pump(
   await tester.pump();
   await tester.pump();
 }
+
+/// Real Roboto — the face Flutter web draws this game in — registered under
+/// a private family name, for the tests that are ABOUT how many characters
+/// fit (ruling 2026-09-25: 'names render in full on a phone').
+///
+/// ⚠️ **Why not the test font.** `flutter_test`'s FlutterTest face draws
+/// every glyph a full em wide — 'Forager's Ration' is 220 px there against
+/// ~102 in Roboto — so a truncation test in it measures nothing a player sees.
+/// The files ship inside the Flutter SDK (`material_fonts`), so no asset is
+/// vendored; ⚠️ a private family name, never 'Roboto', so loading it cannot
+/// change the metrics of any other test sharing this isolate.
+const _roboto = 'ShopRoboto';
+var _robotoLoaded = false;
+
+Future<void> _loadRoboto(WidgetTester tester) async {
+  if (_robotoLoaded) return;
+  // `FLUTTER_ROOT` is exported by the `flutter` launcher; the fallback walks
+  // up from `flutter_tester` itself (…/bin/cache/artifacts/engine/…).
+  final exe = Platform.resolvedExecutable;
+  final root =
+      Platform.environment['FLUTTER_ROOT'] ??
+      exe.substring(0, exe.indexOf('/bin/cache/'));
+  final dir = '$root/bin/cache/artifacts/material_fonts';
+  await tester.runAsync(() async {
+    final loader = FontLoader(_roboto);
+    for (final weight in ['Regular', 'Medium', 'Bold']) {
+      final file = File('$dir/Roboto-$weight.ttf');
+      if (!file.existsSync()) {
+        throw StateError(
+          'Roboto not found at ${file.path} — the SDK layout moved',
+        );
+      }
+      final bytes = file.readAsBytesSync();
+      loader.addFont(Future.value(ByteData.view(bytes.buffer)));
+    }
+    await loader.load();
+  });
+  _robotoLoaded = true;
+}
+
+/// The row's name as laid out — for asking whether it was cut short.
+RenderParagraph _nameParagraph(WidgetTester tester, String itemId) =>
+    tester.renderObject<RenderParagraph>(
+      find.descendant(of: _rowFor(itemId), matching: find.text(_name(itemId))),
+    );
+
+/// The PRICE cell of a row: the one text in it that is nothing but 'Ng'.
+Finder _priceCellOf(String itemId) => find.descendant(
+  of: _rowFor(itemId),
+  matching: find.byWidgetPredicate(
+    (w) => w is Text && RegExp(r'^\d+g$').hasMatch(w.data ?? ''),
+  ),
+);
 
 Future<void> _tapStepper(
   WidgetTester tester,
@@ -1674,6 +1735,387 @@ void main() {
               'all four columns — must fit without overflow; this is what set '
               'chipBreakpoint',
         );
+      });
+
+      // ---- ruling 2026-09-25 (mockup option A): the name gets its width back
+
+      // ⭐ Christian's screenshot named 'Bindweed Tangle' — that is the GATHER
+      // NODE; the shelf item it drops is 'Bindweed Fibre', and that is the row
+      // that truncated. Both names are read off the catalogue, not typed.
+      testWidgets("⭐ names render in full on a 390 dp phone — Bindweed Fibre, "
+          "Forager's Ration", (tester) async {
+        await _loadRoboto(tester);
+        final game = _game(_MemStorage());
+        await _pump(tester, game, width: 390, fontFamily: _roboto);
+        for (final id in const [_bindweed, _ration]) {
+          expect(
+            _nameParagraph(tester, id).didExceedMaxLines,
+            isFalse,
+            reason:
+                '${_name(id)} must render in full (no …) — the mutant that '
+                'keeps the STOCK and TOTAL cells on a phone leaves the name '
+                '4 px and ellipsizes every row on the shelf',
+          );
+        }
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: 'no RenderFlex overflow in real glyph metrics either',
+        );
+      });
+
+      testWidgets('every shelf name fits a phone row, with room to ~22 '
+          'characters', (tester) async {
+        await _loadRoboto(tester);
+        final game = _game(_MemStorage());
+        await _pump(tester, game, width: 390, fontFamily: _roboto);
+        // ⚠️ Measured in the name's OWN resolved style (theme letter-spacing
+        // included), so the probe and the row cannot disagree about the font.
+        final name = find.descendant(
+          of: _rowFor(_oak),
+          matching: find.text(_name(_oak)),
+        );
+        final style = DefaultTextStyle.of(
+          tester.element(name),
+        ).style.merge(tester.widget<Text>(name).style);
+        double widthOf(String s) {
+          final probe = TextPainter(
+            text: TextSpan(text: s, style: style),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          final w = probe.width;
+          probe.dispose();
+          return w;
+        }
+
+        final box = _nameParagraph(tester, _oak).constraints.maxWidth;
+        // ⭐ Every OPEN shelf, derived — a name authored tomorrow joins this
+        // check on its own, the same reasoning that computes town stock.
+        final names = {
+          for (final town in ShopCatalogue.status.keys)
+            if (ShopCatalogue.isOpen(town))
+              for (final id in ShopCatalogue.stockFor(town)) _name(id),
+        };
+        for (final n in names) {
+          expect(
+            widthOf(n),
+            lessThanOrEqualTo(box),
+            reason: '"$n" is on a shelf and must never ellipsize at 390 dp',
+          );
+        }
+        // "~22 characters" read against the shelf's own AVERAGE glyph (~6.9
+        // px — short, capital-heavy names), not a hand-picked thin string.
+        // ⚠️ 148 px holds 21.3 of those: the "~" in the ruling. A true 22
+        // needs ~5 px more, which only the panel's padding could give — an
+        // unruled visual change, left to the designer.
+        final chars = names.fold<int>(0, (a, n) => a + n.length);
+        final glyphs = names.fold<double>(0, (a, n) => a + widthOf(n));
+        expect(
+          box,
+          greaterThanOrEqualTo(21 * glyphs / chars),
+          reason:
+              '~22 characters before the ellipsis (ruling 2026-09-25) — the '
+              'mutant that keeps the wide 10/8 px gaps on a phone leaves '
+              '142 px, under 21 characters',
+        );
+      });
+
+      testWidgets('⭐ the stock is a dim subline — and a consumable says what '
+          'it does', (tester) async {
+        final game = _game(_MemStorage());
+        await _pump(tester, game, width: 390);
+        expect(
+          find.descendant(
+            of: _rowFor(_oak),
+            matching: find.text('60 in stock'),
+          ),
+          findsOneWidget,
+          reason:
+              'the STOCK column became the name\'s subline on a phone — a '
+              'mutant that only deletes the column loses the number entirely',
+        );
+        final rationStock = game.profile.shopStock[_townId]!.stockOf(_ration);
+        final heal = (ItemCatalogue.byId(_ration) as ConsumableDef).effect.heal;
+        expect(
+          find.descendant(
+            of: _rowFor(_ration),
+            matching: find.text('$rationStock in stock · restores $heal'),
+          ),
+          findsOneWidget,
+          reason:
+              'a consumable\'s subline carries its effect off ItemEffect — a '
+              'mutant that skips Usable, or types the number, fails here',
+        );
+        expect(
+          find.descendant(
+            of: _rowFor(_oak),
+            matching: find.textContaining('restores'),
+          ),
+          findsNothing,
+          reason: 'a material does nothing when used and says nothing of it',
+        );
+      });
+
+      testWidgets('the Sell subline says what is left to sell, and a bound '
+          'stack is only held', (tester) async {
+        final game = _game(
+          _MemStorage(),
+          storeroomStacks: {_bindweed: 6, _boundKey: 1},
+        );
+        // ⚠️ Roboto, not the test font: the Sell toolbar's FOUR chips are
+        // ~60 px over 390 dp in the em-wide FlutterTest face and fit in the
+        // face players actually see — the overflow check below is only
+        // meaningful in the latter.
+        await _loadRoboto(tester);
+        await _pump(tester, game, width: 390, fontFamily: _roboto);
+        await _switchToSell(tester);
+        expect(
+          find.descendant(
+            of: _rowFor(_bindweed),
+            matching: find.text('6 to sell'),
+          ),
+          findsOneWidget,
+          reason: 'HAVE became the subline on Sell — the available count',
+        );
+        await _tapStepper(tester, _bindweed, Icons.add, times: 2);
+        expect(
+          find.descendant(
+            of: _rowFor(_bindweed),
+            matching: find.text('4 to sell'),
+          ),
+          findsOneWidget,
+          reason:
+              'live, like the column it replaces — a mutant printing '
+              '`available` instead of `available − qty` still reads 6',
+        );
+        expect(
+          find.descendant(
+            of: _rowFor(_boundKey),
+            matching: find.text('1 held'),
+          ),
+          findsOneWidget,
+          reason:
+              'a bound stack is never \'to sell\' — the word would contradict '
+              'the line under it',
+        );
+        expect(
+          find.descendant(
+            of: _rowFor(_boundKey),
+            matching: find.text('Bound — cannot be sold.'),
+          ),
+          findsOneWidget,
+          reason: 'the phone row keeps the wide row\'s reason it is disabled',
+        );
+        expect(
+          find.text('HAVE'),
+          findsNothing,
+          reason: 'the Sell header drops its HAVE column on a phone too',
+        );
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: 'no overflow on the Sell tab at 390 dp',
+        );
+      });
+
+      testWidgets('⭐ the phone header reads ITEM · PRICE, over the price', (
+        tester,
+      ) async {
+        final game = _game(_MemStorage());
+        await _pump(tester, game, width: 390);
+        for (final gone in const ['STOCK', 'TOTAL']) {
+          expect(
+            find.text(gone),
+            findsNothing,
+            reason: '$gone heads a column the phone row no longer has',
+          );
+        }
+        for (final kept in const ['ITEM', 'PRICE']) {
+          expect(
+            find.text(kept),
+            findsOneWidget,
+            reason: '$kept still heads a real cell on a phone',
+          );
+        }
+        expect(
+          tester.getTopRight(find.text('PRICE')).dx,
+          tester.getTopRight(_priceCellOf(_oak)).dx,
+          reason:
+              'aligned to the cell it heads — the wide header\'s 118 px '
+              'inset on a phone lands PRICE ~60 px left of the prices',
+        );
+        expect(
+          find.descendant(of: _rowFor(_oak), matching: find.text('60')),
+          findsNothing,
+          reason: 'no bare QTY cell left behind in the phone row',
+        );
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: 'no RenderFlex overflow on the phone Buy tab',
+        );
+      });
+
+      testWidgets('at 900 dp the four headers and the qty/total cells are '
+          'back', (tester) async {
+        final game = _game(_MemStorage(), now: _quietDayFor(const [_oak]));
+        await _pump(tester, game, width: 900);
+        for (final h in const ['ITEM', 'STOCK', 'PRICE', 'TOTAL']) {
+          expect(
+            find.text(h),
+            findsOneWidget,
+            reason:
+                'the wide header is untouched by the phone ruling — a mutant '
+                'keyed on anything but chipBreakpoint drops $h here',
+          );
+        }
+        expect(
+          find.textContaining('in stock'),
+          findsNothing,
+          reason: 'no subline on a wide row — the STOCK column says it',
+        );
+        await _tapStepper(tester, _oak, Icons.add);
+        final quote = game.priceShopBasket(
+          townId: _townId,
+          today: ShopState.epochDayOf(game.now()),
+          buy: const {_oak: 1},
+          sellStacks: const {},
+          sellInstances: const {},
+        );
+        expect(
+          find.descendant(of: _rowFor(_oak), matching: find.text('59')),
+          findsOneWidget,
+          reason: 'the QTY cell is back and live on a wide screen',
+        );
+        expect(
+          find.descendant(
+            of: _rowFor(_oak),
+            matching: find.text('${quote.buyGoldOf[_oak]}g'),
+          ),
+          findsWidgets,
+          reason: 'the TOTAL cell is back and carries the quote',
+        );
+      });
+
+      testWidgets('⭐ the stepper never moves — 2-digit vs 1-digit stock, and '
+          'across a stock change', (tester) async {
+        final game = _game(_MemStorage());
+        await _pump(tester, game, width: 390);
+        double plusX(String id) => tester
+            .getTopLeft(
+              find.descendant(
+                of: _rowFor(id),
+                matching: find.byIcon(Icons.add),
+              ),
+            )
+            .dx;
+        final rationStock = game.profile.shopStock[_townId]!.stockOf(_ration);
+        expect(
+          rationStock,
+          lessThan(10),
+          reason: 'the fixture: the ration shelf is 1-digit, oak\'s is 60',
+        );
+        final oakBefore = plusX(_oak);
+        expect(
+          plusX(_ration),
+          oakBefore,
+          reason:
+              'rows with a 1-digit and a 2-digit subline put the stepper at '
+              'the same x — the mutant that lets the name block size to its '
+              'text (Flexible loose + no Expanded) walks it',
+        );
+
+        // Take oak from '60 in stock' to '9 in stock' in one edit.
+        await tester.tap(
+          find.descendant(of: _rowFor(_oak), matching: find.text('0')),
+        );
+        await tester.pump();
+        await tester.enterText(
+          find.descendant(of: _rowFor(_oak), matching: find.byType(TextField)),
+          '51',
+        );
+        await tester.testTextInput.receiveAction(TextInputAction.done);
+        await tester.pump();
+        expect(
+          find.descendant(of: _rowFor(_oak), matching: find.text('9 in stock')),
+          findsOneWidget,
+          reason: 'the premise: the subline really changed width',
+        );
+        expect(
+          plusX(_oak),
+          oakBefore,
+          reason:
+              'pressing must never move what was pressed — the + stays put '
+              'when its row\'s subline shrinks a digit',
+        );
+      });
+
+      testWidgets('buying 3 Oak Log on a phone updates the footer total', (
+        tester,
+      ) async {
+        final game = _game(_MemStorage(), now: _quietDayFor(const [_oak]));
+        await _pump(tester, game, width: 390);
+        await _tapStepper(tester, _oak, Icons.add, times: 3);
+        final quote = game.priceShopBasket(
+          townId: _townId,
+          today: ShopState.epochDayOf(game.now()),
+          buy: const {_oak: 3},
+          sellStacks: const {},
+          sellInstances: const {},
+        );
+        expect(
+          find.text('Buying 3 items −${quote.buyGold}g'),
+          findsOneWidget,
+          reason:
+              'the row lost its TOTAL cell on a phone; the settle bar is '
+              'where the basket total lives now, and it must still move',
+        );
+        expect(
+          _displayedNet(tester),
+          quote.net,
+          reason: 'the Settle button charges the same live total',
+        );
+        expect(
+          find.descendant(
+            of: _rowFor(_oak),
+            matching: find.text('57 in stock'),
+          ),
+          findsOneWidget,
+          reason: 'and the subline counts down with the basket',
+        );
+      });
+
+      testWidgets('the stock number is one tap away, as a dialog chip', (
+        tester,
+      ) async {
+        final game = _game(_MemStorage(), storeroomStacks: {_bindweed: 6});
+        // Roboto for the Sell tab's four-chip toolbar — see the Sell test.
+        await _loadRoboto(tester);
+        await _pump(tester, game, width: 390, fontFamily: _roboto);
+        await _tapRowInfo(tester, _rowFor(_oak), _name(_oak));
+        expect(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.text('60 in stock'),
+          ),
+          findsOneWidget,
+          reason:
+              'the dialog tags carry the full count — a subline that '
+              'ellipsizes must not be the only place the number lives',
+        );
+        await _closeItemDialog(tester);
+
+        await _switchToSell(tester);
+        await _tapRowInfo(tester, _rowFor(_bindweed), _name(_bindweed));
+        expect(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.text('6 to sell'),
+          ),
+          findsOneWidget,
+          reason: 'the Sell row\'s dialog carries its count the same way',
+        );
+        await _closeItemDialog(tester);
       });
     },
   );

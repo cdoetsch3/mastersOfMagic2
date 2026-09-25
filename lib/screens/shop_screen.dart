@@ -881,6 +881,18 @@ bool shopChipsFit(BuildContext context) =>
 /// chips gone.
 const double chipBreakpoint = 760;
 
+/// The compact row's glyph→name gap (10 wide) and info→PRICE gap (8 wide).
+///
+/// ⭐ Measured, not guessed (ruling 2026-09-25, test 'every shelf name fits a
+/// phone row'): with STOCK and TOTAL gone, a 390 dp row has 142 px for the
+/// name — under 21 of the shelf's average Roboto characters. These 4 + 2 px
+/// give it 148, ~21.3 of them (the ruling's "~22"), without touching the
+/// PRICE cell or the stepper. The longest name on any open shelf today is 17
+/// characters. ⚠️ A true 22 would need ~5 px more, and only the panel's
+/// padding has it to give.
+const double _compactGlyphGap = 6;
+const double _compactInfoGap = 6;
+
 /// Spike/sale chip — shown only when `eventMod != 1.0` (§6.2).
 class _EventChip extends StatelessWidget {
   final double eventMod;
@@ -959,12 +971,53 @@ class _TierChip extends StatelessWidget {
 
 /// The QTY/PRICE column header (ruling 2026-08-25: the two numbers Christian
 /// called critical stopped being subline whispers and became COLUMNS).
+///
+/// ⭐ **On a phone it is two headers, 'ITEM' and 'PRICE'** (ruling
+/// 2026-09-25, mockup option A): the STOCK and TOTAL columns left the compact
+/// row — stock became the name's subline, the basket total already lives in
+/// the settle bar — so the header drops the two words it no longer heads.
+/// ⚠️ Aligned by arithmetic to the compact row's cells (test 'PRICE sits over
+/// the price'), not eyeballed: the right inset is the panel's own inset, the
+/// stepper and the compact gap, in that order from the edge.
 class _ColumnHeader extends StatelessWidget {
   final String qtyLabel;
   const _ColumnHeader({required this.qtyLabel});
 
+  /// [GamePanel]'s padding (14) plus its 1 px border — where a row's content
+  /// starts and ends inside the list.
+  static const double _panelInset = 15;
+
+  /// `_QtyControl`'s laid-out width: two 24 px [_StepButton]s around the 34 px
+  /// count. ⚠️ Change the stepper and this header drifts — the alignment test
+  /// is the tripwire.
+  static const double _stepperWidth = 82;
+
+  /// The compact row's gap between the PRICE cell and the stepper.
+  static const double _compactGap = 6;
+
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    if (!shopChipsFit(context)) {
+      return const Padding(
+        padding: EdgeInsets.fromLTRB(
+          _panelInset,
+          0,
+          _panelInset + _stepperWidth + _compactGap,
+          4,
+        ),
+        child: Row(
+          children: [
+            Expanded(child: _HeaderText('ITEM')),
+            SizedBox(width: 58, child: _HeaderText('PRICE', right: true)),
+          ],
+        ),
+      );
+    }
+    return _wide();
+  }
+
+  /// ⚠️ The desktop/tablet header, untouched by the phone ruling.
+  Widget _wide() => Padding(
     padding: const EdgeInsets.fromLTRB(24, 0, 118, 4),
     child: Row(
       children: [
@@ -1057,6 +1110,107 @@ class _TotalCell extends StatelessWidget {
         color: AppColors.gold,
         fontSize: 15,
         fontWeight: FontWeight.w700,
+      ),
+    ),
+  );
+}
+
+/// What a consumable does, in the few words a phone subline has room for —
+/// 'restores 25' (ruling 2026-09-25). Null for anything that is not [Usable]
+/// or does nothing.
+///
+/// ⭐ Built from [ItemEffect], never typed per item — the same reason
+/// [ItemEffect.describe] exists — so a retuned ration cannot disagree with
+/// its own shelf line. The dialog keeps the full sentence; this is its
+/// shorthand, and ⚠️ it totals an over-time heal ([ItemEffect.healFor]) with
+/// the turns spelled out, because 'restores 5' for a 5-a-turn tonic would
+/// undersell it threefold.
+String? _effectBrief(ItemDef def) {
+  if (def is! Usable) return null;
+  final effect = (def as Usable).effect;
+  if (effect.isNothing) return null;
+  return effect.healPerTurn > 0
+      ? 'restores ${effect.healFor()} over ${effect.healTurns} turns'
+      : 'restores ${effect.heal}';
+}
+
+/// The compact row's name block (ruling 2026-09-25, mockup option A): the
+/// name on one line, and under it the dim count that used to be the STOCK /
+/// HAVE column — '60 in stock', '9 in stock · restores 25', '6 to sell'.
+///
+/// ⭐ **The name gets the width the two dropped columns gave back.** It is
+/// the first [Flexible] child of an otherwise fixed-width row, so it ellipsizes
+/// only when it truly does not fit — ~21 average characters on a 390 dp
+/// phone, every name on every open shelf included (see [_compactGlyphGap]).
+///
+/// ⚠️ **One line each, always.** A subline that could wrap would make the row
+/// grow a line when the count drops from '10' to '9' plus an effect, and the
+/// rows below would slide under the player's thumb — the press-stability rule
+/// broken by arithmetic. [Column.mainAxisSize] min so the block is exactly
+/// two lines tall in every row, whatever the words.
+class _CompactNameBlock extends StatelessWidget {
+  final String name;
+  final Color colour;
+  final String subline;
+
+  /// A second dim line kept from the wide row — 'Bound — cannot be sold.' or
+  /// 'vendor (flat)' on the Sell tab — or null.
+  final String? note;
+
+  const _CompactNameBlock({
+    required this.name,
+    required this.colour,
+    required this.subline,
+    this.note,
+  });
+
+  static const _dim = TextStyle(color: AppColors.textDim, fontSize: 11.5);
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: colour,
+          fontSize: 13.5,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      const SizedBox(height: 2),
+      Text(subline, maxLines: 1, overflow: TextOverflow.ellipsis, style: _dim),
+      if (note != null)
+        Text(note!, maxLines: 1, overflow: TextOverflow.ellipsis, style: _dim),
+    ],
+  );
+}
+
+/// The count as a dialog tag — '60 in stock' / '6 to sell' (ruling
+/// 2026-09-25): on a phone the row's subline may ellipsize, so the full
+/// number is one tap away in the item dialog, at every width (the 2026-09-21
+/// rule that a dialog tag never comes and goes with the window).
+class _CountChip extends StatelessWidget {
+  final String label;
+  const _CountChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    decoration: BoxDecoration(
+      color: AppColors.panelHi,
+      border: Border.all(color: AppColors.border),
+      borderRadius: BorderRadius.circular(5),
+    ),
+    child: Text(
+      label,
+      style: const TextStyle(
+        color: AppColors.textDim,
+        fontSize: 10,
+        fontWeight: FontWeight.w600,
       ),
     ),
   );
@@ -1471,6 +1625,9 @@ class _BuyRow extends StatelessWidget {
         : AppColors.teal;
     // ⭐ One flag for chips, gaps and the toolbar (chipBreakpoint).
     final compact = !shopChipsFit(context);
+    // ⭐ What the STOCK column said — REMAINING after the pending basket, live
+    // — now worded, for the phone subline and the dialog chip alike.
+    final countLabel = '${stock - qty} in stock';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -1493,27 +1650,38 @@ class _BuyRow extends StatelessWidget {
                   tags: [
                     _TierChip(mod: locationMod),
                     if (eventMod != 1.0) _EventChip(eventMod: eventMod),
+                    _CountChip(label: countLabel),
                   ],
                 ),
                 child: Row(
                   children: [
                     _ItemGlyph(defId: itemId, name: name),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              name,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: rarityColour(def.rarity),
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w600,
+                    SizedBox(width: compact ? _compactGlyphGap : 10),
+                    if (compact)
+                      // ⭐ Ruling 2026-09-25: on a phone the stock is a
+                      // subline, and a consumable's effect rides beside it.
+                      Expanded(
+                        child: _CompactNameBlock(
+                          name: name,
+                          colour: rarityColour(def.rarity),
+                          subline: [countLabel, ?_effectBrief(def)].join(' · '),
+                        ),
+                      )
+                    else
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                name,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: rarityColour(def.rarity),
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          ),
-                          if (!compact) ...[
                             const SizedBox(width: 6),
                             _TierChip(mod: locationMod),
                             if (eventMod != 1.0) ...[
@@ -1521,23 +1689,30 @@ class _BuyRow extends StatelessWidget {
                               _EventChip(eventMod: eventMod),
                             ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: compact ? _compactInfoGap : 8),
             // ⭐ QTY then PRICE (ruling 2026-08-25): the two critical numbers
             // as aligned columns. QTY is stock REMAINING after the pending
             // basket, live — buying 5 of 60 reads 55 as the stepper moves.
-            _QtyCell(remaining: stock - qty),
-            SizedBox(width: compact ? 6 : 10),
+            // ⚠️ Not on a phone (ruling 2026-09-25): QTY moved under the
+            // name and TOTAL is the settle bar's job, so the row keeps only
+            // the fixed PRICE cell and the stepper — both still fixed-width,
+            // so nothing the player presses moves when a number changes.
+            if (!compact) ...[
+              _QtyCell(remaining: stock - qty),
+              const SizedBox(width: 10),
+            ],
             _PriceCell(unit: unit, colour: eventColour),
             SizedBox(width: compact ? 6 : 10),
-            _TotalCell(gold: qty > 0 ? total : null),
-            SizedBox(width: compact ? 6 : 10),
+            if (!compact) ...[
+              _TotalCell(gold: qty > 0 ? total : null),
+              const SizedBox(width: 10),
+            ],
             _QtyControl(
               value: qty,
               min: 0,
@@ -1757,6 +1932,12 @@ class _SellStackRow extends StatelessWidget {
     // ⭐ One flag for chips, gaps and the toolbar (chipBreakpoint).
     final compact = !shopChipsFit(context);
     final hasSubline = bound || !stocked;
+    // ⭐ What the HAVE column said — what you would have LEFT after this
+    // basket, live — worded for the phone subline and the dialog chip.
+    // ⚠️ A bound stack is 'held', never 'to sell': the one word that must
+    // not contradict the 'Bound — cannot be sold.' line under it.
+    final left = available - qty;
+    final countLabel = bound ? '$left held' : '$left to sell';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -1779,30 +1960,46 @@ class _SellStackRow extends StatelessWidget {
                   tags: [
                     if (stocked) _TierChip(mod: locationMod),
                     if (eventMod != 1.0) _EventChip(eventMod: eventMod),
+                    _CountChip(label: countLabel),
                   ],
                 ),
                 child: Row(
                   children: [
                     _ItemGlyph(defId: itemId, name: name),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  name,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: rarityColour(def.rarity),
-                                    fontSize: 13.5,
-                                    fontWeight: FontWeight.w600,
+                    SizedBox(width: compact ? _compactGlyphGap : 10),
+                    if (compact)
+                      // ⭐ Ruling 2026-09-25 — the Buy row's phone shape, and
+                      // the wide row's own bound/vendor line kept beneath.
+                      Expanded(
+                        child: _CompactNameBlock(
+                          name: name,
+                          colour: rarityColour(def.rarity),
+                          subline: [countLabel, ?_effectBrief(def)].join(' · '),
+                          note: !hasSubline
+                              ? null
+                              : bound
+                              ? 'Bound — cannot be sold.'
+                              : 'vendor (flat)',
+                        ),
+                      )
+                    else
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    name,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: rarityColour(def.rarity),
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              if (!compact) ...[
                                 if (stocked) ...[
                                   const SizedBox(width: 6),
                                   _TierChip(mod: locationMod),
@@ -1812,43 +2009,47 @@ class _SellStackRow extends StatelessWidget {
                                   _EventChip(eventMod: eventMod),
                                 ],
                               ],
+                            ),
+                            if (hasSubline) ...[
+                              const SizedBox(height: 2),
+                              if (bound)
+                                const Text(
+                                  'Bound — cannot be sold.',
+                                  style: TextStyle(
+                                    color: AppColors.textDim,
+                                    fontSize: 11.5,
+                                  ),
+                                )
+                              else
+                                const Text(
+                                  'vendor (flat)',
+                                  style: TextStyle(
+                                    color: AppColors.textDim,
+                                    fontSize: 11.5,
+                                  ),
+                                ),
                             ],
-                          ),
-                          if (hasSubline) ...[
-                            const SizedBox(height: 2),
-                            if (bound)
-                              const Text(
-                                'Bound — cannot be sold.',
-                                style: TextStyle(
-                                  color: AppColors.textDim,
-                                  fontSize: 11.5,
-                                ),
-                              )
-                            else
-                              const Text(
-                                'vendor (flat)',
-                                style: TextStyle(
-                                  color: AppColors.textDim,
-                                  fontSize: 11.5,
-                                ),
-                              ),
                           ],
-                        ],
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: compact ? _compactInfoGap : 8),
             // ⭐ QTY then PRICE — QTY is what you'd have LEFT after this
             // basket, live (selling 3 of 6 reads 3 as the stepper moves).
-            _QtyCell(remaining: available - qty),
-            SizedBox(width: compact ? 6 : 10),
+            // ⚠️ Phone: PRICE and the stepper only (ruling 2026-09-25).
+            if (!compact) ...[
+              _QtyCell(remaining: available - qty),
+              const SizedBox(width: 10),
+            ],
             _PriceCell(unit: unit, colour: eventColour),
             SizedBox(width: compact ? 6 : 10),
-            _TotalCell(gold: qty > 0 ? total : null),
-            SizedBox(width: compact ? 6 : 10),
+            if (!compact) ...[
+              _TotalCell(gold: qty > 0 ? total : null),
+              const SizedBox(width: 10),
+            ],
             _QtyControl(
               value: qty,
               min: 0,
