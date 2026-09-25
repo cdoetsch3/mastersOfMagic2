@@ -9,6 +9,7 @@ import '../../game/adventure.dart';
 import '../../game/adventure_launcher.dart';
 import '../../game/economy/shop_catalogue.dart';
 import '../../game/enemies/bestiary.dart';
+import '../../game/gates.dart';
 import '../../game/world.dart';
 import '../../ui/app_banner.dart';
 import '../../ui/app_theme.dart';
@@ -62,7 +63,10 @@ class _MapTabState extends State<MapTab> {
               const SizedBox(height: 12),
               // The journey in progress, when there is one.
               if (game.isTravelling) TravelProgressCard(game: game),
-              _CurrentLocationCard(location: here),
+              _CurrentLocationCard(
+                location: here,
+                gateOpen: game.profile.openedGates.contains(here.id),
+              ),
               const SizedBox(height: 12),
               const SectionLabel('Here you can'),
               ..._locationActions(context, game),
@@ -76,14 +80,11 @@ class _MapTabState extends State<MapTab> {
                   // than emptying out mid-trip.
                   travelLabel: Travel.labelBetween(here.id, id),
                   enabled: !game.isTravelling,
-                  // ⭐ Still tappable while the gate is shut. The refusal
-                  // names the proof you are short of, which is information;
-                  // a dead tile is not.
-                  gateRefusal: game.gateRefusal(id),
-                  // ⚠️ **Not still-tappable, unlike the gate.** A gate tells
-                  // you what to go and fetch, so the tap is worth making; the
-                  // passage rule's answer is on the card already, and a tile
-                  // that banners what it is printing is noise.
+                  // ⭐ A shut gate is walkable (ruling 2026-09-25, mockup B):
+                  // the trip arrives at the gate screen, where the guard asks.
+                  gateOpen: game.profile.openedGates.contains(id),
+                  // ⚠️ The passage rule's answer is on the card already, so
+                  // the card is dead rather than live-with-a-banner.
                   passageRefusal: game.passageRefusal(id),
                   cleared: game.profile.hasCleared(id),
                   onTravel: () => _travel(context, game, id),
@@ -168,7 +169,7 @@ class _MapTabState extends State<MapTab> {
   void _shopClosed(BuildContext context) =>
       showAppBanner(context, ShopCatalogue.closedFlavor);
 
-  /// Travel, and say why not when the guard says no. Same reasoning as
+  /// Travel, and say why not when the road says no. Same reasoning as
   /// [_shopClosed]: a refused tap that reports nothing reads as a bug.
   Future<void> _travel(BuildContext context, GameState game, String id) async {
     final banner = appBannerOf(context);
@@ -179,7 +180,11 @@ class _MapTabState extends State<MapTab> {
 
 class _CurrentLocationCard extends StatelessWidget {
   final GameLocation location;
-  const _CurrentLocationCard({required this.location});
+
+  /// Whether this character has opened [location]'s gate — the lock line is
+  /// dropped once it has: you are standing on the far side of it.
+  final bool gateOpen;
+  const _CurrentLocationCard({required this.location, this.gateOpen = false});
 
   @override
   Widget build(BuildContext context) {
@@ -258,7 +263,7 @@ class _CurrentLocationCard extends StatelessWidget {
               ],
             ),
           ],
-          if (location.gate != null) ...[
+          if (location.gate != null && !gateOpen) ...[
             const SizedBox(height: 8),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,10 +364,13 @@ class _TravelCard extends StatelessWidget {
   final String? travelLabel;
   final bool enabled;
 
-  /// `GameState.gateRefusal` for this destination — null when the way is open
-  /// (or when the gate is prose only). Passed in rather than read here so the
+  /// Whether this character has opened the destination's gate
+  /// (`PlayerProfile.openedGates`). Passed in rather than read here so the
   /// card stays a pure function of what it is handed.
-  final String? gateRefusal;
+  ///
+  /// ⭐ **Open means gone** (ruling 2026-09-25): an opened gate drops its tag
+  /// entirely — the road is simply a road now.
+  final bool gateOpen;
 
   /// `GameState.passageRefusal` for this destination — null when the road is
   /// walkable. Non-null **disables** the card and prints the sentence on it.
@@ -376,7 +384,7 @@ class _TravelCard extends StatelessWidget {
     required this.onTravel,
     this.travelLabel,
     this.enabled = true,
-    this.gateRefusal,
+    this.gateOpen = false,
     this.passageRefusal,
     this.cleared = false,
   });
@@ -384,6 +392,9 @@ class _TravelCard extends StatelessWidget {
   /// Whether the card can be pressed: not mid-journey, and not walled off by
   /// the passage rule.
   bool get _live => enabled && passageRefusal == null;
+
+  /// Whether the gate tag is drawn: a gate line, not yet opened.
+  bool get _showGate => location.gate != null && !gateOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -435,7 +446,7 @@ class _TravelCard extends StatelessWidget {
                     // who you'll meet, what is taught here, and what bars the way.
                     if (location.elements.isNotEmpty ||
                         location.station != null ||
-                        location.gate != null ||
+                        _showGate ||
                         location.plane == WorldPlane.empyrean)
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
@@ -458,12 +469,8 @@ class _TravelCard extends StatelessWidget {
                                 text: 'Beyond the Veil',
                                 color: AppColors.gem,
                               ),
-                            if (location.gate != null)
-                              _GateTag(
-                                open:
-                                    location.gateItemIds.isNotEmpty &&
-                                    gateRefusal == null,
-                              ),
+                            if (_showGate)
+                              _GateTag(label: Gates.shutTagFor(location)),
                           ],
                         ),
                       ),
@@ -521,8 +528,12 @@ const TextStyle _subtitleStyle = TextStyle(
 
 /// The green check on a travel card whose boss this character has beaten.
 ///
-/// ⚠️ Its width is **measured**, like [_MiniTag.widthOf] and for the same
-/// reason: a constant read off one font overflows under another.
+/// ⚠️ Its width is **measured, not a constant**: the obvious `width: 80`
+/// was right under Roboto and forty pixels short under the test font, where
+/// every glyph is a square. A number read off one font is wrong in another
+/// (and wrong again at 200% text scale). ⚠️ Resolved through
+/// `DefaultTextStyle`, exactly as `Text` resolves its own — a bare
+/// `TextStyle` drops the theme's family and comes up about two pixels short.
 class _ClearedTag extends StatelessWidget {
   const _ClearedTag();
 
@@ -585,75 +596,43 @@ class _MiniTag extends StatelessWidget {
   static const double _gap = 4;
   static const double _fontSize = 11.5;
 
-  /// How wide this tag would be if it sized itself to [text].
-  ///
-  /// ⚠️ **Measured, not a constant.** The obvious `width: 80` was right under
-  /// Roboto and forty pixels short under the test font, where every glyph is
-  /// a square — so the widget looked fine and every widget test overflowed.
-  /// A number read off one font is a number that is wrong in another (and
-  /// wrong again at 200% text scale).
-  ///
-  /// ⚠️ **Resolved through `DefaultTextStyle`, exactly as `Text` resolves its
-  /// own.** Measuring a bare `TextStyle(fontSize: …)` drops the theme's font
-  /// family and comes up about two pixels short — invisible by eye, an
-  /// overflow assertion in a widget test.
-  static double widthOf(BuildContext context, String text) {
-    final painter = TextPainter(
-      text: TextSpan(
-        text: text,
-        style: DefaultTextStyle.of(
-          context,
-        ).style.merge(const TextStyle(fontSize: _fontSize)),
-      ),
-      textDirection: Directionality.of(context),
-      textScaler: MediaQuery.textScalerOf(context),
-    )..layout();
-    // The spare pixel keeps a rounded-up glyph run off the overflow stripes.
-    return _iconSize + _gap + painter.width + 1;
-  }
-
   @override
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
       Icon(icon, size: _iconSize, color: color),
       const SizedBox(width: _gap),
-      Text(
-        text,
-        style: TextStyle(color: color, fontSize: _fontSize),
+      // ⚠️ Flexible: the Pennycross gate tag is a sentence, and on a phone a
+      // sentence in one unbreakable run overflows the card. Where the tag
+      // fits (every other one) this changes nothing.
+      Flexible(
+        child: Text(
+          text,
+          style: TextStyle(color: color, fontSize: _fontSize),
+        ),
       ),
     ],
   );
 }
 
-/// The lock on a travel card: shut, or opened for good.
+/// The lock on a travel card whose gate is still shut.
 ///
-/// ⭐ **One fixed-width cell for both states.** "Gate open" is wider than
-/// "Gated", and this tag sits in a `Wrap` beside the station and element
-/// glyphs — so letting it size itself would shuffle its neighbours the instant
-/// the gate opened, under a finger that is already on its way down. The width
-/// is set by the longer word and never changes (press-stability).
+/// ⭐ **Shut only, since 2026-09-25.** The 'Gate open' state is gone — an
+/// opened gate drops the tag altogether (the road is just a road) — so the
+/// cell no longer has two widths to reconcile, and the old fixed-width cell
+/// went with it. ⚠️ Press-stability still holds: the tag only ever vanishes
+/// on the gate screen, never under a finger on this card.
 ///
-/// ⚠️ Only reached when `location.gate != null`. A gate with no items behind
-/// it (the four still-unbuilt ones) is always [open] `false` — prose that
-/// describes a lock nothing checks yet.
+/// The words are the gate's own ([Gates.shutTagFor]): Pennycross's
+/// 'Gated · show three proofs at the gate', and a bare 'Gated' for a gate
+/// with no ruled copy or no items behind it yet.
 class _GateTag extends StatelessWidget {
-  final bool open;
-  const _GateTag({required this.open});
-
-  /// The longer of the two labels, and therefore the one that sets the cell.
-  static const String openLabel = 'Gate open';
-  static const String shutLabel = 'Gated';
+  final String label;
+  const _GateTag({required this.label});
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    width: _MiniTag.widthOf(context, openLabel),
-    child: _MiniTag(
-      icon: open ? Icons.lock_open : Icons.lock_outline,
-      text: open ? openLabel : shutLabel,
-      color: open ? AppColors.teal : AppColors.gold,
-    ),
-  );
+  Widget build(BuildContext context) =>
+      _MiniTag(icon: Icons.lock_outline, text: label, color: AppColors.gold);
 }
 
 /// ⭐ Shows the run's length up front (GAME_DESIGN world structure) — the

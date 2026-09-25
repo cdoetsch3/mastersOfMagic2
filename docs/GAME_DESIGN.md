@@ -817,13 +817,34 @@ the check now live there (`GameLocation.gateItemIds`). Hearthwood has no gate.
 
 Two halves of that ruling worth keeping straight:
 
-* **Carried, not spent.** The proofs must be in the **backpack** — not a town
-  storeroom — the first time you walk the north road. The guard *looks*; he
-  keeps nothing. Selling them afterwards is allowed and costs you nothing.
+* ~~**Carried, not spent.**~~ *Superseded 2026-09-25, below — the guard now
+  keeps them.* The proofs must be in the **backpack** — not a town
+  storeroom — when you face the guard.
 * **Opened once, open for good.** The opening is recorded on the character
   (`PlayerProfile.openedGates`) and the items are never checked again. A
   re-check on every trip would make the proofs luggage for the rest of the
   campaign, which is the opposite of a gate you *passed*.
+
+⭐ **Ruled 2026-09-25 (Christian) — the gate is a place you arrive at
+(mockup option B), the proofs are consumed, and unlocking it is the game's
+first achievement.**
+
+* **Never refused at departure.** The road to a shut gate is an ordinary
+  road. The trip arrives at a **gate screen** instead of the town: the
+  guard's line (*"Three proofs. One from each of the old roads. Then the gate
+  is yours, and I keep the papers."*), the three proofs as tiles (✓ when
+  carried, "from ‹zone› · boss" when not), and two buttons — **Turn back**
+  (the way you came; the passage rule never refuses it) and **Unlock** (live
+  only with all three carried).
+* **Unlock spends one of each proof**, opens the gate for good
+  (`openedGates`), and earns **Papers in Order** — one write for all three.
+  The town opens behind a gold "Achievement · Papers in Order" toast.
+* **Legacy:** a character who opened Pennycross under the 2026-09-21 rule
+  never sees the screen and **keeps** the proofs (they may sell them).
+* **Spending is Pennycross's alone.** Rimeholt's totem gate is also a stop
+  now, but its guard still only *looks* — the Totem stays keepable (below).
+* The travel card drops the tag once the gate is open; while shut it reads
+  **"Gated · show three proofs at the gate"**.
 
 📝 **Still deferred** for the three later gates: whether their assembled
 objects are consumed or kept as trophies. The Totem in particular wants to be

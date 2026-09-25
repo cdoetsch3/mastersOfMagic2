@@ -447,24 +447,27 @@ void main() {
     });
   });
 
-  group('the gate still speaks first', () {
-    test('⚠️ a missing proof is reported as a missing proof', () async {
+  group('the road speaks alone now', () {
+    test('⚠️ a shut gate no longer outranks the passage rule', () async {
       // Standing in the uncleared Whispering Woods, having come from
-      // Hearthwood, with no proofs: BOTH rules refuse Pennycross. The guard's
-      // sentence is the more specific one and must win.
+      // Hearthwood, with no proofs. Before 2026-09-25 BOTH rules refused
+      // Pennycross and the guard's sentence won; since the gate became a
+      // place you arrive at (mockup B) the guard says nothing at departure,
+      // so the road's refusal is the one the player hears.
       final g = _standingIn('whispering_woods', cameFrom: 'hearthwood');
 
       expect(
-        g.passageRefusal('pennycross'),
-        isNotNull,
-        reason: 'the premise: the passage rule would refuse this too',
+        await g.travelTo('pennycross'),
+        'Clear Whispering Woods first, or go back the way you came '
+        '(Hearthwood).',
+        reason:
+            'kills a mutant that still puts the guard first — he asks at the '
+            'gate now — and one that drops the passage refusal with him',
       );
       expect(
-        await g.travelTo('pennycross'),
-        startsWith('The guard wants three proofs'),
-        reason:
-            'kills a mutant that checks passage before the gate — the player '
-            'would be told to clear a zone when what they need is three items',
+        g.profile.trip,
+        isNull,
+        reason: 'kills a mutant that reports the refusal and travels anyway',
       );
     });
   });

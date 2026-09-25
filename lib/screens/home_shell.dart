@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../game/game_state.dart';
 import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
+import 'gate_screen.dart';
 import 'matchmaking_screen.dart';
 import 'profile_screen.dart';
 import 'tabs/home_tab.dart';
@@ -130,32 +131,38 @@ class _HomeShellState extends State<HomeShell> {
     // the thing it navigates.
     final body = IndexedStack(index: _index, children: tabs);
 
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: SafeArea(
-        // ⭐ One column for content AND chrome, so the bar can never drift
-        // wider than what it navigates.
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: MaxWidth.shellWidth),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final landscape = constraints.maxWidth > constraints.maxHeight;
-                if (landscape) {
-                  return Row(
+    // ⭐ Standing at a shut gate replaces the whole shell with the gate
+    // screen (ruling 2026-09-25) — see [GateCheckpoint]. The tab index lives
+    // in this State, above the checkpoint, so it survives the visit.
+    return GateCheckpoint(
+      child: Scaffold(
+        backgroundColor: AppColors.bg,
+        body: SafeArea(
+          // ⭐ One column for content AND chrome, so the bar can never drift
+          // wider than what it navigates.
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: MaxWidth.shellWidth),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final landscape =
+                      constraints.maxWidth > constraints.maxHeight;
+                  if (landscape) {
+                    return Row(
+                      children: [
+                        _NavRail(index: _index, onSelect: _select),
+                        Expanded(child: body),
+                      ],
+                    );
+                  }
+                  return Column(
                     children: [
-                      _NavRail(index: _index, onSelect: _select),
                       Expanded(child: body),
+                      _BottomBar(index: _index, onSelect: _select),
                     ],
                   );
-                }
-                return Column(
-                  children: [
-                    Expanded(child: body),
-                    _BottomBar(index: _index, onSelect: _select),
-                  ],
-                );
-              },
+                },
+              ),
             ),
           ),
         ),

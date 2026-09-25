@@ -11,8 +11,10 @@ import 'economy/quality_value.dart';
 import 'economy/shop_catalogue.dart';
 import 'economy/shop_pricing.dart';
 import 'economy/shop_state.dart';
+import 'gates.dart';
 import 'enemies/bestiary.dart';
 import 'academy.dart';
+import 'achievements.dart';
 import 'enemies/loot.dart';
 import 'items/carrying.dart';
 import 'items/equipping.dart';
@@ -255,8 +257,12 @@ class GameState extends ChangeNotifier {
       !isTravelling && profile.location.connections.contains(locationId);
 
   /// Why the gate at [locationId] will not let this character through, or null
-  /// if it will. **Pure** — asks nothing, changes nothing, so the Map tab can
-  /// call it on every build to decide between "Gated" and "Gate open".
+  /// if it will. **Pure** — asks nothing, changes nothing.
+  ///
+  /// ⭐ **Asked AT the gate now, not at departure** (ruling, Christian
+  /// 2026-09-25, mockup B). The road to a shut gate is always walkable; this
+  /// is the guard's check when the player presses Unlock ([openGateAt]), and
+  /// the gate screen's disabled button is the same answer drawn as tiles.
   ///
   /// Null in three cases, and the order matters:
   ///  1. the destination has no `gateItemIds` — most of the world, and the
@@ -326,8 +332,20 @@ class GameState extends ChangeNotifier {
   /// conservative reading: it can only cost a walk back to civilisation, never
   /// hand out a quarter of the map. One arrival writes the field and the
   /// normal rule takes over.
+  ///
+  /// ⭐ **(c) At a shut gate, the way you came is always open** (ruling
+  /// 2026-09-25). 'Turn back' on the gate screen IS the road the player just
+  /// walked, so neither half above may refuse it — [PlayerProfile.gateTurnBackId]
+  /// is answered before them. ⚠️ Nothing else is refused here on the gate's
+  /// account: `GateCheckpoint` shows the gate screen in place of the whole
+  /// shell, so the one road a player at a shut gate can reach is this one.
   String? passageRefusal(String toId) {
     final fromId = profile.locationId;
+    // (c) Before the route is even looked at — the rule it exempts from is
+    // the route's.
+    if (profile.shutGateHere != null && toId == profile.gateTurnBackId) {
+      return null;
+    }
     final route = Travel.route(fromId, toId);
     if (route == null || route.isTrivial) return null;
 
@@ -384,17 +402,14 @@ class GameState extends ChangeNotifier {
   /// §4b.2's point-to-point Travel. The Map tab still offers only neighbours
   /// until the travel UI is built; that is a UI limit, not a rule.
   ///
-  /// ⚠️ **The gate is enforced here, not only in [travelTo].** [travelTo] asks
-  /// first so the Map tab has a sentence to show; this second check is what
-  /// stops every other caller — the world map, a future point-to-point
-  /// screen — from walking past the guard in silence.
+  /// ⭐ **A shut gate is NOT refused here** (ruling, Christian 2026-09-25,
+  /// mockup B — reversing 2026-09-21's departure check). The trip proceeds
+  /// and arrives at the gate ([PlayerProfile.shutGateHere]); the guard asks
+  /// for the proofs there, on the gate screen, and nothing opens at
+  /// departure any more.
   Future<bool> beginTravel(String toId, {String? mountId}) async {
     settleTravel();
     if (profile.trip != null || toId == profile.locationId) return false;
-    // ⚠️ Gate first, then passage — the guard's sentence is the more specific
-    // of the two, and a player short of three proofs should hear about the
-    // proofs rather than about the quarry behind them.
-    if (gateRefusal(toId) != null) return false;
     if (passageRefusal(toId) != null) return false;
     final route = Travel.route(profile.locationId, toId);
     if (route == null || route.isTrivial) return false;
@@ -408,15 +423,64 @@ class GameState extends ChangeNotifier {
         now().toUtc(),
         mountId: mountId,
       );
-      // ⭐ The gate opens as the trip STARTS, in the same write — so the one
-      // save that records the journey also records the permission. Splitting
-      // them would leave a window where the player is walking to Pennycross
-      // with the road still shut behind a crash. Nothing is consumed: the
-      // proofs stay in the pack (ruling, Christian 2026-09-21).
-      if (World.byId(toId).gateItemIds.isNotEmpty) {
-        profile.openedGates.add(toId);
-      }
     });
+    return true;
+  }
+
+  /// Unlock the shut gate the player is standing at: the guard keeps the
+  /// items, the gate opens for good, and any achievement it carries is
+  /// earned — ⭐ **one write for all three**, so a crash can never leave the
+  /// proofs spent and the gate shut, or the gate open with its achievement
+  /// lost (ruling, Christian 2026-09-25). Returns whether it opened.
+  ///
+  /// Refuses (false, nothing written) unless [locationId] is
+  /// [PlayerProfile.shutGateHere] and [gateRefusal] is satisfied — every
+  /// item carried in the backpack.
+  ///
+  /// ⭐ **Consumed: exactly one of each gate item**, and nothing else in the
+  /// pack — where the gate's guard keeps them ([Gates.guardKeepsItems]:
+  /// Pennycross). A duplicate proof stays. ⚠️ A non-fungible item's instance
+  /// record goes with its slot, or it would be orphaned in `itemInstances`.
+  ///
+  /// ⚠️ **Every other gate only looks** — Rimeholt's Celestial Totem is ruled
+  /// keepable (CELESTIAL_CONTRACT §3.4), and this ruling did not reopen it.
+  ///
+  /// 📝 The achievement is added directly rather than through
+  /// [grantAchievement], because that would be a second write. The caller
+  /// tells "newly earned" by looking before it asks (see `GateScreen`).
+  Future<bool> openGateAt(String locationId) async {
+    settleTravel();
+    if (profile.shutGateHere != locationId) return false;
+    if (gateRefusal(locationId) != null) return false;
+    final achievement = Gates.achievementFor(locationId);
+    final spent = Gates.guardKeepsItems(locationId)
+        ? World.byId(locationId).gateItemIds
+        : const <String>[];
+    await _mutate(() {
+      for (final id in spent) {
+        final pack = profile.backpack;
+        final i = pack.slots.indexWhere((s) => s?.defId == id);
+        final instanceId = pack.slots[i]?.instanceId;
+        profile.backpack = pack.withRemovedAt(i);
+        if (instanceId != null) profile.itemInstances.remove(instanceId);
+      }
+      profile.openedGates.add(locationId);
+      if (achievement != null) profile.achievements.add(achievement.id);
+    });
+    return true;
+  }
+
+  /// Record achievement [id] as earned. ⭐ **Idempotent**: returns true only
+  /// the first time, and a repeat grant writes nothing — so a caller may
+  /// grant on every qualifying event and toast on `true` alone.
+  ///
+  /// ⚠️ An id the catalogue does not know (`Achievements.byId`) is refused,
+  /// not stored: a typo would otherwise sit in every save forever, earned
+  /// and invisible.
+  Future<bool> grantAchievement(String id) async {
+    if (Achievements.byId(id) == null) return false;
+    if (profile.achievements.contains(id)) return false;
+    await _mutate(() => profile.achievements.add(id));
     return true;
   }
 
@@ -469,19 +533,18 @@ class GameState extends ChangeNotifier {
   /// ⭐ **Returns the refusal, if there is one** — the first thing this method
   /// has ever had to say. Every other way it declines (already travelling, not
   /// a neighbour) is a tile the UI had already greyed out, so `void` was
-  /// honest; a gate is different, because the tile looks live and the player
-  /// is owed a reason. Null means "under way, or nothing to say".
+  /// honest; a refused road is different, because the player is owed a
+  /// reason. Null means "under way, or nothing to say".
   ///
-  /// ⭐ **Two refusals now, in the order [beginTravel] enforces them**: the
-  /// guard at the gate, then the road through an uncleared zone
-  /// ([passageRefusal]). Callers still get one sentence or null, so nothing
-  /// downstream had to learn the difference.
+  /// ⭐ **One refusal: the road** ([passageRefusal]). The guard's used to come
+  /// first; since the 2026-09-25 ruling a shut gate is somewhere you arrive,
+  /// not something that stops you leaving, so it has nothing to say here.
   ///
   /// ⚠️ Returned, not thrown. `interactive_world_map`'s `_travel` already
   /// catches around this call to report a *save* failure as a modal, and a
   /// thrown refusal would arrive there wearing that alert's words.
   Future<String?> travelTo(String locationId) async {
-    final refusal = gateRefusal(locationId) ?? passageRefusal(locationId);
+    final refusal = passageRefusal(locationId);
     if (refusal != null) return refusal;
     if (!canTravelTo(locationId)) return null;
     await beginTravel(locationId);

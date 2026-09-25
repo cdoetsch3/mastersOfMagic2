@@ -208,11 +208,14 @@ class GameLocation {
   /// The item ids that must be **carried** — in the backpack — to open this
   /// gate for the first time.
   ///
-  /// ⭐ **Shown, not spent** (ruling, Christian 2026-09-21). The guard wants
-  /// to *see* the proofs; he does not keep them. So nothing is consumed, and
-  /// the opening is recorded once on the character
-  /// (`PlayerProfile.openedGates`) and never re-checked — a player who sells
-  /// their proofs afterwards does not lose the road they already walked.
+  /// ⭐ **A shut gate is a stop, not a wall** (ruling, Christian 2026-09-25,
+  /// mockup B): the trip arrives at the gate screen (`GateScreen`) and the
+  /// items are asked for there, on Unlock. The opening is recorded once on
+  /// the character (`PlayerProfile.openedGates`) and never re-checked.
+  ///
+  /// ⚠️ **Spent at Pennycross only** (`Gates.guardKeepsItems`) — *"the proofs
+  /// stay with the guard"*. Every other gate still only looks (2026-09-21's
+  /// *shown, not spent*): the Celestial Totem is ruled keepable.
   ///
   /// ⚠️ Empty is the common case and means "no check". A [gate] line with an
   /// empty list is descriptive-only; see the note there.

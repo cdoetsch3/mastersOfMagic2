@@ -6,10 +6,17 @@
 /// > be gated and require the 3 proofs be carried in the inventory once to
 /// > unlock it. Once unlocked, the user no longer needs the proofs."*
 ///
-/// Three rules come out of that, and each has a mutant waiting for it:
+/// Three rules came out of that, and each has a mutant waiting for it:
 ///  * **carried**, in the backpack, not banked in a storeroom,
 ///  * **once** — the opening is recorded on the character and never re-checked,
-///  * **shown, not spent** — the proofs are still in the pack afterwards.
+///  * ~~shown, not spent~~ — ⭐ **superseded 2026-09-25**: the proofs are
+///    consumed at the gate, and the gate is a place you ARRIVE at (mockup B).
+///
+/// ⭐ **RULING (Christian, 2026-09-25): departure is never refused.** The road
+/// to a shut gate is an ordinary road; the trip arrives at the gate screen
+/// and the guard asks there. This file owns the departure half and the Map
+/// tab's tag; `gate_screen_test.dart` owns the arrival, the Unlock and the
+/// achievement.
 ///
 /// `world_test.dart` holds the two facts this file leans on: the gate line is
 /// on Pennycross, and all three proof zones are reachable without walking
@@ -19,6 +26,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
+import 'package:masters_of_magic_2/game/gates.dart';
 import 'package:masters_of_magic_2/game/items/inventory.dart';
 import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
@@ -42,9 +50,13 @@ class _Mem implements ProfileStorage {
   Future<void> clear() async => stored = null;
 }
 
+/// The test clock — moved forward to make a trip arrive.
+DateTime _clock = DateTime.utc(2026, 1, 1, 12);
+
 /// A fresh mage in Hearthwood, carrying [carrying].
 GameState _atHearthwood({List<String> carrying = const []}) {
-  final g = GameState(_Mem(), PlayerProfile.newPlayer());
+  _clock = DateTime.utc(2026, 1, 1, 12);
+  final g = GameState(_Mem(), PlayerProfile.newPlayer(), now: () => _clock);
   for (final id in carrying) {
     g.profile.backpack = g.profile.backpack.withAdded(
       InventorySlot(defId: id),
@@ -67,21 +79,6 @@ void main() {
         reason:
             'kills a mutant that refuses with a generic line, names the '
             'proofs you DO have, or prints the raw item id',
-      );
-      expect(
-        await g.travelTo('pennycross'),
-        'The guard wants three proofs — you are missing Proof of the Brook.',
-        reason: 'kills a mutant that checks the gate but refuses silently',
-      );
-      expect(
-        g.profile.trip,
-        isNull,
-        reason: 'kills a mutant that reports the refusal and travels anyway',
-      );
-      expect(
-        g.profile.openedGates,
-        isEmpty,
-        reason: 'kills a mutant that banks the opening on a refused attempt',
       );
     });
 
@@ -110,95 +107,166 @@ void main() {
             'that comma-splices the list instead of joining it with "and"',
       );
     });
+  });
 
-    test('lets you through with all three, and records the opening', () async {
-      final g = _atHearthwood(carrying: _allThree);
+  group('⭐ the road to a shut gate is an ordinary road (2026-09-25)', () {
+    test('two of three proofs: travelTo departs, and says nothing', () async {
+      final g = _atHearthwood(carrying: [_woods, _foothills]);
 
-      expect(
-        g.gateRefusal('pennycross'),
-        isNull,
-        reason: 'kills a mutant that refuses even a complete set',
-      );
       expect(
         await g.travelTo('pennycross'),
         isNull,
-        reason: 'kills a mutant that returns a refusal on a legal trip',
+        reason:
+            'kills the 2026-09-21 departure check — the guard asks at the '
+            'gate now, not on the road out of Hearthwood',
       );
       expect(
         g.profile.trip?.toId,
         'pennycross',
-        reason: 'kills a mutant that opens the gate without starting the trip',
+        reason: 'kills a mutant that returns no refusal but never departs',
       );
       expect(
         g.profile.openedGates,
-        contains('pennycross'),
-        reason:
-            'kills a mutant that lets you through without recording it — the '
-            'gate would ask again on the next trip',
+        isEmpty,
+        reason: 'kills a mutant that opens a gate the player cannot unlock',
       );
     });
 
-    test('⭐ the proofs stay in the pack — shown, not spent', () async {
-      final g = _atHearthwood(carrying: _allThree);
-      await g.travelTo('pennycross');
+    test('⚠️ beginTravel departs too, with an empty pack', () async {
+      // Every caller goes through beginTravel in the end; a departure check
+      // left behind there would be the old rule with a door beside it.
+      final g = _atHearthwood();
 
-      for (final id in _allThree) {
+      expect(
+        await g.beginTravel('pennycross'),
+        isTrue,
+        reason: 'kills a mutant that keeps the gate check in beginTravel',
+      );
+      expect(
+        g.profile.trip?.toId,
+        'pennycross',
+        reason: 'kills a mutant that returns true but never departs',
+      );
+    });
+
+    test(
+      '⭐ all three carried: nothing opens and nothing is spent on the road',
+      () async {
+        final g = _atHearthwood(carrying: _allThree);
+        await g.travelTo('pennycross');
+
         expect(
-          g.profile.backpack.countOf(id),
-          1,
+          g.profile.openedGates,
+          isEmpty,
           reason:
-              'kills a mutant that consumes $id at the gate — the guard looks '
-              'at the proofs, he does not keep them (ruling 2026-09-21)',
+              'kills the old "opens as the trip STARTS" write — the gate opens '
+              'on Unlock, at the gate screen, and nowhere else',
         );
-      }
+        for (final id in _allThree) {
+          expect(
+            g.profile.backpack.countOf(id),
+            1,
+            reason:
+                'kills a mutant that spends $id at departure — the guard keeps '
+                'the proofs only when the player presses Unlock',
+          );
+        }
+      },
+    );
+
+    test('⭐ arriving at a shut gate stands you AT the gate', () async {
+      final g = _atHearthwood(carrying: [_woods]);
+      await g.travelTo('pennycross');
+      _clock = _clock.add(const Duration(days: 1));
+      await g.tick();
+
+      expect(
+        g.profile.locationId,
+        'pennycross',
+        reason: 'kills a mutant that bounces the player back on arrival',
+      );
+      expect(
+        g.profile.shutGateHere,
+        'pennycross',
+        reason:
+            'kills a mutant that lets a player with one proof straight into '
+            'the town — this is what puts the gate screen up',
+      );
+      expect(
+        g.profile.gateTurnBackId,
+        'hearthwood',
+        reason: 'kills a mutant that forgets which way the player came',
+      );
     });
 
     test('⭐ once opened, never asked again — even with an empty pack', () async {
-      // The real opening, through the real call, and then the proofs are gone:
-      // sold, banked, dropped on the road. The road stays open.
-      final g = _atHearthwood(carrying: _allThree);
+      final g = _atHearthwood();
+      g.profile.openedGates.add('pennycross');
+
       await g.travelTo('pennycross');
-      await g.cancelTravel();
-      g.profile.backpack = g.profile.backpack
-          .withRemovedFirst(_woods)
-          .withRemovedFirst(_brook)
-          .withRemovedFirst(_foothills);
-      expect(g.profile.backpack.used, 0, reason: 'the pack really is empty');
+      _clock = _clock.add(const Duration(days: 1));
+      await g.tick();
 
       expect(
-        g.gateRefusal('pennycross'),
+        g.profile.locationId,
+        'pennycross',
+        reason: 'the trip really arrived',
+      );
+      expect(
+        g.profile.shutGateHere,
         isNull,
         reason:
             'kills a mutant that re-checks the pack on an already-open gate — '
             '"once unlocked, the user no longer needs the proofs"',
       );
       expect(
-        await g.travelTo('pennycross'),
+        g.gateRefusal('pennycross'),
         isNull,
-        reason: 'kills a mutant that re-checks inside travelTo only',
-      );
-      expect(
-        g.profile.trip?.toId,
-        'pennycross',
-        reason: 'kills a mutant that allows the trip but never starts it',
+        reason: 'kills a mutant that asks the guard again after opening',
       );
     });
 
-    test('⚠️ beginTravel is gated too, not just travelTo', () async {
-      // The world map calls `travelTo`, but point-to-point travel goes
-      // straight to `beginTravel`. A check that lives only in the tab is a
-      // gate with a door beside it.
-      final g = _atHearthwood();
+    test(
+      '⚠️ openGateAt refuses short of a full set, and spends nothing',
+      () async {
+        final g = _atHearthwood(carrying: [_woods, _brook]);
+        await g.travelTo('pennycross');
+        _clock = _clock.add(const Duration(days: 1));
+        await g.tick();
+
+        expect(
+          await g.openGateAt('pennycross'),
+          isFalse,
+          reason: "kills a mutant whose Unlock skips the guard's check",
+        );
+        expect(
+          g.profile.backpack.countOf(_woods) +
+              g.profile.backpack.countOf(_brook),
+          2,
+          reason: 'kills a mutant that spends the proofs on a refused unlock',
+        );
+        expect(
+          g.profile.openedGates,
+          isEmpty,
+          reason: 'kills a mutant that opens the gate on a refused unlock',
+        );
+      },
+    );
+
+    test('⚠️ openGateAt refuses from anywhere but the gate', () async {
+      final g = _atHearthwood(carrying: _allThree);
 
       expect(
-        await g.beginTravel('pennycross'),
+        await g.openGateAt('pennycross'),
         isFalse,
-        reason: 'kills a mutant that gates only travelTo',
+        reason:
+            'kills a mutant that unlocks Pennycross from Hearthwood — the '
+            'guard is at the gate, not in your pocket',
       );
       expect(
-        g.profile.trip,
-        isNull,
-        reason: 'kills a mutant that returns false but departs anyway',
+        g.profile.backpack.countOf(_woods),
+        1,
+        reason: 'kills a mutant that spends before checking where you are',
       );
     });
   });
@@ -304,82 +372,55 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('a fresh profile sees Pennycross Gated', (tester) async {
+    const shutTag = 'Gated · show three proofs at the gate';
+
+    testWidgets('a fresh profile sees Pennycross gated, with what to show', (
+      tester,
+    ) async {
       await pumpTab(tester, _atHearthwood());
 
       expect(
-        find.text('Gated'),
+        find.text(shutTag),
         findsOneWidget,
         reason:
-            'kills a mutant that drops the chip, and one that shows it on '
-            'every neighbour rather than the one gated town',
+            'kills a mutant that keeps the bare "Gated" chip, drops the '
+            'chip, or shows it on every neighbour rather than the one town',
       );
       expect(
-        find.text('Gate open'),
-        findsNothing,
-        reason: 'kills a mutant that reads the refusal backwards',
-      );
-      expect(
-        tester.widget<Text>(find.text('Gated')).style?.color,
+        tester.widget<Text>(find.text(shutTag)).style?.color,
         AppColors.gold,
-        reason: 'kills a mutant that tints a shut gate like an open one',
+        reason: 'kills a mutant that tints a shut gate like an open road',
       );
     });
 
-    testWidgets('after the guard is satisfied it reads Gate open', (
+    testWidgets('⭐ once opened, the card carries no gate at all', (
       tester,
     ) async {
-      final g = _atHearthwood(carrying: _allThree);
-      await g.travelTo('pennycross');
-      await g.cancelTravel();
-
+      final g = _atHearthwood()..profile.openedGates.add('pennycross');
       await pumpTab(tester, g);
 
+      expect(
+        find.text(shutTag),
+        findsNothing,
+        reason: 'kills a mutant that leaves the shut tag on an open gate',
+      );
       expect(
         find.text('Gate open'),
-        findsOneWidget,
-        reason:
-            'kills a mutant that leaves the chip saying Gated forever — the '
-            'player has no way to see the road opened',
-      );
-      expect(
-        find.text('Gated'),
         findsNothing,
-        reason: 'kills a mutant that shows both states at once',
+        reason:
+            'kills a mutant that keeps the old "Gate open" chip — open means '
+            'gone (ruling 2026-09-25)',
       );
       expect(
-        tester.widget<Text>(find.text('Gate open')).style?.color,
-        AppColors.teal,
+        find.byIcon(Icons.lock_outline),
+        findsNothing,
         reason:
-            'kills a mutant that keeps the gold lock colour on an open gate',
+            'kills a mutant that drops the words but keeps the lock glyph — '
+            'no other neighbour of Hearthwood has a gate',
       );
     });
 
-    testWidgets('⭐ the chip cell does not move when the gate opens', (
-      tester,
-    ) async {
-      // Press-stability: "Gate open" is the wider word, so a self-sizing tag
-      // would shove the row it sits in sideways under a finger already coming
-      // down. Both states occupy one fixed cell.
-      await pumpTab(tester, _atHearthwood());
-      final shut = _tagCell(tester, 'Gated');
-
-      final g = _atHearthwood(carrying: _allThree);
-      await g.travelTo('pennycross');
-      await g.cancelTravel();
-      await pumpTab(tester, g);
-      final open = _tagCell(tester, 'Gate open');
-
-      expect(
-        open.width,
-        shut.width,
-        reason:
-            'kills a mutant that lets the tag size itself — the station and '
-            'element chips beside it would shift the moment the gate opened',
-      );
-    });
-
-    testWidgets('⚠️ a refused tap says why', (tester) async {
+    testWidgets('⭐ a tap with two proofs travels, no banner', (tester) async {
       final game = _atHearthwood(carrying: [_woods, _brook]);
       await pumpTab(tester, game);
 
@@ -387,26 +428,35 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text(
-          'The guard wants three proofs — you are missing Proof of the '
-          'Foothills.',
-        ),
-        findsOneWidget,
+        game.profile.trip?.toId,
+        'pennycross',
         reason:
-            'kills a mutant that swallows the refusal — a live-looking tile '
-            'that does nothing reads as a broken tile, not a shut gate',
+            'kills a mutant that still refuses the tap — the guard asks at '
+            'the gate now',
       );
       expect(
-        game.profile.trip,
-        isNull,
-        reason: 'kills a mutant that banners the refusal and travels anyway',
+        find.textContaining('The guard wants three proofs'),
+        findsNothing,
+        reason: 'kills a mutant that banners the old refusal and travels',
+      );
+    });
+
+    test('a gate with no ruled copy keeps the bare tag', () {
+      // Concordance's Sigil is prose with nothing behind it, and Rimeholt's
+      // totem has no ruled words yet; "three proofs" is the Primal guard's
+      // sentence and must not be borrowed.
+      expect(
+        Gates.shutTagFor(World.byId('concordance')),
+        'Gated',
+        reason: "kills a mutant that prints Pennycross's tag on every gate",
+      );
+      expect(
+        Gates.shutTagFor(World.byId('rimeholt')),
+        'Gated',
+        reason:
+            'kills a mutant that keys the long tag off "has gate items" '
+            "rather than off Pennycross's own copy",
       );
     });
   });
 }
-
-/// The box the gate tag occupies — the innermost `SizedBox` above [label],
-/// which is the fixed cell `_GateTag` reserves.
-Rect _tagCell(WidgetTester tester, String label) => tester.getRect(
-  find.ancestor(of: find.text(label), matching: find.byType(SizedBox)).first,
-);

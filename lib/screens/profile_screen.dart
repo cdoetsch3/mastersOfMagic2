@@ -4,6 +4,7 @@ import '../game/game_state.dart';
 import '../ui/app_theme.dart';
 import '../ui/rating_text.dart';
 import 'account_screen.dart';
+import 'achievements_screen.dart';
 import 'coming_soon_screen.dart';
 import 'gameplay_guide_screen.dart';
 import 'skills_screen.dart';
@@ -16,12 +17,16 @@ import 'skills_screen.dart';
 /// option A), which every tab already draws — so there is exactly one door
 /// in, and no tab has to spend a card on Skills or the rules again.
 ///
-/// ⭐ **Structure now, screens later** (same ruling). Achievements, the
-/// Bestiary and the Item library are rows with nothing behind them yet; they
-/// exist so the shape of the profile is settled, and each pushes
-/// [ComingSoonScreen]. ⚠️ Do **not** grow their content here — a trailing
-/// count that counts something real is the first step to a screen this file
-/// was told not to build.
+/// ⭐ **Structure now, screens later** (same ruling). The Bestiary and the
+/// Item library are rows with nothing behind them yet; they exist so the
+/// shape of the profile is settled, and each pushes [ComingSoonScreen].
+/// ⚠️ Do **not** grow their content here — a trailing count that counts
+/// something real is the first step to a screen this file was told not to
+/// build.
+///
+/// ⭐ **Achievements is real now** (ruling, Christian 2026-09-25): it pushes
+/// [AchievementsScreen], and its trailing `'n / N'` counts the catalogue —
+/// the one row whose count is not a placeholder.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -73,10 +78,8 @@ class ProfileScreen extends StatelessWidget {
                     _MenuRow(
                       icon: Icons.emoji_events,
                       label: 'Achievements',
-                      onTap: () => _push(
-                        context,
-                        const ComingSoonScreen('Achievements'),
-                      ),
+                      trailing: achievementCountLabel(p.achievements),
+                      onTap: () => _push(context, const AchievementsScreen()),
                     ),
                     const _RowDivider(),
                     _MenuRow(

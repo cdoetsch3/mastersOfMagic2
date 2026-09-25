@@ -1179,6 +1179,10 @@ Also: Practice vs AI section removed from the lobby.
 bar on the road, the Ranking row, dimmed travel cards inside an uncleared
 zone, the Umbral/Reliquary arrival text.
 
+## ✅ Playtest batch 2026-09-25
+
+* **Pennycross gate is a stop** (mockup B): `GateScreen` on arrival, Unlock spends the proofs and grants the first achievement, Papers in Order (`AchievementsScreen`, Profile 'n / N').
+
 ## Deferred / banked — do not build without an explicit ask
 
 - **📝 Creature sprites: the system works, the ART does not.** Built

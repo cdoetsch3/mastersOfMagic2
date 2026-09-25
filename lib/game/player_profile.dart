@@ -327,15 +327,27 @@ class PlayerProfile {
   /// (`GameLocation.gateItemIds`).
   ///
   /// ⭐ **Permanent, and the whole point of the field** (ruling, Christian
-  /// 2026-09-21). The proofs are *shown*, not spent: once an id is in here the
-  /// items are never looked for again, so selling, banking or losing them
-  /// cannot shut a road that is already open. A `bool` per gate in disguise —
+  /// 2026-09-21). Once an id is in here the items are never looked for again,
+  /// so selling, banking or losing them cannot shut a road that is already
+  /// open. 📝 Since 2026-09-25 only `GameState.openGateAt` writes it — on
+  /// Unlock at the gate, not at departure — and Pennycross's proofs are spent
+  /// in the same write. A `bool` per gate in disguise —
   /// a set, because gates are added faster than fields are.
   ///
   /// ⚠️ **Not [discoveredLocationIds]**. Seeing a place on the map and being
   /// allowed through its gate are different permissions, and conflating them
   /// would open Pennycross the moment its name appeared.
   Set<String> openedGates;
+
+  /// Ids of the achievements this character has earned (`achievements.dart`).
+  ///
+  /// ⭐ **Ids only** — the name and blurb live in the catalogue, so rewording
+  /// an achievement never touches a save. Written by
+  /// `GameState.grantAchievement` (and, atomically with the opening, by
+  /// `GameState.openGateAt`). ⚠️ Absent on every save before 2026-09-25, and
+  /// absent reads as "earned nothing" — the only direction that cannot hand
+  /// out something unearned.
+  Set<String> achievements;
 
   /// How many times this character has beaten each zone's **boss**.
   ///
@@ -484,6 +496,7 @@ class PlayerProfile {
     this.run,
     Set<String>? discoveredLocationIds,
     Set<String>? openedGates,
+    Set<String>? achievements,
     Map<String, int>? zoneClears,
     Map<String, int>? skillXp,
     List<LoadoutPreset>? presets,
@@ -510,6 +523,7 @@ class PlayerProfile {
   }) : locationId = locationId ?? World.startLocationId,
        discoveredLocationIds = discoveredLocationIds ?? {World.startLocationId},
        openedGates = openedGates ?? {},
+       achievements = achievements ?? {},
        zoneClears = zoneClears ?? {},
        skillXp = skillXp ?? {},
        presets = presets ?? [LoadoutPreset.starter('Loadout I')],
@@ -558,6 +572,53 @@ class PlayerProfile {
 
   GameLocation get location => World.byId(locationId);
 
+  /// The shut gate this character is standing at, or null — ⭐ **the whole
+  /// arrival seam of the gate ruling** (Christian, 2026-09-25, mockup B).
+  ///
+  /// Derived, not stored: standing (not travelling) at a place with
+  /// `gateItemIds` that is not in [openedGates]. The trip there is never
+  /// refused; it simply arrives here, and `GateCheckpoint` shows the gate
+  /// screen instead of the town for as long as this is non-null. Unlocking
+  /// ([openedGates] gains the id) or turning back (a [trip] begins) is what
+  /// clears it — no flag to set, and none to forget to clear.
+  ///
+  /// ⚠️ **A player who opened the gate under the old rule never sees the
+  /// screen** — their [openedGates] already holds the id.
+  ///
+  /// 📝 **Legacy, and deliberately left alone:** those players opened
+  /// Pennycross when the proofs were shown, not spent, so they still carry
+  /// them. Nothing takes them now — they may sell them; the screen they will
+  /// never see is the only place that would have asked.
+  ///
+  /// 📝 A save from before gates were enforced, standing in Pennycross with
+  /// nothing in [openedGates], DOES land at the gate on its next launch —
+  /// the direction `openedGates`' JSON note already chose ("asked to show
+  /// them once more"). [gateTurnBackId] gives it a way out.
+  String? get shutGateHere {
+    if (trip != null) return null;
+    final here = location;
+    if (here.gateItemIds.isEmpty) return null;
+    if (openedGates.contains(here.id)) return null;
+    return here.id;
+  }
+
+  /// Where 'Turn back' at a shut gate goes: [arrivedFromId], the way you came.
+  ///
+  /// ⚠️ **A legacy save has no [arrivedFromId]** (see the note there), so it
+  /// falls back to the first **town** among the gate's roads — Hearthwood,
+  /// for Pennycross — and failing that, the first road at all. Never null:
+  /// a gate with no way back would strand the player on a screen with one
+  /// working button.
+  String get gateTurnBackId {
+    final came = arrivedFromId;
+    if (came != null && came != locationId) return came;
+    final roads = location.connections;
+    return roads.firstWhere(
+      (id) => World.byId(id).isTown,
+      orElse: () => roads.first,
+    );
+  }
+
   LoadoutPreset get activePreset =>
       presets[activePresetIndex.clamp(0, presets.length - 1)];
 
@@ -581,6 +642,7 @@ class PlayerProfile {
     'run': run?.toJson(),
     'discoveredLocationIds': discoveredLocationIds.toList(),
     'openedGates': openedGates.toList(),
+    'achievements': achievements.toList(),
     'zoneClears': zoneClears,
     if (skillXp.isNotEmpty) 'skillXp': skillXp,
     'presets': presets.map((p) => p.toJson()).toList(),
@@ -658,6 +720,8 @@ class PlayerProfile {
           ?.cast<String>()
           .map(World.canonicalId)
           .toSet(),
+      // Absent before 2026-09-25 — see [achievements].
+      achievements: (json['achievements'] as List?)?.cast<String>().toSet(),
       // Absent on saves from before clears were tracked — an old character
       // reads as "has cleared nothing", which is the safe direction: it can
       // only withhold repeat-clear content, never grant it early.
