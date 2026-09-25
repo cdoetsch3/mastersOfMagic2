@@ -1978,7 +1978,9 @@ stat the item does not have, so a Master robe gains no crit.
 ⚠️ **`beltSlots` is exempt.** It is the one deliberately non-combat power
 axis (§6b.2); letting the crafting roll move it would turn quality into a
 carrying-capacity roll and make belt capacity differ between two clients
-that agreed on everything else.
+that agreed on everything else. ⭐ **`consumablePotencyPercent` is NOT
+exempt** (ruling 2026-09-25, §10.3d): it is how strong the bottles are, not
+how many you carry, and a belt whose roll moved nothing was the complaint.
 
 ⚠️ **Null quality reads as Standard (×1.00).** Dropped gear rolls an aspect
 instead of a quality (§9b.5b), and every instance minted before this ruling
@@ -2821,8 +2823,8 @@ massif the whole Ethereal quarter climbs.
 ✅ **Belt joins the nine, making ten** (§1). It is the one slot whose value is
 deliberately **not** combat power.
 
-✅ **What a belt grants today: `beltSlots`** — how many consumables reach a duel
-at all.
+✅ **What a belt grants: `beltSlots`** — how many consumables reach a duel
+at all — **and `consumablePotencyPercent`** (below).
 
 ✅ **No belt means NO slots** (ruling, 2026-08-17). `Carrying.baseBeltSlots` was
 2 and is now **0**: belt capacity comes only from a worn belt (📝 plus
@@ -2834,14 +2836,54 @@ Storeroom if the pack is full, and otherwise leaves it belted — an
 over-capacity belt is legal and unloadable, because deleting a potion to
 satisfy a number never is.
 
-📝 **More belt modifiers are expected**, shaping what those consumables *do*
-rather than how many fit. ⚠️ Not designed yet; *"potions from this belt heal 20%
-more"* was an illustration, not a spec, and is **not** implemented.
+✅ **Consumable potency** (ruling, Christian 2026-09-25 — *"approved as
+designed"*). Belts carried only capacity, so a Master roll equalled a Rough
+one. Potency is a percentage that multiplies **every consumable effect the
+wearer receives**: the flat heal of a Ration or a Draught, **each tick** of a
+Tonic's heal-over-time, and 📝 any potion effect still to come.
+
+| Belt | Tier | Base potency |
+|---|---|---|
+| Fawnhide | 1 | +10% |
+| Tuskhide | 2 | +15% |
+| Rimepelt, Emberhide | 3 | +20% |
+| Drownling, Palimpsest | 4 | +25% |
+| Corebiter, Penitent, Blankspine | 5 | +30% |
+
+- **Base = 5 × tier + 5**, then the §9b.9f quality multiplier every stat
+  already uses. ⚠️ The mockup quoted ×0.8 / ×1.0 / ×1.3 / ×1.6; the **shipped**
+  ladder is ×0.80 / ×1.00 / ×1.20 / ×1.40 and is what potency uses — so a
+  Master Fawnhide reads **+14%** and a Master Blankspine **+42%**.
+  ⚠️ `beltSlots` stays exempt from quality; potency is a strength, not a
+  capacity, and scales.
+- ⭐ **Order: the bottle, then the drinker.** `applyPotency` (the engine's one
+  helper, called by both the road's `AdventureRun.use` and the duel's drink)
+  scales the flat amount first; `healingReceivedPercent` then scales what
+  lands. The two **multiply**, each rounding half away from zero at its own
+  stage: a Draught's 30 at +16% is 35, then +10% received is **39** (the
+  additive 30 × 1.26 would be 38).
+- ⭐ **Tonics round per tick**, and on the road (where a Tonic pays its whole
+  course at once) the ticks are still scaled one at a time, so a Tonic heals
+  the same total on the road as over three duel turns.
+- ⚠️ **Potency rides the mage (`MageState.consumablePotencyPercent`), never
+  the drink's `ConsumableEffect`.** Only the item id crosses the wire and each
+  client resolves the effect from its own catalogue; the opponent's belt
+  arrives in their handshake gear, so both lockstep clients scale the same
+  drink identically.
+- The item dialog prints `Consumable potency (base 10%) +14%` (the base only
+  when quality moved it) and a dim worked example — *"A Sapwort Draught heals
+  30 → 34 with this belt."* — computed from the shipped Draught; the Inventory
+  stats panel shows the worn total.
+- ✅ **Still not combat power**, so the Belt's exemptions stand: it never
+  carries a set piece (§3.2), and it grants nothing that hits, blocks or dodges.
 
 ⭐ **The reason to want a second axis eventually:** with only capacity, belts
 are a strictly-better ladder — more slots always wins. A second axis makes
 wide-and-weak against narrow-and-strong a genuine build choice. ⚠️ Whatever it
 turns out to be, it should **trade against capacity**, not stack with it.
+📝 *Potency (2026-09-25) was ruled as designed and does climb with the
+ladder alongside capacity — its trade is the quality roll, not the tier.
+The trade-against-capacity axis remains open.*
 
 ✅ **Belts are a Tailoring product** (leather), which gives §6a.1's Tailoring a
 second product line and gives the new slot a maker.

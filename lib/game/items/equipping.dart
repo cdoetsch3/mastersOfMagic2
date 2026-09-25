@@ -135,7 +135,13 @@ abstract final class Equipping {
   /// renamed or added field shows up everywhere or nowhere, never in one
   /// screen and not another. Only non-zero lines are emitted (the export
   /// makes the same choice, for the same reason).
-  static List<String> describe(ItemModifiers m) => [
+  ///
+  /// [base] is the definition's own, un-rolled modifiers — the item dialog
+  /// passes it so a quality-scaled line can show where it started (see
+  /// [potencyLine]). ⚠️ Only consumable potency reads it today: it is the one
+  /// belt number quality moves (ruling 2026-09-25), and a Master belt that
+  /// printed only '+14%' would hide the roll that made it.
+  static List<String> describe(ItemModifiers m, {ItemModifiers? base}) => [
     if (m.maxHpBonus != 0) '+${m.maxHpBonus} max health',
     if (m.damagePerCast != 0) '+${m.damagePerCast} damage per cast',
     if (m.damagePerCharge != 0) '+${m.damagePerCharge} damage per charge spent',
@@ -151,7 +157,52 @@ abstract final class Equipping {
       '+${m.healingReceivedPercent}% healing received',
     if (m.regrowPercent != 0) 'Regrow ${m.regrowPercent}% health each turn',
     if (m.beltSlots != 0) '+${m.beltSlots} belt slots',
+    if (m.consumablePotencyPercent != 0)
+      potencyLine(
+        m.consumablePotencyPercent,
+        base: base?.consumablePotencyPercent,
+      ),
   ];
+
+  /// The consumable-potency stat line (ruling 2026-09-25):
+  /// 'Consumable potency +14%', or — when the quality roll moved it off the
+  /// definition — 'Consumable potency (base 10%) +14%'.
+  ///
+  /// ⚠️ The base only rides along when it DIFFERS, the same rule the dialog's
+  /// Value line follows: a Standard belt reading '(base 10%) +10%' teaches
+  /// that quality moves potency by restating the same number.
+  static String potencyLine(int percent, {int? base}) {
+    final signed = '${percent >= 0 ? '+' : ''}$percent%';
+    return base != null && base != percent
+        ? 'Consumable potency (base $base%) $signed'
+        : 'Consumable potency $signed';
+  }
+
+  /// The def id [potencyExample] quotes — the first Draught in the game.
+  static const potencyExampleId = 'sapwort_draught';
+
+  /// One worked example under a belt's stats: 'A Sapwort Draught heals
+  /// 30 → 34 with this belt.' — or null when [m] carries no potency.
+  ///
+  /// ⭐ **Computed, never typed.** The 30 is the shipped Draught's own
+  /// `ItemEffect.heal`, and the arrow's far side is `applyPotency` — the same
+  /// function both drinking doors call — so a retuned Draught or a retuned
+  /// belt cannot leave this sentence quoting an old number.
+  ///
+  /// ⚠️ The BELT's number alone: the wearer's healing-received gear is left
+  /// out on purpose, because this line describes the item in the hand, not
+  /// the wardrobe — the same "an item shows its contribution" rule as
+  /// [describe].
+  static String? potencyExample(ItemModifiers m) {
+    if (m.consumablePotencyPercent == 0) return null;
+    final draught = ItemCatalogue.tryById(potencyExampleId);
+    if (draught == null || draught is! Usable) return null;
+    final heal = (draught as Usable).effect.heal;
+    if (heal <= 0) return null;
+    return 'A ${ItemCatalogue.displayName(draught)} heals '
+        '$heal → ${applyPotency(heal, m.consumablePotencyPercent)} '
+        'with this belt.';
+  }
 
   /// Base hit chance, before any accuracy gear (ITEMS §9b.8).
   ///
@@ -179,8 +230,8 @@ abstract final class Equipping {
   /// the panel keeps saying what the gear is worth.
   ///
   /// ⚠️ **Only stats with a base get the total form.** Damage per cast, shield
-  /// strength, healing received, regrow and belt slots have no baseline to add
-  /// to (the mage starts at zero of each and nothing else grants them), so a
+  /// strength, healing received, regrow, belt slots and consumable potency
+  /// have no baseline to add to (the mage starts at zero of each and nothing else grants them), so a
   /// "total" would be the bonus wearing a disguise. They keep `+N`.
   ///
   /// ⚠️ Still emits only non-zero lines, exactly like [describe]: this panel is
@@ -204,6 +255,7 @@ abstract final class Equipping {
     'Healing received' => '+${l.bonus}% healing received',
     'Regrow' => 'Regrow ${l.bonus}% health each turn',
     'Belt slots' => '+${l.bonus} belt slots',
+    'Consumable potency' => potencyLine(l.bonus),
     _ => '${l.label} ${l.total}',
   };
 
@@ -308,6 +360,17 @@ abstract final class Equipping {
             total: '${m.beltSlots >= 0 ? '+' : ''}${m.beltSlots}',
             base: null,
             bonus: m.beltSlots,
+          ),
+        // ⭐ Pure-gear, like healing received: the mage starts at 0 and only
+        // a belt grants it (ruling 2026-09-25).
+        if (m.consumablePotencyPercent != 0)
+          (
+            label: 'Consumable potency',
+            total:
+                '${m.consumablePotencyPercent >= 0 ? '+' : ''}'
+                '${m.consumablePotencyPercent}%',
+            base: null,
+            bonus: m.consumablePotencyPercent,
           ),
       ];
 }

@@ -118,6 +118,7 @@ the framework both live under.
     ('healingReceivedPercent', _healingReceivedPercent),
     ('regrowPercent', _regrowPercent),
     ('beltSlots', _beltSlots),
+    ('consumablePotencyPercent', _consumablePotencyPercent),
   ];
 
   static int _accuracyBonus(ItemModifiers m) => m.accuracyBonus;
@@ -134,6 +135,8 @@ the framework both live under.
       m.healingReceivedPercent;
   static int _regrowPercent(ItemModifiers m) => m.regrowPercent;
   static int _beltSlots(ItemModifiers m) => m.beltSlots;
+  static int _consumablePotencyPercent(ItemModifiers m) =>
+      m.consumablePotencyPercent;
 
   /// The [ItemModifiers] an item carries, or null if its kind cannot carry
   /// any (ITEMS §4 grants modifiers to worn Equipment and socketed Gems

@@ -17,6 +17,12 @@ import 'item_def.dart';
 /// id and each looks the effect up locally, so neither can be handed a heal
 /// the catalogue does not actually sell.
 ///
+/// ⚠️ **The bottle's own numbers, never the drinker's belt.** Consumable
+/// potency (ruling 2026-09-25) is applied by the engine from
+/// `MageState.consumablePotencyPercent` via `applyPotency` — an effect built
+/// here with THIS player's potency baked in would be decoded by the opponent's
+/// client without it, and the lockstep would split on the first drink.
+///
 /// ⚠️ Reads the def's own [ItemEffect] rather than restating it. A duplicated
 /// "30" here would silently disagree with the tooltip the moment either is
 /// tuned — which is the same reason [ItemEffect.describe] exists.

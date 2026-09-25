@@ -99,7 +99,8 @@ abstract final class CinderpeakItems {
     slot: EquipSlot.belt,
     form: 'Belt',
     material: 'Tuskhide',
-    modifiers: ItemModifiers(beltSlots: 2),
+    // ⭐ Tier 2: potency 5 × 2 + 5 (ruling 2026-09-25).
+    modifiers: ItemModifiers(beltSlots: 2, consumablePotencyPercent: 15),
     salvage: [SalvageYield('tuskhide', 1, 2)],
     equipLevel: 11,
     value: 110,

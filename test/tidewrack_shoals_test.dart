@@ -1005,13 +1005,15 @@ void main() {
       ], reason: 'deflection spread across more than the gloves');
     });
 
-    test('⚠️ the belt carries capacity and nothing else', () {
-      // The Q1 ruling (ITEMS §6b.2): capacity is the one axis that is
-      // deliberately NOT combat power.
+    test('⚠️ the belt carries capacity, potency and nothing else', () {
+      // The Q1 ruling (ITEMS §6b.2), widened 2026-09-25: the belt is the one
+      // slot that is deliberately NOT combat power — capacity, plus the tier-4
+      // consumable potency (+25%).
       final belt = TidewrackShoalsItems.drownlingBelt;
       expect(belt.modifiers.beltSlots, 5, reason: 'the capacity ladder moved');
       expect(
-        belt.modifiers + const ItemModifiers(beltSlots: -5),
+        belt.modifiers +
+            const ItemModifiers(beltSlots: -5, consumablePotencyPercent: -25),
         isA<ItemModifiers>().having(
           (m) => m.isEmpty,
           'is otherwise empty',

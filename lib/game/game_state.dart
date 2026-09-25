@@ -1001,6 +1001,8 @@ class GameState extends ChangeNotifier {
       maxHp: maxHp,
       carried: profile.backpack.countOf(defId) > 0,
       healingReceivedPercent: equipmentTotals.healingReceivedPercent,
+      // ⭐ The belt's potency reaches the road too (ruling 2026-09-25).
+      consumablePotencyPercent: equipmentTotals.consumablePotencyPercent,
     );
     if (outcome.consumed) {
       // ⚠️ One write for both halves — the item leaving the pack and the HP it
@@ -1038,6 +1040,8 @@ class GameState extends ChangeNotifier {
       maxHp: maxHp,
       carried: profile.belt.loaded.contains(defId),
       healingReceivedPercent: equipmentTotals.healingReceivedPercent,
+      // ⭐ The belt's potency reaches the road too (ruling 2026-09-25).
+      consumablePotencyPercent: equipmentTotals.consumablePotencyPercent,
     );
     if (outcome.consumed) {
       // ⚠️ One write for both halves — the potion leaving the belt and the HP

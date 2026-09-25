@@ -217,6 +217,8 @@ abstract final class ContentExport {
       'healingReceivedPercent': m.healingReceivedPercent,
     if (m.regrowPercent != 0) 'regrowPercent': m.regrowPercent,
     if (m.beltSlots != 0) 'beltSlots': m.beltSlots,
+    if (m.consumablePotencyPercent != 0)
+      'consumablePotencyPercent': m.consumablePotencyPercent,
   };
 
   static Map<String, Object?> _effect(ItemEffect e) => {

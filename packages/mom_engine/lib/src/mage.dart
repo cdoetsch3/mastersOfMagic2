@@ -160,6 +160,19 @@ class MageState {
   /// route through it without knowing it exists.
   int healingReceivedPercent = 0;
 
+  /// Belt consumables this mage drinks are this % stronger — the belt's stat
+  /// (ruling, Christian 2026-09-25). ⭐ Scales the BOTTLE ([applyPotency]),
+  /// before [healingReceivedPercent] scales the drinker, so the two compose.
+  ///
+  /// ⚠️ **On the mage, not on the [ConsumableEffect].** Only the item id
+  /// crosses the wire, and each client resolves the effect from its own
+  /// catalogue — so an effect carrying the drinker's potency would be built
+  /// from the LOCAL player's belt for both sides, and the two lockstep clients
+  /// would heal the same drink differently. The mage is built from each
+  /// side's own gear (the opponent's arrives in the handshake), which is why
+  /// every other gear stat lives here too.
+  int consumablePotencyPercent = 0;
+
   /// Reduces an attacker's hit chance against this mage. Percent points.
   int dodge = 0;
 

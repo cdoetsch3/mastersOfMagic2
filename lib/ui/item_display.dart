@@ -52,9 +52,15 @@ Future<void> showItemDialog(
   // uses the roll is the disagreement this file exists to prevent. With no
   // instance (a Workbench preview of a thing not yet made) the base is the
   // honest answer.
+  final worn = Equipping.modifiersOf(def, instance);
   final lines = def is EquipmentDef
-      ? Equipping.describe(Equipping.modifiersOf(def, instance))
+      // ⭐ The definition rides along as `base` so a quality-scaled potency
+      // line can say where it started: '(base 10%) +14%' (ruling 2026-09-25).
+      ? Equipping.describe(worn, base: def.modifiers)
       : (def is Usable ? [(def as Usable).effect.describe] : const <String>[]);
+  // ⭐ One worked example under a belt (ruling 2026-09-25) — null for
+  // anything without potency, so a hat never grows the sentence.
+  final potencyExample = Equipping.potencyExample(worn);
   // ⚠️ Captured BEFORE the dialog, because the refusal is reported after it
   // pops — at which point `dialogContext` is gone.
   final banner = appBannerOf(context);
@@ -120,6 +126,12 @@ Future<void> showItemDialog(
             Text(
               line,
               style: const TextStyle(color: AppColors.teal, fontSize: 13),
+            ),
+          // ⚠️ Dim, under the stats: it explains a number, it is not one.
+          if (potencyExample != null)
+            Text(
+              potencyExample,
+              style: const TextStyle(color: AppColors.textDim, fontSize: 12),
             ),
           // ⭐ Below the stats, above the lore — the same descending ladder
           // the rest of this dialog reads in: what it is, what it does, what

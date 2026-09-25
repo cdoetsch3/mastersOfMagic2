@@ -486,12 +486,16 @@ class DuelEngine {
     var bite = 0;
     if (effect.healNow > 0) {
       // ⭐ **Flat** (ruling 2026-09-21): the bottle's own number, with no max-HP
-      // term and so no rounding and no 1-HP floor to apply — a catalogue that
-      // ships a positive heal has already promised at least 1. The signed delta
+      // term and so no 1-HP floor to apply — a catalogue that ships a positive
+      // heal has already promised at least 1. The signed delta
       // is what [MageState.heal] actually did: it scales by healing-received
       // (gear and Wither), caps at full, and under Blight it BITES — so the
       // event reports what landed rather than what the label promised.
-      final delta = mage.heal(effect.healNow);
+      // ⭐ Potency first — it is the bottle's strength — then [MageState.heal]
+      // applies healing received on top (ruling 2026-09-25).
+      final delta = mage.heal(
+        applyPotency(effect.healNow, mage.consumablePotencyPercent),
+      );
       healed = delta > 0 ? delta : 0;
       bite = delta < 0 ? -delta : 0;
     }
@@ -510,7 +514,12 @@ class DuelEngine {
       mage.statuses.removeWhere((s) => s is HealOverTimeStatus);
       mage.statuses.add(
         HealOverTimeStatus(
-          healPerTurn: effect.healPerTurn,
+          // ⭐ Each tick scaled and rounded on its own (ruling 2026-09-25) —
+          // baked in at the drink, because the belt cannot come off mid-duel.
+          healPerTurn: applyPotency(
+            effect.healPerTurn,
+            mage.consumablePotencyPercent,
+          ),
           turnsLeft: effect.hotTurns,
           source: effect.name,
         ),

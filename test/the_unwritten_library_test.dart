@@ -1015,7 +1015,7 @@ void main() {
     });
 
     test('⭐ the belt ladder\'s last authored rung is 9, and it is capacity '
-        'ONLY', () {
+        'and potency ONLY', () {
       // §4.7: "Belt ladder complete: … Penitent 8 → Blankspine 9", and
       // `Carrying.maxBeltSlots` is 10, so one rung is left deliberately.
       // ⚠️ ITEMS §6b.2 — the belt is the one slot whose value is NOT combat
@@ -1025,8 +1025,9 @@ void main() {
       expect(belt.slot, EquipSlot.belt);
       expect(
         belt.modifiers,
-        const ItemModifiers(beltSlots: 9),
-        reason: 'the belt carries something other than capacity',
+        // ⭐ Tier 5 potency, +30% (ruling 2026-09-25).
+        const ItemModifiers(beltSlots: 9, consumablePotencyPercent: 30),
+        reason: 'the belt carries something other than capacity and potency',
       );
     });
 

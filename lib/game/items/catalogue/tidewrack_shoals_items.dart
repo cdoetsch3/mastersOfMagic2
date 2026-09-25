@@ -173,9 +173,10 @@ abstract final class TidewrackShoalsItems {
 
   /// ⭐ Belt capacity ladder: Fawnhide 1 → Tuskhide 2 → Rimepelt 3 →
   /// Emberhide 4 → **Drownling 5** → Palimpsest 6. `Carrying.maxBeltSlots`
-  /// is 10. ⚠️ **Belts carry `beltSlots` and nothing else** — the Q1 ruling;
-  /// capacity is the one axis that is deliberately *not* combat power
-  /// (ITEMS §6b.2). Do not add stats to a belt.
+  /// is 10. ⚠️ **Belts carry `beltSlots` and consumable potency and
+  /// nothing else** — the Q1 ruling, widened 2026-09-25; the belt is the
+  /// one slot that is deliberately *not* combat power (ITEMS §6b.2). Do
+  /// not add combat stats to a belt.
   static const drownlingBelt = EquipmentDef(
     id: 'drownling_belt',
     rarity: Rarity.common,
@@ -183,7 +184,8 @@ abstract final class TidewrackShoalsItems {
     slot: EquipSlot.belt,
     form: 'Belt',
     material: 'Drownling',
-    modifiers: ItemModifiers(beltSlots: 5),
+    // ⭐ Tier 4: potency 5 × 4 + 5 (ruling 2026-09-25).
+    modifiers: ItemModifiers(beltSlots: 5, consumablePotencyPercent: 25),
     salvage: [SalvageYield('drownling_hide', 1, 2)],
     equipLevel: 38,
     value: 750,

@@ -88,6 +88,33 @@ class ConsumableEffect {
   String toString() => name;
 }
 
+/// What [amount] of consumable healing becomes under [potencyPercent] of
+/// **consumable potency** — the belt's stat (ruling, Christian 2026-09-25).
+///
+/// ⭐ **One helper for both doors.** The road (`AdventureRun.use`) and the
+/// duel ([MageState.consumablePotencyPercent], read by the drink) both call
+/// this, so a bottle cannot heal one number between fights and another in
+/// them.
+///
+/// ⚠️ **Applied to the bottle, BEFORE healing received.** Potency is what the
+/// potion holds; healing received is what the drinker takes from it — so the
+/// two compose multiplicatively, each rounding at its own stage (30 at +16%
+/// is 35, then +10% received is 39 — not the additive 30 × 1.26 = 38).
+///
+/// ⚠️ **Integer arithmetic on purpose**, the same round-half-away-from-zero
+/// `ItemModifiers.scaledBy` uses: `(30 * 1.16).round()` is at the mercy of
+/// binary floating point, `(30 * 116 + 50) ~/ 100` is not. A Tonic calls this
+/// **per tick**, so each tick rounds on its own.
+///
+/// ⭐ Zero potency and a zero heal are both the identity, and a heal never
+/// turns into a bite — a (📝 future) negative potency floors at 0.
+int applyPotency(int amount, int potencyPercent) {
+  if (amount <= 0 || potencyPercent == 0) return amount;
+  final scaled = amount * (100 + potencyPercent);
+  final rounded = (scaled + (scaled < 0 ? -50 : 50)) ~/ 100;
+  return rounded < 0 ? 0 : rounded;
+}
+
 /// Drink a belt consumable — the Draught, the Tonic (ITEMS §10.3b).
 ///
 /// ⭐ **It is your action for the turn.** That is the whole design: in a

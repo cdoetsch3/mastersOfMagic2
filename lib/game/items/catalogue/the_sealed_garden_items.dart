@@ -130,8 +130,9 @@ abstract final class SealedGardenItems {
   // ---- equipment --------------------------------------------------------
 
   /// ⭐ The belt-capacity ladder's Ethereal rung: … Corebiter 7 → Penitent
-  /// **8**. ⚠️ Belts carry `beltSlots` and nothing else — capacity is the one
-  /// axis that is deliberately *not* combat power (ITEMS §6b.2).
+  /// **8**. ⚠️ Belts carry `beltSlots` and consumable potency
+  /// (ruling 2026-09-25) and nothing else — the belt is the one slot
+  /// that is deliberately *not* combat power (ITEMS §6b.2).
   /// ⚠️ **`properName` stays null**: this is crafted (§5.1 #20), so its name
   /// is composed from material + form by the §9b.5a grammar rather than
   /// written down here where it could drift.
@@ -144,7 +145,8 @@ abstract final class SealedGardenItems {
     slot: EquipSlot.belt,
     form: 'Belt',
     material: 'Thornpenitent',
-    modifiers: ItemModifiers(beltSlots: 8),
+    // ⭐ Tier 5: potency 5 × 5 + 5 (ruling 2026-09-25).
+    modifiers: ItemModifiers(beltSlots: 8, consumablePotencyPercent: 30),
     salvage: [SalvageYield('thornpenitent_hide', 1, 2)],
     equipLevel: 52,
     value: 2190,

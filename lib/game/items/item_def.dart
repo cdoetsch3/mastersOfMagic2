@@ -61,8 +61,9 @@ enum EquipSlot {
   offHand,
 
   /// ⭐ The one slot whose value is deliberately **not** combat power. It
-  /// grants [ItemModifiers.beltSlots] today; 📝 further modifiers that shape
-  /// what belt consumables *do* are expected later (ITEMS §10.3d).
+  /// grants [ItemModifiers.beltSlots] and, since 2026-09-25,
+  /// [ItemModifiers.consumablePotencyPercent] — the first modifier that shapes
+  /// what belt consumables *do* (ITEMS §10.3d).
   belt;
 
   /// Whether a set piece can occupy this slot.
@@ -183,6 +184,17 @@ class ItemModifiers {
   /// wants more of. ⚠️ Clamped by `Carrying.maxBeltSlots`.
   final int beltSlots;
 
+  /// ⭐ **Consumable potency** — every consumable effect the wearer receives
+  /// is this % stronger: a Ration's or a Draught's flat heal, each tick of a
+  /// Tonic, and 📝 any potion effect still to come (ruling, Christian
+  /// 2026-09-25). The belt's stat, so a Master roll is finally worth more than
+  /// a Rough one.
+  ///
+  /// ⚠️ **Scaled by quality, unlike [beltSlots]** — it is a strength, not a
+  /// capacity. Applied to the bottle BEFORE [healingReceivedPercent], so the
+  /// two multiply (see `applyPotency` in the engine).
+  final int consumablePotencyPercent;
+
   const ItemModifiers({
     this.accuracyBonus = 0,
     this.dodge = 0,
@@ -197,6 +209,7 @@ class ItemModifiers {
     this.healingReceivedPercent = 0,
     this.regrowPercent = 0,
     this.beltSlots = 0,
+    this.consumablePotencyPercent = 0,
   });
 
   static const none = ItemModifiers();
@@ -216,6 +229,8 @@ class ItemModifiers {
     healingReceivedPercent: healingReceivedPercent + o.healingReceivedPercent,
     regrowPercent: regrowPercent + o.regrowPercent,
     beltSlots: beltSlots + o.beltSlots,
+    consumablePotencyPercent:
+        consumablePotencyPercent + o.consumablePotencyPercent,
   );
 
   /// This item's stats **as the quality roll made them** (ruling 2026-08-18):
@@ -225,6 +240,11 @@ class ItemModifiers {
   /// non-combat axis (ITEMS §6b.2), and letting quality move it would turn a
   /// crafting roll into a carrying-capacity roll — the exact power-creep lane
   /// §6b.2 exists to keep open *without* stats attached.
+  ///
+  /// ⭐ **[consumablePotencyPercent] DOES scale** (ruling 2026-09-25): the
+  /// belt is still non-combat, but potency is how strong the bottles are, not
+  /// how many you carry — and a quality roll that moved nothing on a belt was
+  /// the complaint the stat was ruled to answer.
   ///
   /// ⭐ **Null is Standard, not "no quality"** — dropped gear rolls an aspect
   /// instead (see [ItemInstance.quality]) and every instance minted before
@@ -258,6 +278,7 @@ class ItemModifiers {
       regrowPercent: s(regrowPercent),
       // ⚠️ Not scaled. See the doc above — this is the ruling, not an omission.
       beltSlots: beltSlots,
+      consumablePotencyPercent: s(consumablePotencyPercent),
     );
   }
 
@@ -288,6 +309,8 @@ class ItemModifiers {
       'healingReceivedPercent': healingReceivedPercent,
     if (regrowPercent != 0) 'regrowPercent': regrowPercent,
     if (beltSlots != 0) 'beltSlots': beltSlots,
+    if (consumablePotencyPercent != 0)
+      'consumablePotencyPercent': consumablePotencyPercent,
   };
 
   /// Reads [toJson]'s output back. ⭐ **Missing key → 0, null map → [none]** —
@@ -312,6 +335,7 @@ class ItemModifiers {
       healingReceivedPercent: read('healingReceivedPercent'),
       regrowPercent: read('regrowPercent'),
       beltSlots: read('beltSlots'),
+      consumablePotencyPercent: read('consumablePotencyPercent'),
     );
   }
 
@@ -328,7 +352,8 @@ class ItemModifiers {
       shieldStrengthPercent == 0 &&
       healingReceivedPercent == 0 &&
       regrowPercent == 0 &&
-      beltSlots == 0;
+      beltSlots == 0 &&
+      consumablePotencyPercent == 0;
 }
 
 // ---- the sealed root ---------------------------------------------------

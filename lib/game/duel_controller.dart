@@ -243,7 +243,11 @@ class DuelController extends ChangeNotifier {
           ..damagePerCast = gear.damagePerCast
           ..damagePerCharge = gear.damagePerCharge
           ..shieldStrengthPercent = gear.shieldStrengthPercent
-          ..healingReceivedPercent = gear.healingReceivedPercent;
+          ..healingReceivedPercent = gear.healingReceivedPercent
+          // ⭐ The belt's potency (ruling 2026-09-25) rides the MAGE, never the
+          // drink's ConsumableEffect: the opponent's belt arrives in their
+          // gear, and both lockstep clients must scale the same drink alike.
+          ..consumablePotencyPercent = gear.consumablePotencyPercent;
     // ⭐ Regrow rides the status machinery (item_status.dart), so the lane
     // sort and the HUD pip come for free. Permanent: gear is not taken off
     // mid-duel.

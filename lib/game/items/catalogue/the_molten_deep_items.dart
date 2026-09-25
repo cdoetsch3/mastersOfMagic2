@@ -94,7 +94,8 @@ abstract final class TheMoltenDeepItems {
     slot: EquipSlot.belt,
     form: 'Belt',
     material: 'Emberhide',
-    modifiers: ItemModifiers(beltSlots: 4),
+    // ⭐ Tier 3: potency 5 × 3 + 5 (ruling 2026-09-25).
+    modifiers: ItemModifiers(beltSlots: 4, consumablePotencyPercent: 20),
     equipLevel: 27,
     value: 380,
   );

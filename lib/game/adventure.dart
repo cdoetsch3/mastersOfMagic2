@@ -369,6 +369,7 @@ class AdventureRun {
     required int maxHp,
     required bool carried,
     int healingReceivedPercent = 0,
+    int consumablePotencyPercent = 0,
   }) {
     if (isOver) return const UseOutcome.refused('Not now.');
     if (!carried) return const UseOutcome.refused('You are not carrying that.');
@@ -385,7 +386,16 @@ class AdventureRun {
     // ⚠️ [maxHp] is no longer an input to the heal itself (ruling 2026-09-21:
     // potions are flat). It still bounds the result — `_heal` clamps to it —
     // so a full-health refusal is decided by the pool, never by the bottle.
-    var amount = effect.healFor();
+    //
+    // ⭐ **Belt potency first, then healing received** (ruling 2026-09-25):
+    // potency is what the bottle holds, healing received is what the drinker
+    // takes from it, so they multiply. A Tonic's ticks are scaled ONE AT A
+    // TIME, exactly as the duel scales them, so drinking it on the road
+    // restores what the duel's three ticks would have — never a rounding more.
+    var amount =
+        applyPotency(effect.heal, consumablePotencyPercent) +
+        applyPotency(effect.healPerTurn, consumablePotencyPercent) *
+            effect.healTurns;
     if (amount > 0 && healingReceivedPercent != 0) {
       amount = (amount * (100 + healingReceivedPercent) / 100).round();
     }

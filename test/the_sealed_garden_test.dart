@@ -1058,14 +1058,15 @@ void main() {
     });
 
     test('⭐ the belt ladder reaches EIGHT, and carries nothing else', () {
-      // §5.3: … Corebiter 7 → Penitent 8. ⚠️ Capacity is the one axis that is
-      // deliberately not combat power (ITEMS §6b.2), so a belt with a stat on
-      // it breaks the whole argument for the slot.
+      // §5.3: … Corebiter 7 → Penitent 8. ⚠️ The belt is the one slot that is
+      // deliberately not combat power (ITEMS §6b.2), so a belt with a combat
+      // stat on it breaks the whole argument for the slot. Capacity and
+      // consumable potency (tier 5: +30%, ruling 2026-09-25) are all it has.
       final belt = SealedGardenItems.penitentBelt;
       expect(belt.modifiers.beltSlots, 8);
       expect(
         belt.modifiers,
-        const ItemModifiers(beltSlots: 8),
+        const ItemModifiers(beltSlots: 8, consumablePotencyPercent: 30),
         reason: 'the belt has picked up a combat stat',
       );
       expect(belt.slot, EquipSlot.belt);

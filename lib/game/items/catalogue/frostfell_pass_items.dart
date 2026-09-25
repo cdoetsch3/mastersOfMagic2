@@ -81,9 +81,9 @@ abstract final class FrostfellPassItems {
   // ---- equipment --------------------------------------------------------
 
   /// ⭐ Belt capacity ladder: Fawnhide 1 → Tuskhide 2 → Rimepelt 3 →
-  /// Emberhide 4. ⚠️ Belts carry `beltSlots` and nothing else — the Q1
-  /// ruling; §6b.2's whole point is that capacity is the one axis that is
-  /// *not* combat power.
+  /// Emberhide 4. ⚠️ Belts carry `beltSlots` and consumable potency
+  /// (ruling 2026-09-25) and nothing else — §6b.2's whole point is that
+  /// the belt is the one slot that is *not* combat power.
   static const rimepeltBelt = EquipmentDef(
     id: 'rimepelt_belt',
     rarity: Rarity.common,
@@ -94,7 +94,8 @@ abstract final class FrostfellPassItems {
     slot: EquipSlot.belt,
     form: 'Belt',
     material: 'Rimepelt',
-    modifiers: ItemModifiers(beltSlots: 3),
+    // ⭐ Tier 3: potency 5 × 3 + 5 (ruling 2026-09-25).
+    modifiers: ItemModifiers(beltSlots: 3, consumablePotencyPercent: 20),
     salvage: [SalvageYield('rimepelt', 1, 2)],
     equipLevel: 23,
     value: 220,

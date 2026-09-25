@@ -108,8 +108,9 @@ abstract final class BuriedSkyItems {
   // ---- equipment --------------------------------------------------------
 
   /// ⭐ The belt-capacity ladder's Ethereal rung: … Palimpsest 6 → Corebiter
-  /// **7**. ⚠️ Belts carry `beltSlots` and nothing else — capacity is the one
-  /// axis that is deliberately *not* combat power (ITEMS §6b.2).
+  /// **7**. ⚠️ Belts carry `beltSlots` and consumable potency
+  /// (ruling 2026-09-25) and nothing else — the belt is the one slot
+  /// that is deliberately *not* combat power (ITEMS §6b.2).
   /// ⚠️ **`properName` stays null**: this is crafted (§5.1 #14), so its name
   /// composes from material + form by the §9b.5a grammar.
   static const corebiterBelt = EquipmentDef(
@@ -119,7 +120,8 @@ abstract final class BuriedSkyItems {
     slot: EquipSlot.belt,
     form: 'Belt',
     material: 'Corebiter',
-    modifiers: ItemModifiers(beltSlots: 7),
+    // ⭐ Tier 5: potency 5 × 5 + 5 (ruling 2026-09-25).
+    modifiers: ItemModifiers(beltSlots: 7, consumablePotencyPercent: 30),
     salvage: [SalvageYield('corebiter_hide', 1, 2)],
     equipLevel: 48,
     value: 1690,

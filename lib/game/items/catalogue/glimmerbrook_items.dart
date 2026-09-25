@@ -116,7 +116,8 @@ abstract final class GlimmerbrookItems {
 
   // ---- equipment ------------------------------------------------------
 
-  /// ⭐ The first belt in the game (ITEMS §10.3d) — capacity, nothing else.
+  /// ⭐ The first belt in the game (ITEMS §10.3d) — capacity, and since
+  /// 2026-09-25 consumable potency (tier 1: +10%).
   static const fawnhideBelt = EquipmentDef(
     id: 'fawnhide_belt',
     rarity: Rarity.common,
@@ -126,7 +127,8 @@ abstract final class GlimmerbrookItems {
     slot: EquipSlot.belt,
     form: 'Belt',
     material: 'Fawnhide',
-    modifiers: ItemModifiers(beltSlots: 1),
+    // ⭐ Tier 1: potency 5 × 1 + 5 (ruling 2026-09-25).
+    modifiers: ItemModifiers(beltSlots: 1, consumablePotencyPercent: 10),
     salvage: [SalvageYield('fawnhide', 1, 2)],
     equipLevel: 4,
     value: 40,

@@ -188,8 +188,9 @@ abstract final class GlassArchiveItems {
 
   /// ⭐ The belt-capacity ladder's Celestial rung: Fawnhide 1 → Tuskhide 2 →
   /// Rimepelt 3 → Emberhide 4 → … → Palimpsest **6**. ⚠️ Belts carry
-  /// `beltSlots` and nothing else — capacity is the one axis that is
-  /// deliberately *not* combat power (ITEMS §6b.2).
+  /// `beltSlots` and consumable potency (ruling 2026-09-25) and nothing
+  /// else — the belt is the one slot that is deliberately *not* combat
+  /// power (ITEMS §6b.2).
   /// ⚠️ **`properName` stays null**: this is crafted (§5.1 #23), so its name
   /// is composed from material + form by the §9b.5a grammar rather than
   /// written down here where it could drift.
@@ -202,7 +203,8 @@ abstract final class GlassArchiveItems {
     slot: EquipSlot.belt,
     form: 'Belt',
     material: 'Palimpsest',
-    modifiers: ItemModifiers(beltSlots: 6),
+    // ⭐ Tier 4: potency 5 × 4 + 5 (ruling 2026-09-25).
+    modifiers: ItemModifiers(beltSlots: 6, consumablePotencyPercent: 25),
     salvage: [SalvageYield('palimpsest_vellum', 1, 2)],
     equipLevel: 45,
     value: 1110,

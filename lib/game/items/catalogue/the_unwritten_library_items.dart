@@ -119,8 +119,9 @@ abstract final class UnwrittenLibraryItems {
 
   /// ⭐ The belt-capacity ladder's last authored rung: Fawnhide 1 → … →
   /// Palimpsest 6 → … → Penitent 8 → **Blankspine 9**. ⚠️ Belts carry
-  /// `beltSlots` and nothing else — capacity is the one axis that is
-  /// deliberately *not* combat power (ITEMS §6b.2).
+  /// `beltSlots` and consumable potency (ruling 2026-09-25) and nothing
+  /// else — the belt is the one slot that is deliberately *not* combat
+  /// power (ITEMS §6b.2).
   /// ⚠️ **`properName` stays null**: this is crafted (§5.1 #21), so its name
   /// is composed from material + form by the §9b.5a grammar rather than
   /// written down here where it could drift.
@@ -133,7 +134,8 @@ abstract final class UnwrittenLibraryItems {
     slot: EquipSlot.belt,
     form: 'Belt',
     material: 'Blankspine',
-    modifiers: ItemModifiers(beltSlots: 9),
+    // ⭐ Tier 5: potency 5 × 5 + 5 (ruling 2026-09-25).
+    modifiers: ItemModifiers(beltSlots: 9, consumablePotencyPercent: 30),
     salvage: [SalvageYield('blankspine_vellum', 1, 2)],
     equipLevel: 56,
     value: 3320,

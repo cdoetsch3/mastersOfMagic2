@@ -1093,7 +1093,8 @@ void main() {
       // number compiles, ships and reads as a balance decision nobody made.
       expect(
         BuriedSkyItems.corebiterBelt.modifiers,
-        const ItemModifiers(beltSlots: 7),
+        // ⭐ Plus tier 5's consumable potency, +30% (ruling 2026-09-25).
+        const ItemModifiers(beltSlots: 7, consumablePotencyPercent: 30),
         reason: 'the belt ladder\'s Ethereal rung moved off Palimpsest 6 → 7',
       );
       expect(
