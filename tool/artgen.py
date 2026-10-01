@@ -207,6 +207,10 @@ PRICE_USD = {
 # reported once and immediately, because retrying it just wastes the operator's
 # afternoon.
 RETRY_STATUSES = {429, 500, 502, 503, 504}
+# ⭐ Images a minute the account's tier allows — `--rpm` overrides. 5 is what
+# the 429 body reported for this organisation on 2026-10-01 ("Limit 5"); raise
+# it when the tier does, and the Pacer spaces requests to match.
+DEFAULT_RPM = 5.0
 MAX_ATTEMPTS = 8
 BACKOFF_BASE = 2.0
 BACKOFF_CAP = 60.0
@@ -219,6 +223,45 @@ BACKOFF_CAP = 60.0
 # backoff, and gets eight tries instead of four, so a run throttles itself
 # to the tier's limit rather than dying at it.
 _RETRY_HINT = re.compile(r"try again in\s+(\d+(?:\.\d+)?)\s*(ms|s)\b", re.I)
+
+
+class Pacer:
+    """Spaces request STARTS across every worker to a per-minute budget.
+
+    ⭐ **A limit is spent, not bounced off.** The image tier allows a fixed
+    number of images a minute ("Limit 5, Used 5" in the 429 body); four
+    workers each firing when ready and each retrying on their own clock
+    starved one another inside that window until one ran out of attempts
+    (2026-10-01, Umbral Wastes). So every worker takes a slot here before it
+    sends: slots are `60 / rpm` seconds apart, process-wide, whoever asks.
+    A 429 that still arrives (another process, a shared key) pushes the next
+    slot out by the server's hint for EVERY worker, not just the one it hit.
+
+    📝 Only [sleep] is injected; the clock is `time.monotonic`.
+    """
+
+    def __init__(self, rpm: float, *, sleep=time.sleep) -> None:
+        import threading
+
+        self.interval = 60.0 / rpm if rpm > 0 else 0.0
+        self._next_at = 0.0
+        self._lock = threading.Lock()
+        self._sleep = sleep
+
+    def take(self) -> None:
+        """Block until a slot is free, and claim it."""
+        with self._lock:
+            now = time.monotonic()
+            start = max(now, self._next_at)
+            self._next_at = start + self.interval
+            wait = start - now
+        if wait > 0:
+            self._sleep(wait)
+
+    def pause(self, seconds: float) -> None:
+        """Push every worker's next slot out — the server said wait."""
+        with self._lock:
+            self._next_at = max(self._next_at, time.monotonic() + seconds)
 
 
 def retry_hint_seconds(raw: bytes) -> float | None:
@@ -913,6 +956,7 @@ class OpenAIGenerator(ImageGenerator):
         quality: str = "medium",
         transport=http_post,
         sleep=time.sleep,
+        rpm: float = DEFAULT_RPM,
     ) -> None:
         if not api_key:
             raise GeneratorError(
@@ -925,6 +969,7 @@ class OpenAIGenerator(ImageGenerator):
         self.quality = quality
         self._transport = transport
         self._sleep = sleep
+        self._pacer = Pacer(rpm, sleep=sleep)
 
     # -- requests --
 
@@ -972,6 +1017,7 @@ class OpenAIGenerator(ImageGenerator):
         headers = dict(headers)
         headers["Authorization"] = f"Bearer {self._key}"
         for attempt in range(1, MAX_ATTEMPTS + 1):
+            self._pacer.take()
             status, raw = self._transport(url, data=data, headers=headers)
             if status == 200:
                 return self._decode(raw)
@@ -980,6 +1026,8 @@ class OpenAIGenerator(ImageGenerator):
                 hint = retry_hint_seconds(raw) if status == 429 else None
                 if hint is not None:
                     wait = max(wait, hint + 1.0)
+                    # ⭐ Everyone waits, not just this worker — see Pacer.
+                    self._pacer.pause(hint + 1.0)
                 print(
                     f"    HTTP {status} — retrying in {wait:.0f}s "
                     f"({attempt}/{MAX_ATTEMPTS - 1})"
@@ -1670,6 +1718,13 @@ def main(argv: list[str] | None = None) -> int:
         help="generations in flight at once (default 1; 4 is a sensible "
         "ceiling against the API's per-minute limits)",
     )
+    ap.add_argument(
+        "--rpm",
+        type=float,
+        default=DEFAULT_RPM,
+        help="images a minute your tier allows (default 5); requests are "
+        "paced to it across all --jobs workers",
+    )
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--no-open", action="store_true", help="do not open a browser")
     ap.add_argument("--status", action="store_true", help="table of every asset")
@@ -1736,7 +1791,9 @@ def main(argv: list[str] | None = None) -> int:
 
     generator = None
     if plan.make:
-        generator = OpenAIGenerator(read_api_key(), quality=args.quality)
+        generator = OpenAIGenerator(
+            read_api_key(), quality=args.quality, rpm=args.rpm
+        )
 
     post = PostProcessor(cutout=args.cutout)
     now = now_iso()

@@ -26,6 +26,7 @@ import pathlib
 import re
 import sys
 import tempfile
+import time
 import unittest
 from contextlib import redirect_stdout
 
@@ -561,10 +562,13 @@ class GeneratorTest(unittest.TestCase):
             ok_response(),
         )
         gen = artgen.OpenAIGenerator(
-            FAKE_KEY, transport=t, quality="medium", sleep=waits.append
+            FAKE_KEY, transport=t, quality="medium", sleep=waits.append, rpm=0
         )
         gen.generate("x", size="1024x1024", transparent=True)
-        self.assertEqual(len(waits), 1)
+        # ⚠️ A fake sleep does not move the clock, so the shared pause the
+        # 429 set is still ahead when the retry takes its slot and shows up
+        # as a second wait. The backoff itself is the first.
+        self.assertGreaterEqual(len(waits), 1)
         self.assertGreaterEqual(waits[0], 13.0, "kills ignoring the hint")
 
     def test_the_backoff_is_capped_and_a_5xx_takes_no_hint(self):
@@ -574,12 +578,43 @@ class GeneratorTest(unittest.TestCase):
             ok_response(),
         )
         gen = artgen.OpenAIGenerator(
-            FAKE_KEY, transport=t, quality="medium", sleep=waits.append
+            FAKE_KEY, transport=t, quality="medium", sleep=waits.append, rpm=0
         )
         gen.generate("x", size="1024x1024", transparent=True)
         self.assertEqual(len(waits), artgen.MAX_ATTEMPTS - 1)
         self.assertEqual(waits[0], 2.0, "a 5xx keeps the plain backoff")
         self.assertLessEqual(max(waits), artgen.BACKOFF_CAP, "kills an uncapped 2**8")
+
+    def test_requests_are_paced_to_the_images_per_minute_budget(self):
+        waits: list[float] = []
+        t = FakeTransport(ok_response(), ok_response(), ok_response())
+        gen = artgen.OpenAIGenerator(
+            FAKE_KEY, transport=t, quality="medium", sleep=waits.append, rpm=120
+        )
+        for _ in range(3):
+            gen.generate("x", size="1024x1024", transparent=True)
+        # The first slot is free; each later one is 60/120 = 0.5s after the
+        # previous START. ⚠️ The fake sleep does not move the clock, so the
+        # slots stack: ~0.5s, then ~1.0s. Kills a pacer that spaces nothing.
+        self.assertEqual(len(waits), 2)
+        self.assertGreater(waits[0], 0.4)
+        self.assertLessEqual(waits[0], 0.5)
+        self.assertGreater(waits[1], 0.9)
+        self.assertLessEqual(waits[1], 1.0)
+
+    def test_a_429_pushes_every_workers_next_slot_out(self):
+        waits: list[float] = []
+        t = FakeTransport(
+            error_response(429, "Please try again in 12s."), ok_response()
+        )
+        gen = artgen.OpenAIGenerator(
+            FAKE_KEY, transport=t, quality="medium", sleep=waits.append, rpm=1000
+        )
+        gen.generate("x", size="1024x1024", transparent=True)
+        # The backoff sleep of 13s, and the SHARED slot moved out by the hint
+        # — kills a pause that touches only the retrying worker.
+        self.assertGreaterEqual(waits[0], 13.0)
+        self.assertGreaterEqual(gen._pacer._next_at, time.monotonic() + 11.0)
 
     def test_a_bad_key_fails_once_and_says_nothing_about_the_key(self):
         gen, t = self._gen(error_response(401, f"Incorrect API key provided: {FAKE_KEY}"))

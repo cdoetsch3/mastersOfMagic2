@@ -72,6 +72,7 @@ by the API is redacted out of the message. `tool/test_artgen.py` asserts it.
 | `--review [--zone <z>]` | serve the contact sheet |
 | `--force` | regenerate even approved art |
 | `--quality low\|medium\|high` | generator quality, and what the estimate assumes |
+| `--rpm N` | images a minute your tier allows (default 5); every worker's requests are paced to it, and a 429 pauses them all for as long as the API asks |
 | `--jobs N` | generations in flight at once (default 1; 4 is a sensible ceiling). ⚠️ Per process only — never run two `--zone` commands at the same time, they share the ledger |
 | `--no-verify` | skip the three Dart contract suites after placement |
 
