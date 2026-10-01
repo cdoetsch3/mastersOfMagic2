@@ -24,6 +24,7 @@ import 'items/item_catalogue.dart';
 import 'items/item_def.dart';
 import 'items/item_instance.dart';
 import 'items/recipe_def.dart';
+import 'items/recipes/salvage_table.dart';
 import 'ladder/ladder_record.dart' as ladder_record;
 import 'skills.dart';
 import 'player_profile.dart';
@@ -1447,6 +1448,142 @@ class GameState extends ChangeNotifier {
     });
     await _earnLive();
     return null;
+  }
+
+  // ---- Salvage (ENCHANTING §6) -------------------------------------------
+  //
+  // ⭐ **An item action, not a bench recipe**: the piece is chosen from its
+  // own dialog, so there is no picker to build and no marker in
+  // `RecipeBook.all`. The markers (`EnchantingRecipes.salvage`) are still the
+  // source of the Enchanting gate and the XP — read here, never duplicated.
+  //
+  // ⭐ **Field-craftable** (§6): no station. The only "where" that matters is
+  // where the PIECE is — it must be in the pack, the one container the
+  // yield lands in.
+
+  /// Refused when the piece is worn (`salvageWhereRefusal`).
+  static const String salvageWornReason = 'Take it off first.';
+
+  /// Refused when the piece sits in a Storeroom (`salvageWhereRefusal`).
+  static const String salvageStoredReason =
+      'Bring it from the storeroom first.';
+
+  /// Refused when the instance is not equipment.
+  static const String salvageNotGearReason = 'Only gear can be salvaged.';
+
+  /// Refused when the motes and gems would not all fit.
+  static const String salvageNoRoomReason =
+      'No room in your pack for what comes out.';
+
+  /// Why [instanceId] cannot be salvaged FROM WHERE IT IS — null when it is
+  /// gear in the pack. ⭐ The half of [salvageRefusal] the item dialog greys
+  /// Salvage… with; the room half is the sheet's to explain beside the
+  /// yield (as the Enchant sheet, not the dialog, explains the motes).
+  ///
+  /// In order: gone, not gear, worn, stored, and — ⚠️ defensively — named
+  /// by no container at all, which `PlayerProfile`'s dangling-id sweep makes
+  /// impossible on a loaded save and which reads as gone.
+  String? salvageWhereRefusal(String instanceId) {
+    final instance = profile.itemInstances[instanceId];
+    if (instance == null) return 'That item is gone.';
+    if (ItemCatalogue.tryById(instance.defId) is! EquipmentDef) {
+      return salvageNotGearReason;
+    }
+    if (profile.equipped.containsValue(instanceId)) return salvageWornReason;
+    if (profile.storerooms.values.any(
+      (r) => r.instanceIds.contains(instanceId),
+    )) {
+      return salvageStoredReason;
+    }
+    if (_packIndexOf(instanceId) < 0) return 'That item is gone.';
+    return null;
+  }
+
+  /// Why [instanceId] cannot be salvaged right now — null when it can.
+  ///
+  /// ⭐ **Pure**: the Salvage sheet greys its button with this, and
+  /// [salvageItem] refuses with it. [salvageWhereRefusal] first, then room.
+  ///
+  /// ⭐ **Room is asked with the piece's own slot already free** — a full
+  /// pack whose twentieth item is the piece has a slot for a common's three
+  /// Dust, and refusing it would be the pack lying about itself (the
+  /// [unsocketRefusal] rule). ⚠️ All-or-nothing: every mote line AND every
+  /// gem must land, or nothing happens — a salvage that dropped the
+  /// overflow would destroy a gem the player socketed.
+  String? salvageRefusal(String instanceId) {
+    final where = salvageWhereRefusal(instanceId);
+    if (where != null) return where;
+    if (_salvagedPack(instanceId) == null) return salvageNoRoomReason;
+    return null;
+  }
+
+  /// What [instanceId] would return — `SalvageTable.yieldOfInstance`, the
+  /// only answer — or empty when the piece is gone.
+  List<InventorySlot> salvageYieldOf(String instanceId) {
+    final instance = profile.itemInstances[instanceId];
+    return instance == null ? const [] : SalvageTable.yieldOfInstance(instance);
+  }
+
+  /// The Enchanting XP salvaging [def] pays, by rarity (ENCHANTING §8.3,
+  /// manager 2026-10-01): common 6 · uncommon 12 · rare 25 · epic 50 ·
+  /// mythic and legendary 80.
+  ///
+  /// ⚠️ NOT `Skills.xpForRecipe` on the salvage marker: every marker is
+  /// Enchanting 1 with one input, so the §9b.9 formula pays 6 for an epic —
+  /// what refining one Dust pays. Salvage XP is a sink's reward for the
+  /// piece given up, and an epic given up is worth more than an oak wand;
+  /// the table stays under a Standard enchant's 120 so salvaging never
+  /// out-trains enchanting.
+  static int salvageXpFor(EquipmentDef def) => switch (def.rarity) {
+    Rarity.common => 6,
+    Rarity.uncommon => 12,
+    Rarity.rare => 25,
+    Rarity.epic => 50,
+    _ => 80,
+  };
+
+  /// Breaks the pack piece [instanceId] into motes of its zone's lead
+  /// element (and its gems, whole) — ENCHANTING §6. Returns
+  /// [salvageRefusal]'s words, or null when done.
+  ///
+  /// ⭐ ONE [_mutate]: the slot freed, the instance dropped from
+  /// `itemInstances` (⚠️ the one-pool rule — a slot removed with its instance
+  /// left behind leaks the piece into every save, as [discardFromBackpack]
+  /// warns), the yield added, the XP paid. Then [_earnLive], as a craft's.
+  Future<String?> salvageItem(String instanceId) async {
+    final no = salvageRefusal(instanceId);
+    if (no != null) return no;
+    final def =
+        ItemCatalogue.byId(profile.itemInstances[instanceId]!.defId)
+            as EquipmentDef;
+    // ⚠️ Non-null by [salvageRefusal]'s room check on this same pack.
+    final pack = _salvagedPack(instanceId)!;
+    final skill = CraftSkill.enchanting.name;
+    final gained = salvageXpFor(def);
+    await _mutate(() {
+      profile.backpack = pack;
+      profile.itemInstances.remove(instanceId);
+      profile.skillXp[skill] = (profile.skillXp[skill] ?? 0) + gained;
+    });
+    await _earnLive();
+    return null;
+  }
+
+  /// The pack slot holding [instanceId], or -1.
+  int _packIndexOf(String instanceId) =>
+      profile.backpack.slots.indexWhere((s) => s?.instanceId == instanceId);
+
+  /// The pack after salvaging [instanceId] — its slot emptied FIRST, then
+  /// every yield line added — or null when something would not fit. ⚠️ Pure;
+  /// [salvageRefusal] asks it and [salvageItem] writes what it returns.
+  Backpack? _salvagedPack(String instanceId) {
+    final index = _packIndexOf(instanceId);
+    if (index < 0) return null;
+    Backpack? pack = profile.backpack.withRemovedAt(index);
+    for (final slot in salvageYieldOf(instanceId)) {
+      pack = pack?.withAdded(slot);
+    }
+    return pack;
   }
 
   // ---- Adventures -------------------------------------------------------

@@ -1,5 +1,6 @@
-/// The Enchant… and Socket… entries an owned piece of gear offers in its item
-/// dialog (ENCHANTING_DESIGN §7), and the one button row both sheets share.
+/// The Enchant…, Socket… and Salvage… entries an owned piece of gear offers in
+/// its item dialog (ENCHANTING_DESIGN §6, §7), and the one button row the
+/// three sheets share.
 ///
 /// ⭐ **One builder for every dialog that shows owned gear** — the paper doll
 /// and the backpack both call [gearWorkActions], so a piece cannot be
@@ -13,6 +14,7 @@ import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
 import '../ui/app_theme.dart';
 import 'enchant_sheet.dart';
+import 'salvage_sheet.dart';
 import 'socket_sheet.dart';
 
 /// What `showItemDialog` takes as one live action.
@@ -27,7 +29,11 @@ const String enchantActionLabel = 'Enchant…';
 /// The label of the item dialog's socket action.
 const String socketActionLabel = 'Socket…';
 
-/// Enchant… on every owned piece of gear, and Socket… on one with sockets.
+/// The label of the item dialog's salvage action.
+const String salvageActionLabel = 'Salvage…';
+
+/// Enchant… on every owned piece of gear, Socket… on one with sockets, and
+/// Salvage… on every one (last — the act that destroys the piece).
 ///
 /// ⭐ **Away from the station, greyed with the reason — never hidden**
 /// (2026-08-17's rule): a missing Enchant… teaches the player that gear cannot
@@ -87,10 +93,28 @@ const String socketActionLabel = 'Socket…';
       unavailable.add((label: socketActionLabel, reason: socketNo));
     }
   }
+  // ⭐ Salvage is field-craftable (§6): no station, so the only thing that
+  // greys the entry is where the PIECE is — worn ('Take it off first.') or
+  // stored. ⚠️ Room is the sheet's to explain, beside the yield it would not
+  // fit: a dialog greyed 'No room …' would hide what the piece is worth.
+  final salvageNo = game.salvageWhereRefusal(id);
+  if (salvageNo == null) {
+    actions.add((
+      label: salvageActionLabel,
+      run: () async {
+        if (context.mounted) {
+          await showSalvageSheet(context, game: game, instanceId: id);
+        }
+        return null;
+      },
+    ));
+  } else {
+    unavailable.add((label: salvageActionLabel, reason: salvageNo));
+  }
   return (actions: actions, unavailable: unavailable);
 }
 
-/// One button and the line beside it — the commit row of both sheets.
+/// One button and the line beside it — the commit row of every gear sheet.
 ///
 /// ⭐ **Press-stable** (house rule): the button sits in a fixed-width cell and
 /// the [note] in a fixed-height one, so a refusal arriving, changing or
@@ -104,8 +128,8 @@ class ReservedActionRow extends StatelessWidget {
   /// change ('Replaces Charred (Lesser).'), or empty.
   final String note;
 
-  /// The button's cell width — wide enough for the longest label either
-  /// sheet uses, so swapping 'Put in' for 'Take out' moves nothing either.
+  /// The button's cell width — wide enough for the longest label any sheet
+  /// uses, so swapping 'Put in' for 'Take out' moves nothing either.
   static const double buttonWidth = 112;
 
   /// Two lines of 12px text.

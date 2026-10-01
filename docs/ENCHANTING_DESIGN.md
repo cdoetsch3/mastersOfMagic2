@@ -318,7 +318,8 @@ piece is a trap).
 - **Craft screen**: Enchanting's Refine / Transmute / Salvage and Jewelry's
   Cut are ordinary recipes, so they use the existing screen with no new UI.
   Salvage needs a picker for *which* instance (a recipe whose input is "one
-  piece of equipment") — the one new recipe shape.
+  piece of equipment") — the one new recipe shape. ⚠️ As built, Salvage is
+  an **item-dialog action** instead (§8.3): the dialog is the picker.
 - **Item dialog**: two new actions on equipment, shown greyed with a reason
   away from the station: **Enchant…** (element and tier picker with the
   cost and the stat it grants, in the words of the §2.5a table) and
@@ -459,16 +460,18 @@ piece is a trap).
      done here): when any input is not `isExact`, gate on
      `recipe.satisfiedBy(counts, skillLevel: level, piece: chosen)` and
      consume exactly `recipe.drawFrom(counts, skillLevel: level)` instead of
-     each line's `defId × count`; for a salvage marker, remove the chosen
+     each line's `defId × count`. ~~For a salvage marker, remove the chosen
      instance and add `SalvageTable.yieldOfInstance(instance)`, then add the
-     salvage markers to `RecipeBook.all`. 📝 `Skills.xpForRecipe` reads the
+     salvage markers to `RecipeBook.all`.~~ ⚠️ Superseded: Salvage shipped as
+     an item-dialog action (§8.3 below), so the markers stay OUT of the book
+     and `craft` refuses one. 📝 `Skills.xpForRecipe` reads the
      static `count` (4) for a transmute at every level — a ruling whether a
      master's cheaper transmute should pay less.
    - Tests: `test/enchanting_recipes_test.dart`; the sink and cut buckets in
      `test/value_conservation_test.dart`.
 3. ✅ **Surfaces** (one lane, built 2026-10-01 — Christian verifies in the
-   browser): Enchant… and Socket… on the item dialog, stat lines. The
-   salvage picker waits for lane 2's salvage recipe.
+   browser): Enchant… and Socket… on the item dialog, stat lines; then
+   Salvage… (below), which replaced the §7 salvage picker.
    - Mutations: `GameState.enchantItem` / `socketGem` / `unsocketGem`, each
      with a PURE refusal (`enchantRefusal` / `socketRefusal` /
      `unsocketRefusal`) the sheets grey their buttons with. Instance
@@ -493,6 +496,50 @@ piece is a trap).
      press-stable button cell), `enchant_sheet.dart`, `socket_sheet.dart`;
      the item dialog prints `Equipping.describeInstance` for an owned piece.
    - Tests: `test/enchanting_surfaces_test.dart`.
+   - ✅ **Salvage… on the item dialog** (built 2026-10-01 — Christian
+     verifies in the browser). ⭐ **An item action, not a bench recipe**: the
+     dialog already names the piece, so §7's "picker for which instance" is
+     the dialog itself, and the six markers stay out of `RecipeBook.all`.
+     - Mutation: `GameState.salvageItem(instanceId)` with the pure
+       `salvageRefusal`, whose first half `salvageWhereRefusal` is what the
+       dialog greys with. **Field-craftable — no station** (§6). In order:
+       'That item is gone.' · 'Only gear can be salvaged.' · 'Take it off
+       first.' (worn) · 'Bring it from the storeroom first.' (in any town's
+       Storeroom) · 'No room in your pack for what comes out.'. ⭐ Room is
+       asked with **the piece's own slot already empty**, then every yield
+       line through `Backpack.withAdded` (Dust tops up stacks at 25, Shards
+       at 5, Crystals and gems 1 a slot), all-or-nothing — a gem never drops
+       on the floor. ONE `_mutate`: the pack swapped, the instance removed
+       from `itemInstances` (the one-pool rule), the XP paid; `_earnLive`
+       after.
+     - Yield: `SalvageTable.yieldOfInstance`, read through
+       `GameState.salvageYieldOf` — the sheet and the write print and add the
+       same list.
+     - XP: ⭐ shipped as the §9b.9 recipe formula on the matching
+       `salvage_<rarity>` marker (`GameState.salvageXpFor` →
+       `Skills.xpForRecipe`): Enchanting 1, one input ⇒ **6 XP at every
+       rarity** (common 6 · uncommon 6 · rare 6 · epic 6 · mythic 6 ·
+       legendary 6). ✅ applied at merge (manager, 2026-10-01) **Too little above common**: 6 XP is what refining
+       ONE Dust pays (a 50-Dust Shard refine pays 300), and it says an epic
+       teaches as much as an oak wand. Proposed instead, a flat table by
+       rarity — **common 6 · uncommon 12 · rare 25 · epic 50 ·
+       mythic/legendary 80** — doubling with rarity and keeping epic under a
+       Standard enchant's 120. Not shipped; a ruling.
+     - UI: `lib/screens/gear_work_actions.dart` (`salvageActionLabel`
+       'Salvage…', last of the gear actions — the one that destroys the
+       piece; greyed 'Salvage…: Take it off first.' on the paper doll),
+       `lib/screens/salvage_sheet.dart`: the piece's name; the yield on one
+       line — '3 Flora Dust', '1 Pyro Shard · 10 Pyro Dust', '3 Sanctus Dust
+       · Lesser Pyro Gem ×2' (a repeated gem once, with the Socket sheet's
+       count mark); the warning 'The piece is destroyed.', or on an
+       enchanted piece 'The piece is destroyed. Its Charred enchant goes
+       with it.' (⚠️ an aspected drop with no enchant gets the plain line —
+       an aspect is not an enchant); then `ReservedActionRow` 'Salvage',
+       greyed with the refusal, otherwise noting '+6 Enchanting XP.'. The
+       yield and warning sit in fixed two-line boxes, so nothing above the
+       button can move it. A press that lands closes the sheet with no
+       banner — the pack shows the motes arriving.
+     - Tests: `test/salvage_test.dart`.
 4. **Re-sim gate** before Greater enchant and Greater gem numbers are final
    (`tool/balance_probe_test.dart` with a full Greater kit).
 
