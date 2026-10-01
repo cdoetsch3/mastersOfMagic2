@@ -56,6 +56,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import concurrent.futures
 import hashlib
 import html
 import http.server
@@ -1233,24 +1234,62 @@ def run_zone(
     plan: Plan,
     *,
     now: str,
+    jobs: int = 1,
 ) -> list[str]:
-    """Generate, place, verify. Returns the ids that landed on their path."""
+    """Generate, place, verify. Returns the ids that landed on their path.
+
+    ⭐ **[jobs] generations in flight at once, one ledger writer.** A picture
+    is several seconds of waiting on the API and nothing else, so a zone of
+    twenty-odd is twenty-odd serial waits; with `--jobs 4` the calls overlap.
+    Only the network call runs on a worker thread — the raw is written, the
+    ledger updated and saved, and progress printed by THIS thread, in
+    submission order, so `art/state.json` has exactly one writer and the
+    output reads top to bottom like the serial run did.
+
+    ⚠️ **A failure keeps what was paid for.** The API refusing one prompt
+    (the safety filter, a 5xx) raises after every picture already in flight
+    has been collected and recorded; only the calls that had not started are
+    cancelled. Nothing bought is lost, and the next run re-pixelates rather
+    than re-buys.
+
+    ⚠️ Parallelism is per PROCESS, never across processes: two `--zone` runs
+    at once would both rewrite `art/state.json` and one would silently win.
+    """
     landed: list[str] = []
     touched: set[tuple[str, str]] = set()
+    failure: GeneratorError | None = None
 
-    for asset in plan.make:
-        print(f"  {asset.kind:9} {asset.asset_id}")
-        blob = generate_one(asset, generator, ledger)
-        asset.source_path.parent.mkdir(parents=True, exist_ok=True)
-        asset.source_path.write_bytes(blob)
-        if asset.transparent and not has_alpha(blob):
-            print(
-                "    ⚠️  the raw has no alpha channel — pass --cutout so "
-                "pixelate strips the background"
-            )
-        ledger.record_generated(asset, model=generator.name, now=now)
-        ledger.save()
-        touched.add((asset.kind, asset.zone))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, jobs)) as pool:
+        futures = [
+            (asset, pool.submit(generate_one, asset, generator, ledger))
+            for asset in plan.make
+        ]
+        for asset, fut in futures:
+            # ⚠️ After a failure, drop only what never started. `cancel()` is
+            # False for a call already running, and that one is money spent —
+            # wait for it and record it like any other.
+            if failure is not None and fut.cancel():
+                continue
+            print(f"  {asset.kind:9} {asset.asset_id}")
+            try:
+                blob = fut.result()
+            except GeneratorError as exc:
+                print(f"    ✖ {exc}")
+                failure = failure or exc
+                continue
+            asset.source_path.parent.mkdir(parents=True, exist_ok=True)
+            asset.source_path.write_bytes(blob)
+            if asset.transparent and not has_alpha(blob):
+                print(
+                    "    ⚠️  the raw has no alpha channel — pass --cutout so "
+                    "pixelate strips the background"
+                )
+            ledger.record_generated(asset, model=generator.name, now=now)
+            ledger.save()
+            touched.add((asset.kind, asset.zone))
+
+    if failure is not None:
+        raise failure
 
     for asset in plan.reprocess:
         print(f"  {asset.kind:9} {asset.asset_id}  (raw already on disk)")
@@ -1602,6 +1641,13 @@ def main(argv: list[str] | None = None) -> int:
         help="print the plan and an estimated cost, touch no network",
     )
     ap.add_argument("--review", action="store_true", help="serve the review sheet")
+    ap.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="generations in flight at once (default 1; 4 is a sensible "
+        "ceiling against the API's per-minute limits)",
+    )
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--no-open", action="store_true", help="do not open a browser")
     ap.add_argument("--status", action="store_true", help="table of every asset")
@@ -1673,7 +1719,9 @@ def main(argv: list[str] | None = None) -> int:
     post = PostProcessor(cutout=args.cutout)
     now = now_iso()
     try:
-        landed = run_zone(source, ledger, generator, post, plan, now=now)
+        landed = run_zone(
+            source, ledger, generator, post, plan, now=now, jobs=args.jobs
+        )
     except GeneratorError as exc:
         print(f"\n✖ {exc}", file=sys.stderr)
         return 1

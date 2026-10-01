@@ -832,6 +832,107 @@ class GenerateOneTest(unittest.TestCase):
         self.assertNotIn("Revise the attached image", gen.prompt)
 
 
+# ---- the run loop --------------------------------------------------------
+
+
+class _NoPost:
+    """A PostProcessor that does nothing — the run loop's placement step is
+    pixelate's, not this test's."""
+
+    def run(self, kind, zone):
+        pass
+
+
+class _SlowGenerator(artgen.ImageGenerator):
+    """Counts how many generations overlap, and refuses one id on demand.
+
+    Each call holds for a few milliseconds so overlapping calls are observable;
+    the peak is read back as `most_in_flight`.
+    """
+
+    name = "slow"
+
+    def __init__(self, *, refuse: str | None = None):
+        import threading
+
+        self._lock = threading.Lock()
+        self.in_flight = 0
+        self.most_in_flight = 0
+        self.refuse = refuse
+
+    def generate(self, prompt, *, size, transparent):
+        import time
+
+        with self._lock:
+            self.in_flight += 1
+            self.most_in_flight = max(self.most_in_flight, self.in_flight)
+        try:
+            time.sleep(0.03)
+            if self.refuse and self.refuse in prompt:
+                raise artgen.GeneratorError("the image API rejected the prompt")
+            return ONE_PIXEL_PNG
+        finally:
+            with self._lock:
+                self.in_flight -= 1
+
+    def edit(self, prompt, *, size, transparent, image):
+        return self.generate(prompt, size=size, transparent=transparent)
+
+
+class RunZoneTest(unittest.TestCase):
+    """`--jobs` overlaps the network calls and nothing else."""
+
+    def setUp(self):
+        self.src = source()
+        self.ledger, self._tmp = temp_ledger()
+        self._raws = tempfile.TemporaryDirectory()
+        raws = pathlib.Path(self._raws.name)
+        self.assets = [
+            _relocated(a, raws / f"{a.asset_id}.png")
+            for a in self.src.assets(zone="glimmerbrook", kind="creature")
+        ]
+
+    def tearDown(self):
+        self._raws.cleanup()
+        self._tmp.cleanup()
+
+    def _run(self, gen, jobs):
+        plan = artgen.Plan(make=list(self.assets))
+        return artgen.run_zone(
+            self.src, self.ledger, gen, _NoPost(), plan, now="T0", jobs=jobs
+        )
+
+    def test_jobs_overlap_the_generations(self):
+        gen = _SlowGenerator()
+        self._run(gen, jobs=4)
+        self.assertGreaterEqual(gen.most_in_flight, 2, "kills a pool of one")
+        for a in self.assets:
+            self.assertEqual(self.ledger.status(a), "generated")
+            self.assertTrue(a.source_path.exists(), a.asset_id)
+
+    def test_jobs_one_is_the_serial_run(self):
+        gen = _SlowGenerator()
+        self._run(gen, jobs=1)
+        self.assertEqual(gen.most_in_flight, 1, "kills a pool that ignores jobs")
+
+    def test_a_refusal_keeps_every_picture_already_bought(self):
+        # ⚠️ The safety filter refusing one prompt mid-zone (Both-Sided Thing,
+        # 2026-09-30) must not throw away the pictures beside it in flight.
+        victim = self.assets[3]
+        # ⚠️ The TAIL of the prompt: every prompt opens with the same quoted
+        # house style, so a head match would refuse the whole zone.
+        gen = _SlowGenerator(refuse=victim.prompt[-80:])
+        with self.assertRaises(artgen.GeneratorError):
+            self._run(gen, jobs=3)
+        self.assertEqual(self.ledger.status(victim), "pending")
+        self.assertFalse(victim.source_path.exists())
+        # Everything submitted before the victim was in flight or done when it
+        # failed, so it is recorded — kills "raise on first error, drop the rest".
+        for a in self.assets[:3]:
+            self.assertEqual(self.ledger.status(a), "generated", a.asset_id)
+            self.assertTrue(a.source_path.exists(), a.asset_id)
+
+
 # ---- the review sheet ----------------------------------------------------
 
 
