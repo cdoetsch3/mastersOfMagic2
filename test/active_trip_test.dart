@@ -233,6 +233,41 @@ void main() {
     });
   });
 
+  // ⭐ Ruling 2026-09-30 (note 12): one Travel for a chained trip. The trip
+  // carries every stop, timed from departure.
+  test(
+    '⭐ a far town is one trip, with every stop and cumulative seconds',
+    () async {
+      final game = fresh();
+      expect(
+        await game.beginTravel('forgeholm'),
+        isTrue,
+        reason: 'kills a mutant that keeps the neighbours-only check',
+      );
+      final trip = game.profile.trip!;
+      expect(trip.stops, [
+        'hearthwood',
+        'pennycross',
+        'old_quarry',
+        'forgeholm',
+      ], reason: 'kills a mutant that keeps only the first leg, or the ends');
+      const leg = TravelTimes.perLegSeconds;
+      expect(
+        trip.secondsAtStop,
+        [0, leg, 2 * leg, 3 * leg],
+        reason:
+            'kills the not-cumulative mutant ([0, leg, leg, leg]), which '
+            'would arrive at Forgeholm one leg after leaving',
+      );
+      clock = noon.add(const Duration(seconds: 2 * leg));
+      expect(
+        game.currentLocationId,
+        'old_quarry',
+        reason: 'kills a mutant that times stops from the wrong end',
+      );
+    },
+  );
+
   group('cancelling', () {
     test('drops you at the LAST STOP REACHED, not back at the start', () async {
       // ⭐ The ruling: A -> B -> C -> D cancelled between B and C leaves you at

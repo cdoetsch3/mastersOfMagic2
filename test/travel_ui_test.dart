@@ -160,6 +160,69 @@ void main() {
     expect(find.textContaining('On the road from $second'), findsOneWidget);
   });
 
+  // ⭐ Ruling 2026-09-30 (note 12): a chained trip says what is still ahead.
+  testWidgets('⭐ a chained trip names its next stop, then the rest', (
+    tester,
+  ) async {
+    final game = await pumpTab(tester);
+    await game.beginTravel('forgeholm');
+    await tester.pump();
+    final trip = game.profile.trip!;
+    expect(trip.stops, [
+      'hearthwood',
+      'pennycross',
+      'old_quarry',
+      'forgeholm',
+    ], reason: 'the premise: the four-stop chain');
+
+    expect(
+      find.text('Next: Pennycross · then Old Quarry, Forgeholm'),
+      findsOneWidget,
+      reason: 'kills a mutant that names only the destination',
+    );
+    expect(
+      find.text('On the road from Hearthwood'),
+      findsOneWidget,
+      reason:
+          'kills a mutant that names the next stop twice — the line below '
+          'already says it',
+    );
+
+    clock = noon.add(Duration(seconds: trip.secondsAtStop[1] + 1));
+    await tester.pump(const Duration(seconds: 1));
+    expect(
+      find.text('Next: Old Quarry · then Forgeholm'),
+      findsOneWidget,
+      reason: 'kills a mutant that never moves on from the first leg',
+    );
+
+    clock = noon.add(Duration(seconds: trip.secondsAtStop[2] + 1));
+    await tester.pump(const Duration(seconds: 1));
+    expect(
+      find.text('Next: Forgeholm'),
+      findsOneWidget,
+      reason:
+          'kills a mutant that drops the line on the last leg — the Stop '
+          'button would jump up a line mid-journey',
+    );
+  });
+
+  testWidgets('a single-leg trip is unchanged', (tester) async {
+    final game = await pumpTab(tester);
+    await game.beginTravel('whispering_woods');
+    await tester.pump();
+    expect(
+      find.textContaining('Next:'),
+      findsNothing,
+      reason: 'kills a mutant that adds the line to every trip',
+    );
+    expect(
+      find.text('On the road from Hearthwood to Whispering Woods'),
+      findsOneWidget,
+      reason: 'kills a mutant that shortens the single-leg line too',
+    );
+  });
+
   // ⭐ Ruling 2026-09-21: "it ends at 0:00 instead of the 0:00 hitting before
   // the bar reaches the end". Pumped against the CARD rather than the tab, so
   // the clock can sit a fraction of a second short of arrival — the tab's

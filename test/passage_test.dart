@@ -558,4 +558,95 @@ void main() {
       );
     });
   });
+
+  // ⭐ Ruling 2026-09-30 (note 12): chained travel. The route is planned per
+  // character, so the passage rule is asked of the route actually walked.
+  group('chained travel honours the passage rule', () {
+    test('⭐ a far place is offered when the road is clear', () {
+      final g = _standingIn(
+        'hearthwood',
+        cleared: ['old_quarry'],
+        opened: ['pennycross'],
+      );
+      expect(
+        g.canTravelTo('forgeholm'),
+        isTrue,
+        reason:
+            'kills a mutant that keeps the neighbours-only check in '
+            'canTravelTo',
+      );
+      expect(g.planTrip('forgeholm')?.walked.stops, [
+        'hearthwood',
+        'pennycross',
+        'old_quarry',
+        'forgeholm',
+      ], reason: 'kills a mutant that plans past the passage filter');
+    });
+
+    test('⭐ never THROUGH an uncleared zone, from two roads away', () async {
+      final g = _standingIn('hearthwood', opened: ['pennycross']);
+      expect(
+        g.planTrip('forgeholm'),
+        isNull,
+        reason: 'kills the filter-dropped mutant in planTrip',
+      );
+      expect(
+        g.canTravelTo('forgeholm'),
+        isFalse,
+        reason: 'kills a mutant that offers a route the rule shuts',
+      );
+      expect(
+        await g.travelTo('forgeholm'),
+        _throughQuarry,
+        reason:
+            'kills a mutant that refuses silently — the existing refusal '
+            'names the first uncleared zone on the way',
+      );
+      expect(
+        g.profile.trip,
+        isNull,
+        reason: 'kills a mutant that refuses and departs anyway',
+      );
+    });
+
+    test('⭐ a trip may END in an uncleared zone, two roads away', () async {
+      final g = _standingIn('hearthwood', opened: ['pennycross']);
+      expect(
+        g.passageRefusal('old_quarry'),
+        isNull,
+        reason: 'kills a mutant that filters the destination',
+      );
+      expect(
+        await g.beginTravel('old_quarry'),
+        isTrue,
+        reason: 'kills a mutant that refuses the way in to a zone',
+      );
+      expect(g.profile.trip?.stops, [
+        'hearthwood',
+        'pennycross',
+        'old_quarry',
+      ], reason: 'kills a mutant that walks somewhere else');
+    });
+
+    test('⚠️ the way back from a chained trip is the trip\'s origin', () async {
+      // Walked Hearthwood -> Pennycross -> Old Quarry in one trip: the door
+      // you came in by is Hearthwood (the trip's origin, ruling 2026-09-21),
+      // and the road back runs through Pennycross, a town.
+      final g = _standingIn(
+        'old_quarry',
+        cameFrom: 'hearthwood',
+        opened: ['pennycross'],
+      );
+      expect(
+        g.passageRefusal('hearthwood'),
+        isNull,
+        reason: 'kills a mutant that only lets you back to a neighbour',
+      );
+      expect(g.planTrip('hearthwood')?.walked.stops, [
+        'old_quarry',
+        'pennycross',
+        'hearthwood',
+      ], reason: 'kills a mutant that cannot route out of an uncleared origin');
+    });
+  });
 }

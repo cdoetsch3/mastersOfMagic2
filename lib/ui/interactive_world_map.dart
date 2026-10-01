@@ -22,9 +22,10 @@ import 'world_map_painter.dart';
 /// abilities you did not have before. A preview you must leave in order to use
 /// is a worse version of the thing it previews.
 ///
-/// ⚠️ Reachability is the graph's business, not the map's — this only ever asks
-/// [GameLocation.connections]. The drawing can be rearranged freely without
-/// changing where anyone can actually go.
+/// ⚠️ Reachability is the graph's business, not the map's — the pins ask
+/// [GameLocation.connections] and the place sheet asks `GameState.planTrip`.
+/// The drawing can be rearranged freely without changing where anyone can
+/// actually go.
 class InteractiveWorldMap extends StatefulWidget {
   final GameState game;
 
@@ -202,8 +203,13 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
   static const double _tapRadiusPx = 26;
 
   Future<void> _showDetails(GameLocation loc) async {
-    final connected = _here.connections.contains(loc.id);
-    final travelling = widget.game.isTravelling;
+    final game = widget.game;
+    final travelling = game.isTravelling;
+    final isHere = loc.id == _here.id;
+    // ⭐ Any pin, not only a neighbour (ruling 2026-09-30, note 12): the
+    // sheet carries the whole route. ⚠️ Not planned mid-journey — the plan
+    // starts from where the trip set out, which is no longer where you are.
+    final asks = !isHere && !travelling;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.panel,
@@ -213,12 +219,12 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
       ),
       builder: (ctx) => PlaceSheet(
         location: loc,
-        isHere: loc.id == _here.id,
-        canTravel: connected,
+        isHere: isHere,
+        plan: asks ? game.planTrip(loc.id) : null,
+        refusal: asks ? game.passageRefusal(loc.id) : null,
         // ⚠️ One journey at a time. Offering Travel mid-trip would silently do
         // nothing, which reads as a broken button.
         isTravelling: travelling,
-        travelLabel: Travel.labelBetween(_here.id, loc.id),
         onTravel: () {
           Navigator.of(ctx).pop();
           _travel(loc);
@@ -432,35 +438,70 @@ class MapButton extends StatelessWidget {
   }
 }
 
-/// What a place is, and whether you can get there from here.
+/// What a place is, and how you would get there from here.
+///
+/// ⭐ **Chained travel lives here** (ruling, Christian 2026-09-30, playtest
+/// note 12, mockup A): tap any pin and the sheet shows the whole route — its
+/// time on foot, every stop, and ONE Travel button for all of it, instead of
+/// a tap and a timer per leg.
 class PlaceSheet extends StatelessWidget {
   final GameLocation location;
   final bool isHere;
-  final bool canTravel;
   final VoidCallback onTravel;
 
   /// A journey is already under way.
   final bool isTravelling;
 
-  /// The walk from here, shown so the cost is visible before committing.
-  ///
-  /// ⭐ A preformatted label ("10s", "3 min"), NOT a minute count — rounding
-  /// seconds to whole minutes for display turned a 10s test leg into "1 min"
-  /// (TravelTimes.label already handles sub-minute durations).
-  final String? travelLabel;
+  /// The trip this character would take (`GameState.planTrip`), or null when
+  /// there is none — standing here, mid-journey, or no road at all.
+  final TripPlan? plan;
+
+  /// Why the road will not carry this character (`GameState.passageRefusal`),
+  /// shown in place of the route. ⚠️ Can stand beside a non-null [plan]: an
+  /// uncleared zone you stand in has roads out that only one door may use.
+  final String? refusal;
 
   const PlaceSheet({
     super.key,
     required this.location,
     required this.isHere,
-    required this.canTravel,
     required this.onTravel,
     this.isTravelling = false,
-    this.travelLabel,
+    this.plan,
+    this.refusal,
   });
+
+  /// The route's first line: `Town · 40s on foot`, or
+  /// `Town · 40s · stops at the Pennycross gate`.
+  ///
+  /// ⭐ The kind is said for a town only — a zone's sheet already carries its
+  /// enemy band as a chip above, and saying it twice is noise.
+  /// ⭐ The time is the WHOLE route on foot; the button carries what is
+  /// actually walked, which a gate can make shorter.
+  static String summaryLine(GameLocation location, TripPlan plan) {
+    final parts = [
+      if (location.isTown) 'Town',
+      plan.gateId == null ? '${plan.route.label} on foot' : plan.route.label,
+      if (plan.gateId != null)
+        'stops at the ${World.byId(plan.gateId!).name} gate',
+    ];
+    return parts.join(' · ');
+  }
+
+  /// `Hearthwood → Pennycross → Old Quarry`.
+  static String stopsLine(TravelRoute route) =>
+      route.stops.map((id) => World.byId(id).name).join(' → ');
+
+  /// The one button's words: `Travel · 40s`, or `Travel to the gate · 10s`.
+  static String travelButtonLabel(TripPlan plan) => plan.gateId == null
+      ? 'Travel · ${plan.walked.label}'
+      : 'Travel to the gate · ${plan.walked.label}';
 
   @override
   Widget build(BuildContext context) {
+    final plan = this.plan;
+    final showRoute = !isHere && !isTravelling;
+    final canGo = showRoute && refusal == null && plan != null;
     final elements = location.elements
         .map((e) => e.name[0].toUpperCase() + e.name.substring(1))
         .join(' + ');
@@ -565,13 +606,23 @@ class PlaceSheet extends StatelessWidget {
                 ],
               ),
             ],
+            if (showRoute && refusal != null) ...[
+              const SizedBox(height: 14),
+              Text(
+                refusal!,
+                style: const TextStyle(
+                  color: AppColors.ember,
+                  fontSize: 12.5,
+                  height: 1.4,
+                ),
+              ),
+            ] else if (showRoute && plan != null)
+              _RouteLines(location: location, plan: plan),
             const SizedBox(height: 18),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: canTravel && !isHere && !isTravelling
-                    ? onTravel
-                    : null,
+                onPressed: canGo ? onTravel : null,
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.teal,
                   foregroundColor: AppColors.bg,
@@ -582,16 +633,75 @@ class PlaceSheet extends StatelessWidget {
                       ? 'You are already here'
                       : isTravelling
                       ? 'Already travelling'
-                      : !canTravel
+                      : refusal != null
+                      ? 'Travel'
+                      : plan == null
                       ? 'No road from here'
-                      : travelLabel == null
-                      ? 'Travel to ${location.name}'
-                      : 'Travel to ${location.name} — $travelLabel',
+                      : travelButtonLabel(plan),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// The route on the place sheet: time and stops.
+///
+/// ⭐ Stops past a shut gate are drawn dim — they are where you asked to go,
+/// not where this trip will take you.
+///
+/// ⚠️ **No healing line** (ruling, coordinator for Christian, 2026-09-30).
+/// The mockup's "Heals at each town on the way." was only trivially true —
+/// health lives on an adventure run and nothing heals it in town — so it was
+/// dropped rather than shown as a promise the game does not keep. See
+/// `TravelRoute.townStops`.
+class _RouteLines extends StatelessWidget {
+  final GameLocation location;
+  final TripPlan plan;
+  const _RouteLines({required this.location, required this.plan});
+
+  @override
+  Widget build(BuildContext context) {
+    final stops = plan.route.stops;
+    final reached = plan.gateIndex ?? stops.length - 1;
+    const dim = TextStyle(color: AppColors.textFaint);
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            PlaceSheet.summaryLine(location, plan),
+            style: const TextStyle(
+              color: AppColors.text,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text.rich(
+            TextSpan(
+              children: [
+                for (var i = 0; i < stops.length; i++) ...[
+                  if (i > 0)
+                    TextSpan(text: ' → ', style: i > reached ? dim : null),
+                  TextSpan(
+                    text: World.byId(stops[i]).name,
+                    style: i > reached ? dim : null,
+                  ),
+                ],
+              ],
+            ),
+            style: const TextStyle(
+              color: AppColors.textDim,
+              fontSize: 12.5,
+              height: 1.4,
+            ),
+          ),
+        ],
       ),
     );
   }

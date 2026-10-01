@@ -172,12 +172,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PlaceSheet(
-              location: loc,
-              isHere: false,
-              canTravel: true,
-              onTravel: () {},
-            ),
+            body: PlaceSheet(location: loc, isHere: false, onTravel: () {}),
           ),
         ),
       );

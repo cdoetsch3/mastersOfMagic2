@@ -7,6 +7,23 @@ import '../game/game_state.dart';
 import '../game/world.dart';
 import 'app_theme.dart';
 
+/// `Next: Old Quarry · then Forgeholm, Concordance` — the stops still ahead
+/// on a chained trip (ruling, Christian 2026-09-30, note 12), or null for a
+/// single-leg trip and once arrived.
+///
+/// ⭐ Decided by the TRIP, not the leg: a chained trip keeps the line on its
+/// last leg (`Next: Concordance`), so the Stop button below never jumps up a
+/// line partway through the journey.
+String? nextStopsLine(ActiveTrip trip, DateTime now) {
+  if (trip.stops.length <= 2) return null;
+  final leg = trip.legAt(now);
+  if (leg == null) return null;
+  final at = trip.stopIndexAt(now);
+  final next = World.byId(trip.stops[at + 1]).name;
+  final then = [for (final id in trip.stops.skip(at + 2)) World.byId(id).name];
+  return then.isEmpty ? 'Next: $next' : 'Next: $next · then ${then.join(', ')}';
+}
+
 /// The journey in progress, at the top of the Map tab.
 ///
 /// ⚠️ The ticker here is **display only**. Arrival is a function of the clock
@@ -49,6 +66,7 @@ class _TravelProgressCardState extends State<TravelProgressCard> {
 
     final now = widget.game.now();
     final leg = trip.legAt(now);
+    final next = nextStopsLine(trip, now);
     final destination = World.byId(trip.toId).name;
     final stopIfCancelled = World.byId(trip.stopReachedAt(now)).name;
 
@@ -109,10 +127,21 @@ class _TravelProgressCardState extends State<TravelProgressCard> {
           Text(
             leg == null
                 ? 'Arriving…'
+                // ⭐ A chained trip names its next stop on the line below, so
+                // this line stops short of naming it twice.
+                : trip.stops.length > 2
+                ? 'On the road from ${World.byId(leg.from).name}'
                 : 'On the road from ${World.byId(leg.from).name} '
                       'to ${World.byId(leg.to).name}',
             style: const TextStyle(color: AppColors.textDim, fontSize: 12),
           ),
+          if (next != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              next,
+              style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+            ),
+          ],
           const SizedBox(height: 10),
           Align(
             alignment: Alignment.centerLeft,

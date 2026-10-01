@@ -7,9 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/game_state.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
+import 'package:masters_of_magic_2/game/world.dart';
 import 'package:masters_of_magic_2/game/world_map_geometry.dart';
 import 'package:masters_of_magic_2/screens/tabs/map_tab.dart';
 import 'package:masters_of_magic_2/screens/world_map_screen.dart';
+import 'package:masters_of_magic_2/ui/app_theme.dart';
+import 'package:masters_of_magic_2/ui/interactive_world_map.dart';
 import 'package:masters_of_magic_2/ui/world_map_painter.dart';
 
 /// Regression guards for the map's tap-to-travel path.
@@ -47,11 +50,19 @@ Future<void> arrive(WidgetTester tester, GameState game) async {
 void main() {
   setUp(() => _clock = DateTime.utc(2026, 1, 1, 12));
 
-  Future<GameState> pumpMap(WidgetTester tester, Size viewport) async {
+  Future<GameState> pumpMap(
+    WidgetTester tester,
+    Size viewport, {
+    PlayerProfile? profile,
+  }) async {
     tester.view.physicalSize = viewport;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
-    final game = GameState(_MemStorage(), PlayerProfile.newPlayer(), now: _now);
+    final game = GameState(
+      _MemStorage(),
+      profile ?? PlayerProfile.newPlayer(),
+      now: _now,
+    );
     await tester.pumpWidget(MaterialApp(home: WorldMapScreen(game: game)));
     await tester.pumpAndSettle();
     return game;
@@ -83,6 +94,15 @@ void main() {
     return b.center + (screen - rect.center) / k;
   }
 
+  /// The open place sheet's title. ⭐ Since chained travel (ruling
+  /// 2026-09-30) the button reads `Travel · 10s` for every place, so these
+  /// taps are checked against the sheet's own name rather than its button.
+  Finder sheetTitled(String name) =>
+      find.descendant(of: find.byType(BottomSheet), matching: find.text(name));
+
+  /// The one Travel button on an open sheet.
+  Finder travelButton() => find.textContaining('Travel · ');
+
   Future<void> dismissSheet(WidgetTester tester) async {
     await tester.tapAt(const Offset(8, 100));
     await tester.pumpAndSettle();
@@ -107,9 +127,9 @@ void main() {
 
     await tester.tapAt(screenPositionOf(tester, 'whispering_woods'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Travel to Whispering Woods'), findsOneWidget);
+    expect(sheetTitled('Whispering Woods'), findsOneWidget);
 
-    await tester.tap(find.textContaining('Travel to Whispering Woods'));
+    await tester.tap(travelButton());
     await tester.pumpAndSettle();
     // ⭐ Travel takes time now: tapping departs, it does not teleport.
     expect(game.isTravelling, isTrue);
@@ -155,7 +175,7 @@ void main() {
     await tester.tapAt(screenPositionOf(tester, 'thornmire'));
     await tester.pumpAndSettle();
     expect(
-      find.textContaining('Travel to Thornmire'),
+      sheetTitled('Thornmire'),
       findsOneWidget,
       reason: 'a pin deep in the clamped zone must still take taps',
     );
@@ -164,7 +184,7 @@ void main() {
     // And the far south of the map — beyond any plausible clamp.
     await tester.tapAt(screenPositionOf(tester, 'glimmerbrook'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Travel to Glimmerbrook'), findsOneWidget);
+    expect(sheetTitled('Glimmerbrook'), findsOneWidget);
     expect(
       game.profile.locationId,
       'hearthwood',
@@ -223,7 +243,7 @@ void main() {
     final at = screenPositionOf(tester, 'pennycross');
     await tester.tapAt(at + const Offset(0, 20));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Travel to Pennycross'), findsOneWidget);
+    expect(sheetTitled('Pennycross'), findsOneWidget);
     await dismissSheet(tester);
 
     // ...and 90 screen px off must not be anything. The direction is chosen
@@ -313,7 +333,7 @@ void main() {
 
     await tester.tapAt(south);
     await tester.pumpAndSettle();
-    expect(find.textContaining('Travel to Thornmire'), findsOneWidget);
+    expect(sheetTitled('Thornmire'), findsOneWidget);
   });
 
   testWidgets('"Whole world" still gets back to everything at once', (
@@ -403,7 +423,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tapAt(screenPositionOf(tester, 'whispering_woods'));
       await tester.pumpAndSettle();
-      await tester.tap(find.textContaining('Travel to Whispering Woods'));
+      expect(sheetTitled('Whispering Woods'), findsOneWidget);
+      await tester.tap(travelButton());
       await arrive(tester, game);
 
       expect(game.profile.locationId, 'whispering_woods');
@@ -528,5 +549,202 @@ void main() {
       isNot(closeTo(dyBefore, 1)),
       reason: 'the drag must reach the map, not be eaten by the list',
     );
+  });
+
+  // ⭐ Ruling (Christian, 2026-09-30, playtest note 12, mockup A): tap any
+  // pin and the sheet carries the whole route, with ONE Travel button.
+  group('chained travel on the place sheet', () {
+    const leg = TravelTimes.perLegSeconds;
+    final three = TravelTimes.label(3 * leg);
+    final one = TravelTimes.label(leg);
+    const chain = 'Hearthwood → Pennycross → Old Quarry → Forgeholm';
+
+    /// A mage in Hearthwood with the quarry cleared — Forgeholm's road is
+    /// clear of the passage rule, and Pennycross's gate is [opened] or not.
+    PlayerProfile pastTheQuarry({required bool opened}) {
+      final p = PlayerProfile.newPlayer()..zoneClears['old_quarry'] = 1;
+      if (opened) p.openedGates.add('pennycross');
+      return p;
+    }
+
+    Future<void> pumpSheetFor(
+      WidgetTester tester,
+      PlayerProfile profile,
+      String id,
+    ) async {
+      tester.view.physicalSize = const Size(420, 1000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final game = GameState(_MemStorage(), profile, now: _now);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PlaceSheet(
+              location: World.byId(id),
+              isHere: id == profile.locationId,
+              plan: id == profile.locationId ? null : game.planTrip(id),
+              refusal: id == profile.locationId
+                  ? null
+                  : game.passageRefusal(id),
+              onTravel: () {},
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('⭐ a plain route: total on foot, every stop, one button', (
+      tester,
+    ) async {
+      await pumpSheetFor(tester, pastTheQuarry(opened: true), 'forgeholm');
+      expect(
+        find.text('Town · $three on foot'),
+        findsOneWidget,
+        reason: 'kills a mutant that drops the kind, or times one leg only',
+      );
+      expect(
+        find.text(chain, findRichText: true),
+        findsOneWidget,
+        reason: 'kills a mutant that lists only the ends of the route',
+      );
+      expect(
+        find.text('Travel · $three'),
+        findsOneWidget,
+        reason: 'kills a mutant that prices the button by the first leg',
+      );
+      expect(
+        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+        isNotNull,
+        reason: 'kills a mutant that keeps the neighbours-only button',
+      );
+    });
+
+    testWidgets('⭐ a gated route stops at the gate, and says so', (
+      tester,
+    ) async {
+      await pumpSheetFor(tester, pastTheQuarry(opened: false), 'forgeholm');
+      expect(
+        find.text('Town · $three · stops at the Pennycross gate'),
+        findsOneWidget,
+        reason: 'kills a mutant that hides the gate from the route',
+      );
+      expect(
+        find.text('Travel to the gate · $one'),
+        findsOneWidget,
+        reason:
+            'kills the not-truncated mutant: it would offer the whole '
+            'route past the gate',
+      );
+      // The stops after the gate are drawn dim; the gate itself is not.
+      final rich = tester.widget<RichText>(
+        find.text(chain, findRichText: true),
+      );
+      final colours = <String, Color?>{};
+      rich.text.visitChildren((span) {
+        if (span is TextSpan && span.text != null && span.text != ' → ') {
+          colours[span.text!] = span.style?.color;
+        }
+        return true;
+      });
+      expect(
+        colours['Pennycross'],
+        isNot(AppColors.textFaint),
+        reason: 'kills a mutant that dims the gate the trip reaches',
+      );
+      expect(
+        [colours['Old Quarry'], colours['Forgeholm']],
+        [AppColors.textFaint, AppColors.textFaint],
+        reason: 'kills a mutant that draws stops past the gate as reached',
+      );
+    });
+
+    testWidgets('a zone at the end of the road names no kind', (tester) async {
+      await pumpSheetFor(
+        tester,
+        PlayerProfile.newPlayer()..openedGates.add('pennycross'),
+        'old_quarry',
+      );
+      expect(
+        find.text('${TravelTimes.label(2 * leg)} on foot'),
+        findsOneWidget,
+        reason:
+            'kills a mutant that repeats the enemy band chip on the route '
+            'line, or refuses the way into an uncleared zone',
+      );
+    });
+
+    testWidgets('a road that runs through an uncleared zone says why', (
+      tester,
+    ) async {
+      await pumpSheetFor(
+        tester,
+        PlayerProfile.newPlayer()..openedGates.add('pennycross'),
+        'forgeholm',
+      );
+      expect(
+        find.text(
+          'The road runs through Old Quarry, and you have not cleared it.',
+        ),
+        findsOneWidget,
+        reason: 'kills a mutant that hides the refusal on the sheet',
+      );
+      expect(
+        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+        isNull,
+        reason: 'kills a mutant that offers a refused trip',
+      );
+      expect(
+        find.textContaining(' on foot'),
+        findsNothing,
+        reason: 'kills a mutant that prices a route the player cannot take',
+      );
+    });
+
+    testWidgets('⭐ where you stand: no route, as before', (tester) async {
+      await pumpSheetFor(tester, pastTheQuarry(opened: true), 'hearthwood');
+      expect(
+        find.text('You are already here'),
+        findsOneWidget,
+        reason: 'kills a mutant that offers travel to here',
+      );
+      expect(
+        find.textContaining(' on foot'),
+        findsNothing,
+        reason: 'kills a mutant that draws a route from here to here',
+      );
+      expect(
+        find.textContaining('→', findRichText: true),
+        findsNothing,
+        reason: 'kills a mutant that lists a stop line for here',
+      );
+    });
+
+    testWidgets('⭐ tapping a far pin and pressing Travel takes the chain', (
+      tester,
+    ) async {
+      final game = await pumpMap(
+        tester,
+        const Size(400, 800),
+        profile: pastTheQuarry(opened: true),
+      );
+      await tester.tapAt(screenPositionOf(tester, 'forgeholm'));
+      await tester.pumpAndSettle();
+      expect(sheetTitled('Forgeholm'), findsOneWidget);
+      await tester.tap(find.text('Travel · $three'));
+      await tester.pumpAndSettle();
+      expect(
+        game.profile.trip?.stops,
+        ['hearthwood', 'pennycross', 'old_quarry', 'forgeholm'],
+        reason:
+            'kills a mutant whose map still asks connections — a far pin '
+            'would offer no road',
+      );
+      await arrive(tester, game);
+      expect(
+        game.profile.locationId,
+        'forgeholm',
+        reason: 'kills a mutant that stops the chain short',
+      );
+    });
   });
 }

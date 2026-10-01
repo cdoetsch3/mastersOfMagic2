@@ -253,8 +253,53 @@ class GameState extends ChangeNotifier {
 
   // ---- Travel ----------------------------------------------------------
 
+  /// Whether a journey to [locationId] can start: not already travelling,
+  /// not already there, and a route exists that this character may walk.
+  ///
+  /// ⭐ **Any destination, not just a neighbour** (ruling, Christian
+  /// 2026-09-30, playtest note 12: chained travel). The Map tab's list still
+  /// offers neighbours; the world map's place sheet offers everywhere.
   bool canTravelTo(String locationId) =>
-      !isTravelling && profile.location.connections.contains(locationId);
+      !isTravelling &&
+      locationId != profile.locationId &&
+      planTrip(locationId) != null;
+
+  /// The trip this character would take to [toId] from where they stand, or
+  /// null when no road will carry them there. **Pure.**
+  ///
+  /// ⭐ Routed per character ([Travel.routeFor]): never THROUGH an uncleared
+  /// zone, though it may end in one (passage ruling (a), 2026-09-21); and cut
+  /// short at the first shut gate on the way ([TripPlan], ruling 2026-09-30).
+  ///
+  /// ⚠️ **Turning back at a shut gate always has a road** (rule (c) of
+  /// [passageRefusal]). It is the road just walked, so the per-character
+  /// route finds it; the plain shortest route stands behind it only so that a
+  /// save the filter cannot explain is never stranded on the gate screen.
+  ///
+  /// 📝 Plans from [PlayerProfile.locationId] — mid-journey that is where the
+  /// trip set out from, which is why the place sheet hides its route then.
+  TripPlan? planTrip(String toId) {
+    final fromId = profile.locationId;
+    var route = Travel.routeFor(fromId, toId, passable: _isPassable);
+    if (route == null &&
+        profile.shutGateHere != null &&
+        toId == profile.gateTurnBackId) {
+      route = Travel.route(fromId, toId);
+    }
+    if (route == null || route.isTrivial) return null;
+    return TripPlan.of(route, isShutGate: _isShutGate);
+  }
+
+  /// A place a route may pass through: a town, or a zone whose boss has
+  /// fallen once.
+  bool _isPassable(String id) => !_isUnclearedZone(id);
+
+  /// A gate this character has not opened — where a trip through it stops.
+  /// ⚠️ The same test as [PlayerProfile.shutGateHere], asked of a place you
+  /// are not standing in yet.
+  bool _isShutGate(String id) =>
+      World.byId(id).gateItemIds.isNotEmpty &&
+      !profile.openedGates.contains(id);
 
   /// Why the gate at [locationId] will not let this character through, or null
   /// if it will. **Pure** — asks nothing, changes nothing.
@@ -311,7 +356,11 @@ class GameState extends ChangeNotifier {
   ///  * **(a) the middle of the route.** Any stop that is neither the origin
   ///    nor the destination must be cleared. This is the Pennycross →
   ///    Forgeholm case: point-to-point travel would otherwise walk the whole
-  ///    quarry without stopping in it.
+  ///    quarry without stopping in it. ⭐ Since chained travel (2026-09-30)
+  ///    the route is chosen per character ([Travel.routeFor]), so a way
+  ///    AROUND an uncleared zone is taken rather than refused; this refuses
+  ///    only when every road runs through one, and names the first on the
+  ///    plain quickest route.
   ///  * **(b) the ground you are standing on.** An uncleared origin offers
   ///    exactly one exit — [PlayerProfile.arrivedFromId], the door you came in
   ///    by. This is the Old-Quarry-to-Molten-Deep case, where the uncleared
@@ -346,15 +395,20 @@ class GameState extends ChangeNotifier {
     if (profile.shutGateHere != null && toId == profile.gateTurnBackId) {
       return null;
     }
-    final route = Travel.route(fromId, toId);
+    final route = Travel.routeFor(fromId, toId, passable: (_) => true);
     if (route == null || route.isTrivial) return null;
 
-    // (a) The middle of the route. `stops` already has exactly the shape this
-    // needs — origin first, destination last — so no accessor was added.
-    for (final id in route.stops.sublist(1, route.stops.length - 1)) {
-      if (_isUnclearedZone(id)) {
-        return 'The road runs through ${World.byId(id).name}, and you have '
-            'not cleared it.';
+    // (a) The middle of the route. Refused only when no route this character
+    // may walk exists — and then the quickest road is certain to have an
+    // uncleared stop in its middle, or the filtered search would have taken
+    // it. `stops` has exactly the shape this needs: origin first,
+    // destination last.
+    if (Travel.routeFor(fromId, toId, passable: _isPassable) == null) {
+      for (final id in route.stops.sublist(1, route.stops.length - 1)) {
+        if (_isUnclearedZone(id)) {
+          return 'The road runs through ${World.byId(id).name}, and you have '
+              'not cleared it.';
+        }
       }
     }
 
@@ -398,9 +452,15 @@ class GameState extends ChangeNotifier {
 
   /// Begin a journey. The player arrives after the route's duration.
   ///
-  /// Accepts any location with a route, not just a neighbour — WORLD_DESIGN
-  /// §4b.2's point-to-point Travel. The Map tab still offers only neighbours
-  /// until the travel UI is built; that is a UI limit, not a rule.
+  /// Accepts any location with a route this character may walk
+  /// ([planTrip]), not just a neighbour — WORLD_DESIGN §4b.2's point-to-point
+  /// Travel, offered from the world map's place sheet (ruling 2026-09-30).
+  /// The trip carries every stop, with cumulative seconds
+  /// ([ActiveTrip.fromRoute]).
+  ///
+  /// ⭐ **A trip through a shut gate ends at the gate** ([TripPlan.walked]):
+  /// its last stop IS the gate, so arrival is the ordinary arrival at a shut
+  /// gate below — the gate screen — with no second path into it.
   ///
   /// ⭐ **A shut gate is NOT refused here** (ruling, Christian 2026-09-25,
   /// mockup B — reversing 2026-09-21's departure check). The trip proceeds
@@ -411,7 +471,7 @@ class GameState extends ChangeNotifier {
     settleTravel();
     if (profile.trip != null || toId == profile.locationId) return false;
     if (passageRefusal(toId) != null) return false;
-    final route = Travel.route(profile.locationId, toId);
+    final route = planTrip(toId)?.walked;
     if (route == null || route.isTrivial) return false;
 
     // ⚠️ Client time, deliberately provisional. The server stamps the real
@@ -502,6 +562,13 @@ class GameState extends ChangeNotifier {
     // Pennycross → Old Quarry → Forgeholm was only legal because the quarry
     // was cleared, and what an uncleared *destination* owes you a way back to
     // is where you set out from. See [passageRefusal] (b).
+    //
+    // 📝 **Towns on the way heal nothing, because nothing needs healing.**
+    // `TravelRoute.townStops` promises a Journey heals at each town (§4b.2),
+    // but health lives only on an adventure run (`AdventureRun.playerHp`) and
+    // every run starts full ([maxHp], in [beginAdventure]) — arriving at a
+    // town today restores nothing, so passing through one does the same.
+    // When health outlives a run, the heal belongs here, once per arrival.
     profile.arrivedFromId = trip.fromId;
     profile.locationId = trip.toId;
     profile.trip = null;
@@ -527,12 +594,12 @@ class GameState extends ChangeNotifier {
     });
   }
 
-  /// Starts a journey to a neighbouring location. Kept for the Map tab, which
-  /// offers neighbours only.
+  /// Starts a journey to [locationId] — a neighbour from the Map tab's list,
+  /// or anywhere from the world map's place sheet ([canTravelTo]).
   ///
   /// ⭐ **Returns the refusal, if there is one** — the first thing this method
-  /// has ever had to say. Every other way it declines (already travelling, not
-  /// a neighbour) is a tile the UI had already greyed out, so `void` was
+  /// has ever had to say. Every other way it declines (already travelling, no
+  /// road at all) is a tile the UI had already greyed out, so `void` was
   /// honest; a refused road is different, because the player is owed a
   /// reason. Null means "under way, or nothing to say".
   ///

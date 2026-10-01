@@ -51,6 +51,13 @@ class TravelRoute {
   /// ⭐ A Journey stops at each of these to heal (§4b.2), which is what breaks
   /// a long road into survivable stages. This is the reason the network stores
   /// routes and not just durations: a table of times cannot say where you stop.
+  ///
+  /// ⚠️ **The healing half of §4b.2 is unimplemented as of 2026-09-30.**
+  /// Health lives only on an adventure run (`AdventureRun.playerHp`) and every
+  /// run starts full, so no town — passed through or arrived at — heals
+  /// anything; the place sheet's "Heals at each town on the way." line was
+  /// dropped for that reason (ruling 2026-09-30). `GameState.settleTravel`
+  /// marks where the heal would go.
   List<String> get townStops => [
     for (final id in stops.skip(1))
       if (World.byId(id).isTown) id,
@@ -62,6 +69,11 @@ class TravelRoute {
   /// rules** and multiply everything equally. This is for passage and for
   /// drawing: WORLD_DESIGN §2.5 makes the sea crossing design-significant.
   bool get needsPassage => legs.any((l) => l.kind != TravelEdgeKind.road);
+
+  /// The route as far as [stopIndex] inclusive — what is walked when the trip
+  /// ends early at a shut gate ([TripPlan]).
+  TravelRoute truncatedAt(int stopIndex) =>
+      TravelRoute(stops.sublist(0, stopIndex + 1), legs.sublist(0, stopIndex));
 
   @override
   String toString() => '${stops.join(' -> ')} (${minutes}m)';
@@ -169,6 +181,133 @@ abstract final class Travel {
     if (World.exists(fromId))
       for (final e in _solved[fromId]!.entries) e.key: e.value.minutes,
   };
+
+  /// The quickest route from [fromId] to [toId] that only passes THROUGH
+  /// places [passable] allows, or null when there is none.
+  ///
+  /// ⭐ **Per character, so not from the table.** The passage ruling
+  /// (Christian, 2026-09-21) shuts every uncleared zone to through-traffic,
+  /// and which zones are cleared differs per save — a single solved table
+  /// cannot answer that. The table stays for the questions that really are
+  /// the same for everyone ([labelBetween], [reachableFrom]).
+  ///
+  /// ⭐ [passable] is asked about the **middle** of the route only. The origin
+  /// is where you stand, and the destination may be anything — ending in an
+  /// uncleared zone is how you go and clear it. An impassable place is a dead
+  /// end: it can be the last stop, never a waypoint.
+  ///
+  /// ⭐ **Deterministic tie-break**: quickest, then fewest stops, then the
+  /// stop ids compared in order. Every leg costs the same today
+  /// ([TravelTimes.perLegSeconds]), so ties are the common case, and a tie
+  /// settled by map iteration order would make tests pin luck. 📝 While every
+  /// leg costs the same, equal time already means equal stops — the
+  /// fewest-stops rule only starts to bite once legs are priced apart.
+  ///
+  /// 📝 Dijkstra over [GameLocation.edges] with [TravelTimes] costs — a
+  /// plain scan for the next node is quick enough for ~36 places.
+  static TravelRoute? routeFor(
+    String fromId,
+    String toId, {
+    required bool Function(String id) passable,
+  }) {
+    if (!World.exists(fromId) || !World.exists(toId)) return null;
+    if (fromId == toId) return TravelRoute([fromId], const []);
+
+    final best = <String, _Path>{
+      fromId: _Path(0, [fromId]),
+    };
+    final settled = <String>{};
+    while (true) {
+      String? at;
+      _Path? path;
+      for (final e in best.entries) {
+        if (settled.contains(e.key)) continue;
+        if (path == null || e.value.compareTo(path) < 0) {
+          at = e.key;
+          path = e.value;
+        }
+      }
+      if (at == null || path == null) return null;
+      if (at == toId) return _routeAlong(path.stops);
+      settled.add(at);
+      // ⚠️ Reached, but not walked through — see the doc above.
+      if (at != fromId && !passable(at)) continue;
+      for (final e in World.byId(at).edges) {
+        if (settled.contains(e.to)) continue;
+        final next = _Path(
+          path.seconds + TravelTimes.secondsBetween(at, e.to),
+          [...path.stops, e.to],
+        );
+        final current = best[e.to];
+        if (current == null || next.compareTo(current) < 0) best[e.to] = next;
+      }
+    }
+  }
+
+  static TravelRoute _routeAlong(List<String> stops) => TravelRoute(stops, [
+    for (var i = 0; i + 1 < stops.length; i++)
+      World.byId(stops[i]).edgeTo(stops[i + 1])!,
+  ]);
+}
+
+/// A route as one character will actually walk it: the whole way to where
+/// they asked to go, and where it ends early if a shut gate stands on it.
+///
+/// ⭐ **A shut gate ends the trip AT the gate** (ruling, Christian
+/// 2026-09-30, building on 2026-09-25's mockup B). The road to a gate is
+/// never refused; a longer trip through one simply stops there, and arrival
+/// lands on the gate screen exactly as a trip *to* the gate does — the same
+/// `PlayerProfile.shutGateHere` seam, not a second one.
+class TripPlan {
+  /// The whole route to the place asked for.
+  final TravelRoute route;
+
+  /// Index into [route]'s stops of the shut gate the trip stops at, or null
+  /// when nothing stops it. ⚠️ May be the last stop: a trip *to* a shut gate
+  /// stops at it too, and says so.
+  final int? gateIndex;
+
+  const TripPlan(this.route, this.gateIndex);
+
+  /// Plans [route], stopping at the first place after the origin that
+  /// [isShutGate] names. ⚠️ Never the origin — standing at a shut gate,
+  /// the way back must not stop where it starts.
+  factory TripPlan.of(
+    TravelRoute route, {
+    required bool Function(String id) isShutGate,
+  }) {
+    for (var i = 1; i < route.stops.length; i++) {
+      if (isShutGate(route.stops[i])) return TripPlan(route, i);
+    }
+    return TripPlan(route, null);
+  }
+
+  /// What is actually walked: [route], or [route] cut at the gate.
+  TravelRoute get walked =>
+      gateIndex == null ? route : route.truncatedAt(gateIndex!);
+
+  /// The shut gate the trip stops at, or null.
+  String? get gateId => gateIndex == null ? null : route.stops[gateIndex!];
+}
+
+/// A candidate path in [Travel.routeFor], ordered by the tie-break rule.
+class _Path implements Comparable<_Path> {
+  final int seconds;
+  final List<String> stops;
+  const _Path(this.seconds, this.stops);
+
+  @override
+  int compareTo(_Path other) {
+    if (seconds != other.seconds) return seconds.compareTo(other.seconds);
+    if (stops.length != other.stops.length) {
+      return stops.length.compareTo(other.stops.length);
+    }
+    for (var i = 0; i < stops.length; i++) {
+      final c = stops[i].compareTo(other.stops[i]);
+      if (c != 0) return c;
+    }
+    return 0;
+  }
 }
 
 /// One cell of the solved table: what the trip costs, and the first step of it.

@@ -199,6 +199,60 @@ void main() {
       );
     });
 
+    // ⭐ Ruling 2026-09-30 (note 12): chained travel. A trip through a shut
+    // gate ends at the gate, and arrives exactly as a trip TO it does.
+    test('⭐ a trip PAST a shut gate stops at the gate', () async {
+      final g = _atHearthwood(carrying: [_woods]);
+      g.profile.zoneClears['old_quarry'] = 1;
+
+      expect(
+        await g.travelTo('forgeholm'),
+        isNull,
+        reason:
+            'kills a mutant that refuses at departure — the road to a gate '
+            'is never refused (2026-09-25)',
+      );
+      expect(
+        g.profile.trip?.stops,
+        ['hearthwood', 'pennycross'],
+        reason:
+            'kills the not-truncated mutant: the trip would walk on past '
+            'the gate to Forgeholm',
+      );
+
+      _clock = _clock.add(const Duration(days: 1));
+      await g.tick();
+      expect(
+        g.profile.locationId,
+        'pennycross',
+        reason: 'kills a mutant that arrives past the gate',
+      );
+      expect(
+        g.profile.shutGateHere,
+        'pennycross',
+        reason:
+            'kills a mutant that forks arrival — the same seam as a direct '
+            'trip puts the gate screen up',
+      );
+      expect(
+        g.profile.gateTurnBackId,
+        'hearthwood',
+        reason: 'kills a mutant that loses the way back from a chained trip',
+      );
+    });
+
+    test('an OPENED gate on the way does not stop the trip', () async {
+      final g = _atHearthwood();
+      g.profile.zoneClears['old_quarry'] = 1;
+      g.profile.openedGates.add('pennycross');
+      await g.travelTo('forgeholm');
+      expect(
+        g.profile.trip?.toId,
+        'forgeholm',
+        reason: 'kills a mutant that stops at every gate, opened or not',
+      );
+    });
+
     test('⭐ once opened, never asked again — even with an empty pack', () async {
       final g = _atHearthwood();
       g.profile.openedGates.add('pennycross');

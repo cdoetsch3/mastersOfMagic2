@@ -249,4 +249,257 @@ void main() {
       expect(TravelTimes.between('a', 'b'), greaterThanOrEqualTo(1));
     });
   });
+
+  // ⭐ Ruling (Christian, 2026-09-30, playtest note 12): chained travel. A
+  // route is planned per character — never THROUGH an uncleared zone — and
+  // cut short at a shut gate.
+  //
+  // ⚠️ Another change is removing roads from the world. These tests lean on
+  // Hearthwood – Pennycross – Old Quarry – Forgeholm only, and check every
+  // other claim against a brute-force search of whatever roads exist.
+  group('routeFor — the roads one character may walk', () {
+    const chain = ['hearthwood', 'pennycross', 'old_quarry', 'forgeholm'];
+
+    /// Every simple path from [from] to [to] of at most [depth] legs, whose
+    /// middle [passable] allows — the same contract as routeFor, written as
+    /// an exhaustive search so the two cannot share a bug.
+    List<List<String>> allPaths(
+      String from,
+      String to,
+      bool Function(String) passable,
+      int depth,
+    ) {
+      final found = <List<String>>[];
+      void walk(List<String> path) {
+        final at = path.last;
+        if (at == to) {
+          found.add(path);
+          return;
+        }
+        if (path.length > depth) return;
+        if (at != from && !passable(at)) return;
+        for (final e in World.byId(at).edges) {
+          if (path.contains(e.to)) continue;
+          walk([...path, e.to]);
+        }
+      }
+
+      walk([from]);
+      return found;
+    }
+
+    int secondsOf(List<String> stops) {
+      var total = 0;
+      for (var i = 0; i + 1 < stops.length; i++) {
+        total += TravelTimes.secondsBetween(stops[i], stops[i + 1]);
+      }
+      return total;
+    }
+
+    /// The path the tie-break rule picks: quickest, fewest stops, then ids.
+    List<String>? bestOf(List<List<String>> paths) {
+      List<String>? best;
+      for (final p in paths) {
+        if (best == null) {
+          best = p;
+          continue;
+        }
+        final a = secondsOf(p), b = secondsOf(best);
+        if (a != b) {
+          if (a < b) best = p;
+          continue;
+        }
+        if (p.length != best.length) {
+          if (p.length < best.length) best = p;
+          continue;
+        }
+        final current = best;
+        for (var i = 0; i < p.length; i++) {
+          final c = p[i].compareTo(current[i]);
+          if (c < 0) best = p;
+          if (c != 0) break;
+        }
+      }
+      return best;
+    }
+
+    const pairs = [
+      ['hearthwood', 'forgeholm'],
+      ['pennycross', 'thunderspire_peaks'],
+      ['hearthwood', 'concordance'],
+      ['forgeholm', 'meridian'],
+      ['old_quarry', 'thornmire'],
+    ];
+
+    test('with every road open it is the quickest route, ties broken '
+        'by fewest stops then ids', () {
+      for (final pair in pairs) {
+        final r = Travel.routeFor(pair[0], pair[1], passable: (_) => true)!;
+        expect(
+          r.seconds,
+          Travel.secondsBetween(pair[0], pair[1]),
+          reason:
+              '${pair[0]} -> ${pair[1]}: kills a mutant that is not the '
+              'quickest (breadth-first on a weighted graph, or an early '
+              'return before the destination is settled)',
+        );
+        expect(
+          r.stops,
+          bestOf(allPaths(pair[0], pair[1], (_) => true, 9)),
+          reason:
+              '${pair[0]} -> ${pair[1]}: kills a mutant whose tie-break is '
+              'map order rather than fewest stops, then ids',
+        );
+        expect(
+          r.legs.length,
+          r.stops.length - 1,
+          reason: 'kills a mutant that builds stops without their legs',
+        );
+      }
+    });
+
+    test('⭐ the Hearthwood – Forgeholm road is the four-stop chain', () {
+      expect(
+        Travel.routeFor(
+          'hearthwood',
+          'forgeholm',
+          passable: (_) => true,
+        )!.stops,
+        chain,
+        reason:
+            'kills a mutant that detours — and pins the premise of every '
+            'chained-travel test below',
+      );
+    });
+
+    test('⭐ never THROUGH an impassable place', () {
+      expect(
+        Travel.routeFor(
+          'hearthwood',
+          'forgeholm',
+          passable: (id) => id != 'old_quarry',
+        ),
+        isNull,
+        reason:
+            'kills the filter-dropped mutant: every road from the starting '
+            'valley to Forgeholm runs through Old Quarry, so with every '
+            'other place open the quarry alone still shuts it',
+      );
+      // Any blocked set, any pair: no route uses a blocked place as a
+      // waypoint, and a route exists exactly when the brute force finds one.
+      bool towns(String id) => World.byId(id).isTown;
+      for (final pair in pairs) {
+        final r = Travel.routeFor(pair[0], pair[1], passable: towns);
+        final truth = bestOf(allPaths(pair[0], pair[1], towns, 9));
+        expect(
+          r?.stops,
+          truth,
+          reason:
+              '${pair[0]} -> ${pair[1]} through towns only: kills a mutant '
+              'that ignores passable, or refuses a route that exists',
+        );
+      }
+    });
+
+    test('⭐ a route may END in an impassable place', () {
+      final r = Travel.routeFor(
+        'hearthwood',
+        'old_quarry',
+        passable: (id) => World.byId(id).isTown,
+      );
+      expect(
+        r?.stops,
+        ['hearthwood', 'pennycross', 'old_quarry'],
+        reason:
+            'kills a mutant that filters the destination too — ending in an '
+            'uncleared zone is how you go and clear it',
+      );
+    });
+
+    test('the origin is always passable', () {
+      expect(
+        Travel.routeFor(
+          'old_quarry',
+          'forgeholm',
+          passable: (id) => id != 'old_quarry',
+        )?.stops,
+        ['old_quarry', 'forgeholm'],
+        reason: 'kills a mutant that filters the place you stand in',
+      );
+    });
+
+    test('going nowhere, and nowhere at all', () {
+      expect(
+        Travel.routeFor(
+          'pennycross',
+          'pennycross',
+          passable: (_) => false,
+        )!.stops,
+        ['pennycross'],
+        reason: 'kills a mutant that treats a trip to yourself as no route',
+      );
+      expect(
+        Travel.routeFor('hearthwood', 'atlantis', passable: (_) => true),
+        isNull,
+        reason: 'kills a mutant that throws on an unknown id',
+      );
+    });
+  });
+
+  group('TripPlan — a shut gate ends the trip there', () {
+    final route = Travel.route('hearthwood', 'forgeholm')!;
+
+    test('⭐ cut at the first shut gate after the origin', () {
+      final plan = TripPlan.of(route, isShutGate: (id) => id == 'pennycross');
+      expect(plan.walked.stops, [
+        'hearthwood',
+        'pennycross',
+      ], reason: 'kills the not-truncated mutant: it walks past the gate');
+      expect(
+        plan.walked.legs.length,
+        1,
+        reason: 'kills a mutant that cuts the stops but not the legs',
+      );
+      expect(
+        plan.gateId,
+        'pennycross',
+        reason: 'kills a mutant that forgets which gate stopped it',
+      );
+      expect(
+        plan.route.stops,
+        route.stops,
+        reason: 'kills a mutant that loses the stops after the gate',
+      );
+    });
+
+    test('a trip TO a shut gate says it stops there', () {
+      final plan = TripPlan.of(
+        Travel.route('hearthwood', 'pennycross')!,
+        isShutGate: (id) => id == 'pennycross',
+      );
+      expect(
+        plan.gateId,
+        'pennycross',
+        reason: 'kills a mutant that only looks at the middle of the route',
+      );
+    });
+
+    test('⚠️ never the origin — the way back from a gate is open', () {
+      final plan = TripPlan.of(
+        Travel.route('pennycross', 'hearthwood')!,
+        isShutGate: (id) => id == 'pennycross',
+      );
+      expect(
+        plan.gateId,
+        isNull,
+        reason:
+            'kills a mutant that checks stop 0: turning back would end '
+            'where it starts',
+      );
+      expect(plan.walked.stops, [
+        'pennycross',
+        'hearthwood',
+      ], reason: 'kills a mutant that truncates with no gate on the way');
+    });
+  });
 }
