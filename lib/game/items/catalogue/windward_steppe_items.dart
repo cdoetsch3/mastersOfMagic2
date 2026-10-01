@@ -14,8 +14,12 @@ import '../item_def.dart';
 abstract final class WindwardSteppeItems {
   // ---- materials ------------------------------------------------------
 
-  /// ✅ §9b.6 — the wood ladder's tier-3 log; Yew equips at 20.
-  /// `value: 58` — ECONOMY_CONTRACT §8.2.
+  /// ✅ §9b.6 — the wood ladder's tier-4 log; Yew equips at 20.
+  /// `value: 120` — ECONOMY_CONTRACT §8.2.
+  ///
+  /// ⭐ Re-tiered above Rowan (ruling, Christian 2026-09-30, playtest note
+  /// 9): Yew 3/58 → **4/120**, because Windward Steppe (19-24) now sits above
+  /// Thunderspire (17-22). See `rowanLog`.
   static const yewLog = MaterialDef(
     id: 'yew_log',
     properName: 'Yew Log',
@@ -25,8 +29,8 @@ abstract final class WindwardSteppeItems {
         'same way. Cut with the lean, not against it, or the grain fights '
         'you the whole way through.',
     skill: CraftSkill.woodcarving,
-    tier: 3,
-    value: 58,
+    tier: 4,
+    value: 120,
   );
 
   /// `value: 37` — ECONOMY_CONTRACT §8.2.
@@ -94,6 +98,10 @@ abstract final class WindwardSteppeItems {
   );
 
   // ---- equipment: Woodcarving, Yew (§9b.6) -----------------------------
+  //
+  // 📝 `value`s swapped with Rowan's on 2026-09-30 (160/135/110 → 330/280/230):
+  // the gear was priced against its own log, and the logs swapped (see
+  // `yewLog`). Every other field is unchanged.
 
   static const yewQuarterstaff = EquipmentDef(
     id: 'yew_quarterstaff',
@@ -108,7 +116,7 @@ abstract final class WindwardSteppeItems {
     modifiers: ItemModifiers(damagePerCharge: 3, accuracyBonus: 7),
     salvage: [SalvageYield('yew_log', 1, 2)],
     equipLevel: 20,
-    value: 160,
+    value: 330,
   );
 
   static const yewWand = EquipmentDef(
@@ -123,7 +131,7 @@ abstract final class WindwardSteppeItems {
     modifiers: ItemModifiers(damagePerCast: 4, accuracyBonus: 2),
     salvage: [SalvageYield('yew_log', 1, 1)],
     equipLevel: 20,
-    value: 135,
+    value: 250,
   );
 
   static const yewKnot = EquipmentDef(
@@ -138,7 +146,7 @@ abstract final class WindwardSteppeItems {
     modifiers: ItemModifiers(accuracyBonus: 5),
     salvage: [SalvageYield('yew_log', 1, 1)],
     equipLevel: 20,
-    value: 110,
+    value: 230,
   );
 
   // ---- equipment: the Tussock set (Tailoring) --------------------------

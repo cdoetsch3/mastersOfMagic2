@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:masters_of_magic_2/game/travel.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:mom_engine/mom_engine.dart';
 
@@ -337,10 +338,16 @@ void main() {
         LocationKind.dungeon,
         reason: 'it is an interior, not open ground',
       );
+      // 📝 2026-09-30 (playtest note 1): the Cinderpeak Foothills door was
+      // cut as a hub trim. The descent is through the quarry, and only the
+      // quarry — which is what this test's name always said.
       expect(
         molten.connections,
-        containsAll(<String>['old_quarry', 'cinderpeak_foothills']),
-        reason: 'the descent runs under both',
+        ['old_quarry'],
+        reason:
+            'kills the mutant that restores the Cinderpeak Foothills → Molten '
+            'Deep road (ruling 2026-09-30), and the one that drops the quarry '
+            'descent',
       );
     });
 
@@ -452,6 +459,99 @@ void main() {
               'proof would then be locked behind the gate it opens',
         );
       }
+    });
+  });
+
+  // ⭐ **The map was simplified** (ruling, Christian 2026-09-30, playtest note
+  // 1). Nine roads were cut; WORLD_DESIGN §4b.7 lists them and the rule. Tier
+  // 1 is Christian's rule — an encounter-to-encounter road whose two zones
+  // already touch the same city is a duplicate. Tier 2 are hub trims.
+  group('the simplified map (2026-09-30)', () {
+    const removed = [
+      // Tier 1 — both ends already touch the same city.
+      ['whispering_woods', 'thornmire'],
+      ['glimmerbrook', 'thornmire'],
+      ['windward_steppe', 'frostfell_pass'],
+      ['the_kiln_desert', 'the_sunless_reach'],
+      ['the_mirrormere', 'the_sunless_reach'],
+      ['hallowmarch', 'the_umbral_wastes'],
+      // Tier 2 — hub trims.
+      ['the_mirrormere', 'meridian'],
+      ['cinderpeak_foothills', 'the_molten_deep'],
+      ['glimmerbrook', 'pennycross'],
+    ];
+
+    test('the nine cut roads stay cut, in both directions', () {
+      for (final pair in removed) {
+        for (final (from, to) in [(pair[0], pair[1]), (pair[1], pair[0])]) {
+          expect(
+            byId[from]!.connections,
+            isNot(contains(to)),
+            reason:
+                'kills the mutant that restores the $from → $to road the '
+                '2026-09-30 ruling removed',
+          );
+        }
+      }
+    });
+
+    test('39 legs remain — 48 less the nine', () {
+      // Every leg is authored on both of its ends, so the edge entries count
+      // each leg twice.
+      // ⚠️ The brief said "47 roads become 38", quoting `travel.dart`'s doc —
+      // but that 47 was already stale: the pre-cut graph had 48 legs (45
+      // roads, the Galehaven sea passage and the two Veil crossings). Pinned
+      // by counting, 2026-09-30.
+      final all = [for (final l in World.locations) ...l.edges];
+      expect(
+        all.length,
+        39 * 2,
+        reason:
+            'kills the mutant that restores (or cuts) any leg: 48 before '
+            '2026-09-30, nine removed, 39 after',
+      );
+      expect(
+        all.where((e) => e.kind == TravelEdgeKind.road).length,
+        36 * 2,
+        reason:
+            'kills the mutant that restores one of the nine cut roads — all '
+            'nine were ordinary roads, so 45 became 36; the sea and Veil '
+            'crossings are untouched',
+      );
+    });
+
+    test('the two routes the cut made longer cost what the doc says', () {
+      int authored(TravelRoute r) => r.legs.fold(0, (t, e) => t + e.minutes);
+
+      // Rimeholt → The Umbral Wastes used to be Hallowmarch's 6 + 8 = 14.
+      final wastes = Travel.route('rimeholt', 'the_umbral_wastes')!;
+      expect(
+        wastes.stops,
+        ['rimeholt', 'hallowmarch', 'vespergate', 'the_umbral_wastes'],
+        reason:
+            'kills the mutant that restores the Hallowmarch → Wastes road: '
+            'the trip would go back to two legs',
+      );
+      expect(
+        authored(wastes),
+        20,
+        reason: 'WORLD_DESIGN §4b.7 records 14 → 20 authored minutes (6+6+8)',
+      );
+
+      // Concordance → The Sunless Reach: unchanged at 11, through Meridian.
+      final reach = Travel.route('concordance', 'the_sunless_reach')!;
+      expect(
+        reach.stops,
+        ['concordance', 'meridian', 'the_sunless_reach'],
+        reason:
+            'kills the mutant that cuts the Meridian → Sunless Reach road, '
+            'now its only door',
+      );
+      expect(
+        authored(reach),
+        11,
+        reason: 'WORLD_DESIGN §4b.7 records 11 authored minutes (5+6)',
+      );
     });
   });
 }

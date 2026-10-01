@@ -389,7 +389,7 @@ abstract final class World {
       // level-1-5 wood.
       // ⭐ Both sides were edited together — see `ashfall_vale` below, and
       // `test/world_test.dart`'s bidirectionality + reachability guards.
-      edges: [TravelEdge('hearthwood', 3), TravelEdge('thornmire', 3)],
+      edges: [TravelEdge('hearthwood', 3)],
     ),
     GameLocation(
       id: 'glimmerbrook',
@@ -404,11 +404,7 @@ abstract final class World {
           'The brook runs over pale stones and throws the light back at '
           'you in pieces. Fish hang in the current without swimming. The water '
           'is colder than the season should allow.',
-      edges: [
-        TravelEdge('hearthwood', 3),
-        TravelEdge('thornmire', 3),
-        TravelEdge('pennycross', 3),
-      ],
+      edges: [TravelEdge('hearthwood', 3)],
     ),
     GameLocation(
       id: 'cinderpeak_foothills',
@@ -427,11 +423,7 @@ abstract final class World {
       // ⚠️ **No shortcut to Forgeholm from here.** This edge used to exist
       // and it let a level-11 player skip the climb; the way into the range
       // is the Old Quarry, and there is no second way.
-      edges: [
-        TravelEdge('hearthwood', 3),
-        TravelEdge('ashfall_vale', 3),
-        TravelEdge('the_molten_deep', 5),
-      ],
+      edges: [TravelEdge('hearthwood', 3), TravelEdge('ashfall_vale', 3)],
     ),
     GameLocation(
       id: 'thornmire',
@@ -447,11 +439,7 @@ abstract final class World {
           'The path becomes a suggestion, then a rumour, then water. '
           'Trees stand in it up to their knees and have made peace with that. '
           'Everything green here is winning.',
-      edges: [
-        TravelEdge('hearthwood', 3),
-        TravelEdge('whispering_woods', 3),
-        TravelEdge('glimmerbrook', 3),
-      ],
+      edges: [TravelEdge('hearthwood', 3)],
     ),
     GameLocation(
       id: 'ashfall_vale',
@@ -501,11 +489,7 @@ abstract final class World {
           'Two roads meet and a town happened. Stalls have grown into '
           'buildings, and the buildings still look like stalls. Everyone is '
           'halfway through a transaction.',
-      edges: [
-        TravelEdge('hearthwood', 3),
-        TravelEdge('glimmerbrook', 3),
-        TravelEdge('old_quarry', 4),
-      ],
+      edges: [TravelEdge('hearthwood', 3), TravelEdge('old_quarry', 4)],
     ),
 
     // ---------------------------------------------------------------
@@ -610,7 +594,6 @@ abstract final class World {
           'blowing since before there was anyone to notice.',
       edges: [
         TravelEdge('thunderspire_peaks', 5),
-        TravelEdge('frostfell_pass', 5),
         TravelEdge('concordance', 5),
       ],
     ),
@@ -630,7 +613,6 @@ abstract final class World {
           'somewhere, and other people have been sure of that too.',
       edges: [
         TravelEdge('thunderspire_peaks', 5),
-        TravelEdge('windward_steppe', 5),
         TravelEdge('galehaven', 5),
         TravelEdge('concordance', 5),
       ],
@@ -673,10 +655,7 @@ abstract final class World {
           "The quarry's deepest gallery keeps going after the tool marks "
           'stop. The rock gets warm, then hot, then lit from below. There is a '
           'floor down here that moves like water because it is not water.',
-      edges: [
-        TravelEdge('old_quarry', 5),
-        TravelEdge('cinderpeak_foothills', 5),
-      ],
+      edges: [TravelEdge('old_quarry', 5)],
     ),
 
     // ---------------------------------------------------------------
@@ -721,11 +700,7 @@ abstract final class World {
           'The air is too thin to hold heat, so the sun burns while the '
           'wind bites. There is no shade anywhere and no water for a day\'s '
           'walk. Your shadow is the hardest-edged thing you have ever seen.',
-      edges: [
-        TravelEdge('concordance', 5),
-        TravelEdge('meridian', 5),
-        TravelEdge('the_sunless_reach', 6),
-      ],
+      edges: [TravelEdge('concordance', 5), TravelEdge('meridian', 5)],
     ),
     GameLocation(
       id: 'the_mirrormere',
@@ -742,9 +717,7 @@ abstract final class World {
           'the shore, you are careful not to look down for too long.',
       edges: [
         TravelEdge('concordance', 6),
-        TravelEdge('meridian', 6),
         TravelEdge('tidewrack_shoals', 6),
-        TravelEdge('the_sunless_reach', 6),
         TravelEdge('rimeholt', 6),
       ],
     ),
@@ -780,7 +753,6 @@ abstract final class World {
       edges: [
         TravelEdge('concordance', 5),
         TravelEdge('the_kiln_desert', 5),
-        TravelEdge('the_mirrormere', 6),
         TravelEdge('starfall_basin', 6),
         TravelEdge('the_sunless_reach', 6),
         TravelEdge('rimeholt', 6),
@@ -818,11 +790,7 @@ abstract final class World {
           'You come over the crest out of glare into a valley that has '
           'never been lit. The rock is the same rock. The desert is a thousand '
           'feet away and on the other side of the world.',
-      edges: [
-        TravelEdge('meridian', 6),
-        TravelEdge('the_kiln_desert', 6),
-        TravelEdge('the_mirrormere', 6),
-      ],
+      edges: [TravelEdge('meridian', 6)],
     ),
     GameLocation(
       id: 'the_shattered_orrery',
@@ -891,14 +859,16 @@ abstract final class World {
           'for a few hours and the meltwater runs beside you the whole way. '
           'Every mile or so there is a marker, and every marker has been '
           'maintained.',
-      // ⭐ **The causeway now hands the climber to the Wastes, not to the
-      // Reliquary** (ruling, Christian 2026-09-21). The old road ran
-      // Hallowmarch 45-49 → Reliquary Deep 52-56 → Umbral Wastes 47-51, which
-      // made the hardest place on the mountain the corridor you walked to
-      // reach an easier one.
+      // 📝 **History.** 2026-09-21 moved the Wastes onto the causeway: the old
+      // road ran Hallowmarch 45-49 → Reliquary Deep 52-56 → Umbral Wastes
+      // 47-51, the hardest place on the mountain as the corridor to an easier
+      // one.
+      // ⭐ **No road to the Wastes any more** (ruling, Christian 2026-09-30,
+      // playtest note 1 — "simplify the map"). Hallowmarch and the Wastes
+      // both already touch Vespergate, so their direct road was a duplicate;
+      // the Wastes are now reached through Vespergate only. WORLD_DESIGN §4b.7.
       edges: [
         TravelEdge('rimeholt', 6),
-        TravelEdge('the_umbral_wastes', 8),
         TravelEdge('vespergate', 6),
         TravelEdge('the_sealed_garden', 6),
       ],
@@ -916,14 +886,14 @@ abstract final class World {
           'You round the shoulder and the light stops. Not dusk — an '
           'absence with an edge to it. The ice here has never melted and holds '
           'its shape like something that has been thought about.',
-      // ⭐ The middle of the north road: the causeway rounds the shoulder out
-      // of Hallowmarch into here, the Reliquary's door is at the top of the
-      // ice above, and the upper icefall drops away to Vespergate.
-      edges: [
-        TravelEdge('hallowmarch', 8),
-        TravelEdge('the_reliquary_deep', 8),
-        TravelEdge('vespergate', 8),
-      ],
+      // ⭐ Reached from Vespergate only (ruling, Christian 2026-09-30 — the
+      // Hallowmarch road was cut as a duplicate; WORLD_DESIGN §4b.7). The
+      // upper icefall drops away to Vespergate, and the Reliquary's door is at
+      // the top of the ice above.
+      // 📝 The passage law asks the same of the climber as before: from
+      // Rimeholt the road runs through Hallowmarch either way, so Hallowmarch
+      // must be cleared first (Vespergate is a town, and towns never refuse).
+      edges: [TravelEdge('the_reliquary_deep', 8), TravelEdge('vespergate', 8)],
     ),
     GameLocation(
       id: 'the_reliquary_deep',

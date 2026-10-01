@@ -34,8 +34,15 @@ import '../item_def.dart';
 abstract final class ThunderspirePeaksItems {
   // ---- materials ------------------------------------------------------
 
-  /// ✅ §9b.6 — the wood ladder's tier-4 log; Rowan equips at 19.
-  /// `value: 120` — ECONOMY_CONTRACT §8.2.
+  /// ✅ §9b.6 — the wood ladder's tier-3 log; Rowan equips at 19.
+  /// `value: 58` — ECONOMY_CONTRACT §8.2.
+  ///
+  /// ⭐ **Yew before Rowan → Rowan before Yew** (ruling, Christian
+  /// 2026-09-30, playtest note 9). The 2026-09-21 re-band put Thunderspire
+  /// (17-22) below Windward Steppe (19-24), so the logs swap tier and value
+  /// to match: Rowan 4/120 → **3/58**, Yew 3/58 → 4/120. The gear `value`s
+  /// followed their logs (follow-up, same day); lore, zones, every other gear
+  /// field and the recipes are as they were.
   static const rowanLog = MaterialDef(
     id: 'rowan_log',
     properName: 'Rowan Log',
@@ -46,8 +53,8 @@ abstract final class ThunderspirePeaksItems {
         'bark, one of the only living things taller than a person this high '
         'up.',
     skill: CraftSkill.woodcarving,
-    tier: 4,
-    value: 120,
+    tier: 3,
+    value: 58,
   );
 
   /// `value: 12` — ECONOMY_CONTRACT §8.2.
@@ -104,6 +111,10 @@ abstract final class ThunderspirePeaksItems {
   //
   // ⭐ The first crafted crit in the game, and the wood ladder's first gem
   // socket — left empty on purpose, a promise the Celestial quarter keeps.
+  //
+  // 📝 `value`s swapped with Yew's on 2026-09-30 (330/280/230 → 160/135/110):
+  // the gear was priced against its own log, and the logs swapped (see
+  // `rowanLog`). Every other field is unchanged.
 
   static const rowanQuarterstaff = EquipmentDef(
     id: 'rowan_quarterstaff',
@@ -125,7 +136,7 @@ abstract final class ThunderspirePeaksItems {
     socketCount: 1,
     salvage: [SalvageYield('rowan_log', 1, 2)],
     equipLevel: 19,
-    value: 330,
+    value: 200,
   );
 
   static const rowanWand = EquipmentDef(
@@ -147,7 +158,7 @@ abstract final class ThunderspirePeaksItems {
     socketCount: 1,
     salvage: [SalvageYield('rowan_log', 1, 1)],
     equipLevel: 19,
-    value: 280,
+    value: 135,
   );
 
   static const rowanKnot = EquipmentDef(
@@ -164,7 +175,7 @@ abstract final class ThunderspirePeaksItems {
     socketCount: 1,
     salvage: [SalvageYield('rowan_log', 1, 1)],
     equipLevel: 19,
-    value: 230,
+    value: 110,
   );
 
   // ---- equipment: the chase -----------------------------------------------

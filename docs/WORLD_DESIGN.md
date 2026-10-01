@@ -619,6 +619,67 @@ one edge.
 - ❓ Open: whether shops also *buy* from players (a price floor, and a second
   faucet to watch).
 
+### 4b.7 ✅ The road network, simplified (ruled 2026-09-30)
+
+📝 Playtest 2026-09-30, note 1: *simplify the map.* **Nine roads are cut, in
+both directions.** Travel times on the surviving roads are unchanged.
+
+⭐ **Tier 1 is Christian's rule: an encounter-to-encounter road whose two
+zones already touch the same city is a duplicate.** The city already joins
+them, so the direct road only adds clutter to the map. Tier 2 are hub trims,
+accepted alongside it.
+
+| # | Road cut | Why |
+|---|---|---|
+| 1 | Whispering Woods – Thornmire | Tier 1: both touch Hearthwood |
+| 2 | Glimmerbrook – Thornmire | Tier 1: both touch Hearthwood |
+| 3 | Windward Steppe – Frostfell Pass | Tier 1: both touch Concordance |
+| 4 | The Kiln Desert – The Sunless Reach | Tier 1: both touch Meridian |
+| 5 | The Mirrormere – The Sunless Reach | Tier 1: both touched Meridian (before #7) |
+| 6 | Hallowmarch – The Umbral Wastes | Tier 1: both touch Vespergate |
+| 7 | The Mirrormere – Meridian | Tier 2: hub trim (Concordance and Rimeholt remain) |
+| 8 | Cinderpeak Foothills – The Molten Deep | Tier 2: hub trim (the quarry descent remains) |
+| 9 | Glimmerbrook – Pennycross | Tier 2: hub trim (Hearthwood remains) |
+
+⚠️ **48 legs become 39, not "47 become 38".** `travel.dart` said 47, but the
+figure was already stale before the cut. The graph had 48 legs: 45 roads,
+the Galehaven sea passage and the two Veil crossings. All nine cuts were
+roads, so it is now **36 roads + 1 sea + 2 Veil = 39**. Both figures are
+counted in `world_test.dart`, not copied from here.
+
+**Two routes the cut touches** (authored minutes; the live policy is still a
+flat cost per leg, §4b.1):
+
+| Route | Before | After |
+|---|---|---|
+| Rimeholt → The Umbral Wastes | 14 (Hallowmarch 6 + 8), 2 legs | **20** (Hallowmarch 6 + Vespergate 6 + 8), 3 legs |
+| Concordance → The Sunless Reach | 11 (via Meridian, Kiln or Mirrormere) | **11**, unchanged, via Meridian, which is now its only door |
+
+📝 Other trips that got one leg longer: Meridian → The Mirrormere 6 → 11,
+Pennycross → Glimmerbrook 3 → 6, Galehaven → Windward Steppe 10 → 15, and
+Hearthwood → The Molten Deep 8 → 12. No zone's nearest town got further away
+except the Molten Deep's (Hearthwood 8 → Pennycross 9).
+
+⭐ **Cut #8 also closes a way around the Pennycross gate.** Before the cut,
+Hearthwood → Cinderpeak → The Molten Deep → Old Quarry → Forgeholm reached the
+Kinetic range without passing Pennycross. The Deep is now entered from the
+quarry only, which is what §3.1 always said.
+
+⚠️ **The Umbral Wastes are now reached from Vespergate only** (plus the
+Reliquary above them). The 2026-09-21 point still holds: the Reliquary is the
+top of the north road, behind the Wastes. The passage law asks the same of
+the climber as before, because the trip from Rimeholt runs through Hallowmarch
+either way.
+
+**Guarded by:**
+* `world_test.dart` "the simplified map (2026-09-30)": the nine roads are
+  absent both ways, the 39/36 counts hold, and the two routes above have those
+  stops and costs.
+* `world_test.dart` / `travel_test.dart`: every place is still reachable
+  from Hearthwood.
+* `world_bands_test.dart`: the Wastes sit between Vespergate and the
+  Reliquary.
+
 ---
 
 ## 4c. ⭐ Element coverage across the world — audit + the late-zone question
@@ -1046,7 +1107,9 @@ not locked.
 > shifts under you. Somewhere above, the mountain is breathing. The air tastes
 > of struck flint.
 >
-> **Here** — Best Pyro motes. Mining. The descent to The Molten Deep.
+> **Here** — Best Pyro motes. Mining. ~~The descent to The Molten Deep.~~
+> *(Road cut 2026-09-30, §4b.7: the Deep is entered from the Old Quarry
+> only.)*
 
 #### Thornmire · hybrid · Flora + Aqua *(Flora ▸ Aqua)* · Lv 8–13
 > **Blurb** — Where the woods drown in the brook's outflow.
@@ -1485,6 +1548,11 @@ Wastes 47–51**: the hardest place on the mountain was the corridor you walked
 | **Hallowmarch** | Rimeholt · **The Umbral Wastes** · Vespergate · The Sealed Garden |
 | **The Umbral Wastes** | Hallowmarch · The Reliquary Deep · Vespergate |
 | **The Reliquary Deep** | The Umbral Wastes *(only)* |
+
+📝 **Superseded in part, 2026-09-30 (§4b.7).** The Hallowmarch ↔ Umbral Wastes
+road was cut as a duplicate, because both already touch Vespergate.
+Hallowmarch now runs to Rimeholt, Vespergate and The Sealed Garden. The Wastes
+run to The Reliquary Deep and Vespergate. The Reliquary is unchanged.
 
 Travel durations are unchanged at 8 minutes a leg. ⚠️ **The Reliquary is now
 entered from the ice and only from the ice** — the vault is still bored from

@@ -33,13 +33,18 @@ class _MemStorage implements ProfileStorage {
   Future<void> clear() async => stored = null;
 }
 
-/// A player standing in Whispering Woods, whose roads lead to Hearthwood (a
-/// town) and Thornmire (a zone) — one card of each kind, side by side.
-Future<void> _pumpMapTabInWoods(WidgetTester tester) async {
+/// A player standing in Cinderpeak Foothills, whose roads lead to Hearthwood
+/// (a town) and Ashfall Vale (a zone) — one card of each kind, side by side.
+///
+/// 📝 Was Whispering Woods → Thornmire until the 2026-09-30 map
+/// simplification cut that road (WORLD_DESIGN §4b.7); the Woods now has a
+/// town neighbour only. The Foothills have the same shape.
+Future<void> _pumpMapTabInFoothills(WidgetTester tester) async {
   tester.view.physicalSize = const Size(420, 1600);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
-  final profile = PlayerProfile.newPlayer()..locationId = 'whispering_woods';
+  final profile = PlayerProfile.newPlayer()
+    ..locationId = 'cinderpeak_foothills';
   await tester.pumpWidget(
     MaterialApp(
       home: GameStateScope(
@@ -59,18 +64,18 @@ Finder _inCard(String name, Finder f) =>
     find.descendant(of: _card(name), matching: f);
 
 void main() {
-  final woods = World.byId('whispering_woods');
+  final foothills = World.byId('cinderpeak_foothills');
   final hearthwood = World.byId('hearthwood');
-  final thornmire = World.byId('thornmire');
+  final ashfall = World.byId('ashfall_vale');
 
   setUpAll(() {
     expect(
-      woods.connections,
-      containsAll([hearthwood.id, thornmire.id]),
+      foothills.connections,
+      containsAll([hearthwood.id, ashfall.id]),
       reason: 'precondition: the test needs a town card and a zone card',
     );
     expect(
-      (hearthwood.isTown, thornmire.isTown),
+      (hearthwood.isTown, ashfall.isTown),
       (true, false),
       reason: 'precondition: one of each kind',
     );
@@ -80,17 +85,17 @@ void main() {
     testWidgets("the current location's card carries both lines", (
       tester,
     ) async {
-      await _pumpMapTabInWoods(tester);
+      await _pumpMapTabInFoothills(tester);
       expect(
-        find.text(Provenance.gatherLine(woods)!),
+        find.text(Provenance.gatherLine(foothills)!),
         findsOneWidget,
         reason:
-            'the Woods\' gather line under its blurb — a current card '
-            'without the lines fails here (the Woods is nobody\'s neighbour '
-            'here, so only that card can print it)',
+            'the Foothills\' gather line under its blurb — a current card '
+            'without the lines fails here (the Foothills are nobody\'s '
+            'neighbour here, so only that card can print it)',
       );
       expect(
-        find.text(Provenance.dropsLine(woods)!),
+        find.text(Provenance.dropsLine(foothills)!),
         findsOneWidget,
         reason: 'and its drops line',
       );
@@ -99,19 +104,19 @@ void main() {
     testWidgets('a zone travel card carries both lines; a town card neither', (
       tester,
     ) async {
-      await _pumpMapTabInWoods(tester);
+      await _pumpMapTabInFoothills(tester);
       expect(
         _inCard(
-          thornmire.name,
-          find.text('Gather: Bogflax Fibre · Fenroot · Amber'),
+          ashfall.name,
+          find.text('Gather: Birch Log · Brookmint · Charcoal'),
         ),
         findsOneWidget,
         reason:
-            'Thornmire\'s three nodes — a travel card without the lines, or '
-            'one reading the CURRENT location, fails here',
+            'Ashfall Vale\'s three nodes — a travel card without the lines, '
+            'or one reading the CURRENT location, fails here',
       );
       expect(
-        _inCard(thornmire.name, find.textContaining('Drops: ')),
+        _inCard(ashfall.name, find.textContaining('Drops: ')),
         findsOneWidget,
         reason: 'and its drops line',
       );
@@ -133,9 +138,9 @@ void main() {
         // ⭐ Press-stability: a town neighbour and a zone neighbour stand the
         // same height in this cell, so the cards below never shift by which
         // kind of place sits above them.
-        await _pumpMapTabInWoods(tester);
+        await _pumpMapTabInFoothills(tester);
         final town = tester.getSize(find.byKey(mapYieldCellKey(hearthwood.id)));
-        final zone = tester.getSize(find.byKey(mapYieldCellKey(thornmire.id)));
+        final zone = tester.getSize(find.byKey(mapYieldCellKey(ashfall.id)));
         expect(
           zone.height,
           greaterThan(0),
@@ -152,9 +157,9 @@ void main() {
     );
 
     testWidgets('a travel card line never wraps', (tester) async {
-      await _pumpMapTabInWoods(tester);
+      await _pumpMapTabInFoothills(tester);
       final line = tester.widget<Text>(
-        _inCard(thornmire.name, find.textContaining('Drops: ')),
+        _inCard(ashfall.name, find.textContaining('Drops: ')),
       );
       expect(
         (line.maxLines, line.overflow),

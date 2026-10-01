@@ -31,6 +31,14 @@ import 'package:masters_of_magic_2/game/world.dart';
 /// Tailoring robe/leggings outputs, §14b.1) and now clean-pass with everyone
 /// else — leaving exactly the 3 boundary + 14 minor-overage recipes exempt,
 /// 20 + 4 + 3 + 14 = 41.
+///
+/// 📝 **16 since 2026-09-30.** The Yew/Rowan log re-tier swapped the logs'
+/// tier and value, and the six pieces of gear swapped `value` with them. The
+/// recipes' ingots did NOT swap (Rowan still takes iron at 52, Yew bronze at
+/// 32), so the buckets moved: both quarterstaffs pass cleanly now (the Rowan
+/// staff re-priced 160 → 200 and the Yew wand 280 → 250 so each sits inside
+/// the strict window, ruling at merge) and leave this list; the Rowan wand is
+/// a new minor overage and joins. 17 − 2 + 1 = 16.
 const Map<String, String> _exemptions = {
   // ---- ⚠️ boundary (§8.6): Σ(inputs) sits AT the Standard edge, not inside
   // the open interval. The contract's own audit calls these "zero headroom,"
@@ -63,8 +71,15 @@ const Map<String, String> _exemptions = {
   'craft_bindweed_gloves': '§8.6 minor overage — Master-profitable.',
   'craft_bogflax_boots': '§8.6 minor overage — Master-profitable.',
   'craft_bogflax_gloves': '§8.6 minor overage — Master-profitable.',
-  'craft_yew_quarterstaff': '§8.6 minor overage — Master-profitable.',
-  'craft_rowan_quarterstaff': '§8.6 minor overage — Master-profitable.',
+  // 📝 craft_yew_quarterstaff and craft_rowan_quarterstaff were here until
+  // 2026-09-30. After the log re-tier the Yew staff passes cleanly (392 <
+  // Ornate 396) and the Rowan staff is past the Master line (226 > 224), so
+  // neither "minor overage, Master-profitable" reason holds any more.
+  'craft_rowan_wand':
+      '2026-09-30 log re-tier: rowan_log×2 (58) + iron_ingot (52) = 168 '
+      'against the swapped Standard 135 is over Ornate (162) and under the '
+      'Master line (189), the §8.6 minor-overage shape. It was a clean pass '
+      'as yew_wand before the swap, and the iron ingot is the 20 g gap.',
   'craft_tussock_robe': '§8.6 minor overage — Master-profitable.',
   'craft_tussock_leggings': '§8.6 minor overage — Master-profitable.',
 };
@@ -188,19 +203,20 @@ void main() {
       }
     });
 
-    test(
-      'exemption list is exactly the 17 the audit blessed, no more no less',
-      () {
-        expect(
-          _exemptions.length,
-          17,
-          reason:
-              '§8.6: 3 boundary + 14 minor-overage = 17. A count drifting '
-              'either way means either a real regression got quietly '
-              'exempted, or a fixed recipe is still carrying a stale waiver',
-        );
-      },
-    );
+    test('exemption list is exactly the 16 the audit still blesses, no more no '
+        'less', () {
+      expect(
+        _exemptions.length,
+        16,
+        reason:
+            '§8.6: 3 boundary + 14 minor-overage = 17. The 2026-09-30 log '
+            're-tier (logs and gear values swapped, ingots did not) dropped '
+            'both quarterstaffs and added the Rowan wand: 17 − 2 + 1 = 16. A '
+            'count drifting either way means either a real regression got '
+            'quietly exempted, or a fixed recipe is still carrying a stale '
+            'waiver',
+      );
+    });
 
     for (final r in RecipeBook.all) {
       final exemptReason = _exemptions[r.id];

@@ -1,4 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:masters_of_magic_2/game/gathering/gather_node.dart';
+import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
+import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 
 /// ⭐ **Difficulty ascends along the forced route** (ruling, Christian
@@ -142,19 +145,28 @@ void main() {
       );
     });
 
-    test('the Umbral Wastes sit between Hallowmarch and the Reliquary', () {
+    // 📝 2026-09-30 (playtest note 1, "simplify the map"): the Hallowmarch ↔
+    // Umbral Wastes road was cut as a duplicate — both already touch
+    // Vespergate. The 2026-09-21 point of this test survives intact: the
+    // Reliquary is still the TOP of the north road, behind the Wastes, and
+    // no level-45 road opens onto it.
+    test('the Umbral Wastes sit between Vespergate and the Reliquary', () {
       expect(
         byId['hallowmarch']!.connections,
-        ['rimeholt', 'the_umbral_wastes', 'vespergate', 'the_sealed_garden'],
+        ['rimeholt', 'vespergate', 'the_sealed_garden'],
         reason:
             'kills the mutant that puts the Hallowmarch → Reliquary Deep '
-            'short cut back and lets a level-45 road open on 52-56 content',
+            'short cut back (a level-45 road opening on 52-56 content), and '
+            'the one that restores the Hallowmarch → Umbral Wastes road the '
+            '2026-09-30 ruling cut',
       );
-      expect(byId['the_umbral_wastes']!.connections, [
-        'hallowmarch',
-        'the_reliquary_deep',
-        'vespergate',
-      ], reason: 'the Wastes are now the middle of the road, not its end');
+      expect(
+        byId['the_umbral_wastes']!.connections,
+        ['the_reliquary_deep', 'vespergate'],
+        reason:
+            'kills the mutant that drops the Vespergate road — since '
+            '2026-09-30 it is the only way into the Wastes',
+      );
       expect(
         byId['the_reliquary_deep']!.connections,
         ['the_umbral_wastes'],
@@ -163,10 +175,10 @@ void main() {
             'dark face only',
       );
 
-      // ⚠️ Durations were deliberately NOT retuned by the ruling — only the
-      // shape of the road changed.
+      // ⚠️ Durations were deliberately NOT retuned by either ruling — only
+      // the shape of the road changed.
       for (final pair in [
-        ['hallowmarch', 'the_umbral_wastes'],
+        ['vespergate', 'the_umbral_wastes'],
         ['the_umbral_wastes', 'the_reliquary_deep'],
       ]) {
         expect(
@@ -219,5 +231,70 @@ void main() {
         }
       },
     );
+  });
+
+  // ⭐ **The wood ladder follows the bands** (ruling, Christian 2026-09-30,
+  // playtest note 9). The 2026-09-21 re-band put Thunderspire Peaks (17-22)
+  // below Windward Steppe (19-24), but the logs kept their old ladder:
+  // Thunderspire's Rowan was tier 4 and Windward's Yew tier 3. The ruling
+  // re-tiers the logs, and the gear's `value`s follow their logs (same-day
+  // follow-up); nothing else moved.
+  group('the wood ladder follows the bands (2026-09-30)', () {
+    /// The zone whose gather node yields [logId]: where the log comes from,
+    /// read from the content rather than restated here.
+    GameLocation homeOf(String logId) {
+      final zones = {
+        for (final n in GatherNodes.all)
+          if (n.yieldsDefId == logId) n.zoneId,
+      };
+      expect(
+        zones,
+        hasLength(1),
+        reason: 'precondition: $logId is gathered in exactly one zone',
+      );
+      return byId[zones.single]!;
+    }
+
+    test("yew_log's tier is above rowan_log's, matching the zone bands", () {
+      final rowan = ItemCatalogue.byId('rowan_log') as MaterialDef;
+      final yew = ItemCatalogue.byId('yew_log') as MaterialDef;
+      final rowanZone = homeOf('rowan_log');
+      final yewZone = homeOf('yew_log');
+
+      expect(
+        (rowanZone.id, yewZone.id),
+        ('thunderspire_peaks', 'windward_steppe'),
+        reason: 'precondition: the logs are where the ruling says they are',
+      );
+      expect(
+        yewZone.minLevel,
+        greaterThan(rowanZone.minLevel),
+        reason:
+            'precondition: Windward Steppe sits above Thunderspire since '
+            'the 2026-09-21 re-band, which is what the ruling follows',
+      );
+      expect(
+        yew.tier,
+        greaterThan(rowan.tier),
+        reason:
+            'kills the mutant that swaps the tiers back (Rowan 4, Yew 3): '
+            'the higher-band zone must drop the higher-tier log',
+      );
+      expect(
+        yew.value,
+        greaterThan(rowan.value),
+        reason:
+            'kills the mutant that swaps the tiers but leaves the values '
+            'behind: the value moves with the tier',
+      );
+      expect(
+        [(rowan.tier, rowan.value), (yew.tier, yew.value)],
+        [(3, 58), (4, 120)],
+        reason:
+            'the ruling\'s exact figures: the two logs trade tier AND value '
+            'wholesale (Rowan 4/120 → 3/58, Yew 3/58 → 4/120), nothing '
+            're-derived',
+      );
+    });
   });
 }

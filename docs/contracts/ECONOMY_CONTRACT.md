@@ -553,11 +553,11 @@ even though §8.4 shows one of them still fails its own recipe.
 | `bronze_ingot` (intermediate) | 3 | common | 0 | **32** |
 | `seawrack_fibre` | 3 | common | 0 | **30** |
 | `saltwort` | 3 | common | 0 | **16** |
-| `yew_log` | 3 | common | 0 | **58** |
+| `yew_log` | ~~3~~ **4** | common | 0 | ~~58~~ **120** ⚠️ re-tiered 2026-09-30 (gear followed), see below |
 | `tussock_flax` | 4 | common | 0 | **37** |
 | `rimepelt` | 4 | common | 12 | **95** ⚠️ see §8.4 |
 | `hoarlichen` | 4 | common | 11 | 11 (no recipe consumer — kept as-is) |
-| `rowan_log` | 4 | common | 0 | **120** |
+| `rowan_log` | ~~4~~ **3** | common | 0 | ~~120~~ **58** ⚠️ re-tiered 2026-09-30 (gear followed), see below |
 | `iron_ore` | 4 | common | 0 | **12** |
 | `hum_quartz` | 4 | uncommon | 0 | **20** |
 | `iron_ingot` (intermediate) | 4 | common | 0 | **52** |
@@ -565,6 +565,18 @@ even though §8.4 shows one of them still fails its own recipe.
 | `everice` | 5 | uncommon | 26 | 26 (no recipe consumer — kept as-is) |
 | `firesalt` | 5 | common | 0 | **15** |
 | `emberhide` | 5 | common | 0 | **190** ⚠️ see §8.5 |
+
+⚠️ **2026-09-30 — Yew and Rowan swap tier and value, and their gear swaps
+value with them** (ruling, Christian, playtest note 9). The 2026-09-21
+re-band put Thunderspire Peaks (Lv 17–22, Rowan's zone) below Windward Steppe
+(Lv 19–24, Yew's zone), so the logs now follow the zones: `rowan_log` 4/120 →
+**3/58** and `yew_log` 3/58 → **4/120**. The values above were back-solved
+against each log's **own** gear (this section's method). So the gear `value`s
+follow their logs too: Rowan Quarterstaff/Wand/Knot 330/280/230 →
+**160/135/110**, and Yew 160/135/110 → **330/280/230**. Lore, zones, every
+other gear field and the recipes are unchanged. ⭐ **The Forgeholm/Concordance
+Rowan loop is closed.** A logs-only swap had briefly left Rowan gear
+32–50% under Standard on shop-bought logs (§8.6 note).
 
 ⭐ **A pattern worth stating once rather than per-row:** materials do **not**
 scale like equipment. Equipment value roughly triples per wood tier (Oak
@@ -621,6 +633,35 @@ The table below re-runs the audit with §8.2's **proposed** values (`oak_log
 | ⚠️ Boundary (exactly at Standard or Ornate) | 3 | seawrack_hood (60=Standard), craft_bronze_ingot, craft_iron_ingot (both Σ=output, zero headroom — propose +2 on each ingot's value) |
 | 📝 Minor overage (4–12% over Ornate; still Master-profitable) | 14 | oak_quarterstaff, oak_knot, birch_quarterstaff, birch_knot, bindweed_robe, bindweed_leggings, bindweed_boots, bindweed_gloves, bogflax_boots, bogflax_gloves, yew_quarterstaff, rowan_quarterstaff, tussock_robe, tussock_leggings |
 | 🔴 **Major violation** (Master-tier still a loss) | 4 | **bogflax_robe** (+37%), **bogflax_leggings** (+33%), **seawrack_robe** (+32%), **seawrack_leggings** (+28%) |
+
+⚠️ **2026-09-30 — the Yew/Rowan re-tier (§8.2 note) moves the six wood
+recipes.** Logs and gear swapped together, but **the ingots did not**: Rowan
+still takes `iron_ingot` (52) and Yew `bronze_ingot` (32). So each recipe sits
+±20 g from where it was:
+
+| Recipe | Σ(inputs) now | Standard | Ornate | Master line | Verdict (was) |
+|---|---|---|---|---|---|
+| `craft_rowan_knot` | 2×58 = **116** | 110 | 132 | 154 | ✅ clean (clean) |
+| `craft_rowan_wand` | 2×58 + 52 = **168** | 135 | 162 | 189 | 📝 minor overage (clean) |
+| `craft_rowan_quarterstaff` | 3×58 + 52 = **226** | ~~160~~ **200** | 240 | 280 | ✅ clean after the merge re-price (was minor overage) |
+| `craft_yew_knot` | 2×120 = **240** | 230 | 276 | 322 | ✅ clean (clean) |
+| `craft_yew_wand` | 2×120 + 32 = **272** | ~~280~~ **250** | 300 | 350 | ✅ clean after the merge re-price (clean) |
+| `craft_yew_quarterstaff` | 3×120 + 32 = **392** | 330 | 396 | 462 | ✅ clean (minor overage) |
+
+The test's exemption list goes from 17 to **16**. Both quarterstaffs leave it
+as clean passes and the Rowan wand joins it as a minor overage. ✅ The two
+rows that fell outside every bucket were re-priced at merge (2026-09-30):
+`rowan_quarterstaff` 160 → **200** (Σ 226 was 2 g past its Master line) and
+`yew_wand` 280 → **250** (Σ 272 was 8 g under Standard, the exploitable
+direction). Each now sits inside `Standard < Σ < Ornate`; the L19 Rowan staff
+stays well under the L20 Yew staff (330).
+
+📝 **`tool/economy_probe_test.dart` confirms the Rowan loop is closed.** The
+greedy crafter's best recipe at margin +5 is `craft_brookmint_tonic`, about
+4.0 g a craft, the same as before the re-tier. At +15 it is
+`craft_rowan_knot`, about 7.1 g (17.5 g before the re-tier). The logs-only
+intermediate had Rowan Knot at about 55.5 g and 81.5 g. The Yew wand's 8 g is
+not the best recipe at either margin.
 
 ⭐ **The 🔴 row is a real, shipped structural pattern, not a one-off:** in
 every Tailoring family that has shipped so far, the **robe and leggings** —

@@ -90,8 +90,10 @@ class TravelRoute {
 ///
 /// ⚠️ The table is **derived from [GameLocation.edges], never authored.** A
 /// hand-written matrix would be ~500 numbers that must all be revisited
-/// whenever any one of the 47 roads changes, and a stale entry looks entirely
-/// plausible. Edges stay the single source of truth.
+/// whenever any one of the 39 legs changes (36 roads, the sea passage and
+/// two Veil crossings, since the 2026-09-30 cut — `world_test.dart` counts
+/// them), and a stale entry looks entirely plausible. Edges stay the single
+/// source of truth.
 ///
 /// ⚠️ Reads [World] only through its edges. Nothing here knows where anything
 /// is *drawn* — the graph/geometry seam that `world_map_test.dart` guards in
