@@ -100,7 +100,7 @@ void main() {
   };
 
   group('the roll', () {
-    test('a Greater Pyro wearer ignites on ~15% of 2,000 hits', () {
+    test('a Greater Pyro wearer ignites on ~10% of 2,000 hits', () {
       final rng = Random(20261001);
       var ignites = 0;
       for (var i = 0; i < 2000; i++) {
@@ -111,16 +111,18 @@ void main() {
       }
       expect(
         ignites,
-        inInclusiveRange(2000 * 13 ~/ 100, 2000 * 17 ~/ 100),
+        inInclusiveRange(2000 * 8 ~/ 100, 2000 * 12 ~/ 100),
         reason:
-            '15% ± 2 points of 2,000 hits — the mutants this kills: the '
+            '10% ± 2 points of 2,000 hits (the §8.4 retune, down from 15) — '
+            'the mutants this kills: the '
             'spell path\'s 25% reused for gear (≈500), no roll at all (0), '
             'or a proc on every hit (2,000)',
       );
       expect(
         ElementTuning.gearProcPercent,
-        15,
-        reason: 'ENCHANTING §4.1a ruled 15% — a retune is a ruling',
+        10,
+        reason:
+            'ENCHANTING §4.1a ruled 15, §8.4 retuned it to 10 — a retune is a ruling',
       );
     });
 

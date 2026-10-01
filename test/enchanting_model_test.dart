@@ -70,65 +70,67 @@ const _gemIds = [
 /// ENCHANTING_DESIGN §4.1's table, written out as the doc writes it — the
 /// wire form of each tier's modifiers, Lesser / Standard / Greater.
 const _section41 = <MagicElement, List<Map<String, int>>>{
+  // ✅ The §8.4 retune (2026-10-01): dodge 1/1/2, crit chance 1/2/3, every
+  // other Greater row two thirds of the draft, Sanctus 2/4/5.
   MagicElement.pyro: [
     {'critDamage': 4},
     {'critDamage': 8},
-    {'critDamage': 14},
+    {'critDamage': 9},
   ],
   MagicElement.umbra: [
     {'critDamage': 4},
     {'critDamage': 8},
-    {'critDamage': 14},
+    {'critDamage': 9},
   ],
   MagicElement.electro: [
+    {'critChance': 1},
     {'critChance': 2},
-    {'critChance': 4},
-    {'critChance': 7},
+    {'critChance': 3},
   ],
   MagicElement.astral: [
+    {'critChance': 1},
     {'critChance': 2},
-    {'critChance': 4},
-    {'critChance': 7},
+    {'critChance': 3},
   ],
   MagicElement.aero: [
+    {'dodge': 1},
+    {'dodge': 1},
     {'dodge': 2},
-    {'dodge': 4},
-    {'dodge': 7},
   ],
   MagicElement.lunar: [
+    {'dodge': 1},
+    {'dodge': 1},
     {'dodge': 2},
-    {'dodge': 4},
-    {'dodge': 7},
   ],
   MagicElement.geo: [
     {'deflectChance': 3},
     {'deflectChance': 6},
-    {'deflectChance': 10},
+    {'deflectChance': 7},
   ],
   MagicElement.arcane: [
     {'deflectChance': 3},
     {'deflectChance': 6},
-    {'deflectChance': 10},
+    {'deflectChance': 7},
   ],
   MagicElement.solar: [
     {'accuracyBonus': 3},
     {'accuracyBonus': 6},
-    {'accuracyBonus': 10},
+    {'accuracyBonus': 7},
   ],
   MagicElement.aqua: [
     {'shieldStrengthPercent': 4},
     {'shieldStrengthPercent': 8},
-    {'shieldStrengthPercent': 14},
+    {'shieldStrengthPercent': 9},
   ],
   MagicElement.flora: [
     {'healingReceivedPercent': 4},
     {'healingReceivedPercent': 8},
-    {'healingReceivedPercent': 14},
+    {'healingReceivedPercent': 9},
   ],
   MagicElement.sanctus: [
     {'shieldStrengthPercent': 2, 'healingReceivedPercent': 2},
     {'shieldStrengthPercent': 4, 'healingReceivedPercent': 4},
-    {'shieldStrengthPercent': 7, 'healingReceivedPercent': 7},
+    {'shieldStrengthPercent': 5, 'healingReceivedPercent': 5},
   ],
 };
 
@@ -249,7 +251,7 @@ void main() {
         final tier = EnchantTier.values.firstWhere(
           (t) => g.id.endsWith('_${t.name}'),
         );
-        final n = const [2, 4, 7][tier.index];
+        final n = Affinity.enchantAmount(g.element!, tier);
         expect(
           g.modifiers.toJson(),
           {for (final k in _section41[g.element]![0].keys) k: n},
@@ -294,7 +296,7 @@ void main() {
         'element': 'pyro',
         'tier': 'greater',
         'label': 'Charred (Greater)',
-        'modifiers': {'critDamage': 14},
+        'modifiers': {'critDamage': 9},
         'procElement': 'pyro',
         'procPercent': ElementTuning.gearProcPercent,
       });
@@ -355,10 +357,10 @@ void main() {
             ],
           ),
         ),
-        18 + 7 + 3 + 3,
+        18 + 9 + 4 + 4,
         reason:
-            'first copy 7, later copies 7 >> 1 = 3 — the mutants this kills '
-            'are full repeats (39) and rounding up (7 + 4 + 4)',
+            'first copy 9, later copies 9 >> 1 = 4 — the mutants this kills '
+            'are full repeats (45) and rounding up (9 + 5 + 5)',
       );
       expect(
         _critDamageOf(
@@ -370,14 +372,14 @@ void main() {
             ],
           ),
         ),
-        18 + 2 + 4 + 7,
+        18 + 4 + 8 + 9,
         reason: 'the rule is per GEM ID — three tiers are three firsts',
       );
       expect(
         _critDamageOf(
           _piece(quality: Quality.rough, socketed: ['gem_pyro_greater']),
         ),
-        (18 * 0.8).round() + 7,
+        (18 * 0.8).round() + 9,
         reason: 'a gem is the jeweller\'s work — quality never scales it',
       );
     });
@@ -392,8 +394,8 @@ void main() {
         _critDamageOf(
           _piece(aspect: MagicElement.pyro, enchantId: 'pyro_greater'),
         ),
-        18 + 14,
-        reason: 'an enchant REPLACES the aspect — never both (32 + 4)',
+        18 + 9,
+        reason: 'an enchant REPLACES the aspect — never both (27 + 4)',
       );
       expect(
         _critDamageOf(_piece(aspect: MagicElement.pyro, enchantId: 'unbind')),
@@ -411,7 +413,7 @@ void main() {
             socketed: [ItemInstance.emptySocket, 'oak_log', 'gem_pyro_lesser'],
           ),
         ),
-        18 + 2,
+        18 + 4,
         reason: 'only a GemDef in a real socket grants anything',
       );
       final noSockets = ItemCatalogue.ofKind<EquipmentDef>().firstWhere(
@@ -449,32 +451,25 @@ void main() {
       );
       expect(
         wear(['pyro_greater', 'pyro_greater']).critDamage,
-        2 * (18 + 14),
+        2 * (18 + 9),
         reason: 'the STATS still sum — only the proc dedupes',
       );
     });
 
     test('caps: the overlay sums honestly; CombatClamps clamps the output', () {
-      // Nine Greater Geo enchants: exactly the deflect activation cap.
+      // Thirteen Greater Geo enchants (7 each since the §8.4 retune): one
+      // past the deflect activation cap of 90. ⚠️ No kit holds thirteen
+      // pieces — this is the arithmetic, not a wardrobe.
       var deflect = ItemModifiers.none;
-      for (var i = 0; i < 9; i++) {
+      for (var i = 0; i < 13; i++) {
         deflect =
             deflect +
             Equipping.enchantOverlay(_piece(enchantId: 'geo_greater'));
       }
-      expect(deflect.deflectChance, 90);
-      expect(
-        CombatClamps.deflectActivation(deflect.deflectChance),
-        CombatClamps.deflectActivationCapPercent,
-        reason: 'at the cap, the cap',
-      );
-      final onePast =
-          deflect +
-          Gems.of(MagicElement.geo, EnchantTier.lesser).modifiers.halved();
       expect(
         (
-          onePast.deflectChance,
-          CombatClamps.deflectActivation(onePast.deflectChance),
+          deflect.deflectChance,
+          CombatClamps.deflectActivation(deflect.deflectChance),
         ),
         (91, 90),
         reason:
@@ -482,8 +477,9 @@ void main() {
             'modifiersOf — the mutant this kills clamps the components) and '
             'the resolution clamps it to 90',
       );
-      // Two Greater Solar enchants close the 20-point base miss exactly.
+      // Three Greater Solar enchants (7 each) close the 20-point base miss.
       final acc =
+          Equipping.enchantOverlay(_piece(enchantId: 'solar_greater')) +
           Equipping.enchantOverlay(_piece(enchantId: 'solar_greater')) +
           Equipping.enchantOverlay(_piece(enchantId: 'solar_greater'));
       int hit(int bonus) =>
@@ -680,8 +676,8 @@ void main() {
       expect(Equipping.describeInstance(_staff, i), [
         ...Equipping.describe(_staff.modifiers),
         'Enchant: Charred (Standard) · +8% crit damage',
-        'Socket: Lesser Pyro Gem · +2% crit damage',
-        'Socket: Lesser Pyro Gem · +1% crit damage (repeat, half)',
+        'Socket: Lesser Pyro Gem · +4% crit damage',
+        'Socket: Lesser Pyro Gem · +2% crit damage (repeat, half)',
         'Socket: empty',
       ], reason: 'ENCHANTING §7\'s lines, numbers read through the overlay');
     });
@@ -692,14 +688,14 @@ void main() {
           _staff,
           _piece(enchantId: 'pyro_greater'),
         ).where((l) => l.startsWith('Enchant')),
-        ['Enchant: Charred (Greater) · +14% crit damage, 15% on hit: Ignite'],
+        ['Enchant: Charred (Greater) · +9% crit damage, 10% on hit: Ignite'],
       );
       expect(
         Equipping.describeInstance(
           _staff,
           _piece(aspect: MagicElement.lunar),
         ).where((l) => !l.startsWith('Socket')).last,
-        'Aspect: Moonlit · +2% dodge',
+        'Aspect: Moonlit · +1% dodge',
         reason:
             'a §4.4 drop has no enchant to name — its Lesser affinity still '
             'needs a line, or the dialog and the totals disagree',
@@ -714,15 +710,15 @@ void main() {
             gearProcs: {MagicElement.solar, MagicElement.lunar},
           ),
         ),
-        ['+4% crit damage', '15% on hit: Blind', '15% on hit: Blind'],
+        ['+4% crit damage', '10% on hit: Blind', '10% on hit: Blind'],
         reason: 'Solar and Lunar both Blind (§4.1a) — one line per roll',
       );
       final lines = Equipping.describeTotals(
         Equipping.modifiersOf(_staff, _piece(enchantId: 'aero_greater')),
         level: 50,
       );
-      expect(lines, contains('Dodge 7% (+7)'));
-      expect(lines, contains('Tailwind on hit 15%'));
+      expect(lines, contains('Dodge 2% (+2)'));
+      expect(lines, contains('Tailwind on hit 10%'));
     });
   });
 

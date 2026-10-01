@@ -986,10 +986,11 @@ void main() {
   });
 
   group('the §8.4 fence', () {
-    test('Greater procs land at about the 15% roll per damaging hit', () {
+    test('Greater procs land at about the 10% roll per damaging hit', () {
       // ⭐ Kills both wiring mutants: procs not reaching the duel (Δ ≈ 0) and
       // procs rolled once PER PIECE instead of once per element (nine rolls
-      // at 15% would land on most hits). Measured 13.6–15.7% for these four;
+      // at 10% would land on most hits). Measured 13.6–15.7% at the draft's
+      // 15 for these four — the band tracks the retuned 10;
       // Electro (no charge to strip), Aero (Haste already held) and the
       // self-buffs sit lower for board reasons, not wiring ones.
       for (final e in [
@@ -1005,7 +1006,7 @@ void main() {
             grt.vsBare.hitsPerDuel;
         expect(
           perHit,
-          inInclusiveRange(0.10, 0.20),
+          inInclusiveRange(0.06, 0.14),
           reason:
               '${e.name}: ${Enchants.procEffectName(e)} landings per hit '
               'over Standard',

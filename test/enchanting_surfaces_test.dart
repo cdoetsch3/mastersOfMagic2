@@ -556,7 +556,7 @@ void main() {
       for (final line in [
         '+14% crit damage',
         'Enchant: Charred (Standard) · +8% crit damage',
-        'Socket: Lesser Pyro Gem · +2% crit damage',
+        'Socket: Lesser Pyro Gem · +4% crit damage',
         'Socket: empty',
       ]) {
         expect(
@@ -689,10 +689,10 @@ void main() {
       final lines = Equipping.statTotals(g.equipmentTotals, level: 1);
       expect(
         lines.firstWhere((l) => l.label == 'Crit damage').bonus,
-        14 + 14,
+        14 + 9,
         reason:
-            'the wand\'s +14 and the Greater enchant\'s +14 — totals that '
-            'skip the overlay read 14',
+            'the wand\'s +14 and the Greater enchant\'s +9 (the §8.4 retune) '
+            '— totals that skip the overlay read 14',
       );
       await tester.pumpWidget(
         MaterialApp(
@@ -773,8 +773,8 @@ void main() {
       for (final text in [
         '+4% crit damage',
         '+8% crit damage',
-        '+14% crit damage',
-        '15% on hit: Ignite',
+        '+9% crit damage',
+        '10% on hit: Ignite',
       ]) {
         expect(
           find.text(text),
@@ -935,7 +935,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(_inst(g).socketed, [_pyroGem], reason: 'seated in socket 0');
       expect(
-        find.text('+2% crit damage'),
+        find.text('+4% crit damage'),
         findsOneWidget,
         reason: 'the filled cell shows what the gem adds here',
       );

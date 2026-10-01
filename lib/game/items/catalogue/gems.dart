@@ -26,7 +26,11 @@ abstract final class Gems {
   /// +2 crit DAMAGE where an Electro gem's is +2 crit CHANCE. The enchant
   /// table scales by the stat's unit and this one does not; ⚠️ the §8.4
   /// re-sim is where that gets judged.
-  static const List<int> affinityByTier = [2, 4, 7];
+  /// ✅ **A gem grants its element's enchant amount for the tier** (the §8.4
+  /// retune, 2026-10-01) — not the draft's flat +2/+4/+7, which made six
+  /// Greater Aero gems alone worth 5.4 levels. One table, two doors.
+  static int affinityOf(MagicElement element, EnchantTier tier) =>
+      Affinity.enchantAmount(element, tier);
 
   /// Vendor values, Lesser / Standard / Greater. ❓ Draft numbers (§5.1),
   /// kept as consts so the ruling is one edit.
@@ -105,7 +109,7 @@ abstract final class Gems {
           rarity: _rarityByTier[tier.index],
           lore: _lore(element, tier),
           element: element,
-          modifiers: Affinity.of(element, affinityByTier[tier.index]),
+          modifiers: Affinity.of(element, affinityOf(element, tier)),
           value: _valueByTier[tier.index],
           tradability: _tradabilityByTier[tier.index],
         ),

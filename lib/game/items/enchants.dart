@@ -111,25 +111,31 @@ abstract final class Affinity {
         ),
       };
 
-  /// ENCHANTING_DESIGN §4.1's table, per element and tier.
-  ///
-  /// 📝 A first draft sized against the shipped rare jewelry; ⚠️ the §8.4
-  /// re-sim gate runs before Greater is final ("Greater lands around two
-  /// thirds of the draft").
+  /// ENCHANTING_DESIGN §4.1's table, per element and tier — ✅ **the
+  /// measured retune (Christian, 2026-10-01, §8.4).** The draft (14 / 7 / 10
+  /// at Greater everywhere) put nine Greater Aero enchants at 18.8 character
+  /// levels over the bare kit; the target for the enchant layer is about 5.
+  /// ⚠️ Dodge and crit chance are the dangerous stats on a nine-slot kit —
+  /// they compound per hit — so their rows are cut deepest; every other
+  /// Greater row is two thirds of the draft. `tool/enchant_probe_test.dart`
+  /// fences each kit at its measured strength.
   static int enchantAmount(MagicElement element, EnchantTier tier) {
     final row = switch (element) {
+      // crit damage (Pyro, Umbra), shield % (Aqua), healing % (Flora)
       MagicElement.pyro ||
       MagicElement.umbra ||
       MagicElement.aqua ||
-      MagicElement.flora => const [4, 8, 14],
-      MagicElement.electro ||
-      MagicElement.astral ||
-      MagicElement.aero ||
-      MagicElement.lunar ||
-      MagicElement.sanctus => const [2, 4, 7],
+      MagicElement.flora => const [4, 8, 9],
+      // crit chance — compounds on every hit
+      MagicElement.electro || MagicElement.astral => const [1, 2, 3],
+      // dodge — the stat that broke the budget
+      MagicElement.aero || MagicElement.lunar => const [1, 1, 2],
+      // two stats at once
+      MagicElement.sanctus => const [2, 4, 5],
+      // deflect chance (Geo, Arcane), accuracy (Solar)
       MagicElement.geo ||
       MagicElement.arcane ||
-      MagicElement.solar => const [3, 6, 10],
+      MagicElement.solar => const [3, 6, 7],
     };
     return row[tier.index];
   }

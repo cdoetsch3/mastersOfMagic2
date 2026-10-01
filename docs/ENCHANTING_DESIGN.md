@@ -156,16 +156,21 @@ Pendant*) and **sets `enchantId`** to `<element>_<tier>`. Its effect is that
 element's affinity stat from CELESTIAL §2.5a, as an overlay on the def's
 modifiers:
 
+✅ **Retuned 2026-10-01 after the §8.4 re-sim** (Christian: "the measured
+retune"): dodge 1/1/2, crit chance 1/2/3, Sanctus 2/4/5, every other Greater
+row two thirds of the draft; gems grant the same amounts (§5.1); the gear
+proc is 10%.
+
 | Element | Affinity stat | Lesser | Standard | Greater |
 |---|---|---|---|---|
-| Pyro, Umbra | crit damage | +4 | +8 | +14 |
-| Electro, Astral | crit chance | +2 | +4 | +7 |
-| Aero, Lunar | dodge | +2 | +4 | +7 |
-| Geo, Arcane | deflect chance | +3 | +6 | +10 |
-| Solar | accuracy | +3 | +6 | +10 |
-| Aqua | shield strength % | +4 | +8 | +14 |
-| Flora | healing received % | +4 | +8 | +14 |
-| Sanctus | shield strength % **and** healing received % | +2 / +2 | +4 / +4 | +7 / +7 |
+| Pyro, Umbra | crit damage | +4 | +8 | +9 |
+| Electro, Astral | crit chance | +1 | +2 | +3 |
+| Aero, Lunar | dodge | +1 | +1 | +2 |
+| Geo, Arcane | deflect chance | +3 | +6 | +7 |
+| Solar | accuracy | +3 | +6 | +7 |
+| Aqua | shield strength % | +4 | +8 | +9 |
+| Flora | healing received % | +4 | +8 | +9 |
+| Sanctus | shield strength % **and** healing received % | +2 / +2 | +4 / +4 | +5 / +5 |
 
 📝 Numbers are a first draft sized against the shipped rare jewelry (a rare
 pendant carries roughly +5 to +10 of one stat). ⚠️ **Re-sim before Greater
@@ -188,7 +193,7 @@ gate (§8.4) runs before Greater numbers are final.
 
 ### 4.1a The Greater proc ✅
 A Greater enchant on ANY slot gives the wearer one **gear proc**: on each
-damaging hit the wearer lands, a flat **15%** roll applies that element's
+damaging hit the wearer lands, a flat **10%** roll (✅ retuned from 15, §8.4) applies that element's
 signature effect at base magnitude, as if a spell of that element had done
 it — ⚠️ one roll per hit per element, never stacking across pieces (two
 Greater Pyro enchants are still one 15% Ignite roll; a Pyro and an Electro
@@ -262,9 +267,9 @@ mote tier:
 
 | Gem | Spends | Jewelry level | Grants (elemental) | Grants (universal) ❓ |
 |---|---|---|---|---|
-| Lesser `<el>` | stone + 1 Crystal | 10 | affinity +2 | +15 max HP **or** +1 damage per cast |
-| Standard `<el>` | stone + 1 Core | 25 | affinity +4 | +30 / +2 |
-| Greater `<el>` | stone + 1 Heart | 40 | affinity +7 | +50 / +4 |
+| Lesser `<el>` | stone + 1 Crystal | 10 | the element's Lesser enchant amount | +15 max HP **or** +1 damage per cast |
+| Standard `<el>` | stone + 1 Core | 25 | the Standard enchant amount | +30 / +2 |
+| Greater `<el>` | stone + 1 Heart | 40 | the Greater enchant amount | +50 / +4 |
 
 ⭐ **Elemental gems are stronger than universal ones** (§6d.3's anti-meta fix
 1), and ⭐ **a second identical gem on the same piece gives half** (fix 2).

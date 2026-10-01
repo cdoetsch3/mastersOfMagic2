@@ -29,7 +29,11 @@ abstract final class ElementTuning {
   /// flat roll per hit per element in `MageState.gearProcs`, never a
   /// streak-threshold change (ITEMS §7.1's proc-stacking risk). ⚠️ The §8.4
   /// re-sim gate runs before this is final.
-  static const int gearProcPercent = 15;
+  /// ✅ 10, down from the 15 the design drafted (ENCHANTING §8.4 re-sim,
+  /// 2026-10-01): the proc is sub-additive — nine procs were worth ~2 levels
+  /// — so this is the smaller lever, but it brings a mixed Greater kit from
+  /// 7.6 to about 6 levels alongside the stat retune.
+  static const int gearProcPercent = 10;
 
   // ---- Tier 1 — Primal ------------------------------------------------
 
