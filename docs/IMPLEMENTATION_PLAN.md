@@ -1267,6 +1267,34 @@ too — never rename one. ⚠️ Christian verifies the screen in the browser.
 ❓ Tres Commas reachability; Elementalist reads the unlock schedule (level
 40) because element slots are not enforced yet.
 
+## 🔨 Enchanting, Jewelry & the mote economy (release 11, 2026-10-01, Opus lanes)
+
+Design: `docs/ENCHANTING_DESIGN.md` (gathers ITEMS §6/§6c/§6d/§9b.5b,
+CELESTIAL §2.5a and the shipped `enchantId`/`aspect`/`socketed` seams).
+Rulings: enchants grant the element's affinity stat at every tier and at
+Greater the element's status as a 15% gear proc; whole scope in one pass;
+re-enchant at full cost; transmute 4:1 → 2:1 with Enchanting level; Core
+drops from bosses at 2%; elemental gems only; unsocket = one Shard, gem
+survives; aspected drops at 10% of rare+; stations Meridian (Enchanting) and
+Rimeholt (Jewelry). Sets stay a separate Phase 8 lane.
+Lane 1 ✅ (69a6901; 3579 app / 640 engine): 24 Core/Heart motes (Heart 0g
+Bound per ECONOMY §14c), 36 enchants, 36 gems (Greater Bound at 0g too),
+`Equipping.modifiersOf` overlay (enchant unscaled by quality, gem repeats
+halved, aspected drop = Lesser), `MageState.gearProcs` + `ElementTuning.
+gearProcPercent` with one roll per element per hit and empty-set rng
+neutrality, aspected-drop roll in `rollKill`, `ItemCatalogue.byWorkshop`
+('refined', 'gems'), 60 ITEM_ART entries, `describeInstance`.
+⚠️ Gear procs cross the PvP wire (`ItemModifiers.gearProcs`) — the release
+11 gate covers it. Lane 2 🔨 recipes (refine 48, transmute, salvage table,
+cut 36, Jewelry ladder 12) — `RecipeInput` gains any-mote/any-equipment
+matchers that I wire into `GameState.craft` at merge. Lane 3 🔨 surfaces
+(`enchantItem`/`socketGem`/`unsocketGem` with real station gates, Enchant…
+and Socket… sheets, `describeInstance` in the dialog). Then the re-sim gate
+on Greater numbers (`tool/balance_probe_test.dart`).
+❓ Open: Greater gem/enchant numbers after the sim; `stationRequired` on
+recipes still unenforced (only the new actions gate); wiki export regen
+(now 325 items) — run `flutter test tool/export_content_test.dart` alone.
+
 ## Deferred / banked — do not build without an explicit ask
 
 - **📝 Creature sprites: the system works, the ART does not.** Built
