@@ -95,8 +95,11 @@ void main() {
       // per pair: rung 4 over rung 3 went 51.0% → 50.2%, still a climb, but
       // the default 3-seed/300-duel ruler (±~1.2) reads it at 47.8%. A pair
       // the narrow ruler cannot resolve gets 40 seeds × 1000 duels (±~0.2)
-      // before it is called a failure. 📝 Rung 4 ≈ rung 3 is a content
-      // finding for the ladder's owner, not something this test can fix.
+      // before it is called a failure. 📝 Rung 4 ≈ rung 3 was a content
+      // finding for the ladder's owner; the blunder gradient was re-spread
+      // the same day (spread A, `_blunderRate`) and 4 over 3 reads 53.4% on
+      // the wide ruler. The re-measure stays: the narrow ruler is still
+      // ±1.2 against steps of 2–4 points.
       final wideSeeds = [for (var i = 0; i < 40; i++) 1000 + i * 13];
       final failures = <String>[];
       for (var low = 1; low < 10; low++) {

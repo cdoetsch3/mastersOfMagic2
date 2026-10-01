@@ -146,15 +146,25 @@ class EnemyView {
 // gradient has to carry more of the spread. 2 rises toward (but not to) the
 // 0.48 collapse point; 4 drops a step so its deliberating body stays ahead
 // of the sharpened 3.
+// ⚠️ Re-spread above 3 for the base-crit ruling (Christian, 2026-09-30:
+// "spread A"). A 5% base crit that doubles puts luck on every hit, and luck
+// compresses skill gaps: at 18/17/13/10/7/4 rung 4 beat rung 3 only 50.4%
+// of the time (24,000 duels a pair) — a dead step — and dropping 4 alone
+// made 5 LOSE to 4, because counter-awareness is worth only ~2 points by
+// itself. So the whole upper gradient moved: 15/12/9/7/5/2. Measured:
+// 4v3 53.4, 5v4 54.0, 6v5 58.2, 7v6 54.8, 8v7 51.7, 9v8 54.7, 10v9 52.9,
+// 9v5 68.6, 10v1 92.5. The top steps thin a little (8v7, 10v9) because
+// the top rungs were always close in competence and the blunder gap was
+// carrying them; 2 and 3 are untouched (3v2 59.5 either way).
 const Map<int, double> _blunderRate = {
   2: 0.44,
   3: 0.27,
-  4: 0.18,
-  5: 0.17,
-  6: 0.13,
-  7: 0.10,
-  8: 0.07,
-  9: 0.04,
+  4: 0.15,
+  5: 0.12,
+  6: 0.09,
+  7: 0.07,
+  8: 0.05,
+  9: 0.02,
   10: 0.00,
 };
 
