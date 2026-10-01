@@ -1,6 +1,15 @@
 # Masters of Magic 2 — Enchanting, Jewelry & the mote economy
 
-Status: 📝 **draft for Christian's red-pen (2026-10-01).** Nothing built.
+Status: ✅ **ruled 2026-10-01, building.** Rulings (Christian, same day):
+1. Enchants grant the element's **affinity stat at every tier, and at
+   Greater the element's status as a gear proc too** ("both, by tier").
+2. Scope: **all four verbs plus gems** in the first pass (three lanes, §8).
+3. Re-enchanting costs the **full** price of the new enchant.
+4. Transmute improves with Enchanting level: **4:1 → 2:1** (§3.2 curve).
+5–9. Taken as recommended unless Christian says otherwise: Core drops from
+   bosses at 2% `bonus`; elemental gems only; unsocket = one Shard, gem
+   survives; aspected drops at 10% of rare+ drops; the Enchanting station's
+   town is pinned in §4.2 at build.
 Christian's ask: *"what should we do with enchanting? That needs a design, and
 we need something to do with all of the elemental motes. Same is true for
 jewelry."*
@@ -107,7 +116,7 @@ table already says this.
 never"*). ❓ **Should Core drop at all?** Proposal: bosses only, as a `bonus`
 entry at 2% — rare enough to be a story when it happens, not a plan.
 
-### 3.2 Transmute ❓
+### 3.2 Transmute ✅ (skill curve)
 ITEMS §6.0b designed neutral → element conversion, but **no neutral motes
 exist** and no zone drops them. The equivalent need is real, though: a Pyro
 player farming the Sunless Reach banks Solar and Lunar Dust they will never
@@ -116,7 +125,9 @@ tier in and out (`transmute_dust`, `transmute_shard`, `transmute_crystal` as
 recipes that take any element and name the target). ⚠️ The §6.0b rate
 improvement with skill (4:1 → 1:1) was for *neutral* motes; cross-element
 should stay lossy at every level or farming the easiest zone becomes the
-best source of every element. ❓ 3:1 flat, or a 4:1 → 2:1 skill curve?
+best source of every element. ✅ **Ruled: a skill curve, never better than
+2:1** — Enchanting 1: 4:1 · 15: 3:1 · 30: 5:2 · 45: 2:1. The recipe reads
+the crafter's level at craft time (one recipe per tier, variable input count).
 
 ### 3.3 XP
 Refining pays Enchanting XP by the §9b.9 formula (inputs × (4 + 2 × level)),
@@ -152,13 +163,38 @@ chance, which the §4.1a caps (deflect 50%) will clamp but the balance probe
 has never seen. The honest expectation is that Greater lands around two
 thirds of the draft.
 
-❓ **Affinity stats, or the element's status?** The §5.1 effects (Ignite on
-hit, Static Feedback, …) are the other candidate. **Recommendation: stats
-now, statuses never on enchants.** Statuses on gear multiply proc sources,
-which ITEMS §7.1 calls the single biggest balance risk, and the sets lane
-already plans to own the status-granting bonuses. An enchant that is a clean
-stat keeps the two axes distinct: *sets say what you do, enchants say which
-element you lean on.*
+✅ **Ruled: both, by tier.** Lesser and Standard grant the stat; **Greater
+grants the stat AND the element's status as a gear proc** (§4.1a). ⚠️ ITEMS
+§7.1 names proc stacking as the biggest balance risk, so the proc is one
+flat roll per damaging hit, never a streak-threshold change, and the re-sim
+gate (§8.4) runs before Greater numbers are final.
+
+### 4.1a The Greater proc ✅
+A Greater enchant on ANY slot gives the wearer one **gear proc**: on each
+damaging hit the wearer lands, a flat **15%** roll applies that element's
+signature effect at base magnitude, as if a spell of that element had done
+it — ⚠️ one roll per hit per element, never stacking across pieces (two
+Greater Pyro enchants are still one 15% Ignite roll; a Pyro and an Electro
+are two separate rolls). Streak-based effects map to their base unit:
+
+| Element | Gear proc on hit |
+|---|---|
+| Pyro | Ignite (base tick, 3 turns) |
+| Aqua | Waterlogged on them |
+| Flora | +1 Photosynthesis stack on you |
+| Electro | Static Feedback (strip 1 charge) |
+| Aero | Tailwind: you gain Haste |
+| Geo | Stagger: their next offensive ×0.5 |
+| Solar | Blind, 1 turn |
+| Lunar | Blind, 1 turn (Lunar's lock is Blind) |
+| Astral | Astral Alignment on your next cast |
+| Sanctus | Grace on you |
+| Umbra | +1 Creeping Dark stack on them |
+| Arcane | +1 Arcane Knowledge stack on you |
+
+📝 Each proc uses the engine's existing status with its existing id, in the
+GEAR lane (§7a lanes law), so it sums with spell stances and never replaces
+them. Immunities and the §5.2 cleanse web apply unchanged.
 
 ### 4.2 Cost and tier
 
@@ -169,15 +205,16 @@ element you lean on.*
 | Greater | 1 Core | 30 | yes |
 
 ⭐ **Station-bound, unlike Refine.** A tier gate must not be craftable in the
-field (the Totem's own rule); an enchant is a tier gate on a piece. The
-Enchanting station sits where ITEMS §9b.1 put the skill — ❓ confirm the town
-(the plan says one making skill per town until Zenith; Enchanting's town is
-not pinned in code today).
+field (the Totem's own rule); an enchant is a tier gate on a piece. ✅ The
+Enchanting station is already pinned in `world.dart`: **Concordance**
+(Jewelry's is Rimeholt, and Zenith has every station). ⚠️ `RecipeDef.
+stationRequired` is a shipped field that NOTHING enforces today — the
+Enchant and Socket actions (lane 3) are the first real station gates, and
+they gate on `World.byId(location).station`, not on that flag.
 
 ### 4.3 Re-enchanting (the rewritable rule)
-Enchanting an enchanted piece **replaces** the enchant. ❓ SYSTEMS §3.6
-proposed *motes of the new element at half the original cost, no gold, no
-cooldown*. **Recommendation: full cost.** Half price makes the second enchant
+Enchanting an enchanted piece **replaces** the enchant. ✅ **Ruled: full cost.** (SYSTEMS §3.6
+had proposed half; declined.) Half price makes the second enchant
 cheaper than the first for no reason the player can see, and the whole cost
 is already small next to the piece. What makes two axes freeing is that
 re-attunement is *possible*, not that it is discounted.
@@ -313,4 +350,4 @@ piece is a trap).
 6. Universal gems in the first pass, or elemental only (recommended)?
 7. Unsocket: one Shard, gem survives (recommended), or the unbinding enchant?
 8. Aspected drops on at 10% of rare+ drops?
-9. Which town holds the Enchanting station?
+9. ~~Which town holds the Enchanting station?~~ ✅ Concordance (already in code).
