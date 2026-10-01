@@ -170,9 +170,15 @@ modifiers:
 📝 Numbers are a first draft sized against the shipped rare jewelry (a rare
 pendant carries roughly +5 to +10 of one stat). ⚠️ **Re-sim before Greater
 is final**: nine Greater enchants on a full kit is +63 crit chance or +90 deflect
-chance, which the §4.1a caps (deflect 50%) will clamp but the balance probe
-has never seen. The honest expectation is that Greater lands around two
-thirds of the draft.
+chance, which the §7a output clamps (deflect activation **90%**, not 50% —
+`CombatClamps.deflectActivationCapPercent`; crit chance is unclamped and
+saturates at 100) will clamp but the balance probe has never seen. The
+honest expectation is that Greater lands around two thirds of the draft.
+⚠️ **Measured 2026-10-01 (§8.4): over budget.** The dodge row (Aero, Lunar)
+is worth ~19 levels at Greater ×9 and ~9 at Standard ×9; crit chance
+(Electro, Astral) ~9 at Greater; Mixed Greater ~12. ❓ Proposed retune in
+§8.4 (dodge 1 / 1 / 2, crit chance 1 / 2 / 3, the rest of Greater to two
+thirds) — the table above is still the shipped draft.
 
 ✅ **Ruled: both, by tier.** Lesser and Standard grant the stat; **Greater
 grants the stat AND the element's status as a gear proc** (§4.1a). ⚠️ ITEMS
@@ -262,7 +268,13 @@ mote tier:
 
 ⭐ **Elemental gems are stronger than universal ones** (§6d.3's anti-meta fix
 1), and ⭐ **a second identical gem on the same piece gives half** (fix 2).
-Both, as SYSTEMS §3.5 allowed. ❓ Ship universal gems at all in the first
+Both, as SYSTEMS §3.5 allowed.
+⚠️ **Measured (§8.4):** flat +2 / +4 / +7 across elements over-pays the
+per-point-strong stats — three Greater Aero gems (+7, +3, +3 = +13 dodge) are
+worth ~3 levels, and the one-hand route's six sockets (+26) ~5.4, a whole
+late-game budget from gems alone; the same +13 as Pyro crit damage is 0.5.
+❓ Proposed: a gem grants its element's ENCHANT amount at the same tier (so a
+retuned Greater dodge gem is +2), keeping repeats-halved. ❓ Ship universal gems at all in the first
 pass? Recommendation: elemental only; add universal later if sockets feel
 too narrow.
 
@@ -540,8 +552,149 @@ piece is a trap).
        button can move it. A press that lands closes the sheet with no
        banner — the pack shows the motes arriving.
      - Tests: `test/salvage_test.dart`.
-4. **Re-sim gate** before Greater enchant and Greater gem numbers are final
-   (`tool/balance_probe_test.dart` with a full Greater kit).
+4. ⚠️ **Re-sim gate — measured 2026-10-01: the draft is OVER budget.**
+   Greater enchant and Greater gem numbers are NOT final; the retune below
+   is ❓ for Christian. Nothing in `enchants.dart`, `gems.dart` or
+   `ElementTuning` was changed — only the probe and its fence landed.
+   - **Probe:** `tool/enchant_probe_test.dart` (`flutter test tool/
+     enchant_probe_test.dart`, ~10 s, N = 300 on the six gate elements;
+     `ENCHANT_PROBE_DEEP=1` runs all twelve, N = 1,200, kit-vs-kit and the
+     WHAT-IF retune rows, ~90 s). The balance probe's seam and brain (i7
+     both sides, starter loadout, 200-turn cap); every mage built by
+     `DuelController._buildMage`, every kit read through `Equipping.totals`
+     over real `withEnchant` / `withSocket` instances.
+   - **Kit (L50):** the best SHIPPED piece per slot by the balance probe's
+     stat-total proxy, main hand restricted to a two-hander → nine pieces:
+     The Noon Hour, The Larger Reflection, Bedrock Greaves, Lowwater Tread,
+     Umbralweave Gloves, The Maintained Road, Stonefall Signet, **Aetherwood
+     Quarterstaff (3 sockets — the kit's only sockets)**, Corebiter Belt.
+     No shipped piece has a `setId`, so "non-set" filters nothing. 📝 The
+     one-hand route (Aetherwood Wand + Knot) is ten pieces and **six**
+     sockets — one more enchant and double the gems; not run.
+   - **Opponents:** every bestiary creature from a zone whose band holds 50
+     (20 commons, 16 minis, 8 bosses), fought AT 50; "elite" = minis +
+     bosses (commons are 100% for every kit, Bare included). **vsBare** is
+     the kit-vs-Bare mirror (sides alternate). **lv** = levels the Bare kit
+     must gain to tie, bisected on `levelScale` (4%/level on HP and damage):
+     PvP = mirror at 50%, elite = Bare's elite win rate matching the kit's.
+   - **Bare itself is worth 15.2 levels over a naked mage** (mirror) — the
+     shipped L50 kit already sits past the "gear ≈ ten levels" line before
+     any enchant. Greater ×9 Electro on top: 22.1 levels over naked; Mixed
+     Greater: 25.4.
+
+   **Measured (deep, N = 1,200 per kit per group):**
+
+   | Kit | Key totals (base + gear) | Caps hit | Boss | Elite | vsBare | lv PvP | lv elite |
+   |---|---|---|---|---|---|---|---|
+   | Bare | crit 19% ×238, dodge 13, deflect 56/46, acc +12 | — | 47.0% | 69.8% | 49.4% | 0 | 0 |
+   | Standard ×9 Pyro | crit dmg ×310 | — | 52.6% | 72.8% | 54.2% | 1.3 | 0.9 |
+   | Greater ×9 Pyro | crit dmg ×364 | — | 60.8% | 76.3% | 60.1% | 2.6 | 2.2 |
+   | Standard ×9 Electro | crit 55% | — | 65.7% | 79.9% | 69.9% | 5.6 | 3.6 |
+   | Greater ×9 Electro | crit 82% | — | 79.0% | 87.8% | 81.7% | **9.1** | 7.3 |
+   | Standard ×9 Aero | dodge 49 | — | 79.0% | 88.1% | 79.1% | **8.7** | 7.4 |
+   | Greater ×9 Aero | dodge 76 (attacker hits ~16%) | near the 10% hit floor | 87.6% | 93.6% | 94.2% | **18.8** | 10.4 |
+   | Standard ×9 Geo | deflect 110 | deflect >90 | 64.7% | 80.5% | 66.8% | 3.5 | 3.9 |
+   | Greater ×9 Geo | deflect 146 | deflect >90 (+56 wasted) | 72.6% | 84.8% | 72.0% | 5.0 | 5.8 |
+   | Standard ×9 Solar | acc +66 | hit 100 (+46 wasted) | 56.4% | 74.6% | 67.4% | 3.6 | 1.7 |
+   | Greater ×9 Solar | acc +102 | hit 100 (+82 wasted) | 55.8% | 75.1% | 68.3% | 3.9 | 1.9 |
+   | Standard ×9 Aqua | shield +102% | — | 59.8% | 77.4% | 59.3% | 1.9 | 2.6 |
+   | Greater ×9 Aqua | shield +156% | — | 65.8% | 81.0% | 64.8% | 3.9 | 4.1 |
+   | Greater ×9 Flora / Sanctus / Umbra | heal +141 / sh+93 heal+78 / crit dmg ×364 | — | 51–61% | 71–78% | 52–60% | 0.6 / 2.4 / 2.1 | ≤ 2.7 |
+   | Greater ×9 Lunar / Astral / Arcane | = Aero / Electro / Geo | as their twins | | | 95.0 / 80.0 / 68.9% | 18.8 / 8.4 / 4.2 | 10.1 / 7.0 / 4.9 |
+   | Mixed Standard ×9 | acc +18, crit 27%, dodge 17, deflect 68 | — | 67.7% | 81.7% | 69.9% | 5.4 | 4.4 |
+   | **Mixed Greater ×9** (9 procs) | acc +22, crit 33% ×266, dodge 20, deflect 76 | hit 100 (+2) | 88.7% | 93.8% | 88.8% | **11.6** | 10.6 |
+   | Greater ×9 + 3 gems, Electro | crit 95% | — | 81.4% | 89.0% | 84.4% | **10.3** | 7.8 |
+   | Greater ×9 + 3 gems, Aero | dodge 89 | hit floor | 87.6% | 93.6% | 97.2% | **21.6** | 10.4 |
+   | Greater ×9 + 3 gems, Pyro / Geo / Solar / Aqua | +13 of the stat | Geo, Solar: all wasted | | | 60.6 / 72.0 / 68.3 / 66.7% | 2.7 / 5.0 / 3.9 / 4.0 | |
+
+   (Mixed = Aqua, Pyro, Electro, Aero, Geo, Solar, Astral, Umbra, Arcane:
+   the twelve minus Lunar — its proc is Solar's Blind — Flora, the weakest,
+   and Sanctus, whose Grace only blocks; Sanctus measured 2.4 levels to
+   Umbra's 2.1, so the nine is "strongest" within noise.)
+
+   **Procs observed** (Greater minus Standard effect landings per duel, the
+   mirror vs Bare): Ignite +0.82, Waterlogged +0.99, Stagger +1.03, Blind
+   +0.90 / +1.04 (Solar / Lunar), Photosynthesis +0.88, Creeping Dark +0.81,
+   Arcane Knowledge +0.98, Astral Alignment +0.57, Grace +0.67, Static
+   Feedback +0.44, Tailwind +0.28 — on ~5–7 damaging hits per duel, i.e.
+   **13.6–15.7% per hit** where the effect can always land (the 15% roll,
+   one per element — pinned). Electro (no charge to strip), Grace (max 1)
+   and Tailwind (Haste often already held) land less for board reasons.
+   ⚠️ **Stagger is applied ~7× as often and Waterlogged ~12× as often** as
+   the Standard kit's own spells manage — the two effects ITEMS §7.1 puts on
+   its "not modifiable" / "cap at −1" list.
+
+   **What the WHAT-IF rows say** (deep run; hypothetical totals):
+   - **The stat is the risk, not the proc.** Greater with its proc stripped:
+     Electro 9.0 levels (proc adds ~0), Aero 18.8 (~0), Geo 3.5 (the proc is
+     all of Geo's +1.5 — its Greater stat is entirely past the deflect cap),
+     Pyro 1.9 (+0.7), Aqua 3.1 (+0.8), Mixed 9.1 (+2.5 for nine procs).
+   - **Procs are sub-additive:** on the same mixed stats, one proc (Geo) adds
+     ~1.5 levels, eight add ~1.3–2.5. Proc COUNT is not the lever.
+   - **`gearProcPercent` is a weak lever:** 15 → 10 → 7 moved a mixed kit
+     8.2 → 6.9 → 6.9 levels and single elements ≤ 0.7.
+   - **Per point, dodge and crit chance are the strongest stats in the
+     duel.** Dodge subtracts straight off the attacker's hit roll and nothing
+     but the 10% hit floor stops it; crit chance compounds with the kit's own
+     +38 crit damage. Deflect and accuracy self-limit at their caps; crit
+     damage, shield and healing are cheap per point.
+   - **Kit vs kit** (row's score): Aero beats every Greater kit 86–94%
+     except **Solar, which beats Aero 68.6%** (accuracy is dodge's counter —
+     the triangle works, the magnitude does not); Mixed beats everything but
+     Aero (24.6%).
+
+   **Conclusion.** Read against ITEMS §9b.4a's ten-level ceiling **as the
+   enchant layer's own allowance**: single-element Greater ×9 is inside for
+   ten of twelve elements (≤ 9.1), but **Aero/Lunar (18.8) and Mixed
+   Greater (11.6) are outside**, as are Electro + gems (10.3) and Aero +
+   gems (21.6); even **Standard ×9 Aero is 8.7**. Read **as a total** (the
+   honest reading — the Bare kit already spends 15.2), nothing has room, and
+   §9b.4a's own late-game figure (one quality tier ≈ **~5 levels** at L50)
+   is the defensible ceiling for the enchant layer. On ITEMS §7.1: nine 15%
+   procs are within the letter (+15pp per effect, never a threshold change)
+   and measured cheap, but Stagger and Waterlogged procs contradict §7.1's
+   allowlist outright.
+
+   ❓ **Proposed retune (Christian's call — not applied).** Target: every
+   single-element Greater ×9 ≤ ~5 levels, Mixed ≤ ~6.
+   1. **Dodge (Aero, Lunar): 2 / 4 / 7 → 1 / 1 / 2.** Measured: Greater ×9
+      → **4.5** levels (from 18.8), Standard ×9 at 1 → 2.5 (from 8.7). The
+      first priority — the Standard tier is already over.
+   2. **Crit chance (Electro, Astral): 2 / 4 / 7 → 1 / 2 / 3.** Greater ×9
+      → **5.0** (from 9.1); Standard at 2 → 2.7 (from 5.6).
+   3. **Every other Greater row to two thirds** (§4.1's own expectation):
+      crit damage / shield / healing 14 → **9**, deflect / accuracy 10 →
+      **7**, Sanctus 7 → **5**. Measured: Pyro 2.0, Aqua 2.7, Geo 5.0 (all
+      cap + Stagger), Solar 3.9, Umbra 1.5, Sanctus 1.8, Flora 0.5, Arcane
+      4.2. 📝 Geo/Arcane's deflect is past the 90 cap at ANY amount ≥ 4 on
+      this kit, so their Greater number only matters on a deflect-less kit.
+   4. With 1–3, **Mixed Greater ×9 = 7.6** (PvP) / 7.7 (elite); adding
+      **`gearProcPercent` 15 → 10** brings it to **6.1** / 7.1. Without the
+      proc cut Mixed stays the one build over ~6.
+   5. **Gems follow the element's enchant row, not a flat +2 / +4 / +7.**
+      Three Greater Aero gems alone (+13 dodge) are worth 2.9 levels; the
+      one-hand route's six (+26) are worth **5.4 — a full budget from gems
+      alone**. A Greater gem at the element's Greater enchant amount (dodge
+      2, crit chance 3) closes it; ⭐ repeats-halved already keeps the rest
+      small (Pyro +13 crit damage = 0.5 levels).
+   6. **Stagger and Waterlogged as gear procs** need a ruling against ITEMS
+      §7.1 (Stagger "explicitly not modifiable"): keep at 15%, drop them
+      (Geo's Greater then grants only its capped stat), or swap in a
+      non-lockout rider.
+   After a retune lands: re-run deep, tighten `_measured` in the probe to
+   the new numbers, and drop the ⚠️ above.
+
+   ⚠️ **The fence (landed):** the probe pins the CI run's measured numbers
+   + a margin (mirror score +5pp, levels +1.5, elite +5pp) for Greater ×9
+   Pyro / Electro / Aero / Geo / Solar / Aqua, Mixed Greater and Greater +
+   gems Electro / Aero; the proc rate per hit (10–20%) on Pyro, Geo, Solar,
+   Aqua; the kit's composition; and that the WHAT-IF path equals the
+   shipped overlay. Mutation-checked: Electro/Aero row 7 → 9 fails the
+   fence (Aero 21.2 levels > 19.9), `gearProcPercent` 40 fails both the
+   per-hit pin (0.41) and the fence.
+   📝 Found in passing: `craftedGearAt` in `tool/balance_probe_test.dart`
+   sums a two-handed main hand AND an off hand (at L50 the Aetherwood
+   Quarterstaff + Knot) — a kit no player can wear.
 
 ---
 
