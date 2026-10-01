@@ -478,7 +478,7 @@ abstract final class CollapsedAcademyBestiary {
         id: 'ca_thread',
         name: 'Thread',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

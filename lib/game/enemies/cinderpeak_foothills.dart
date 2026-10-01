@@ -317,7 +317,7 @@ abstract final class CinderpeakBestiary {
         id: 'cp_blowoff',
         name: 'Blow Off',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(22, 28),
       ),
     ],
@@ -377,7 +377,7 @@ abstract final class CinderpeakBestiary {
         id: 'cp_wingdust',
         name: 'Wing Dust',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

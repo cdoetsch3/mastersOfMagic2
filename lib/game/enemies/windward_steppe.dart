@@ -328,7 +328,7 @@ abstract final class WindwardSteppeBestiary {
         id: 'ws_draw_breath',
         name: 'Draw Breath',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(9, 12, lifesteal: 1),
       ),
     ],
@@ -397,7 +397,7 @@ abstract final class WindwardSteppeBestiary {
         id: 'ws_whisper',
         name: 'Whisper',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

@@ -389,7 +389,7 @@ abstract final class StarfallBasinBestiary {
         id: 'sb_takebackthelight',
         name: 'Take Back the Light',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],
@@ -457,7 +457,7 @@ abstract final class StarfallBasinBestiary {
         id: 'sb_answerfirst',
         name: 'Answer First',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before

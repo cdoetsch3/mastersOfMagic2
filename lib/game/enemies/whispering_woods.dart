@@ -296,7 +296,7 @@ abstract final class WhisperingWoodsBestiary {
         id: 'ww_flourish',
         name: 'Flourish',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(9, 12, lifesteal: 1),
       ),
     ],
@@ -347,7 +347,7 @@ abstract final class WhisperingWoodsBestiary {
         id: 'ww_undertone',
         name: 'Undertone',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       Spell(
@@ -432,7 +432,7 @@ abstract final class WhisperingWoodsBestiary {
         id: 'ww_standcloser',
         name: 'Stand Closer',
         chargeCost: 4,
-        priority: 6,
+        priority: 7,
         effect: DamageEffect(30, 37, lifesteal: 0.5),
       ),
       Spell(

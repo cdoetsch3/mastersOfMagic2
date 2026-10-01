@@ -351,7 +351,7 @@ abstract final class TidewrackShoalsBestiary {
         id: 'tw_swallowwhole',
         name: 'Swallow Whole',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],
@@ -419,7 +419,7 @@ abstract final class TidewrackShoalsBestiary {
         id: 'tw_runout',
         name: 'Run Out',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before

@@ -1792,6 +1792,17 @@ behaviour dial, because `_affordable()` gates on cost regardless of which
 catalogue a move came from. A creature whose only move is expensive must
 charge before it can act, exactly as a mage with only Cataclysm must.
 
+### 3.1a ⭐ The priority ladder ✅ (ruling 2026-09-30)
+
+Every creature move sits on one of **1–2** (quickened strikes — the Hexer's
+and Skirmisher's countdowns), **3** (shields), **5** (quick), **7–8**
+(auxiliary) or **9** (the standard attack). Christian's playtest note 6
+("thought I saw one at p4 in Thunderspire") turned up 46 moves at 4 and 5 at
+6 across every zone; all 51 were snapped (4 → 5, 6 → 7) by script, nothing
+else moved, and `test/enemy_priority_ladder_test.dart` pins the ladder
+game-wide. ⚠️ Mage bosses are exempt — their spells carry the Spellbook's
+own priorities.
+
 ### 3.2 ⚠️ Archetype ≠ move set
 
 ✅ **Moves are independent of archetype.** Do not define an archetype by naming

@@ -362,7 +362,7 @@ abstract final class MirrormereBestiary {
         id: 'mm_waxwider',
         name: 'Wax Wider',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34),
       ),
     ],
@@ -429,7 +429,7 @@ abstract final class MirrormereBestiary {
         id: 'mm_takeasliver',
         name: 'Take a Sliver',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

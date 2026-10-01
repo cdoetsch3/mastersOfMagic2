@@ -365,7 +365,7 @@ abstract final class UnwrittenLibraryBestiary {
         id: 'ul_setthelastpage',
         name: 'Set the Last Page',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34),
       ),
     ],
@@ -434,7 +434,7 @@ abstract final class UnwrittenLibraryBestiary {
         id: 'ul_takedictation',
         name: 'Take Dictation',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

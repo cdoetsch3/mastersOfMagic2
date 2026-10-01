@@ -354,7 +354,7 @@ abstract final class FrostfellPassBestiary {
         id: 'ff_takethewarmth',
         name: 'Take the Warmth',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],
@@ -418,7 +418,7 @@ abstract final class FrostfellPassBestiary {
         id: 'ff_marktheway',
         name: 'Mark the Way',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

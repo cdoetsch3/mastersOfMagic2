@@ -323,7 +323,7 @@ abstract final class OldQuarryBestiary {
         id: 'oq_takeitback',
         name: 'Take It Back',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],
@@ -393,7 +393,7 @@ abstract final class OldQuarryBestiary {
         id: 'oq_markit',
         name: 'Mark It',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

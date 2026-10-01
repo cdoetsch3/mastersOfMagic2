@@ -411,7 +411,7 @@ abstract final class UmbralWastesBestiary {
         id: 'uw_takewhatcrosses',
         name: 'Take What Crosses',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],
@@ -481,7 +481,7 @@ abstract final class UmbralWastesBestiary {
         id: 'uw_drawthefirstthread',
         name: 'Draw the First Thread',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

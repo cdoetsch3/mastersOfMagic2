@@ -379,7 +379,7 @@ abstract final class ThunderspirePeaksBestiary {
         id: 'tp_drawthestormdown',
         name: 'Draw the Storm Down',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],
@@ -452,7 +452,7 @@ abstract final class ThunderspirePeaksBestiary {
         id: 'tp_countthegap',
         name: 'Count the Gap',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

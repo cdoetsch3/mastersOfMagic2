@@ -356,7 +356,7 @@ abstract final class StormcliffCoastBestiary {
         id: 'sc_drawdown',
         name: 'Draw Down',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],
@@ -423,7 +423,7 @@ abstract final class StormcliffCoastBestiary {
         id: 'sc_crackle',
         name: 'Crackle',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

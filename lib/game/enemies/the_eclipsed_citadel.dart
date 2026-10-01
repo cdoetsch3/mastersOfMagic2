@@ -547,7 +547,7 @@ abstract final class EclipsedCitadelBestiary {
         id: 'ec_weighthepack',
         name: 'Weigh the Pack',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

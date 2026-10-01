@@ -467,7 +467,7 @@ abstract final class SunlessReachBestiary {
         id: 'sr_marktheshadow',
         name: 'Mark the Shadow',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.

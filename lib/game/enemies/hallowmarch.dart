@@ -388,7 +388,7 @@ abstract final class HallowmarchBestiary {
         id: 'hm_drawfromthelamp',
         name: 'Draw from the Lamp',
         chargeCost: 4,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(26, 34, lifesteal: 0.4),
       ),
     ],
@@ -459,7 +459,7 @@ abstract final class HallowmarchBestiary {
         id: 'hm_makeasmallrepair',
         name: 'Make a Small Repair',
         chargeCost: 1,
-        priority: 4,
+        priority: 5,
         effect: DamageEffect(6, 9),
       ),
       // ⭐ Priority 1 — before shields, before quick attacks, before anything.
