@@ -1240,7 +1240,7 @@ Ladder blunder gradient re-spread 15/12/9/7/5/2 above rung 3 (spread A;
 4v3 50.4 → 53.4%). ❓ Open: "Heals at each town" is unimplemented (WORLD §4b.2); wiki export
 stale; Stormcliff seawrack set at L16 in a 23–28 zone (re-band leftover).
 
-## 🔨 Achievements build (release 10, 2026-10-01, Opus lanes)
+## ✅ Achievements build (release 10, 2026-10-01, Opus lanes, all merged)
 
 ACHIEVEMENTS_DESIGN.md (July spec, ~140 entries) built against today's
 rulings: rewards CLAIMED (Claim / Claim all), the §6 reward table as written
@@ -1252,15 +1252,20 @@ once per duel from ChargedEvents, goldEarned via the one `earnGold` door,
 itemsSeen at the loot roll — the Item library row counts it — travelSeconds
 at settle/cancel), AchievementDef points/family/tier/hidden, `Reward.forPoints`,
 claimedAchievements + claim paths, screen wiring (Claim cells, reward lines,
-points, `???`). Stage 2 🔨: catalogue content lane (~160: 26×3 campaign with
+points, `???`). Stage 2 ✅ (3552 app / 602 engine): catalogue content lane (171: 26×3 campaign with
 78 hand-written names, 3 capstones, 60 mastery + Twelvefold + Elementalist,
 4 wealth, dueling incl. Giant Slayer (new `biggestWinLevelGap`) / Procarius
 Falls / Vanquisher I–V, world incl. 'The Empyrean' and 'Ten Hours on the
 Road' — the shipped `beyond_the_veil`/`the_long_road` ids keep their old
 meanings) + screen lane (family collapse via `achievement_families.dart`,
 To-claim filter, Claim-all banner, section counts).
-⚠️ Academy bouts bank no charges (character untouched) — Christian may
-re-rule. ⚠️ Christian verifies the screen in the browser.
+✅ Academy charges count toward mastery (ruled same day; `bankCharges`).
+Catalogue totals: Campaign 86 · Mastery 62 · Wealth 4 · Dueling 11 · World
+4 · Craft 2 · Ladder 2. Hidden: extinction, nothing_left_to_find,
+tres_commas, procarius_falls. ⚠️ A combat zone id is now an achievement id
+too — never rename one. ⚠️ Christian verifies the screen in the browser.
+❓ Tres Commas reachability; Elementalist reads the unlock schedule (level
+40) because element slots are not enforced yet.
 
 ## Deferred / banked — do not build without an explicit ask
 
