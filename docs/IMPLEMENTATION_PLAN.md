@@ -1240,6 +1240,28 @@ Ladder blunder gradient re-spread 15/12/9/7/5/2 above rung 3 (spread A;
 4v3 50.4 → 53.4%). ❓ Open: "Heals at each town" is unimplemented (WORLD §4b.2); wiki export
 stale; Stormcliff seawrack set at L16 in a 23–28 zone (re-band leftover).
 
+## 🔨 Achievements build (release 10, 2026-10-01, Opus lanes)
+
+ACHIEVEMENTS_DESIGN.md (July spec, ~140 entries) built against today's
+rulings: rewards CLAIMED (Claim / Claim all), the §6 reward table as written
+(XP · gold · RP by points), mastery at 250/1k/5k/10k/25k charges (a duel is
+30–40 charges), Wealth = Young Money 10k/5 · Fat Stacks 100k/10 · Big Money
+1M/25 · Tres Commas 1B/100, hidden spoiler entries now, titles later.
+Stage 1 ✅ (4d981b5): counters on the character (charges per element flushed
+once per duel from ChargedEvents, goldEarned via the one `earnGold` door,
+itemsSeen at the loot roll — the Item library row counts it — travelSeconds
+at settle/cancel), AchievementDef points/family/tier/hidden, `Reward.forPoints`,
+claimedAchievements + claim paths, screen wiring (Claim cells, reward lines,
+points, `???`). Stage 2 🔨: catalogue content lane (~160: 26×3 campaign with
+78 hand-written names, 3 capstones, 60 mastery + Twelvefold + Elementalist,
+4 wealth, dueling incl. Giant Slayer (new `biggestWinLevelGap`) / Procarius
+Falls / Vanquisher I–V, world incl. 'The Empyrean' and 'Ten Hours on the
+Road' — the shipped `beyond_the_veil`/`the_long_road` ids keep their old
+meanings) + screen lane (family collapse via `achievement_families.dart`,
+To-claim filter, Claim-all banner, section counts).
+⚠️ Academy bouts bank no charges (character untouched) — Christian may
+re-rule. ⚠️ Christian verifies the screen in the browser.
+
 ## Deferred / banked — do not build without an explicit ask
 
 - **📝 Creature sprites: the system works, the ART does not.** Built
