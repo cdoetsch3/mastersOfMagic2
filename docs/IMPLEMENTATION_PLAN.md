@@ -1236,8 +1236,8 @@ A + search): seen/slain per creature on the profile, field guide by zone,
 search by name or drop, entry page with moves and rates.
 ⚠️ Christian verifies every screen above in the browser. No rules change
 (`tool/deploy.sh` without `--rules`).
-❓ Open: ladder rungs 3≈4 after the crit base (probe: re-spread 15/12/9/7/5/2
-proposed); "Heals at each town" is unimplemented (WORLD §4b.2); wiki export
+Ladder blunder gradient re-spread 15/12/9/7/5/2 above rung 3 (spread A;
+4v3 50.4 → 53.4%). ❓ Open: "Heals at each town" is unimplemented (WORLD §4b.2); wiki export
 stale; Stormcliff seawrack set at L16 in a 23–28 zone (re-band leftover).
 
 ## Deferred / banked — do not build without an explicit ask
