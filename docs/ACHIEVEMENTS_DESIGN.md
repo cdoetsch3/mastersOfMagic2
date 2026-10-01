@@ -51,6 +51,12 @@ Christian's rulings for the stage-1 build. Each amends the section named.
 
 ---
 
+7. ✅ **Academy charges count toward mastery** (Christian, 2026-10-01, on
+   stage 1's flag). An Academy bout still pays no XP, gold or win — the
+   character stays untouched in every other respect — but its charge tally
+   is banked through `GameState.bankCharges` in one write. What you lean on
+   is what you lean on, whichever room you were in.
+
 ## 1. What achievements are for
 
 ⭐ **An achievement names something the player already did and makes it

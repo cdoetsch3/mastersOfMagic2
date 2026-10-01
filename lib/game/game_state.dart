@@ -617,6 +617,17 @@ class GameState extends ChangeNotifier {
     return true;
   }
 
+  /// Banks a duel's charge tally on its own — the Academy's path (ruling,
+  /// Christian 2026-10-01: Academy charges count toward mastery even though
+  /// the bout pays no XP, gold or win). ⭐ One write, then the live
+  /// achievement pass, so a mastery tier crossed in the Academy toasts like
+  /// one crossed anywhere else. A tally with nothing in it writes nothing.
+  Future<void> bankCharges(Map<String, int> charges) async {
+    if (charges.isEmpty) return;
+    await _mutate(() => profile.addCharges(charges));
+    await _earnLive();
+  }
+
   /// Claims every [Achievements.claimable] entry in **one** write and returns
   /// the summed reward — all zero, and nothing written, when there is none.
   Future<AchievementReward> claimAllAchievements() async {

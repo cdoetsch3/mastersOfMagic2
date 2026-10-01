@@ -79,9 +79,14 @@ Future<void> launchDuel(
           final won = outcome == DuelOutcome.won;
           // ⭐ Academy banks no XP/gold/win-count (ruled 2026-09-10) — the
           // character is untouched — but it DOES rate (LADDER §1 law 4).
-          // Geared banks XP/gold AND rates. ⚠️ So an Academy bout's charges
-          // are not banked either: "untouched" includes the mastery record.
-          if (!academy) {
+          // Geared banks XP/gold AND rates. ✅ **Charges are the exception
+          // (Christian, 2026-10-01): an Academy bout's charges DO count
+          // toward mastery** — what you lean on is what you lean on,
+          // whichever room you were in — so the Academy branch banks them
+          // alone, through `bankCharges`, in one write.
+          if (academy) {
+            await game.bankCharges(charges);
+          } else {
             game.recordDuelResult(
               won: won,
               opponentLevel: driver.opponentLevel,

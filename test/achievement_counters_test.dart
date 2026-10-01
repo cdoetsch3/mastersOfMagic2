@@ -369,7 +369,7 @@ void main() {
       }, reason: 'kills fleeEncounter dropping the charges, or never saving');
     });
 
-    testWidgets('⭐ launchDuel banks them — and the Academy does not', (
+    testWidgets('⭐ launchDuel banks them — and so does the Academy', (
       tester,
     ) async {
       tester.view.physicalSize = const Size(1280, 720);
@@ -419,12 +419,21 @@ void main() {
       final bout = await launch(academy, academy: true);
       await bout.onResult!(DuelOutcome.won, const {'solar': 5});
       await tester.pump();
+      // ✅ Ruling (Christian, 2026-10-01): Academy charges COUNT toward
+      // mastery — the one thing an Academy bout writes to the character.
       expect(
         academy.profile.charges,
-        isEmpty,
+        {'solar': 5},
         reason:
-            'kills an Academy bout that touches the character — it banks no '
-            'XP, gold or wins, and no charges either',
+            'kills an Academy branch that still treats the mastery record as '
+            'part of "the character is untouched"',
+      );
+      expect(
+        (academy.profile.xp, academy.profile.gold, academy.profile.duelsWon),
+        (0, 0, 0),
+        reason:
+            'kills banking the charges through recordDuelResult, which would '
+            'pay the XP, gold and win the Academy ruling forbids',
       );
     });
 
