@@ -1843,9 +1843,10 @@ glare, one cool violet note for the Arcane half.
 HP · Lv 45*
 `assets/items/the_glass_archive/the_last_reading.png`
 > A flat rectangular locket of pale glass on a fine chain, standing upright,
-> a folded scrap of vellum visible inside it; Rare, so one hard white point
-> of light sits at the locket's edge and throws a legible-looking line of
-> shadow-writing across the glass.
+> a folded scrap of blank vellum visible inside it; Rare, so one hard white
+> point of light sits at the locket's edge and throws a single thin straight
+> line of shadow across the glass, like the shadow of a ruled edge — no
+> letters, no marks, nothing readable anywhere.
 
 **The Noon Hour** — *epic · hat · +20 crit damage, +55 max HP, 12% deflect,
 14% amount · Lv 47*
