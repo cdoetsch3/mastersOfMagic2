@@ -19,6 +19,7 @@ import '../game/items/item_catalogue.dart';
 import '../game/items/item_def.dart';
 import '../game/items/item_instance.dart';
 import '../game/items/item_naming.dart';
+import '../game/provenance.dart';
 import '../game/economy/quality_value.dart';
 import 'app_banner.dart';
 import 'app_theme.dart';
@@ -69,6 +70,7 @@ Future<void> showItemDialog(
   // nothing by construction) prints NO line: 'Value: 0g' reads as a bug
   // report, not as "this is not merchandise".
   final scaledValue = qualityValue(def, instance);
+  final foundIn = Provenance.foundInLine(def);
   await showDialog<void>(
     context: context,
     builder: (dialogContext) => AlertDialog(
@@ -148,6 +150,25 @@ Future<void> showItemDialog(
               style: const TextStyle(color: AppColors.gold, fontSize: 12.5),
             ),
           ],
+          // 📝 Ruling 2026-09-30 (note 3): where to go for more, under what
+          // it is worth. Read off the gather nodes and drop tables
+          // ([Provenance.sourcesOf]); an item that is only ever crafted
+          // prints nothing. ⚠️ ONE soft-wrapping [Text], never a Row of
+          // place chips — Climber's Ration is found in eight places, and a
+          // row of eight would overflow a phone-width dialog.
+          if (foundIn != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                foundIn,
+                softWrap: true,
+                style: const TextStyle(
+                  color: AppColors.textDim,
+                  fontSize: 12,
+                  height: 1.35,
+                ),
+              ),
+            ),
           // ⚠️ The reason is text in the body, not only a tooltip on the dead
           // button — there is no hover on a phone, and a greyed button whose
           // reason cannot be reached is worse than no button.

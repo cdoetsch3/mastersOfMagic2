@@ -10,6 +10,7 @@ import '../../game/adventure_launcher.dart';
 import '../../game/economy/shop_catalogue.dart';
 import '../../game/enemies/bestiary.dart';
 import '../../game/gates.dart';
+import '../../game/provenance.dart';
 import '../../game/world.dart';
 import '../../ui/app_banner.dart';
 import '../../ui/app_theme.dart';
@@ -234,6 +235,11 @@ class _CurrentLocationCard extends StatelessWidget {
             location.blurb,
             style: const TextStyle(color: AppColors.textDim, fontSize: 13),
           ),
+          // 📝 Ruling 2026-09-30 (note 3): what this place gives up, under
+          // what it is. ⚠️ Not reserved here, unlike the travel card: this
+          // card only changes when the player arrives somewhere, and then
+          // the whole tab is new.
+          _YieldLines(location: location, maxLines: 2, reserve: false),
           if (location.hasAdventure) ...[
             const SizedBox(height: 6),
             Text(
@@ -474,6 +480,18 @@ class _TravelCard extends StatelessWidget {
                           ],
                         ),
                       ),
+                    // 📝 Ruling 2026-09-30 (note 3): what the place gives
+                    // up, so a player hunting Rowan Logs can read it off the
+                    // list. ⭐ Reserved on EVERY card, town or zone, filled
+                    // or not — the same rule as the Cleared cell above: a
+                    // town neighbour and a zone neighbour stand the same
+                    // height, so no card below them shifts under a finger.
+                    _YieldLines(
+                      key: mapYieldCellKey(location.id),
+                      location: location,
+                      maxLines: 1,
+                      reserve: true,
+                    ),
                     // ⭐ The reason, on the card, in full. The passage rule is
                     // the one refusal a player cannot work out by looking —
                     // "you have not cleared the Old Quarry" is a fact about
@@ -520,6 +538,72 @@ class _TravelCard extends StatelessWidget {
     );
   }
 }
+
+/// The Gather and Drops lines for a zone ([Provenance.gatherLine],
+/// [Provenance.dropsLine]); nothing for a town.
+///
+/// With [reserve], an absent line still takes its one line of height —
+/// ⚠️ which is why a reserving caller must pass `maxLines: 1`: the cell is
+/// then exactly two lines tall whatever is (or is not) in it. ⭐ The blank
+/// is an invisible copy of a real line rather than a measured number, so it
+/// is right under any font and at any text scale (the lesson [_ClearedTag]
+/// learned the hard way).
+class _YieldLines extends StatelessWidget {
+  final GameLocation location;
+  final int maxLines;
+  final bool reserve;
+  const _YieldLines({
+    super.key,
+    required this.location,
+    required this.maxLines,
+    required this.reserve,
+  });
+
+  static const TextStyle _style = TextStyle(
+    color: AppColors.textDim,
+    fontSize: 11.5,
+    height: 1.3,
+  );
+
+  Widget? _line(String? text) {
+    if (text != null) {
+      return Text(
+        text,
+        maxLines: maxLines,
+        overflow: TextOverflow.ellipsis,
+        style: _style,
+      );
+    }
+    if (!reserve) return null;
+    return const Visibility(
+      visible: false,
+      maintainSize: true,
+      maintainAnimation: true,
+      maintainState: true,
+      child: Text(' ', maxLines: 1, style: _style),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lines = [
+      _line(Provenance.gatherLine(location)),
+      _line(Provenance.dropsLine(location)),
+    ].nonNulls.toList();
+    if (lines.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: lines,
+      ),
+    );
+  }
+}
+
+/// The key on each travel card's Gather/Drops cell, for the height law.
+@visibleForTesting
+Key mapYieldCellKey(String locationId) => ValueKey('map-yields:$locationId');
 
 const TextStyle _subtitleStyle = TextStyle(
   color: AppColors.textDim,

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../game/game_state.dart';
+import '../game/provenance.dart';
 import '../game/world.dart';
 import '../game/travel.dart';
 import '../game/world_map_geometry.dart';
@@ -495,6 +496,26 @@ class PlaceSheet extends StatelessWidget {
               location.blurb,
               style: const TextStyle(color: AppColors.textDim, height: 1.4),
             ),
+            // 📝 Ruling 2026-09-30 (note 3): the same Gather and Drops lines
+            // the Map tab's cards carry. ⭐ Unclipped here — the sheet scrolls
+            // and is the place you come to read the whole list — and nothing
+            // reserved, since the sheet is built once per tap and nothing on
+            // it moves after it opens.
+            for (final line in [
+              Provenance.gatherLine(location),
+              Provenance.dropsLine(location),
+            ].nonNulls)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  line,
+                  style: const TextStyle(
+                    color: AppColors.textDim,
+                    fontSize: 12.5,
+                    height: 1.35,
+                  ),
+                ),
+              ),
             const SizedBox(height: 14),
             Wrap(
               spacing: 8,
