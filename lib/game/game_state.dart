@@ -77,6 +77,17 @@ class GameState extends ChangeNotifier {
   /// it (boot, sign-in, any save) have no screen of their own to report to.
   final ValueNotifier<String?> notice = ValueNotifier<String?>(null);
 
+  /// Achievements earned **live** since the shell last showed them —
+  /// `HomeShell` raises the gold toast for them and clears the list.
+  ///
+  /// ⭐ **Live only.** The load-time sweep ([_sweepAchievements]) grants in
+  /// silence, so a character who already had twelve wins when `tenfold`
+  /// shipped gets it on launch without a stack of toasts for things done
+  /// weeks ago. ⚠️ Not written by `openGateAt`'s own achievement — the gate
+  /// screen toasts that one itself (`GateScreen._unlock`).
+  final ValueNotifier<List<AchievementDef>> achievementNews =
+      ValueNotifier<List<AchievementDef>>(const []);
+
   /// The banner after a refused save — see [_reloadAfterConflict].
   static const String conflictNotice =
       'Your save changed on another device — reloaded.';
@@ -106,6 +117,8 @@ class GameState extends ChangeNotifier {
     state.settleBeltOverflow();
     // ⚠️ …and saves from before a staff took both hands (ruling 2026-09-21).
     state.settleTwoHanded();
+    // …and characters who met an achievement before it existed.
+    state._sweepAchievements();
     await state._persist();
     return state;
   }
@@ -149,8 +162,9 @@ class GameState extends ChangeNotifier {
       if (loaded != null) {
         // Adopt the existing cloud profile (progress from another session).
         _adopt(loaded);
-        // ⚠️ Only a repair is worth a write here: adopting is a read.
-        if (_repair()) await _persist();
+        // ⚠️ Only a repair or a sweep is worth a write here: adopting is a
+        // read. Both always run — `|`, not `||`.
+        if (_repair() | _sweepAchievements()) await _persist();
       } else {
         // First time on this account — seed the cloud with the current
         // (guest) profile so nothing is lost. ⚠️ The seed is conditional on
@@ -195,11 +209,12 @@ class GameState extends ChangeNotifier {
       if (fresh == null) return;
       _adopt(fresh);
       final repaired = profile.repairContainers();
+      final swept = _sweepAchievements();
       notice.value = repaired > 0
           ? '$conflictNotice ${repairNotice(repaired)}'
           : conflictNotice;
       notifyListeners();
-      if (repaired > 0) await _persist();
+      if (repaired > 0 || swept) await _persist();
     } finally {
       _reloading = false;
     }
@@ -225,8 +240,40 @@ class GameState extends ChangeNotifier {
     return true;
   }
 
+  /// Grants, **silently**, every achievement the profile has met but does
+  /// not hold ([Achievements.newlyEarned]); returns whether any was added,
+  /// i.e. whether the caller must persist. The load-time half of granting —
+  /// see [achievementNews].
+  ///
+  /// ⚠️ Writes nothing itself: every caller is already deciding whether to
+  /// persist a freshly loaded profile.
+  bool _sweepAchievements() {
+    final due = Achievements.newlyEarned(profile);
+    for (final def in due) {
+      profile.achievements.add(def.id);
+    }
+    return due.isNotEmpty;
+  }
+
+  /// The live half of granting: after a mutation that can change the answer
+  /// (a duel result, a rated result, a gate, a craft), grant each newly met
+  /// achievement through [grantAchievement] and queue it on
+  /// [achievementNews] for the toast.
+  ///
+  /// ⭐ Costs nothing when nothing is due — no write, no notify — which is
+  /// almost every call.
+  Future<void> _earnLive() async {
+    final fresh = <AchievementDef>[];
+    for (final def in Achievements.newlyEarned(profile)) {
+      if (await grantAchievement(def.id)) fresh.add(def);
+    }
+    if (fresh.isEmpty) return;
+    achievementNews.value = [...achievementNews.value, ...fresh];
+  }
+
   @override
   void dispose() {
+    achievementNews.dispose();
     notice.dispose();
     super.dispose();
   }
@@ -527,6 +574,10 @@ class GameState extends ChangeNotifier {
       profile.openedGates.add(locationId);
       if (achievement != null) profile.achievements.add(achievement.id);
     });
+    // ⭐ After, not inside: the gate's own achievement above is already
+    // held, so this only finds what the opening newly satisfied elsewhere
+    // (Rimeholt's `beyond_the_veil`).
+    await _earnLive();
     return true;
   }
 
@@ -664,6 +715,8 @@ class GameState extends ChangeNotifier {
         profile.duelsLost++;
       }
     });
+    // Wins, clears and levels all move here.
+    await _earnLive();
     final after = profile.level;
     if (after > before) {
       pendingLevelUp = after;
@@ -682,14 +735,17 @@ class GameState extends ChangeNotifier {
     required bool academy,
     required int newRating,
     required bool won,
-  }) => _mutate(() {
-    ladder_record.applyRatedResult(
-      profile,
-      academy: academy,
-      newRating: newRating,
-      won: won,
-    );
-  });
+  }) async {
+    await _mutate(() {
+      ladder_record.applyRatedResult(
+        profile,
+        academy: academy,
+        newRating: newRating,
+        won: won,
+      );
+    });
+    await _earnLive();
+  }
 
   /// Records the id of the ladder bot this player last fought (LADDER §3:
   /// the search excludes it next time so two people online at once — or one
@@ -948,6 +1004,8 @@ class GameState extends ChangeNotifier {
       if (room != null) profile.storerooms[here] = room;
       profile.skillXp[skillKey] = (profile.skillXp[skillKey] ?? 0) + gained;
     });
+    // A craft level can earn the Craft entries.
+    await _earnLive();
     final levelAfter = profile.skillLevel(skillKey);
     return CraftOutcome.made(
       defId: outputDef.id,

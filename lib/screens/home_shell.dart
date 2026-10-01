@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../game/game_state.dart';
 import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
+import 'achievements_screen.dart';
 import 'gate_screen.dart';
 import 'matchmaking_screen.dart';
 import 'profile_screen.dart';
@@ -69,8 +70,10 @@ class _HomeShellState extends State<HomeShell> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _noticeSource = GameStateScope.read(context)
-        ..notice.addListener(_onNotice);
+        ..notice.addListener(_onNotice)
+        ..achievementNews.addListener(_onAchievements);
       _onNotice();
+      _onAchievements();
     });
     final code = widget.pendingJoinCode;
     if (code != null) {
@@ -106,10 +109,24 @@ class _HomeShellState extends State<HomeShell> {
     showAppBanner(context, text);
   }
 
+  /// Toasts achievements earned live ([GameState.achievementNews]), once,
+  /// then clears them — the same show-and-clear as [_onNotice].
+  ///
+  /// ⭐ **One toast for the lot.** Banners replace each other, so a duel that
+  /// earns two would otherwise show only the second.
+  void _onAchievements() {
+    final source = _noticeSource;
+    final earned = source?.achievementNews.value ?? const [];
+    if (source == null || earned.isEmpty || !mounted) return;
+    source.achievementNews.value = const [];
+    announceAchievements(appBannerOf(context), earned);
+  }
+
   @override
   void dispose() {
     HomeShell.tabRequest.removeListener(_onTabRequest);
     _noticeSource?.notice.removeListener(_onNotice);
+    _noticeSource?.achievementNews.removeListener(_onAchievements);
     super.dispose();
   }
 

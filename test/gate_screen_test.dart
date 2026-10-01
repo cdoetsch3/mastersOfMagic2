@@ -337,7 +337,7 @@ void main() {
   });
 
   group('⚠️ only Pennycross spends', () {
-    test('Rimeholt opens on the totem and keeps it, earning nothing', () async {
+    test('Rimeholt opens on the totem and keeps it, earning its own', () async {
       // The Celestial Totem is ruled keepable (CELESTIAL_CONTRACT §3.4);
       // the arrival ruling made Rimeholt a stop too, but did not make its
       // guard keep anything.
@@ -368,8 +368,18 @@ void main() {
       );
       expect(
         game.profile.achievements,
-        isEmpty,
-        reason: 'kills a mutant that hands Papers in Order out at any gate',
+        {'beyond_the_veil'},
+        reason:
+            'kills a mutant that hands Papers in Order out at any gate, and '
+            'one that opens Rimeholt without Beyond the Veil (ruling '
+            '2026-09-30, note 7)',
+      );
+      expect(
+        game.achievementNews.value.map((a) => a.id),
+        ['beyond_the_veil'],
+        reason:
+            'kills a mutant that earns it silently — Rimeholt has no gate '
+            'toast of its own, so the shell must hear of it',
       );
     });
   });
