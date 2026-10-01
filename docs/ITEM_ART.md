@@ -2363,8 +2363,8 @@ amount · Lv 53*
 +10% healing received · Lv 53*
 `assets/items/the_reliquary_deep/aetherglass_locket.png`
 > A flat rectangular locket of pale archive glass in a soft gold bezel on a
-> fine chain, standing upright, a faint suggestion of writing in the glass;
-> Common, so nothing is emissive.
+> fine chain, standing upright, a faint ruled pattern of pale lines in the
+> glass, no letters; Common, so nothing is emissive.
 
 **Censer Pendant** — *rare · neck · +20 crit damage, +15% shield strength,
 +15% healing received · Lv 54*
@@ -2440,9 +2440,10 @@ black ink, absolute black, one cold violet note where the writing happens.
 crit · Lv 58*
 `assets/items/the_unwritten_library/the_open_colophon.png`
 > A thick codex bound in pale vellum, the size of two hands, held open in
-> mid-air at its final page; Epic, so a line of cold violet script is
-> *writing itself* across that page, one character at a time, reaching the
-> margin and continuing on the next line without ever filling it.
+> mid-air at its final page; Epic, so a thin line of cold violet light is
+> drawing itself across that otherwise blank page like the stroke of a pen
+> with no letters in it, reaching the margin and continuing on the next
+> line without ever filling the page.
 
 ---
 
