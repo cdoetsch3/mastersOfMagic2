@@ -40,6 +40,97 @@
       "processed": true,
       "updated": "2026-10-01T02:25:08+00:00"
     },
+    "aetherglass": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/aetherglass.png",
+      "source": "art/source/items/the_glass_archive/aetherglass.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:c5dcd92173d10cd4",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "aetherglass_locket": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/aetherglass_locket.png",
+      "source": "art/source/items/the_reliquary_deep/aetherglass_locket.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:8bffb7e5b323cb3d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "aethersteel_ingot": {
+      "kind": "icon",
+      "zone": "the_collapsed_academy",
+      "target": "assets/items/the_collapsed_academy/aethersteel_ingot.png",
+      "source": "art/source/items/the_collapsed_academy/aethersteel_ingot.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d305476a2f789047",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "aetherwood_knot": {
+      "kind": "icon",
+      "zone": "the_collapsed_academy",
+      "target": "assets/items/the_collapsed_academy/aetherwood_knot.png",
+      "source": "art/source/items/the_collapsed_academy/aetherwood_knot.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:7bfea527d834bec2",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "aetherwood_log": {
+      "kind": "icon",
+      "zone": "the_collapsed_academy",
+      "target": "assets/items/the_collapsed_academy/aetherwood_log.png",
+      "source": "art/source/items/the_collapsed_academy/aetherwood_log.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:61c90060f37cad3d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "aetherwood_quarterstaff": {
+      "kind": "icon",
+      "zone": "the_collapsed_academy",
+      "target": "assets/items/the_collapsed_academy/aetherwood_quarterstaff.png",
+      "source": "art/source/items/the_collapsed_academy/aetherwood_quarterstaff.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:01c2b1d17cbafacc",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "aetherwood_wand": {
+      "kind": "icon",
+      "zone": "the_collapsed_academy",
+      "target": "assets/items/the_collapsed_academy/aetherwood_wand.png",
+      "source": "art/source/items/the_collapsed_academy/aetherwood_wand.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:689ba207a71c438d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
     "amber": {
       "kind": "icon",
       "zone": "thornmire",
@@ -53,6 +144,19 @@
       "processed": true,
       "updated": "2026-10-01T01:50:06+00:00"
     },
+    "antechoir": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/antechoir.png",
+      "source": "art/source/the_reliquary_deep/antechoir.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:e8589803388eeb1a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
     "anvilhead": {
       "kind": "creature",
       "zone": "thunderspire_peaks",
@@ -65,6 +169,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:02:44+00:00"
+    },
+    "aperture": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/aperture.png",
+      "source": "art/source/the_glass_archive/aperture.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:999e65ce5e33ac75",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
     },
     "aqua_crystal": {
       "kind": "icon",
@@ -105,6 +222,110 @@
       "processed": true,
       "updated": "2026-10-01T01:40:50+00:00"
     },
+    "arcane_chimera": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/arcane_chimera.png",
+      "source": "art/source/the_collapsed_academy/arcane_chimera.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:785536a3c7fccd0a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "arcane_crystal": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/arcane_crystal.png",
+      "source": "art/source/items/the_glass_archive/arcane_crystal.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4c40e5feb7f225c6",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "arcane_dust": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/arcane_dust.png",
+      "source": "art/source/items/the_glass_archive/arcane_dust.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9138b67d72cd9e52",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "arcane_shard": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/arcane_shard.png",
+      "source": "art/source/items/the_glass_archive/arcane_shard.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:34e7ad9f9e69d78e",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "arcflock": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/arcflock.png",
+      "source": "art/source/the_shattered_orrery/arcflock.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:3bbb736ad95909fe",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "arcsalt": {
+      "kind": "icon",
+      "zone": "the_shattered_orrery",
+      "target": "assets/items/the_shattered_orrery/arcsalt.png",
+      "source": "art/source/items/the_shattered_orrery/arcsalt.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:e7c3eea84a81408e",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "arcsalt_draught": {
+      "kind": "icon",
+      "zone": "the_shattered_orrery",
+      "target": "assets/items/the_shattered_orrery/arcsalt_draught.png",
+      "source": "art/source/items/the_shattered_orrery/arcsalt_draught.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:f1618babe8c473f7",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "armature": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/armature.png",
+      "source": "art/source/the_shattered_orrery/armature.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:10c075485df0b9e8",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
     "ashfall_vale": {
       "kind": "backdrop",
       "zone": "ashfall_vale",
@@ -130,6 +351,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T01:44:50+00:00"
+    },
+    "ashlight": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/ashlight.png",
+      "source": "art/source/the_eclipsed_citadel/ashlight.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2a23356909e8fb2a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
     },
     "ashroot_sapling": {
       "kind": "creature",
@@ -195,6 +429,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:50:18+00:00"
+    },
+    "bedrock_colossus": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/bedrock_colossus.png",
+      "source": "art/source/the_buried_sky/bedrock_colossus.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:208bfddcbd04f01a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "bedrock_greaves": {
+      "kind": "icon",
+      "zone": "the_buried_sky",
+      "target": "assets/items/the_buried_sky/bedrock_greaves.png",
+      "source": "art/source/items/the_buried_sky/bedrock_greaves.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:57d4040d7967de45",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
     },
     "bindweed_boots": {
       "kind": "icon",
@@ -339,6 +599,45 @@
       "processed": true,
       "updated": "2026-10-01T01:56:13+00:00"
     },
+    "blankspine": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/blankspine.png",
+      "source": "art/source/the_unwritten_library/blankspine.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:95c2a5a3e49b24da",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "blankspine_belt": {
+      "kind": "icon",
+      "zone": "the_unwritten_library",
+      "target": "assets/items/the_unwritten_library/blankspine_belt.png",
+      "source": "art/source/items/the_unwritten_library/blankspine_belt.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2c300f8b81fc3c92",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "blankspine_vellum": {
+      "kind": "icon",
+      "zone": "the_unwritten_library",
+      "target": "assets/items/the_unwritten_library/blankspine_vellum.png",
+      "source": "art/source/items/the_unwritten_library/blankspine_vellum.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2077816bbc769c0a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
     "bloodwood_knot": {
       "kind": "icon",
       "zone": "the_mirrormere",
@@ -482,6 +781,32 @@
       "processed": true,
       "updated": "2026-10-01T01:50:06+00:00"
     },
+    "bone_reliquary": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/bone_reliquary.png",
+      "source": "art/source/the_reliquary_deep/bone_reliquary.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ec7210d9410fc48a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "both_sided_thing": {
+      "kind": "creature",
+      "zone": "the_sunless_reach",
+      "target": "assets/creatures/the_sunless_reach/both_sided_thing.png",
+      "source": "art/source/the_sunless_reach/both_sided_thing.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:037a92e2b4c7fe79",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
     "breathfrost": {
       "kind": "creature",
       "zone": "frostfell_pass",
@@ -573,6 +898,19 @@
       "processed": true,
       "updated": "2026-10-01T01:40:50+00:00"
     },
+    "burnt_index": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/burnt_index.png",
+      "source": "art/source/the_glass_archive/burnt_index.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:94e7c41e7751f3e2",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
     "cairnwight": {
       "kind": "creature",
       "zone": "frostfell_pass",
@@ -586,6 +924,84 @@
       "processed": true,
       "updated": "2026-10-01T02:08:16+00:00"
     },
+    "causeway_warden": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/causeway_warden.png",
+      "source": "art/source/hallowmarch/causeway_warden.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:416c6f78472215af",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "celestial_totem": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/celestial_totem.png",
+      "source": "art/source/items/the_glass_archive/celestial_totem.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2c94fcf66b59a8b3",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "censer_draught": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/censer_draught.png",
+      "source": "art/source/items/the_reliquary_deep/censer_draught.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9d1558a821eae70d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "censer_pendant": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/censer_pendant.png",
+      "source": "art/source/items/the_reliquary_deep/censer_pendant.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:60910f82465422ca",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "censer_resin": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/censer_resin.png",
+      "source": "art/source/items/the_reliquary_deep/censer_resin.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:409f573f31bee8de",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "censer_wraith": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/censer_wraith.png",
+      "source": "art/source/the_reliquary_deep/censer_wraith.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:737815908f2c65c4",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
     "chaff": {
       "kind": "creature",
       "zone": "windward_steppe",
@@ -598,6 +1014,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:25:08+00:00"
+    },
+    "chalkline_signet": {
+      "kind": "icon",
+      "zone": "the_collapsed_academy",
+      "target": "assets/items/the_collapsed_academy/chalkline_signet.png",
+      "source": "art/source/items/the_collapsed_academy/chalkline_signet.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9dd88ef420aa6389",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "chalkwraith": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/chalkwraith.png",
+      "source": "art/source/the_collapsed_academy/chalkwraith.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:bc85bda5d6a86cc0",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
     },
     "char_tusk": {
       "kind": "creature",
@@ -638,6 +1080,19 @@
       "processed": true,
       "updated": "2026-10-01T01:56:13+00:00"
     },
+    "cherub_of_the_turning_blade": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/cherub_of_the_turning_blade.png",
+      "source": "art/source/the_sealed_garden/cherub_of_the_turning_blade.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:07ab3a94ce21fa4c",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
     "chill_eel": {
       "kind": "creature",
       "zone": "glimmerbrook",
@@ -663,6 +1118,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:13:02+00:00"
+    },
+    "chorister_vine": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/chorister_vine.png",
+      "source": "art/source/the_sealed_garden/chorister_vine.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ced81d70c17aacad",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
     },
     "cinder_loop": {
       "kind": "icon",
@@ -716,6 +1184,19 @@
       "processed": true,
       "updated": "2026-10-01T01:44:50+00:00"
     },
+    "climbers_ration": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/climbers_ration.png",
+      "source": "art/source/items/hallowmarch/climbers_ration.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b66d6fd92897c2b8",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
     "cold_ejecta": {
       "kind": "creature",
       "zone": "starfall_basin",
@@ -739,8 +1220,8 @@
       "feedback": [],
       "prompt_hash": "sha256:b2b38d304a19c161",
       "model": "gpt-image-1",
-      "processed": false,
-      "updated": "2026-10-01T03:01:35+00:00"
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
     },
     "coldsnap": {
       "kind": "creature",
@@ -754,6 +1235,71 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:08:16+00:00"
+    },
+    "colophon": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/colophon.png",
+      "source": "art/source/the_unwritten_library/colophon.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:376656e05ff96fe3",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "colophon_signet": {
+      "kind": "icon",
+      "zone": "the_unwritten_library",
+      "target": "assets/items/the_unwritten_library/colophon_signet.png",
+      "source": "art/source/items/the_unwritten_library/colophon_signet.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:0b7c022f7bc1825c",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "colophon_stone": {
+      "kind": "icon",
+      "zone": "the_unwritten_library",
+      "target": "assets/items/the_unwritten_library/colophon_stone.png",
+      "source": "art/source/items/the_unwritten_library/colophon_stone.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b2fd59b5ea6f1235",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "considered_ice": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/considered_ice.png",
+      "source": "art/source/the_umbral_wastes/considered_ice.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:e1d6e7ceea2277ac",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "constellate": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/constellate.png",
+      "source": "art/source/the_buried_sky/constellate.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2b64549aaf5b176d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
     },
     "constellation_warden": {
       "kind": "creature",
@@ -794,6 +1340,84 @@
       "processed": true,
       "updated": "2026-10-01T01:44:50+00:00"
     },
+    "corebiter": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/corebiter.png",
+      "source": "art/source/the_buried_sky/corebiter.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9731a22a966a1891",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "corebiter_belt": {
+      "kind": "icon",
+      "zone": "the_buried_sky",
+      "target": "assets/items/the_buried_sky/corebiter_belt.png",
+      "source": "art/source/items/the_buried_sky/corebiter_belt.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:7f7284711d1228d5",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "corebiter_hide": {
+      "kind": "icon",
+      "zone": "the_buried_sky",
+      "target": "assets/items/the_buried_sky/corebiter_hide.png",
+      "source": "art/source/items/the_buried_sky/corebiter_hide.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b368aae9f63b09c2",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "corona_pearl": {
+      "kind": "icon",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/items/the_eclipsed_citadel/corona_pearl.png",
+      "source": "art/source/items/the_eclipsed_citadel/corona_pearl.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:695146c35b282f86",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
+    "corona_torc": {
+      "kind": "icon",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/items/the_eclipsed_citadel/corona_torc.png",
+      "source": "art/source/items/the_eclipsed_citadel/corona_torc.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:74c8348415c73201",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
+    "corridor_crawler": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/corridor_crawler.png",
+      "source": "art/source/the_reliquary_deep/corridor_crawler.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:add8d73d72c5fd29",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
     "countstone_pendant": {
       "kind": "icon",
       "zone": "thunderspire_peaks",
@@ -820,6 +1444,19 @@
       "processed": true,
       "updated": "2026-10-01T02:50:18+00:00"
     },
+    "crestline_ring": {
+      "kind": "icon",
+      "zone": "the_sunless_reach",
+      "target": "assets/items/the_sunless_reach/crestline_ring.png",
+      "source": "art/source/items/the_sunless_reach/crestline_ring.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9e8a57eda6f93924",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
     "crestline_warden": {
       "kind": "creature",
       "zone": "the_sunless_reach",
@@ -830,8 +1467,8 @@
       "feedback": [],
       "prompt_hash": "sha256:b23092490307eb98",
       "model": "gpt-image-1",
-      "processed": false,
-      "updated": "2026-10-01T03:01:35+00:00"
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
     },
     "crown_fire": {
       "kind": "creature",
@@ -859,6 +1496,19 @@
       "processed": true,
       "updated": "2026-10-01T02:32:01+00:00"
     },
+    "deadreckoner": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/deadreckoner.png",
+      "source": "art/source/the_buried_sky/deadreckoner.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2ae021f010a5be5f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
     "deadweight": {
       "kind": "creature",
       "zone": "old_quarry",
@@ -871,6 +1521,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:13:02+00:00"
+    },
+    "deepsteel_ingot": {
+      "kind": "icon",
+      "zone": "the_buried_sky",
+      "target": "assets/items/the_buried_sky/deepsteel_ingot.png",
+      "source": "art/source/items/the_buried_sky/deepsteel_ingot.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:f37ef278d71fc072",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "deepstratum_ore": {
+      "kind": "icon",
+      "zone": "the_buried_sky",
+      "target": "assets/items/the_buried_sky/deepstratum_ore.png",
+      "source": "art/source/items/the_buried_sky/deepstratum_ore.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:623e184ac35d0e32",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
     },
     "drownling_belt": {
       "kind": "icon",
@@ -898,6 +1574,45 @@
       "processed": true,
       "updated": "2026-10-01T02:55:39+00:00"
     },
+    "duskcap": {
+      "kind": "icon",
+      "zone": "the_sunless_reach",
+      "target": "assets/items/the_sunless_reach/duskcap.png",
+      "source": "art/source/items/the_sunless_reach/duskcap.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:c32ed6a16c4e3f8f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "duskcap_tonic": {
+      "kind": "icon",
+      "zone": "the_sunless_reach",
+      "target": "assets/items/the_sunless_reach/duskcap_tonic.png",
+      "source": "art/source/items/the_sunless_reach/duskcap_tonic.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:7490f5966b7e0a8a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "duskmarch": {
+      "kind": "creature",
+      "zone": "the_sunless_reach",
+      "target": "assets/creatures/the_sunless_reach/duskmarch.png",
+      "source": "art/source/the_sunless_reach/duskmarch.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:e50cc94aa3f511ce",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
     "earth_titan": {
       "kind": "creature",
       "zone": "old_quarry",
@@ -910,6 +1625,58 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:13:02+00:00"
+    },
+    "ebony_knot": {
+      "kind": "icon",
+      "zone": "the_sunless_reach",
+      "target": "assets/items/the_sunless_reach/ebony_knot.png",
+      "source": "art/source/items/the_sunless_reach/ebony_knot.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:c114715f8a712bd9",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "ebony_log": {
+      "kind": "icon",
+      "zone": "the_sunless_reach",
+      "target": "assets/items/the_sunless_reach/ebony_log.png",
+      "source": "art/source/items/the_sunless_reach/ebony_log.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:29844f5a5ac46c2a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "ebony_quarterstaff": {
+      "kind": "icon",
+      "zone": "the_sunless_reach",
+      "target": "assets/items/the_sunless_reach/ebony_quarterstaff.png",
+      "source": "art/source/items/the_sunless_reach/ebony_quarterstaff.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:bf9c43ee4e4a6bc1",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "ebony_wand": {
+      "kind": "icon",
+      "zone": "the_sunless_reach",
+      "target": "assets/items/the_sunless_reach/ebony_wand.png",
+      "source": "art/source/items/the_sunless_reach/ebony_wand.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ed8401ab0f368144",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
     },
     "echo_of_the_between": {
       "kind": "creature",
@@ -934,8 +1701,86 @@
       "feedback": [],
       "prompt_hash": "sha256:ca6d792990e28c7e",
       "model": "gpt-image-1",
-      "processed": false,
-      "updated": "2026-10-01T03:01:35+00:00"
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "eclipse_iron": {
+      "kind": "icon",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/items/the_eclipsed_citadel/eclipse_iron.png",
+      "source": "art/source/items/the_eclipsed_citadel/eclipse_iron.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:3ef30ffc1494c619",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
+    "eclipse_opal": {
+      "kind": "icon",
+      "zone": "the_sunless_reach",
+      "target": "assets/items/the_sunless_reach/eclipse_opal.png",
+      "source": "art/source/items/the_sunless_reach/eclipse_opal.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:813b9507e167f196",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "eclipse_ring": {
+      "kind": "icon",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/items/the_eclipsed_citadel/eclipse_ring.png",
+      "source": "art/source/items/the_eclipsed_citadel/eclipse_ring.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:978b544790f3d50d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
+    "eclipse_signet": {
+      "kind": "icon",
+      "zone": "the_sealed_garden",
+      "target": "assets/items/the_sealed_garden/eclipse_signet.png",
+      "source": "art/source/items/the_sealed_garden/eclipse_signet.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:bf95c35ee62a8495",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "eclipse_weaver": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/eclipse_weaver.png",
+      "source": "art/source/the_umbral_wastes/eclipse_weaver.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:30c023c83dc8063d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "edgewalker": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/edgewalker.png",
+      "source": "art/source/the_umbral_wastes/edgewalker.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6a58b14f718c5db2",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
     },
     "efreet": {
       "kind": "creature",
@@ -1054,6 +1899,58 @@
       "processed": true,
       "updated": "2026-10-01T01:56:13+00:00"
     },
+    "emeritus": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/emeritus.png",
+      "source": "art/source/the_collapsed_academy/emeritus.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:84cff4e591ea928d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "errant_ring": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/errant_ring.png",
+      "source": "art/source/the_shattered_orrery/errant_ring.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2f4fa327d897f6f4",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "erratum": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/erratum.png",
+      "source": "art/source/the_unwritten_library/erratum.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b153e1ad290859e5",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "escapement": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/escapement.png",
+      "source": "art/source/the_shattered_orrery/escapement.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:09fdc46b291990a0",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
     "everice": {
       "kind": "icon",
       "zone": "frostfell_pass",
@@ -1066,6 +1963,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:08:16+00:00"
+    },
+    "everice_band": {
+      "kind": "icon",
+      "zone": "the_buried_sky",
+      "target": "assets/items/the_buried_sky/everice_band.png",
+      "source": "art/source/items/the_buried_sky/everice_band.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ce7a69c8f5775418",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "fadelight": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/fadelight.png",
+      "source": "art/source/the_buried_sky/fadelight.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:499edff62fd7e4d5",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
     },
     "fallpoint": {
       "kind": "creature",
@@ -1275,6 +2198,19 @@
       "processed": true,
       "updated": "2026-08-19T18:22:12+00:00"
     },
+    "footnote": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/footnote.png",
+      "source": "art/source/the_unwritten_library/footnote.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:783e8e3a12ccd478",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
     "foragers_ration": {
       "kind": "icon",
       "zone": "whispering_woods",
@@ -1352,6 +2288,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:25:08+00:00"
+    },
+    "gear_ghost": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/gear_ghost.png",
+      "source": "art/source/the_shattered_orrery/gear_ghost.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:f435422ede2b491f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
     },
     "geo_crystal": {
       "kind": "icon",
@@ -1444,6 +2393,19 @@
       "processed": true,
       "updated": "2026-10-01T02:36:35+00:00"
     },
+    "glasswright": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/glasswright.png",
+      "source": "art/source/the_glass_archive/glasswright.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:eaf64815d73eecbb",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
     "glimmerbrook": {
       "kind": "backdrop",
       "zone": "glimmerbrook",
@@ -1456,6 +2418,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T01:40:50+00:00"
+    },
+    "goldenrood": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/goldenrood.png",
+      "source": "art/source/items/hallowmarch/goldenrood.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:5956fb796aa1701c",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "goldenrood_draught": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/goldenrood_draught.png",
+      "source": "art/source/items/hallowmarch/goldenrood_draught.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:13f45769a2b5d7de",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
     },
     "gravelswarm": {
       "kind": "creature",
@@ -1496,6 +2484,19 @@
       "processed": true,
       "updated": "2026-10-01T02:18:34+00:00"
     },
+    "guardian_of_the_world_tree": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/guardian_of_the_world_tree.png",
+      "source": "art/source/the_sealed_garden/guardian_of_the_world_tree.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:fc1a648ea3c1be97",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
     "gullbone_flock": {
       "kind": "creature",
       "zone": "tidewrack_shoals",
@@ -1508,6 +2509,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:55:39+00:00"
+    },
+    "hallowmarch": {
+      "kind": "backdrop",
+      "zone": "hallowmarch",
+      "target": "assets/backgrounds/hallowmarch.png",
+      "source": "art/source/backgrounds/hallowmarch.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:93146eea9f523867",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
     },
     "hardtack": {
       "kind": "icon",
@@ -1638,6 +2652,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:02:44+00:00"
+    },
+    "ink_drinker": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/ink_drinker.png",
+      "source": "art/source/the_unwritten_library/ink_drinker.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:fb32d1fe834b5144",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
     },
     "ionwake": {
       "kind": "creature",
@@ -1834,6 +2861,19 @@
       "processed": true,
       "updated": "2026-10-01T01:50:06+00:00"
     },
+    "lensfly": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/lensfly.png",
+      "source": "art/source/the_glass_archive/lensfly.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6b23625c13e60b30",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
     "leviathan": {
       "kind": "creature",
       "zone": "tidewrack_shoals",
@@ -1859,6 +2899,19 @@
       "processed": true,
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
+    },
+    "long_division": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/long_division.png",
+      "source": "art/source/the_shattered_orrery/long_division.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:fee583ea2df77690",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
     },
     "lowwater_thing": {
       "kind": "creature",
@@ -1976,6 +3029,84 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:32:01+00:00"
+    },
+    "mana_golem": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/mana_golem.png",
+      "source": "art/source/the_collapsed_academy/mana_golem.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:3785c20b93a72112",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "mana_slag": {
+      "kind": "icon",
+      "zone": "the_collapsed_academy",
+      "target": "assets/items/the_collapsed_academy/mana_slag.png",
+      "source": "art/source/items/the_collapsed_academy/mana_slag.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:899aa28168534c29",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "marginal_note": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/marginal_note.png",
+      "source": "art/source/the_collapsed_academy/marginal_note.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:18eef65fbf35b9c9",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "marker_sworn": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/marker_sworn.png",
+      "source": "art/source/hallowmarch/marker_sworn.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:0071c30210cbd16b",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "meltwater_choir": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/meltwater_choir.png",
+      "source": "art/source/hallowmarch/meltwater_choir.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:7736bda6d6390d39",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "milestone": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/milestone.png",
+      "source": "art/source/hallowmarch/milestone.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ac0eb76809616c52",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
     },
     "mirage": {
       "kind": "creature",
@@ -2159,6 +3290,71 @@
       "processed": true,
       "updated": "2026-10-01T02:55:39+00:00"
     },
+    "nacre_pendant": {
+      "kind": "icon",
+      "zone": "the_buried_sky",
+      "target": "assets/items/the_buried_sky/nacre_pendant.png",
+      "source": "art/source/items/the_buried_sky/nacre_pendant.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:20931e821069fcb3",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "nadir": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/nadir.png",
+      "source": "art/source/the_buried_sky/nadir.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:3d990eae559e1146",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "nadir_garnet": {
+      "kind": "icon",
+      "zone": "the_buried_sky",
+      "target": "assets/items/the_buried_sky/nadir_garnet.png",
+      "source": "art/source/items/the_buried_sky/nadir_garnet.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:30fd7919019d9d2f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "nightbringer": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/nightbringer.png",
+      "source": "art/source/the_umbral_wastes/nightbringer.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6d81fe2c9eca3cd1",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "nightcurrent": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/nightcurrent.png",
+      "source": "art/source/the_eclipsed_citadel/nightcurrent.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:673d8d75ebc5eb90",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
     "nightglare": {
       "kind": "creature",
       "zone": "the_sunless_reach",
@@ -2169,8 +3365,60 @@
       "feedback": [],
       "prompt_hash": "sha256:f8b9fd287344693f",
       "model": "gpt-image-1",
-      "processed": false,
-      "updated": "2026-10-01T03:01:35+00:00"
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "nightink": {
+      "kind": "icon",
+      "zone": "the_unwritten_library",
+      "target": "assets/items/the_unwritten_library/nightink.png",
+      "source": "art/source/items/the_unwritten_library/nightink.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:7d6d562debb1e10c",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "nightink_draught": {
+      "kind": "icon",
+      "zone": "the_unwritten_library",
+      "target": "assets/items/the_unwritten_library/nightink_draught.png",
+      "source": "art/source/items/the_unwritten_library/nightink_draught.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a581b9f9c448b003",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "nightspill": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/nightspill.png",
+      "source": "art/source/the_umbral_wastes/nightspill.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:21b76bc11d7d2e8e",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "noonmark": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/noonmark.png",
+      "source": "art/source/the_glass_archive/noonmark.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:655ad34f14a9ae0d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
     },
     "oak_circlet": {
       "kind": "icon",
@@ -2302,6 +3550,71 @@
       "processed": true,
       "updated": "2026-10-01T01:50:06+00:00"
     },
+    "orchard_amber": {
+      "kind": "icon",
+      "zone": "the_sealed_garden",
+      "target": "assets/items/the_sealed_garden/orchard_amber.png",
+      "source": "art/source/items/the_sealed_garden/orchard_amber.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:cdc20abd0e94d093",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "orchard_loop": {
+      "kind": "icon",
+      "zone": "the_sealed_garden",
+      "target": "assets/items/the_sealed_garden/orchard_loop.png",
+      "source": "art/source/items/the_sealed_garden/orchard_loop.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:cfc564b51b253dba",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "orchard_warden": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/orchard_warden.png",
+      "source": "art/source/the_sealed_garden/orchard_warden.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:aa352e68de44dc2a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "orrery_automaton": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/orrery_automaton.png",
+      "source": "art/source/the_shattered_orrery/orrery_automaton.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b6873710c9d6e808",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "orrery_scrap": {
+      "kind": "icon",
+      "zone": "the_shattered_orrery",
+      "target": "assets/items/the_shattered_orrery/orrery_scrap.png",
+      "source": "art/source/items/the_shattered_orrery/orrery_scrap.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:f26d4652a9ddfeee",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
     "overseers_seal": {
       "kind": "icon",
       "zone": "old_quarry",
@@ -2341,6 +3654,58 @@
       "processed": true,
       "updated": "2026-10-01T02:43:07+00:00"
     },
+    "palimpsest": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/palimpsest.png",
+      "source": "art/source/the_glass_archive/palimpsest.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ed611f2dbae06ab2",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "palimpsest_belt": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/palimpsest_belt.png",
+      "source": "art/source/items/the_glass_archive/palimpsest_belt.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b525e35db429f209",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "palimpsest_vellum": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/palimpsest_vellum.png",
+      "source": "art/source/items/the_glass_archive/palimpsest_vellum.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:f385ab30a7aa3484",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "penitent_belt": {
+      "kind": "icon",
+      "zone": "the_sealed_garden",
+      "target": "assets/items/the_sealed_garden/penitent_belt.png",
+      "source": "art/source/items/the_sealed_garden/penitent_belt.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:7ca1b4c3403408f5",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
     "pilgrims_ration": {
       "kind": "icon",
       "zone": "the_kiln_desert",
@@ -2353,6 +3718,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:36:35+00:00"
+    },
+    "pilgrims_remnant": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/pilgrims_remnant.png",
+      "source": "art/source/hallowmarch/pilgrims_remnant.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:91fdb2ee5a7ece1f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
     },
     "plumbline_sentry": {
       "kind": "creature",
@@ -2379,6 +3757,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:36:35+00:00"
+    },
+    "procarius_the_eclipsed": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/procarius_the_eclipsed.png",
+      "source": "art/source/the_eclipsed_citadel/procarius_the_eclipsed.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4ecd9edc311da0c8",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
     },
     "proof_of_the_brook": {
       "kind": "icon",
@@ -2497,6 +3888,32 @@
       "processed": true,
       "updated": "2026-10-01T02:13:02+00:00"
     },
+    "readerless": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/readerless.png",
+      "source": "art/source/the_glass_archive/readerless.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2dc69d5c281ec7fa",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "redaction": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/redaction.png",
+      "source": "art/source/the_unwritten_library/redaction.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b302db2df2d4a1a6",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
     "reedback_lurker": {
       "kind": "creature",
       "zone": "thornmire",
@@ -2509,6 +3926,45 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T01:50:06+00:00"
+    },
+    "reliquary_colossus": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/reliquary_colossus.png",
+      "source": "art/source/the_reliquary_deep/reliquary_colossus.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4b8f427bf4af57cc",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "reliquary_gold": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/reliquary_gold.png",
+      "source": "art/source/items/the_reliquary_deep/reliquary_gold.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:1989d37a37f6f4a4",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "reliquary_keeper": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/reliquary_keeper.png",
+      "source": "art/source/the_reliquary_deep/reliquary_keeper.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b12fb4097e0652bd",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
     },
     "rift_walker": {
       "kind": "creature",
@@ -2587,6 +4043,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:43:07+00:00"
+    },
+    "root_matriarch": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/root_matriarch.png",
+      "source": "art/source/the_sealed_garden/root_matriarch.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b687fb14ccfea850",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
     },
     "rootknuckle": {
       "kind": "creature",
@@ -2691,6 +4160,45 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:18:34+00:00"
+    },
+    "sanctus_crystal": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/sanctus_crystal.png",
+      "source": "art/source/items/hallowmarch/sanctus_crystal.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:8e42d0831e72e30f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "sanctus_dust": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/sanctus_dust.png",
+      "source": "art/source/items/hallowmarch/sanctus_dust.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d62d8fb193dc9cea",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "sanctus_shard": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/sanctus_shard.png",
+      "source": "art/source/items/hallowmarch/sanctus_shard.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:1b248bbe055a3a4f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
     },
     "sapwort": {
       "kind": "icon",
@@ -2822,6 +4330,19 @@
       "processed": true,
       "updated": "2026-10-01T02:18:34+00:00"
     },
+    "seraph_judicant": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/seraph_judicant.png",
+      "source": "art/source/hallowmarch/seraph_judicant.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:65a266ffae9194a0",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
     "shadeless": {
       "kind": "creature",
       "zone": "the_kiln_desert",
@@ -2845,8 +4366,8 @@
       "feedback": [],
       "prompt_hash": "sha256:a3be4149cd52b3ea",
       "model": "gpt-image-1",
-      "processed": false,
-      "updated": "2026-10-01T03:01:35+00:00"
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
     },
     "shiverfish_shoal": {
       "kind": "creature",
@@ -2860,6 +4381,45 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-08-19T18:43:59+00:00"
+    },
+    "sidereal_fault": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/sidereal_fault.png",
+      "source": "art/source/the_shattered_orrery/sidereal_fault.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:8a1ce799199f40e6",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "sidereal_glass": {
+      "kind": "icon",
+      "zone": "the_shattered_orrery",
+      "target": "assets/items/the_shattered_orrery/sidereal_glass.png",
+      "source": "art/source/items/the_shattered_orrery/sidereal_glass.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:aa87525cd0fdd159",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "sidereal_signet": {
+      "kind": "icon",
+      "zone": "the_shattered_orrery",
+      "target": "assets/items/the_shattered_orrery/sidereal_signet.png",
+      "source": "art/source/items/the_shattered_orrery/sidereal_signet.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6031ba2dda2909e6",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
     },
     "siltback_crawler": {
       "kind": "creature",
@@ -2988,8 +4548,8 @@
       "feedback": [],
       "prompt_hash": "sha256:12a590fc5d0b92d2",
       "model": "gpt-image-1",
-      "processed": false,
-      "updated": "2026-10-01T03:01:35+00:00"
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
     },
     "solar_crystal": {
       "kind": "icon",
@@ -3069,6 +4629,19 @@
       "processed": true,
       "updated": "2026-10-01T02:18:34+00:00"
     },
+    "spell_weaver": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/spell_weaver.png",
+      "source": "art/source/the_collapsed_academy/spell_weaver.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4a52e606d12138ec",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
     "spindrift": {
       "kind": "creature",
       "zone": "tidewrack_shoals",
@@ -3081,6 +4654,58 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:55:39+00:00"
+    },
+    "spiritwood_knot": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/spiritwood_knot.png",
+      "source": "art/source/items/hallowmarch/spiritwood_knot.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:8286616936068a99",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "spiritwood_log": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/spiritwood_log.png",
+      "source": "art/source/items/hallowmarch/spiritwood_log.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:fb38d3b0de7161e8",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "spiritwood_quarterstaff": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/spiritwood_quarterstaff.png",
+      "source": "art/source/items/hallowmarch/spiritwood_quarterstaff.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6f7f3bbc7b070829",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "spiritwood_wand": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/spiritwood_wand.png",
+      "source": "art/source/items/hallowmarch/spiritwood_wand.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b66bd4175ea8b8e8",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
     },
     "sporecap_mantle": {
       "kind": "icon",
@@ -3108,6 +4733,19 @@
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
     },
+    "stairhead": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/stairhead.png",
+      "source": "art/source/the_collapsed_academy/stairhead.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d66c223eb206a2ed",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
     "stalker_of_the_new_moon": {
       "kind": "creature",
       "zone": "the_mirrormere",
@@ -3120,6 +4758,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:43:07+00:00"
+    },
+    "starbrass_ingot": {
+      "kind": "icon",
+      "zone": "the_shattered_orrery",
+      "target": "assets/items/the_shattered_orrery/starbrass_ingot.png",
+      "source": "art/source/items/the_shattered_orrery/starbrass_ingot.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:5f8e60a44abb3a8d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
     },
     "starfall_basin": {
       "kind": "backdrop",
@@ -3186,6 +4837,32 @@
       "processed": true,
       "updated": "2026-08-19T18:43:59+00:00"
     },
+    "stonefall_herald": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/stonefall_herald.png",
+      "source": "art/source/the_buried_sky/stonefall_herald.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a2cac6f37b769676",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "stonefall_signet": {
+      "kind": "icon",
+      "zone": "the_buried_sky",
+      "target": "assets/items/the_buried_sky/stonefall_signet.png",
+      "source": "art/source/items/the_buried_sky/stonefall_signet.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:713d84f1ac3fd98d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
     "storm_lord": {
       "kind": "creature",
       "zone": "stormcliff_coast",
@@ -3251,6 +4928,19 @@
       "processed": true,
       "updated": "2026-10-01T02:02:44+00:00"
     },
+    "stratum_warden": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/stratum_warden.png",
+      "source": "art/source/the_buried_sky/stratum_warden.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:43415e313e659eeb",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
     "sun_templar": {
       "kind": "creature",
       "zone": "the_kiln_desert",
@@ -3263,6 +4953,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:36:35+00:00"
+    },
+    "sunbleach_lichen": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/sunbleach_lichen.png",
+      "source": "art/source/items/the_glass_archive/sunbleach_lichen.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4ef16deeb6fd8cc0",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "sunbleach_tonic": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/sunbleach_tonic.png",
+      "source": "art/source/items/the_glass_archive/sunbleach_tonic.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:416e791e727cdc80",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
     },
     "sunstruck_pilgrim": {
       "kind": "creature",
@@ -3316,6 +5032,71 @@
       "processed": true,
       "updated": "2026-10-01T02:50:18+00:00"
     },
+    "the_amanuensis": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/the_amanuensis.png",
+      "source": "art/source/the_unwritten_library/the_amanuensis.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:abfdc42aaa4de4ce",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "the_answer": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/the_answer.png",
+      "source": "art/source/the_shattered_orrery/the_answer.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:1c5b91efd4b690db",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "the_archmage": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/the_archmage.png",
+      "source": "art/source/the_collapsed_academy/the_archmage.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:00704cdfa68db678",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "the_author": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/the_author.png",
+      "source": "art/source/the_unwritten_library/the_author.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4b035ed42c31b9a1",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "the_basin": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/the_basin.png",
+      "source": "art/source/the_eclipsed_citadel/the_basin.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ce57b61a556a997b",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
     "the_blackened_crown": {
       "kind": "creature",
       "zone": "ashfall_vale",
@@ -3341,6 +5122,45 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T01:44:50+00:00"
+    },
+    "the_buried_constellation": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/the_buried_constellation.png",
+      "source": "art/source/the_buried_sky/the_buried_constellation.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d463130ad2e03ed0",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "the_buried_sky": {
+      "kind": "backdrop",
+      "zone": "the_buried_sky",
+      "target": "assets/backgrounds/the_buried_sky.png",
+      "source": "art/source/backgrounds/the_buried_sky.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:846ed365bf7c1acc",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
+    "the_calculation": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/the_calculation.png",
+      "source": "art/source/the_shattered_orrery/the_calculation.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d40c57a022d95dd4",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
     },
     "the_certain_road": {
       "kind": "creature",
@@ -3368,6 +5188,19 @@
       "processed": true,
       "updated": "2026-10-01T01:56:13+00:00"
     },
+    "the_climb": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/the_climb.png",
+      "source": "art/source/the_eclipsed_citadel/the_climb.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:f490a6b6240db7de",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
     "the_cold_below": {
       "kind": "creature",
       "zone": "glimmerbrook",
@@ -3394,6 +5227,45 @@
       "processed": true,
       "updated": "2026-10-01T02:36:35+00:00"
     },
+    "the_collapsed_academy": {
+      "kind": "backdrop",
+      "zone": "the_collapsed_academy",
+      "target": "assets/backgrounds/the_collapsed_academy.png",
+      "source": "art/source/backgrounds/the_collapsed_academy.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:3a31483cd7d23489",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "the_considered_ring": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/the_considered_ring.png",
+      "source": "art/source/items/the_umbral_wastes/the_considered_ring.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:832fb56b5713d625",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "the_corona": {
+      "kind": "icon",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/items/the_eclipsed_citadel/the_corona.png",
+      "source": "art/source/items/the_eclipsed_citadel/the_corona.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4aa8f1aeb53b16df",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
     "the_crest": {
       "kind": "creature",
       "zone": "the_sunless_reach",
@@ -3404,8 +5276,60 @@
       "feedback": [],
       "prompt_hash": "sha256:f2dea04b5408cd9d",
       "model": "gpt-image-1",
-      "processed": false,
-      "updated": "2026-10-01T03:01:35+00:00"
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "the_dark_third": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/the_dark_third.png",
+      "source": "art/source/items/the_umbral_wastes/the_dark_third.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:c32587663ea0eef6",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "the_deliberate_dark": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/the_deliberate_dark.png",
+      "source": "art/source/items/the_umbral_wastes/the_deliberate_dark.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:7e1bc9622b94fc10",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "the_dictating_hand": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/the_dictating_hand.png",
+      "source": "art/source/the_unwritten_library/the_dictating_hand.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d046eac9f1933942",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "the_dividing_line": {
+      "kind": "icon",
+      "zone": "the_sunless_reach",
+      "target": "assets/items/the_sunless_reach/the_dividing_line.png",
+      "source": "art/source/items/the_sunless_reach/the_dividing_line.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6ed3770a7cba911f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
     },
     "the_drinking_grove": {
       "kind": "creature",
@@ -3419,6 +5343,45 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T01:50:06+00:00"
+    },
+    "the_eclipsed_band": {
+      "kind": "icon",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/items/the_eclipsed_citadel/the_eclipsed_band.png",
+      "source": "art/source/items/the_eclipsed_citadel/the_eclipsed_band.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:309288e2ff309899",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
+    "the_eclipsed_citadel": {
+      "kind": "backdrop",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/backgrounds/the_eclipsed_citadel.png",
+      "source": "art/source/backgrounds/the_eclipsed_citadel.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:3bdcfd71d68abe0e",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
+    "the_edge": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/the_edge.png",
+      "source": "art/source/the_umbral_wastes/the_edge.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d1fbe04e710440c4",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
     },
     "the_emberqueen": {
       "kind": "creature",
@@ -3446,6 +5409,19 @@
       "processed": true,
       "updated": "2026-10-01T02:13:02+00:00"
     },
+    "the_first_dark": {
+      "kind": "creature",
+      "zone": "the_sunless_reach",
+      "target": "assets/creatures/the_sunless_reach/the_first_dark.png",
+      "source": "art/source/the_sunless_reach/the_first_dark.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ac99bb5b4d077a32",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
     "the_floor": {
       "kind": "creature",
       "zone": "the_molten_deep",
@@ -3459,6 +5435,32 @@
       "processed": true,
       "updated": "2026-10-01T02:32:01+00:00"
     },
+    "the_fourth_item": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/the_fourth_item.png",
+      "source": "art/source/the_collapsed_academy/the_fourth_item.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9c09aaeabf57c17e",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "the_gardeners_loop": {
+      "kind": "icon",
+      "zone": "the_sealed_garden",
+      "target": "assets/items/the_sealed_garden/the_gardeners_loop.png",
+      "source": "art/source/items/the_sealed_garden/the_gardeners_loop.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9dd2b556d7d426fe",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
     "the_given_weight": {
       "kind": "icon",
       "zone": "old_quarry",
@@ -3471,6 +5473,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:13:02+00:00"
+    },
+    "the_glass_archive": {
+      "kind": "backdrop",
+      "zone": "the_glass_archive",
+      "target": "assets/backgrounds/the_glass_archive.png",
+      "source": "art/source/backgrounds/the_glass_archive.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:3f7a0a901d198b82",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
     },
     "the_green_drowning": {
       "kind": "creature",
@@ -3524,6 +5539,32 @@
       "processed": true,
       "updated": "2026-08-19T18:43:59+00:00"
     },
+    "the_held_door": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/the_held_door.png",
+      "source": "art/source/the_eclipsed_citadel/the_held_door.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:59391bb744d45232",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
+    "the_hierophant_eternal": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/the_hierophant_eternal.png",
+      "source": "art/source/hallowmarch/the_hierophant_eternal.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9bd2e74dec9bd3ea",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
     "the_holdfast": {
       "kind": "icon",
       "zone": "frostfell_pass",
@@ -3536,6 +5577,71 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:08:16+00:00"
+    },
+    "the_index": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/the_index.png",
+      "source": "art/source/the_unwritten_library/the_index.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:07e7419a182d2248",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "the_keeper_of_the_road": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/the_keeper_of_the_road.png",
+      "source": "art/source/hallowmarch/the_keeper_of_the_road.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ab9bab6383f26047",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "the_kept_third": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/the_kept_third.png",
+      "source": "art/source/items/hallowmarch/the_kept_third.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:904038c3a2f7e8dd",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "the_kept_vow": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/the_kept_vow.png",
+      "source": "art/source/the_sealed_garden/the_kept_vow.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2e6b6e32c64925c0",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "the_kept_watch": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/the_kept_watch.png",
+      "source": "art/source/the_eclipsed_citadel/the_kept_watch.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ddce41edb3cd3084",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
     },
     "the_kiln_desert": {
       "kind": "backdrop",
@@ -3563,6 +5669,19 @@
       "processed": true,
       "updated": "2026-10-01T02:43:07+00:00"
     },
+    "the_last_applicant": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/the_last_applicant.png",
+      "source": "art/source/the_eclipsed_citadel/the_last_applicant.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2b36cef38b6cd9ec",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
     "the_last_cairn": {
       "kind": "creature",
       "zone": "frostfell_pass",
@@ -3576,6 +5695,84 @@
       "processed": true,
       "updated": "2026-10-01T02:08:16+00:00"
     },
+    "the_last_gardener": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/the_last_gardener.png",
+      "source": "art/source/the_sealed_garden/the_last_gardener.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6d0c2094c176814d",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "the_last_light": {
+      "kind": "creature",
+      "zone": "the_sunless_reach",
+      "target": "assets/creatures/the_sunless_reach/the_last_light.png",
+      "source": "art/source/the_sunless_reach/the_last_light.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:89248a1d90b0da22",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
+    "the_last_reader": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/the_last_reader.png",
+      "source": "art/source/the_glass_archive/the_last_reader.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:aef0570e9e54cb86",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "the_last_reading": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/the_last_reading.png",
+      "source": "art/source/items/the_glass_archive/the_last_reading.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2513b82f619ffe7b",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "the_last_thing_in_the_way": {
+      "kind": "icon",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/items/the_eclipsed_citadel/the_last_thing_in_the_way.png",
+      "source": "art/source/items/the_eclipsed_citadel/the_last_thing_in_the_way.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:708cdbb1646164bc",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
+    "the_last_three_items": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/the_last_three_items.png",
+      "source": "art/source/the_collapsed_academy/the_last_three_items.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a65bd14a17a7b7f0",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
     "the_long_cooling": {
       "kind": "icon",
       "zone": "the_molten_deep",
@@ -3588,6 +5785,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:32:01+00:00"
+    },
+    "the_long_count": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/the_long_count.png",
+      "source": "art/source/the_buried_sky/the_long_count.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d5508f0fbe195af7",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
     },
     "the_long_lean": {
       "kind": "icon",
@@ -3614,6 +5824,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:18:34+00:00"
+    },
+    "the_maintained_road": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/the_maintained_road.png",
+      "source": "art/source/items/hallowmarch/the_maintained_road.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:df8578fd650f1470",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "the_marginalia": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/the_marginalia.png",
+      "source": "art/source/the_glass_archive/the_marginalia.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:7df1bf10e8c15a02",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
     },
     "the_mirrormere": {
       "kind": "backdrop",
@@ -3680,6 +5916,45 @@
       "processed": true,
       "updated": "2026-10-01T02:50:18+00:00"
     },
+    "the_noon_hour": {
+      "kind": "icon",
+      "zone": "the_glass_archive",
+      "target": "assets/items/the_glass_archive/the_noon_hour.png",
+      "source": "art/source/items/the_glass_archive/the_noon_hour.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:05775faac23ed850",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
+    "the_open_colophon": {
+      "kind": "icon",
+      "zone": "the_unwritten_library",
+      "target": "assets/items/the_unwritten_library/the_open_colophon.png",
+      "source": "art/source/items/the_unwritten_library/the_open_colophon.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:e16a75fa8b3e9560",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "the_overburden": {
+      "kind": "creature",
+      "zone": "the_buried_sky",
+      "target": "assets/creatures/the_buried_sky/the_overburden.png",
+      "source": "art/source/the_buried_sky/the_overburden.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a1a97fb4617f9f56",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:51+00:00"
+    },
     "the_overseer": {
       "kind": "creature",
       "zone": "old_quarry",
@@ -3692,6 +5967,58 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:13:02+00:00"
+    },
+    "the_range": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/the_range.png",
+      "source": "art/source/the_eclipsed_citadel/the_range.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a26ec06df957fed9",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
+    },
+    "the_record": {
+      "kind": "creature",
+      "zone": "the_unwritten_library",
+      "target": "assets/creatures/the_unwritten_library/the_record.png",
+      "source": "art/source/the_unwritten_library/the_record.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:171402696c517462",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "the_reliquary_deep": {
+      "kind": "backdrop",
+      "zone": "the_reliquary_deep",
+      "target": "assets/backgrounds/the_reliquary_deep.png",
+      "source": "art/source/backgrounds/the_reliquary_deep.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ba262d5ff3ead0b9",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "the_remainder": {
+      "kind": "creature",
+      "zone": "the_shattered_orrery",
+      "target": "assets/creatures/the_shattered_orrery/the_remainder.png",
+      "source": "art/source/the_shattered_orrery/the_remainder.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a3edb9c75db294a8",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
     },
     "the_return_stroke": {
       "kind": "creature",
@@ -3732,6 +6059,58 @@
       "processed": true,
       "updated": "2026-10-01T01:56:13+00:00"
     },
+    "the_running_count": {
+      "kind": "icon",
+      "zone": "the_shattered_orrery",
+      "target": "assets/items/the_shattered_orrery/the_running_count.png",
+      "source": "art/source/items/the_shattered_orrery/the_running_count.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:7573a7603952db6e",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "the_sealed_garden": {
+      "kind": "backdrop",
+      "zone": "the_sealed_garden",
+      "target": "assets/backgrounds/the_sealed_garden.png",
+      "source": "art/source/backgrounds/the_sealed_garden.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b0e74e8469dd81aa",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "the_season_at_once": {
+      "kind": "icon",
+      "zone": "the_sealed_garden",
+      "target": "assets/items/the_sealed_garden/the_season_at_once.png",
+      "source": "art/source/items/the_sealed_garden/the_season_at_once.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:cd18be6754270722",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "the_second_hand": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/the_second_hand.png",
+      "source": "art/source/the_reliquary_deep/the_second_hand.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6a7589bd2a843212",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
     "the_second_you": {
       "kind": "creature",
       "zone": "the_mirrormere",
@@ -3744,6 +6123,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:43:07+00:00"
+    },
+    "the_serpent_in_the_branches": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/the_serpent_in_the_branches.png",
+      "source": "art/source/the_sealed_garden/the_serpent_in_the_branches.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:1b7617800758c53f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
     },
     "the_shadeless_band": {
       "kind": "icon",
@@ -3770,6 +6162,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:36:35+00:00"
+    },
+    "the_shattered_orrery": {
+      "kind": "backdrop",
+      "zone": "the_shattered_orrery",
+      "target": "assets/backgrounds/the_shattered_orrery.png",
+      "source": "art/source/backgrounds/the_shattered_orrery.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:faf0d526fc078b05",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:14:55+00:00"
+    },
+    "the_shelf": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/the_shelf.png",
+      "source": "art/source/the_eclipsed_citadel/the_shelf.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b15d7fa901c5f6ca",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
     },
     "the_shortening": {
       "kind": "creature",
@@ -3836,6 +6254,19 @@
       "processed": true,
       "updated": "2026-10-01T02:02:44+00:00"
     },
+    "the_sunless_reach": {
+      "kind": "backdrop",
+      "zone": "the_sunless_reach",
+      "target": "assets/backgrounds/the_sunless_reach.png",
+      "source": "art/source/backgrounds/the_sunless_reach.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:f17e5d9a2eecd49b",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T03:13:36+00:00"
+    },
     "the_turning": {
       "kind": "creature",
       "zone": "tidewrack_shoals",
@@ -3862,6 +6293,19 @@
       "processed": true,
       "updated": "2026-10-01T02:55:39+00:00"
     },
+    "the_umbral_wastes": {
+      "kind": "backdrop",
+      "zone": "the_umbral_wastes",
+      "target": "assets/backgrounds/the_umbral_wastes.png",
+      "source": "art/source/backgrounds/the_umbral_wastes.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:5d2af746f4c6b7bd",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
     "the_unbroken_blow": {
       "kind": "creature",
       "zone": "windward_steppe",
@@ -3875,6 +6319,32 @@
       "processed": true,
       "updated": "2026-10-01T02:25:08+00:00"
     },
+    "the_unbuilt_stair": {
+      "kind": "icon",
+      "zone": "the_collapsed_academy",
+      "target": "assets/items/the_collapsed_academy/the_unbuilt_stair.png",
+      "source": "art/source/items/the_collapsed_academy/the_unbuilt_stair.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:5007b1f9a8a69f30",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "the_unconsecrated": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/the_unconsecrated.png",
+      "source": "art/source/items/the_reliquary_deep/the_unconsecrated.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:20c06fc86f2bee8f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
     "the_undertow": {
       "kind": "creature",
       "zone": "tidewrack_shoals",
@@ -3887,6 +6357,45 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:55:39+00:00"
+    },
+    "the_unleft": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/the_unleft.png",
+      "source": "art/source/the_reliquary_deep/the_unleft.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b2e3580d30cddf87",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "the_unwritten_library": {
+      "kind": "backdrop",
+      "zone": "the_unwritten_library",
+      "target": "assets/backgrounds/the_unwritten_library.png",
+      "source": "art/source/backgrounds/the_unwritten_library.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:704b89eaaa004099",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:09:09+00:00"
+    },
+    "the_upkeep": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/the_upkeep.png",
+      "source": "art/source/hallowmarch/the_upkeep.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:862d9504f6f8b79e",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
     },
     "the_waning_charm": {
       "kind": "icon",
@@ -3926,6 +6435,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:08:16+00:00"
+    },
+    "the_written_third": {
+      "kind": "icon",
+      "zone": "the_collapsed_academy",
+      "target": "assets/items/the_collapsed_academy/the_written_third.png",
+      "source": "art/source/items/the_collapsed_academy/the_written_third.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:0bbe4c61cfc69c31",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
     },
     "the_zodiac_ascendant": {
       "kind": "creature",
@@ -3978,6 +6500,58 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T01:50:06+00:00"
+    },
+    "thornpenitent": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/thornpenitent.png",
+      "source": "art/source/the_sealed_garden/thornpenitent.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b9a371fe81e1766b",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "thornpenitent_hide": {
+      "kind": "icon",
+      "zone": "the_sealed_garden",
+      "target": "assets/items/the_sealed_garden/thornpenitent_hide.png",
+      "source": "art/source/items/the_sealed_garden/thornpenitent_hide.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a045893c5955b8a1",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "thoughtform": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/thoughtform.png",
+      "source": "art/source/the_umbral_wastes/thoughtform.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:042f267584813782",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "thoughtglass": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/thoughtglass.png",
+      "source": "art/source/items/the_umbral_wastes/thoughtglass.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:b40dccf4dd321003",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
     },
     "thunder_roc": {
       "kind": "creature",
@@ -4056,6 +6630,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:13:02+00:00"
+    },
+    "totality": {
+      "kind": "creature",
+      "zone": "the_eclipsed_citadel",
+      "target": "assets/creatures/the_eclipsed_citadel/totality.png",
+      "source": "art/source/the_eclipsed_citadel/totality.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:d7b7b4c5cd704240",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:13:09+00:00"
     },
     "tumblehusk": {
       "kind": "creature",
@@ -4174,6 +6761,149 @@
       "processed": true,
       "updated": "2026-10-01T02:25:08+00:00"
     },
+    "umbra_crystal": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/umbra_crystal.png",
+      "source": "art/source/items/the_umbral_wastes/umbra_crystal.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ebc665fdceff1405",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbra_dust": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/umbra_dust.png",
+      "source": "art/source/items/the_umbral_wastes/umbra_dust.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4f831c9da41d0dcc",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbra_shard": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/umbra_shard.png",
+      "source": "art/source/items/the_umbral_wastes/umbra_shard.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6c379c6570c2965f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbral_devourer": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/umbral_devourer.png",
+      "source": "art/source/the_umbral_wastes/umbral_devourer.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:9ed5c1ff238873c5",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbral_knight": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/umbral_knight.png",
+      "source": "art/source/the_umbral_wastes/umbral_knight.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:37bfec9897f44235",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbralweave": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/umbralweave.png",
+      "source": "art/source/items/the_umbral_wastes/umbralweave.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:8132fb014eeef80f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbralweave_boots": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/umbralweave_boots.png",
+      "source": "art/source/items/the_umbral_wastes/umbralweave_boots.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6583f41a57200121",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbralweave_gloves": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/umbralweave_gloves.png",
+      "source": "art/source/items/the_umbral_wastes/umbralweave_gloves.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a54edd7e0c5044be",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbralweave_hood": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/umbralweave_hood.png",
+      "source": "art/source/items/the_umbral_wastes/umbralweave_hood.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a986b977336400b3",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbralweave_leggings": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/umbralweave_leggings.png",
+      "source": "art/source/items/the_umbral_wastes/umbralweave_leggings.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:4a6bb8239dc0a3f7",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "umbralweave_robe": {
+      "kind": "icon",
+      "zone": "the_umbral_wastes",
+      "target": "assets/items/the_umbral_wastes/umbralweave_robe.png",
+      "source": "art/source/items/the_umbral_wastes/umbralweave_robe.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:52aa335501335ba2",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
     "undershine": {
       "kind": "creature",
       "zone": "the_mirrormere",
@@ -4186,6 +6916,97 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:43:07+00:00"
+    },
+    "unfinished_scholar": {
+      "kind": "creature",
+      "zone": "the_collapsed_academy",
+      "target": "assets/creatures/the_collapsed_academy/unfinished_scholar.png",
+      "source": "art/source/the_collapsed_academy/unfinished_scholar.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:cb4c3aab8f5c1457",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:59:46+00:00"
+    },
+    "unleft_boots": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/unleft_boots.png",
+      "source": "art/source/items/the_reliquary_deep/unleft_boots.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:c7c082315a23e6dd",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "unleft_gloves": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/unleft_gloves.png",
+      "source": "art/source/items/the_reliquary_deep/unleft_gloves.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:e4dfafea7f4b95ba",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "unleft_hood": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/unleft_hood.png",
+      "source": "art/source/items/the_reliquary_deep/unleft_hood.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:22d8d38c0ebd0e1f",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "unleft_leggings": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/unleft_leggings.png",
+      "source": "art/source/items/the_reliquary_deep/unleft_leggings.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:756818fb6922dbd1",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "unleft_linen": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/unleft_linen.png",
+      "source": "art/source/items/the_reliquary_deep/unleft_linen.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:18da186a9c9efaff",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "unleft_robe": {
+      "kind": "icon",
+      "zone": "the_reliquary_deep",
+      "target": "assets/items/the_reliquary_deep/unleft_robe.png",
+      "source": "art/source/items/the_reliquary_deep/unleft_robe.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:f58e6e1a47a6f8a3",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
     },
     "updraft_wisp": {
       "kind": "creature",
@@ -4239,6 +7060,32 @@
       "processed": true,
       "updated": "2026-10-01T01:44:50+00:00"
     },
+    "vestal_warden": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/vestal_warden.png",
+      "source": "art/source/hallowmarch/vestal_warden.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:3c670bf30dfac7e3",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "void_stalker": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/void_stalker.png",
+      "source": "art/source/the_umbral_wastes/void_stalker.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:e73a9530bc6351ed",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
     "voltgeist": {
       "kind": "creature",
       "zone": "stormcliff_coast",
@@ -4251,6 +7098,45 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:18:34+00:00"
+    },
+    "votive": {
+      "kind": "creature",
+      "zone": "hallowmarch",
+      "target": "assets/creatures/hallowmarch/votive.png",
+      "source": "art/source/hallowmarch/votive.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:1809b2792fe1ca53",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "votive_pendant": {
+      "kind": "icon",
+      "zone": "hallowmarch",
+      "target": "assets/items/hallowmarch/votive_pendant.png",
+      "source": "art/source/items/hallowmarch/votive_pendant.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a14e488acfbdea87",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:14:26+00:00"
+    },
+    "warm_middle": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/warm_middle.png",
+      "source": "art/source/the_reliquary_deep/warm_middle.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:5a198039e97308c4",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
     },
     "weirkeeper": {
       "kind": "creature",
@@ -4265,6 +7151,32 @@
       "processed": true,
       "updated": "2026-08-19T18:43:59+00:00"
     },
+    "what_did_not_leave_it_alone": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/what_did_not_leave_it_alone.png",
+      "source": "art/source/the_reliquary_deep/what_did_not_leave_it_alone.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:3e43e75665b83322",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "what_is_left_of_it": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/what_is_left_of_it.png",
+      "source": "art/source/the_glass_archive/what_is_left_of_it.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:371225491836326c",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
     "what_landed": {
       "kind": "creature",
       "zone": "starfall_basin",
@@ -4278,6 +7190,45 @@
       "processed": true,
       "updated": "2026-10-01T02:50:18+00:00"
     },
+    "what_was_consecrated": {
+      "kind": "creature",
+      "zone": "the_reliquary_deep",
+      "target": "assets/creatures/the_reliquary_deep/what_was_consecrated.png",
+      "source": "art/source/the_reliquary_deep/what_was_consecrated.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:037f4878bfbb3921",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T12:04:10+00:00"
+    },
+    "what_was_thought_about": {
+      "kind": "creature",
+      "zone": "the_umbral_wastes",
+      "target": "assets/creatures/the_umbral_wastes/what_was_thought_about.png",
+      "source": "art/source/the_umbral_wastes/what_was_thought_about.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:8797291876e74840",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:01+00:00"
+    },
+    "what_was_written": {
+      "kind": "creature",
+      "zone": "the_glass_archive",
+      "target": "assets/creatures/the_glass_archive/what_was_written.png",
+      "source": "art/source/the_glass_archive/what_was_written.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:f4ce5b9522365ef7",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:06:47+00:00"
+    },
     "whispering_woods": {
       "kind": "backdrop",
       "zone": "whispering_woods",
@@ -4290,6 +7241,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T01:40:25+00:00"
+    },
+    "whisperling": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/whisperling.png",
+      "source": "art/source/the_sealed_garden/whisperling.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:aa0154f57cae3290",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
     },
     "wickerbound_ring": {
       "kind": "icon",
@@ -4330,6 +7294,19 @@
       "processed": true,
       "updated": "2026-10-01T02:25:08+00:00"
     },
+    "windfall": {
+      "kind": "creature",
+      "zone": "the_sealed_garden",
+      "target": "assets/creatures/the_sealed_garden/windfall.png",
+      "source": "art/source/the_sealed_garden/windfall.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2e3e7b020c2e7900",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
     "windward_steppe": {
       "kind": "backdrop",
       "zone": "windward_steppe",
@@ -4342,6 +7319,32 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-10-01T02:25:08+00:00"
+    },
+    "worldroot": {
+      "kind": "icon",
+      "zone": "the_sealed_garden",
+      "target": "assets/items/the_sealed_garden/worldroot.png",
+      "source": "art/source/items/the_sealed_garden/worldroot.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:6524b1e96c1e8e65",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
+    },
+    "worldroot_tonic": {
+      "kind": "icon",
+      "zone": "the_sealed_garden",
+      "target": "assets/items/the_sealed_garden/worldroot_tonic.png",
+      "source": "art/source/items/the_sealed_garden/worldroot_tonic.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2b0b5ce2532f5d3a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T11:55:24+00:00"
     },
     "wrackcotton": {
       "kind": "icon",
