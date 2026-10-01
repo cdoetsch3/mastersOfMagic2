@@ -206,7 +206,7 @@ them. Immunities and the §5.2 cleanse web apply unchanged.
 
 ⭐ **Station-bound, unlike Refine.** A tier gate must not be craftable in the
 field (the Totem's own rule); an enchant is a tier gate on a piece. ✅ The
-Enchanting station is already pinned in `world.dart`: **Concordance**
+Enchanting station is already pinned in `world.dart`: **Meridian**
 (Jewelry's is Rimeholt, and Zenith has every station). ⚠️ `RecipeDef.
 stationRequired` is a shipped field that NOTHING enforces today — the
 Enchant and Socket actions (lane 3) are the first real station gates, and
@@ -350,4 +350,4 @@ piece is a trap).
 6. Universal gems in the first pass, or elemental only (recommended)?
 7. Unsocket: one Shard, gem survives (recommended), or the unbinding enchant?
 8. Aspected drops on at 10% of rare+ drops?
-9. ~~Which town holds the Enchanting station?~~ ✅ Concordance (already in code).
+9. ~~Which town holds the Enchanting station?~~ ✅ Meridian (already in code).
