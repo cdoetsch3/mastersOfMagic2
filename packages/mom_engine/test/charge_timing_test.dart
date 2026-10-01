@@ -27,8 +27,12 @@ void main() {
 
   group('a spent bar cannot be punished', () {
     test('a shield cast first leaves nothing for Overload to read', () {
-      final a = MageState(name: 'A');
-      final b = MageState(name: 'B');
+      // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+      // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+      // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+      // A test about crits sets its own chance after construction.
+      final a = MageState(name: 'A')..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       charged(a, MagicElement.arcane, 4);
       charged(b, MagicElement.astral, 4);
 
@@ -53,8 +57,8 @@ void main() {
     });
 
     test('a quick attack first also empties the bar', () {
-      final a = MageState(name: 'A');
-      final b = MageState(name: 'B');
+      final a = MageState(name: 'A')..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       charged(a, MagicElement.arcane, 4);
       charged(b, MagicElement.pyro, 4);
 
@@ -67,8 +71,8 @@ void main() {
     });
 
     test('charge the enemy HOLDS is punished in full', () {
-      final a = MageState(name: 'A');
-      final b = MageState(name: 'B');
+      final a = MageState(name: 'A')..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       charged(a, MagicElement.arcane, 2);
       charged(b, MagicElement.pyro, 4);
 
@@ -89,8 +93,8 @@ void main() {
       // ⭐ With no Haste there is no "first", so neither may read a bar the
       // other has already committed. Both fizzle to nothing.
       for (var seed = 0; seed < 10; seed++) {
-        final a = MageState(name: 'A');
-        final b = MageState(name: 'B');
+        final a = MageState(name: 'A')..critChance = 0;
+        final b = MageState(name: 'B')..critChance = 0;
         charged(a, MagicElement.arcane, 4);
         charged(b, MagicElement.astral, 4);
 
@@ -104,8 +108,8 @@ void main() {
     });
 
     test('two Discharges both end on zero', () {
-      final a = MageState(name: 'A');
-      final b = MageState(name: 'B');
+      final a = MageState(name: 'A')..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       charged(a, MagicElement.electro, 4);
       charged(b, MagicElement.geo, 5);
 
@@ -120,8 +124,8 @@ void main() {
 
   group('Haste decides who reads the board first', () {
     test('the holder Overloads a full bar; the other finds it empty', () {
-      final a = MageState(name: 'A');
-      final b = MageState(name: 'B');
+      final a = MageState(name: 'A')..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       charged(a, MagicElement.arcane, 4);
       charged(b, MagicElement.astral, 4);
       a.hasHaste = true;
@@ -146,8 +150,8 @@ void main() {
 
   group('what a fizzle keeps', () {
     test('a Discharged caster keeps the charge their spell never used', () {
-      final a = MageState(name: 'A');
-      final b = MageState(name: 'B');
+      final a = MageState(name: 'A')..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       charged(a, MagicElement.electro, 5);
       charged(b, MagicElement.pyro, 3);
 
@@ -167,8 +171,8 @@ void main() {
     });
 
     test('a Barrage still scales with what it actually paid', () {
-      final a = MageState(name: 'A');
-      final b = MageState(name: 'B');
+      final a = MageState(name: 'A')..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       charged(a, MagicElement.pyro, 4);
 
       duel(

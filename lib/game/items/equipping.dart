@@ -205,13 +205,20 @@ abstract final class Equipping {
   /// reads moves with it.
   static const int baseHitPercent = 100 - ElementTuning.baseMissPercent;
 
-  /// What a crit deals with no crit-damage gear: 150% of the hit.
+  /// What a crit deals with no crit-damage gear: 200% of the hit (ruling
+  /// 2026-09-30, up from 150%).
   ///
-  /// ⚠️ **Mirrors `MageState.critDamage`'s default of +50** on top of the 100%
-  /// a normal hit deals. It is a field default rather than a const over in the
-  /// engine, so it cannot be imported — this is the one place the app restates
-  /// it, and it is stated once.
-  static const int baseCritDamagePercent = 150;
+  /// ⭐ **Derived, never typed twice** — the 100% a normal hit deals plus
+  /// [MageState.baseCritDamage], the engine's own const. Retune the engine
+  /// and the panel's "Crit damage" base moves with it.
+  static const int baseCritDamagePercent = 100 + MageState.baseCritDamage;
+
+  /// Every mage's crit chance before gear: 5% (ruling 2026-09-30).
+  ///
+  /// ⭐ **Derived, never typed twice** — the engine's
+  /// [MageState.baseCritChance], the same number `DuelController` adds gear
+  /// to. It makes crit chance a BASED stat on the panel, like accuracy.
+  static const int baseCritChancePercent = MageState.baseCritChance;
 
   /// The same stats as [describe], but as the numbers the player **ends up
   /// with** — for the "From equipment" panel.
@@ -261,8 +268,10 @@ abstract final class Equipping {
   ///
   /// [base] is null for the pure-gear stats (nothing else grants them — a
   /// "total" would be the bonus in disguise, so the panel prints the bonus
-  /// AS the total and no parenthesis). Base-zero stats (crit: §9b.8, crits
-  /// exist only through gear) keep a parenthesis but hide the pointless 0.
+  /// AS the total and no parenthesis). Base-zero stats (dodge, deflect
+  /// chance) keep a parenthesis but hide the pointless 0. ⚠️ Crit chance is
+  /// NOT base-zero any more: every mage crits [baseCritChancePercent] (5%)
+  /// since the 2026-09-30 ruling, so it prints `(5 +6) 11%` like accuracy.
   static List<GearStatLine> statTotals(ItemModifiers m, {required int level}) =>
       [
         if (m.maxHpBonus != 0)
@@ -282,8 +291,8 @@ abstract final class Equipping {
         if (m.critChance != 0)
           (
             label: 'Crit chance',
-            total: '${m.critChance}%',
-            base: 0,
+            total: '${baseCritChancePercent + m.critChance}%',
+            base: baseCritChancePercent,
             bonus: m.critChance,
           ),
         if (m.critDamage != 0)

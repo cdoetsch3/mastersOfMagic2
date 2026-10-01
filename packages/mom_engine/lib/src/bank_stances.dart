@@ -247,10 +247,13 @@ class KeenStatus extends StatStanceStatus {
 ///
 /// ⚠️ Pure upside only while something is critting: it multiplies a crit that
 /// already happened and does nothing at all without crit chance under it (the
-/// mage's base 50% crit damage is likewise inert at 0% chance). The pair is
+/// mage's base +100% crit damage, [MageState.baseCritDamage], is likewise
+/// inert at 0% chance — though every mage now starts at a 5%
+/// [MageState.baseCritChance], so Heavyhand is never wholly dead). The pair is
 /// each other's brake, which is why neither needs a cap.
 class HeavyhandStatus extends StatStanceStatus {
-  /// Extra crit damage, in percentage points, on top of the base 50.
+  /// Extra crit damage, in percentage points, on top of the base
+  /// [MageState.baseCritDamage] (+100).
   final int critDamage;
 
   HeavyhandStatus({required this.critDamage, required int turns})

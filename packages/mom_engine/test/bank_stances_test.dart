@@ -60,8 +60,12 @@ void main() {
   }
 
   setUp(() {
-    alice = MageState(name: 'Alice');
-    bruno = MageState(name: 'Bruno');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
+    bruno = MageState(name: 'Bruno')..critChance = 0;
     newDuel();
   });
 
@@ -286,7 +290,11 @@ void main() {
       );
       expect(alice.effectiveDodge, 15);
       expect(alice.effectiveCritChance, 15);
-      expect(alice.effectiveCritDamage, 80);
+      expect(
+        alice.effectiveCritDamage,
+        130,
+        reason: 'the +100 base (ruling 2026-09-30) + Heavyhand\'s 30',
+      );
     });
 
     test('the Divert pair replaces as ONE status, both numbers together', () {
@@ -446,29 +454,33 @@ void main() {
       castBy(alice, dmg(20));
       expect(
         bruno.hp,
-        70,
+        60,
         reason:
             '⚠️ THE mutant: reading the stored critChance leaves 0, the '
-            'roll is skipped entirely, and 20 lands flat (hp 80). 20 × 1.5 '
-            '= 30 is the crit',
+            'roll is skipped entirely, and 20 lands flat (hp 80). 20 × 2 '
+            '= 40 is the crit at the +100 base',
       );
     });
 
-    test('⭐ Heavyhand moves crit damage, on top of the base 50', () {
+    test('⭐ Heavyhand moves crit damage, on top of the base 100', () {
       alice.critChance = 100; // gear: something must be critting first
       castBy(alice, Spellbook.heavyhand);
-      expect(alice.effectiveCritDamage, 80);
-      expect(alice.critDamage, 50, reason: 'the base field is untouched');
+      expect(alice.effectiveCritDamage, 130);
+      expect(
+        alice.critDamage,
+        MageState.baseCritDamage,
+        reason: 'the base field is untouched',
+      );
 
       newDuel(ints: [0]);
       castBy(alice, dmg(20));
       expect(
         bruno.hp,
-        64,
+        54,
         reason:
-            '⚠️ THE mutant: reading the stored critDamage gives 20 × 1.5 '
-            '= 30 (hp 70); replacing the base instead of adding to it gives '
-            '20 × 1.3 = 26 (hp 74). It ADDS: 20 × 1.8 = 36',
+            '⚠️ THE mutant: reading the stored critDamage gives 20 × 2 '
+            '= 40 (hp 60); replacing the base instead of adding to it gives '
+            '20 × 1.3 = 26 (hp 74). It ADDS: 20 × 2.3 = 46',
       );
     });
 
@@ -587,7 +599,11 @@ void main() {
             '⚠️ kills a duration read off the cheap price point — the '
             'extra charge buys the clock, and nothing else here',
       );
-      expect(alice.effectiveCritDamage, 100);
+      expect(
+        alice.effectiveCritDamage,
+        150,
+        reason: 'Overkill\'s +50 on the +100 base, still running at turn 20',
+      );
     });
 
     test('an expired stance stops feeding its roll', () {
@@ -600,9 +616,9 @@ void main() {
       castBy(alice, dmg(20));
       expect(
         bruno.hp,
-        70,
+        60,
         reason:
-            '⚠️ hp 64 is a contribution still being summed after the '
+            '⚠️ hp 54 is a contribution still being summed after the '
             'status was removed — a cached sum, not a derived one',
       );
     });

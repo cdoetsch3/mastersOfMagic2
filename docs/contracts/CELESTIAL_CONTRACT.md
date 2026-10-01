@@ -234,6 +234,9 @@ on crit   : perHit × (100 + 50 + critDamage) / 100
 on deflect: taken = damage × (1 − deflectAmount/100)   (player design cap 50; engine clamps 90)
 ```
 
+> **✅ RULED 2026-09-30: base 5% / +100%** — the `50` above is now `100` (a crit doubles the
+> hit), and crit chance starts at 5% before gear.
+
 ⚠️ **The three inert-stat traps of KINETIC §2.1 all still apply**, and every
 line in §4 pairs `critChance` with `critDamage` and `deflectChance` with
 `deflectAmount`.
@@ -412,6 +415,11 @@ Gdmg             Gacc × Gflat × Gcrit
 Ghp              (scaledMaxHp(L) + ΣmaxHpBonus) / scaledMaxHp(L)  ×  1 / (1 − Σdefl% × Σdeflamt)
 Gdodge           80 / (80 − Σdodge)                        ⚠️ deliberately OUTSIDE the headline — see below
 ```
+
+> **✅ RULED 2026-09-30: base 5% / +100%** — `Gcrit` above assumes the old 0% / +50 base. Under
+> the ruling it reads `(1 + (5 + Σcrit%)/100 × (100 + ΣcritDmg)/100) / 1.05`
+> (gear's gain over a naked mage who already crits 5% for ×2). The published
+> BiS figures below predate the ruling and were not recomputed.
 
 ⭐ **The method is validated against the Kinetic contract's own published
 number before it is used here.** Applied to the Kinetic best-in-slot loadout

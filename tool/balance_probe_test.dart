@@ -627,11 +627,17 @@ void main() {
         reason: 'a stat-free Q1 EnemyDef must build at the engine baseline',
       );
       expect(rig.enemy.dodge, 0);
-      expect(rig.enemy.critChance, 0);
+      expect(
+        rig.enemy.critChance,
+        MageState.baseCritChance,
+        reason:
+            'a stat-free Q1 def still crits at the 5% base every mage has '
+            '(ruling 2026-09-30) — nothing more',
+      );
       expect(
         rig.enemy.critDamage,
-        50,
-        reason: 'the engine\'s own inert default',
+        MageState.baseCritDamage,
+        reason: 'the engine\'s own default (+100)',
       );
       expect(rig.enemy.deflectChance, 0);
       expect(rig.enemy.deflectAmount, 0);

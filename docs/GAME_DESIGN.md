@@ -105,8 +105,8 @@ have an axis other than shields.
 |---|---|---|
 | **Accuracy** | spell (+ gear) | **100%** for every shipped spell · **can exceed 100%** |
 | **Dodge** | mage (gear) | 0% · subtracts from accuracy |
-| **Crit Chance** | mage (gear) | **0%** |
-| **Crit Damage** | mage (gear) | +50% *(the bonus when a crit lands)* |
+| **Crit Chance** | mage (gear) | **0%** *(✅ RULED 2026-09-30: base 5% / +100% — every mage crits 5% before gear)* |
+| **Crit Damage** | mage (gear) | +50% *(the bonus when a crit lands)* *(✅ RULED 2026-09-30: base 5% / +100% — a crit doubles the hit)* |
 | **Deflection Chance** | mage (gear) | 0% |
 | **Deflection Amount** | mage (gear) | — *(% of damage reduced on proc; **capped at 50% for players**)* |
 
@@ -114,6 +114,13 @@ have an axis other than shields.
 until gear grants chance, crit damage is inert. That keeps the early game
 clean and makes the first crit item feel like an unlock rather than a
 percentage nudge.
+
+> **✅ RULED 2026-09-30: base 5% / +100%** (Christian, playtest 2026-09-30, note 10: "Base crit
+> chance should be 5%, base crit damage should be 100% (doubling).") The
+> paragraph above is superseded: every mage — player, rival, every campaign
+> creature — now starts at 5% crit chance and +100% crit damage, and gear or
+> an enemy kit ADDS to both. The numbers live in one place,
+> `MageState.baseCritChance` / `MageState.baseCritDamage`.
 
 #### One hit roll, not two ⭐
 

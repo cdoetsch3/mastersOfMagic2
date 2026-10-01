@@ -176,12 +176,37 @@ class MageState {
   /// Reduces an attacker's hit chance against this mage. Percent points.
   int dodge = 0;
 
-  /// Chance this mage's attacks land a crit (percent, 0–100).
-  int critChance = 0;
+  /// Every mage's crit chance before gear, archetype or status (percent).
+  ///
+  /// ⭐ **The one place the number lives** (ruling, Christian 2026-09-30:
+  /// "base crit chance should be 5%"). The field default below reads it, the
+  /// app's `DuelController` adds gear and an enemy's kit ON TOP of it, and
+  /// the stats panel and the duel guide quote it — so retuning it here moves
+  /// the fight, the panel and the copy together.
+  ///
+  /// ⚠️ A non-zero base means every mage now draws one RNG value per hit for
+  /// its crit roll ([DuelEngine]'s guard skips the draw only at 0). A test
+  /// asserting exact damage must pin `critChance = 0` — or pick a seed that
+  /// does not crit and say so — or it is a 1-in-20 flake.
+  static const int baseCritChance = 5;
 
-  /// Extra damage a crit deals, in percent (default +50). Inert without
-  /// [critChance], which is the natural brake on the pair.
-  int critDamage = 50;
+  /// Extra damage every crit deals before gear, archetype or status, in
+  /// percent: a crit deals `100 + critDamage` percent of the hit.
+  ///
+  /// ⭐ **The one place the number lives** (ruling, Christian 2026-09-30:
+  /// "base crit damage should be 100% (doubling)" — up from +50, i.e. 150%).
+  /// Gear and kits ADD points to it; the app derives its "Crit damage 200%"
+  /// panel base from it rather than restating it.
+  static const int baseCritDamage = 100;
+
+  /// Chance this mage's attacks land a crit (percent, 0–100). Starts at
+  /// [baseCritChance]; the app OVERWRITES it with base + gear + kit.
+  int critChance = baseCritChance;
+
+  /// Extra damage a crit deals, in percent (starts at [baseCritDamage], so a
+  /// plain crit doubles the hit). Inert without [critChance], which is the
+  /// natural brake on the pair.
+  int critDamage = baseCritDamage;
 
   /// Chance this mage deflects an incoming hit (percent, 0–100).
   int deflectChance = 0;

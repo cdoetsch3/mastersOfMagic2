@@ -72,8 +72,12 @@ void main() {
   late MageState bruno;
 
   setUp(() {
-    alice = MageState(name: 'Alice');
-    bruno = MageState(name: 'Bruno');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
+    bruno = MageState(name: 'Bruno')..critChance = 0;
   });
 
   void cast(DuelEngine d, Spell s, [MagicElement e = MagicElement.pyro]) {
@@ -304,7 +308,7 @@ void main() {
       expect(alice.effectiveCritChance, 25);
       expect(
         alice.effectiveCritDamage,
-        50,
+        MageState.baseCritDamage,
         reason: '⚠️ kills a seam that adds every contribution to every stat',
       );
     });
@@ -376,13 +380,13 @@ void main() {
         baseMissPercent: 0,
       );
       cast(duel, dmg(20));
-      // 50 base + 30 = 80% crit bonus → 20 × 1.8 = 36.
+      // 100 base + 30 = 130% crit bonus → 20 × 2.3 = 46.
       expect(
         bruno.hp,
-        64,
+        54,
         reason:
             '⚠️ kills reading the stored critChance (0 → no crit, hp 80) '
-            'and the stored critDamage (50 → hp 70)',
+            'and the stored critDamage (100 → hp 60)',
       );
     });
 
@@ -439,8 +443,11 @@ void main() {
 
         // 90.1 < 90 is false → it lands. There is always a sliver.
         alice = MageState(name: 'Alice')
+          ..critChance = 0
           ..statuses.add(_StatChip(CombatStat.accuracy, -200));
-        bruno = MageState(name: 'Bruno')..dodge = 200;
+        bruno = MageState(name: 'Bruno')
+          ..critChance = 0
+          ..dodge = 200;
         duel = DuelEngine(
           alice,
           bruno,
@@ -520,8 +527,9 @@ void main() {
       expect(bruno.hp, 90, reason: '50% of 20 removed, 10 lands');
 
       // nextInt(100) → 90: 90 < 90 is false, so the "certain" deflect fails.
-      alice = MageState(name: 'Alice');
+      alice = MageState(name: 'Alice')..critChance = 0;
       bruno = MageState(name: 'Bruno')
+        ..critChance = 0
         ..deflectChance = 100
         ..deflectAmount = 50;
       duel = DuelEngine(

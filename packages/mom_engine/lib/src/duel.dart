@@ -1024,7 +1024,11 @@ class DuelEngine {
       if (h == 0 && flatBonus > 0) perHit += flatBonus;
 
       // Crit (§5.2 step 4/5, per hit). Guarded on chance > 0 so a no-crit
-      // build rolls nothing. The bonus is a multiplier atop the damage mods.
+      // build rolls nothing — ⚠️ but every mage starts at
+      // [MageState.baseCritChance] (5%, ruling 2026-09-30), so only a mage
+      // explicitly pinned to 0 skips the draw. The bonus is a multiplier atop
+      // the damage mods: `100 + critDamage` percent, i.e. ×2 at the
+      // [MageState.baseCritDamage] of +100.
       // Both figures are derived per hit (Keen and Heavyhand contribute here);
       // crit has no global clamp — Execute and Death Wish are *meant* to reach
       // a guaranteed crit, and Composure is the counter, not a cap.
@@ -1149,7 +1153,8 @@ class DuelEngine {
     var crit = guaranteed || attacksAlwaysCrit(caster);
     if (!crit) {
       // Derived per hit (Keen contributes here), and guarded on chance > 0 so
-      // a no-crit build rolls nothing.
+      // a no-crit build rolls nothing. ⚠️ The 5% [MageState.baseCritChance]
+      // means that is now only a mage pinned to 0 — every other hit draws.
       final critChance = caster.effectiveCritChance;
       crit = critChance > 0 && rng.nextInt(100) < critChance;
     }

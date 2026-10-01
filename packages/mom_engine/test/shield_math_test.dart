@@ -7,8 +7,12 @@ void main() {
   late DuelEngine duel;
 
   setUp(() {
-    attacker = MageState(name: 'Attacker');
-    defender = MageState(name: 'Defender');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    attacker = MageState(name: 'Attacker')..critChance = 0;
+    defender = MageState(name: 'Defender')..critChance = 0;
     duel = DuelEngine(
       attacker,
       defender,

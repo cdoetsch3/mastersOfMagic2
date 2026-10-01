@@ -215,6 +215,17 @@ class DuelController extends ChangeNotifier {
   /// [EnemyCombatStats.none], so a player (who never has one) and every Q1
   /// enemy (whose def doesn't set one) build byte-identical mages to before
   /// this parameter existed.
+  ///
+  /// ⭐ **Crit starts at the engine's base for EVERYONE** (ruling 2026-09-30):
+  /// [MageState.baseCritChance] (5%) and [MageState.baseCritDamage] (+100,
+  /// a crit doubles the hit), with gear and an enemy's kit ADDED on top. So a
+  /// Champion whose kit says `critChance: 20` crits 25% of the time, and a
+  /// Q1 creature with no kit at all still crits 5% — the base is a property
+  /// of being a mage, not of carrying gear.
+  ///
+  /// ⚠️ These fields are OVERWRITTEN here, not left at the engine's field
+  /// defaults — so the base must be named in the sum. Dropping it would
+  /// silently build every duellist at 0% / +0, whatever the engine says.
   static MageState _buildMage({
     required String name,
     required int level,
@@ -234,10 +245,16 @@ class DuelController extends ChangeNotifier {
           )
           ..accuracyBonus = gear.accuracyBonus + combatStats.accuracyBonus
           ..dodge = gear.dodge + combatStats.dodge
-          ..critChance = gear.critChance + combatStats.critChance
-          // ⭐ critDamage ADDS to the engine's 50 base, so Cinder Loop's 5 points
-          // read 155%, exactly as ruled — an archetype's lean adds the same way.
-          ..critDamage = 50 + gear.critDamage + combatStats.critDamage
+          ..critChance =
+              MageState.baseCritChance +
+              gear.critChance +
+              combatStats.critChance
+          // ⭐ critDamage ADDS to the engine's +100 base, so Cinder Loop's 5
+          // points read 205% — an archetype's lean adds the same way.
+          ..critDamage =
+              MageState.baseCritDamage +
+              gear.critDamage +
+              combatStats.critDamage
           ..deflectChance = gear.deflectChance + combatStats.deflectChance
           ..deflectAmount = gear.deflectAmount + combatStats.deflectAmount
           ..damagePerCast = gear.damagePerCast

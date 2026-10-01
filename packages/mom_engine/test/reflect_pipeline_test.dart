@@ -48,8 +48,13 @@ void main() {
   late MageState bruno;
 
   setUp(() {
-    alice = MageState(name: 'Alice');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
     bruno = MageState(name: 'Bruno')
+      ..critChance = 0
       ..statuses.add(_Divert())
       ..statuses.add(ReflectStatus.reflect());
   });

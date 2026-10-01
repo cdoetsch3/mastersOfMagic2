@@ -38,8 +38,12 @@ void main() {
   late DuelEngine duel;
 
   setUp(() {
-    alice = MageState(name: 'Alice');
-    bruno = MageState(name: 'Bruno');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
+    bruno = MageState(name: 'Bruno')..critChance = 0;
     duel = DuelEngine(alice, bruno, elementEffects: false, baseMissPercent: 0);
   });
 
@@ -98,12 +102,16 @@ void main() {
       // run off a 100 max — at 100 the flat and percent readings agree, so
       // every assertion above is blind to the difference. Here they diverge
       // hard in both directions.
-      final tiny = MageState(name: 'Tiny', maxHp: 20)..hp = 1;
-      final huge = MageState(name: 'Huge', maxHp: 400)..hp = 1;
+      final tiny = MageState(name: 'Tiny', maxHp: 20)
+        ..critChance = 0
+        ..hp = 1;
+      final huge = MageState(name: 'Huge', maxHp: 400)
+        ..critChance = 0
+        ..hp = 1;
       for (final mage in [tiny, huge]) {
         DuelEngine(
           mage,
-          MageState(name: 'Other'),
+          MageState(name: 'Other')..critChance = 0,
           elementEffects: false,
           baseMissPercent: 0,
         ).resolveTurn(
@@ -378,10 +386,12 @@ void main() {
       // ⚠️ The over-time twin of the instant-heal pin: HealOverTimeStatus
       // used to read a percent of max, and every other Tonic assertion runs
       // at a 100 max where that mutant is invisible.
-      final huge = MageState(name: 'Huge', maxHp: 400)..hp = 1;
+      final huge = MageState(name: 'Huge', maxHp: 400)
+        ..critChance = 0
+        ..hp = 1;
       final duel = DuelEngine(
         huge,
-        MageState(name: 'Other'),
+        MageState(name: 'Other')..critChance = 0,
         elementEffects: false,
         baseMissPercent: 0,
       );

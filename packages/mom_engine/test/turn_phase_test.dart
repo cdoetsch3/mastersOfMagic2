@@ -87,8 +87,12 @@ void main() {
   late DuelEngine duel;
 
   setUp(() {
-    alice = MageState(name: 'Alice');
-    bruno = MageState(name: 'Bruno');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
+    bruno = MageState(name: 'Bruno')..critChance = 0;
     duel = DuelEngine(alice, bruno, elementEffects: false, baseMissPercent: 0);
   });
 
@@ -239,8 +243,12 @@ void main() {
 
     test('phase resolution is deterministic across identical runs', () {
       List<String> run() {
-        final a = MageState(name: 'A')..hp = 40;
-        final b = MageState(name: 'B')..hp = 40;
+        final a = MageState(name: 'A')
+          ..critChance = 0
+          ..hp = 40;
+        final b = MageState(name: 'B')
+          ..critChance = 0
+          ..hp = 40;
         a.statuses.add(_Burn(3, 5, bypass: true));
         b.statuses
           ..add(_Regen(2))

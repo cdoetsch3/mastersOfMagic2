@@ -94,11 +94,15 @@ void main() {
       final e = _enemyFor(_synthDef(const EnemyCombatStats(accuracyBonus: 11)));
       expect(e.accuracyBonus, 11, reason: 'the seam dropped accuracyBonus');
       expect(e.dodge, 0);
-      expect(e.critChance, 0);
+      expect(
+        e.critChance,
+        MageState.baseCritChance,
+        reason: 'unset critChance must stay at the engine base (5%)',
+      );
       expect(
         e.critDamage,
-        50,
-        reason: 'unset critDamage must stay at engine base',
+        MageState.baseCritDamage,
+        reason: 'unset critDamage must stay at the engine base (+100)',
       );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 0);
@@ -108,8 +112,16 @@ void main() {
       final e = _enemyFor(_synthDef(const EnemyCombatStats(dodge: 13)));
       expect(e.accuracyBonus, 0);
       expect(e.dodge, 13, reason: 'the seam dropped dodge');
-      expect(e.critChance, 0);
-      expect(e.critDamage, 50);
+      expect(
+        e.critChance,
+        MageState.baseCritChance,
+        reason: 'unset critChance must stay at the engine base (5%)',
+      );
+      expect(
+        e.critDamage,
+        MageState.baseCritDamage,
+        reason: 'unset critDamage must stay at the engine base (+100)',
+      );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 0);
     });
@@ -118,20 +130,34 @@ void main() {
       final e = _enemyFor(_synthDef(const EnemyCombatStats(critChance: 17)));
       expect(e.accuracyBonus, 0);
       expect(e.dodge, 0);
-      expect(e.critChance, 17, reason: 'the seam dropped critChance');
-      expect(e.critDamage, 50);
+      expect(
+        e.critChance,
+        MageState.baseCritChance + 17,
+        reason:
+            'the seam dropped critChance (5), or overwrote the base instead '
+            'of adding to it (17) — a kit of 17 crits 22% (ruling 2026-09-30)',
+      );
+      expect(
+        e.critDamage,
+        MageState.baseCritDamage,
+        reason: 'unset critDamage must stay at the engine base (+100)',
+      );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 0);
     });
 
-    test('critDamage adds to the engine\'s base 50', () {
+    test('critDamage adds to the engine\'s base 100', () {
       final e = _enemyFor(_synthDef(const EnemyCombatStats(critDamage: 19)));
       expect(e.accuracyBonus, 0);
       expect(e.dodge, 0);
-      expect(e.critChance, 0);
+      expect(
+        e.critChance,
+        MageState.baseCritChance,
+        reason: 'unset critChance must stay at the engine base (5%)',
+      );
       expect(
         e.critDamage,
-        69,
+        MageState.baseCritDamage + 19,
         reason:
             'the seam dropped critDamage, or overwrote the base instead of adding to it',
       );
@@ -143,8 +169,16 @@ void main() {
       final e = _enemyFor(_synthDef(const EnemyCombatStats(deflectChance: 23)));
       expect(e.accuracyBonus, 0);
       expect(e.dodge, 0);
-      expect(e.critChance, 0);
-      expect(e.critDamage, 50);
+      expect(
+        e.critChance,
+        MageState.baseCritChance,
+        reason: 'unset critChance must stay at the engine base (5%)',
+      );
+      expect(
+        e.critDamage,
+        MageState.baseCritDamage,
+        reason: 'unset critDamage must stay at the engine base (+100)',
+      );
       expect(e.deflectChance, 23, reason: 'the seam dropped deflectChance');
       expect(e.deflectAmount, 0);
     });
@@ -153,8 +187,16 @@ void main() {
       final e = _enemyFor(_synthDef(const EnemyCombatStats(deflectAmount: 29)));
       expect(e.accuracyBonus, 0);
       expect(e.dodge, 0);
-      expect(e.critChance, 0);
-      expect(e.critDamage, 50);
+      expect(
+        e.critChance,
+        MageState.baseCritChance,
+        reason: 'unset critChance must stay at the engine base (5%)',
+      );
+      expect(
+        e.critDamage,
+        MageState.baseCritDamage,
+        reason: 'unset critDamage must stay at the engine base (+100)',
+      );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 29, reason: 'the seam dropped deflectAmount');
     });
@@ -176,8 +218,16 @@ void main() {
         );
         expect(e.accuracyBonus, 11);
         expect(e.dodge, 13);
-        expect(e.critChance, 17);
-        expect(e.critDamage, 69);
+        expect(
+          e.critChance,
+          MageState.baseCritChance + 17,
+          reason: 'kills a write that clobbers critChance or drops the base',
+        );
+        expect(
+          e.critDamage,
+          MageState.baseCritDamage + 19,
+          reason: 'kills a write that clobbers critDamage or drops the base',
+        );
         expect(e.deflectChance, 23);
         expect(e.deflectAmount, 29);
       },
@@ -202,8 +252,18 @@ void main() {
       final e = _enemyFor(fawn, level: 5);
       expect(e.accuracyBonus, 0);
       expect(e.dodge, 0);
-      expect(e.critChance, 0);
-      expect(e.critDamage, 50, reason: 'the engine\'s own inert default');
+      expect(
+        e.critChance,
+        MageState.baseCritChance,
+        reason:
+            '⚠️ a stat-free Q1 creature still crits at the 5% base every '
+            'mage has (ruling 2026-09-30) — kills a seam that drops the base',
+      );
+      expect(
+        e.critDamage,
+        MageState.baseCritDamage,
+        reason: 'the engine\'s own default (+100)',
+      );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 0);
     });
@@ -327,7 +387,9 @@ void main() {
           const EnemyCombatStats(deflectChance: 100, deflectAmount: 40),
         ),
       );
-      final player = MageState(name: 'You', level: 1);
+      // ⚠️ Pinned: _ScriptedRandom's nextInt is always 0, so the player's
+      // 5% base crit (ruling 2026-09-30) would fire and double the hit.
+      final player = MageState(name: 'You', level: 1)..critChance = 0;
       final duel = DuelEngine(
         player,
         enemy,
@@ -358,8 +420,8 @@ void main() {
         );
         expect(
           enemy.critDamage,
-          70,
-          reason: '50 engine base + 20 archetype lean',
+          120,
+          reason: '100 engine base + 20 archetype lean',
         );
         expect(
           enemy.powerScale,
@@ -383,8 +445,10 @@ void main() {
         );
         expect(
           before - player.hp,
-          34,
-          reason: '20 × (100+70)/100 = 34 — the seam-carried crit lean landed',
+          44,
+          reason:
+              '20 × (100+120)/100 = 44 — the seam-carried crit lean landed on '
+              'the +100 base. Kills a dropped base (24) and the old +50 (34)',
         );
       },
     );

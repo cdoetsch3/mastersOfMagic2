@@ -11,8 +11,12 @@ void main() {
   late MageState bruno;
 
   setUp(() {
-    alice = MageState(name: 'Alice');
-    bruno = MageState(name: 'Bruno');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
+    bruno = MageState(name: 'Bruno')..critChance = 0;
   });
 
   void charge(int n, [MagicElement e = MagicElement.pyro]) {
@@ -58,8 +62,8 @@ void main() {
     // weaker per hit than a committed attack: it ignores shields and can be
     // thrown at any charge, and that flexibility is what it pays for.
     for (var seed = 0; seed < 25; seed++) {
-      final a = MageState(name: 'A');
-      final b = MageState(name: 'B');
+      final a = MageState(name: 'A')..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       final duel = DuelEngine(
         a,
         b,
@@ -81,8 +85,8 @@ void main() {
     // ends is enough to show the rolls are separate.
     final totals = <int>{};
     for (var seed = 0; seed < 40; seed++) {
-      final a = MageState(name: 'A');
-      final b = MageState(name: 'B');
+      final a = MageState(name: 'A')..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       final duel = DuelEngine(
         a,
         b,

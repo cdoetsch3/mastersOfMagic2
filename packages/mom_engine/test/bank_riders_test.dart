@@ -45,8 +45,12 @@ void main() {
   late MageState bruno;
 
   setUp(() {
-    alice = MageState(name: 'Alice');
-    bruno = MageState(name: 'Bruno');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
+    bruno = MageState(name: 'Bruno')..critChance = 0;
   });
 
   /// One turn: Alice casts [s] in [e] (fully paid), Bruno does nothing.
@@ -123,8 +127,8 @@ void main() {
       );
 
       // Pierced: the deflect draw is never made, so the stream advances by one.
-      alice = MageState(name: 'Alice');
-      bruno = MageState(name: 'Bruno');
+      alice = MageState(name: 'Alice')..critChance = 0;
+      bruno = MageState(name: 'Bruno')..critChance = 0;
       turtle(bruno);
       final pierced = CountingRandom();
       duel = engine(pierced);
@@ -331,8 +335,8 @@ void main() {
   // ======================================================================
   group('Execute', () {
     setUp(() {
-      alice = MageState(name: 'Alice');
-      bruno = MageState(name: 'Bruno', maxHp: 1000);
+      alice = MageState(name: 'Alice')..critChance = 0;
+      bruno = MageState(name: 'Bruno', maxHp: 1000)..critChance = 0;
     });
 
     bool critOf(TurnResult r) => r.events.whereType<DamageEvent>().first.crit;
@@ -344,8 +348,10 @@ void main() {
       expect(critOf(r), isTrue, reason: '29% is below the 30% line');
       expect(
         bruno.hp,
-        290 - 47,
-        reason: 'the min roll of 31 at the default +50% crit damage',
+        290 - 62,
+        reason:
+            'the min roll of 31 at the default +100% crit damage — ×2; the '
+            'old +50 base (×1.5) leaves 290 − 47',
       );
     });
 
@@ -386,15 +392,19 @@ void main() {
 
     test('⭐ a Heavyhand STANCE rides the guaranteed crit', () {
       // The same claim through the seam rather than the base field: Heavyhand
-      // contributes +30 crit damage, so the finisher hits for 31 x 1.8.
+      // contributes +30 crit damage, so the finisher hits for 31 x 2.3.
       bruno.hp = 290;
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.heavyhand, MagicElement.geo);
-      expect(alice.effectiveCritDamage, 80, reason: '50 base + 30 stance');
+      expect(
+        alice.effectiveCritDamage,
+        MageState.baseCritDamage + 30,
+        reason: '100 base + 30 stance',
+      );
       cast(duel, Spellbook.execute, MagicElement.geo);
       expect(
         bruno.hp,
-        290 - 56,
+        290 - 71,
         reason:
             'the stance reached the crit because the crit went through '
             'the ordinary door',
@@ -414,7 +424,9 @@ void main() {
       );
 
       alice = MageState(name: 'Alice')..critChance = 100;
-      bruno = MageState(name: 'Bruno', maxHp: 1000)..hp = 900;
+      bruno = MageState(name: 'Bruno', maxHp: 1000)
+        ..critChance = 0
+        ..hp = 900;
       final rolled = CountingRandom();
       duel = engine(rolled);
       cast(duel, Spellbook.execute, MagicElement.geo);

@@ -17,8 +17,12 @@ void main() {
     var total = 0;
     const trials = 400;
     for (var seed = 0; seed < trials; seed++) {
-      final a = MageState(name: 'A', level: level);
-      final b = MageState(name: 'B', maxHp: 100000);
+      // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+      // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+      // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+      // A test about crits sets its own chance after construction.
+      final a = MageState(name: 'A', level: level)..critChance = 0;
+      final b = MageState(name: 'B', maxHp: 100000)..critChance = 0;
       a
         ..charge = 1
         ..element = MagicElement.pyro;
@@ -68,7 +72,7 @@ void main() {
       // Same level on both sides -> the ratio of damage to health is identical
       // at every level, so every figure tuned at level 1 still holds.
       for (final level in [1, 10, 30, 60]) {
-        final m = MageState(name: 'x', level: level);
+        final m = MageState(name: 'x', level: level)..critChance = 0;
         expect(
           averageBoltDamage(level) / m.maxHp,
           closeTo(averageBoltDamage(1) / 100, 0.02),
@@ -83,8 +87,8 @@ void main() {
     // branch, so "damage scales" proves nothing about them — and an unscaled
     // shield quietly stops being a defence as levels climb.
     int shieldAt(int level) {
-      final a = MageState(name: 'A', level: level);
-      final b = MageState(name: 'B');
+      final a = MageState(name: 'A', level: level)..critChance = 0;
+      final b = MageState(name: 'B')..critChance = 0;
       a
         ..charge = 2
         ..element = MagicElement.aqua;
@@ -111,8 +115,8 @@ void main() {
   test('Ignite breaks the whole Flora streak, not just Photosynthesis', () {
     // ⚠️ Stripping only the Photosynthesis status would let it return on the
     // very next Flora cast, so Ignite would counter nothing.
-    final a = MageState(name: 'A');
-    final b = MageState(name: 'B');
+    final a = MageState(name: 'A')..critChance = 0;
+    final b = MageState(name: 'B')..critChance = 0;
     final duel = DuelEngine(a, b, rng: Random(3), baseMissPercent: 0);
 
     for (var i = 0; i < 3; i++) {

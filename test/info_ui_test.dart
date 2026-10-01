@@ -220,6 +220,65 @@ void main() {
     );
   });
 
+  /// ⭐ Ruling 2026-09-30 (base crit 5% / +100): the guide states the base,
+  /// and states it from the engine's consts rather than a typed copy.
+  testWidgets('the gameplay guide states the base crit from the engine', (
+    tester,
+  ) async {
+    expect(
+      GameplayGuideScreen.critRule,
+      allOf(
+        contains('${MageState.baseCritChance}% chance to crit'),
+        contains('doubles the damage'),
+        contains('crit gear adds to both'),
+      ),
+      reason:
+          '⚠️ kills a sentence typed without the const (a stale "5%" would '
+          'survive a retune) and the old 150% wording',
+    );
+    expect(
+      MageState.baseCritDamage,
+      100,
+      reason:
+          '"doubles" is only honest at +100 — the const conditional in '
+          'critRule falls back to a percentage otherwise',
+    );
+
+    await tester.binding.setSurfaceSize(const Size(400, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(const MaterialApp(home: GameplayGuideScreen()));
+    await tester.pumpAndSettle();
+
+    // ⚠️ Lazy ListView — sweep it, as the DoT test above does.
+    final rendered = <String>{};
+    void collect() {
+      for (final text in tester.widgetList<Text>(find.byType(Text))) {
+        if (text.data case final data?) rendered.add(data);
+      }
+    }
+
+    collect();
+    for (var i = 0; i < 40; i++) {
+      await tester.drag(find.byType(ListView), const Offset(0, -600));
+      await tester.pump();
+      collect();
+    }
+    bool says(String fragment) => rendered.any((t) => t.contains(fragment));
+
+    expect(
+      says(GameplayGuideScreen.critRule),
+      isTrue,
+      reason:
+          'the "Hits, crits and deflection" section must render the rule — '
+          'kills a critRule that exists but is never shown',
+    );
+    expect(
+      says('100% + your crit damage'),
+      isFalse,
+      reason: 'kills the pre-ruling sentence surviving beside the new one',
+    );
+  });
+
   testWidgets('the gameplay guide also lays out on a narrow screen', (
     tester,
   ) async {

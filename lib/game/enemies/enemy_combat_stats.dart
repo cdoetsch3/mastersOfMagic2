@@ -19,11 +19,14 @@ class EnemyCombatStats {
   /// at 10 — enforced by the authoring table, not by this type.
   final int dodge;
 
-  /// Chance (%) this creature's own attacks crit.
+  /// Chance (%) this creature's own attacks crit, ADDED to the engine's
+  /// `MageState.baseCritChance` (5%, ruling 2026-09-30) — so a kit saying
+  /// `critChance: 20` crits 25% of the time, and [none] still crits 5%.
   final int critChance;
 
-  /// Extra crit damage, in percent, ADDED to the engine's base 50 — inert
-  /// without [critChance] > 0 (the engine's own guard, MageState/DuelEngine).
+  /// Extra crit damage, in percent, ADDED to the engine's
+  /// `MageState.baseCritDamage` (+100, so a plain crit doubles the hit). A
+  /// negative value makes this creature's crits gentler than the base.
   final int critDamage;
 
   /// Chance (%) this creature deflects an incoming hit.
@@ -42,8 +45,10 @@ class EnemyCombatStats {
   });
 
   /// The inert default — every Q1 `EnemyDef` and any Kinetic def that doesn't
-  /// name one. Applying it to a `MageState` changes nothing (KINETIC_CONTRACT
-  /// §2.2's invariance requirement).
+  /// name one. Applying it to a `MageState` adds nothing to the engine's base
+  /// (KINETIC_CONTRACT §2.2's invariance requirement). ⚠️ Since 2026-09-30
+  /// that base includes a 5% crit chance, so a [none] creature DOES crit —
+  /// at the same rate as everyone else, and no more.
   static const none = EnemyCombatStats();
 
   @override

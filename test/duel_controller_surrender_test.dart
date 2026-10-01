@@ -5,6 +5,8 @@ import 'package:mom_engine/mom_engine.dart';
 import 'package:masters_of_magic_2/game/ai_personas.dart';
 import 'package:masters_of_magic_2/game/duel_controller.dart';
 import 'package:masters_of_magic_2/game/enemies/enemy_combat_stats.dart';
+import 'package:masters_of_magic_2/game/enemies/enemy_encounter.dart';
+import 'package:masters_of_magic_2/game/enemies/frostfell_pass.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/loadout.dart';
 import 'package:masters_of_magic_2/game/mage_apparel.dart';
@@ -108,9 +110,18 @@ void main() {
       );
       expect(geared.player.accuracyBonus, 5);
       expect(geared.player.damagePerCharge, 1);
-      // ⭐ The ruling: crit = 150% base + points. Engine base is 50, so the
-      // Cinder Loop's 5 points must read 55, never 5.
-      expect(geared.player.critDamage, 55);
+      // ⭐ The ruling (2026-09-30): crit = 200% base + points. Engine base is
+      // +100, so the Cinder Loop's 5 points must read 105, never 5.
+      expect(
+        geared.player.critDamage,
+        105,
+        reason: '⚠️ kills dropping the base (5) and the old +50 base (55)',
+      );
+      expect(
+        geared.player.critChance,
+        10,
+        reason: '5% base + the ring\'s 5 — kills dropping the base (5)',
+      );
       expect(geared.player.shieldStrengthPercent, 10);
       expect(geared.player.healingReceivedPercent, 10);
       // ⭐ Regrow arrives as a status, so the HUD pip and the heal-lane
@@ -149,10 +160,18 @@ void main() {
       expect(duel.enemy.hp, 120, reason: 'they start full at the bigger pool');
       expect(duel.enemy.accuracyBonus, 3);
       expect(duel.enemy.dodge, 4);
-      expect(duel.enemy.critChance, 7);
-      // ⭐ The same 50-base ruling applies to THEIR crits, or the two clients
+      expect(
+        duel.enemy.critChance,
+        12,
+        reason: 'the 5% base + their 7 — kills a base given only to us',
+      );
+      // ⭐ The same +100 base applies to THEIR crits, or the two clients
       // roll different crit damage from the same seed.
-      expect(duel.enemy.critDamage, 55);
+      expect(
+        duel.enemy.critDamage,
+        105,
+        reason: 'kills a base given only to us (5) and the old +50 (55)',
+      );
       expect(duel.enemy.deflectChance, 2);
       expect(duel.enemy.deflectAmount, 6);
       expect(duel.enemy.damagePerCast, 2);
@@ -167,7 +186,11 @@ void main() {
       // ⚠️ Their wardrobe is theirs — none of it may leak onto us.
       expect(duel.player.maxHp, 100);
       expect(duel.player.accuracyBonus, 0);
-      expect(duel.player.critDamage, 50);
+      expect(
+        [duel.player.critChance, duel.player.critDamage],
+        [MageState.baseCritChance, MageState.baseCritDamage],
+        reason: 'the engine base only — kills their +7 / +5 leaking onto us',
+      );
       expect(duel.player.statuses.whereType<RegrowStatus>(), isEmpty);
     });
 
@@ -258,7 +281,12 @@ void main() {
         playerGear: const ItemModifiers(maxHpBonus: 50, critDamage: 20),
       );
       expect(duel.enemy.maxHp, MageState.scaledMaxHp(persona.level));
-      expect(duel.enemy.critDamage, 50);
+      expect(
+        duel.enemy.critDamage,
+        MageState.baseCritDamage,
+        reason:
+            'the engine base only — kills our gear\'s +20 leaking onto them',
+      );
       expect(duel.enemy.statuses.whereType<RegrowStatus>(), isEmpty);
       expect(duel.player.maxHp, 150, reason: 'ours still counts');
     });
@@ -269,11 +297,52 @@ void main() {
         driver: FakeRemoteDriver(),
       );
       expect(bare.player.maxHp, 100);
-      expect(bare.player.critChance, 0);
+      expect(
+        bare.player.critChance,
+        MageState.baseCritChance,
+        reason:
+            '⚠️ the 5% base every mage has (ruling 2026-09-30) — kills a '
+            'build that overwrites the field with gear alone (0)',
+      );
       expect(
         bare.player.critDamage,
-        50,
+        MageState.baseCritDamage,
         reason: 'the engine default, untouched by empty gear',
+      );
+    });
+
+    // ⭐ Ruling 2026-09-30: "base crit chance should be 5%, base crit damage
+    // should be 100%". `_buildMage` OVERWRITES both fields, so the base must
+    // be named in its sum — this pins base + gear + kit on both sides.
+    test('⭐ crit is base + gear for us, base + kit for a campaign foe', () {
+      final def = FrostfellPassBestiary.breathfrost;
+      expect(
+        def.combatStats,
+        const EnemyCombatStats(critChance: 20, critDamage: 30),
+        reason: 'sanity: the fixture\'s kit is the 20 / +30 this test sums',
+      );
+      final duel = DuelController(
+        loadout: Loadout.starter,
+        driver: LocalAiDriver(
+          persona: EnemyEncounter(def: def, level: 21).toPersona(),
+          enemy: def,
+        ),
+        playerLevel: 21,
+        playerGear: const ItemModifiers(critChance: 6, critDamage: 12),
+      );
+      expect(
+        [duel.player.critChance, duel.player.critDamage],
+        [MageState.baseCritChance + 6, MageState.baseCritDamage + 12],
+        reason:
+            '⚠️ THE mutant: dropping the base from the sum builds us at '
+            '6% / +12 — the engine default is overwritten, never inherited',
+      );
+      expect(
+        [duel.enemy.critChance, duel.enemy.critDamage],
+        [25, 130],
+        reason:
+            'a kit of 20 crits 25% on the 5% base, and its +30 rides the +100 '
+            '— kills dropping the base on the enemy side (20 / 30)',
       );
     });
   });

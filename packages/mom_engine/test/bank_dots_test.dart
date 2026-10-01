@@ -91,8 +91,12 @@ void main() {
   late MageState bruno;
 
   setUp(() {
-    alice = MageState(name: 'Alice');
-    bruno = MageState(name: 'Bruno');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
+    bruno = MageState(name: 'Bruno')..critChance = 0;
   });
 
   DuelEngine engine({
@@ -236,8 +240,8 @@ void main() {
       // is applied, at the caster's level and power scale. Without it a
       // level-60 Agony would tick for a level-1's 7 and the whole lane would
       // quietly stop being playable as the game went on.
-      final boss = MageState(name: 'Boss', level: 20);
-      final target = MageState(name: 'Target', level: 20);
+      final boss = MageState(name: 'Boss', level: 20)..critChance = 0;
+      final target = MageState(name: 'Target', level: 20)..critChance = 0;
       final duel = DuelEngine(
         boss,
         target,
@@ -628,8 +632,9 @@ void main() {
         );
         expect(alice.hp, 100, reason: 'and a miss is no effect at all');
 
-        final clean = MageState(name: 'Clean');
+        final clean = MageState(name: 'Clean')..critChance = 0;
         final swinger = MageState(name: 'Swinger')
+          ..critChance = 0
           ..charge = 1
           ..element = MagicElement.geo;
         final control = DuelEngine(
@@ -922,7 +927,7 @@ void main() {
     test(
       '⭐ Dispel on a mage with 4 AK stacks leaves 4 — and takes a stance',
       () {
-        alice = MageState(name: 'Alice', maxHp: 2000);
+        alice = MageState(name: 'Alice', maxHp: 2000)..critChance = 0;
         final duel = engine(elementEffects: true);
         for (var i = 0; i < 4; i++) {
           bruno
@@ -978,6 +983,7 @@ void main() {
     test('Purify and Cleanse on the holder leave it (it is a buff)', () {
       for (final spell in [Spellbook.purify, Spellbook.cleanse]) {
         bruno = MageState(name: 'Bruno')
+          ..critChance = 0
           ..statuses.add(ArcaneKnowledgeStatus(4))
           ..statuses.add(IgniteStatus(3));
         final duel = engine();
@@ -1018,6 +1024,7 @@ void main() {
         reason: '⚠️ kills a Shatter that ignores the veto',
       );
       final holder = MageState(name: 'H')
+        ..critChance = 0
         ..statuses.add(_FakeDebuff(strippable: false));
       expect(
         debuffsOn(holder),

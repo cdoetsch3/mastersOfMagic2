@@ -24,7 +24,12 @@ class _AlwaysProc implements Random {
 
 void main() {
   MageState mage(String name, MagicElement e, int charge) =>
+      // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+      // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+      // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+      // A test about crits sets its own chance after construction.
       MageState(name: name)
+        ..critChance = 0
         ..charge = charge
         ..element = e;
 

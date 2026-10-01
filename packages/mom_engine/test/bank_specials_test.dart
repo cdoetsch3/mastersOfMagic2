@@ -54,8 +54,12 @@ void main() {
   late MageState bruno;
 
   setUp(() {
-    alice = MageState(name: 'Alice');
-    bruno = MageState(name: 'Bruno');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
+    bruno = MageState(name: 'Bruno')..critChance = 0;
   });
 
   DuelEngine engine({
@@ -217,8 +221,8 @@ void main() {
         'mending': Spellbook.mend,
       };
       expected.forEach((id, spell) {
-        final a = MageState(name: 'A');
-        final b = MageState(name: 'B');
+        final a = MageState(name: 'A')..critChance = 0;
+        final b = MageState(name: 'B')..critChance = 0;
         final duel = DuelEngine(
           a,
           b,
@@ -363,7 +367,7 @@ void main() {
         80,
         reason:
             '⚠️ kills the missing blank: a 100%-crit attacker otherwise '
-            'lands 20 × 1.5 = 30 (hp 70)',
+            'lands 20 × 2 = 40 at the +100 base (hp 60)',
       );
     });
 
@@ -414,7 +418,13 @@ void main() {
         20,
         reason: '⚠️ kills a grant that never reaches the derivation seam',
       );
-      expect(alice.effectiveCritDamage, 90, reason: '50 base + 40');
+      expect(
+        alice.effectiveCritDamage,
+        140,
+        reason:
+            '100 base (MageState.baseCritDamage) + 40 — kills a grant that '
+            'never reaches the seam (100) and the old +50 base (90)',
+      );
       expect(
         only<KeenStatus>(alice).turnsLeft,
         24,
@@ -494,7 +504,8 @@ void main() {
     }
 
     test('⭐ it always crits below 25% of the holder\'s own max health', () {
-      attackAt(24, expectHp: 70);
+      // 20 × 2 at the +100 base crit damage (ruling 2026-09-30).
+      attackAt(24, expectHp: 60);
     });
 
     test('⭐ …and does nothing AT 25%, or above it', () {
@@ -503,8 +514,12 @@ void main() {
 
     test('⭐ 25% is a strict floor, checked either side of the boundary', () {
       // Two mages, one test: the pair is what kills the off-by-one.
-      final low = MageState(name: 'Low')..hp = 24;
-      final high = MageState(name: 'High')..hp = 25;
+      final low = MageState(name: 'Low')
+        ..critChance = 0
+        ..hp = 24;
+      final high = MageState(name: 'High')
+        ..critChance = 0
+        ..hp = 25;
       for (final m in [low, high]) {
         m.statuses.add(DeathWishStatus(turns: 10));
       }
@@ -543,11 +558,11 @@ void main() {
       castBy(duel, alice, dmg(20));
       expect(
         bruno.hp,
-        70,
+        60,
         reason:
             '⚠️ kills a guarantee that still rolls: that draws the 60 for '
-            'the crit, leaving the deflect to read 0 < 50 and soften the hit '
-            'to 15 (hp 85)',
+            'the crit, leaving the deflect to read 0 < 50 and soften the '
+            '40-damage crit to 20 (hp 80)',
       );
     });
 
@@ -742,8 +757,10 @@ void main() {
             'never expires',
       );
 
-      alice = MageState(name: 'Alice')..hp = 1;
-      bruno = MageState(name: 'Bruno');
+      alice = MageState(name: 'Alice')
+        ..critChance = 0
+        ..hp = 1;
+      bruno = MageState(name: 'Bruno')..critChance = 0;
       duel = engine();
       castBy(duel, alice, Spellbook.renewal);
       for (var i = 0; i < 14; i++) {

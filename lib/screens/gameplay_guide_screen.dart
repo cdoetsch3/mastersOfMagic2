@@ -11,6 +11,20 @@ import '../ui/app_theme.dart';
 class GameplayGuideScreen extends StatelessWidget {
   const GameplayGuideScreen({super.key});
 
+  /// The base-crit sentence in "Hits, crits and deflection" (ruling,
+  /// Christian 2026-09-30: "every hit has a 5% chance to crit; a crit doubles
+  /// the damage; crit gear adds to both").
+  ///
+  /// ⭐ **Computed from the engine's consts, never typed** —
+  /// [MageState.baseCritChance] and [MageState.baseCritDamage] — so a retuned
+  /// base cannot leave the guide quoting the old one. ⚠️ "doubles" is only
+  /// true at +100; the const conditional falls back to the plain percentage
+  /// the moment that stops being so, rather than letting the word lie.
+  static const critRule =
+      'every hit has a ${MageState.baseCritChance}% chance to crit; a crit '
+      '${MageState.baseCritDamage == 100 ? 'doubles the damage' : 'deals ${100 + MageState.baseCritDamage}% damage'}; '
+      'crit gear adds to both';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,10 +88,10 @@ class GameplayGuideScreen extends StatelessWidget {
                       'Six numbers shape every hit, from gear, enemy kits and '
                       'buffs alike: Accuracy and Dodge decide whether it '
                       'lands; Crit chance and Crit damage decide whether it '
-                      'lands HARD (a crit multiplies by 100% + your crit '
-                      'damage; Composure on the defender turns any crit back '
-                      'into a plain hit, whatever earned it — Keen, Execute, '
-                      'even Death Wish); Deflect chance and amount shave a '
+                      'lands HARD (${GameplayGuideScreen.critRule}. Composure '
+                      'on the defender turns any crit back into a plain hit, '
+                      'whatever earned it — Keen, Execute, even Death Wish); '
+                      'Deflect chance and amount shave a '
                       'share off before the shield, capped at 90% and 90% so '
                       'a sliver always lands. Reflect sends the deflected '
                       'share straight back. Pierce makes your next attack '

@@ -110,17 +110,26 @@ void main() {
       expect(lines.single, isNot(contains('111')));
     });
 
-    test('the Cinder Loop reads as 5% of 155%, exactly as §9b.8 says', () {
+    // ✅ Re-ruled 2026-09-30 (base 5% / +100): §9b.8's "5% of 155%" is now
+    // 10% of 205% — the ring's +5 / +5 on the new base.
+    test('the Cinder Loop reads as 10% of 205% on the 2026-09-30 base', () {
       final lines = Equipping.describeTotals(
         CinderpeakItems.cinderLoop.modifiers,
         level: 1,
       );
-      expect(lines, contains('Crit chance 5% (+5)'));
       expect(
         lines,
-        contains('Crit damage 155% (+5)'),
+        contains('Crit chance 10% (+5)'),
         reason:
-            'a crit is 150% before gear — MageState.critDamage starts at 50',
+            '⚠️ every mage crits 5% before gear — kills the old base-zero '
+            'line (5%) that ignored MageState.baseCritChance',
+      );
+      expect(
+        lines,
+        contains('Crit damage 205% (+5)'),
+        reason:
+            'a crit is 200% before gear — MageState.baseCritDamage is +100. '
+            'Kills the old typed 150 (155%)',
       );
     });
 
@@ -610,6 +619,27 @@ void main() {
         reason:
             '⚠️ the mutant this kills: an abs() anywhere in the seam, '
             'which would print a stat LOSS as a gain',
+      );
+    });
+
+    test('⭐ crit chance is a BASED stat now — the 5% shows as its base', () {
+      final line = Equipping.statTotals(
+        const ItemModifiers(critChance: 6),
+        level: 1,
+      ).single;
+      expect(
+        [line.label, line.total, line.base, line.bonus],
+        ['Crit chance', '11%', MageState.baseCritChance, 6],
+        reason:
+            '⚠️ kills the pre-ruling base: 0 (which the panel hides, '
+            'printing "(+6) 6%") — the duel rolls 11%, so the panel must too',
+      );
+      expect(
+        Equipping.baseCritDamagePercent,
+        100 + MageState.baseCritDamage,
+        reason:
+            'derived from the engine const — kills the old typed 150, '
+            'which would now disagree with the duel by half a hit',
       );
     });
 

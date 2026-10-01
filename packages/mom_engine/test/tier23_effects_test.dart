@@ -27,8 +27,12 @@ void main() {
   late MageState bruno;
 
   setUp(() {
-    alice = MageState(name: 'Alice');
-    bruno = MageState(name: 'Bruno');
+    // ⚠️ critChance pinned to 0 throughout this file: every mage now starts
+    // at MageState.baseCritChance (5%, ruling 2026-09-30), and these tests
+    // assert exact damage — an unpinned base crit is a 1-in-20 flake per hit.
+    // A test about crits sets its own chance after construction.
+    alice = MageState(name: 'Alice')..critChance = 0;
+    bruno = MageState(name: 'Bruno')..critChance = 0;
   });
 
   void charge(MageState m, MagicElement e, int to) {
@@ -250,8 +254,8 @@ void main() {
       expect(bruno.statuses.whereType<BlindStatus>(), hasLength(1));
 
       // ...and a 0.41 roll does not.
-      alice = MageState(name: 'Alice');
-      bruno = MageState(name: 'Bruno');
+      alice = MageState(name: 'Alice')..critChance = 0;
+      bruno = MageState(name: 'Bruno')..critChance = 0;
       duel = DuelEngine(
         alice,
         bruno,

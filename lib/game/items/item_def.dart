@@ -150,11 +150,14 @@ class ItemModifiers {
 
   final int dodge;
 
-  /// Chance (%) that a hit crits. ⚠️ **Standard stats are 0** — crits exist
-  /// only through gear, and in Q1 only through one ring (§9b.8).
+  /// Crit-chance percentage points ADDED to the engine's
+  /// `MageState.baseCritChance` (5%). ⚠️ Before the 2026-09-30 ruling the
+  /// base was 0 and crits existed only through gear (§9b.8); now gear raises
+  /// a chance every mage already has.
   final int critChance;
 
-  /// A crit deals 150% damage; each point here adds 1 to the 50 (§9b.8).
+  /// A crit deals `100 + MageState.baseCritDamage` = 200% damage (ruling
+  /// 2026-09-30, up from §9b.8's 150%); each point here adds 1 to it.
   final int critDamage;
 
   final int deflectChance;

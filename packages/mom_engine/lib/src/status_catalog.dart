@@ -1,4 +1,5 @@
 import 'element.dart';
+import 'mage.dart';
 import 'status.dart';
 
 /// Whether a status helps its holder, hurts them, or is a moment rather than a
@@ -333,10 +334,14 @@ abstract final class StatusCatalog {
       id: 'heavyhand',
       name: 'Heavyhand',
       description:
-          'Your crits hit harder, on top of the 50% extra a crit already '
-          'deals. It does nothing at all until something is critting, so it '
-          'wants crit chance beside it. Casting either Heavyhand spell '
-          'replaces the other outright.',
+          // ⭐ Both numbers are the engine's own consts (ruling 2026-09-30),
+          // so a retuned base cannot leave this sentence quoting the old one.
+          'Your crits hit harder, on top of the '
+          '${MageState.baseCritDamage}% extra a crit already deals. It does '
+          'nothing until something crits, and on its own a mage crits only '
+          '${MageState.baseCritChance}% of the time, so it wants crit chance '
+          'beside it. Casting either Heavyhand spell replaces the other '
+          'outright.',
       trigger: 'Casting Heavyhand or Overkill.',
       kind: StatusKind.buff,
       element: null,
