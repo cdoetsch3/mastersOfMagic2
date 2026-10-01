@@ -1267,7 +1267,7 @@ too — never rename one. ⚠️ Christian verifies the screen in the browser.
 ❓ Tres Commas reachability; Elementalist reads the unlock schedule (level
 40) because element slots are not enforced yet.
 
-## 🔨 Enchanting, Jewelry & the mote economy (release 11, 2026-10-01, Opus lanes)
+## ✅ Enchanting, Jewelry & the mote economy (release 11, 2026-10-01, Opus lanes, all merged)
 
 Design: `docs/ENCHANTING_DESIGN.md` (gathers ITEMS §6/§6c/§6d/§9b.5b,
 CELESTIAL §2.5a and the shipped `enchantId`/`aspect`/`socketed` seams).
@@ -1285,15 +1285,23 @@ gearProcPercent` with one roll per element per hit and empty-set rng
 neutrality, aspected-drop roll in `rollKill`, `ItemCatalogue.byWorkshop`
 ('refined', 'gems'), 60 ITEM_ART entries, `describeInstance`.
 ⚠️ Gear procs cross the PvP wire (`ItemModifiers.gearProcs`) — the release
-11 gate covers it. Lane 2 🔨 recipes (refine 48, transmute, salvage table,
-cut 36, Jewelry ladder 12) — `RecipeInput` gains any-mote/any-equipment
-matchers that I wire into `GameState.craft` at merge. Lane 3 🔨 surfaces
-(`enchantItem`/`socketGem`/`unsocketGem` with real station gates, Enchant…
-and Socket… sheets, `describeInstance` in the dialog). Then the re-sim gate
-on Greater numbers (`tool/balance_probe_test.dart`).
-❓ Open: Greater gem/enchant numbers after the sim; `stationRequired` on
-recipes still unenforced (only the new actions gate); wiki export regen
-(now 325 items) — run `flutter test tool/export_content_test.dart` alone.
+11 gate covers it. Lane 2 ✅ (6292e50): refine 48, transmute 36 (one per
+target element and tier; `RecipeInput.anyElement` drawn by the crafter at
+the Enchanting curve, L1 4 · L15 3 · L30 3 · L45 2), cut 36, Jewelry ladder
+12 (supersedes the Jewelry-at-Rimeholt ruling), `SalvageTable`. Lane 3 ✅
+(5c5e1b2): `enchantItem`/`socketGem`/`unsocketGem` + sheets, station gates
+Meridian/Rimeholt. Lane 4 ✅ (2d70639): Salvage… from the item dialog, XP
+6/12/25/50/80 by rarity. Re-sim ✅ (`tool/enchant_probe_test.dart`): the
+draft was over budget (nine Greater Aero = 18.8 levels; mixed 11.6) →
+Christian chose the measured retune (dodge 1/1/2, crit chance 1/2/3,
+Sanctus 2/4/5, other Greater rows two thirds, gems = enchant amounts, proc
+10%); single-element Greater kits ≤ 5 levels, mixed ≈ 6. Wiki export
+regenerated (337 items). Final: 3815 app / 640 engine / 25 tool.
+❓ Open: Lesser gem value 300 vs Crystal 150 + stone; transmute XP pays the
+L1 count at every level; `stationRequired` on recipes still unenforced;
+Stagger/Waterlogged as gear procs vs ITEMS §7.1 (now at 10%, one roll).
+⚠️ Christian verifies in the browser: Enchant…/Socket…/Salvage… sheets,
+the Workbench's transmute rows, an aspected drop's name and dialog.
 
 ## Deferred / banked — do not build without an explicit ask
 
