@@ -9,6 +9,7 @@ import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/screens/tabs/inventory_tab.dart';
 import 'package:masters_of_magic_2/ui/app_banner.dart';
+import 'package:masters_of_magic_2/ui/item_icon.dart';
 
 /// ⚠️ A ListView only builds what fits. The default 800x600 test viewport
 /// leaves the Storeroom below the fold, so it never renders and assertions
@@ -25,6 +26,13 @@ Widget _wrap(GameState game) => MaterialApp(
     child: const Scaffold(body: InventoryTab()),
   ),
 );
+
+/// The pack tile or belt chip for [defId], whether it draws a PNG or its
+/// fallback. ⚠️ Since the 2026-10-01 bulk art pass every item has an icon,
+/// so the tile no longer prints its name and the belt chip no longer prints
+/// an initial — the [ItemIcon] is the one thing both always carry.
+Finder itemIcon(String defId) =>
+    find.byWidgetPredicate((w) => w is ItemIcon && w.defId == defId);
 
 void main() {
   testWidgets('the pack shows every slot, full or empty', (tester) async {
@@ -221,7 +229,7 @@ void main() {
     await _pump(tester, game);
 
     // Long-press opens the full menu (tap stows, in town).
-    await tester.longPress(find.text('Sapwort Draught'));
+    await tester.longPress(itemIcon('sapwort_draught'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Load onto belt'));
     await tester.pumpAndSettle();
@@ -244,7 +252,7 @@ void main() {
       InventorySlot(defId: 'sapwort_draught'),
     ]);
     await _pump(tester, game);
-    await tester.longPress(find.text('Sapwort Draught'));
+    await tester.longPress(itemIcon('sapwort_draught'));
     await tester.pumpAndSettle();
 
     expect(find.text('Load onto belt'), findsOneWidget);
@@ -273,8 +281,8 @@ void main() {
       ..belt = const Belt(loaded: ['sapwort_draught']);
     await _pump(tester, game);
 
-    // The slot chip shows the item's initial; the dialog does the rest.
-    await tester.tap(find.text('S'));
+    // The slot chip shows the item's icon; the dialog does the rest.
+    await tester.tap(itemIcon('sapwort_draught'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Take off belt'));
     await tester.pumpAndSettle();

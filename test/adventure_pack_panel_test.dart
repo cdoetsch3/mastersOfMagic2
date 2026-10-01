@@ -24,6 +24,7 @@ import 'package:masters_of_magic_2/game/world.dart';
 import 'package:masters_of_magic_2/screens/adventure_screen.dart';
 import 'package:masters_of_magic_2/ui/app_theme.dart';
 import 'package:masters_of_magic_2/ui/belt_bay.dart';
+import 'package:masters_of_magic_2/ui/item_icon.dart';
 
 final _woods = World.byId('whispering_woods');
 
@@ -57,9 +58,14 @@ final _confirmDrop = find.descendant(
 /// The loaded belt slot, by the initial its box falls back to while
 /// `assets/items/` is empty — 'S' for Sapwort Draught, as `loop_ui_test` taps
 /// it. Scoped to the bay so a pack row starting with S cannot stand in.
+/// The belted Draught's slot — found by its [ItemIcon], which is there
+/// whether the slot draws the PNG (every item has one since the 2026-10-01
+/// bulk art pass) or the 'S' initial it used to fall back to.
 final _beltSlot = find.descendant(
   of: find.byType(BeltBay),
-  matching: find.text('S'),
+  matching: find.byWidgetPredicate(
+    (w) => w is ItemIcon && w.defId == 'sapwort_draught',
+  ),
 );
 
 void main() {

@@ -29,6 +29,15 @@ import 'package:mom_engine/mom_engine.dart';
 
 const _draught = 'sapwort_draught';
 const _tonic = 'brookmint_tonic';
+
+/// Every button on the arena's belt rail, by the `belt-<index>-<defId>` key
+/// each one carries. ⚠️ Not the drink glyph: that was the icon's FALLBACK,
+/// and since the 2026-10-01 bulk art pass every consumable has a PNG.
+final _railButtons = find.byWidgetPredicate(
+  (w) =>
+      w.key is ValueKey<String> &&
+      (w.key as ValueKey<String>).value.startsWith('belt-'),
+);
 const _ration = 'foragers_ration';
 
 void main() {
@@ -354,7 +363,7 @@ void main() {
     testWidgets('⚠️ an empty belt draws NO rail at all', (tester) async {
       await _pumpArena(tester, belt: const []);
       expect(
-        find.byIcon(Icons.local_drink),
+        _railButtons,
         findsNothing,
         reason:
             'an empty rail spends arena height to say "you brought '
@@ -364,7 +373,7 @@ void main() {
 
     testWidgets('two loaded slots draw two buttons', (tester) async {
       await _pumpArena(tester, belt: const [_draught, _tonic]);
-      expect(find.byIcon(Icons.local_drink), findsNWidgets(2));
+      expect(_railButtons, findsNWidgets(2));
       expect(find.text('Brookmint Tonic'), findsOneWidget);
     });
   });
