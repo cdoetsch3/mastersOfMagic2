@@ -324,9 +324,30 @@ piece is a trap).
 
 ## 8. Budget and order of work
 
-1. **Model + overlay** (one lane): Core/Heart motes, `enchantId`/`socketed`
-   read by `Equipping.modifiersOf`, the gem and enchant tables, aspected drop
-   roll, tests at the caps. No UI.
+1. ✅ **Model + overlay** (one lane, built 2026-10-01): Core/Heart motes,
+   `enchantId`/`socketed` read by `Equipping.modifiersOf`, the gem and enchant
+   tables, aspected drop roll, tests at the caps. No UI.
+   - Motes: `lib/game/items/catalogue/refined_motes.dart` (24; Core rare 900,
+     ⚠️ Heart epic **0g and Bound** per ECONOMY §14c — the 3,600 above stays ❓).
+   - Gems: `lib/game/items/catalogue/gems.dart` (36, +2/+4/+7, 300/1,500/Bound at 0 — a Greater gem inherits the Heart's ECONOMY §14c rule).
+     Both registered under `ItemCatalogue.byWorkshop` (`refined`, `gems`) —
+     made, never found, so no zone owns them; icons under
+     `assets/items/refined|gems/`, described in `docs/ITEM_ART.md`.
+   - Enchants: `lib/game/items/enchants.dart` (`EnchantDef`, `EnchantTier`,
+     `Affinity`, `Enchants` — 36, the §4.1 table; Greater's
+     `procElement`).
+   - Overlay + stat lines: `lib/game/items/equipping.dart`
+     (`modifiersOf` = def × quality + `enchantOverlay` + `socketOverlays`,
+     repeats halved; `describeInstance`); instance verbs `withEnchant` /
+     `withSocket` / `withoutSocket` in `item_instance.dart`.
+   - Gear procs: `ItemModifiers.gearProcs` (rides the PvP handshake) →
+     `DuelController._buildMage` → `MageState.gearProcs` → the engine's
+     `_rollGearProcs` at `ElementTuning.gearProcPercent` (15), element-enum
+     order, no draw for an empty set.
+   - Aspected drops: `aspectedDropPercent` (10) / `rollDropAspect` in
+     `lib/game/enemies/loot.dart`, threaded from `rollKill`'s zone.
+   - Tests: `test/enchanting_model_test.dart`,
+     `packages/mom_engine/test/gear_proc_test.dart`.
 2. **Recipes** (one lane): refine ×48, transmute ×3, salvage, cut ×36 (12
    elements × 3 tiers), the Jewelry ladder below L45. Value-conservation and
    §8.7 pricing re-pinned.
@@ -350,4 +371,8 @@ piece is a trap).
 6. Universal gems in the first pass, or elemental only (recommended)?
 7. Unsocket: one Shard, gem survives (recommended), or the unbinding enchant?
 8. Aspected drops on at 10% of rare+ drops?
+<<<<<<< ours
 9. ~~Which town holds the Enchanting station?~~ ✅ Meridian (already in code).
+=======
+9. ~~Which town holds the Enchanting station?~~ ✅ Meridian (already in code).
+>>>>>>> theirs

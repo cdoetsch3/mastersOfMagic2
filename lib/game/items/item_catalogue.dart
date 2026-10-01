@@ -9,9 +9,11 @@ library;
 import 'catalogue/ashfall_vale_items.dart';
 import 'catalogue/cinderpeak_items.dart';
 import 'catalogue/frostfell_pass_items.dart';
+import 'catalogue/gems.dart';
 import 'catalogue/glimmerbrook_items.dart';
 import 'catalogue/hallowmarch_items.dart';
 import 'catalogue/old_quarry_items.dart';
+import 'catalogue/refined_motes.dart';
 import 'catalogue/starfall_basin_items.dart';
 import 'catalogue/stormcliff_coast_items.dart';
 import 'catalogue/the_mirrormere_items.dart';
@@ -81,12 +83,28 @@ abstract final class ItemCatalogue {
     'the_eclipsed_citadel': EclipsedCitadelItems.all,
   };
 
-  /// ⚠️ **Derived from [byZone], not written out again.** Two hand-kept lists
-  /// of the same five catalogues is exactly how an item ends up resolvable by
-  /// id but owned by no zone — an icon that can never load, with nothing
-  /// failing to say so.
+  /// ⭐ **Defs no zone yields** — made at a bench, never found — keyed by a
+  /// workshop name that is deliberately NOT a place (ENCHANTING_DESIGN §3.1,
+  /// §5.1): the Core and Heart motes (`refined`) and the cut gems (`gems`).
+  ///
+  /// ⚠️ **Kept out of [byZone] on purpose.** [zoneOf] answers "which zone
+  /// defines this", and shop sourcing, rank gear and the native-zone pricing
+  /// all read it as geography; a `'refined'` key there would be a zone that
+  /// does not exist (and `item_icon_test` pins that every [byZone] key is a
+  /// real `World` location). [homeOf] is the question the icon path asks,
+  /// and it answers for both maps.
+  static final Map<String, List<ItemDef>> byWorkshop = <String, List<ItemDef>>{
+    'refined': RefinedMotes.all,
+    'gems': Gems.all,
+  };
+
+  /// ⚠️ **Derived from [byZone] and [byWorkshop], not written out again.**
+  /// Two hand-kept lists of the same catalogues is exactly how an item ends
+  /// up resolvable by id but owned by no file — an icon that can never load,
+  /// with nothing failing to say so.
   static final List<ItemDef> all = <ItemDef>[
     for (final defs in byZone.values) ...defs,
+    for (final defs in byWorkshop.values) ...defs,
   ];
 
   static final Map<String, ItemDef> _byId = {for (final d in all) d.id: d};
@@ -96,6 +114,17 @@ abstract final class ItemCatalogue {
       for (final d in e.value) d.id: e.key,
   };
 
+  static final Map<String, String> _workshopById = {
+    for (final e in byWorkshop.entries)
+      for (final d in e.value) d.id: e.key,
+  };
+
+  /// The folder [defId] is filed under — its zone, or for a made-not-found
+  /// def its [byWorkshop] key. ⭐ What `itemIconFor` builds
+  /// `assets/items/<home>/<id>.png` from. Null only for an id nothing claims.
+  static String? homeOf(String defId) =>
+      _zoneById[defId] ?? _workshopById[defId];
+
   /// Which zone's catalogue file defines [defId].
   ///
   /// ⭐ **A lookup rather than a field on [ItemDef].** A `zoneId` on every def
@@ -103,8 +132,9 @@ abstract final class ItemCatalogue {
   /// lives in and once by the string beside it — and the two can disagree.
   /// Here the file placement *is* the answer, so it cannot.
   ///
-  /// ⚠️ Null means no catalogue claims the id, which callers must treat the
-  /// way `tryById` does: a save written before a content patch, not a crash.
+  /// ⚠️ Null means no ZONE claims the id — a save written before a content
+  /// patch, which callers must treat the way `tryById` does, or a
+  /// [byWorkshop] def (a Core, a gem), which no zone yields by design.
   static String? zoneOf(String defId) => _zoneById[defId];
 
   /// Null when nothing owns [id] — callers should treat that as a bug, not a

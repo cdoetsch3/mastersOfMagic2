@@ -8,9 +8,11 @@ library;
 
 import 'package:mom_engine/mom_engine.dart';
 
+import 'enchants.dart';
 import 'item_catalogue.dart';
 import 'item_def.dart';
 import 'item_instance.dart';
+import 'item_naming.dart';
 
 abstract final class Equipping {
   /// What one **owned** item actually grants: the definition's base stats as
@@ -25,9 +27,77 @@ abstract final class Equipping {
   /// ⚠️ Anything that is not equipment grants nothing: gems carry modifiers
   /// too, but a socketed gem is resolved through the *host* item's sockets,
   /// not by wearing the gem.
+  ///
+  /// ⭐ **The overlay** (ENCHANTING_DESIGN §1, §4, §5): the def's stats scaled
+  /// by quality, **plus** [enchantOverlay] (the enchant, or a bare aspect's
+  /// Lesser affinity), **plus** every socket's [socketOverlays]. ⚠️ Quality
+  /// scales the def's share ONLY — an enchant is the enchanter's work and a
+  /// gem the jeweller's, not the smith's, so a Rough staff and a Master staff
+  /// wearing the same Charred (Standard) gain the same +8.
+  ///
+  /// ⚠️ **No clamp here.** The overlay sums honestly past every combat cap;
+  /// `CombatClamps` clamps the OUTPUT at resolution (§7a, ruled 2026-08-26), so
+  /// a ninth Greater Geo enchant is worthless on the field and still honest
+  /// on the panel.
   static ItemModifiers modifiersOf(ItemDef? def, [ItemInstance? instance]) {
     if (def is! EquipmentDef) return ItemModifiers.none;
-    return def.modifiers.scaledBy(instance?.quality);
+    final base = def.modifiers.scaledBy(instance?.quality);
+    if (instance == null) return base;
+    var sum = base + enchantOverlay(instance);
+    for (final gem in socketOverlays(def, instance)) {
+      if (gem != null) sum = sum + gem;
+    }
+    return sum;
+  }
+
+  /// What [instance]'s enchant grants — or, with no enchant, what its bare
+  /// aspect grants.
+  ///
+  /// - **Enchanted** → the enchant's `grants` (stats, plus the proc at
+  ///   Greater). An `enchantId` the table does not hold — the reserved
+  ///   `unbind`, or a save from a newer build — grants nothing, and ⚠️ does
+  ///   NOT fall back to the aspect: an enchant replaces the aspect (§4.4),
+  ///   whether or not this build can read it.
+  /// - **Aspected, not enchanted** (a §4.4 drop) → its element's **Lesser**
+  ///   affinity: "pre-enchanted sidegrades, weaker than a real enchant".
+  /// - Neither → nothing.
+  static ItemModifiers enchantOverlay(ItemInstance instance) {
+    if (instance.enchantId != null) {
+      return Enchants.tryById(instance.enchantId)?.grants ?? ItemModifiers.none;
+    }
+    final aspect = instance.aspect;
+    if (aspect == null) return ItemModifiers.none;
+    return Enchants.of(aspect, EnchantTier.lesser).grants;
+  }
+
+  /// What each of [def]'s sockets grants on [instance], index for index —
+  /// `def.socketCount` entries, null for an empty socket.
+  ///
+  /// ⭐ **Diminishing repeats** (§5.1, ITEMS §6d.3 fix 2): the FIRST copy of a
+  /// gem id on a piece gives its full modifiers; the second and every later
+  /// copy gives [ItemModifiers.halved] (integer, floor). "First" is socket
+  /// order, so the numbers read left to right exactly as the cells do.
+  ///
+  /// ⚠️ Per PIECE, never per wardrobe — the same Lesser Pyro gem in a hat and
+  /// in a ring is two first copies. ⚠️ A socket past `socketCount`, an empty
+  /// one, or an id that is not a [GemDef] grants nothing: the instance does
+  /// not know its catalogue (see `ItemInstance.withSocket`), so this is where
+  /// a bad write is made harmless.
+  static List<ItemModifiers?> socketOverlays(
+    EquipmentDef def,
+    ItemInstance instance,
+  ) {
+    final seen = <String>{};
+    return [
+      for (var i = 0; i < def.socketCount; i++)
+        switch (i < instance.socketed.length
+            ? ItemCatalogue.tryById(instance.socketed[i])
+            : null) {
+          final GemDef gem =>
+            seen.add(gem.id) ? gem.modifiers : gem.modifiers.halved(),
+          _ => null,
+        },
+    ];
   }
 
   /// The sum of every worn item's modifiers.
@@ -160,7 +230,72 @@ abstract final class Equipping {
     if (m.beltSlots != 0) '+${m.beltSlots} belt slots',
     if (m.consumablePotencyPercent != 0)
       potencyLine(m.consumablePotencyPercent),
+    for (final e in MagicElement.values)
+      if (m.gearProcs.contains(e)) procLine(e),
   ];
+
+  /// A gear proc's stat line: '15% on hit: Ignite' (ENCHANTING §4.1a).
+  ///
+  /// ⭐ The 15 is [ElementTuning.gearProcPercent], the number the engine rolls
+  /// against — never typed here.
+  static String procLine(MagicElement element) =>
+      '${ElementTuning.gearProcPercent}% on hit: '
+      '${Enchants.procEffectName(element)}';
+
+  /// The stat lines for one OWNED piece — the item dialog's (ENCHANTING §7).
+  ///
+  /// ⭐ The def's own lines as quality made them ([describe]), then one line
+  /// for the element axis, then one line per socket:
+  ///
+  /// - `Enchant: Charred (Standard) · +8% crit damage`
+  /// - `Aspect: Charred · +4% crit damage` — a §4.4 drop with no enchant
+  /// - `Socket: Lesser Pyro Gem · +2% crit damage`
+  /// - `Socket: Lesser Pyro Gem · +1% crit damage (repeat, half)`
+  /// - `Socket: empty`
+  ///
+  /// ⚠️ **[describe] stays for the modifier-only callers** (the "From
+  /// equipment" panel and every total) — this one needs the instance. Each
+  /// overlay line prints what [modifiersOf] actually adds, read through
+  /// [enchantOverlay] and [socketOverlays], so the dialog and the totals can
+  /// never quote different numbers for the same piece.
+  static List<String> describeInstance(
+    EquipmentDef def,
+    ItemInstance instance,
+  ) {
+    String joined(ItemModifiers m) => describe(m).join(', ');
+    final enchant = Enchants.tryById(instance.enchantId);
+    final aspect = instance.aspect;
+    final overlay = enchantOverlay(instance);
+    final sockets = socketOverlays(def, instance);
+    final seen = <String>{};
+    return [
+      ...describe(def.modifiers.scaledBy(instance.quality)),
+      if (enchant != null)
+        'Enchant: ${enchant.label} · ${joined(overlay)}'
+      else if (instance.enchantId == null && aspect != null)
+        'Aspect: ${aspectPrefixes[aspect.name]} · ${joined(overlay)}',
+      for (var i = 0; i < sockets.length; i++)
+        switch (sockets[i]) {
+          null => 'Socket: empty',
+          final m => _socketLine(
+            ItemCatalogue.byId(instance.socketed[i]),
+            m,
+            repeat: !seen.add(instance.socketed[i]),
+          ),
+        },
+    ];
+  }
+
+  static String _socketLine(
+    ItemDef gem,
+    ItemModifiers m, {
+    required bool repeat,
+  }) {
+    final line =
+        'Socket: ${ItemCatalogue.displayName(gem)} · '
+        '${describe(m).join(', ')}';
+    return repeat ? '$line (repeat, half)' : line;
+  }
 
   /// The consumable-potency stat line: 'Consumable potency +14%'.
   ///
@@ -375,6 +510,17 @@ abstract final class Equipping {
             base: null,
             bonus: m.consumablePotencyPercent,
           ),
+        // ⭐ One line per gear proc (ENCHANTING §4.1a), pure-gear like
+        // potency: the wardrobe's set is already deduplicated, so two Greater
+        // Pyro pieces print ONE 'Ignite on hit 15%' — what the engine rolls.
+        for (final e in MagicElement.values)
+          if (m.gearProcs.contains(e))
+            (
+              label: '${Enchants.procEffectName(e)} on hit',
+              total: '${ElementTuning.gearProcPercent}%',
+              base: null,
+              bonus: ElementTuning.gearProcPercent,
+            ),
       ];
 }
 

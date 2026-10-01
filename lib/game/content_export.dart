@@ -16,10 +16,13 @@
 /// asks, and a hand-written answer is stale the first time a drop table moves.
 library;
 
+import 'package:mom_engine/mom_engine.dart';
+
 import 'enemies/bestiary.dart';
 import 'enemies/drop_table.dart';
 import 'enemies/enemy_def.dart';
 import 'enemies/loot.dart';
+import 'items/enchants.dart';
 import 'items/item_catalogue.dart';
 import 'items/item_def.dart';
 import 'gathering/gather_node.dart';
@@ -38,6 +41,7 @@ abstract final class ContentExport {
     final items = ItemCatalogue.all.map(_item).toList();
     final recipes = RecipeBook.all.map(_recipe).toList();
     final gatherNodes = GatherNodes.all.map(_gatherNode).toList();
+    final enchants = Enchants.all.map(_enchant).toList();
     return {
       'schemaVersion': schemaVersion,
       'counts': {
@@ -47,15 +51,32 @@ abstract final class ContentExport {
         'items': items.length,
         'recipes': recipes.length,
         'gatherNodes': gatherNodes.length,
+        'enchants': enchants.length,
       },
       'zones': zones,
       'creatures': creatures,
       'items': items,
       'recipes': recipes,
       'gatherNodes': gatherNodes,
+      // ⭐ Additive (2026-10-01, ENCHANTING §8.1), so [schemaVersion] stays 1:
+      // a reader that predates enchants ignores a key it never asked for.
+      'enchants': enchants,
       'index': _index(),
     };
   }
+
+  /// One enchant (ENCHANTING_DESIGN §4.1). ⚠️ Not an item — an enchant is
+  /// what an instance's `enchantId` points at — so it is its own list, and
+  /// its proc is exported as the element it rolls, `null` below Greater.
+  static Map<String, Object?> _enchant(EnchantDef e) => {
+    'id': e.id,
+    'element': e.element.name,
+    'tier': e.tier.name,
+    'label': e.label,
+    'modifiers': _modifiers(e.modifiers),
+    'procElement': e.procElement?.name,
+    'procPercent': e.procElement == null ? null : ElementTuning.gearProcPercent,
+  };
 
   // ---- entities ----------------------------------------------------------
 
@@ -233,6 +254,7 @@ abstract final class ContentExport {
     if (m.beltSlots != 0) 'beltSlots': m.beltSlots,
     if (m.consumablePotencyPercent != 0)
       'consumablePotencyPercent': m.consumablePotencyPercent,
+    if (m.gearProcs.isNotEmpty) 'gearProcs': m.toJson()['gearProcs'],
   };
 
   static Map<String, Object?> _effect(ItemEffect e) => {

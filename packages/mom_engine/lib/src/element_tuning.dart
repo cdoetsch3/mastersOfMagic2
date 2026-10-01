@@ -23,6 +23,14 @@ abstract final class ElementTuning {
   /// baseline.
   static const int baseMissPercent = 20;
 
+  /// ⭐ **The gear-proc roll** (ENCHANTING_DESIGN §4.1a, ✅ Christian
+  /// 2026-10-01): a Greater enchant's element applies its signature effect
+  /// at base magnitude on this percent of the wearer's damaging hits — one
+  /// flat roll per hit per element in `MageState.gearProcs`, never a
+  /// streak-threshold change (ITEMS §7.1's proc-stacking risk). ⚠️ The §8.4
+  /// re-sim gate runs before this is final.
+  static const int gearProcPercent = 15;
+
   // ---- Tier 1 — Primal ------------------------------------------------
 
   /// Ignite (Pyro): chance to proc on a damaging hit, even a fully shielded

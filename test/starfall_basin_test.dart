@@ -815,13 +815,29 @@ void main() {
           reason: '$id is owned by another zone\'s catalogue',
         );
       }
+      // 📝 2026-10-01 (the enchanting build): the family DID grow a Core and a
+      // Heart (ENCHANTING_DESIGN §3.1) — made, never found, so they live in
+      // ItemCatalogue.byWorkshop['refined'] and no zone owns them. The law
+      // this pinned is "no TWIN in any zone", so it now counts zone-owned
+      // motes, and the two refined ones are pinned to their workshop below.
       final astralMotes = ItemCatalogue.all.whereType<MoteDef>().where(
         (d) => d.element == MagicElement.astral,
       );
       expect(
-        astralMotes,
+        astralMotes.where((d) => ItemCatalogue.zoneOf(d.id) != null),
         hasLength(3),
-        reason: 'the astral family has grown a Core, a Heart, or a twin',
+        reason: 'a zone has grown a twin of the astral Dust/Shard/Crystal',
+      );
+      expect(
+        {
+          for (final d in astralMotes)
+            if (ItemCatalogue.zoneOf(d.id) == null)
+              d.id: ItemCatalogue.homeOf(d.id),
+        },
+        {'astral_core': 'refined', 'astral_heart': 'refined'},
+        reason:
+            'the only zone-less astral motes are the refined Core and Heart '
+            '— anything else is a mote filed under no zone and no workshop',
       );
     });
 

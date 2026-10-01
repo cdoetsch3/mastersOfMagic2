@@ -36,6 +36,7 @@ document with a `schemaVersion`, four entity lists, and the derived index:
 | `creatures` | Every `EnemyDef`: rank, archetype, moves, full drop tables **with computed fractions**, and a `kill` block — consolation item, rank-gear chance and epic share (ENEMIES §2e.1, 2026-09-30) read off the roller |
 | `items` | Every `ItemDef`: kind, rarity, slot, modifiers, salvage, effects |
 | `recipes` | Every `RecipeDef`: skill, skill level, inputs, output, station requirement |
+| `enchants` | Every `EnchantDef` (ENCHANTING_DESIGN §4.1, added 2026-10-01): id, element, tier, label (`Charred (Standard)`), modifiers, and the Greater tier's `procElement` + `procPercent` (null below Greater). ⭐ Additive — `schemaVersion` stays 1. Gems need no key of their own: they are `GemDef` items, already in `items` with `kind: gem`, and a modifiers map now carries `gearProcs` when one grants a proc |
 | `index` | ⭐ `itemSources` + `itemUses` — see §4 |
 
 Regenerate after any content change:

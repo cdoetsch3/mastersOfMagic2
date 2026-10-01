@@ -119,6 +119,10 @@ ZONES = [
     "the_eclipsed_citadel",
 ]
 
+# ⭐ `ItemCatalogue.byWorkshop`'s keys (2026-10-01): item folders for defs no
+# zone yields — the Core/Heart motes and the gems. Icons only.
+WORKSHOPS = ["refined", "gems"]
+
 # ⭐ The palette a zone's creatures are locked to by `pixelate.py`. Hybrid
 # zones use their LEAD element, so the generated art and the silhouette
 # fallback agree about what you are fighting (IMPLEMENTATION_PLAN, Art row).
@@ -437,9 +441,16 @@ def _paragraph_anchored_on(text: str, anchor: str) -> str:
 
 
 def zone_of_heading(heading: str) -> str | None:
-    """`## Whispering Woods · Lv 1–5 · Flora` -> `whispering_woods`."""
+    """`## Whispering Woods · Lv 1–5 · Flora` -> `whispering_woods`.
+
+    ⭐ Also answers for an ITEM_ART.md workshop section (`## Refined · …`,
+    `## Gems · …`), so its `**Palette:**` line and art direction reach the
+    prompts the way a zone's do. ⚠️ Only for prompt assembly: workshops are
+    not in ZONES, so `--zone` cannot generate them yet (no creatures, no
+    backdrop, no pixelate element) — 📝 that lands with their art.
+    """
     zone = slugify(heading.split("·")[0])
-    return zone if zone in ZONES else None
+    return zone if zone in ZONES or zone in WORKSHOPS else None
 
 
 def enemy_ids() -> dict[str, str]:

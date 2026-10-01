@@ -110,3 +110,7 @@ flutter:
     - assets/items/the_reliquary_deep/
     - assets/items/the_unwritten_library/
     - assets/items/the_eclipsed_citadel/
+    # Made-not-found defs (`ItemCatalogue.byWorkshop`): Core/Heart motes and
+    # the cut gems belong to no zone (ENCHANTING_DESIGN §3.1, §5.1).
+    - assets/items/refined/
+    - assets/items/gems/

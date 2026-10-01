@@ -35,9 +35,13 @@ import '../game/items/item_catalogue.dart';
 ///
 /// ⚠️ Returns null for an id no catalogue claims — a save written before a
 /// content patch, exactly as `ItemCatalogue.tryById` treats it.
+///
+/// ⭐ Reads [ItemCatalogue.homeOf], not `zoneOf`: a Core or a gem belongs to
+/// no zone (ENCHANTING_DESIGN §3.1, §5.1) and lives under
+/// `assets/items/refined/` or `assets/items/gems/` instead.
 String? itemIconFor(String defId) {
-  final zone = ItemCatalogue.zoneOf(defId);
-  return zone == null ? null : 'assets/items/$zone/$defId.png';
+  final home = ItemCatalogue.homeOf(defId);
+  return home == null ? null : 'assets/items/$home/$defId.png';
 }
 
 /// An item's icon, or [fallback] when there is no PNG for it.

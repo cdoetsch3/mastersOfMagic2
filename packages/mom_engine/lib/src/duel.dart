@@ -963,6 +963,140 @@ class DuelEngine {
     // Waterlogged, and the Aqua-shield cleanse).
     if (elementEffects) {
       _triggerElementEffects(cast, rawDamage, chargeSpent, events);
+      // ⭐ Then the wearer's gear procs (ENCHANTING §4.1a) — AFTER the cast's
+      // own element effect, so a Pyro spell from a Greater-Pyro wearer rolls
+      // its 25% Ignite first and the 15% gear roll second, in that order on
+      // every client. ⚠️ The `isNotEmpty` guard is the rng discipline: a mage
+      // with no procs never reaches a draw.
+      if (rawDamage > 0 && caster.gearProcs.isNotEmpty) {
+        _rollGearProcs(cast, rawDamage, events);
+      }
+    }
+  }
+
+  /// One [ElementTuning.gearProcPercent] roll per element in the caster's
+  /// [MageState.gearProcs], drawn in **element-enum order** whatever order
+  /// the set was built in, and ALWAYS drawn — whether or not the effect could
+  /// land — so the stream's shape depends only on the set, never on the
+  /// board (the `rollRankGear` discipline, in the engine).
+  void _rollGearProcs(_Entry cast, int rawDamage, List<DuelEvent> e) {
+    for (final element in MagicElement.values) {
+      if (!cast.caster.gearProcs.contains(element)) continue;
+      if (rng.nextDouble() < ElementTuning.gearProcPercent / 100) {
+        _applyGearProc(element, cast, rawDamage, e);
+      }
+    }
+  }
+
+  /// Applies [element]'s signature effect at base magnitude, as if a spell of
+  /// that element had done it (ENCHANTING_DESIGN §4.1a's table).
+  ///
+  /// ⭐ **The spell path's own code**, never a copy: each arm calls the helper
+  /// [_triggerElementEffects] calls, so Grace, Photosynthesis-blocks-
+  /// Waterlogged, the Geo-shield ground, the Tailwind-shrugs-Stagger rule and
+  /// Dusk-blocks-Knowledge all apply unchanged (§5.2). Only the TRIGGER
+  /// differs — a flat roll instead of a streak, a cadence or a charge count —
+  /// and a streak-based effect lands its base unit once.
+  void _applyGearProc(
+    MagicElement element,
+    _Entry cast,
+    int rawDamage,
+    List<DuelEvent> e,
+  ) {
+    final caster = cast.caster;
+    final target = cast.target;
+    switch (element) {
+      case MagicElement.pyro:
+        // Ignite at the base tick (10% of this hit's raw damage), 3 turns.
+        _applyIgnite(target, rawDamage, e);
+      case MagicElement.aqua:
+        _applyWaterlogged(caster, target, e);
+      case MagicElement.flora:
+        // +1 Photosynthesis "stack" = one turn of its heal (see
+        // [PhotosynthesisStatus.gearUnits]).
+        final photo =
+            _statusOf<PhotosynthesisStatus>(caster) ??
+            (() {
+              final s = PhotosynthesisStatus();
+              caster.statuses.add(s);
+              return s;
+            })();
+        photo.gearUnits = 1;
+        e.add(
+          BuffAppliedEvent(
+            caster,
+            'Photosynthesis — healing this turn',
+            statusId: 'photosynthesis',
+          ),
+        );
+      case MagicElement.electro:
+        // Static Feedback strips 1 — only its strip; the Tailwind scatter is
+        // a property of an Electro ATTACK, not of the status.
+        if (_canStaticFeedback(target)) _stripOneCharge(target, e);
+      case MagicElement.aero:
+        // Tailwind: the wind takes the Haste token, through the same grab the
+        // streak uses (resolved after the turn's normal Haste transfer).
+        _elementHasteGrab = caster;
+      case MagicElement.geo:
+        _applyStagger(target, e);
+      case MagicElement.solar:
+      case MagicElement.lunar:
+        // ⚠️ ONE turn, not the spell's three (§4.1a). Lunar's lock is Blind.
+        _applyBlind(target, e, turns: 1);
+      case MagicElement.astral:
+        final align =
+            _statusOf<AstralAlignmentStatus>(caster) ??
+            (() {
+              final s = AstralAlignmentStatus(0);
+              caster.statuses.add(s);
+              return s;
+            })();
+        align
+          ..addStacks(ElementTuning.alignmentPerCharge)
+          ..holdDecay = true;
+        e.add(
+          BuffAppliedEvent(
+            caster,
+            'Astral Alignment (${align.stacks} — ${align.piercePercent}% pierce)',
+            statusId: 'astralAlignment',
+          ),
+        );
+      case MagicElement.sanctus:
+        // Grace is max-1: a proc while warded changes nothing and says
+        // nothing (Hallow's "Already warded" line is for a wasted TURN).
+        if (!caster.hasGrace) {
+          caster.hasGrace = true;
+          e.add(
+            BuffAppliedEvent(
+              caster,
+              'Grace — next debuff blocked',
+              statusId: 'grace',
+            ),
+          );
+        }
+      case MagicElement.umbra:
+        // ⚠️ On the WEARER, as the spell path does: Creeping Dark is the
+        // holder's own veil (Shadow/Dusk hide the board from the opponent),
+        // so §4.1a's "on them" would hand the opponent the concealment.
+        final dark =
+            _statusOf<CreepingDarkStatus>(caster) ??
+            (() {
+              final s = CreepingDarkStatus();
+              caster.statuses.add(s);
+              return s;
+            })();
+        dark
+          ..addStacks(ElementTuning.creepingDarkPerCharge)
+          ..holdDecay = true;
+        e.add(
+          BuffAppliedEvent(
+            caster,
+            'Creeping Dark (${dark.stacks} stacks)',
+            statusId: 'creepingDark',
+          ),
+        );
+      case MagicElement.arcane:
+        _gainArcaneKnowledge(caster, target, e);
     }
   }
 
@@ -1210,27 +1344,7 @@ class DuelEngine {
         // next action by +10 priority, unless they hold Photosynthesis.
         if (caster.streakElement == MagicElement.aqua &&
             caster.streakCount % ElementTuning.waterloggedEveryNthCast == 0) {
-          if (_statusOf<PhotosynthesisStatus>(target) == null &&
-              !_graceBlocks(target, e)) {
-            target.priorityPenalty = ElementTuning.waterloggedPriorityPenalty;
-            e.add(
-              BuffAppliedEvent(
-                target,
-                'Waterlogged — next action slowed',
-                statusId: 'waterlogged',
-              ),
-            );
-            // ⭐ Ruled 2026-09-21: the water also takes the initiative. Slowing
-            // a mage who holds Haste and leaving them the same-priority
-            // tiebreak was the two halves of one idea disagreeing.
-            //
-            // ⚠️ INSIDE this `if`, and gated on the target actually holding
-            // it. Blocked by Photosynthesis or grace → nothing moves; nobody
-            // holding it → still nobody (Waterlogged never ESTABLISHES Haste,
-            // it only takes it). And Cleansing the Waterlogged later does not
-            // hand it back — the token moved, the debuff did not carry it.
-            if (target.hasHaste) _elementHasteGrab = caster;
-          }
+          _applyWaterlogged(caster, target, e);
         }
         // An Aqua elemental shield cleanses the caster's Ignite.
         if (spell.effect is ShieldEffect &&
@@ -1260,12 +1374,11 @@ class DuelEngine {
           }
           // Static Feedback — 20% on hit strips one charge. Grounded out by
           // a Geo shield still standing after the hit.
-          final grounded = target.shield?.element == MagicElement.geo;
-          if (!grounded &&
-              _drainableCharge(target) > 0 &&
+          // ⚠️ The guard short-circuits BEFORE the draw, exactly as it always
+          // has — a grounded or empty target consumes no number.
+          if (_canStaticFeedback(target) &&
               rng.nextDouble() < ElementTuning.staticFeedbackPercent / 100) {
-            final taken = _drainCharge(target, 1);
-            if (taken > 0) e.add(ChargeDrainedEvent(target, taken));
+            _stripOneCharge(target, e);
           }
         }
       case MagicElement.aero:
@@ -1282,20 +1395,7 @@ class DuelEngine {
         // Tailwind streak of 3+ (Aero weathers Geo).
         if (caster.streakElement == MagicElement.geo &&
             caster.streakCount % ElementTuning.staggerEveryNthCast == 0) {
-          final windShielded =
-              target.streakElement == MagicElement.aero &&
-              target.streakCount >= 3;
-          if (!windShielded && !_graceBlocks(target, e)) {
-            target.nextOffensiveDamageScale =
-                ElementTuning.staggerDamagePercent / 100;
-            e.add(
-              BuffAppliedEvent(
-                target,
-                'Staggered — next offensive spell halved',
-                statusId: 'stagger',
-              ),
-            );
-          }
+          _applyStagger(target, e);
         }
 
       // ---- Tier 3 — Celestial ------------------------------------------
@@ -1418,45 +1518,133 @@ class DuelEngine {
         // the opponent's darkness is at Dusk or worse (Umbra corrupts
         // Arcane).
         if (chargeSpent >= 4) {
-          final theirDark = _statusOf<CreepingDarkStatus>(target);
-          if (theirDark == null || !theirDark.dusk) {
-            final ak = _statusOf<ArcaneKnowledgeStatus>(caster);
-            if (ak == null) {
-              caster.statuses.add(ArcaneKnowledgeStatus());
-            } else {
-              ak.addStack();
-            }
-            final stacks = _statusOf<ArcaneKnowledgeStatus>(caster)!.stacks;
-            caster.bonusDamagePercent =
-                stacks * ArcaneKnowledgeStatus.percentPerStack;
-            e.add(
-              BuffAppliedEvent(
-                caster,
-                'Arcane Knowledge ($stacks stacks, '
-                '+${caster.bonusDamagePercent}% damage)',
-                statusId: 'arcaneKnowledge',
-              ),
-            );
-          }
+          _gainArcaneKnowledge(caster, target, e);
         }
     }
+  }
+
+  // ---- Element effects, shared by the spell path and the gear proc --------
+  //
+  // ⭐ One function per effect, so a Greater enchant's proc cannot drift from
+  // the spell that defines it (ENCHANTING §4.1a "as if a spell of that element
+  // had done it"). None of these draws from [rng]; each caller rolls (or
+  // counts) its own trigger first.
+
+  /// Waterlogged on [target] from [caster]: +10 priority on their next
+  /// action, unless they hold Photosynthesis or Grace eats it.
+  void _applyWaterlogged(
+    MageState caster,
+    MageState target,
+    List<DuelEvent> e,
+  ) {
+    if (_statusOf<PhotosynthesisStatus>(target) != null ||
+        _graceBlocks(target, e)) {
+      return;
+    }
+    target.priorityPenalty = ElementTuning.waterloggedPriorityPenalty;
+    e.add(
+      BuffAppliedEvent(
+        target,
+        'Waterlogged — next action slowed',
+        statusId: 'waterlogged',
+      ),
+    );
+    // ⭐ Ruled 2026-09-21: the water also takes the initiative. Slowing
+    // a mage who holds Haste and leaving them the same-priority
+    // tiebreak was the two halves of one idea disagreeing.
+    //
+    // ⚠️ Only once it has LANDED, and gated on the target actually holding
+    // it. Blocked by Photosynthesis or grace → nothing moves; nobody
+    // holding it → still nobody (Waterlogged never ESTABLISHES Haste,
+    // it only takes it). And Cleansing the Waterlogged later does not
+    // hand it back — the token moved, the debuff did not carry it.
+    if (target.hasHaste) _elementHasteGrab = caster;
+  }
+
+  /// Whether Static Feedback could strip anything from [target]: not
+  /// grounded by a standing Geo shield, and holding drainable charge.
+  bool _canStaticFeedback(MageState target) =>
+      target.shield?.element != MagicElement.geo &&
+      _drainableCharge(target) > 0;
+
+  /// Static Feedback's strip: one charge off [target].
+  void _stripOneCharge(MageState target, List<DuelEvent> e) {
+    final taken = _drainCharge(target, ElementTuning.staticFeedbackChargeDrain);
+    if (taken > 0) e.add(ChargeDrainedEvent(target, taken));
+  }
+
+  /// Stagger on [target]: their next offensive spell ×0.5 — unless a
+  /// Tailwind streak of 3+ shrugs it off (Aero weathers Geo) or Grace eats it.
+  void _applyStagger(MageState target, List<DuelEvent> e) {
+    final windShielded =
+        target.streakElement == MagicElement.aero &&
+        target.streakCount >= ElementTuning.tailwindStreak;
+    if (windShielded || _graceBlocks(target, e)) return;
+    target.nextOffensiveDamageScale = ElementTuning.staggerDamagePercent / 100;
+    e.add(
+      BuffAppliedEvent(
+        target,
+        'Staggered — next offensive spell halved',
+        statusId: 'stagger',
+      ),
+    );
+  }
+
+  /// +1 Arcane Knowledge for [caster] — unless [target]'s darkness is at
+  /// Dusk or worse (Umbra corrupts Arcane).
+  void _gainArcaneKnowledge(
+    MageState caster,
+    MageState target,
+    List<DuelEvent> e,
+  ) {
+    final theirDark = _statusOf<CreepingDarkStatus>(target);
+    if (theirDark != null && theirDark.dusk) return;
+    final ak = _statusOf<ArcaneKnowledgeStatus>(caster);
+    if (ak == null) {
+      caster.statuses.add(ArcaneKnowledgeStatus());
+    } else {
+      ak.addStack();
+    }
+    final stacks = _statusOf<ArcaneKnowledgeStatus>(caster)!.stacks;
+    caster.bonusDamagePercent = stacks * ArcaneKnowledgeStatus.percentPerStack;
+    e.add(
+      BuffAppliedEvent(
+        caster,
+        'Arcane Knowledge ($stacks stacks, '
+        '+${caster.bonusDamagePercent}% damage)',
+        statusId: 'arcaneKnowledge',
+      ),
+    );
   }
 
   /// Applies (or refreshes) Blind on [target]. Under V2 this no longer clears
   /// Creeping Dark (that job is Absolution's); it does, while it persists,
   /// eclipse the target's moon (read by [_effectiveMoonPhase]).
-  void _applyBlind(MageState target, List<DuelEvent> e) {
+  ///
+  /// ⭐ [turns] below the spell's [ElementTuning.blindTurns] is a gear proc's
+  /// short Blind (ENCHANTING §4.1a, 1 turn). ⚠️ It **never shortens or
+  /// restarts** a Blind already standing — any standing Blind has at least the
+  /// one turn the proc would grant, so a short proc on a blinded target is a
+  /// no-op that neither spends their Grace nor logs a line. The spell path
+  /// ([turns] = 3) is exactly what it always was: Grace first, refresh.
+  void _applyBlind(
+    MageState target,
+    List<DuelEvent> e, {
+    int turns = ElementTuning.blindTurns,
+  }) {
+    final short = turns < ElementTuning.blindTurns;
+    if (short && _statusOf<BlindStatus>(target) != null) return;
     if (_graceBlocks(target, e)) return;
     final existing = _statusOf<BlindStatus>(target);
     if (existing != null) {
       existing.refresh();
     } else {
-      target.statuses.add(BlindStatus());
+      target.statuses.add(BlindStatus(turns: turns));
     }
     e.add(
       BuffAppliedEvent(
         target,
-        'Blinded — 50% miss for 3 turns',
+        'Blinded — 50% miss for $turns turn${turns == 1 ? '' : 's'}',
         statusId: 'blind',
       ),
     );

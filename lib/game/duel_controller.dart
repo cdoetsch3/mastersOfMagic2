@@ -280,7 +280,13 @@ class DuelController extends ChangeNotifier {
           // ⭐ The belt's potency (ruling 2026-09-25) rides the MAGE, never the
           // drink's ConsumableEffect: the opponent's belt arrives in their
           // gear, and both lockstep clients must scale the same drink alike.
-          ..consumablePotencyPercent = gear.consumablePotencyPercent;
+          ..consumablePotencyPercent = gear.consumablePotencyPercent
+          // ⭐ Gear procs (ENCHANTING §4.1a) — the worn kit's Greater enchants,
+          // already deduplicated by `Equipping.totals` (a set union), and for
+          // a human rival read off the same handshake as every stat above.
+          // ⚠️ A COPY: the engine owns its mage, and the gear totals are a
+          // value the controller may hand to the next duel too.
+          ..gearProcs = {...gear.gearProcs};
     // ⭐ Regrow rides the status machinery (item_status.dart), so the lane
     // sort and the HUD pip come for free. Permanent: gear is not taken off
     // mid-duel.

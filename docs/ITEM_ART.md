@@ -22,7 +22,7 @@ border colour.
 `tool/artgen.py` parses it on every run — an entry is `**Name** — *rarity ·
 kind · stats*` followed by its `` `assets/items/<zone>/<id>.png` `` filename
 line and one blockquote, each zone states a wrapped `**Palette:**` line, and
-the shared preamble below is quoted verbatim into all 265 icon prompts. Reword
+the shared preamble below is quoted verbatim into all 325 icon prompts. Reword
 the prose freely; change those shapes and the tool silently finds fewer icons,
 which `test/item_icon_test.dart` and `tool/test_artgen.py` both fail on.
 
@@ -2512,11 +2512,435 @@ shield strength · Lv 60*
 
 ---
 
-## ✅ Written — all 265 items
+## Refined · Core and Heart motes · made, never found · **24 items**
+
+📝 Core and Heart (ENCHANTING_DESIGN §3.1): refined from Crystals and Cores,
+never dropped, so they belong to no zone and are filed under
+`assets/items/refined/` (`ItemCatalogue.byWorkshop`).
+
+**Palette:** each element's own crystal colour, deeper and denser than the
+Crystal's; one inner light, never a glow spilling onto the ground
+
+> ⭐ **The ladder reads by SHAPE as well as colour**: Dust is a heap, a Shard a
+> splinter, a Crystal a hexagonal prism — a Core is a rough-faceted egg, and
+> a Heart is the only mote that is polished, a perfect smooth orb.
+
+**Aqua Core** — *rare · mote · core · Aqua*
+`assets/items/refined/aqua_core.png`
+> A single rough-faceted core of deep sea green-blue mineral the size of a
+> hen's egg, resting on its broad end. Many small irregular facets, none of
+> them flat enough to be a crystal face, with a slow swirl of paler water
+> turning inside it. ⚠️ Egg-shaped and rough, never hexagonal — it must not
+> read as a bigger Aqua Crystal.
+
+**Aqua Heart** — *epic · mote · heart · Aqua*
+`assets/items/refined/aqua_heart.png`
+> A perfectly round, polished orb of deep sea green-blue the size of a small
+> apple, sitting on nothing. Glass-smooth with no facets at all, and a slow
+> swirl of paler water turning inside it. ⭐ The only polished mote: one soft
+> highlight on the upper left and nothing else on the surface.
+
+**Pyro Core** — *rare · mote · core · Pyro*
+`assets/items/refined/pyro_core.png`
+> A single rough-faceted core of deep orange-red mineral the size of a hen's
+> egg, resting on its broad end. Many small irregular facets, none of them
+> flat enough to be a crystal face, with a steady ember glow from somewhere
+> inside. ⚠️ Egg-shaped and rough, never hexagonal — it must not read as a
+> bigger Pyro Crystal.
+
+**Pyro Heart** — *epic · mote · heart · Pyro*
+`assets/items/refined/pyro_heart.png`
+> A perfectly round, polished orb of deep orange-red the size of a small
+> apple, sitting on nothing. Glass-smooth with no facets at all, and a steady
+> ember glow from somewhere inside. ⭐ The only polished mote: one soft
+> highlight on the upper left and nothing else on the surface.
+
+**Flora Core** — *rare · mote · core · Flora*
+`assets/items/refined/flora_core.png`
+> A single rough-faceted core of leaf green clouded with amber sap mineral the
+> size of a hen's egg, resting on its broad end. Many small irregular facets,
+> none of them flat enough to be a crystal face, with one slow pale-green
+> pulse at its middle. ⚠️ Egg-shaped and rough, never hexagonal — it must not
+> read as a bigger Flora Crystal.
+
+**Flora Heart** — *epic · mote · heart · Flora*
+`assets/items/refined/flora_heart.png`
+> A perfectly round, polished orb of leaf green clouded with amber sap the
+> size of a small apple, sitting on nothing. Glass-smooth with no facets at
+> all, and one slow pale-green pulse at its middle. ⭐ The only polished mote:
+> one soft highlight on the upper left and nothing else on the surface.
+
+**Electro Core** — *rare · mote · core · Electro*
+`assets/items/refined/electro_core.png`
+> A single rough-faceted core of pale violet-white mineral the size of a hen's
+> egg, resting on its broad end. Many small irregular facets, none of them
+> flat enough to be a crystal face, with a single hairline of white light
+> running through it. ⚠️ Egg-shaped and rough, never hexagonal — it must not
+> read as a bigger Electro Crystal.
+
+**Electro Heart** — *epic · mote · heart · Electro*
+`assets/items/refined/electro_heart.png`
+> A perfectly round, polished orb of pale violet-white the size of a small
+> apple, sitting on nothing. Glass-smooth with no facets at all, and a single
+> hairline of white light running through it. ⭐ The only polished mote: one
+> soft highlight on the upper left and nothing else on the surface.
+
+**Aero Core** — *rare · mote · core · Aero*
+`assets/items/refined/aero_core.png`
+> A single rough-faceted core of near-colourless sky-white mineral the size of
+> a hen's egg, resting on its broad end. Many small irregular facets, none of
+> them flat enough to be a crystal face, with a few pale motes drifting inside
+> it as if in a draught. ⚠️ Egg-shaped and rough, never hexagonal — it must
+> not read as a bigger Aero Crystal.
+
+**Aero Heart** — *epic · mote · heart · Aero*
+`assets/items/refined/aero_heart.png`
+> A perfectly round, polished orb of near-colourless sky-white the size of a
+> small apple, sitting on nothing. Glass-smooth with no facets at all, and a
+> few pale motes drifting inside it as if in a draught. ⭐ The only polished
+> mote: one soft highlight on the upper left and nothing else on the surface.
+
+**Geo Core** — *rare · mote · core · Geo*
+`assets/items/refined/geo_core.png`
+> A single rough-faceted core of dull red-brown jasper mineral the size of a
+> hen's egg, resting on its broad end. Many small irregular facets, none of
+> them flat enough to be a crystal face, with fine grey strata lines and a
+> matte, heavy finish. ⚠️ Egg-shaped and rough, never hexagonal — it must not
+> read as a bigger Geo Crystal.
+
+**Geo Heart** — *epic · mote · heart · Geo*
+`assets/items/refined/geo_heart.png`
+> A perfectly round, polished orb of dull red-brown jasper the size of a small
+> apple, sitting on nothing. Glass-smooth with no facets at all, and fine grey
+> strata lines and a matte, heavy finish. ⭐ The only polished mote: one soft
+> highlight on the upper left and nothing else on the surface.
+
+**Solar Core** — *rare · mote · core · Solar*
+`assets/items/refined/solar_core.png`
+> A single rough-faceted core of bright gold-white mineral the size of a hen's
+> egg, resting on its broad end. Many small irregular facets, none of them
+> flat enough to be a crystal face, with a hot white point at its centre. ⚠️
+> Egg-shaped and rough, never hexagonal — it must not read as a bigger Solar
+> Crystal.
+
+**Solar Heart** — *epic · mote · heart · Solar*
+`assets/items/refined/solar_heart.png`
+> A perfectly round, polished orb of bright gold-white the size of a small
+> apple, sitting on nothing. Glass-smooth with no facets at all, and a hot
+> white point at its centre. ⭐ The only polished mote: one soft highlight on
+> the upper left and nothing else on the surface.
+
+**Lunar Core** — *rare · mote · core · Lunar*
+`assets/items/refined/lunar_core.png`
+> A single rough-faceted core of silver-grey with blue shadows mineral the
+> size of a hen's egg, resting on its broad end. Many small irregular facets,
+> none of them flat enough to be a crystal face, with a soft crescent of light
+> that sits on the side away from the viewer. ⚠️ Egg-shaped and rough, never
+> hexagonal — it must not read as a bigger Lunar Crystal.
+
+**Lunar Heart** — *epic · mote · heart · Lunar*
+`assets/items/refined/lunar_heart.png`
+> A perfectly round, polished orb of silver-grey with blue shadows the size of
+> a small apple, sitting on nothing. Glass-smooth with no facets at all, and a
+> soft crescent of light that sits on the side away from the viewer. ⭐ The
+> only polished mote: one soft highlight on the upper left and nothing else on
+> the surface.
+
+**Astral Core** — *rare · mote · core · Astral*
+`assets/items/refined/astral_core.png`
+> A single rough-faceted core of indigo-black mineral the size of a hen's egg,
+> resting on its broad end. Many small irregular facets, none of them flat
+> enough to be a crystal face, with a scatter of fine white star points deep
+> inside. ⚠️ Egg-shaped and rough, never hexagonal — it must not read as a
+> bigger Astral Crystal.
+
+**Astral Heart** — *epic · mote · heart · Astral*
+`assets/items/refined/astral_heart.png`
+> A perfectly round, polished orb of indigo-black the size of a small apple,
+> sitting on nothing. Glass-smooth with no facets at all, and a scatter of
+> fine white star points deep inside. ⭐ The only polished mote: one soft
+> highlight on the upper left and nothing else on the surface.
+
+**Sanctus Core** — *rare · mote · core · Sanctus*
+`assets/items/refined/sanctus_core.png`
+> A single rough-faceted core of warm ivory-gold mineral the size of a hen's
+> egg, resting on its broad end. Many small irregular facets, none of them
+> flat enough to be a crystal face, with a soft even glow with no single
+> bright point. ⚠️ Egg-shaped and rough, never hexagonal — it must not read as
+> a bigger Sanctus Crystal.
+
+**Sanctus Heart** — *epic · mote · heart · Sanctus*
+`assets/items/refined/sanctus_heart.png`
+> A perfectly round, polished orb of warm ivory-gold the size of a small
+> apple, sitting on nothing. Glass-smooth with no facets at all, and a soft
+> even glow with no single bright point. ⭐ The only polished mote: one soft
+> highlight on the upper left and nothing else on the surface.
+
+**Umbra Core** — *rare · mote · core · Umbra*
+`assets/items/refined/umbra_core.png`
+> A single rough-faceted core of violet-black mineral the size of a hen's egg,
+> resting on its broad end. Many small irregular facets, none of them flat
+> enough to be a crystal face, with a darker core that seems to swallow the
+> light around it. ⚠️ Egg-shaped and rough, never hexagonal — it must not read
+> as a bigger Umbra Crystal.
+
+**Umbra Heart** — *epic · mote · heart · Umbra*
+`assets/items/refined/umbra_heart.png`
+> A perfectly round, polished orb of violet-black the size of a small apple,
+> sitting on nothing. Glass-smooth with no facets at all, and a darker core
+> that seems to swallow the light around it. ⭐ The only polished mote: one
+> soft highlight on the upper left and nothing else on the surface.
+
+**Arcane Core** — *rare · mote · core · Arcane*
+`assets/items/refined/arcane_core.png`
+> A single rough-faceted core of teal-violet mineral the size of a hen's egg,
+> resting on its broad end. Many small irregular facets, none of them flat
+> enough to be a crystal face, with geometric sigil lines just under the
+> surface. ⚠️ Egg-shaped and rough, never hexagonal — it must not read as a
+> bigger Arcane Crystal.
+
+**Arcane Heart** — *epic · mote · heart · Arcane*
+`assets/items/refined/arcane_heart.png`
+> A perfectly round, polished orb of teal-violet the size of a small apple,
+> sitting on nothing. Glass-smooth with no facets at all, and geometric sigil
+> lines just under the surface. ⭐ The only polished mote: one soft highlight
+> on the upper left and nothing else on the surface.
+
+## Gems · cut at Rimeholt · **36 items**
+
+📝 The elemental gems (ENCHANTING_DESIGN §5.1): cut by Jewelry from a stone
+and a Crystal, Core or Heart, never dropped, filed under
+`assets/items/gems/` (`ItemCatalogue.byWorkshop`).
+
+**Palette:** each element's crystal colour, clear and gem-bright; the cut —
+not the colour — says the tier
+
+> ⭐ **The tier is the cut**: a Lesser gem is a small smooth cabochon dome, a
+> Standard gem a step-cut rectangle, a Greater gem a many-faceted round
+> brilliant. Loose stones only — no setting, no ring, no claws.
+
+**Lesser Aqua Gem** — *uncommon · gem · Aqua · +2 shield strength*
+`assets/items/gems/gem_aqua_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of deep sea green-blue; a slow swirl of paler water turning
+> inside it, faint.
+
+**Standard Aqua Gem** — *rare · gem · Aqua · +4 shield strength*
+`assets/items/gems/gem_aqua_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of deep sea green-blue; a slow swirl of paler water
+> turning inside it.
+
+**Greater Aqua Gem** — *epic · gem · Aqua · +7 shield strength*
+`assets/items/gems/gem_aqua_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of deep sea green-blue; a slow swirl of paler
+> water turning inside it, plainly visible.
+
+**Lesser Pyro Gem** — *uncommon · gem · Pyro · +2 crit damage*
+`assets/items/gems/gem_pyro_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of deep orange-red; a steady ember glow from somewhere inside,
+> faint.
+
+**Standard Pyro Gem** — *rare · gem · Pyro · +4 crit damage*
+`assets/items/gems/gem_pyro_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of deep orange-red; a steady ember glow from somewhere
+> inside.
+
+**Greater Pyro Gem** — *epic · gem · Pyro · +7 crit damage*
+`assets/items/gems/gem_pyro_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of deep orange-red; a steady ember glow from
+> somewhere inside, plainly visible.
+
+**Lesser Flora Gem** — *uncommon · gem · Flora · +2 healing received*
+`assets/items/gems/gem_flora_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of leaf green clouded with amber sap; one slow pale-green pulse
+> at its middle, faint.
+
+**Standard Flora Gem** — *rare · gem · Flora · +4 healing received*
+`assets/items/gems/gem_flora_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of leaf green clouded with amber sap; one slow
+> pale-green pulse at its middle.
+
+**Greater Flora Gem** — *epic · gem · Flora · +7 healing received*
+`assets/items/gems/gem_flora_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of leaf green clouded with amber sap; one slow
+> pale-green pulse at its middle, plainly visible.
+
+**Lesser Electro Gem** — *uncommon · gem · Electro · +2 crit chance*
+`assets/items/gems/gem_electro_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of pale violet-white; a single hairline of white light running
+> through it, faint.
+
+**Standard Electro Gem** — *rare · gem · Electro · +4 crit chance*
+`assets/items/gems/gem_electro_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of pale violet-white; a single hairline of white light
+> running through it.
+
+**Greater Electro Gem** — *epic · gem · Electro · +7 crit chance*
+`assets/items/gems/gem_electro_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of pale violet-white; a single hairline of white
+> light running through it, plainly visible.
+
+**Lesser Aero Gem** — *uncommon · gem · Aero · +2 dodge*
+`assets/items/gems/gem_aero_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of near-colourless sky-white; a few pale motes drifting inside it
+> as if in a draught, faint.
+
+**Standard Aero Gem** — *rare · gem · Aero · +4 dodge*
+`assets/items/gems/gem_aero_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of near-colourless sky-white; a few pale motes
+> drifting inside it as if in a draught.
+
+**Greater Aero Gem** — *epic · gem · Aero · +7 dodge*
+`assets/items/gems/gem_aero_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of near-colourless sky-white; a few pale motes
+> drifting inside it as if in a draught, plainly visible.
+
+**Lesser Geo Gem** — *uncommon · gem · Geo · +2 deflect*
+`assets/items/gems/gem_geo_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of dull red-brown jasper; fine grey strata lines and a matte,
+> heavy finish, faint.
+
+**Standard Geo Gem** — *rare · gem · Geo · +4 deflect*
+`assets/items/gems/gem_geo_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of dull red-brown jasper; fine grey strata lines and a
+> matte, heavy finish.
+
+**Greater Geo Gem** — *epic · gem · Geo · +7 deflect*
+`assets/items/gems/gem_geo_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of dull red-brown jasper; fine grey strata lines
+> and a matte, heavy finish, plainly visible.
+
+**Lesser Solar Gem** — *uncommon · gem · Solar · +2 accuracy*
+`assets/items/gems/gem_solar_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of bright gold-white; a hot white point at its centre, faint.
+
+**Standard Solar Gem** — *rare · gem · Solar · +4 accuracy*
+`assets/items/gems/gem_solar_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of bright gold-white; a hot white point at its centre.
+
+**Greater Solar Gem** — *epic · gem · Solar · +7 accuracy*
+`assets/items/gems/gem_solar_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of bright gold-white; a hot white point at its
+> centre, plainly visible.
+
+**Lesser Lunar Gem** — *uncommon · gem · Lunar · +2 dodge*
+`assets/items/gems/gem_lunar_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of silver-grey with blue shadows; a soft crescent of light that
+> sits on the side away from the viewer, faint.
+
+**Standard Lunar Gem** — *rare · gem · Lunar · +4 dodge*
+`assets/items/gems/gem_lunar_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of silver-grey with blue shadows; a soft crescent of
+> light that sits on the side away from the viewer.
+
+**Greater Lunar Gem** — *epic · gem · Lunar · +7 dodge*
+`assets/items/gems/gem_lunar_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of silver-grey with blue shadows; a soft crescent
+> of light that sits on the side away from the viewer, plainly visible.
+
+**Lesser Astral Gem** — *uncommon · gem · Astral · +2 crit chance*
+`assets/items/gems/gem_astral_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of indigo-black; a scatter of fine white star points deep inside,
+> faint.
+
+**Standard Astral Gem** — *rare · gem · Astral · +4 crit chance*
+`assets/items/gems/gem_astral_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of indigo-black; a scatter of fine white star points
+> deep inside.
+
+**Greater Astral Gem** — *epic · gem · Astral · +7 crit chance*
+`assets/items/gems/gem_astral_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of indigo-black; a scatter of fine white star
+> points deep inside, plainly visible.
+
+**Lesser Sanctus Gem** — *uncommon · gem · Sanctus · +2 shield strength + healing received*
+`assets/items/gems/gem_sanctus_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of warm ivory-gold; a soft even glow with no single bright point,
+> faint.
+
+**Standard Sanctus Gem** — *rare · gem · Sanctus · +4 shield strength + healing received*
+`assets/items/gems/gem_sanctus_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of warm ivory-gold; a soft even glow with no single
+> bright point.
+
+**Greater Sanctus Gem** — *epic · gem · Sanctus · +7 shield strength + healing received*
+`assets/items/gems/gem_sanctus_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of warm ivory-gold; a soft even glow with no
+> single bright point, plainly visible.
+
+**Lesser Umbra Gem** — *uncommon · gem · Umbra · +2 crit damage*
+`assets/items/gems/gem_umbra_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of violet-black; a darker core that seems to swallow the light
+> around it, faint.
+
+**Standard Umbra Gem** — *rare · gem · Umbra · +4 crit damage*
+`assets/items/gems/gem_umbra_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of violet-black; a darker core that seems to swallow
+> the light around it.
+
+**Greater Umbra Gem** — *epic · gem · Umbra · +7 crit damage*
+`assets/items/gems/gem_umbra_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of violet-black; a darker core that seems to
+> swallow the light around it, plainly visible.
+
+**Lesser Arcane Gem** — *uncommon · gem · Arcane · +2 deflect*
+`assets/items/gems/gem_arcane_lesser.png`
+> A small smooth cabochon the size of a fingernail, one rounded dome with a
+> flat back, of teal-violet; geometric sigil lines just under the surface,
+> faint.
+
+**Standard Arcane Gem** — *rare · gem · Arcane · +4 deflect*
+`assets/items/gems/gem_arcane_standard.png`
+> A step-cut rectangular gem the size of a thumbnail, crisp stepped facets
+> along its long sides, of teal-violet; geometric sigil lines just under the
+> surface.
+
+**Greater Arcane Gem** — *epic · gem · Arcane · +7 deflect*
+`assets/items/gems/gem_arcane_greater.png`
+> A round brilliant-cut gem the size of a walnut, dozens of sharp facets
+> throwing small highlights, of teal-violet; geometric sigil lines just under
+> the surface, plainly visible.
+
+## ✅ Written — all 325 items
 
 Every item in `ItemCatalogue` has an icon description here. The **Primal
 quarter (52)**, the **Kinetic quarter (58)**, the **Celestial quarter (76)**
-and the **Ethereal quarter plus The Eclipsed Citadel (79)** are all written.
+and the **Ethereal quarter plus The Eclipsed Citadel (79)** are all written,
+and so (2026-10-01, the enchanting build) are the **60 made-not-found defs**:
+24 Core and Heart motes and 36 gems, filed under `assets/items/refined/` and
+`assets/items/gems/` because no zone yields them.
 
 📝 **The Celestial and Ethereal icon lines came out of the contracts, not out
 of this file.** Each zone lane wrote its items' icon briefs into
@@ -2534,6 +2958,7 @@ alone there.
 | Celestial 30–47 | 7 | 76 | ✅ | ⬜ |
 | Ethereal 45–58 | 7 | 72 | ✅ | ⬜ |
 | The Eclipsed Citadel 58–60 | 1 | 7 | ✅ | ⬜ |
+| Made, never found (refined motes, gems) | — | 60 | ✅ | ⬜ |
 
 ⚠️ **No icon PNG exists for any zone yet**, and `assets/items/<zone>/` is
 declared in pubspec only for the zones that have one. Every inventory tile in
@@ -2548,7 +2973,9 @@ generated first.
 
 📝 The count in each zone heading above must equal that zone's list in
 `lib/game/items/catalogue/`. `test/item_icon_test.dart` asserts the catalogue
-total is **265**, so an item added without an entry here fails the suite with
+total is **325**, so an item added without an entry here fails the suite with
 a pointer to this file. ⚠️ Add the entry in the zone's own section, under the
 heading its kind belongs to, and give it a `assets/items/<zone>/<id>.png`
-line — the path, not the name, is what ties the description to the item.
+line — the path, not the name, is what ties the description to the item. A
+def no zone yields goes under its `ItemCatalogue.byWorkshop` key instead
+(`assets/items/refined/…`, `assets/items/gems/…`).

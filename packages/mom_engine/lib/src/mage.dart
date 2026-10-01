@@ -173,6 +173,17 @@ class MageState {
   /// every other gear stat lives here too.
   int consumablePotencyPercent = 0;
 
+  /// The elements this mage's gear procs on a damaging hit (ENCHANTING_DESIGN
+  /// §4.1a) — one [ElementTuning.gearProcPercent] roll per element, after
+  /// the cast's own element effect.
+  ///
+  /// ⭐ **Plain data, and a set**: the app fills it from the worn kit's
+  /// Greater enchants, already deduplicated, so two Greater Pyro pieces are
+  /// one roll. ⚠️ **Empty draws nothing** — the engine never touches the
+  /// shared rng for a mage with no procs, which is what keeps every seeded
+  /// duel written before gear procs byte-identical.
+  Set<MagicElement> gearProcs = {};
+
   /// Reduces an attacker's hit chance against this mage. Percent points.
   int dodge = 0;
 

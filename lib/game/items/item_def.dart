@@ -200,6 +200,20 @@ class ItemModifiers {
   /// two multiply (see `applyPotency` in the engine).
   final int consumablePotencyPercent;
 
+  /// ⭐ **Gear procs** (ENCHANTING_DESIGN §4.1a, ruled 2026-10-01): the
+  /// elements whose status a damaging hit by the wearer rolls for at
+  /// `ElementTuning.gearProcPercent`. Granted by a Greater enchant.
+  ///
+  /// ⭐ **A set, and it sums as a union** — two Greater Pyro pieces are ONE
+  /// Ignite roll, a Pyro and an Electro are two (§4.1a "never stacking across
+  /// pieces"). Mirrors `MageState.gearProcs` by name, like every field here.
+  ///
+  /// ⚠️ **On the modifiers so it crosses the wire.** PvP builds the opponent
+  /// from the handshake's [toJson]; a proc carried anywhere else would be a
+  /// roll one client makes and the other does not — a desync, not a cosmetic
+  /// loss. Never scaled by quality: a proc is a fact, not a magnitude.
+  final Set<MagicElement> gearProcs;
+
   const ItemModifiers({
     this.accuracyBonus = 0,
     this.dodge = 0,
@@ -215,6 +229,7 @@ class ItemModifiers {
     this.regrowPercent = 0,
     this.beltSlots = 0,
     this.consumablePotencyPercent = 0,
+    this.gearProcs = const <MagicElement>{},
   });
 
   static const none = ItemModifiers();
@@ -236,6 +251,38 @@ class ItemModifiers {
     beltSlots: beltSlots + o.beltSlots,
     consumablePotencyPercent:
         consumablePotencyPercent + o.consumablePotencyPercent,
+    // ⚠️ A union, never a concatenation — see [gearProcs].
+    gearProcs: o.gearProcs.isEmpty
+        ? gearProcs
+        : gearProcs.isEmpty
+        ? o.gearProcs
+        : {...gearProcs, ...o.gearProcs},
+  );
+
+  /// Every numeric field halved, rounding DOWN — the second and later copies
+  /// of one gem on one piece (ENCHANTING_DESIGN §5.1, ITEMS §6d.3 fix 2).
+  ///
+  /// ⚠️ `>> 1` is a true floor for negatives too (−3 → −2), where `~/ 2`
+  /// would truncate toward zero (−3 → −1) and quietly make a repeated
+  /// stat-LOWERING gem cost less than half. No gem lowers a stat today; the
+  /// day one does, this is already right. [gearProcs] pass through — a proc
+  /// has no half.
+  ItemModifiers halved() => ItemModifiers(
+    accuracyBonus: accuracyBonus >> 1,
+    dodge: dodge >> 1,
+    critChance: critChance >> 1,
+    critDamage: critDamage >> 1,
+    deflectChance: deflectChance >> 1,
+    deflectAmount: deflectAmount >> 1,
+    maxHpBonus: maxHpBonus >> 1,
+    damagePerCast: damagePerCast >> 1,
+    damagePerCharge: damagePerCharge >> 1,
+    shieldStrengthPercent: shieldStrengthPercent >> 1,
+    healingReceivedPercent: healingReceivedPercent >> 1,
+    regrowPercent: regrowPercent >> 1,
+    beltSlots: beltSlots >> 1,
+    consumablePotencyPercent: consumablePotencyPercent >> 1,
+    gearProcs: gearProcs,
   );
 
   /// This item's stats **as the quality roll made them** (ruling 2026-08-18):
@@ -284,6 +331,8 @@ class ItemModifiers {
       // ⚠️ Not scaled. See the doc above — this is the ruling, not an omission.
       beltSlots: beltSlots,
       consumablePotencyPercent: s(consumablePotencyPercent),
+      // ⚠️ Not scaled either: a Master staff does not Ignite more often.
+      gearProcs: gearProcs,
     );
   }
 
@@ -316,6 +365,13 @@ class ItemModifiers {
     if (beltSlots != 0) 'beltSlots': beltSlots,
     if (consumablePotencyPercent != 0)
       'consumablePotencyPercent': consumablePotencyPercent,
+    // ⭐ Element-enum order, so the encoding is deterministic whatever order
+    // the set was built in.
+    if (gearProcs.isNotEmpty)
+      'gearProcs': [
+        for (final e in MagicElement.values)
+          if (gearProcs.contains(e)) e.name,
+      ],
   };
 
   /// Reads [toJson]'s output back. ⭐ **Missing key → 0, null map → [none]** —
@@ -341,6 +397,13 @@ class ItemModifiers {
       regrowPercent: read('regrowPercent'),
       beltSlots: read('beltSlots'),
       consumablePotencyPercent: read('consumablePotencyPercent'),
+      // ⚠️ An unknown name (a newer client's element) is dropped, never
+      // thrown on — the same leniency as a missing key.
+      gearProcs: {
+        for (final name in (json['gearProcs'] as List?) ?? const [])
+          for (final e in MagicElement.values)
+            if (e.name == name) e,
+      },
     );
   }
 
@@ -358,7 +421,8 @@ class ItemModifiers {
       healingReceivedPercent == 0 &&
       regrowPercent == 0 &&
       beltSlots == 0 &&
-      consumablePotencyPercent == 0;
+      consumablePotencyPercent == 0 &&
+      gearProcs.isEmpty;
 }
 
 // ---- the sealed root ---------------------------------------------------

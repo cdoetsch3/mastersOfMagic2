@@ -9,6 +9,7 @@ library;
 import 'package:flutter/foundation.dart';
 import 'package:mom_engine/mom_engine.dart';
 
+import 'enchants.dart';
 import 'item_def.dart';
 
 /// A non-fungible item — one that carries rolls of its own.
@@ -31,16 +32,34 @@ class ItemInstance {
   /// instance — reads as Standard.
   final Quality? quality;
 
-  /// The element prefix a drop carries (ITEMS §9b.5b). 📝 Not rolled by
-  /// anything yet; independent of [quality].
+  /// The element prefix a piece carries (ITEMS §9b.5b), independent of
+  /// [quality].
+  ///
+  /// ⭐ Two ways in: a rare-or-better **drop** rolls one at mint
+  /// (`aspectedDropPercent` in `loot.dart`, ENCHANTING §4.4), and an
+  /// **enchant** sets it to its own element ([withEnchant]). With no
+  /// [enchantId] an aspect grants its element's **Lesser** affinity — the
+  /// "pre-enchanted sidegrade, weaker" (§4.4), resolved in
+  /// `Equipping.modifiersOf`.
   final MagicElement? aspect;
 
-  /// Gem def ids, positionally. Length must not exceed the def's socketCount.
+  /// Gem def ids, positionally — index `i` is socket `i`. Length must not
+  /// exceed the def's socketCount.
+  ///
+  /// ⚠️ **An empty socket BEFORE a filled one is [emptySocket] (`''`)**, so a
+  /// gem keeps its index when the one beside it comes out ([withoutSocket]).
+  /// Trailing empties are trimmed, so an all-empty piece is `[]` and writes no
+  /// key at all — exactly the shape every save before sockets already has.
   final List<String> socketed;
 
-  /// The enchant applied, if any. ⭐ Includes the unbinding enchant, which is
-  /// how an Untradeable item becomes Tradeable (ITEMS §6c).
+  /// The enchant applied, if any — an `Enchants` id (`pyro_standard`).
+  /// ⭐ Includes the unbinding enchant, which is how an Untradeable item
+  /// becomes Tradeable (ITEMS §6c; reserved as `unbind`, ENCHANTING §4.5).
   final String? enchantId;
+
+  /// What [socketed] holds for an empty socket that has a filled one after
+  /// it. ⚠️ Never a def id, so it can never resolve to a gem.
+  static const String emptySocket = '';
 
   const ItemInstance({
     required this.instanceId,
@@ -50,6 +69,78 @@ class ItemInstance {
     this.socketed = const [],
     this.enchantId,
   });
+
+  /// This piece with [enchantId] applied (ENCHANTING §4.1): ⭐ sets the
+  /// enchant AND the [aspect] to the enchant's element, so the piece is named
+  /// by its prefix (*Charred Oak Staff*) from the shipped grammar.
+  ///
+  /// ⭐ **Replaces** whatever was there — an older enchant, or a drop's own
+  /// aspect (§4.3, §4.4: "the enchant replaces the aspect"). Cost and level
+  /// gates are the caller's (lane 3's item-dialog action); this is the fact,
+  /// not the transaction.
+  ///
+  /// ⚠️ Throws on an id the enchant table does not hold: an enchant whose
+  /// element is unknown has no aspect to set, and minting a piece that
+  /// half-applies one is a save nobody can explain later.
+  ItemInstance withEnchant(String enchantId) {
+    final enchant = Enchants.tryById(enchantId);
+    if (enchant == null) {
+      throw ArgumentError.value(enchantId, 'enchantId', 'no such enchant');
+    }
+    return ItemInstance(
+      instanceId: instanceId,
+      defId: defId,
+      quality: quality,
+      aspect: enchant.element,
+      socketed: socketed,
+      enchantId: enchant.id,
+    );
+  }
+
+  /// This piece with [gemId] seated in socket [index] (ENCHANTING §5.2),
+  /// replacing whatever was there. Sockets before [index] that do not exist
+  /// yet are padded with [emptySocket].
+  ///
+  /// ⚠️ **Does not check the def's socketCount or that [gemId] is a gem** —
+  /// an instance does not know its catalogue. The Socket… action (lane 3)
+  /// validates; `Equipping.modifiersOf` ignores anything past socketCount
+  /// and anything that does not resolve to a `GemDef`, so a bad write can
+  /// never grant a stat.
+  ItemInstance withSocket(int index, String gemId) {
+    RangeError.checkNotNegative(index, 'index');
+    final next = [...socketed];
+    while (next.length <= index) {
+      next.add(emptySocket);
+    }
+    next[index] = gemId;
+    return _withSockets(next);
+  }
+
+  /// This piece with socket [index] emptied (ENCHANTING §5.2 — the gem
+  /// survives; giving it back is the caller's job). Other gems keep their
+  /// indices. An index that is already empty, or past the end, is a no-op.
+  ItemInstance withoutSocket(int index) {
+    RangeError.checkNotNegative(index, 'index');
+    if (index >= socketed.length) return this;
+    final next = [...socketed];
+    next[index] = emptySocket;
+    return _withSockets(next);
+  }
+
+  /// ⚠️ Trims trailing empties — see [socketed].
+  ItemInstance _withSockets(List<String> sockets) {
+    while (sockets.isNotEmpty && sockets.last == emptySocket) {
+      sockets.removeLast();
+    }
+    return ItemInstance(
+      instanceId: instanceId,
+      defId: defId,
+      quality: quality,
+      aspect: aspect,
+      socketed: List.unmodifiable(sockets),
+      enchantId: enchantId,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'instanceId': instanceId,

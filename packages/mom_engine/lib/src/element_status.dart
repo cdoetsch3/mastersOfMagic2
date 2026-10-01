@@ -107,17 +107,35 @@ class PhotosynthesisStatus extends TurnStatus {
       holder.streakElement == MagicElement.flora &&
       holder.streakCount >= streakThreshold;
 
+  /// ⭐ **The gear proc's unit** (ENCHANTING_DESIGN §4.1a "+1 Photosynthesis
+  /// stack on you"): one turn's [healPercent] heal granted by a Greater Flora
+  /// enchant, owed at THIS turn's end and cleared by its bookkeeping.
+  ///
+  /// ⚠️ Photosynthesis has had no stacks since the 2026-07-26 streak rework,
+  /// so "a stack" maps to its base unit — one turn of the heal — and ⚠️ it
+  /// ADDS to a streak-sustained heal rather than replacing it, which is what
+  /// "+1" meant against the old stacking design. Set, never incremented: one
+  /// proc per hit and one hit a turn makes 1 the most a turn can owe.
+  ///
+  /// 📝 While it is owed the holder holds Photosynthesis — so it blocks
+  /// Waterlogged and Ignite strips it, the §5.2 web unchanged.
+  int gearUnits = 0;
+
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) {
-    if (phase != TurnPhase.end || !activeFor(holder)) return const [];
-    final heal = (holder.maxHp * healPercent / 100).round();
+    final units = (activeFor(holder) ? 1 : 0) + gearUnits;
+    if (phase != TurnPhase.end || units == 0) return const [];
+    final heal = units * (holder.maxHp * healPercent / 100).round();
     return heal > 0
         ? [StatusHeal(heal, lane: Lane.heal, source: 'Photosynthesis')]
         : const [];
   }
 
   @override
-  bool advanceAndCheckExpiry(MageState holder) => !activeFor(holder);
+  bool advanceAndCheckExpiry(MageState holder) {
+    gearUnits = 0;
+    return !activeFor(holder);
+  }
 }
 
 /// **Blind** (Solar in the V2 roster). The holder's harmful spells have a 50%
@@ -128,8 +146,13 @@ class PhotosynthesisStatus extends TurnStatus {
 /// (the engine reads its presence — TYPE_EFFECTS §4b.3).
 class BlindStatus extends TurnStatus implements Blinding, TurnTimed {
   @override
-  int turnsLeft = 3;
+  int turnsLeft;
   bool _justApplied = true;
+
+  /// A Blind of [turns] miss-turns. ⭐ The default is the spell path's
+  /// [ElementTuning.blindTurns]; a Greater Solar or Lunar enchant's gear proc
+  /// passes 1 (ENCHANTING_DESIGN §4.1a "Blind, 1 turn").
+  BlindStatus({int turns = ElementTuning.blindTurns}) : turnsLeft = turns;
 
   @override
   StatusPolarity get polarity => StatusPolarity.debuff;
@@ -200,12 +223,21 @@ class CreepingDarkStatus extends TurnStatus {
   @override
   String get id => 'creepingDark';
 
+  /// ⭐ Set by a Greater Umbra enchant's gear proc (ENCHANTING_DESIGN §4.1a):
+  /// skip THIS turn's decay once. ⚠️ Without it a stack granted on a
+  /// non-Umbra turn decays at that same turn's end and the proc would add
+  /// nothing anyone could ever see. Cleared by the bookkeeping that honours
+  /// it; the spell path never sets it.
+  bool holdDecay = false;
+
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) => const [];
 
   @override
   bool advanceAndCheckExpiry(MageState holder) {
-    if (holder.activeElementThisTurn != MagicElement.umbra) {
+    if (holdDecay) {
+      holdDecay = false;
+    } else if (holder.activeElementThisTurn != MagicElement.umbra) {
       stacks--;
     }
     return stacks <= 0;
@@ -287,12 +319,23 @@ class AstralAlignmentStatus extends TurnStatus {
   @override
   String get id => 'astralAlignment';
 
+  /// ⭐ Set by a Greater Astral enchant's gear proc — ENCHANTING_DESIGN §4.1a
+  /// promises the Alignment "on your NEXT cast", so the granted stack must
+  /// survive this turn's decay once. ⚠️ Without it a non-Astral wearer's
+  /// stack is gone at the end of the turn it landed, before any cast could
+  /// pierce with it. Cleared by the bookkeeping that honours it.
+  bool holdDecay = false;
+
   @override
   List<StatusOp> operationsFor(TurnPhase phase, MageState holder) => const [];
 
   @override
   bool advanceAndCheckExpiry(MageState holder) {
-    if (holder.activeElementThisTurn != MagicElement.astral) stacks--;
+    if (holdDecay) {
+      holdDecay = false;
+    } else if (holder.activeElementThisTurn != MagicElement.astral) {
+      stacks--;
+    }
     return stacks <= 0;
   }
 }

@@ -307,21 +307,45 @@ the framework both live under.
         });
 
       buf.writeln('### ${loc.name} (`${loc.id}`) — ${sorted.length} items\n');
+      _itemRows(buf, sorted);
+    }
+    // ⭐ Then the made-not-found defs (`ItemCatalogue.byWorkshop`, 2026-10-01
+    // — the Core/Heart motes and the gems), in their own sections so the
+    // per-section counts still sum to the whole catalogue. ⚠️ Catalogue
+    // order, not level order: these are a table (element × tier), and the
+    // table reads best the way it was written.
+    for (final e in ItemCatalogue.byWorkshop.entries) {
       buf.writeln(
-        '| Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |',
+        '### Made, never found (`${e.key}`) — ${e.value.length} items\n',
       );
-      buf.writeln('|---|---|---|---|---|---|---|---|');
-      for (final d in sorted) {
-        final slot = d is EquipmentDef ? d.slot.name : '';
-        buf.writeln(
-          '| `${d.id}` | ${ItemCatalogue.displayName(d)} | ${_kindOf(d)} '
-          '| $slot | ${d.rarity.name} | ${d.equipLevel} '
-          '| ${_compactStats(d)} | ${_obtainedBy(d.id)} |',
-        );
-      }
-      buf.writeln();
+      _itemRows(buf, e.value, madeNotFound: true);
     }
     return buf.toString();
+  }
+
+  static void _itemRows(
+    StringBuffer buf,
+    List<ItemDef> items, {
+    bool madeNotFound = false,
+  }) {
+    buf.writeln(
+      '| Id | Name | Kind | Slot | Rarity | Equip Lv | Stats | Obtained |',
+    );
+    buf.writeln('|---|---|---|---|---|---|---|---|');
+    for (final d in items) {
+      final slot = d is EquipmentDef ? d.slot.name : '';
+      var obtained = _obtainedBy(d.id);
+      // ⚠️ `drop` is [_obtainedBy]'s fallback, and for a def no zone yields
+      // it would be a lie: these come from recipes (ENCHANTING §8 lane 2),
+      // and until those land nothing makes them.
+      if (madeNotFound && obtained == 'drop') obtained = 'no recipe yet';
+      buf.writeln(
+        '| `${d.id}` | ${ItemCatalogue.displayName(d)} | ${_kindOf(d)} '
+        '| $slot | ${d.rarity.name} | ${d.equipLevel} '
+        '| ${_compactStats(d)} | $obtained |',
+      );
+    }
+    buf.writeln();
   }
 
   // ---- bestiary by zone ---------------------------------------------------

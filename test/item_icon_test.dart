@@ -291,31 +291,69 @@ void main() {
       );
     });
 
-    test('every item in the catalogue knows which zone defines it', () {
+    test('every item in the catalogue knows which folder defines it', () {
       // ⭐ The claim that makes the whole convention safe: an item resolvable
-      // by id but owned by no zone is an icon that can never load, and the
-      // only symptom is a picture that never appears.
+      // by id but owned by no zone (or workshop) is an icon that can never
+      // load, and the only symptom is a picture that never appears.
+      // 📝 2026-10-01: "zone" became "home" — the Core/Heart motes and the
+      // gems are made, never found, and live under ItemCatalogue.byWorkshop.
       for (final def in ItemCatalogue.all) {
         expect(
-          ItemCatalogue.zoneOf(def.id),
+          ItemCatalogue.homeOf(def.id),
           isNotNull,
           reason:
-              '${def.id} is in ItemCatalogue.all but in no zone list — '
-              'add its catalogue to ItemCatalogue.byZone',
+              '${def.id} is in ItemCatalogue.all but in no zone or workshop '
+              'list — add its catalogue to ItemCatalogue.byZone or byWorkshop',
         );
       }
       expect(
         ItemCatalogue.all.length,
-        265,
+        325,
         reason:
             'Primal 52 + Kinetic 58 + Celestial 76 + Ethereal 72 + The '
-            'Eclipsed Citadel 7 (CELESTIAL_CONTRACT §7.1, ETHEREAL §7.1). '
+            'Eclipsed Citadel 7 (CELESTIAL_CONTRACT §7.1, ETHEREAL §7.1), '
+            'and since 2026-10-01 (the enchanting build, ENCHANTING_DESIGN '
+            '§3.1/§5.1) 24 Core/Heart motes + 36 gems = 325. '
             'If this number moved, docs/ITEM_ART.md is now short an entry '
             '(or carries a stale one) and nothing else in the suite would '
             'say so — every id in the catalogue has an '
-            '`assets/items/<zone>/<id>.png` line in that file and the two '
+            '`assets/items/<home>/<id>.png` line in that file and the two '
             'counts are meant to stay equal',
       );
+    });
+
+    test('⚠️ a workshop is never a zone, and never a place', () {
+      // ⭐ byWorkshop exists so zoneOf keeps meaning GEOGRAPHY — shop
+      // sourcing, rank gear and native pricing read it. A workshop key that
+      // collided with a location would make a Core "native" to somewhere.
+      final places = World.locations.map((l) => l.id).toSet();
+      for (final key in ItemCatalogue.byWorkshop.keys) {
+        expect(
+          places,
+          isNot(contains(key)),
+          reason:
+              '"$key" names a real World location — a workshop must not, or '
+              'its defs would read as that place\'s',
+        );
+      }
+      for (final defs in ItemCatalogue.byWorkshop.values) {
+        for (final def in defs) {
+          expect(
+            ItemCatalogue.zoneOf(def.id),
+            isNull,
+            reason:
+                '${def.id} is made, never found — the mutant this kills is a '
+                'workshop folded into byZone, which hands it a zone',
+          );
+          expect(
+            itemIconFor(def.id),
+            'assets/items/${ItemCatalogue.homeOf(def.id)}/${def.id}.png',
+            reason:
+                'itemIconFor must read homeOf, not zoneOf — otherwise every '
+                'gem and Core asks for no path at all and never gets art',
+          );
+        }
+      }
     });
 
     test('⚠️ every item in the catalogue has an icon description', () {
@@ -356,11 +394,11 @@ void main() {
       );
       for (final m in described) {
         expect(
-          ItemCatalogue.zoneOf(m.group(2)!),
+          ItemCatalogue.homeOf(m.group(2)!),
           m.group(1),
           reason:
               '${m.group(2)} is filed under ${m.group(1)} in ITEM_ART.md but '
-              'the catalogue defines it in ${ItemCatalogue.zoneOf(m.group(2)!)}'
+              'the catalogue defines it in ${ItemCatalogue.homeOf(m.group(2)!)}'
               ' — the generator would write the PNG into a directory '
               'itemIconFor never asks about',
         );
@@ -396,12 +434,12 @@ void main() {
       final zone =
           zoneDir.uri.pathSegments[zoneDir.uri.pathSegments.length - 2];
       expect(
-        ItemCatalogue.byZone.keys,
+        {...ItemCatalogue.byZone.keys, ...ItemCatalogue.byWorkshop.keys},
         contains(zone),
         reason:
             'assets/items/$zone/ is a folder for nowhere — itemIconFor '
-            'can only ever ask under a zone in byZone, so nothing in it will '
-            'ever load',
+            'can only ever ask under a byZone or byWorkshop key, so nothing '
+            'in it will ever load',
       );
       final stems = zoneDir
           .listSync()
@@ -418,11 +456,11 @@ void main() {
               'only ever ask for a def id, so nothing will ever load it',
         );
         expect(
-          ItemCatalogue.zoneOf(stem),
+          ItemCatalogue.homeOf(stem),
           zone,
           reason:
               '$stem.png is filed under $zone but the catalogue defines '
-              'it in ${ItemCatalogue.zoneOf(stem)} — the game will look in '
+              'it in ${ItemCatalogue.homeOf(stem)} — the game will look in '
               'the other folder and find nothing',
         );
       }

@@ -8,9 +8,12 @@ library;
 
 import 'dart:math';
 
+import 'package:mom_engine/mom_engine.dart';
+
 import '../items/item_catalogue.dart';
 import '../items/item_def.dart';
 import '../items/item_instance.dart';
+import '../world.dart';
 import 'drop_table.dart';
 import 'enemy_def.dart';
 
@@ -78,8 +81,13 @@ class Loot {
 /// one shared stream. Pass a seeded `Random` only to pin a test; a caller that
 /// hands over a fresh `Random()` per kill re-creates exactly the per-kill
 /// construction [lootRng] exists to retire.
-Loot rollDrops(DropTable table, [Random? rng]) {
-  rng ??= lootRng;
+///
+/// 📝 No zone, so no aspect roll (ENCHANTING §4.4) — [rollKill] is the call
+/// that knows where the kill happened, and the one production uses.
+Loot rollDrops(DropTable table, [Random? rng]) =>
+    _rollDrops(table, rng ?? lootRng, zoneId: null);
+
+Loot _rollDrops(DropTable table, Random rng, {required String? zoneId}) {
   final ids = <String>[];
 
   for (final e in table.always) {
@@ -107,7 +115,7 @@ Loot rollDrops(DropTable table, [Random? rng]) {
     if (rng.nextDouble() < e.chance) ids.addAll(_expand(e, rng));
   }
 
-  return _materialise(ids, rng);
+  return _materialise(ids, rng, zoneId: zoneId);
 }
 
 /// Rolls one KILL: [table]'s own drops, then the consolation item if they
@@ -145,13 +153,17 @@ Loot rollKill(
   Random? rng,
 }) {
   rng ??= lootRng;
-  var base = rollDrops(table, rng);
+  // ⭐ [zoneId] reaches the minting too (ENCHANTING §4.4): a rare-or-better
+  // piece dropped here may carry this zone's lead element as its aspect.
+  var base = _rollDrops(table, rng, zoneId: zoneId);
   if (base.isEmpty) {
     final consolation = consolationOf(table);
     // ⭐ Every consolation is fungible by content (a craftable, or Mirage's
     // Dust), so materialising it draws nothing from [rng]: the rank-gear roll
     // below sees the same numbers whether or not the consolation paid.
-    if (consolation != null) base = _materialise([consolation], rng);
+    if (consolation != null) {
+      base = _materialise([consolation], rng, zoneId: zoneId);
+    }
   }
   final gear = rollRankGear(
     rank,
@@ -160,7 +172,7 @@ Loot rollKill(
     excluding: {for (final s in base.slots) s.defId},
   );
   if (gear == null) return base;
-  final extra = _materialise([gear], rng);
+  final extra = _materialise([gear], rng, zoneId: zoneId);
   return Loot(
     [...base.slots, ...extra.slots],
     {...base.instances, ...extra.instances},
@@ -325,7 +337,10 @@ String? _rollRarePlus(String zoneId, Random rng, Set<String> excluding) {
 }
 
 /// Turns rolled ids into slots, minting an instance for every non-fungible.
-Loot _materialise(List<String> ids, Random rng) {
+///
+/// [zoneId] is where the kill happened — null for a bare [rollDrops], which
+/// mints no aspects (see [rollDropAspect]).
+Loot _materialise(List<String> ids, Random rng, {String? zoneId}) {
   final slots = <InventorySlot>[];
   final instances = <String, ItemInstance>{};
   for (final id in ids) {
@@ -337,15 +352,50 @@ Loot _materialise(List<String> ids, Random rng) {
       slots.add(InventorySlot(defId: id));
     } else {
       final instanceId = _mintId(rng);
+      // ⚠️ Quality is drawn BEFORE the aspect, and the aspect last: the id
+      // and the quality a seeded piece mints with are exactly what they were
+      // before aspects existed.
+      final quality = rollDropQuality(rng);
       instances[instanceId] = ItemInstance(
         instanceId: instanceId,
         defId: id,
-        quality: rollDropQuality(rng),
+        quality: quality,
+        aspect: zoneId == null ? null : rollDropAspect(def, zoneId, rng),
       );
       slots.add(InventorySlot(defId: id, instanceId: instanceId));
     }
   }
   return Loot(slots, instances);
+}
+
+/// The chance a rare-or-better equipment drop mints **aspected**
+/// (ENCHANTING_DESIGN §4.4; ruling 8, 2026-10-01, "as recommended").
+///
+/// ⭐ **Christian tunes this, and this is the one place the number lives.**
+const int aspectedDropPercent = 10;
+
+/// The aspect a piece of [def] dropped in [zoneId] mints with, or null.
+///
+/// ⭐ **Rare-or-better [EquipmentDef] only**, and for those the roll is ALWAYS
+/// drawn — so a common, a material or a tool consumes nothing (every seeded
+/// loot test that never dropped a rare is byte-identical), and a rare's draw
+/// does not depend on which zone it fell in. Only the pay-out reads the zone.
+///
+/// ⭐ **The zone's LEAD element** — its first `elements` entry — so a hybrid
+/// zone teaches its first element's prefix. ⚠️ A place with no element (a
+/// town, or an id `World` does not know — `World.byId` would silently answer
+/// with the first location) pays no aspect, after drawing the roll.
+///
+/// 📝 An aspected drop grants its element's Lesser affinity
+/// (`Equipping.enchantOverlay`); an enchant replaces it.
+MagicElement? rollDropAspect(ItemDef def, String zoneId, Random rng) {
+  if (def is! EquipmentDef || def.rarity.index < Rarity.rare.index) {
+    return null;
+  }
+  final hit = rng.nextInt(100) < aspectedDropPercent;
+  if (!hit || !World.exists(zoneId)) return null;
+  final elements = World.byId(zoneId).elements;
+  return elements.isEmpty ? null : elements.first;
 }
 
 /// The quality a DROPPED piece of equipment arrives at (ruling 2026-08-18):

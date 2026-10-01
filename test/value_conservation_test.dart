@@ -557,11 +557,22 @@ void main() {
       // ⭐ Lunar is the seventh family, defined in `the_mirrormere_items.dart`
       // (CELESTIAL_CONTRACT §3.2 — the mote lives with the zone that first
       // yields it). ⚠️ Each Celestial zone that lands adds three more.
-      expect(motes.length, 36, reason: '12 elements × 3 shipped tiers');
+      // 📝 2026-10-01 (the enchanting build, ENCHANTING_DESIGN §3.1): the
+      // ladder got its top — 12 Cores and 12 Hearts, made never found.
+      expect(
+        motes.length,
+        60,
+        reason: '12 elements × 5 tiers: 3 zone-dropped + Core + Heart',
+      );
       const perTier = {
         MoteTier.dust: 2,
         MoteTier.shard: 25,
         MoteTier.crystal: 150,
+        // ⭐ ECONOMY §14c: "Core 900g when it ships".
+        MoteTier.core: 900,
+        // ⚠️ ECONOMY §14c: "Hearts get no value, no vendor path, and Bound
+        // tradability" — the 3,600 in ENCHANTING §3.1 is an open ❓.
+        MoteTier.heart: 0,
       };
       for (final m in motes) {
         expect(
@@ -588,9 +599,28 @@ void main() {
         lessThan(20 * 25),
         reason: 'a Crystal must vendor under its 20-Shard cost',
       );
-      // 📝 When Cores (900g proposed) and Hearts arrive: 900 < 12×150, and
-      // Hearts get NO value at all — craft-only (§6.0) means unvendorable,
-      // untradeable, the one mote-family exception, already ruled.
+      // ⭐ Cores and Hearts arrived 2026-10-01 — read off the defs, not typed.
+      for (final core in ItemCatalogue.all.whereType<MoteDef>().where(
+        (m) => m.tier == MoteTier.core,
+      )) {
+        expect(
+          core.value,
+          lessThan(12 * 150),
+          reason: '${core.id} must vendor under its 12-Crystal cost',
+        );
+      }
+      for (final heart in ItemCatalogue.all.whereType<MoteDef>().where(
+        (m) => m.tier == MoteTier.heart,
+      )) {
+        expect(
+          (heart.value, heart.tradability),
+          (0, Tradability.bound),
+          reason:
+              '${heart.id}: Hearts get NO value and Bound tradability — '
+              'craft-only (§6.0) is load-bearing (ECONOMY §14c); the mutant '
+              'this kills is the 3,600 draft landing without a ruling',
+        );
+      }
     });
 
     test('no town ever stocks a mote — sell-only is structural', () {

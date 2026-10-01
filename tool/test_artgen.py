@@ -46,7 +46,10 @@ ROOT = artgen.ROOT
 # separate numbers rather than one: a missing backdrop brief is invisible in
 # the creature count.
 EXPECTED_CREATURES = 55 + 66 + 77 + 88  # Primal + Kinetic + Celestial + Ethereal
-EXPECTED_ICONS = 52 + 58 + 76 + 79  # same four bands, per ITEM_ART.md
+# Same four bands, per ITEM_ART.md — plus (2026-10-01, the enchanting build)
+# the 60 made-not-found defs filed under `refined` and `gems`, which belong to
+# no zone (`ItemCatalogue.byWorkshop`).
+EXPECTED_ICONS = 52 + 58 + 76 + 79 + 24 + 36
 EXPECTED_BACKDROPS = 5 + 6 + 7 + 8  # same four bands, Citadel in the last
 ICONS_PER_ZONE = {
     "thunderspire_peaks": 9,
@@ -75,6 +78,9 @@ ICONS_PER_ZONE = {
     "the_reliquary_deep": 12,
     "the_unwritten_library": 7,
     "the_eclipsed_citadel": 7,
+    # ⭐ Workshops, not zones: the Core/Heart motes and the gems.
+    "refined": 24,
+    "gems": 36,
 }
 
 # The zones that carry an `### Arena backdrop` entry — all 26, in band order.
