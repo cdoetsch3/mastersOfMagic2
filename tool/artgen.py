@@ -207,8 +207,27 @@ PRICE_USD = {
 # reported once and immediately, because retrying it just wastes the operator's
 # afternoon.
 RETRY_STATUSES = {429, 500, 502, 503, 504}
-MAX_ATTEMPTS = 4
+MAX_ATTEMPTS = 8
 BACKOFF_BASE = 2.0
+BACKOFF_CAP = 60.0
+
+# ⭐ The rate-limit reply says how long to wait ("Please try again in 12s"),
+# and that number beats any backoff of ours: four workers (`--jobs 4`) each
+# retrying on their own 2/4/8s clock walked straight back into the same
+# per-minute window and burned every attempt (2026-10-01, Hallowmarch icons).
+# A 429 now waits the LONGER of the server's hint plus a second and the
+# backoff, and gets eight tries instead of four, so a run throttles itself
+# to the tier's limit rather than dying at it.
+_RETRY_HINT = re.compile(r"try again in\s+(\d+(?:\.\d+)?)\s*(ms|s)\b", re.I)
+
+
+def retry_hint_seconds(raw: bytes) -> float | None:
+    """The wait the API asked for in a 429 body, in seconds, or None."""
+    m = _RETRY_HINT.search(raw.decode("utf-8", "replace"))
+    if not m:
+        return None
+    value, unit = float(m.group(1)), m.group(2).lower()
+    return value / 1000 if unit == "ms" else value
 
 LEDGER_VERSION = 1
 STATUSES = ("pending", "generated", "approved", "rejected")
@@ -957,7 +976,10 @@ class OpenAIGenerator(ImageGenerator):
             if status == 200:
                 return self._decode(raw)
             if status in RETRY_STATUSES and attempt < MAX_ATTEMPTS:
-                wait = BACKOFF_BASE ** attempt
+                wait = min(BACKOFF_CAP, BACKOFF_BASE**attempt)
+                hint = retry_hint_seconds(raw) if status == 429 else None
+                if hint is not None:
+                    wait = max(wait, hint + 1.0)
                 print(
                     f"    HTTP {status} — retrying in {wait:.0f}s "
                     f"({attempt}/{MAX_ATTEMPTS - 1})"

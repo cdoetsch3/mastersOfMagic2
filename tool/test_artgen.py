@@ -552,6 +552,35 @@ class GeneratorTest(unittest.TestCase):
         self.assertEqual(blob, ONE_PIXEL_PNG)
         self.assertEqual(len(t.calls), 3)
 
+    def test_a_rate_limit_waits_as_long_as_the_api_asked(self):
+        # ⚠️ Four workers on a 2/4/8s clock walked back into the same
+        # per-minute window and died (2026-10-01). The hint wins.
+        waits: list[float] = []
+        t = FakeTransport(
+            error_response(429, "Rate limit reached. Please try again in 12s."),
+            ok_response(),
+        )
+        gen = artgen.OpenAIGenerator(
+            FAKE_KEY, transport=t, quality="medium", sleep=waits.append
+        )
+        gen.generate("x", size="1024x1024", transparent=True)
+        self.assertEqual(len(waits), 1)
+        self.assertGreaterEqual(waits[0], 13.0, "kills ignoring the hint")
+
+    def test_the_backoff_is_capped_and_a_5xx_takes_no_hint(self):
+        waits: list[float] = []
+        t = FakeTransport(
+            *[error_response(503, "try again in 12s")] * (artgen.MAX_ATTEMPTS - 1),
+            ok_response(),
+        )
+        gen = artgen.OpenAIGenerator(
+            FAKE_KEY, transport=t, quality="medium", sleep=waits.append
+        )
+        gen.generate("x", size="1024x1024", transparent=True)
+        self.assertEqual(len(waits), artgen.MAX_ATTEMPTS - 1)
+        self.assertEqual(waits[0], 2.0, "a 5xx keeps the plain backoff")
+        self.assertLessEqual(max(waits), artgen.BACKOFF_CAP, "kills an uncapped 2**8")
+
     def test_a_bad_key_fails_once_and_says_nothing_about_the_key(self):
         gen, t = self._gen(error_response(401, f"Incorrect API key provided: {FAKE_KEY}"))
         with self.assertRaises(artgen.GeneratorError) as ctx:
