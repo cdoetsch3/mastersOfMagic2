@@ -389,7 +389,7 @@ abstract final class StarfallBasinBestiary {
         id: 'sb_takebackthelight',
         name: 'Take Back the Light',
         chargeCost: 4,
-        priority: 5,
+        priority: 9,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],

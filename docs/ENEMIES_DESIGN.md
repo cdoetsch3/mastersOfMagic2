@@ -1796,12 +1796,22 @@ charge before it can act, exactly as a mage with only Cataclysm must.
 
 Every creature move sits on one of **1–2** (quickened strikes — the Hexer's
 and Skirmisher's countdowns), **3** (shields), **5** (quick), **7–8**
-(auxiliary) or **9** (the standard attack). Christian's playtest note 6
-("thought I saw one at p4 in Thunderspire") turned up 46 moves at 4 and 5 at
-6 across every zone; all 51 were snapped (4 → 5, 6 → 7) by script, nothing
-else moved, and `test/enemy_priority_ladder_test.dart` pins the ladder
-game-wide. ⚠️ Mage bosses are exempt — their spells carry the Spellbook's
-own priorities.
+(auxiliary) or **9** (the standard attack). ⭐ **An attack goes at 9 unless
+there is a thematic or telegraphed reason for it to go first** (Christian,
+2026-09-30: otherwise a 7 beats the player's Discharge at 8 for no reason).
+Playtest note 6 ("thought I saw one at p4 in Thunderspire") turned up 46
+moves at 4 and 5 at 6 across every zone, every one a damage move: the
+Hexers' one-charge countdown openers (6–9 at 4), the Redoubts' four-charge
+drains (26–34 lifesteal at 4) and five boss heavy hits at 6. Ruling: the 28
+one-charge jabs are the quick band (5) — priority IS the Hexer's signature;
+the 23 three- and four-charge attacks are plain attacks and went to 9. The
+same law then caught ten older moves — the Lashers' four-hit flurries at 5
+and 7 (the player's Flurry and Volley are 9) and the Juggernauts' drains —
+which went to 9 as well; Ashfall's Executioner keeps "Take It Fast" at 5,
+the one named exemption. `test/enemy_priority_ladder_test.dart` pins the
+ladder game-wide and that no heavy attack sits in the quick or auxiliary
+band without its name on the exemption list. ⚠️ Mage bosses are
+exempt — their spells carry the Spellbook's own priorities.
 
 ### 3.2 ⚠️ Archetype ≠ move set
 

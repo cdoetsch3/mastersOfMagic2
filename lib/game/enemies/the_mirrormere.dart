@@ -362,7 +362,7 @@ abstract final class MirrormereBestiary {
         id: 'mm_waxwider',
         name: 'Wax Wider',
         chargeCost: 4,
-        priority: 5,
+        priority: 9,
         effect: DamageEffect(26, 34),
       ),
     ],

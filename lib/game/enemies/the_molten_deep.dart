@@ -356,7 +356,7 @@ abstract final class TheMoltenDeepBestiary {
         id: 'md_reclaim',
         name: 'Reclaim',
         chargeCost: 4,
-        priority: 5,
+        priority: 9,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],

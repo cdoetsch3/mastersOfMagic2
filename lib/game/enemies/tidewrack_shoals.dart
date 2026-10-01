@@ -351,7 +351,7 @@ abstract final class TidewrackShoalsBestiary {
         id: 'tw_swallowwhole',
         name: 'Swallow Whole',
         chargeCost: 4,
-        priority: 5,
+        priority: 9,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],

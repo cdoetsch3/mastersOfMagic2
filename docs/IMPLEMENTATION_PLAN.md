@@ -1223,8 +1223,9 @@ by the rank roll; all 26 tables leaned (nothing halved, motes ×2/3, freed
 weight to the heaviest material; mini crystals 15%, boss dust 3–6). 10.
 Crit base 5% / +100% (`MageState.baseCritChance/baseCritDamage`). 1. Map:
 nine roads out (tier 1 rule + tier 2 hub trims; 38 stay). 9. Rowan tier 3 /
-Yew tier 4 (logs re-tiered, nothing moves). 6. Priorities snapped to the
-ladder: p4→5, p6→7 (51 moves). 12. **Travel chaining** (mockup A): tap any
+Yew tier 4 (logs re-tiered, nothing moves). 6. Priorities: 51 off-ladder moves, all
+attacks — 28 one-charge countdown jabs to 5, 23 heavy attacks to 9 (an
+attack goes at 9 unless thematic/telegraphed). 12. **Travel chaining** (mockup A): tap any
 pin, per-character route that never passes an uncleared zone, a shut gate
 ends the trip at the gate. 7. **Achievements** (mockup A + filters):
 categories, progress, Hide earned, sweep on load. 8. **Bestiary** (mockup

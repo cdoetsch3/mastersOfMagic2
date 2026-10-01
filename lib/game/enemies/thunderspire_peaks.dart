@@ -379,7 +379,7 @@ abstract final class ThunderspirePeaksBestiary {
         id: 'tp_drawthestormdown',
         name: 'Draw the Storm Down',
         chargeCost: 4,
-        priority: 5,
+        priority: 9,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],

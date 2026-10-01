@@ -354,7 +354,7 @@ abstract final class FrostfellPassBestiary {
         id: 'ff_takethewarmth',
         name: 'Take the Warmth',
         chargeCost: 4,
-        priority: 5,
+        priority: 9,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],

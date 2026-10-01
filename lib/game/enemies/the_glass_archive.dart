@@ -260,7 +260,7 @@ abstract final class GlassArchiveBestiary {
         id: 'ga_arriveatonce',
         name: 'Arrive At Once',
         chargeCost: 3,
-        priority: 5,
+        priority: 9,
         effect: DamageEffect(4, 6, hits: 4),
       ),
     ],

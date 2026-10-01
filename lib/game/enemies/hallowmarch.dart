@@ -388,7 +388,7 @@ abstract final class HallowmarchBestiary {
         id: 'hm_drawfromthelamp',
         name: 'Draw from the Lamp',
         chargeCost: 4,
-        priority: 5,
+        priority: 9,
         effect: DamageEffect(26, 34, lifesteal: 0.4),
       ),
     ],

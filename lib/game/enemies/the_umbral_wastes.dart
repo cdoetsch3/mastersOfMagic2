@@ -411,7 +411,7 @@ abstract final class UmbralWastesBestiary {
         id: 'uw_takewhatcrosses',
         name: 'Take What Crosses',
         chargeCost: 4,
-        priority: 5,
+        priority: 9,
         effect: DamageEffect(26, 34, lifesteal: 1),
       ),
     ],
