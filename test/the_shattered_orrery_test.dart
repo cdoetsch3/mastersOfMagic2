@@ -833,13 +833,15 @@ void main() {
   });
 
   group('the catalogue matches §4.6', () {
-    test('7 defs, and that is the whole zone', () {
+    test('9 defs, and that is the whole zone', () {
       expect(
         ShatteredOrreryItems.all,
-        hasLength(7),
+        hasLength(9),
         reason:
             'the quarter\'s smallest catalogue is correct — the Orrery has '
-            'no wood, no cloth and no hide',
+            'no wood, no cloth and no hide. 📝 7 → 9 on 2026-10-01: the '
+            'Jewelry ladder\'s top rung (sidereal ring + pendant, ENCHANTING '
+            '§5.3) is defined here',
       );
     });
 
@@ -895,6 +897,9 @@ void main() {
         'arcsalt_draught': 95,
         'sidereal_signet': 1600,
         'the_running_count': 4500,
+        // 📝 2026-10-01, ENCHANTING §5.3 / ECONOMY §8.8 — the Jewelry ladder.
+        'sidereal_ring': 390,
+        'sidereal_pendant': 530,
       };
       for (final def in ShatteredOrreryItems.all) {
         expect(

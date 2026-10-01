@@ -183,6 +183,50 @@ abstract final class OldQuarryItems {
     value: 720,
   );
 
+  // ---- the Jewelry ladder, rung 3 (ENCHANTING §5.3) ---------------------
+  //
+  // ⭐ Jewelry 12: iron — §5.3's Kinetic setting — around the quarry's own
+  // jasper, the first Kinetic stone a player can carry.
+
+  /// Flat HP, the ring's line — about half a Seawrack robe. Σ iron ×1 (52)
+  /// + jasper ×2 (30) = **82**; `value: 74` (74 < 82 < 88.8).
+  static const jasperRing = EquipmentDef(
+    id: 'jasper_ring',
+    rarity: Rarity.common,
+    lore:
+        'A slab of red jasper in an iron collar, squared off with the same '
+        'tools that cut the steps.',
+    slot: EquipSlot.ring,
+    form: 'Ring',
+    material: 'Jasper',
+    modifiers: ItemModifiers(maxHpBonus: 7),
+    salvage: [SalvageYield('quarry_jasper', 1, 1)],
+    equipLevel: 17,
+    value: 74,
+  );
+
+  /// ⭐ The `jasper_pendant` KINETIC §8.1 cut, returned. ⚠️ **Accuracy, not
+  /// Geo's deflection**: CELESTIAL §2.1b fences deflection to the crafted
+  /// gloves and exactly one drop per quarter (`Σ deflectAmount ≤ 50`), so a
+  /// crafted pendant may not add to it. Accuracy is the Kinetic quarter's
+  /// continuity line and the counter-pick to dodge (KINETIC §2.5).
+  /// Σ iron ×1 (52) + jasper ×3 (45) = **97**; `value: 88` (88 < 97 <
+  /// 105.6).
+  static const jasperPendant = EquipmentDef(
+    id: 'jasper_pendant',
+    rarity: Rarity.common,
+    lore:
+        'A plumb-bob of polished jasper on an iron chain. It hangs dead '
+        'straight whichever way you lean.',
+    slot: EquipSlot.neck,
+    form: 'Pendant',
+    material: 'Jasper',
+    modifiers: ItemModifiers(accuracyBonus: 2),
+    salvage: [SalvageYield('quarry_jasper', 1, 2)],
+    equipLevel: 17,
+    value: 88,
+  );
+
   static const all = <ItemDef>[
     tinOre,
     quarryJasper,
@@ -193,5 +237,7 @@ abstract final class OldQuarryItems {
     bronzeIngot,
     overseersSeal,
     theGivenWeight,
+    jasperRing,
+    jasperPendant,
   ];
 }

@@ -520,7 +520,15 @@ void main() {
       //   boots     bogflax_boots      (eq10): +2 max HP
       //   gloves    bogflax_gloves     (eq10): +2 max HP
       //   belt      tuskhide_belt      (eq11): +2 belt slots
-      // totals: accuracy 6+4+2=12, dmg/charge 2, max HP 10+7+2+2=21, belt 2
+      //   ring      amber_ring         (eq12): +6 max HP
+      //   neck      amber_pendant      (eq12): +5% healing received
+      // totals: accuracy 6+4+2=12, dmg/charge 2, max HP 10+7+2+2+6=27, belt 2
+      //
+      // 📝 2026-10-01 — the Jewelry ladder (ENCHANTING §5.3) put a crafted
+      // ring and pendant in the Primal band. ⚠️ Both are set in BRONZE, which
+      // needs Old Quarry tin, so a real level-12 player cannot make them yet;
+      // this derivation reads equip levels only and so counts them. Pinned as
+      // the derivation's answer, not as a claim about the Primal economy.
       final gear = craftedGearAt(12);
       expect(
         gear.accuracyBonus,
@@ -528,7 +536,18 @@ void main() {
         reason: 'crafted mainHand+offHand+hat accuracy',
       );
       expect(gear.damagePerCharge, 2, reason: 'crafted mainHand damage/charge');
-      expect(gear.maxHpBonus, 21, reason: 'crafted robe set max HP');
+      expect(
+        gear.maxHpBonus,
+        27,
+        reason: 'crafted robe set + the amber ring\'s max HP',
+      );
+      expect(
+        gear.healingReceivedPercent,
+        5,
+        reason:
+            'the amber pendant is the only crafted neck piece by 12 — a '
+            'derivation that skipped the neck slot reads 0',
+      );
       expect(gear.beltSlots, 2, reason: 'crafted belt slots');
       expect(
         gear.damagePerCast,

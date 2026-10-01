@@ -793,13 +793,24 @@ void main() {
               'above 1 is a tier gate nobody could ever pass — the Rimeholt '
               'barrier would be permanently shut',
         );
+        // 📝 Scoped to THIS QUARTER since 2026-10-01: the enchanting build
+        // (ENCHANTING §8.2) gave the skill its Refine/Transmute ladder in its
+        // own file, so "the whole skill" is now "the whole of Enchanting the
+        // Celestial quarter authors" — still exactly the Totem.
         expect(
-          RecipeBook.forSkill(CraftSkill.enchanting),
+          CelestialRecipes.all
+              .where((r) => r.skill == CraftSkill.enchanting)
+              .toList(),
           [totem],
           reason:
-              'the Totem is the only Enchanting recipe in the entire game '
-              'so far; a second would contradict §5.2\'s "does not climb at '
-              'all this quarter"',
+              'the Totem is the only Enchanting recipe this quarter authors; '
+              'a second would contradict §5.2\'s "does not climb at all this '
+              'quarter"',
+        );
+        expect(
+          RecipeBook.forSkill(CraftSkill.enchanting),
+          contains(totem),
+          reason: 'the Totem must still be reachable through the book',
         );
       });
 

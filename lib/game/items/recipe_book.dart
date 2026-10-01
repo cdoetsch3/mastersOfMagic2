@@ -9,17 +9,27 @@ library;
 import 'item_def.dart';
 import 'recipe_def.dart';
 import 'recipes/celestial_recipes.dart';
+import 'recipes/enchanting_recipes.dart';
 import 'recipes/ethereal_recipes.dart';
+import 'recipes/jewelry_recipes.dart';
 import 'recipes/kinetic_recipes.dart';
 import 'recipes/primal_recipes.dart';
 
 abstract final class RecipeBook {
-  static const List<RecipeDef> all = <RecipeDef>[
+  /// ⚠️ **`final`, not `const`, since 2026-10-01** (ENCHANTING §8.2): the
+  /// Refine, Transmute and Cut tables are generated from the element enum and
+  /// resolved through [ItemCatalogue], which no const expression can do.
+  ///
+  /// ⚠️ The Salvage markers (`EnchantingRecipes.salvage`) are deliberately
+  /// NOT here — see their doc.
+  static final List<RecipeDef> all = List.unmodifiable(<RecipeDef>[
     ...PrimalRecipes.all,
     ...KineticRecipes.all,
     ...CelestialRecipes.all,
     ...EtherealRecipes.all,
-  ];
+    ...EnchantingRecipes.all,
+    ...JewelryRecipes.all,
+  ]);
 
   static final Map<String, RecipeDef> _byId = {for (final r in all) r.id: r};
 

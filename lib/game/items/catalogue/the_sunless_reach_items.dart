@@ -197,6 +197,48 @@ abstract final class SunlessReachItems {
     value: 3700,
   );
 
+  // ---- the Jewelry ladder, rung 5 (ENCHANTING §5.3) ---------------------
+  //
+  // ⭐ Jewelry 24: Starfall skysteel around the Reach's eclipse opal — the
+  // first Celestial jewelry a player can make rather than find.
+
+  /// Flat HP, the ring's line — under half a Wrackcotton robe. Σ skysteel ×1
+  /// (110) + eclipse opal ×2 (260) = **370**; `value: 330` (330 < 370 < 396).
+  static const opalRing = EquipmentDef(
+    id: 'opal_ring',
+    rarity: Rarity.common,
+    lore:
+        'A skysteel band with an opal set flush, light side out. Turn it in '
+        'and it is a plain ring.',
+    slot: EquipSlot.ring,
+    form: 'Ring',
+    material: 'Eclipse Opal',
+    modifiers: ItemModifiers(maxHpBonus: 14),
+    salvage: [SalvageYield('eclipse_opal', 1, 1)],
+    equipLevel: 39,
+    value: 330,
+  );
+
+  /// Solar's accuracy — the Reach's lead element (§2.5a). 📝 Accuracy clamps
+  /// in this band (CELESTIAL §2.1a), so this is a floor-raiser, not a
+  /// differentiator, and harmless to the §2.6 invariant for exactly that
+  /// reason. Σ skysteel ×1 (110) + eclipse opal ×3 (390) = **500**;
+  /// `value: 450` (450 < 500 < 540).
+  static const opalPendant = EquipmentDef(
+    id: 'opal_pendant',
+    rarity: Rarity.common,
+    lore:
+        'Three opals on a skysteel bar, all turned the same way. The line '
+        'between light and dark runs straight through every one.',
+    slot: EquipSlot.neck,
+    form: 'Pendant',
+    material: 'Eclipse Opal',
+    modifiers: ItemModifiers(accuracyBonus: 3),
+    salvage: [SalvageYield('eclipse_opal', 1, 2)],
+    equipLevel: 39,
+    value: 450,
+  );
+
   static const all = <ItemDef>[
     ebonyLog,
     duskcap,
@@ -207,5 +249,7 @@ abstract final class SunlessReachItems {
     ebonyKnot,
     crestlineRing,
     theDividingLine,
+    opalRing,
+    opalPendant,
   ];
 }

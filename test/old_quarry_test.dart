@@ -6,6 +6,7 @@ import 'package:masters_of_magic_2/game/enemies/old_quarry.dart';
 import 'package:masters_of_magic_2/game/gathering/gather_node.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
+import 'package:masters_of_magic_2/game/items/recipe_book.dart';
 import 'package:masters_of_magic_2/game/skills.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:mom_engine/mom_engine.dart';
@@ -464,27 +465,43 @@ void main() {
   group('the item catalogue is complete and registered', () {
     test('the catalogue is registered under the real zone id', () {
       expect(ItemCatalogue.byZone.keys, contains(zone));
-      expect(ItemCatalogue.byZone[zone], hasLength(9));
+      // 📝 9 → 11 on 2026-10-01: the jasper ring + pendant, the Jewelry
+      // ladder's Jewelry-12 rung (ENCHANTING §5.3), are defined here.
+      expect(ItemCatalogue.byZone[zone], hasLength(11));
     });
 
     test('every item in the zone catalogue is actually obtainable', () {
       // ⚠️ bronze_ingot is the one exception: its recipe lives in the
       // (separately-owned) kinetic_recipes.dart, out of this build's scope,
       // so it is verified only as a resolvable, correctly-typed def below.
+      // ⭐ 2026-10-01: a RecipeBook output is obtainable by being made — the
+      // Jewelry ladder's jasper pieces (ENCHANTING §5.3) are crafted, never
+      // dropped, and the recipe is what this check then demands.
       final dropped = OldQuarryBestiary.allDrops;
+      final crafted = RecipeBook.all.map((r) => r.outputId).toSet();
       for (final d in ItemCatalogue.byZone[zone]!) {
         if (d.id == 'bronze_ingot') continue;
         expect(
-          dropped.contains(d.id),
+          dropped.contains(d.id) || crafted.contains(d.id),
           isTrue,
-          reason: '${d.id} is defined but nothing drops it',
+          reason: '${d.id} is defined but nothing drops or makes it',
         );
       }
     });
 
     test('equipment leaves properName set only for named drops, per the id '
         'convention', () {
+      final crafted = RecipeBook.all.map((r) => r.outputId).toSet();
       for (final d in ItemCatalogue.byZone[zone]!.whereType<EquipmentDef>()) {
+        // 📝 A crafted piece is named by its material and form (§9b.5a).
+        if (crafted.contains(d.id)) {
+          expect(
+            d.properName,
+            isNull,
+            reason: '${d.id} is crafted and must take its composed name',
+          );
+          continue;
+        }
         expect(
           d.properName,
           isNotNull,
@@ -493,8 +510,9 @@ void main() {
       }
     });
 
-    test('quarry_jasper banks — no recipe in this build consumes it '
-        '(Jewelry does not debut this quarter)', () {
+    // 📝 Renamed 2026-10-01: jasper no longer banks — the Jewelry ladder
+    // (ENCHANTING §5.3) spends it from Jewelry 12. What this pins is unchanged.
+    test('quarry_jasper is a Jewelry material', () {
       final jasper = ItemCatalogue.byId('quarry_jasper');
       expect(jasper, isA<MaterialDef>());
       expect((jasper as MaterialDef).skill, CraftSkill.jewelry);

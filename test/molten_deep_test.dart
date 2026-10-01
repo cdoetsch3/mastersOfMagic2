@@ -8,6 +8,7 @@ import 'package:masters_of_magic_2/game/gathering/gather_node.dart';
 import 'package:masters_of_magic_2/game/items/catalogue/the_molten_deep_items.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
+import 'package:masters_of_magic_2/game/items/recipe_book.dart';
 import 'package:masters_of_magic_2/game/skills.dart';
 import 'package:masters_of_magic_2/game/world.dart';
 import 'package:mom_engine/mom_engine.dart';
@@ -564,9 +565,12 @@ void main() {
       }
     });
 
-    test('the catalogue is registered under the real zone id, with 6 defs', () {
+    test('the catalogue is registered under the real zone id, with 8 defs', () {
       expect(ItemCatalogue.byZone.keys, contains(zone));
-      expect(ItemCatalogue.byZone[zone], hasLength(6));
+      // 📝 6 → 8 on 2026-10-01: the obsidian ring + pendant, the Jewelry
+      // ladder's Jewelry-18 rung (ENCHANTING §5.3) — `obsidian_ring` is the
+      // id KINETIC §8.1 cut, returned.
+      expect(ItemCatalogue.byZone[zone], hasLength(8));
     });
 
     test('every item in the zone catalogue is actually obtainable', () {
@@ -575,13 +579,16 @@ void main() {
       // recipe lives outside this build's scope (the recipe ladder file),
       // so it is verified only as a resolvable, correctly-typed def below —
       // the same shape old_quarry_test.dart carves out for `bronze_ingot`.
+      // ⭐ 2026-10-01: a RecipeBook output is obtainable by being made — the
+      // obsidian Jewelry pieces (ENCHANTING §5.3) are crafted, never dropped.
       final dropped = TheMoltenDeepBestiary.allDrops;
+      final crafted = RecipeBook.all.map((r) => r.outputId).toSet();
       for (final d in ItemCatalogue.byZone[zone]!) {
         if (d.id == 'emberhide_belt') continue;
         expect(
-          dropped.contains(d.id),
+          dropped.contains(d.id) || crafted.contains(d.id),
           isTrue,
-          reason: '${d.id} is defined but nothing drops it',
+          reason: '${d.id} is defined but nothing drops or makes it',
         );
       }
     });

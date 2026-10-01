@@ -150,6 +150,47 @@ abstract final class ShatteredOrreryItems {
     value: 4500,
   );
 
+  // ---- the Jewelry ladder, rung 6 (ENCHANTING §5.3) ---------------------
+  //
+  // ⭐ Jewelry 30, the top of the ladder below Rimeholt: skysteel — §5.3's
+  // Celestial setting — around the Orrery's lens glass. The next Jewelry a
+  // player meets is the Ethereal quarter's, and the cut gems.
+
+  /// Flat HP, the ring's line — half a Wrackcotton robe. Σ skysteel ×1 (110)
+  /// + sidereal glass ×2 (320) = **430**; `value: 390` (390 < 430 < 468).
+  static const siderealRing = EquipmentDef(
+    id: 'sidereal_ring',
+    rarity: Rarity.common,
+    lore:
+        'A ring of fallen lens glass in a skysteel setting. Look through it '
+        'and something far off is in focus.',
+    slot: EquipSlot.ring,
+    form: 'Ring',
+    material: 'Sidereal Glass',
+    modifiers: ItemModifiers(maxHpBonus: 16),
+    salvage: [SalvageYield('sidereal_glass', 1, 1)],
+    equipLevel: 42,
+    value: 390,
+  );
+
+  /// Astral's crit chance, the Orrery's lead element (§2.5a) — under half the
+  /// Sidereal Signet's 10. Σ skysteel ×1 (110) + sidereal glass ×3 (480) =
+  /// **590**; `value: 530` (530 < 590 < 636).
+  static const siderealPendant = EquipmentDef(
+    id: 'sidereal_pendant',
+    rarity: Rarity.common,
+    lore:
+        'Three lenses stacked in a skysteel tube on a chain. They line up '
+        'only when you are about to need them to.',
+    slot: EquipSlot.neck,
+    form: 'Pendant',
+    material: 'Sidereal Glass',
+    modifiers: ItemModifiers(critChance: 4),
+    salvage: [SalvageYield('sidereal_glass', 1, 2)],
+    equipLevel: 42,
+    value: 530,
+  );
+
   static const all = <ItemDef>[
     orreryScrap,
     arcsalt,
@@ -158,5 +199,7 @@ abstract final class ShatteredOrreryItems {
     arcsaltDraught,
     siderealSignet,
     theRunningCount,
+    siderealRing,
+    siderealPendant,
   ];
 }

@@ -6,15 +6,18 @@
 /// and `geo_*` (Old Quarry) mote families instead; this zone and Frostfell
 /// Pass are the first places Q1's motes get a new source (§3.2).
 ///
-/// ⚠️ **Was 8; two are cut.** `obsidian_ring` was a Jewelry recipe output
+/// ⚠️ **Was 8; two were cut.** `obsidian_ring` was a Jewelry recipe output
 /// with no other source — cut with its recipe (§8.1). `firesalt_flask` was
 /// the quarter's offensive potion — cut with the Antidote (§8.5). Neither
 /// Molten Deep zone has an epic gap to fill (§8.7 only touches Frostfell and
-/// Thunderspire), so nothing replaces them.
+/// Thunderspire), so nothing replaces them. 📝 **2026-10-01: `obsidian_ring`
+/// is back**, with an `obsidian_pendant` beside it — the Jewelry ladder below
+/// Rimeholt (ENCHANTING §5.3) reversed §8.1's hold, and its Jewelry-18 rung
+/// is defined here.
 ///
-/// ⏳ **Two materials bank rather than spend.** `obsidian` banks until
-/// Jewelry unlocks at Rimeholt, L45 (§8.1); `firesalt` banks until the
-/// offensive-potion vocabulary ships (§8.5, §9 Fast-follow).
+/// ⏳ `firesalt` banks until the offensive-potion vocabulary ships (§8.5, §9
+/// Fast-follow). `obsidian` no longer banks: the ladder spends it from
+/// Jewelry 18, and the Pyro gem cut (ENCHANTING §5.1) at Rimeholt.
 ///
 /// ⚠️ **`emberhide` is kill-only** — a hide, and it has no gather node
 /// (§3.1/§6).
@@ -146,6 +149,47 @@ abstract final class TheMoltenDeepItems {
     value: 820,
   );
 
+  // ---- the Jewelry ladder, rung 4 (ENCHANTING §5.3) ---------------------
+  //
+  // ⭐ Jewelry 18: iron around the Deep's obsidian. The `obsidian_ring` KINETIC
+  // §8.1 cut returns here — and with it the sidegrade that cut left
+  // unexpressed: steady crafted stats beside the Firstmelt Loop's gamble.
+
+  /// Flat HP, the ring's line — half a Tussock robe. Σ iron ×1 (52) +
+  /// obsidian ×2 (40) = **92**; `value: 84` (84 < 92 < 100.8).
+  static const obsidianRing = EquipmentDef(
+    id: 'obsidian_ring',
+    rarity: Rarity.common,
+    lore:
+        'Black glass ground into a band and pinned with iron. It took the '
+        'heat once and kept the shape.',
+    slot: EquipSlot.ring,
+    form: 'Ring',
+    material: 'Obsidian',
+    modifiers: ItemModifiers(maxHpBonus: 10),
+    salvage: [SalvageYield('obsidian', 1, 1)],
+    equipLevel: 27,
+    value: 84,
+  );
+
+  /// Pyro's crit damage — ⭐ legal on crafted gear from equip 25 (KINETIC
+  /// §2.5: Rowan is where crafting gets crit). Σ iron ×1 (52) + obsidian ×3
+  /// (60) = **112**; `value: 100` (100 < 112 < 120).
+  static const obsidianPendant = EquipmentDef(
+    id: 'obsidian_pendant',
+    rarity: Rarity.common,
+    lore:
+        'An obsidian flake knapped to a point and hung on iron. The edge is '
+        'still the sharpest thing you own.',
+    slot: EquipSlot.neck,
+    form: 'Pendant',
+    material: 'Obsidian',
+    modifiers: ItemModifiers(critDamage: 8),
+    salvage: [SalvageYield('obsidian', 1, 2)],
+    equipLevel: 27,
+    value: 100,
+  );
+
   static const all = <ItemDef>[
     obsidian,
     firesalt,
@@ -153,5 +197,7 @@ abstract final class TheMoltenDeepItems {
     emberhideBelt,
     firstmeltLoop,
     theLongCooling,
+    obsidianRing,
+    obsidianPendant,
   ];
 }

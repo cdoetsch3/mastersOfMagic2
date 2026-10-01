@@ -308,12 +308,13 @@ void main() {
       }
       expect(
         ItemCatalogue.all.length,
-        325,
+        337,
         reason:
             'Primal 52 + Kinetic 58 + Celestial 76 + Ethereal 72 + The '
             'Eclipsed Citadel 7 (CELESTIAL_CONTRACT §7.1, ETHEREAL §7.1), '
             'and since 2026-10-01 (the enchanting build, ENCHANTING_DESIGN '
-            '§3.1/§5.1) 24 Core/Heart motes + 36 gems = 325. '
+            '§3.1/§5.1/§5.3) 24 Core/Heart motes + 36 gems + the 12-piece '
+            'Jewelry ladder (4 per quarter, Primal to Celestial) = 337. '
             'If this number moved, docs/ITEM_ART.md is now short an entry '
             '(or carries a stale one) and nothing else in the suite would '
             'say so — every id in the catalogue has an '

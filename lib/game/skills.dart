@@ -107,6 +107,29 @@ abstract final class Skills {
       recipe.inputs.fold<int>(0, (sum, i) => sum + i.count) *
       (4 + 2 * recipe.skillLevel);
 
+  // ---- the transmute curve (ENCHANTING_DESIGN §3.2) ----------------------
+
+  /// Motes in per mote out when transmuting element → element, by Enchanting
+  /// level: ✅ **4 : 1 → 3 : 1 → 5 : 2 → 2 : 1** at 1 / 15 / 30 / 45
+  /// (ruling 4, Christian 2026-10-01: "a skill curve, never better than
+  /// 2 : 1"). ⚠️ Cross-element stays lossy at every level, or farming the
+  /// easiest zone becomes the best source of every element.
+  static double transmuteRatioAt(int level) => level >= 45
+      ? 2
+      : level >= 30
+      ? 2.5
+      : level >= 15
+      ? 3
+      : 4;
+
+  /// What one transmute (one mote out) actually consumes: the ratio **rounded
+  /// UP** — ⭐ never better than the curve. So the 5 : 2 rung costs 3 for 1,
+  /// the same as 3 : 1, and the pinned table is **L1 4 · L15 3 · L30 3 ·
+  /// L45 2**. 📝 The recipe always makes one mote; a two-out recipe that
+  /// honoured 5 : 2 exactly would need a variable [RecipeDef.outputCount] as
+  /// well as a variable input, and the 30-rung is the only place it differs.
+  static int transmuteInputsAt(int level) => transmuteRatioAt(level).ceil();
+
   // ---- what a level means (the Ledger's three views) ---------------------
 
   /// Everything [skill] can ever make, unlock order then name — the

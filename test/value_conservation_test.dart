@@ -18,7 +18,43 @@ import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/items/item_def.dart';
 import 'package:masters_of_magic_2/game/items/recipe_book.dart';
 import 'package:masters_of_magic_2/game/items/recipe_def.dart';
+import 'package:masters_of_magic_2/game/items/recipes/enchanting_recipes.dart';
+import 'package:masters_of_magic_2/game/items/recipes/jewelry_recipes.dart';
 import 'package:masters_of_magic_2/game/world.dart';
+
+/// ⭐ **2026-10-01 — the mote SINKS** (ENCHANTING_DESIGN §3.1/§3.2). Refine and
+/// Transmute destroy value by design, so they cannot sit in the
+/// `Standard < Σ < Ornate` window and must not pretend to: each is held here
+/// under one dated reason and checked in the OTHER direction — strictly lossy
+/// (`Σ > output`), which is the only direction a mote recipe could be an
+/// exploit in. ⚠️ Not an exemption from the law: the law's purpose is "no
+/// buy→craft→vendor mint", and a recipe that always loses value is that
+/// purpose kept more strictly than the window keeps it.
+final Map<String, String> _sinks = {
+  for (final r in EnchantingRecipes.refine)
+    r.id:
+        '2026-10-01: refinement is a sink, ITEMS §6.0 — 50 Dust (100g) → '
+        '1 Shard (25g); a Heart is 0g Bound (ECONOMY §14c)',
+  for (final r in EnchantingRecipes.transmute)
+    r.id:
+        '2026-10-01: transmutation is lossy at every rung by ruling '
+        '(ENCHANTING §3.2, "never better than 2:1")',
+};
+
+/// ❓ **2026-10-01 — the 36 gem cuts await the gem-value ruling** (ENCHANTING
+/// §5.1 marks the Lesser/Standard 300/1,500 values ❓ draft). Gem values are
+/// flat across elements while the twelve stones span 14–480g, so no single
+/// value puts every cut inside the window: Lesser Σ runs 164–630 against 300,
+/// Standard 914–1,380 against 1,500, Greater stone-only against 0. ⚠️ Held
+/// here unpatched, with the guard that actually matters — **the mote input
+/// can never be bought**, so a cut whose Σ sits under its gem's value cannot
+/// be fed from a shelf.
+final Map<String, String> _gemCutsPending = {
+  for (final r in JewelryRecipes.cut)
+    r.id:
+        '2026-10-01: ❓ ENCHANTING §5.1 gem values are draft; flat gem '
+        'values over 14–480g stones cannot all sit in one window',
+};
 
 /// §8's own audit blessed 17 of the 41 recipes as something other than a
 /// clean `Standard < Σ < Ornate` pass — ⚠️ **not failures**, documented
@@ -218,9 +254,94 @@ void main() {
       );
     });
 
+    test('⭐ the sink and cut buckets name real recipes, 84 + 36', () {
+      final allIds = RecipeBook.all.map((r) => r.id).toSet();
+      expect(
+        (_sinks.length, _gemCutsPending.length),
+        (84, 36),
+        reason:
+            '48 refines + 36 transmutes are sinks, 36 cuts await §5.1. A '
+            'count drifting means a recipe joined a bucket by accident — or '
+            'left it and is now judged by a law it was never written for',
+      );
+      for (final id in [..._sinks.keys, ..._gemCutsPending.keys]) {
+        expect(
+          allIds,
+          contains(id),
+          reason:
+              '"$id" is bucketed but not in RecipeBook.all — the mutant this '
+              'kills is EnchantingRecipes/JewelryRecipes falling out of the '
+              'book, which would make every bucket check vacuous',
+        );
+      }
+    });
+
     for (final r in RecipeBook.all) {
       final exemptReason = _exemptions[r.id];
       final pending = _pendingRuling[r.id];
+      final sink = _sinks[r.id];
+      final cut = _gemCutsPending[r.id];
+
+      if (sink != null) {
+        test('${r.id}: ⭐ a sink — Σ(inputs) > output, at the best rung', () {
+          // ⭐ Measured at Enchanting 45, the curve's best rung: a transmute
+          // that is lossy there is lossy everywhere. Refine lines are exact,
+          // so countAt is their count at every level.
+          var best = 0;
+          for (final i in r.inputs) {
+            best += (materialValues[i.defId] ?? 0) * i.countAt(45);
+          }
+          expect(
+            best,
+            greaterThan(ItemCatalogue.byId(r.outputId).value),
+            reason:
+                '$sink. ⚠️ The mutant this kills: a ratio dropping to break-'
+                'even (refine 50→8, the transmute curve reaching 1:1) or an '
+                'output value raised past its inputs (a Core over 1,800g, the '
+                'Heart\'s 3,600 ❓ landing) — either turns refining into a mint',
+          );
+        });
+        continue;
+      }
+
+      if (cut != null) {
+        test('${r.id}: ❓ a cut — its mote can never be bought', () {
+          final motes = [
+            for (final i in r.inputs)
+              if (ItemCatalogue.byId(i.defId) is MoteDef) i.defId,
+          ];
+          expect(
+            motes,
+            hasLength(1),
+            reason:
+                'a cut is one stone + one refined mote (§5.1) — the mote is '
+                'what makes the gem unbuyable, so a cut without one is a '
+                'stone→gem mint ($cut)',
+          );
+          for (final town in World.locations.where((l) => l.isTown)) {
+            expect(
+              ShopCatalogue.stockFor(town.id),
+              isNot(contains(motes.single)),
+              reason:
+                  '${town.id} stocks ${motes.single}: the cut\'s Σ sits under '
+                  'its gem\'s value, so a buyable mote makes it a shelf-fed '
+                  'mint — the guard this bucket stands on',
+            );
+          }
+          final gem = ItemCatalogue.byId(r.outputId);
+          if (gem.rarity == Rarity.epic) {
+            expect(
+              (gem.value, gem.tradability),
+              (0, Tradability.bound),
+              reason:
+                  'a Greater gem is cut from a Bound 0g Heart and inherits '
+                  'ECONOMY §14c — a vendorable Greater gem is the Heart\'s '
+                  'missing vendor path by another door',
+            );
+          }
+        });
+        continue;
+      }
 
       if (pending != null) {
         test('${r.id}: ❓ awaiting §8.7 — held non-clean, bounded', () {
@@ -317,6 +438,8 @@ void main() {
       for (final r in RecipeBook.all) {
         if (_exemptions.containsKey(r.id)) continue;
         if (_pendingRuling.containsKey(r.id)) continue; // ❓ §8.7
+        if (_sinks.containsKey(r.id)) continue; // ⭐ lossy by design
+        if (_gemCutsPending.containsKey(r.id)) continue; // ❓ ENCHANTING §5.1
         final a = audit(r);
         if (!(a.sum > a.standard && a.sum < a.ornate)) {
           unexplained.add(r.id);

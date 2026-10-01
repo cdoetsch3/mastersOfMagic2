@@ -6,6 +6,17 @@ Status: ✅ **ruled 2026-10-01, building.** Rulings (Christian, same day):
 2. Scope: **all four verbs plus gems** in the first pass (three lanes, §8).
 3. Re-enchanting costs the **full** price of the new enchant.
 4. Transmute improves with Enchanting level: **4:1 → 2:1** (§3.2 curve).
+⚠️ **Ruling 2 reverses an older one**: KINETIC §8.1 / ITEMS §9b.8 ruling 9
+   kept Jewelry's learning at Rimeholt (L45). The §5.3 ladder below L45
+   (twelve recipes, Thornmire to the Orrery) was in the scope Christian
+   accepted, so that older ruling is superseded here; nothing in code gates
+   learning a skill, and the Primal rungs open with Bronze (Old Quarry tin),
+   so their job is Jewelry XP before Rimeholt, not Primal-band gear.
+❓ **Lesser gem value (300) exceeds Crystal (150) + its stone**, so cutting
+   a dropped Crystal vendors for more than the Crystal would. Not a shelf
+   exploit (motes are never stock, and the conservation test guards that),
+   but if cutting must never out-sell its mote, Lesser ≤ 150 + the cheapest
+   stone. Christian's call.
 5–9. Taken as recommended unless Christian says otherwise: Core drops from
    bosses at 2% `bonus`; elemental gems only; unsocket = one Shard, gem
    survives; aspected drops at 10% of rare+ drops; the Enchanting station's
@@ -348,10 +359,114 @@ piece is a trap).
      `lib/game/enemies/loot.dart`, threaded from `rollKill`'s zone.
    - Tests: `test/enchanting_model_test.dart`,
      `packages/mom_engine/test/gear_proc_test.dart`.
-2. **Recipes** (one lane): refine ×48, transmute ×3, salvage, cut ×36 (12
-   elements × 3 tiers), the Jewelry ladder below L45. Value-conservation and
-   §8.7 pricing re-pinned.
-3. 🔨 **Surfaces** (one lane, built 2026-10-01 — Christian verifies in the
+2. ✅ **Recipes** (one lane, built 2026-10-01): **refine ×48, transmute ×36,
+   cut ×36, the Jewelry ladder ×12** — 132 recipes in `RecipeBook.all`
+   (now `final`: the tables are generated) — plus **six salvage markers**
+   and `SalvageTable`, held OUT of the book until the crafter can match them.
+   - Files: `lib/game/items/recipes/enchanting_recipes.dart` (Refine,
+     Transmute, Salvage markers, `moteOf`), `jewelry_recipes.dart` (Cut,
+     `stoneFor`, the ladder), `salvage_table.dart`; the input shape and the
+     pure matcher in `recipe_def.dart`; the curve in `skills.dart`.
+   - **Refine**: `refine_<element>_<tier made>`, 50 / 20 / 12 / 4 at
+     Enchanting 1 / 10 / 25 / 40, field-craftable. The Heart rung makes a 0g
+     Bound item. ⭐ A sink: `value_conservation_test` holds all 84 refines and
+     transmutes in a dated bucket that asserts `Σ inputs > output` (the
+     transmute at its best rung) instead of the clean window.
+   - **Transmute** (§3.2, ruling 4): one recipe per **(target element, tier)**,
+     `transmute_<target>_<tier>`, Dust / Shard / Crystal only (never Core or
+     Heart), Enchanting 1, field-craftable. Its single input carries
+     `RecipeInput.anyElement`: any element's mote of that tier **except the
+     target's**, mixable in one craft, drawn largest-stack first (ties in
+     enum order). ⭐ **The count is the curve at craft time, rounded UP —
+     never better than the curve: L1 4 · L15 3 · L30 3 · L45 2** (5 : 2
+     becomes 3 : 1 because the recipe makes one mote; honouring 5 : 2
+     exactly would need a two-out recipe). `Skills.transmuteRatioAt` /
+     `transmuteInputsAt`. The line's own `count` holds the L1 rung (4) so a
+     reader that ignores the flag sees the worst case, and its exemplar id is
+     the NEXT element's mote, so an unwired crafter performs a legal
+     fixed-source transmute rather than a 4 : 1 self-loss.
+   - **Salvage** (§6): `salvage_<rarity>` markers, Enchanting 1, 6 XP, input
+     `RecipeInput.anyEquipmentOfRarity` (exact rarity). The yield is
+     `SalvageTable.yieldOfInstance`: §6's table in the **first element of the
+     zone whose catalogue defines the piece**, plus every socketed gem whole.
+     Every shipped piece has a zone with elements, so **no piece salvages to
+     nothing today**; a def no zone owns (a workshop def) would. Every shipped
+     piece returns less mote value than its own vendor value (tested).
+     📝 The Eclipsed Citadel lists all twelve elements, so its pieces salvage
+     to **Aqua** — mechanical, flagged for a ruling.
+   - **Cut** (§5.1): `cut_<element>_<lesser|standard|greater>`, stone + 1
+     Crystal / Core / Heart at Jewelry 10 / 25 / 40, `stationRequired: true`
+     (Rimeholt; enforced by lane 3's station gate, not the flag). The stone
+     per element — each from a zone carrying the element, all twelve
+     distinct:
+
+     | Element | Stone | Zone (elements) | Stone value |
+     |---|---|---|---|
+     | Aqua | `nacre` | Tidewrack Shoals (Lunar + Aqua) | 95 |
+     | Pyro | `obsidian` | The Molten Deep (Pyro + Geo) | 20 |
+     | Flora | `amber` | Thornmire (Flora + Aqua) | 14 |
+     | Electro | `hum_quartz` | Thunderspire Peaks (Electro + Aero) | 20 |
+     | Aero | `everice` | Frostfell Pass (Aqua + Aero) | 26 |
+     | Geo | `quarry_jasper` | Old Quarry (Geo) | 15 |
+     | Solar | `aetherglass` | The Glass Archive (Solar + Arcane) | 210 |
+     | Lunar | `eclipse_opal` | The Sunless Reach (Solar + Lunar) | 130 |
+     | Astral | `sidereal_glass` | The Shattered Orrery (Astral + Electro) | 160 |
+     | Sanctus | `reliquary_gold` | The Reliquary Deep (Sanctus + Umbra) | 340 |
+     | Umbra | `thoughtglass` | The Umbral Wastes (Umbra) | 200 |
+     | Arcane | `colophon_stone` | The Unwritten Library (Umbra + Arcane) | 480 |
+
+     ⚠️ Aero has no stone in an Aero-led zone, so it takes Frostfell's
+     everice and Aqua takes nacre; no Arcane-led zone yields a stone.
+     `hum_quartz` is tagged Enchanting, not Jewelry — it is Thunderspire's
+     only stone. ❓ **The gem values cannot sit in ECONOMY §8's window**:
+     gems are flat (300 / 1,500 / 0) while stones span 14–480g, so the 36
+     cuts are held in a dated ❓ bucket whose guard is that **their mote can
+     never be bought**. A Lesser gem cut from a dropped Crystal (150) and a
+     cheap stone vendors for more than the Crystal would — a real uplift,
+     not a shelf-fed mint.
+   - **The Jewelry ladder below Rimeholt** (§5.3): Jewelry 1 / 5 / 12 / 18 /
+     24 / 30, a ring and a pendant at each; §5.3's metals verbatim (**bronze
+     → iron → skysteel**); the ring carries flat HP, the pendant the stone's
+     affinity. All common, all clean-passing ECONOMY §8 (§8.8 there):
+
+     | Id | Zone | Slot | Stats | Equip | Jewelry | Inputs | Value |
+     |---|---|---|---|---|---|---|---|
+     | `amber_band` | thornmire | ring | +4 max HP | 8 | 1 | bronze + amber | 42 |
+     | `amber_drop` | thornmire | neck | +3% healing received | 8 | 1 | bronze + amber ×2 | 54 |
+     | `amber_ring` | thornmire | ring | +6 max HP | 12 | 5 | bronze + amber ×3 | 66 |
+     | `amber_pendant` | thornmire | neck | +5% healing received | 12 | 5 | bronze + amber ×4 | 80 |
+     | `jasper_ring` | old_quarry | ring | +7 max HP | 17 | 12 | iron + jasper ×2 | 74 |
+     | `jasper_pendant` | old_quarry | neck | +2 accuracy | 17 | 12 | iron + jasper ×3 | 88 |
+     | `obsidian_ring` | the_molten_deep | ring | +10 max HP | 27 | 18 | iron + obsidian ×2 | 84 |
+     | `obsidian_pendant` | the_molten_deep | neck | +8 crit damage | 27 | 18 | iron + obsidian ×3 | 100 |
+     | `opal_ring` | the_sunless_reach | ring | +14 max HP | 39 | 24 | skysteel + eclipse opal ×2 | 330 |
+     | `opal_pendant` | the_sunless_reach | neck | +3 accuracy | 39 | 24 | skysteel + eclipse opal ×3 | 450 |
+     | `sidereal_ring` | the_shattered_orrery | ring | +16 max HP | 42 | 30 | skysteel + sidereal glass ×2 | 390 |
+     | `sidereal_pendant` | the_shattered_orrery | neck | 4% crit | 42 | 30 | skysteel + sidereal glass ×3 | 530 |
+
+     ⚠️ **This reverses KINETIC §8.1 / ITEMS §9b.8 ruling 9** ("Jewelry's
+     station and learning stay at Rimeholt"), on the strength of scope
+     ruling 2; `amber_ring`, `jasper_pendant` and `obsidian_ring` are the ids
+     that cut removed, returned. ⚠️ **Not raw copper for Primal**: copper is
+     banked for exactly one maker, the Bronze Ingot (`cinderpeak_test`), so
+     the Primal rungs take bronze and open once a player smelts it (~L15) —
+     the ladder's job is Jewelry XP before Rimeholt, not Primal-band gear.
+     ⚠️ The Geo pendant takes **accuracy, not deflection**: CELESTIAL §2.1b
+     fences deflection to crafted gloves plus one drop per quarter. 📝 The
+     ladder's Jewelry gates interleave with the Ethereal jewelry's own
+     (1 / 10 / 20 / 30 / 35) — they were always skill levels, not zone ones.
+   - ⭐ **What `GameState.craft` must do at merge** (lane 3's file, so not
+     done here): when any input is not `isExact`, gate on
+     `recipe.satisfiedBy(counts, skillLevel: level, piece: chosen)` and
+     consume exactly `recipe.drawFrom(counts, skillLevel: level)` instead of
+     each line's `defId × count`; for a salvage marker, remove the chosen
+     instance and add `SalvageTable.yieldOfInstance(instance)`, then add the
+     salvage markers to `RecipeBook.all`. 📝 `Skills.xpForRecipe` reads the
+     static `count` (4) for a transmute at every level — a ruling whether a
+     master's cheaper transmute should pay less.
+   - Tests: `test/enchanting_recipes_test.dart`; the sink and cut buckets in
+     `test/value_conservation_test.dart`.
+3. ✅ **Surfaces** (one lane, built 2026-10-01 — Christian verifies in the
    browser): Enchant… and Socket… on the item dialog, stat lines. The
    salvage picker waits for lane 2's salvage recipe.
    - Mutations: `GameState.enchantItem` / `socketGem` / `unsocketGem`, each

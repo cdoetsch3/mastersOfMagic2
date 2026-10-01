@@ -34,9 +34,13 @@ String _nameOf(String recipeId) {
 RecipeDef _recipe(String id) => RecipeBook.tryById(id)!;
 
 /// ⚠️ Every recipe must be built for the order/visibility assertions to mean
-/// anything, and a ListView only builds what fits.
+/// anything, and a ListView only builds what fits. 📝 Sized from the book
+/// rather than a fixed 6000px since 2026-10-01: the enchanting build added
+/// 132 recipes (ENCHANTING §8.2) and pushed the locked belt — sorted last —
+/// past a fixed surface, which failed these tests for a reason that had
+/// nothing to do with the shelf.
 Future<void> _pump(WidgetTester tester, GameState game) async {
-  await tester.binding.setSurfaceSize(const Size(900, 6000));
+  await tester.binding.setSurfaceSize(Size(900, 120.0 * RecipeBook.all.length));
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
     MaterialApp(

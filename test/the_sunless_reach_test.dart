@@ -915,11 +915,14 @@ void main() {
   });
 
   group('the catalogue matches CELESTIAL_CONTRACT §4.5', () {
-    test('nine defs, and every one resolvable under this zone', () {
+    test('eleven defs, and every one resolvable under this zone', () {
       expect(
         SunlessReachItems.all,
-        hasLength(9),
-        reason: '§7.1 counts the Sunless Reach at 9 item definitions',
+        hasLength(11),
+        reason:
+            '§7.1 counts the Sunless Reach at 9 item definitions; 📝 +2 on '
+            '2026-10-01 — the opal ring and pendant, the Jewelry ladder\'s '
+            'Jewelry-24 rung (ENCHANTING §5.3)',
       );
       for (final def in SunlessReachItems.all) {
         expect(

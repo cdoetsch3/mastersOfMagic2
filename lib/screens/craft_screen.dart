@@ -82,7 +82,7 @@ class _CraftScreenState extends State<CraftScreen> {
   /// or a recipe the town's Storeroom can afford gets hidden as unmakeable.
   bool _isMissing(GameState game, RecipeDef r) {
     for (final i in r.inputs) {
-      if (game.materialCount(i.defId) < i.count) return true;
+      if (game.inputHave(r, i) < game.inputNeed(r, i)) return true;
     }
     return false;
   }
@@ -356,12 +356,9 @@ class _RecipeCard extends StatelessWidget {
     final shortfalls = <String>[];
     var haveAll = true;
     for (final i in recipe.inputs) {
-      if (game.materialCount(i.defId) < i.count) {
+      if (game.inputHave(recipe, i) < game.inputNeed(recipe, i)) {
         haveAll = false;
-        final inputDef = ItemCatalogue.tryById(i.defId);
-        shortfalls.add(
-          inputDef == null ? i.defId : ItemCatalogue.displayName(inputDef),
-        );
+        shortfalls.add(inputName(i));
       }
     }
     final canCraft = !locked && haveAll;
@@ -434,7 +431,8 @@ class _RecipeCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 6),
-              for (final i in recipe.inputs) _NeedRow(game: game, input: i),
+              for (final i in recipe.inputs)
+                _NeedRow(game: game, recipe: recipe, input: i),
               const SizedBox(height: 6),
               Align(
                 alignment: Alignment.centerRight,
@@ -556,8 +554,20 @@ class _RecipeCard extends StatelessWidget {
 /// uses, and names the split when the town's Storeroom is part of the answer
 /// — otherwise a player with 3 stored logs reads "0 / 3" above a live Craft
 /// button and files a bug.
+/// What a recipe line is called on the shelf: the item, or — for a
+/// transmute's `anyElement` line (ENCHANTING §3.2) — the tier word, since any
+/// element's mote of that tier will do: 'Shards of another element'.
+String inputName(RecipeInput input) {
+  if (input.anyElement) {
+    return '${GameState.transmuteTierLabel(input)}s of another element';
+  }
+  final def = ItemCatalogue.tryById(input.defId);
+  return def == null ? input.defId : ItemCatalogue.displayName(def);
+}
+
 class _NeedRow extends StatelessWidget {
   final GameState game;
+  final RecipeDef recipe;
   final RecipeInput input;
 
   /// ⚠️ **Fixed, because the trailing cell's text changes width.** The count
@@ -566,28 +576,37 @@ class _NeedRow extends StatelessWidget {
   /// rule is that nothing the player presses may move when a count changes.
   static const double _countCellWidth = 132;
 
-  const _NeedRow({required this.game, required this.input});
+  const _NeedRow({
+    required this.game,
+    required this.recipe,
+    required this.input,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final def = ItemCatalogue.tryById(input.defId);
-    final split = game.materialSplit(input.defId);
+    // ⚠️ A transmute line has no one item to split: its "have" is every
+    // other element's mote of the tier, and its "need" is the curve at the
+    // crafter's level — both from GameState, the same answers the gate uses.
+    final split = input.anyElement
+        ? (pack: game.inputHave(recipe, input), stored: 0)
+        : game.materialSplit(input.defId);
     final have = split.pack + split.stored;
-    final enough = have >= input.count;
+    final need = game.inputNeed(recipe, input);
+    final enough = have >= need;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 1),
       child: Row(
         children: [
           Expanded(
             child: Text(
-              def == null ? input.defId : ItemCatalogue.displayName(def),
+              inputName(input),
               style: const TextStyle(color: AppColors.textDim, fontSize: 12),
             ),
           ),
           SizedBox(
             width: _countCellWidth,
             child: Text(
-              '$have / ${input.count}${enough ? ' ✓' : ''}'
+              '$have / $need${enough ? ' ✓' : ''}'
               '${split.stored > 0 ? ' (${split.stored} stored)' : ''}',
               textAlign: TextAlign.right,
               // ⚠️ One line, always: wrapping would change the row's HEIGHT,

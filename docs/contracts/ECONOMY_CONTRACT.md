@@ -715,6 +715,48 @@ session (~80 duels) tops out near **2,400g/day** before any travel-time
 overhead — the number the probe's "bounded gold/day" assertion should be
 checked against, not a number this contract fixes.
 
+### 8.8 The enchanting build's recipes (2026-10-01, ENCHANTING_DESIGN §8.2)
+
+132 recipes joined the book. ⭐ **No new material value** — every input is a
+shipped def — and **12 new equipment values**, the Jewelry ladder below
+Rimeholt, each back-solved to clean-pass `Standard < Σ < Ornate (1.2×)`
+the way §8.2 back-solved materials:
+
+| id | Zone | Recipe Σ (inputs) | **Value** | Ornate | Verdict |
+|---|---|---|---|---|---|
+| `amber_band` | thornmire | bronze 32 + amber 14 = 46 | **42** | 50.4 | ✅ |
+| `amber_drop` | thornmire | 32 + 2 × 14 = 60 | **54** | 64.8 | ✅ |
+| `amber_ring` | thornmire | 32 + 3 × 14 = 74 | **66** | 79.2 | ✅ |
+| `amber_pendant` | thornmire | 32 + 4 × 14 = 88 | **80** | 96 | ✅ |
+| `jasper_ring` | old_quarry | iron 52 + 2 × 15 = 82 | **74** | 88.8 | ✅ |
+| `jasper_pendant` | old_quarry | 52 + 3 × 15 = 97 | **88** | 105.6 | ✅ |
+| `obsidian_ring` | the_molten_deep | iron 52 + 2 × 20 = 92 | **84** | 100.8 | ✅ |
+| `obsidian_pendant` | the_molten_deep | 52 + 3 × 20 = 112 | **100** | 120 | ✅ |
+| `opal_ring` | the_sunless_reach | skysteel 110 + 2 × 130 = 370 | **330** | 396 | ✅ |
+| `opal_pendant` | the_sunless_reach | 110 + 3 × 130 = 500 | **450** | 540 | ✅ |
+| `sidereal_ring` | the_shattered_orrery | skysteel 110 + 2 × 160 = 430 | **390** | 468 | ✅ |
+| `sidereal_pendant` | the_shattered_orrery | 110 + 3 × 160 = 590 | **530** | 636 | ✅ |
+
+📝 Every one sits under the rare drop jewelry of its band (Kinetic rares
+260–360, Celestial 620–1,600) — crafted is the floor (§9b.4a). Their
+ingots are never shelf stock (§14b.3), so no ladder recipe is feasible for
+the §10 probe's buy-craft-vendor bot.
+
+**Two dated buckets outside the window**, held in `value_conservation_test`
+with the check that fits them rather than exempted from the law:
+
+| Bucket | Recipes | Shape | The check instead |
+|---|---|---|---|
+| ⭐ **Sinks** — "refinement is a sink, ITEMS §6.0" | 48 refine + 36 transmute | Lossy by design: 50 Dust (100g) → 1 Shard (25g); 12 Crystals (1,800g) → 1 Core (900g); 4 Cores → a 0g Bound Heart (§14c); transmute 2–4 : 1 at one value per tier | `Σ inputs > output` — strictly lossy, the transmute measured at its best (Enchanting 45) rung |
+| ❓ **Cuts** — gem values are ENCHANTING §5.1 drafts | 36 cut | Gems are flat (Lesser 300, Standard 1,500, Greater 0 Bound) while stones span 14–480g: Lesser Σ 164–630, Standard 914–1,380, Greater stone-only against 0 | The cut's mote (Crystal / Core / Heart) is stocked by no town, so no shelf can feed a cut whose Σ sits under its gem |
+
+⚠️ **For the ruling**: a Lesser gem cut from a *dropped* Crystal (150) and
+a cheap stone (amber 14) vendors at 300 — an uplift over vendoring the
+Crystal, not a shelf-fed mint. The Standard gem (1,500) is a loss against
+its Core's own 12-Crystal refine cost (1,800 + stone). If cutting should
+never out-sell its mote, the Lesser value wants to be ≤ 150 + the cheapest
+stone.
+
 ---
 
 ## 9. No hard caps; Discordant mode

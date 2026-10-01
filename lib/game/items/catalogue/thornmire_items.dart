@@ -150,6 +150,88 @@ abstract final class ThornmireItems {
     value: 240,
   );
 
+  // ---- the Jewelry ladder, the Primal rungs (ENCHANTING §5.3) ----------
+  //
+  // ⭐ Jewelry 1 and 5: bronze wire around this mire's amber — §5.3's
+  // "bronze → iron → skyiron", Primal's rung. All four live here because the
+  // stone is the Primal part; the metal is not. ⚠️ **Bronze, not raw
+  // copper**: Cinderpeak copper is banked for exactly ONE maker, the Bronze
+  // Ingot (ITEMS §9b.8, pinned in `cinderpeak_test`), and a second consumer
+  // nobody asked for would spend that promise. So the first rungs open once
+  // a player has smelted bronze — the ladder's point is Jewelry XP before
+  // Rimeholt (a Lesser cut wants Jewelry 10), not Primal-band gear.
+  // ⭐ The ring carries the quarter's universal line (flat HP), the pendant
+  // the stone's affinity: amber is Flora's, healing received (§2.5a).
+
+  /// Jewelry 1. About half a Bogflax robe. Σ bronze ×1 (32) + amber ×1 (14)
+  /// = **46**; `value: 42` (42 < 46 < 50.4, ECONOMY §8).
+  static const amberBand = EquipmentDef(
+    id: 'amber_band',
+    rarity: Rarity.common,
+    lore:
+        'Bronze wire wound three times round a chip of amber. Somebody\'s '
+        'first try, and it holds.',
+    slot: EquipSlot.ring,
+    form: 'Band',
+    material: 'Amber',
+    modifiers: ItemModifiers(maxHpBonus: 4),
+    salvage: [SalvageYield('amber', 1, 1)],
+    equipLevel: 8,
+    value: 42,
+  );
+
+  /// Jewelry 1. Σ bronze ×1 (32) + amber ×2 (28) = **60**; `value: 54`
+  /// (54 < 60 < 64.8).
+  static const amberDrop = EquipmentDef(
+    id: 'amber_drop',
+    rarity: Rarity.common,
+    lore:
+        'One bead of amber on a bronze loop. Warm against the skin long after '
+        'the fire is out.',
+    slot: EquipSlot.neck,
+    form: 'Drop',
+    material: 'Amber',
+    modifiers: ItemModifiers(healingReceivedPercent: 3),
+    salvage: [SalvageYield('amber', 1, 1)],
+    equipLevel: 8,
+    value: 54,
+  );
+
+  /// ⭐ Jewelry 5 — the `amber_ring` KINETIC §8.1 cut when Jewelry was held at
+  /// Rimeholt, returned as the Primal ladder's top rung. Σ bronze ×1 (32) +
+  /// amber ×3 (42) = **74**; `value: 66` (66 < 74 < 79.2).
+  static const amberRing = EquipmentDef(
+    id: 'amber_ring',
+    rarity: Rarity.common,
+    lore:
+        'A band of amber set in a bronze rim, cloudy on one side where the '
+        'mire got into it first.',
+    slot: EquipSlot.ring,
+    form: 'Ring',
+    material: 'Amber',
+    modifiers: ItemModifiers(maxHpBonus: 6),
+    salvage: [SalvageYield('amber', 1, 2)],
+    equipLevel: 12,
+    value: 66,
+  );
+
+  /// Jewelry 5. Half the Wickerbound Ring's 10, a rung sooner. Σ bronze ×1
+  /// (32) + amber ×4 (56) = **88**; `value: 80` (80 < 88 < 96).
+  static const amberPendant = EquipmentDef(
+    id: 'amber_pendant',
+    rarity: Rarity.common,
+    lore:
+        'Three drops of amber on a bronze chain, the middle one with a wing '
+        'in it. The wing is the part people ask about.',
+    slot: EquipSlot.neck,
+    form: 'Pendant',
+    material: 'Amber',
+    modifiers: ItemModifiers(healingReceivedPercent: 5),
+    salvage: [SalvageYield('amber', 1, 2)],
+    equipLevel: 12,
+    value: 80,
+  );
+
   static const all = <ItemDef>[
     bogflaxFibre,
     fenroot,
@@ -160,5 +242,9 @@ abstract final class ThornmireItems {
     bogflaxBoots,
     bogflaxGloves,
     wickerboundRing,
+    amberBand,
+    amberDrop,
+    amberRing,
+    amberPendant,
   ];
 }

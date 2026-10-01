@@ -21,6 +21,7 @@ import 'package:masters_of_magic_2/game/items/item_instance.dart';
 import 'package:masters_of_magic_2/game/items/recipe_book.dart';
 import 'package:masters_of_magic_2/game/items/recipe_def.dart';
 import 'package:masters_of_magic_2/game/items/recipes/ethereal_recipes.dart';
+import 'package:masters_of_magic_2/game/items/recipes/jewelry_recipes.dart';
 import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/game/skills.dart';
@@ -710,36 +711,52 @@ void main() {
         // the Whispering Woods to The Glass Archive. Before this quarter NO
         // recipe made either; the assertion is not "some recipe does" but
         // "exactly these seven, all Jewelry, all Ethereal".
-        List<String> makersOf(EquipSlot slot) => [
-          for (final r in RecipeBook.all)
+        //
+        // 📝 2026-10-01 — ENCHANTING §5.3 (scope ruling 2) added a Jewelry
+        // ladder below Rimeholt in its own file, `JewelryRecipes.ladder`. So
+        // the seven are now "the Ethereal quarter's", and every OTHER maker
+        // in the book must be one of the ladder's twelve — ⚠️ still never a
+        // recipe in an earlier quarter's own file, which is the mutant.
+        List<String> makersOf(EquipSlot slot, Iterable<RecipeDef> book) => [
+          for (final r in book)
             if (ItemCatalogue.byId(r.outputId) case final EquipmentDef d)
               if (d.slot == slot) r.id,
         ];
         expect(
-          makersOf(EquipSlot.neck),
+          makersOf(EquipSlot.neck, EtherealRecipes.all),
           [
             'craft_nacre_pendant',
             'craft_aetherglass_locket',
             'craft_corona_torc',
           ],
           reason:
-              '§5.3: the three Neck makers in the whole game, in gate order. '
-              'An extra one means an earlier quarter grew a necklace recipe '
-              'it was ruled not to have',
+              '§5.3: the three Ethereal Neck makers, in gate order. An extra '
+              'one means the quarter grew a necklace recipe it was not given',
         );
-        expect(
-          makersOf(EquipSlot.ring),
-          [
-            'craft_everice_band',
-            'craft_eclipse_signet',
-            'craft_orchard_loop',
-            'craft_eclipse_ring',
-          ],
-          reason: '§5.3: the four Ring makers in the whole game, in gate order',
-        );
+        expect(makersOf(EquipSlot.ring, EtherealRecipes.all), [
+          'craft_everice_band',
+          'craft_eclipse_signet',
+          'craft_orchard_loop',
+          'craft_eclipse_ring',
+        ], reason: '§5.3: the four Ethereal Ring makers, in gate order');
+        final ladder = JewelryRecipes.ladder.map((r) => r.id).toSet();
+        for (final slot in [EquipSlot.neck, EquipSlot.ring]) {
+          final elsewhere = makersOf(
+            slot,
+            RecipeBook.all,
+          ).toSet().difference(makersOf(slot, EtherealRecipes.all).toSet());
+          expect(
+            elsewhere.difference(ladder),
+            isEmpty,
+            reason:
+                '${slot.name}: an earlier quarter grew a ${slot.name} recipe '
+                'it was ruled not to have — the only makers outside this '
+                'quarter are ENCHANTING §5.3\'s ladder',
+          );
+        }
         for (final id in [
-          ...makersOf(EquipSlot.neck),
-          ...makersOf(EquipSlot.ring),
+          ...makersOf(EquipSlot.neck, RecipeBook.all),
+          ...makersOf(EquipSlot.ring, RecipeBook.all),
         ]) {
           expect(
             RecipeBook.tryById(id)!.skill,
@@ -881,12 +898,30 @@ void main() {
   });
 
   group('⭐⭐ the seven banked gems — §0.2\'s ruling, made checkable', () {
-    test('each banked gem is consumed by exactly one Jewelry recipe', () {
+    test('each banked gem is consumed by exactly one Ethereal Jewelry '
+        'recipe', () {
+      // 📝 2026-10-01 — ENCHANTING §5.1/§5.3 gave these stones more Jewelry
+      // consumers (the gem cuts and the ladder below Rimeholt), priced in
+      // ECONOMY §8.8. The §5.1 payoff this test pins is THIS quarter's one
+      // recipe per stone; the new eaters must all be Jewelry and all live in
+      // `JewelryRecipes`, never in a quarter's own file.
+      final enchantingJewelry = JewelryRecipes.all.map((r) => r.id).toSet();
       for (final entry in _bankedGems.entries) {
         final eaters = [
-          for (final r in RecipeBook.all)
+          for (final r in EtherealRecipes.all)
             if (r.inputs.any((i) => i.defId == entry.key)) r.id,
         ];
+        final others = {
+          for (final r in RecipeBook.all)
+            if (r.inputs.any((i) => i.defId == entry.key)) r.id,
+        }.difference(eaters.toSet());
+        expect(
+          others.difference(enchantingJewelry),
+          isEmpty,
+          reason:
+              '${entry.key} gained a consumer outside the Ethereal payoff and '
+              'outside ENCHANTING §5\'s Jewelry recipes — an uninvited eater',
+        );
         expect(
           eaters,
           [entry.value],

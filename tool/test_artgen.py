@@ -48,8 +48,9 @@ ROOT = artgen.ROOT
 EXPECTED_CREATURES = 55 + 66 + 77 + 88  # Primal + Kinetic + Celestial + Ethereal
 # Same four bands, per ITEM_ART.md — plus (2026-10-01, the enchanting build)
 # the 60 made-not-found defs filed under `refined` and `gems`, which belong to
-# no zone (`ItemCatalogue.byWorkshop`).
-EXPECTED_ICONS = 52 + 58 + 76 + 79 + 24 + 36
+# no zone (`ItemCatalogue.byWorkshop`). The same day the Jewelry ladder below
+# Rimeholt (ENCHANTING §5.3) added four pieces to each of the first three bands.
+EXPECTED_ICONS = 56 + 62 + 80 + 79 + 24 + 36
 EXPECTED_BACKDROPS = 5 + 6 + 7 + 8  # same four bands, Citadel in the last
 ICONS_PER_ZONE = {
     "thunderspire_peaks": 9,
@@ -57,18 +58,18 @@ ICONS_PER_ZONE = {
     "whispering_woods": 18,
     "glimmerbrook": 9,
     "cinderpeak_foothills": 8,
-    "thornmire": 9,
+    "thornmire": 13,
     "ashfall_vale": 8,
-    "old_quarry": 9,
+    "old_quarry": 11,
     "stormcliff_coast": 13,
     "windward_steppe": 15,
-    "the_molten_deep": 6,
+    "the_molten_deep": 8,
     "the_kiln_desert": 13,
     "the_mirrormere": 16,
     "starfall_basin": 9,
     "tidewrack_shoals": 11,
-    "the_sunless_reach": 9,
-    "the_shattered_orrery": 7,
+    "the_sunless_reach": 11,
+    "the_shattered_orrery": 9,
     "the_glass_archive": 11,
     "hallowmarch": 13,
     "the_buried_sky": 9,

@@ -22,7 +22,7 @@ border colour.
 `tool/artgen.py` parses it on every run — an entry is `**Name** — *rarity ·
 kind · stats*` followed by its `` `assets/items/<zone>/<id>.png` `` filename
 line and one blockquote, each zone states a wrapped `**Palette:**` line, and
-the shared preamble below is quoted verbatim into all 325 icon prompts. Reword
+the shared preamble below is quoted verbatim into all 337 icon prompts. Reword
 the prose freely; change those shapes and the tool silently finds fewer icons,
 which `test/item_icon_test.dart` and `tool/test_artgen.py` both fail on.
 
@@ -502,7 +502,7 @@ tan hide, pale ash grey.
 
 ---
 
-## Thornmire · Lv 8–13 · Flora + Aqua · **9 items**
+## Thornmire · Lv 8–13 · Flora + Aqua · **13 items**
 
 > ⭐ *A hybrid zone, and everything from it is wet and stays wet.* ⚠️ Peat,
 > tannin, retted fibre, standing water. Nothing here is clean and nothing here
@@ -596,6 +596,46 @@ sickly pale highlight.
 > tiny fresh leaf bud has opened on the band, saying it grows closed by morning.
 > Rare, so a soft green light in the gaps of the weave and nowhere else.
 
+### Equipment — the Jewelry ladder, Primal rungs (Jewelry)
+
+> ⭐ **Bronze wire and mire amber, and nothing else** (ENCHANTING §5.3) — the
+> first things the Jewelry skill makes, and they should look like it: honest
+> warm gold-brown bronze, hand-bent, around amber that is cloudy on the side
+> the mire got into. Common, so no glow anywhere — the amber's gold is lit
+> from behind like the raw nugget's, never from within.
+
+**Amber Band** — *common · ring · +4 max HP · Lv 8*
+`assets/items/thornmire/amber_band.png`
+> A plain finger ring shown standing upright, made of three turns of thin
+> warm gold-brown bronze wire wound round a single small chip of honey-gold
+> amber the size of a lentil. ⭐ *Somebody's first try, and it holds* — the
+> wire turns are slightly uneven and one end is tucked under rather than
+> soldered. Thick and rounded rather than sharp: the flat-HP line.
+
+**Amber Drop** — *common · neck · +3% healing received · Lv 8*
+`assets/items/thornmire/amber_drop.png`
+> A single rounded bead of amber the size of a pea hanging from a simple
+> bronze wire loop on a short length of plain cord, shown hanging. Warm
+> translucent honey-gold, smooth and rounded with nothing sharp anywhere —
+> the soft healing look — one side faintly cloudy. Common, so the amber is
+> lit from behind and carries no light of its own.
+
+**Amber Ring** — *common · ring · +6 max HP · Lv 12*
+`assets/items/thornmire/amber_ring.png`
+> A finger ring shown standing upright: a smooth band of polished amber set
+> into a thin bronze rim on both edges. Honey-gold, clear on one side and
+> **cloudy and darker on the other, where the mire got into it first** — a
+> visible line where the two meet. Thicker than the Amber Band, solid and
+> rounded.
+
+**Amber Pendant** — *common · neck · +5% healing received · Lv 12*
+`assets/items/thornmire/amber_pendant.png`
+> Three teardrop drops of amber hanging side by side from a short bronze bar
+> on a fine bronze chain, shown hanging, the middle drop longest. ⭐ **The
+> middle one has a small dark insect wing suspended in it**, sharply in
+> focus — *the wing is the part people ask about*. Smooth, rounded, green-gold
+> warmth at the edges; no light of its own.
+
 ---
 
 ## Ashfall Vale · Lv 10–14 · Pyro + Flora · **8 items**
@@ -688,7 +728,7 @@ orange, one vivid new green.
 
 ---
 
-## Old Quarry · Lv 15–19 · Geo · **9 items**
+## Old Quarry · Lv 15–19 · Geo · **11 items**
 
 > ⭐ *Everything here is what the hole gave back.* ⚠️ Grey stone and dust
 > first, colour only where a material or a mechanic earns it — jasper's
@@ -776,6 +816,21 @@ silver-grey, bronze warm gold-brown.
 > continuously from a hairline crack around its rim, as though it is still
 > settling. ⚠️ The dust never stops — that is the whole tell of *"the precise
 > mass the hole is missing."*
+
+**Jasper Ring** — *common · ring · +7 max HP · Lv 17*
+`assets/items/old_quarry/jasper_ring.png`
+> A heavy finger ring shown standing upright: a squared-off slab of brick-red
+> quarry jasper held in a plain dark-grey iron collar. The stone's faces are
+> flat and tool-marked, *squared off with the same tools that cut the steps*,
+> its edges chamfered rather than sharp. Common, so matte and unlit — the red
+> is the stone's own colour, not a glow.
+
+**Jasper Pendant** — *common · neck · +2 accuracy · Lv 17*
+`assets/items/old_quarry/jasper_pendant.png`
+> A polished brick-red jasper plumb-bob, a pointed cone the length of a
+> thumb, hanging from a plain dark iron chain, shown hanging. ⭐ **It hangs
+> dead straight** — chain and bob form one perfectly vertical line, the
+> accuracy look: true, aimed, a line the eye can follow. Common, no glow.
 
 ---
 
@@ -1212,7 +1267,7 @@ blue, one cold grey-white light for deflection.
 
 ---
 
-## The Molten Deep · Lv 25–29 · Pyro + Geo · **6 items**
+## The Molten Deep · Lv 25–29 · Pyro + Geo · **8 items**
 
 > ⭐ *The stone is a liquid and has been the whole time.* ⚠️ Nothing here
 > should read as two elements sharing a frame — it is one substance at two
@@ -1272,6 +1327,23 @@ crit damage · Lv 29*
 > — the deflect; and one hairline crack low on the band still shows a live
 > ember-orange point — the crit. ⭐ *"It is still cooling; it will always
 > still be cooling"* — the two lights never meet.
+
+**Obsidian Ring** — *common · ring · +10 max HP · Lv 27*
+`assets/items/the_molten_deep/obsidian_ring.png`
+> A thick finger ring of black obsidian ground smooth and pinned at one
+> point with a small dark iron rivet, shown standing upright. Glassy black
+> with a dull sheen, rounded edges, a faint conchoidal ripple across the
+> outer face. ⭐ *It took the heat once and kept the shape* — no ember
+> anywhere; that is the Firstmelt Loop's, and this is the steady one.
+
+**Obsidian Pendant** — *common · neck · +8 crit damage · Lv 27*
+`assets/items/the_molten_deep/obsidian_pendant.png`
+> A single knapped flake of black obsidian, a narrow leaf-shaped point the
+> length of a finger joint, hung point-down from a small iron cap on a plain
+> iron chain, shown hanging. ⭐ **The edge is the sharpest thing in the
+> frame** — a crisp knapped ridge running to a needle point, the crit look:
+> a point rather than a face. Common, so no ember, just the glass catching
+> the light along that edge.
 
 ---
 
@@ -1640,7 +1712,7 @@ strength · Lv 40*
 
 ---
 
-## The Sunless Reach · Lv 38–42 · Solar + Lunar · **9 items**
+## The Sunless Reach · Lv 38–42 · Solar + Lunar · **11 items**
 
 > ⭐ *Identical ground, opposite worlds, one line between them.* ⚠️ **The
 > fusion is a boundary, not a blend** — no dusk, no gradient, no soft
@@ -1715,9 +1787,25 @@ crit, +20 crit damage · Lv 42 · 1 socket*
 > length is lit hard white and the other is in total shadow, with no falloff
 > between them — and the lit side is slowly *changing sides*.
 
+**Eclipse Opal Ring** — *common · ring · +14 max HP · Lv 39*
+`assets/items/the_sunless_reach/opal_ring.png`
+> A plain brushed blue-grey skysteel band shown standing upright, with one
+> oval eclipse opal set flush into the top, its pale light half facing
+> outward and a hard dark line across it. ⭐ *Turn it in and it is a plain
+> ring* — from this angle the dark half is just visible at the setting's
+> edge. Common, so the opal's pale side is daylit, not glowing.
+
+**Eclipse Opal Pendant** — *common · neck · +3 accuracy · Lv 39*
+`assets/items/the_sunless_reach/opal_pendant.png`
+> Three small round eclipse opals set in a row along a short straight
+> skysteel bar on a fine chain, shown hanging level. ⭐ **All three are
+> turned the same way**, so the line between light and dark runs straight
+> through every one — one continuous dead-flat line across the bar, the
+> accuracy look. Common, no light of its own.
+
 ---
 
-## The Shattered Orrery · Lv 40–44 · Astral + Electro · **7 items**
+## The Shattered Orrery · Lv 40–44 · Astral + Electro · **9 items**
 
 > ⭐ *Rings the size of bridges, half of them fallen, and the fallen half
 > still turning.* ⚠️ Every object is **a part off a machine that has not
@@ -1774,6 +1862,22 @@ white-blue arc note where the Electro half shows.
 > A pair of brass-plated gauntlets, palms outward, with a row of small
 > toothed wheels set along the back of each hand; Epic, so the wheels are
 > *turning* — slowly, unevenly, and never stopping.
+
+**Sidereal Glass Ring** — *common · ring · +16 max HP · Lv 42*
+`assets/items/the_shattered_orrery/sidereal_ring.png`
+> A ring cut whole from a thick slice of pale, faintly blue sidereal lens
+> glass, held in a thin blue-grey skysteel setting on each edge, shown
+> standing upright. ⭐ Looking through the glass band, the background
+> behind it is **magnified and sharply in focus** — a lens, still working.
+> Common, so clear glass and plain metal, unlit.
+
+**Sidereal Glass Pendant** — *common · neck · 4% crit · Lv 42*
+`assets/items/the_shattered_orrery/sidereal_pendant.png`
+> A short skysteel tube the length of a finger joint on a fine chain, shown
+> hanging, with three round lenses of pale sidereal glass stacked inside it
+> visible through a slot down one side. ⭐ The three lenses are **almost
+> aligned** — one is a hair off-centre, so the tube reads as about to snap
+> into focus: a point, about to arrive. Common, no glow.
 
 ---
 
@@ -2933,14 +3037,18 @@ not the colour — says the tier
 > throwing small highlights, of teal-violet; geometric sigil lines just under
 > the surface, plainly visible.
 
-## ✅ Written — all 325 items
+## ✅ Written — all 337 items
 
 Every item in `ItemCatalogue` has an icon description here. The **Primal
-quarter (52)**, the **Kinetic quarter (58)**, the **Celestial quarter (76)**
+quarter (56)**, the **Kinetic quarter (62)**, the **Celestial quarter (80)**
 and the **Ethereal quarter plus The Eclipsed Citadel (79)** are all written,
 and so (2026-10-01, the enchanting build) are the **60 made-not-found defs**:
 24 Core and Heart motes and 36 gems, filed under `assets/items/refined/` and
-`assets/items/gems/` because no zone yields them.
+`assets/items/gems/` because no zone yields them. 📝 The same day added the
+**12-piece Jewelry ladder below Rimeholt** (ENCHANTING §5.3) — four each to
+the first three quarters, filed under the zone whose catalogue defines them:
+Thornmire, Old Quarry, The Molten Deep, The Sunless Reach and The Shattered
+Orrery.
 
 📝 **The Celestial and Ethereal icon lines came out of the contracts, not out
 of this file.** Each zone lane wrote its items' icon briefs into
@@ -2953,9 +3061,9 @@ alone there.
 
 | Quarter | Zones | Items | Icon descriptions | Icons (PNG) |
 |---|---|---|---|---|
-| **Primal** 1–14 | 5 | 52 | ✅ | ⬜ |
-| Kinetic 15–29 | 6 | 58 | ✅ | ⬜ |
-| Celestial 30–47 | 7 | 76 | ✅ | ⬜ |
+| **Primal** 1–14 | 5 | 56 | ✅ | ⬜ |
+| Kinetic 15–29 | 6 | 62 | ✅ | ⬜ |
+| Celestial 30–47 | 7 | 80 | ✅ | ⬜ |
 | Ethereal 45–58 | 7 | 72 | ✅ | ⬜ |
 | The Eclipsed Citadel 58–60 | 1 | 7 | ✅ | ⬜ |
 | Made, never found (refined motes, gems) | — | 60 | ✅ | ⬜ |
@@ -2973,7 +3081,7 @@ generated first.
 
 📝 The count in each zone heading above must equal that zone's list in
 `lib/game/items/catalogue/`. `test/item_icon_test.dart` asserts the catalogue
-total is **325**, so an item added without an entry here fails the suite with
+total is **337**, so an item added without an entry here fails the suite with
 a pointer to this file. ⚠️ Add the entry in the zone's own section, under the
 heading its kind belongs to, and give it a `assets/items/<zone>/<id>.png`
 line — the path, not the name, is what ties the description to the item. A

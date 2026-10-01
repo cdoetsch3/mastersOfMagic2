@@ -924,6 +924,42 @@ class GameState extends ChangeNotifier {
   /// on the road this is the backpack and nothing else. 📝 Stacks only — a
   /// Storeroom's `instanceIds` are distinct physical things, never the
   /// fungible inputs a recipe names.
+  /// Every mote the character holds, pack and Storeroom alike — the counts
+  /// a transmute draws from ([RecipeDef.drawFrom]).
+  Map<String, int> _moteCounts() => {
+    for (final m in ItemCatalogue.ofKind<MoteDef>()) m.id: materialCount(m.id),
+  };
+
+  /// How many of [input] the character has toward [recipe] — the literal
+  /// count for an ordinary line; for a transmute line, every mote of the
+  /// exemplar's tier that is NOT the output's own element, since that is what
+  /// the draw may take. The Workbench prints this beside [inputNeed].
+  int inputHave(RecipeDef recipe, RecipeInput input) {
+    if (!input.anyElement) return materialCount(input.defId);
+    final tier = (ItemCatalogue.byId(input.defId) as MoteDef).tier;
+    final out = ItemCatalogue.tryById(recipe.outputId);
+    final skip = out is MoteDef ? out.element : null;
+    var have = 0;
+    for (final m in ItemCatalogue.ofKind<MoteDef>()) {
+      if (m.tier == tier && m.element != skip) have += materialCount(m.id);
+    }
+    return have;
+  }
+
+  /// How many of [input] [recipe] needs from THIS crafter — the curve at the
+  /// character's Enchanting level for a transmute line, the literal count
+  /// otherwise.
+  int inputNeed(RecipeDef recipe, RecipeInput input) =>
+      input.countAt(profile.skillLevel(recipe.skill.name));
+
+  /// 'Dust' / 'Shard' / 'Crystal' — the tier word a transmute line's refusal
+  /// and Workbench row use in place of one element's name.
+  static String transmuteTierLabel(RecipeInput input) {
+    final tier = (ItemCatalogue.byId(input.defId) as MoteDef).tier;
+    final n = tier.name;
+    return n[0].toUpperCase() + n.substring(1);
+  }
+
   int materialCount(String defId) {
     final split = materialSplit(defId);
     return split.pack + split.stored;
@@ -980,12 +1016,35 @@ class GameState extends ChangeNotifier {
         'you are $have.',
       );
     }
-    for (final input in recipe.inputs) {
+    // ⭐ Salvage is an item action, never a bench recipe: its markers are
+    // kept out of `RecipeBook.all` (ENCHANTING §8.2), so reaching here with
+    // one is a content bug, not a player problem.
+    if (recipe.inputs.any((i) => i.anyEquipmentOfRarity != null)) {
+      return CraftOutcome.refused('That cannot be made here.');
+    }
+    for (final input in recipe.inputs.where((i) => i.isExact)) {
       final short = input.count - materialCount(input.defId);
       if (short > 0) {
         final def = ItemCatalogue.tryById(input.defId);
         final name = def == null ? input.defId : ItemCatalogue.displayName(def);
         return CraftOutcome.refused('Needs $short more $name.');
+      }
+    }
+    // ⭐ Transmute (ENCHANTING §3.2): an `anyElement` line draws its count —
+    // the curve at THIS crafter's level — from any element's mote of the
+    // exemplar's tier except the output's own, largest stacks first. The
+    // plan is computed once here and spent verbatim below, so what the
+    // refusal counted is exactly what the write removes.
+    Map<String, int>? draw;
+    if (recipe.inputs.any((i) => i.anyElement)) {
+      draw = recipe.drawFrom(_moteCounts(), skillLevel: have);
+      if (draw == null) {
+        final line = recipe.inputs.firstWhere((i) => i.anyElement);
+        return CraftOutcome.refused(
+          'Needs ${inputNeed(recipe, line)} '
+          '${transmuteTierLabel(line)}s of other elements — '
+          'you have ${inputHave(recipe, line)}.',
+        );
       }
     }
     final outputDef = ItemCatalogue.tryById(recipe.outputId);
@@ -1027,10 +1086,13 @@ class GameState extends ChangeNotifier {
     await _mutate(() {
       var pack = profile.backpack;
       var room = profile.storerooms[here];
-      for (final input in recipe.inputs) {
+      // ⚠️ The transmute plan replaces the literal lines wholesale — it
+      // already holds the exact lines too (`drawFrom` folds them in).
+      final toSpend = draw ?? {for (final i in recipe.inputs) i.defId: i.count};
+      for (final entry in toSpend.entries) {
         (pack, room) = _spend(
-          input.defId,
-          input.count,
+          entry.key,
+          entry.value,
           pack: pack,
           room: room,
           inTown: inTown,
