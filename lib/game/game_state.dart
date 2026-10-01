@@ -777,6 +777,10 @@ class GameState extends ChangeNotifier {
       if (won) {
         profile.earnGold(Progression.winGold);
         profile.duelsWon++;
+        // ⭐ Giant Slayer's record: how far above us the beaten foe stood,
+        // measured against our level GOING IN — before this win's XP.
+        final gap = opponentLevel - before;
+        if (gap > profile.biggestWinLevelGap) profile.biggestWinLevelGap = gap;
         if (bossDefeated) {
           final zone = locationId ?? profile.locationId;
           profile.zoneClears[zone] = profile.clearCountFor(zone) + 1;

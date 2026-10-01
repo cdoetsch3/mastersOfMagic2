@@ -11,6 +11,9 @@
 /// `skillXp`, the ladder is its rated-game counts. So an entry
 /// added later is earned retroactively by the load-time sweep
 /// (`GameState`), never lost to "you did it before it existed".
+/// 📝 Stage 2 added exactly one counter for one entry:
+/// `PlayerProfile.biggestWinLevelGap`, for Giant Slayer — a win before it
+/// existed left no record of the gap, so that one entry is not retroactive.
 ///
 /// ⚠️ **An id is forever.** Once shipped, an id is on disk in every profile
 /// that earned it. Rename the [AchievementDef.name] freely; never the id.
@@ -24,8 +27,19 @@
 /// 📝 The counters the stage-2 catalogue reads (charges, gold earned, items
 /// seen, travel) exist on the profile since 2026-10-01; the twelve entries
 /// here predate them and still read only the older counters.
+///
+/// ⭐ **Stage 2 (2026-10-01): the full catalogue lives in
+/// `achievements/`** — one file per §5 section, the per-zone and
+/// per-element entries generated from the world and the element list. This
+/// file keeps the model and the twelve shipped entries; [Achievements.all]
+/// stitches them together in §5 order.
 library;
 
+import 'achievements/campaign.dart';
+import 'achievements/duelling.dart';
+import 'achievements/mastery.dart';
+import 'achievements/wealth.dart';
+import 'achievements/world.dart';
 import 'items/item_def.dart';
 import 'player_profile.dart';
 
@@ -195,7 +209,7 @@ abstract final class Achievements {
   /// Lifetime charges of one element for Mastery tiers I–V (ruling,
   /// Christian 2026-10-01; a duel is 30–40 charges, so tier I is roughly
   /// seven duels in one element and tier V several hundred). ⭐ Consts to
-  /// tune, read by the stage-2 Mastery family — not entries yet.
+  /// tune, read by the stage-2 Mastery family (`achievements/mastery.dart`).
   static const masteryThresholds = <int>[250, 1000, 5000, 10000, 25000];
 
   // ---- Campaign ----------------------------------------------------------
@@ -334,20 +348,31 @@ abstract final class Achievements {
 
   /// Every achievement: ⭐ grouped by [AchievementCategory] in enum order,
   /// and within a category in the order the screen lists them.
-  static const all = <AchievementDef>[
+  ///
+  /// ⭐ Stage 2: the shipped twelve where they fit, the generated sections
+  /// around them (§5). ⚠️ `final`, not `const` — the generated entries close
+  /// over a zone or an element.
+  static final List<AchievementDef> all = List.unmodifiable([
+    // Campaign: the shipped five, every zone's three, the capstones.
     papersInOrder,
     firstClearing,
     fiveBanners,
     theLongRoad,
     beyondTheVeil,
+    ...CampaignAchievements.zones,
+    ...CampaignAchievements.capstones,
+    ...MasteryAchievements.all,
+    ...WealthAchievements.all,
     firstBlood,
     tenfold,
     centurion,
+    ...DuellingAchievements.all,
+    ...WorldAchievements.all,
     journeyman,
     artisan,
     rated,
     ladderRegular,
-  ];
+  ]);
 
   /// The entries in [category], in catalogue order.
   static List<AchievementDef> inCategory(AchievementCategory category) => [

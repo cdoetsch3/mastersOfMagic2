@@ -416,6 +416,17 @@ class PlayerProfile {
   /// part actually walked.
   int travelSeconds;
 
+  /// The most levels any opponent this character has BEATEN stood above it —
+  /// the opponent's level minus this character's level going in, the best
+  /// so far. ⭐ Giant Slayer reads it (ACHIEVEMENTS §5.4: 10+ levels).
+  ///
+  /// ⭐ Written by `GameState.recordDuelResult` on a win, riding the result's
+  /// write; a loss never moves it, and it never goes down. 0 until a win
+  /// over someone higher — a win over an equal or a lower foe leaves it.
+  ///
+  /// 📝 On the character document (§2.4): one int.
+  int biggestWinLevelGap;
+
   /// How many times this character has beaten each zone's **boss**.
   ///
   /// ⚠️ **Not the same as [discoveredLocationIds]** — walking somewhere is not
@@ -570,6 +581,7 @@ class PlayerProfile {
     this.goldEarned = 0,
     Set<String>? itemsSeen,
     this.travelSeconds = 0,
+    this.biggestWinLevelGap = 0,
     Map<String, int>? zoneClears,
     Map<String, int>? skillXp,
     List<LoadoutPreset>? presets,
@@ -767,6 +779,7 @@ class PlayerProfile {
     'goldEarned': goldEarned,
     'itemsSeen': itemsSeen.toList(),
     'travelSeconds': travelSeconds,
+    'biggestWinLevelGap': biggestWinLevelGap,
     'zoneClears': zoneClears,
     if (skillXp.isNotEmpty) 'skillXp': skillXp,
     'presets': presets.map((p) => p.toJson()).toList(),
@@ -862,6 +875,8 @@ class PlayerProfile {
       goldEarned: (json['goldEarned'] as num?)?.toInt() ?? 0,
       itemsSeen: (json['itemsSeen'] as List?)?.cast<String>().toSet(),
       travelSeconds: (json['travelSeconds'] as num?)?.toInt() ?? 0,
+      // Absent before stage 2 (2026-10-01): no recorded giant-slaying yet.
+      biggestWinLevelGap: (json['biggestWinLevelGap'] as num?)?.toInt() ?? 0,
       // Absent on saves from before clears were tracked — an old character
       // reads as "has cleared nothing", which is the safe direction: it can
       // only withhold repeat-clear content, never grant it early.

@@ -36,9 +36,12 @@ class AchievementsScreen extends StatefulWidget {
   /// ⭐ The entries to list — [Achievements.all] in the game. A parameter so
   /// the tests can hand it synthetic families; ⚠️ claiming still goes through
   /// [GameState], which pays from [Achievements.all].
-  final List<AchievementDef> catalogue;
+  /// ⚠️ Nullable rather than defaulted: [Achievements.all] holds generated
+  /// closures (stage 2) and is no longer a compile-time constant, so it
+  /// cannot be a default. Null means the game's catalogue.
+  final List<AchievementDef>? catalogue;
 
-  const AchievementsScreen({super.key, this.catalogue = Achievements.all});
+  const AchievementsScreen({super.key, this.catalogue});
 
   /// The summary's Claim all button, for the tests.
   static const claimAllKey = ValueKey('achievements-claim-all');
@@ -142,7 +145,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   Widget build(BuildContext context) {
     final game = GameStateScope.of(context);
     final profile = game.profile;
-    final catalogue = widget.catalogue;
+    final catalogue = widget.catalogue ?? Achievements.all;
     final rows = rowsFor(catalogue, profile);
     final waiting = [
       for (final a in catalogue)
@@ -217,7 +220,9 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 // can only ever show the empty line is a promise the screen
                 // cannot keep.
                 for (final c in AchievementCategory.values)
-                  if (widget.catalogue.any((a) => a.category == c))
+                  if ((widget.catalogue ?? Achievements.all).any(
+                    (a) => a.category == c,
+                  ))
                     _FilterChip(
                       label: c.label,
                       on: _category == c,
@@ -286,7 +291,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         // ⚠️ Counted over the whole category, filters or not, and in
         // entries — a family of five is five here.
         final inCat = [
-          for (final a in widget.catalogue)
+          for (final a in widget.catalogue ?? Achievements.all)
             if (a.category == c) a,
         ];
         out.add(
@@ -856,16 +861,20 @@ String claimedBannerText(AchievementReward paid) =>
 /// counts entries (tiers), not the screen's collapsed rows.
 String achievementCountLabel(
   Set<String> earned, {
-  List<AchievementDef> catalogue = Achievements.all,
-}) => countLabel(_earnedOf(catalogue, earned), catalogue.length);
+  List<AchievementDef>? catalogue,
+}) {
+  final defs = catalogue ?? Achievements.all;
+  return countLabel(_earnedOf(defs, earned), defs.length);
+}
 
 /// The Profile row's trailing: ⭐ `'n to claim'` while any reward waits —
 /// the one thing worth a glance from the Profile — else [achievementCountLabel].
 /// ⚠️ n is tiers waiting, not families: three tiers of one family are three.
 String achievementProfileTrailing(
   PlayerProfile p, {
-  List<AchievementDef> catalogue = Achievements.all,
+  List<AchievementDef>? catalogue,
 }) {
+  catalogue ??= Achievements.all;
   final waiting = catalogue
       .where(
         (a) =>

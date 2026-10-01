@@ -84,9 +84,29 @@ void main() {
   });
 
   group('the catalogue shape', () {
+    // 📝 The twelve shipped before stage 2. The stage-2 catalogue's shape is
+    // pinned in `achievement_catalogue_test`.
+    const shipped = {
+      'papers_in_order',
+      'first_clearing',
+      'five_banners',
+      'the_long_road',
+      'beyond_the_veil',
+      'first_blood',
+      'tenfold',
+      'centurion',
+      'journeyman',
+      'artisan',
+      'rated',
+      'ladder_regular',
+    };
+
     test('⭐ the twelve, re-pointed (2026-10-01)', () {
       expect(
-        {for (final a in Achievements.all) a.id: a.points},
+        {
+          for (final a in Achievements.all)
+            if (shipped.contains(a.id)) a.id: a.points,
+        },
         {
           'papers_in_order': 10,
           'first_clearing': 10,
@@ -136,7 +156,9 @@ void main() {
       expect(
         [
           for (final a in Achievements.all)
-            if (a.hidden || a.family != null || a.tier != null) a.id,
+            if (shipped.contains(a.id) &&
+                (a.hidden || a.family != null || a.tier != null))
+              a.id,
         ],
         isEmpty,
         reason:

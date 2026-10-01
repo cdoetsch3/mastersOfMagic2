@@ -1,9 +1,9 @@
 # Masters of Magic 2 — Achievements & Character Progress
 
 Status: 🔨 **stage 1 built (2026-10-01)** — the model, the four lifetime
-counters and Claim (see the rulings below and §11). 📝 Stage 2 is the
-catalogue content (≈160 entries) and the screen redesign. Requested
-2026-07-28, revised with Christian's rulings the same day.
+counters and Claim (see the rulings below and §11). ✅ **Stage 2's catalogue
+is built** — 171 entries (§5). 📝 The screen redesign is the rest of stage 2.
+Requested 2026-07-28, revised with Christian's rulings the same day.
 
 Two systems, documented together because one is useless without the other:
 
@@ -214,7 +214,8 @@ written (even empty or zero), each absent-reads-as-empty on an older save:
 | `goldEarned` | lifetime gold **gained** (duel rewards, vendor sales, claims) | **one int** | `PlayerProfile.earnGold`, the only way gold is gained |
 | `itemsSeen` | every item def id that has ever dropped for this character | **≤265 ids** — the item catalogue | `winEncounter`, when the loot is rolled |
 | `travelSeconds` | lifetime seconds on the road | **one int** | `settleTravel` (the whole trip, on arrival); `cancelTravel` (the part walked) |
-| `claimedAchievements` | ids whose reward has been taken | **≤ the catalogue** (≈160) | `claimAchievement` / `claimAllAchievements` |
+| `claimedAchievements` | ids whose reward has been taken | **≤ the catalogue** (171) | `claimAchievement` / `claimAllAchievements` |
+| `biggestWinLevelGap` | the most levels a beaten opponent stood above this character (stage 2, for Giant Slayer §5.4) | **one int** | `recordDuelResult`, on a win — never down |
 
 The same three tests §2.3 applied, and the same answer:
 
@@ -273,7 +274,8 @@ each tier carry its own reward, and it keeps "earned" a simple set.
 
 **Example — Pyro Mastery** (numbers 📝 provisional, to be tuned in a later
 session — ✅ **superseded 2026-10-01**: the thresholds are 250 / 1,000 /
-5,000 / 10,000 / 25,000, ruling 3 above; points per tier are still stage 2):
+5,000 / 10,000 / 25,000, ruling 3 above; ✅ points 5 / 10 / 25 / 25 / 50,
+built in stage 2 — §5.2):
 
 | Tier | Charges | Points |
 |---|---|---|
@@ -308,80 +310,207 @@ result handler. Deferred to a second pass — everything else works without it.
 
 ---
 
-## 5. The catalogue
+## 5. The catalogue ✅ built (stage 2, 2026-10-01)
 
-### 5.1 Campaign — three achievements per zone ✅
+✅ **Built: 171 entries.** `Achievements.all` (`lib/game/achievements.dart`)
+stitches them together in this section's order; the content lives in
+`lib/game/achievements/`, one file per section (`campaign.dart`,
+`mastery.dart`, `wealth.dart`, `duelling.dart`, `world.dart`). The twelve
+entries shipped in release 9 keep their ids and meanings and sit where they
+fit. Laws: `test/achievement_catalogue_test.dart`.
+
+⭐ **Generated where the shape is uniform.** The 78 campaign entries come
+from `World.locations` (every location with an adventure) and the 60
+mastery tiers from `MagicElement.values` × `Achievements.masteryThresholds`;
+only their **names** are hand-written (§5.1a). A combat zone added without a
+names row fails at load.
+
+| Category | Entries | Arithmetic |
+|---|---|---|
+| Campaign | **86** | 5 shipped + 26 zones × 3 + 3 capstones |
+| Mastery | **62** | 12 elements × 5 tiers + Twelvefold + Elementalist |
+| Wealth | **4** | Young Money … Tres Commas |
+| Dueling | **11** | 3 shipped + Champion, Giant Slayer, Procarius Falls + Vanquisher I–V |
+| World | **4** | Wayfarer, Cartographer, The Empyrean, Ten Hours on the Road |
+| Craft | **2** | shipped (Journeyman, Artisan) |
+| Ladder | **2** | shipped (On the Ladder, Regular) |
+| **Total** | **171** | |
+
+**Hidden** (§7.1, `???` until earned) — exactly four: `extinction`,
+`nothing_left_to_find`, `tres_commas`, `procarius_falls`.
+
+**Families** (§3.1) — fourteen: `mastery_<element>` × 12 (tiers 1–5),
+`wealth` (1–4), `vanquisher` (1–5). Every family's tiers run 1..n.
+
+### 5.1 Campaign — three achievements per zone ✅ built
 
 ✅ **Ruling: "cleared" is three separate things, not one.** Per zone:
 
-| Achievement | Earned by | Points |
-|---|---|---|
-| **Clear** — "Woods Walker" | Beat the zone once | 10 |
-| **Purge** — "Nothing Left Standing" | Defeat **every enemy type** in it | 25 |
-| **Collector** — "Everything the Woods Gave" | See **every possible drop**, rares included | 50 |
+| Achievement | Id | Earned by | Points |
+|---|---|---|---|
+| **Clear** — "Woods Walker" | `clear_<zone>` | The zone cleared once (`zoneClears`) | 10 |
+| **Purge** — "Nothing Left Standing" | `purge_<zone>` | **Every creature** of the zone slain at least once (`bestiary`), progress n/11 | 25 |
+| **Collector** — "Everything the Woods Gave" | `collect_<zone>` | **Every possible drop** of the zone seen (`itemsSeen`), progress n/total | 50 |
+
+⭐ **Collector's set is the zone's drop TABLES**: `DropTable.possibleDrops`
+across the zone's eleven creatures, motes included. ⚠️ **`KeyDef`s are
+excluded** — the proofs and the Ethereal thirds are quest items; a character
+who carried one before `itemsSeen` existed could never see it drop again.
+📝 The boss's guaranteed zone gear and the empty-roll consolation are not in
+any table (`rollKill` adds them), so Collector does not ask for them.
+
+⚠️ **Purge counts that zone's roster only** — a kill anywhere else never
+moves another zone's bar — and counts creatures, not kills.
 
 ⚠️ **The Collector tier is intentionally grindy and genuinely hard**, and is
 the one place this system knowingly breaks the "record, not quest" rule (§1).
-It is the long tail. Two risks to accept openly:
+It is the long tail. ⚠️ It is **hostage to drop rates**: the rates and this
+achievement must be tuned *together*, or it becomes the reason someone quits.
 
-- It is **hostage to drop rates**. A 0.5% rare across a 40-item table is tens
-  of hours per zone. The rates and this achievement must be tuned *together*,
-  or it becomes the reason someone quits.
-- It **cannot be built before the item catalogue and drop tables exist**
-  (Phases 7–8), and it should be revisited once they do.
+26 zones × 3 = **78 achievements**, plus capstones:
 
-23 zones × 3 = **69 achievements**, plus capstones:
+| Achievement | Id | Earned by | Points |
+|---|---|---|---|
+| **The Known World** | `the_known_world` | All 26 cleared | 100 |
+| **Extinction** 🔒 | `extinction` | All 26 purged | 100 |
+| **Nothing Left to Find** 🔒 | `nothing_left_to_find` | All 26 collected | 150 |
 
-- **"The Known World"** — clear all 23. 100 points, + title.
-- **"Extinction"** — purge all 23. 100 points.
-- **"Nothing Left to Find"** — collect all 23. 150 points, + title + cosmetic.
+📝 Titles and cosmetics on the capstones wait on §6.1 (ruling 2, 2026-10-01).
 
-### 5.2 Mastery — charges ✅
+### 5.1a The 78 names ✅
 
-- **`<Element>` Mastery I–V** — 12 elements × 5 tiers (§3.1). **60**.
-- **"Twelvefold"** — reach Tier I in **all twelve**. 100 points, + title.
+Blurbs follow one pattern per kind: Clear "*Zone* cleared to its boss.",
+Purge "Every creature of *zone* slain at least once.", Collector
+"Everything *zone* can drop, seen at least once." **Total** is the
+Collector's drop-set size, keys excluded.
+
+| Zone (id) | Clear | Purge | Collector | Total |
+|---|---|---|---|---|
+| `whispering_woods` | Woods Walker | Nothing Left Standing | Everything the Woods Gave | 9 |
+| `glimmerbrook` | Brook Wader | The Brook Runs Quiet | All That Glimmers | 8 |
+| `cinderpeak_foothills` | Foothill Climber | Cold Ashes | Picked from the Cinders | 6 |
+| `thornmire` | Mire Strider | The Mire Lies Still | Dredged from the Mire | 10 |
+| `ashfall_vale` | Vale Wanderer | The Vale Swept Clean | Sifted from the Ash | 11 |
+| `old_quarry` | Quarry Scrambler | Not a Stone Stirring | Quarried Clean | 8 |
+| `stormcliff_coast` | Coast Runner | The Storm Breaks | Storm Salvage | 9 |
+| `windward_steppe` | Steppe Rider | Nothing on the Wind | Gathered on the Wind | 8 |
+| `frostfell_pass` | Frost Treader | Nothing Left but Snow | Dug from the Snow | 12 |
+| `thunderspire_peaks` | Spire Scaler | The Thunder Stops | Struck Lucky | 12 |
+| `the_molten_deep` | Deep Delver | Nothing Left but Slag | Pulled from the Fire | 12 |
+| `the_kiln_desert` | Dune Crosser | Only Sand Remains | Fired in the Kiln | 9 |
+| `the_mirrormere` | Mere Skimmer | Nothing in the Mirror | Everything the Mere Reflected | 10 |
+| `starfall_basin` | Basin Roamer | The Stars Go Out | Every Fallen Star | 10 |
+| `tidewrack_shoals` | Shoal Sailor | The Tide Goes Out | Flotsam and Jetsam | 13 |
+| `the_sunless_reach` | Sunless Rambler | Nothing in the Dark | Found in the Dark | 13 |
+| `the_shattered_orrery` | Orrery Drifter | The Gears Stop Turning | Every Last Cog | 13 |
+| `hallowmarch` | March Pilgrim | The March Ends | Every Offering | 8 |
+| `the_umbral_wastes` | Shadow Trekker | Not a Shadow Moves | Everything the Shadows Held | 9 |
+| `the_reliquary_deep` | Vault Descender | Nothing Left to Guard | Every Relic | 13 |
+| `the_sealed_garden` | Garden Trespasser | The Garden Weeded | The Full Harvest | 13 |
+| `the_glass_archive` | Glass Stepper | Nothing Behind the Glass | The Archive Catalogued | 14 |
+| `the_buried_sky` | Sky Burrower | The Sky Stays Buried | Everything the Sky Buried | 13 |
+| `the_collapsed_academy` | Rubble Crawler | Class Dismissed | Full Marks | 8 |
+| `the_unwritten_library` | Stack Rover | Not a Page Turns | Every Unwritten Page | 14 |
+| `the_eclipsed_citadel` | Eclipse Chaser | The Citadel Empty | Everything the Eclipse Hid | 35 |
+
+⚠️ **A combat zone's id is now an achievement id too.** `World.renamedIds`
+rescues a stored location, not an earned `clear_<zone>`; never rename a
+combat zone.
+
+### 5.2 Mastery — charges ✅ built
+
+- **`<Element>` Mastery I–V** — 12 elements × 5 tiers (§3.1). **60**. Id
+  `mastery_<element>_<tier>`, family `mastery_<element>`, blurb
+  "*Element* charged *n* times.", progress charges/threshold.
+
+| Tier | Charges (ruling 3) | Points |
+|---|---|---|
+| I | 250 | 5 |
+| II | 1,000 | 10 |
+| III | 5,000 | 25 |
+| IV | 10,000 | 25 |
+| V | 25,000 | 50 |
+
+- **"Twelvefold"** (`twelvefold`) — Tier I in **all twelve**. 100 points.
   ⭐ The flagship: the one achievement that asks a player to leave the loadout
   they are comfortable in, which is exactly what the twelve-element design
   most wants.
-- **"Elementalist"** — all 5 element slots unlocked. 25.
+- **"Elementalist"** (`elementalist`) — all 5 element slots unlocked. 25.
+  ⚠️ Read off the **schedule** (`Progression.elementsAtLevel`, the fifth slot
+  at level 40), not the usable count: slots are not enforced yet, so
+  `usableElementsAtLevel` is five at level 1 and would give it away.
 
-### 5.3 Wealth ✅ (requested)
+### 5.3 Wealth ✅ built
 
-✅ **Four entries (ruling 6, 2026-10-01).**
+✅ **Four entries (ruling 6, 2026-10-01).** Family `wealth`, tiers 1–4,
+progress `goldEarned`/threshold.
 
-| Achievement | Earned by | Points |
-|---|---|---|
-| **Young Money** | Earn 10,000 gold | 5 |
-| **Fat Stacks** | Earn 100,000 gold | 10 |
-| **Big Money** | Earn 1,000,000 gold | 25 |
-| **Tres Commas** | Earn 1,000,000,000 gold | 100 |
+| Achievement | Id | Earned by | Points |
+|---|---|---|---|
+| **Young Money** | `young_money` | Earn 10,000 gold | 5 |
+| **Fat Stacks** | `fat_stacks` | Earn 100,000 gold | 10 |
+| **Big Money** | `big_money` | Earn 1,000,000 gold | 25 |
+| **Tres Commas** 🔒 | `tres_commas` | Earn 1,000,000,000 gold | 100 |
 
 ⚠️ **Lifetime gold *earned*, not gold *held*.** Held balance would punish
 spending — a player who invests in gear would watch progress go backwards, and
-the achievement would quietly discourage engaging with the economy. `totals`
-(§2.1) tracks the lifetime figure. ✅ (2026-10-01: `PlayerProfile.goldEarned`, on the
-character — §2.4.)
+the achievement would quietly discourage engaging with the economy.
+✅ `PlayerProfile.goldEarned`, on the character (§2.4).
 
 ❓ **Is a billion reachable?** That depends entirely on an economy that does
 not exist yet. If end-game income is ~10k/hour, Tres Commas is 100,000 hours
 and is not an achievement but a joke. Keep the name, set the number once the
-economy is real.
+economy is real. 📝 Hidden meanwhile.
 
-### 5.4 Duelling
+### 5.4 Dueling ✅ built
 
-| Achievement | Earned by | Points |
-|---|---|---|
-| **First Blood** | Win one duel | 5 |
-| **Duellist / Veteran / Champion** | Win 10 / 100 / 500 | 10 / 25 / 50 |
-| **Giant Slayer** | Beat an opponent 10+ levels above you | 25 |
-| **Procarius Falls** | Beat Procarius | 50, + title |
-| 📝 **Vanquisher I–V** | Defeat N enemies total | tiered (needs bestiary) |
+| Achievement | Id | Earned by | Points |
+|---|---|---|---|
+| **First Blood** | `first_blood` | Win one duel (shipped) | 5 |
+| **Tenfold** | `tenfold` | Win 10 (shipped; §5.4's "Duellist") | 10 |
+| **Centurion** | `centurion` | Win 100 (shipped; §5.4's "Veteran") | 25 |
+| **Champion** | `champion` | Win 500 | 50 |
+| **Giant Slayer** | `giant_slayer` | Beat an opponent 10+ levels above you | 25 |
+| **Procarius Falls** 🔒 | `procarius_falls` | Slay Procarius in the Eclipsed Citadel | 50 |
+| **Vanquisher I–V** | `vanquisher_1` … `_5` | 50 / 250 / 1,000 / 2,500 / 5,000 creatures slain | 5 / 10 / 25 / 25 / 50 |
 
-### 5.5 World
+⚠️ Wins are `duelsWon` — the geared and campaign record. Academy wins are a
+separate record and do not count.
 
-**Wayfarer** (visit 10) · **Cartographer** (visit all 32, + title) ·
-**Beyond the Veil** (reach the Empyrean) · **The Long Road** (10 hours
-travelled).
+⭐ **Giant Slayer has the one new counter**:
+`PlayerProfile.biggestWinLevelGap` — the best (opponent level − own level
+going in) over every win, written by `GameState.recordDuelResult`. ⚠️
+Measured against the level **before** the win's XP, so a win that levels you
+up still counts its full gap. 📝 Not retroactive: wins before the field
+existed left no gap behind.
+
+⚠️ **Procarius Falls reads the bestiary id `procarius_the_eclipsed`** — the
+Citadel's last boss — not the duelling persona id `procarius`. A practice
+bout against the persona is not the finale.
+
+Vanquisher counts **every kill** (`bestiary[*].slain` summed, repeats
+included); family `vanquisher`.
+
+### 5.5 World ✅ built
+
+| Achievement | Id | Earned by | Points |
+|---|---|---|---|
+| **Wayfarer** | `wayfarer` | 10 places discovered | 10 |
+| **Cartographer** | `cartographer` | Every `World.locations` id discovered (35 today) | 50 |
+| **The Empyrean** | `the_empyrean` | Zenith discovered | 25 |
+| **Ten Hours on the Road** | `ten_hours_on_the_road` | `travelSeconds` ≥ 36,000 (progress in whole hours) | 25 |
+
+⚠️ **Two of the names first written here were already taken** by stage-1
+Campaign entries with other meanings — `beyond_the_veil` is Rimeholt's gate
+and `the_long_road` is fifteen clears. Their World counterparts are **The
+Empyrean** and **Ten Hours on the Road**. ⚠️ Discovery counts only ids that
+name a real place, so a retired id on an old save never counts.
+
+### 5.6 Craft and Ladder (shipped)
+
+**Journeyman** (`journeyman`, one craft at level 5, 10) · **Artisan**
+(`artisan`, level 10, 25) · **On the Ladder** (`rated`, one rated duel, 5) ·
+**Regular** (`ladder_regular`, ten rated duels, 10). Unchanged by stage 2.
 
 ---
 
@@ -577,8 +706,8 @@ extra vocabulary, which is a point in favour of the names chosen.
 | 2 | ✅ **Zone `cleared` state** (§2.3) — `PlayerProfile.zoneClears` | 23 campaign achievements |
 | 3 | ✅ **Per-element charge counters** (§2.2) — `PlayerProfile.charges` | 61 mastery achievements |
 | 4 | ✅ **Lifetime gold earned** (§5.3) — `PlayerProfile.goldEarned` | wealth achievements |
-| 5 | 📝 **Bestiary** (Phase 6) | purge + vanquisher achievements |
-| 6 | 📝 **Item catalogue + drop tables** (Phases 7–8) | collector achievements |
+| 5 | ✅ **Bestiary** — `PlayerProfile.bestiary` (seen/slain per creature) | purge + vanquisher achievements |
+| 6 | ✅ **Item catalogue + drop tables** — `DropTable.possibleDrops`, `itemsSeen` | collector achievements |
 | 7 | 📝 **`DuelSummary`** (§4) | conditional duel achievements only |
 
 📝 Built alongside 1–4 (2026-10-01): `PlayerProfile.itemsSeen` (the

@@ -87,11 +87,33 @@ PlayerProfile _p() => PlayerProfile.newPlayer();
 
 Iterable<String> _ids(Iterable<AchievementDef> defs) => defs.map((d) => d.id);
 
+/// The twelve entries shipped before stage 2 (release 9) — their ids are on
+/// disk. 📝 The stage-2 catalogue is pinned in `achievement_catalogue_test`.
+const _shipped = {
+  'papers_in_order',
+  'first_clearing',
+  'five_banners',
+  'the_long_road',
+  'beyond_the_veil',
+  'first_blood',
+  'tenfold',
+  'centurion',
+  'journeyman',
+  'artisan',
+  'rated',
+  'ladder_regular',
+};
+
+/// [Achievements.all] narrowed to [_shipped], in catalogue order.
+Iterable<AchievementDef> get _twelve =>
+    Achievements.all.where((a) => _shipped.contains(a.id));
+
 void main() {
   group('the catalogue', () {
-    test('⭐ the full id list, in order, with categories — ids are forever', () {
+    test('⭐ the shipped twelve, in order, with categories — ids are '
+        'forever', () {
       expect(
-        [for (final a in Achievements.all) '${a.category.name}:${a.id}'],
+        [for (final a in _twelve) '${a.category.name}:${a.id}'],
         [
           'campaign:papers_in_order',
           'campaign:first_clearing',
@@ -148,12 +170,20 @@ void main() {
         'first_blood',
         'tenfold',
         'centurion',
+        'champion',
+        'giant_slayer',
+        'procarius_falls',
+        'vanquisher_1',
+        'vanquisher_2',
+        'vanquisher_3',
+        'vanquisher_4',
+        'vanquisher_5',
       ], reason: 'kills an inCategory that leaks or reorders entries');
     });
 
     test('the copy, as written', () {
       expect(
-        {for (final a in Achievements.all) a.name: a.blurb},
+        {for (final a in _twelve) a.name: a.blurb},
         {
           'Papers in Order':
               'Pennycross unlocked. The proofs stay with the guard.',
@@ -198,7 +228,7 @@ void main() {
     test('one-shots have no count; counted entries do', () {
       expect(
         [
-          for (final a in Achievements.all)
+          for (final a in _twelve)
             if (a.progress != null) a.id,
         ],
         [
@@ -477,29 +507,33 @@ void main() {
       );
     });
 
-    test('a boss win earns two, queued together in catalogue order', () async {
-      final game = GameState(_JsonMem(), _p());
-      await game.recordDuelResult(
-        won: true,
-        bossDefeated: true,
-        locationId: 'whispering_woods',
-      );
-      expect(_ids(game.achievementNews.value), [
-        'first_clearing',
-        'first_blood',
-      ], reason: 'kills a hook that grants only the first it finds');
-      expect(
-        achievementsToastText(game.achievementNews.value),
-        'Achievements · First Clearing, First Blood',
-        reason:
-            'one toast names both — a second banner would replace the first',
-      );
-      expect(
-        achievementsToastText([Achievements.tenfold]),
-        'Achievement · Tenfold',
-        reason: 'one alone reads as the gate toast always has',
-      );
-    });
+    test(
+      'a boss win earns three, queued together in catalogue order',
+      () async {
+        final game = GameState(_JsonMem(), _p());
+        await game.recordDuelResult(
+          won: true,
+          bossDefeated: true,
+          locationId: 'whispering_woods',
+        );
+        expect(_ids(game.achievementNews.value), [
+          'first_clearing',
+          'clear_whispering_woods',
+          'first_blood',
+        ], reason: 'kills a hook that grants only the first it finds');
+        expect(
+          achievementsToastText(game.achievementNews.value),
+          'Achievements · First Clearing, Woods Walker, First Blood',
+          reason:
+              'one toast names both — a second banner would replace the first',
+        );
+        expect(
+          achievementsToastText([Achievements.tenfold]),
+          'Achievement · Tenfold',
+          reason: 'one alone reads as the gate toast always has',
+        );
+      },
+    );
 
     test('a loss earns nothing and writes nothing extra', () async {
       final storage = _JsonMem();
