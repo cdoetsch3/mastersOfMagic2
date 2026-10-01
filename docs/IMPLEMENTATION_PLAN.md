@@ -1209,9 +1209,11 @@ belt line, rating colour, cleared marks, the header pill.
 §8.5, Saltwort 75→95, Sanctus Aspect, stationRequired, wiki export stale
 (~40k lines), loot picker partial stacks (all-or-nothing today).
 
-## 🔨 Playtest batch 2026-09-30 (release 8, Opus lanes, merging)
+## ✅ Playtest batch 2026-09-30 (release 8, Opus lanes, all merged)
 
-Thirteen notes + one mid-turn ruling ("lean the tables into craftables").
+Thirteen notes + one mid-turn ruling ("lean the tables into craftables");
+nine Opus lanes, all on main (3465 app / 602 engine, analyzers zero, format
+clean).
 Mockups: claude.ai/artifact/Fu5HF543vUw6Q8mnnphbve (map tiers, travel A,
 Achievements A + filters, Bestiary A + search).
 2. Potency line loses '(base 10%)'. 13. Nav tabs top-aligned (level with
@@ -1228,10 +1230,15 @@ attacks — 28 one-charge countdown jabs to 5, 23 heavy attacks to 9 (an
 attack goes at 9 unless thematic/telegraphed). 12. **Travel chaining** (mockup A): tap any
 pin, per-character route that never passes an uncleared zone, a shut gate
 ends the trip at the gate. 7. **Achievements** (mockup A + filters):
-categories, progress, Hide earned, sweep on load. 8. **Bestiary** (mockup
+twelve entries in Journey/Combat/Craft/Ladder from existing counters, Hide
+earned, live toasts, silent sweep on load. 8. **Bestiary** (mockup
 A + search): seen/slain per creature on the profile, field guide by zone,
 search by name or drop, entry page with moves and rates.
-⚠️ Christian verifies every screen above in the browser.
+⚠️ Christian verifies every screen above in the browser. No rules change
+(`tool/deploy.sh` without `--rules`).
+❓ Open: ladder rungs 3≈4 after the crit base (probe: re-spread 15/12/9/7/5/2
+proposed); "Heals at each town" is unimplemented (WORLD §4b.2); wiki export
+stale; Stormcliff seawrack set at L16 in a 23–28 zone (re-band leftover).
 
 ## Deferred / banked — do not build without an explicit ask
 
