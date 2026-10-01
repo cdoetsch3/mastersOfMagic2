@@ -1660,11 +1660,14 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > with no gradient. Immobile, planted, its long axis running rightward.
 
 **Both-Sided Thing** — *mini · Executioner · Solar+Lunar*
-> A humanoid figure of ordinary person height, split top to bottom down its
-> exact centre line — the right half bleached the pale grey-white of desert
-> floor stone, the left half flat lightless black — with a hard seam between
-> them and no blending at all. Both halves are the same shape. Turned
-> three-quarters to the right, weight forward, arms low and loose.
+> A carved stone statue the height of a person, in the plain shape of a
+> standing figure wearing a floor-length hooded robe — featureless, no face
+> under the hood, no hands showing, nothing but the robe's folds and the
+> stone they are cut from — split top to bottom down its exact centre line:
+> the right half bleached the pale grey-white of desert floor stone, the
+> left half flat lightless black, with a hard seam between them and no
+> blending at all. Both halves are the same shape. Turned three-quarters to
+> the right, weight forward, the robe hanging loose.
 
 **Duskmarch** — *mini · Hexer · Lunar*
 > A tall, very thin humanoid silhouette of uniform flat black, person-height
