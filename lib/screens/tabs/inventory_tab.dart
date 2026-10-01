@@ -16,6 +16,7 @@ import '../../ui/item_display.dart';
 import '../../ui/item_icon.dart';
 import '../../ui/stack_count_badge.dart';
 import '../craft_screen.dart';
+import '../gear_work_actions.dart';
 import '../home_shell.dart';
 import '../shop_screen.dart';
 
@@ -414,17 +415,22 @@ class _EquipSlotChip extends StatelessWidget {
     if (def is EquipmentDef) {
       return InkWell(
         borderRadius: BorderRadius.circular(6),
-        onTap: () => showItemDialog(
-          context,
-          def: def,
-          instance: inst,
-          actions: [
-            (
-              label: 'Unequip',
-              run: () => GameStateScope.read(context).unequip(slot),
-            ),
-          ],
-        ),
+        onTap: () {
+          final game = GameStateScope.read(context);
+          // ⭐ Enchant… / Socket… on worn gear too — the instance is the same
+          // piece wherever it sits (ENCHANTING §7).
+          final work = gearWorkActions(context, game, def, inst);
+          showItemDialog(
+            context,
+            def: def,
+            instance: inst,
+            actions: [
+              (label: 'Unequip', run: () => game.unequip(slot)),
+              ...work.actions,
+            ],
+            unavailable: work.unavailable,
+          );
+        },
         child: chip,
       );
     }
@@ -699,6 +705,9 @@ class _BackpackGrid extends StatelessWidget {
                   wornMainHand: game.wornDef(EquipSlot.mainHand),
                 )
               : null;
+          // ⭐ Enchant… / Socket… (ENCHANTING §7) — live at the station,
+          // greyed with the station's name everywhere else.
+          final work = gearWorkActions(context, game, def, instance);
           // The full menu, reached by long-press (Option A) — or by tap when
           // out of town, where there is nowhere to deposit.
           void openMenu() => showItemDialog(
@@ -720,12 +729,14 @@ class _BackpackGrid extends StatelessWidget {
                     return null;
                   },
                 ),
+              ...work.actions,
             ],
             // ⚠️ Greyed with the reason rather than hidden — otherwise a full
             // belt is indistinguishable from an item that was never beltable.
             unavailable: [
               if (handsNo != null) (label: 'Equip', reason: handsNo),
               if (beltNo != null) (label: 'Load onto belt', reason: beltNo),
+              ...work.unavailable,
             ],
           );
           return _ItemSlot(

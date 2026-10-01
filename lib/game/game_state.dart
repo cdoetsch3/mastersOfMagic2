@@ -17,6 +17,7 @@ import 'academy.dart';
 import 'achievements.dart';
 import 'enemies/loot.dart';
 import 'items/carrying.dart';
+import 'items/enchants.dart';
 import 'items/equipping.dart';
 import 'items/inventory.dart';
 import 'items/item_catalogue.dart';
@@ -1027,28 +1028,13 @@ class GameState extends ChangeNotifier {
       var pack = profile.backpack;
       var room = profile.storerooms[here];
       for (final input in recipe.inputs) {
-        // ⭐ Pack first, Storeroom second — see the doc comment. Reversing
-        // these two loops would hoard the pack and starve the output of slots.
-        var need = input.count;
-        // ⭐ By count, across stacks (2026-09-25): 30 Dust from [25, 5] is
-        // one removal of 30, smallest stack first, and leaves nothing.
-        final fromPack = pack.countOf(input.defId) < need
-            ? pack.countOf(input.defId)
-            : need;
-        pack = pack.withRemovedFirst(input.defId, n: fromPack);
-        need -= fromPack;
-        while (need > 0 && inTown) {
-          final took = (room ?? const Storeroom()).withWithdrawn(
-            InventorySlot(defId: input.defId),
-          );
-          // ⚠️ Gated above on the same `stacks` this reads, so a short
-          // withdrawal cannot happen; the break is defensive, and it errs
-          // toward the player (the craft completes having consumed less)
-          // rather than toward a throw inside a save.
-          if (took.taken == null) break;
-          room = took.room;
-          need--;
-        }
+        (pack, room) = _spend(
+          input.defId,
+          input.count,
+          pack: pack,
+          room: room,
+          inTown: inTown,
+        );
       }
       for (var n = 0; n < recipe.outputCount; n++) {
         InventorySlot slot;
@@ -1102,6 +1088,44 @@ class GameState extends ChangeNotifier {
     );
   }
 
+  /// Takes [count] of the fungible [defId] out of [pack], then [room] — THE
+  /// spending door for every material a craft, an enchant or an unsocket
+  /// pays (ENCHANTING_DESIGN §4.2, §5.2).
+  ///
+  /// ⭐ **Pack first, Storeroom second** — see [craft]'s doc. Reversing the
+  /// two would hoard the pack and starve a craft's output of slots. ⭐ By
+  /// count, across stacks (2026-09-25): 30 Dust from [25, 5] is one removal
+  /// of 30, smallest stack first, and leaves nothing.
+  ///
+  /// ⚠️ Pure — it returns the next pack and room and writes neither, so a
+  /// caller can run it inside [_mutate] (to spend) or outside it (to ask
+  /// whether what follows would fit, as [unsocketRefusal] does).
+  static (Backpack, Storeroom?) _spend(
+    String defId,
+    int count, {
+    required Backpack pack,
+    required Storeroom? room,
+    required bool inTown,
+  }) {
+    var need = count;
+    final fromPack = min(pack.countOf(defId), need);
+    pack = pack.withRemovedFirst(defId, n: fromPack);
+    need -= fromPack;
+    while (need > 0 && inTown) {
+      final took = (room ?? const Storeroom()).withWithdrawn(
+        InventorySlot(defId: defId),
+      );
+      // ⚠️ Every caller gates on [materialCount], which reads the same
+      // `stacks`, so a short withdrawal cannot happen; the break is
+      // defensive, and it errs toward the player (the act completes having
+      // consumed less) rather than toward a throw inside a save.
+      if (took.taken == null) break;
+      room = took.room;
+      need--;
+    }
+    return (pack, room);
+  }
+
   static int _craftMintCounter = 0;
 
   /// Instance ids for crafted goods — same shape as drop minting (loot.dart),
@@ -1109,6 +1133,259 @@ class GameState extends ChangeNotifier {
   String _mintCraftId() =>
       'c${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}'
       '${(_craftMintCounter++).toRadixString(36)}';
+
+  // ---- Enchanting and Jewelry on an owned piece (ENCHANTING §4, §5.2) ----
+  //
+  // ⭐ **Instance mutations, not recipes** (§2): Enchant, Socket and Unsocket
+  // act on a piece the player already owns, so they spend motes and gems
+  // directly through [_spend] — the same door [craft] spends through — and
+  // rewrite the instance in `profile.itemInstances`. Each verb has a PURE
+  // refusal (the sheet greys its button with exactly these words, computed
+  // without committing) and a mutation that refuses with the same function,
+  // then writes ONCE.
+
+  /// Why this character cannot work [skill] where they stand — null when
+  /// they can: 'Needs the Meridian station.'
+  ///
+  /// ⭐ **The first real station gate** (§4.2): read off
+  /// `World.byId(locationId).station`, never `RecipeDef.stationRequired`
+  /// (which nothing enforces). Zenith has every station.
+  ///
+  /// ⚠️ Names the town by looking it up — the town whose station is this
+  /// skill — so moving a station in `world.dart` moves the sentence too.
+  /// 📝 Not 'Enchanting needs …': the dialog prints this after the action's
+  /// own label ('Enchant…: Needs the Meridian station.'), and the skill's
+  /// name twice in one line is the repeated label the copy rules forbid.
+  String? stationRefusal(CraftSkill skill) {
+    final name = Skills.displayName(skill.name);
+    final here = profile.location;
+    final station = here.station;
+    if (here.isTown &&
+        station != null &&
+        (station == name || station.startsWith(everyStationPrefix))) {
+      return null;
+    }
+    final home = World.towns.where((t) => t.station == name).firstOrNull;
+    return home == null
+        ? 'Needs a $name station.'
+        : 'Needs the ${home.name} station.';
+  }
+
+  /// How Zenith's station string begins (`world.dart`): ⚠️ the one town
+  /// whose station is not a skill name, so it is matched by prefix.
+  static const String everyStationPrefix = 'Every station';
+
+  /// The owned piece [instanceId] names, with its def — or the refusal that
+  /// stops every verb below before it starts.
+  ({ItemInstance? instance, EquipmentDef? def, String? no}) _ownedGear(
+    String instanceId,
+  ) {
+    final instance = profile.itemInstances[instanceId];
+    if (instance == null) {
+      return (instance: null, def: null, no: 'That item is gone.');
+    }
+    final def = ItemCatalogue.tryById(instance.defId);
+    if (def is! EquipmentDef) {
+      return (instance: instance, def: null, no: 'Only gear takes that.');
+    }
+    return (instance: instance, def: def, no: null);
+  }
+
+  /// 'Needs 2 more Pyro Shards.' — [craft]'s grammar, counted.
+  static String _short(int short, String defId) {
+    final def = ItemCatalogue.tryById(defId);
+    final name = def == null ? defId : ItemCatalogue.displayName(def);
+    return 'Needs $short more $name${short == 1 ? '' : 's'}.';
+  }
+
+  /// Why [enchant] cannot go onto [instanceId] right now — null when it can.
+  ///
+  /// ⭐ **Pure**: the Enchant sheet greys its button with this, and
+  /// [enchantItem] refuses with it, so the dead button and the banner can
+  /// never say different things. In order: the piece, the station, the
+  /// level, the same enchant again, the motes.
+  ///
+  /// ⚠️ **Full cost on a re-enchant** (§4.3, ruled) — an enchanted piece pays
+  /// exactly what a bare one does. The one re-enchant refused is the SAME
+  /// enchant, which would spend motes to change nothing.
+  String? enchantRefusal(String instanceId, EnchantDef enchant) {
+    final owned = _ownedGear(instanceId);
+    if (owned.no != null) return owned.no;
+    final station = stationRefusal(CraftSkill.enchanting);
+    if (station != null) return station;
+    final gate = EnchantingCosts.levelFor(enchant.tier);
+    if (profile.skillLevel(CraftSkill.enchanting.name) < gate) {
+      return 'Enchanting $gate needed.';
+    }
+    if (owned.instance!.enchantId == enchant.id) {
+      return 'It already carries ${enchant.label}.';
+    }
+    final cost = EnchantingCosts.of(enchant);
+    final short = cost.count - materialCount(cost.defId);
+    if (short > 0) return _short(short, cost.defId);
+    return null;
+  }
+
+  /// Lays [enchant] onto the owned piece [instanceId] (ENCHANTING §4): spends
+  /// its motes (pack first, then this town's Storeroom), replaces the
+  /// instance with `withEnchant`, and pays [EnchantingCosts.xpFor]. Returns
+  /// [enchantRefusal]'s words, or null when done.
+  ///
+  /// ⭐ ONE [_mutate] — the motes leaving and the enchant landing must never
+  /// reach disk apart. ⭐ Works on a piece wherever it is (pack, worn, or
+  /// stored): the instance pool is keyed by id, and the slot that holds it
+  /// does not change.
+  Future<String?> enchantItem(String instanceId, EnchantDef enchant) async {
+    final no = enchantRefusal(instanceId, enchant);
+    if (no != null) return no;
+    final cost = EnchantingCosts.of(enchant);
+    final skill = CraftSkill.enchanting.name;
+    final here = profile.locationId;
+    final inTown = profile.location.isTown;
+    await _mutate(() {
+      final room = profile.storerooms[here];
+      final (pack, after) = _spend(
+        cost.defId,
+        cost.count,
+        pack: profile.backpack,
+        room: room,
+        inTown: inTown,
+      );
+      profile.backpack = pack;
+      if (after != null) profile.storerooms[here] = after;
+      profile.itemInstances[instanceId] = profile.itemInstances[instanceId]!
+          .withEnchant(enchant.id);
+      profile.skillXp[skill] =
+          (profile.skillXp[skill] ?? 0) + EnchantingCosts.xpFor(enchant.tier);
+    });
+    // ⚠️ An Enchanting level can earn the Craft entries, as a craft's can.
+    await _earnLive();
+    return null;
+  }
+
+  /// Why [gemId] cannot go into socket [index] of [instanceId] — null when
+  /// it can. ⭐ Pure, like [enchantRefusal]; the Socket sheet greys with it.
+  ///
+  /// 📝 No Jewelry level gate: §5.2 — "any level once you hold a gem".
+  String? socketRefusal(String instanceId, int index, String gemId) {
+    final owned = _ownedGear(instanceId);
+    if (owned.no != null) return owned.no;
+    final station = stationRefusal(CraftSkill.jewelry);
+    if (station != null) return station;
+    if (index < 0 || index >= owned.def!.socketCount) {
+      return 'It has no socket there.';
+    }
+    if (_gemAt(owned.instance!, index) != null) {
+      return 'That socket is full — take the gem out first.';
+    }
+    if (ItemCatalogue.tryById(gemId) is! GemDef) return 'That is not a gem.';
+    if (materialCount(gemId) < 1) return _short(1, gemId);
+    return null;
+  }
+
+  /// What socket [index] of [instance] holds, or null when it is empty.
+  /// ⚠️ Any non-empty string counts as full — an id this build cannot
+  /// resolve is still something IN the socket.
+  static String? _gemAt(ItemInstance instance, int index) {
+    if (index >= instance.socketed.length) return null;
+    final id = instance.socketed[index];
+    return id == ItemInstance.emptySocket ? null : id;
+  }
+
+  /// Seats [gemId] in socket [index] of [instanceId] (§5.2): spends one gem
+  /// (pack first, then this town's Storeroom) and sets it, in ONE [_mutate].
+  /// Returns [socketRefusal]'s words, or null when done.
+  Future<String?> socketGem(String instanceId, int index, String gemId) async {
+    final no = socketRefusal(instanceId, index, gemId);
+    if (no != null) return no;
+    final here = profile.locationId;
+    final inTown = profile.location.isTown;
+    await _mutate(() {
+      final (pack, after) = _spend(
+        gemId,
+        1,
+        pack: profile.backpack,
+        room: profile.storerooms[here],
+        inTown: inTown,
+      );
+      profile.backpack = pack;
+      if (after != null) profile.storerooms[here] = after;
+      profile.itemInstances[instanceId] = profile.itemInstances[instanceId]!
+          .withSocket(index, gemId);
+    });
+    await _earnLive();
+    return null;
+  }
+
+  /// The Shard taking the gem out of socket [index] costs — `<element>_shard`
+  /// of the gem's element (§5.2) — or null when the socket holds nothing
+  /// this build can price.
+  String? unsocketShardFor(String instanceId, int index) {
+    final instance = profile.itemInstances[instanceId];
+    final id = instance == null ? null : _gemAt(instance, index);
+    final gem = id == null ? null : ItemCatalogue.tryById(id);
+    final element = gem is GemDef ? gem.element : null;
+    return element == null ? null : '${element.name}_shard';
+  }
+
+  /// Why the gem in socket [index] of [instanceId] cannot come out — null
+  /// when it can. ⭐ Pure, like [enchantRefusal].
+  ///
+  /// ⚠️ **Room is asked AFTER the Shard is paid**: a full pack whose last
+  /// slot is one Pyro Shard has room for the gem once that Shard is spent,
+  /// and refusing it would be the pack lying about itself.
+  String? unsocketRefusal(String instanceId, int index) {
+    final owned = _ownedGear(instanceId);
+    if (owned.no != null) return owned.no;
+    final station = stationRefusal(CraftSkill.jewelry);
+    if (station != null) return station;
+    final gemId = _gemAt(owned.instance!, index);
+    if (index < 0 || index >= owned.def!.socketCount || gemId == null) {
+      return 'That socket is empty.';
+    }
+    final shard = unsocketShardFor(instanceId, index);
+    if (shard == null) return 'That cannot be taken out.';
+    if (materialCount(shard) < 1) return _short(1, shard);
+    final (pack, _) = _spend(
+      shard,
+      1,
+      pack: profile.backpack,
+      room: profile.storerooms[profile.locationId],
+      inTown: profile.location.isTown,
+    );
+    if (pack.withAdded(InventorySlot(defId: gemId)) == null) {
+      return 'No room in your pack for the gem.';
+    }
+    return null;
+  }
+
+  /// Takes the gem out of socket [index] of [instanceId] (§5.2 — the gem
+  /// survives): spends one Shard of its element and puts the gem in the
+  /// pack, in ONE [_mutate]. Returns [unsocketRefusal]'s words, or null.
+  Future<String?> unsocketGem(String instanceId, int index) async {
+    final no = unsocketRefusal(instanceId, index);
+    if (no != null) return no;
+    final instance = profile.itemInstances[instanceId]!;
+    final gemId = _gemAt(instance, index)!;
+    final shard = unsocketShardFor(instanceId, index)!;
+    final here = profile.locationId;
+    final inTown = profile.location.isTown;
+    await _mutate(() {
+      final (pack, after) = _spend(
+        shard,
+        1,
+        pack: profile.backpack,
+        room: profile.storerooms[here],
+        inTown: inTown,
+      );
+      // ⚠️ Non-null by [unsocketRefusal]'s room check on this same pack.
+      profile.backpack = pack.withAdded(InventorySlot(defId: gemId))!;
+      if (after != null) profile.storerooms[here] = after;
+      profile.itemInstances[instanceId] = instance.withoutSocket(index);
+    });
+    await _earnLive();
+    return null;
+  }
 
   // ---- Adventures -------------------------------------------------------
 
@@ -2442,6 +2719,35 @@ class ShopSettleOutcome {
   }) : refusal = null;
 
   bool get succeeded => refusal == null;
+}
+
+/// What an enchant costs, gates on and pays (ENCHANTING_DESIGN §4.2) — the
+/// numbers [GameState.enchantRefusal], [GameState.enchantItem] and the
+/// Enchant sheet all read, so the row's '3 / 5 Pyro Shards' and the refusal's
+/// 'Needs 2 more Pyro Shards.' cannot disagree.
+abstract final class EnchantingCosts {
+  /// The mote an enchant spends, and how many: 5 Shards, 3 Crystals or 1
+  /// Core of its element. ⭐ The same price on a re-enchant (§4.3, ruled).
+  static ({String defId, int count}) of(EnchantDef enchant) {
+    final el = enchant.element.name;
+    return switch (enchant.tier) {
+      EnchantTier.lesser => (defId: '${el}_shard', count: 5),
+      EnchantTier.standard => (defId: '${el}_crystal', count: 3),
+      EnchantTier.greater => (defId: '${el}_core', count: 1),
+    };
+  }
+
+  /// The Enchanting level a tier needs: 1 / 15 / 30.
+  static int levelFor(EnchantTier tier) => const [1, 15, 30][tier.index];
+
+  /// Enchanting XP per enchant: a flat **40 / 120 / 400** by tier.
+  ///
+  /// 📝 Proposed (lane 3, 2026-10-01), not ruled. ⚠️ NOT the §9b.9 recipe
+  /// formula (inputs × (4 + 2 × gate)) — that pays Lesser 30, Standard 102
+  /// and Greater 64, so the rarest act would pay less than the middle one
+  /// because it eats one Core instead of three Crystals. A flat ladder keeps
+  /// each tier worth more than the last.
+  static int xpFor(EnchantTier tier) => const [40, 120, 400][tier.index];
 }
 
 /// What a craft attempt produced.

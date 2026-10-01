@@ -351,8 +351,33 @@ piece is a trap).
 2. **Recipes** (one lane): refine ×48, transmute ×3, salvage, cut ×36 (12
    elements × 3 tiers), the Jewelry ladder below L45. Value-conservation and
    §8.7 pricing re-pinned.
-3. **Surfaces** (one lane): Enchant… and Socket… on the item dialog, salvage
-   picker, stat lines. Christian verifies in the browser.
+3. 🔨 **Surfaces** (one lane, built 2026-10-01 — Christian verifies in the
+   browser): Enchant… and Socket… on the item dialog, stat lines. The
+   salvage picker waits for lane 2's salvage recipe.
+   - Mutations: `GameState.enchantItem` / `socketGem` / `unsocketGem`, each
+     with a PURE refusal (`enchantRefusal` / `socketRefusal` /
+     `unsocketRefusal`) the sheets grey their buttons with. Instance
+     mutations, not recipes: motes and gems are spent through `_spend`, the
+     same pack-first-then-Storeroom door `craft` now uses. One `_mutate`
+     each, `_earnLive` after.
+   - Station gate: `GameState.stationRefusal(skill)` reads
+     `World.byId(locationId).station` (Zenith's "Every station …" matches by
+     prefix) and names the town: 'Needs the Meridian station.' /
+     'Needs the Rimeholt station.'.
+   - Costs and XP: `EnchantingCosts` (`game_state.dart`) — 5 Shards / 3
+     Crystals / 1 Core, Enchanting 1 / 15 / 30, full price on a re-enchant;
+     ❓ XP a flat **40 / 120 / 400** (proposed, not ruled — the §9b.9 recipe
+     formula would pay Greater 64, less than Standard's 102).
+   - Unsocket: one Shard of the gem's element, the gem back to the PACK
+     (refused 'No room in your pack for the gem.' when it cannot land —
+     room asked after the Shard is paid).
+   - Refused re-enchant: the SAME enchant again ('It already carries
+     Charred (Lesser).') — it would spend motes to change nothing.
+   - UI: `lib/screens/gear_work_actions.dart` (the dialog entries, greyed
+     with the station reason away from it; `ReservedActionRow`, the shared
+     press-stable button cell), `enchant_sheet.dart`, `socket_sheet.dart`;
+     the item dialog prints `Equipping.describeInstance` for an owned piece.
+   - Tests: `test/enchanting_surfaces_test.dart`.
 4. **Re-sim gate** before Greater enchant and Greater gem numbers are final
    (`tool/balance_probe_test.dart` with a full Greater kit).
 
@@ -371,8 +396,4 @@ piece is a trap).
 6. Universal gems in the first pass, or elemental only (recommended)?
 7. Unsocket: one Shard, gem survives (recommended), or the unbinding enchant?
 8. Aspected drops on at 10% of rare+ drops?
-<<<<<<< ours
 9. ~~Which town holds the Enchanting station?~~ ✅ Meridian (already in code).
-=======
-9. ~~Which town holds the Enchanting station?~~ ✅ Meridian (already in code).
->>>>>>> theirs

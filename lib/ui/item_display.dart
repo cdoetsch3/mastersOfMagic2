@@ -54,8 +54,15 @@ Future<void> showItemDialog(
   // instance (a Workbench preview of a thing not yet made) the base is the
   // honest answer.
   final worn = Equipping.modifiersOf(def, instance);
+  // ⭐ An OWNED piece reads through `describeInstance` (ENCHANTING §7): the
+  // def's lines as quality made them, then 'Enchant: Charred (Standard) ·
+  // +8% crit damage' (or a drop's 'Aspect: …'), then one line per socket.
+  // ⚠️ With no instance — a Workbench preview, a shop shelf — there is no
+  // enchant or socket to speak of, and the base lines are the honest answer.
   final lines = def is EquipmentDef
-      ? Equipping.describe(worn)
+      ? (instance == null
+            ? Equipping.describe(worn)
+            : Equipping.describeInstance(def, instance))
       : (def is Usable ? [(def as Usable).effect.describe] : const <String>[]);
   // ⭐ One worked example under a belt (ruling 2026-09-25) — null for
   // anything without potency, so a hat never grows the sentence.
