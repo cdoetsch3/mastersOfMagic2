@@ -198,6 +198,9 @@ class _AdventureScreenState extends State<AdventureScreen> {
     final encounter = run.current;
     if (encounter == null || _busy) return;
     setState(() => _busy = true);
+    // ⭐ The fight begins here — the Bestiary's `seen` (GameState docs).
+    await game.beginEncounter();
+    if (!mounted) return;
 
     await Navigator.of(context).push(
       MaterialPageRoute<void>(

@@ -941,6 +941,25 @@ class GameState extends ChangeNotifier {
     return started;
   }
 
+  /// Marks the current encounter's fight as **begun** — the Bestiary's
+  /// `seen` count (ruling, Christian playtest 2026-09-30, note 8).
+  ///
+  /// ⭐ **The one seen hook.** `AdventureScreen._fight` calls it immediately
+  /// before it pushes the duel, so `seen` means "a fight with this creature
+  /// started" — whatever the ending. ⚠️ Not in [winEncounter]/[loseEncounter]:
+  /// a fight that is fled, or abandoned by closing the app, was still met.
+  /// Its partner, `slain`, ticks in [winEncounter] alone.
+  ///
+  /// 📝 A run resumed after a force-quit restarts the encounter, and this
+  /// counts it again — it was fought again.
+  Future<void> beginEncounter() async {
+    final r = run;
+    if (r == null || r.isOver) return;
+    final enemy = r.current;
+    if (enemy == null) return;
+    await _mutate(() => profile.noteSeen(enemy.def.id));
+  }
+
   /// Records a won encounter, rolling its drops onto the run as an
   /// **unanswered picker** ([AdventureRun.unclaimed]).
   ///
@@ -975,6 +994,9 @@ class GameState extends ChangeNotifier {
     // Eclipsed Citadel, whose two bosses are a sequence (ENEMIES §2e) — there,
     // `atBoss` would bank the clear on Totality and leave Procarius unfought.
     final wasBoss = r.atFinalBoss;
+    // ⭐ The Bestiary's `slain` — on a WIN only, never in [loseEncounter].
+    // Rides recordDuelResult's write below with the rest of the result.
+    profile.noteSlain(enemy.def.id);
     r.recordVictory(
       loot: loot.slots,
       instances: loot.instances,

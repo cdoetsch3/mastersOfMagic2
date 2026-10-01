@@ -338,7 +338,7 @@ void main() {
       }
     });
 
-    testWidgets('the two library rows carry the dim placeholder count', (
+    testWidgets('the two library rows carry a dim "seen" count', (
       tester,
     ) async {
       await _pumpProfile(tester, PlayerProfile.newPlayer());
@@ -347,9 +347,10 @@ void main() {
         find.text('0 seen'),
         findsNWidgets(2),
         reason:
-            'exactly the Bestiary and Item library rows show a trailing '
-            'count — a row builder that put the trailing text on every row '
-            '(6) or dropped it (0) fails here',
+            'exactly the Bestiary (a real count, 0 for a new character) and '
+            'Item library (still a placeholder) rows show it — a row builder '
+            'that put the trailing text on every row (6) or dropped it (0) '
+            'fails here',
       );
     });
 
@@ -369,23 +370,25 @@ void main() {
       );
     });
 
-    testWidgets('Bestiary opens the shared placeholder, titled Bestiary', (
+    // 📝 The Bestiary row is real since 2026-09-30 (bestiary_screen_test
+    // pins it); the Item library is the placeholder left to pin.
+    testWidgets('Item library opens the shared placeholder, titled so', (
       tester,
     ) async {
       await _pumpProfile(tester, PlayerProfile.newPlayer());
 
-      await tester.tap(find.text('Bestiary'));
+      await tester.tap(find.text('Item library'));
       await tester.pumpAndSettle();
 
       expect(
         find.byWidgetPredicate(
-          (w) => w is ComingSoonScreen && w.title == 'Bestiary',
+          (w) => w is ComingSoonScreen && w.title == 'Item library',
         ),
         findsOneWidget,
         reason:
             'the placeholder must carry the row that opened it — a menu that '
-            'passes a constant title (or Achievements\' title, the row '
-            'above) lands the player on a screen naming somewhere else',
+            'passes a constant title (or Bestiary\'s, the row above) lands '
+            'the player on a screen naming somewhere else',
       );
       expect(
         find.text('Not built yet — it is on the list.'),

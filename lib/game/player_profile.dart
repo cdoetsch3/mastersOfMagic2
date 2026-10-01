@@ -7,6 +7,7 @@ import 'items/item_def.dart';
 import 'items/item_instance.dart';
 
 import 'adventure.dart';
+import 'bestiary_record.dart';
 import 'loadout.dart';
 import 'progression.dart';
 import 'skills.dart';
@@ -350,6 +351,22 @@ class PlayerProfile {
   /// out something unearned.
   Set<String> achievements;
 
+  /// What this character knows of each creature, by `EnemyDef.id` (ruling,
+  /// Christian playtest 2026-09-30, note 8) — the Bestiary screen's record.
+  ///
+  /// ⭐ **Sparse**: a creature never fought has no entry, and absent reads as
+  /// "not yet met". Written by `GameState.beginEncounter` (seen) and
+  /// `GameState.winEncounter` (slain) — read [BestiaryEntry] for which moment
+  /// each count marks.
+  ///
+  /// ⚠️ Absent on every save before 2026-09-30, and absent reads as "met
+  /// nothing" — the same safe direction as [achievements].
+  ///
+  /// 📝 On the character document, not in a subcollection: bounded by the
+  /// roster (one entry per `Bestiary.all` creature), and the Profile row
+  /// reads its count on every open.
+  Map<String, BestiaryEntry> bestiary;
+
   /// How many times this character has beaten each zone's **boss**.
   ///
   /// ⚠️ **Not the same as [discoveredLocationIds]** — walking somewhere is not
@@ -498,6 +515,7 @@ class PlayerProfile {
     Set<String>? discoveredLocationIds,
     Set<String>? openedGates,
     Set<String>? achievements,
+    Map<String, BestiaryEntry>? bestiary,
     Map<String, int>? zoneClears,
     Map<String, int>? skillXp,
     List<LoadoutPreset>? presets,
@@ -525,6 +543,7 @@ class PlayerProfile {
        discoveredLocationIds = discoveredLocationIds ?? {World.startLocationId},
        openedGates = openedGates ?? {},
        achievements = achievements ?? {},
+       bestiary = bestiary ?? {},
        zoneClears = zoneClears ?? {},
        skillXp = skillXp ?? {},
        presets = presets ?? [LoadoutPreset.starter('Loadout I')],
@@ -559,6 +578,20 @@ class PlayerProfile {
   /// several, because the mini pool shows 2 of 4 and the boss pool 1 of 2 —
   /// about **4.2 clears** to meet every elevated enemy in a zone.
   int clearCountFor(String locationId) => zoneClears[locationId] ?? 0;
+
+  /// The record for creature [enemyId] — an empty one when never fought.
+  BestiaryEntry bestiaryEntryFor(String enemyId) =>
+      bestiary[enemyId] ?? const BestiaryEntry();
+
+  /// Counts a fight against [enemyId] beginning. ⚠️ Mutates only — the caller
+  /// (`GameState.beginEncounter`) owns the save.
+  void noteSeen(String enemyId) =>
+      bestiary[enemyId] = bestiaryEntryFor(enemyId).withSeen();
+
+  /// Counts a win over [enemyId]. ⚠️ Mutates only — it rides the save of the
+  /// result that earned it (`GameState.winEncounter`).
+  void noteSlain(String enemyId) =>
+      bestiary[enemyId] = bestiaryEntryFor(enemyId).withSlain();
 
   /// How many distinct combat zones this character has finished.
   int get zonesCleared => zoneClears.length;
@@ -644,6 +677,9 @@ class PlayerProfile {
     'discoveredLocationIds': discoveredLocationIds.toList(),
     'openedGates': openedGates.toList(),
     'achievements': achievements.toList(),
+    // ⭐ Always written, even empty (like [achievements]), so the character
+    // document's field set never varies and the update mask always covers it.
+    'bestiary': {for (final e in bestiary.entries) e.key: e.value.toJson()},
     'zoneClears': zoneClears,
     if (skillXp.isNotEmpty) 'skillXp': skillXp,
     'presets': presets.map((p) => p.toJson()).toList(),
@@ -723,6 +759,10 @@ class PlayerProfile {
           .toSet(),
       // Absent before 2026-09-25 — see [achievements].
       achievements: (json['achievements'] as List?)?.cast<String>().toSet(),
+      // Absent before 2026-09-30 — see [bestiary].
+      bestiary: (json['bestiary'] as Map?)?.map(
+        (k, v) => MapEntry(k as String, BestiaryEntry.fromJson(v)),
+      ),
       // Absent on saves from before clears were tracked — an old character
       // reads as "has cleared nothing", which is the safe direction: it can
       // only withhold repeat-clear content, never grant it early.
