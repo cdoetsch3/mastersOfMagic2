@@ -93,14 +93,14 @@ void main() {
       expect(
         [for (final a in Achievements.all) '${a.category.name}:${a.id}'],
         [
-          'journey:papers_in_order',
-          'journey:first_clearing',
-          'journey:five_banners',
-          'journey:the_long_road',
-          'journey:beyond_the_veil',
-          'combat:first_blood',
-          'combat:tenfold',
-          'combat:centurion',
+          'campaign:papers_in_order',
+          'campaign:first_clearing',
+          'campaign:five_banners',
+          'campaign:the_long_road',
+          'campaign:beyond_the_veil',
+          'duelling:first_blood',
+          'duelling:tenfold',
+          'duelling:centurion',
           'craft:journeyman',
           'craft:artisan',
           'ladder:rated',
@@ -131,10 +131,20 @@ void main() {
     test('categories run in enum order, with their labels', () {
       expect(
         [for (final c in AchievementCategory.values) c.label],
-        ['Journey', 'Combat', 'Craft', 'Ladder'],
-        reason: 'kills a relabelled or reordered category',
+        [
+          'Campaign',
+          'Mastery',
+          'Wealth',
+          'Dueling',
+          'World',
+          'Craft',
+          'Ladder',
+        ],
+        reason:
+            'kills a relabelled or reordered category — §5\'s seven, in '
+            'screen order',
       );
-      expect(_ids(Achievements.inCategory(AchievementCategory.combat)), [
+      expect(_ids(Achievements.inCategory(AchievementCategory.duelling)), [
         'first_blood',
         'tenfold',
         'centurion',

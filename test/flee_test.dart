@@ -678,7 +678,8 @@ Future<void> _pumpDuel(
         campaign: campaign,
         playerLevel: 1,
         rng: rng,
-        onSettle: onSettle,
+        // The charge tally is not this file's subject.
+        onSettle: onSettle == null ? null : (o, hp, _) => onSettle(o, hp),
       ),
     ),
   );

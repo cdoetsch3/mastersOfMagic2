@@ -54,7 +54,8 @@ void main() {
           loadout: Loadout.starter,
           campaign: campaign,
           academy: academy,
-          onResult: onResult,
+          // The charge tally is not this file's subject.
+          onResult: onResult == null ? null : (o, _) => onResult(o),
           rng: campaign ? _AlwaysEscapes() : null,
           driver: LocalAiDriver(
             persona: const EnemyEncounter(

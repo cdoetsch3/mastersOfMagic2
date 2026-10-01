@@ -69,7 +69,7 @@ Future<void> launchDuel(
         // and damage; the opponent's scales the XP the win is worth. This is
         // the only path a real player takes, so a level dropped here is
         // invisible to every test that builds DuelScreen directly.
-        onResult: (outcome) async {
+        onResult: (outcome, charges) async {
           // ⚠️ A fled duel is banked by nobody. It pays no XP, no gold, and
           // records neither a win nor a loss (2026-08-17 ruling), and it is
           // never rated either — nobody actually finished the fight. Null,
@@ -79,7 +79,8 @@ Future<void> launchDuel(
           final won = outcome == DuelOutcome.won;
           // ⭐ Academy banks no XP/gold/win-count (ruled 2026-09-10) — the
           // character is untouched — but it DOES rate (LADDER §1 law 4).
-          // Geared banks XP/gold AND rates.
+          // Geared banks XP/gold AND rates. ⚠️ So an Academy bout's charges
+          // are not banked either: "untouched" includes the mastery record.
           if (!academy) {
             game.recordDuelResult(
               won: won,
@@ -90,6 +91,7 @@ Future<void> launchDuel(
               // still single player — but the driver can: a room is remote,
               // everything else is a brain on this device.
               pvp: driver is RemoteDuelDriver,
+              charges: charges,
             );
           }
           // ⭐ LADDER §2: a quickMatch human (RemoteDuelDriver.rated) or a

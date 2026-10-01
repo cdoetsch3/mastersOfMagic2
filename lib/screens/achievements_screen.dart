@@ -7,6 +7,7 @@ import '../game/game_state.dart';
 import '../game/player_profile.dart';
 import '../ui/app_banner.dart';
 import '../ui/app_theme.dart';
+import 'level_up_screen.dart';
 
 /// Every achievement in the catalogue, earned or not — the "Ledger" (ruling,
 /// Christian playtest 2026-09-30 note 7, mockup A): a count in the app bar,
@@ -22,8 +23,20 @@ import '../ui/app_theme.dart';
 ///
 /// 📝 **No dates.** The profile stores the ids earned and nothing else — no
 /// timestamp — so "earned on…" would be a new field on every save first.
+///
+/// ⭐ **Claim** (ruling, Christian 2026-10-01): an earned entry's reward waits
+/// here until the player presses Claim on its row, or Claim all in the
+/// summary. Both cells are **always reserved** — empty when there is nothing
+/// to claim — so a press that empties them moves nothing (the press-stability
+/// rule). 📝 Minimal wiring: the full redesign is stage 2.
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({super.key});
+
+  /// The summary's Claim all button, for the tests.
+  static const claimAllKey = ValueKey('achievements-claim-all');
+
+  /// ⭐ The summary's claim row's one height, Claim all drawn or not.
+  static const double claimRowHeight = 32;
 
   /// The filter row, for the press-stability test.
   static const filterRowKey = ValueKey('achievements-filter-row');
@@ -34,6 +47,12 @@ class AchievementsScreen extends StatefulWidget {
   /// What an empty view says — everything filtered or hidden away.
   static const emptyLine = 'Nothing left in this view.';
 
+  /// A row's claim button.
+  static const claimLabel = 'Claim';
+
+  /// The summary's claim-everything button.
+  static const claimAllLabel = 'Claim all';
+
   @override
   State<AchievementsScreen> createState() => _AchievementsScreenState();
 }
@@ -43,9 +62,37 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   AchievementCategory? _category;
   bool _hideEarned = false;
 
+  /// Claims [id] — then, like every other XP gain, shows a level crossed.
+  Future<void> _claim(GameState game, String id) async {
+    await game.claimAchievement(id);
+    await _showLevelUpIfAny(game);
+  }
+
+  /// Claims everything claimable in one write.
+  Future<void> _claimAll(GameState game) async {
+    await game.claimAllAchievements();
+    await _showLevelUpIfAny(game);
+  }
+
+  /// ⚠️ A claim's XP can cross a level, and nothing else on this screen
+  /// would ever say so — the duel flows that normally surface
+  /// `pendingLevelUp` are not on the stack. Same shape as the adventure's.
+  Future<void> _showLevelUpIfAny(GameState game) async {
+    final level = game.pendingLevelUp;
+    final from = game.pendingLevelUpFrom;
+    if (level == null || !mounted) return;
+    game.acknowledgeLevelUp();
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LevelUpScreen(from: from ?? level - 1, to: level),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final profile = GameStateScope.of(context).profile;
+    final game = GameStateScope.of(context);
+    final profile = game.profile;
     final earned = profile.achievements;
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -65,13 +112,19 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-              child: _Summary(earned: Achievements.earnedCount(earned)),
+              child: _Summary(
+                earned: Achievements.earnedCount(earned),
+                points: Achievements.totalPoints(profile),
+                onClaimAll: Achievements.claimable(profile).isEmpty
+                    ? null
+                    : () => _claimAll(game),
+              ),
             ),
             _filterRow(),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(14, 8, 14, 16),
-                children: _entries(profile),
+                children: _entries(game),
               ),
             ),
           ],
@@ -101,12 +154,16 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                   on: _category == null,
                   onTap: () => setState(() => _category = null),
                 ),
+                // 📝 No chip for a category with nothing in it yet (Mastery,
+                // Wealth, World until stage 2) — a chip that can only ever
+                // show the empty line is a promise the screen cannot keep.
                 for (final c in AchievementCategory.values)
-                  _FilterChip(
-                    label: c.label,
-                    on: _category == c,
-                    onTap: () => setState(() => _category = c),
-                  ),
+                  if (Achievements.inCategory(c).isNotEmpty)
+                    _FilterChip(
+                      label: c.label,
+                      on: _category == c,
+                      onTap: () => setState(() => _category = c),
+                    ),
               ],
             ),
           ),
@@ -129,8 +186,10 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   /// ⭐ A section with nothing left in it is dropped whole, heading too; and
   /// with a category chip lit there are no headings at all — the chip
   /// already says which category this is.
-  List<Widget> _entries(PlayerProfile profile) {
+  List<Widget> _entries(GameState game) {
+    final profile = game.profile;
     final earned = profile.achievements;
+    final claimed = profile.claimedAchievements;
     final out = <Widget>[];
     final categories = _category == null
         ? AchievementCategory.values
@@ -143,6 +202,9 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
               def: def,
               earned: earned.contains(def.id),
               progress: def.progress?.call(profile),
+              onClaim: earned.contains(def.id) && !claimed.contains(def.id)
+                  ? () => _claim(game, def.id)
+                  : null,
             ),
       ];
       if (rows.isEmpty) continue;
@@ -189,13 +251,26 @@ class _CountPill extends StatelessWidget {
   );
 }
 
-/// `Earned`, the percent, and a bar.
+/// `Earned`, the percent, and a bar; under them the total points and, when
+/// anything waits, Claim all.
 ///
 /// ⚠️ **No `n of N` here** (coordinator, 2026-09-30): the app bar's pill
 /// already says it, and one number is said once.
+///
+/// ⭐ The points row is [AchievementsScreen.claimRowHeight] tall whether or
+/// not Claim all is drawn, so claiming everything never moves the list.
 class _Summary extends StatelessWidget {
   final int earned;
-  const _Summary({required this.earned});
+  final int points;
+
+  /// Null when nothing is claimable — and then no button, only its cell.
+  final VoidCallback? onClaimAll;
+
+  const _Summary({
+    required this.earned,
+    required this.points,
+    required this.onClaimAll,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -228,10 +303,68 @@ class _Summary extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           _Bar(value: total == 0 ? 0 : earned / total, height: 6),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: AchievementsScreen.claimRowHeight,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    pointsLabel(points),
+                    style: const TextStyle(
+                      color: AppColors.gold,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                if (onClaimAll != null)
+                  _ClaimButton(
+                    key: AchievementsScreen.claimAllKey,
+                    label: AchievementsScreen.claimAllLabel,
+                    onTap: onClaimAll!,
+                  ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
+}
+
+/// The gold Claim pill — a row's, and the summary's Claim all.
+///
+/// ⚠️ Hand-rolled like [_FilterChip], for the same reason: the themed
+/// buttons bring their own surface and padding.
+class _ClaimButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _ClaimButton({super.key, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: AppColors.gold,
+    borderRadius: BorderRadius.circular(14),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: Text(
+          label,
+          maxLines: 1,
+          softWrap: false,
+          style: const TextStyle(
+            color: AppColors.bg,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 /// A rounded progress bar in gold on the dim border colour.
@@ -331,8 +464,13 @@ class _SectionLabel extends StatelessWidget {
   );
 }
 
-/// One catalogue entry: a medal cell, the name and blurb, and — while a
-/// countable entry is unearned — a thin bar with its count.
+/// One catalogue entry: a medal cell, the name, blurb and reward line, a
+/// claim cell — and, while a countable entry is unearned, a thin bar with its
+/// count.
+///
+/// ⚠️ **A hidden entry, unearned, is `???`** — no blurb and no bar, either of
+/// which would say what it is for. Its reward line stays: what it pays is
+/// not a spoiler.
 class AchievementRow extends StatelessWidget {
   final AchievementDef def;
   final bool earned;
@@ -340,24 +478,45 @@ class AchievementRow extends StatelessWidget {
   /// How far a countable entry has come; null for a one-shot.
   final AchievementProgress? progress;
 
+  /// Takes this entry's reward — non-null only while it is earned and
+  /// unclaimed, and then the row draws Claim.
+  final VoidCallback? onClaim;
+
   /// ⭐ The medal cell's one width, earned or not, so the name sits at one x
   /// the day it is earned.
   static const double medalSize = 34;
 
+  /// ⭐ The claim cell's one width, on **every** row, Claim drawn or not — so
+  /// the text column is one width down the whole list, and pressing Claim
+  /// moves nothing.
+  static const double claimCellWidth = 70;
+
+  /// ⭐ …and its one height: a row whose text ran shorter than the button
+  /// would otherwise shrink when Claim leaves.
+  static const double claimCellHeight = 30;
+
+  /// What a hidden, unearned entry is called.
+  static const hiddenName = '???';
+
   /// The medal cell of entry [id], for the layout tests.
   static ValueKey<String> medalKey(String id) => ValueKey('medal-$id');
+
+  /// The claim cell of entry [id], for the layout tests.
+  static ValueKey<String> claimCellKey(String id) => ValueKey('claim-$id');
 
   const AchievementRow({
     super.key,
     required this.def,
     required this.earned,
     this.progress,
+    this.onClaim,
   });
 
   @override
   Widget build(BuildContext context) {
     final nameColor = earned ? AppColors.text : AppColors.textFaint;
-    final counted = progress;
+    final veiled = def.hidden && !earned;
+    final counted = veiled ? null : progress;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: GamePanel(
@@ -376,19 +535,31 @@ class AchievementRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    def.name,
+                    veiled ? hiddenName : def.name,
                     style: TextStyle(
                       color: nameColor,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  if (!veiled) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      def.blurb,
+                      style: TextStyle(
+                        color: earned ? AppColors.textDim : AppColors.textFaint,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 3),
                   Text(
-                    def.blurb,
+                    rewardLabel(def.reward),
                     style: TextStyle(
-                      color: earned ? AppColors.textDim : AppColors.textFaint,
-                      fontSize: 12,
+                      color: onClaim != null
+                          ? AppColors.gold
+                          : AppColors.textFaint,
+                      fontSize: 11,
                     ),
                   ),
                   if (!earned && counted != null) ...[
@@ -416,6 +587,21 @@ class AchievementRow extends StatelessWidget {
                   ],
                 ],
               ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              key: claimCellKey(def.id),
+              width: claimCellWidth,
+              height: claimCellHeight,
+              child: onClaim == null
+                  ? null
+                  : Align(
+                      alignment: Alignment.topRight,
+                      child: _ClaimButton(
+                        label: AchievementsScreen.claimLabel,
+                        onTap: onClaim!,
+                      ),
+                    ),
             ),
           ],
         ),
@@ -509,3 +695,32 @@ String achievementsToastText(List<AchievementDef> defs) => defs.length == 1
 /// catalogue still knows, so a retired entry cannot push n past N.
 String achievementCountLabel(Set<String> earned) =>
     '${Achievements.earnedCount(earned)} / ${Achievements.all.length}';
+
+/// The Profile row's trailing: ⭐ `'n to claim'` while any reward waits —
+/// the one thing worth a glance from the Profile — else [achievementCountLabel].
+String achievementProfileTrailing(PlayerProfile p) {
+  final waiting = Achievements.claimable(p).length;
+  return waiting > 0
+      ? '$waiting to claim'
+      : achievementCountLabel(p.achievements);
+}
+
+/// A row's reward line: `'+250 XP · +150 gold'`, and `' · +1 RP'` when the
+/// entry pays any.
+String rewardLabel(AchievementReward r) =>
+    '+${groupedNumber(r.xp)} XP · +${groupedNumber(r.gold)} gold'
+    '${r.rp > 0 ? ' · +${groupedNumber(r.rp)} RP' : ''}';
+
+/// The summary's total: `'45 points'`.
+String pointsLabel(int points) => '${groupedNumber(points)} points';
+
+/// [n] with thousands commas — `5000` reads `'5,000'`, as §6 writes it.
+String groupedNumber(int n) {
+  final digits = n.abs().toString();
+  final out = StringBuffer(n < 0 ? '-' : '');
+  for (var i = 0; i < digits.length; i++) {
+    if (i > 0 && (digits.length - i) % 3 == 0) out.write(',');
+    out.write(digits[i]);
+  }
+  return out.toString();
+}

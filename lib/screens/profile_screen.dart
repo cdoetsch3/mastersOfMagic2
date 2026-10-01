@@ -20,17 +20,18 @@ import 'skills_screen.dart';
 ///
 /// ⭐ **Structure now, screens later** (same ruling). The Item library is a
 /// row with nothing behind it yet; it exists so the shape of the profile is
-/// settled, and pushes [ComingSoonScreen]. ⚠️ Do **not** grow its content
-/// here — a trailing count that counts something real is the first step to a
-/// screen this file was told not to build.
+/// settled, and pushes [ComingSoonScreen]. Its trailing `'n seen'` is real
+/// since 2026-10-01 — `PlayerProfile.itemsSeen`, every def that has dropped
+/// — but ⚠️ the screen behind it is still not this file's to build.
 ///
 /// ⭐ **The Bestiary is real now** (ruling, Christian playtest 2026-09-30,
 /// note 8): it pushes [BestiaryScreen], and its `'n seen'` counts the
 /// creatures this character has met.
 ///
 /// ⭐ **Achievements is real now** (ruling, Christian 2026-09-25): it pushes
-/// [AchievementsScreen], and its trailing `'n / N'` counts the catalogue —
-/// the one row whose count is not a placeholder.
+/// [AchievementsScreen], and its trailing reads `'n to claim'` while rewards
+/// wait (2026-10-01), else `'n / N'` of the catalogue
+/// ([achievementProfileTrailing]).
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -82,7 +83,7 @@ class ProfileScreen extends StatelessWidget {
                     _MenuRow(
                       icon: Icons.emoji_events,
                       label: 'Achievements',
-                      trailing: achievementCountLabel(p.achievements),
+                      trailing: achievementProfileTrailing(p),
                       onTap: () => _push(context, const AchievementsScreen()),
                     ),
                     const _RowDivider(),
@@ -96,7 +97,7 @@ class ProfileScreen extends StatelessWidget {
                     _MenuRow(
                       icon: Icons.inventory_2,
                       label: 'Item library',
-                      trailing: '0 seen',
+                      trailing: itemsSeenLabel(p.itemsSeen),
                       onTap: () => _push(
                         context,
                         const ComingSoonScreen('Item library'),
@@ -341,3 +342,7 @@ class _RowDivider extends StatelessWidget {
     color: AppColors.borderDim,
   );
 }
+
+/// The Item library row's trailing: `'n seen'`, every def that has ever
+/// dropped for this character (`PlayerProfile.itemsSeen`).
+String itemsSeenLabel(Set<String> seen) => '${seen.length} seen';

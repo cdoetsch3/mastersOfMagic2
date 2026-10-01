@@ -367,6 +367,55 @@ class PlayerProfile {
   /// reads its count on every open.
   Map<String, BestiaryEntry> bestiary;
 
+  /// Ids of the earned achievements whose reward this character has taken
+  /// (ruling, Christian 2026-10-01: rewards are CLAIMED, not auto-granted).
+  ///
+  /// ⭐ **Always a subset of [achievements]** — `GameState.claimAchievement`
+  /// refuses an id that is not earned, or already here. Earning and being
+  /// paid are two moments: the load-time sweep earns silently, so a
+  /// returning player finds a pile to claim rather than a pile already spent.
+  ///
+  /// ⚠️ Absent on every save before 2026-10-01, and absent reads as "claimed
+  /// nothing" — so every achievement earned before the ruling is owed its
+  /// reward, once. The other direction would quietly pay nobody.
+  Set<String> claimedAchievements;
+
+  /// Lifetime **charges** per element, keyed by `MagicElement.name` — the
+  /// mastery record (ACHIEVEMENTS §2.2: "mastery is charges, not wins").
+  ///
+  /// ⭐ **The local player's charges only, banked ONCE per duel** —
+  /// `DuelController` counts them in memory and the duel's result write
+  /// carries the lot (`GameState.recordDuelResult`, and `fleeEncounter` for an
+  /// escape). ⚠️ Never a save per charge: a duel is 30–40 of them.
+  ///
+  /// 📝 On the character document (ruling 2026-10-01, the §2 amendment):
+  /// hard-bounded at 12 keys, one per element. Sparse — an element never
+  /// charged has no key; read [chargesOf].
+  Map<String, int> charges;
+
+  /// Lifetime gold **gained** — never gold held (ACHIEVEMENTS §5.3: spending
+  /// must not walk the Wealth entries backwards).
+  ///
+  /// ⭐ **Only [earnGold] moves it**, and every gain goes through [earnGold]:
+  /// duel rewards, vendor sales, achievement claims. A raw `gold +=` anywhere
+  /// is a gain this counter never hears about. ⚠️ Spending does not touch it.
+  int goldEarned;
+
+  /// Every item def id that has ever **dropped** for this character — the
+  /// Item library's record, and the Collector tier's (§5.1).
+  ///
+  /// ⭐ **Seen, not owned**: selling, banking or losing an item never takes
+  /// the credit back. Written by `GameState.winEncounter` when the loot is
+  /// rolled, riding the result's write.
+  ///
+  /// 📝 On the character document: bounded by the item catalogue (≤265 ids).
+  Set<String> itemsSeen;
+
+  /// Lifetime seconds spent on the road. Added by `GameState.settleTravel`
+  /// when a trip arrives (its whole length), and by `cancelTravel` for the
+  /// part actually walked.
+  int travelSeconds;
+
   /// How many times this character has beaten each zone's **boss**.
   ///
   /// ⚠️ **Not the same as [discoveredLocationIds]** — walking somewhere is not
@@ -516,6 +565,11 @@ class PlayerProfile {
     Set<String>? openedGates,
     Set<String>? achievements,
     Map<String, BestiaryEntry>? bestiary,
+    Set<String>? claimedAchievements,
+    Map<String, int>? charges,
+    this.goldEarned = 0,
+    Set<String>? itemsSeen,
+    this.travelSeconds = 0,
     Map<String, int>? zoneClears,
     Map<String, int>? skillXp,
     List<LoadoutPreset>? presets,
@@ -544,6 +598,9 @@ class PlayerProfile {
        openedGates = openedGates ?? {},
        achievements = achievements ?? {},
        bestiary = bestiary ?? {},
+       claimedAchievements = claimedAchievements ?? {},
+       charges = charges ?? {},
+       itemsSeen = itemsSeen ?? {},
        zoneClears = zoneClears ?? {},
        skillXp = skillXp ?? {},
        presets = presets ?? [LoadoutPreset.starter('Loadout I')],
@@ -595,6 +652,29 @@ class PlayerProfile {
 
   /// How many distinct combat zones this character has finished.
   int get zonesCleared => zoneClears.length;
+
+  /// Lifetime charges of [element] — 0 when never charged.
+  int chargesOf(MagicElement element) => charges[element.name] ?? 0;
+
+  /// Banks one duel's charges (element id → count) onto [charges]. ⚠️
+  /// Mutates only — it rides the caller's result write.
+  void addCharges(Map<String, int> duel) {
+    for (final e in duel.entries) {
+      if (e.value <= 0) continue;
+      charges[e.key] = (charges[e.key] ?? 0) + e.value;
+    }
+  }
+
+  /// ⭐ **The one way gold is gained**: adds [amount] to [gold] and to
+  /// [goldEarned] together, so no gain can forget the lifetime count.
+  ///
+  /// ⚠️ Gains only — a spend is a plain `gold -=`, and [goldEarned] never
+  /// goes down. Mutates only; the caller owns the save.
+  void earnGold(int amount) {
+    assert(amount >= 0, 'earnGold is for gains; spend with gold -=');
+    gold += amount;
+    goldEarned += amount;
+  }
 
   /// The skill ledger, read side: level for a Skills.allKeys key.
   int skillLevel(String key) => Skills.levelForXp(skillXp[key] ?? 0);
@@ -680,6 +760,13 @@ class PlayerProfile {
     // ⭐ Always written, even empty (like [achievements]), so the character
     // document's field set never varies and the update mask always covers it.
     'bestiary': {for (final e in bestiary.entries) e.key: e.value.toJson()},
+    // ⭐ The 2026-10-01 counters: always written, even empty or zero, for the
+    // same reason as [bestiary] — the update mask is built from these keys.
+    'claimedAchievements': claimedAchievements.toList(),
+    'charges': charges,
+    'goldEarned': goldEarned,
+    'itemsSeen': itemsSeen.toList(),
+    'travelSeconds': travelSeconds,
     'zoneClears': zoneClears,
     if (skillXp.isNotEmpty) 'skillXp': skillXp,
     'presets': presets.map((p) => p.toJson()).toList(),
@@ -763,6 +850,18 @@ class PlayerProfile {
       bestiary: (json['bestiary'] as Map?)?.map(
         (k, v) => MapEntry(k as String, BestiaryEntry.fromJson(v)),
       ),
+      // Absent before 2026-10-01 — each reads as empty or zero: nothing
+      // claimed (so what was earned is owed), nothing charged, earned, seen
+      // or travelled. See each field.
+      claimedAchievements: (json['claimedAchievements'] as List?)
+          ?.cast<String>()
+          .toSet(),
+      charges: (json['charges'] as Map?)?.map(
+        (k, v) => MapEntry(k as String, (v as num).toInt()),
+      ),
+      goldEarned: (json['goldEarned'] as num?)?.toInt() ?? 0,
+      itemsSeen: (json['itemsSeen'] as List?)?.cast<String>().toSet(),
+      travelSeconds: (json['travelSeconds'] as num?)?.toInt() ?? 0,
       // Absent on saves from before clears were tracked — an old character
       // reads as "has cleared nothing", which is the safe direction: it can
       // only withhold repeat-clear content, never grant it early.

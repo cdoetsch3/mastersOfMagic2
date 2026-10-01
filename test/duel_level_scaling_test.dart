@@ -205,7 +205,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       final screen = tester.widget<DuelScreen>(find.byType(DuelScreen));
-      screen.onResult!(DuelOutcome.won);
+      screen.onResult!(DuelOutcome.won, const {});
       await tester.pump();
 
       expect(

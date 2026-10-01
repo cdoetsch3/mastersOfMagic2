@@ -227,17 +227,23 @@ class _AdventureScreenState extends State<AdventureScreen> {
           // rather than an `if (!won)`: an escape (2026-08-17 ruling) ends the
           // run the way walking out does — nothing recorded, backpack kept —
           // and must never fall into the defeat branch.
-          onSettle: (outcome, remainingHp) async {
+          onSettle: (outcome, remainingHp, charges) async {
             switch (outcome) {
               case DuelOutcome.won:
-                return game.winEncounter(remainingHp: remainingHp);
+                return game.winEncounter(
+                  remainingHp: remainingHp,
+                  charges: charges,
+                );
               case DuelOutcome.fled:
-                await game.fleeEncounter(remainingHp: remainingHp);
+                await game.fleeEncounter(
+                  remainingHp: remainingHp,
+                  charges: charges,
+                );
                 return const [];
               case DuelOutcome.lost:
                 // ⚠️ The defeat penalty is paid here, on the profile, and
                 // this is the only moment its size is knowable — see [_wiped].
-                _wiped = await game.loseEncounter();
+                _wiped = await game.loseEncounter(charges: charges);
                 return const [];
             }
           },

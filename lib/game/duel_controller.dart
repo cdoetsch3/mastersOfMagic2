@@ -141,6 +141,22 @@ class DuelController extends ChangeNotifier {
 
   final List<String> battleLog = [];
 
+  /// The local player's charges this duel, by element id
+  /// (`MagicElement.name`) — the mastery tally (ACHIEVEMENTS §2.2).
+  final Map<String, int> _chargesThisDuel = {};
+
+  /// What [chargesThisDuel] hands the result write: a copy, so the profile
+  /// never holds a map this controller keeps mutating.
+  ///
+  /// ⭐ **Counted off the engine's [ChargedEvent]s, not the
+  /// [ChargeAction]s the player submits.** An action names its element only
+  /// on the first charge (`chargeAction` sends null once the bar is
+  /// started); the event always names it, and is emitted only when a channel
+  /// actually resolved. ⚠️ **Never written per charge** — this map is
+  /// in memory until the duel ends, and the result write carries it
+  /// (`GameState.recordDuelResult`).
+  Map<String, int> get chargesThisDuel => Map.of(_chargesThisDuel);
+
   /// The player's character level, for health and damage scaling.
   final int playerLevel;
 
@@ -323,6 +339,7 @@ class DuelController extends ChangeNotifier {
     _myForfeitStreak = 0;
     _theirForfeitStreak = 0;
     battleLog.clear();
+    _chargesThisDuel.clear();
     notifyListeners();
   }
 
@@ -454,6 +471,7 @@ class DuelController extends ChangeNotifier {
     _frames = result.frames;
     battleLog.add('— Turn ${result.turn}');
     battleLog.addAll(result.events.map(_describe));
+    _countCharges(result.events);
     _trackForfeits(action, theirs, fleeAttempt: fleeAttempt);
     notifyListeners();
     return result.events;
@@ -496,6 +514,17 @@ class DuelController extends ChangeNotifier {
       enemyDefeated = true;
       shownEnemyHp = 0;
       battleLog.add('${enemy.name} left the duel. You win!');
+    }
+  }
+
+  /// Adds the local player's [ChargedEvent]s in [events] to
+  /// [chargesThisDuel]. ⚠️ The opponent's charges are theirs, never ours.
+  void _countCharges(List<DuelEvent> events) {
+    for (final e in events) {
+      if (e is ChargedEvent && identical(e.mage, player)) {
+        final id = e.element.name;
+        _chargesThisDuel[id] = (_chargesThisDuel[id] ?? 0) + 1;
+      }
     }
   }
 

@@ -347,10 +347,24 @@ void main() {
         find.text('0 seen'),
         findsNWidgets(2),
         reason:
-            'exactly the Bestiary (a real count, 0 for a new character) and '
-            'Item library (still a placeholder) rows show it — a row builder '
+            'exactly the Bestiary and Item library rows (real counts, 0 for '
+            'a new character) show it — a row builder '
             'that put the trailing text on every row (6) or dropped it (0) '
             'fails here',
+      );
+    });
+
+    testWidgets('⭐ the Item library counts the items seen', (tester) async {
+      await _pumpProfile(
+        tester,
+        PlayerProfile.newPlayer()..itemsSeen.addAll({'oak_log', 'pyro_dust'}),
+      );
+      expect(
+        find.text('2 seen'),
+        findsOneWidget,
+        reason:
+            'kills an Item library row still printing the placeholder '
+            '"0 seen" over a real record',
       );
     });
 

@@ -14,6 +14,16 @@
 ///
 /// ⚠️ **An id is forever.** Once shipped, an id is on disk in every profile
 /// that earned it. Rename the [AchievementDef.name] freely; never the id.
+///
+/// ⭐ **Earning and being paid are two moments** (ruling, Christian
+/// 2026-10-01). An entry met is earned (`PlayerProfile.achievements`, the
+/// toast); its [Reward] waits on the Achievements screen until the player
+/// presses Claim (`PlayerProfile.claimedAchievements`). See
+/// ACHIEVEMENTS_DESIGN's 2026-10-01 rulings.
+///
+/// 📝 The counters the stage-2 catalogue reads (charges, gold earned, items
+/// seen, travel) exist on the profile since 2026-10-01; the twelve entries
+/// here predate them and still read only the older counters.
 library;
 
 import 'items/item_def.dart';
@@ -21,9 +31,19 @@ import 'player_profile.dart';
 
 /// The Achievements screen's groups, **in screen order** — the enum order is
 /// the order the sections appear and the filter chips run.
+///
+/// ⭐ ACHIEVEMENTS §5's sections (2026-10-01). The 2026-09-30 `journey` and
+/// `combat` became [campaign] and [duelling]. ⚠️ A category is never on
+/// disk — only ids are — so renaming one costs no save anything.
+///
+/// 📝 [mastery], [wealth] and [world] hold nothing until the stage-2
+/// catalogue lands; the screen offers no chip for an empty category.
 enum AchievementCategory {
-  journey('Journey'),
-  combat('Combat'),
+  campaign('Campaign'),
+  mastery('Mastery'),
+  wealth('Wealth'),
+  duelling('Dueling'),
+  world('World'),
   craft('Craft'),
   ladder('Ladder');
 
@@ -35,6 +55,49 @@ enum AchievementCategory {
 
 /// How far a countable goal has come: [done] of [total].
 typedef AchievementProgress = ({int done, int total});
+
+/// What claiming an achievement pays: XP, gold and Resonance Prisms.
+typedef AchievementReward = ({int xp, int gold, int rp});
+
+/// The ACHIEVEMENTS §6 reward table, keyed on points (ruling, Christian
+/// 2026-10-01: §6 as written; no titles or cosmetics this pass).
+///
+/// | Points | XP | Gold | RP |
+/// |---|---|---|---|
+/// | 5 | 100 | 50 | — |
+/// | 10 | 250 | 150 | — |
+/// | 25 | 750 | 500 | 1 |
+/// | 50 | 2,000 | 1,500 | 5 |
+/// | 100+ | 5,000 | 5,000 | 25 |
+///
+/// ⭐ **Rewards are never power** (§6): XP, gold and RP only — no equipment,
+/// materials, elements, spells or slots, ever.
+abstract final class Reward {
+  /// Nothing — what `GameState.claimAllAchievements` pays with nothing due.
+  static const AchievementReward none = (xp: 0, gold: 0, rp: 0);
+
+  /// The row for [points]. ⚠️ A threshold walk, not an exact-key lookup: a
+  /// 150-point entry pays the **100+** row (§6), and anything between rows
+  /// pays the row below it.
+  static AchievementReward forPoints(int points) {
+    if (points >= 100) return (xp: 5000, gold: 5000, rp: 25);
+    if (points >= 50) return (xp: 2000, gold: 1500, rp: 5);
+    if (points >= 25) return (xp: 750, gold: 500, rp: 1);
+    if (points >= 10) return (xp: 250, gold: 150, rp: 0);
+    return (xp: 100, gold: 50, rp: 0);
+  }
+
+  /// [rewards] added together — what Claim all pays.
+  static AchievementReward sum(Iterable<AchievementReward> rewards) {
+    var xp = 0, gold = 0, rp = 0;
+    for (final r in rewards) {
+      xp += r.xp;
+      gold += r.gold;
+      rp += r.rp;
+    }
+    return (xp: xp, gold: gold, rp: rp);
+  }
+}
 
 /// One thing a character can earn.
 class AchievementDef {
@@ -49,6 +112,22 @@ class AchievementDef {
 
   /// Which section of the screen it sits in.
   final AchievementCategory category;
+
+  /// The arcade-style weight: one of [allowedPoints]. ⭐ Decides the
+  /// [reward] (§6) and sums into the screen's total.
+  final int points;
+
+  /// The tiered set this entry belongs to (§3.1) — e.g. `'pyro_mastery'` —
+  /// or null for a stand-alone entry. ⭐ Tiers are N separate entries sharing
+  /// a family, never one entry with a level; the stage-2 screen collapses a
+  /// family to its current tier.
+  final String? family;
+
+  /// This entry's tier within its [family], 1 upward; null when [family] is.
+  final int? tier;
+
+  /// A spoiler: the screen shows `???` and no blurb until it is earned (§7.1).
+  final bool hidden;
 
   /// For an entry with a countable goal, how far [PlayerProfile] has come —
   /// earned once `done >= total`. Null for a one-shot.
@@ -65,14 +144,27 @@ class AchievementDef {
   /// granting the id directly could earn it.
   final bool Function(PlayerProfile)? earnedWhen;
 
+  /// The weights an entry may carry (§3, §5).
+  static const allowedPoints = [5, 10, 25, 50, 100, 150];
+
   const AchievementDef({
     required this.id,
     required this.name,
     required this.blurb,
     required this.category,
+    required this.points,
+    this.family,
+    this.tier,
+    this.hidden = false,
     this.progress,
     this.earnedWhen,
-  });
+  }) : assert(
+         (family == null) == (tier == null),
+         'a tier needs a family, and a family member needs a tier',
+       );
+
+  /// What claiming this entry pays — [Reward.forPoints] of [points].
+  AchievementReward get reward => Reward.forPoints(points);
 
   /// Whether [p] has met this entry's condition — whether or not the id is
   /// on the profile yet.
@@ -100,7 +192,16 @@ int _bestCraftLevel(PlayerProfile p) {
 }
 
 abstract final class Achievements {
-  // ---- Journey -----------------------------------------------------------
+  /// Lifetime charges of one element for Mastery tiers I–V (ruling,
+  /// Christian 2026-10-01; a duel is 30–40 charges, so tier I is roughly
+  /// seven duels in one element and tier V several hundred). ⭐ Consts to
+  /// tune, read by the stage-2 Mastery family — not entries yet.
+  static const masteryThresholds = <int>[250, 1000, 5000, 10000, 25000];
+
+  // ---- Campaign ----------------------------------------------------------
+  //
+  // 📝 Points (2026-10-01): a one-shot 5–10, a counted goal 10–25, and the
+  // two far milestones (Beyond the Veil, The Long Road) 25.
 
   /// ⭐ The game's first achievement: opening the Pennycross gate, which
   /// costs the three proofs (ruling 2026-09-25). `GameState.openGateAt`
@@ -110,7 +211,8 @@ abstract final class Achievements {
     id: 'papers_in_order',
     name: 'Papers in Order',
     blurb: 'Pennycross unlocked. The proofs stay with the guard.',
-    category: AchievementCategory.journey,
+    category: AchievementCategory.campaign,
+    points: 10,
     earnedWhen: _pennycrossOpen,
   );
 
@@ -118,7 +220,8 @@ abstract final class Achievements {
     id: 'first_clearing',
     name: 'First Clearing',
     blurb: 'One zone cleared to its boss.',
-    category: AchievementCategory.journey,
+    category: AchievementCategory.campaign,
+    points: 10,
     earnedWhen: _anyZoneCleared,
   );
 
@@ -126,7 +229,8 @@ abstract final class Achievements {
     id: 'five_banners',
     name: 'Five Banners',
     blurb: 'Five zones cleared to their bosses.',
-    category: AchievementCategory.journey,
+    category: AchievementCategory.campaign,
+    points: 10,
     progress: _zonesOf5,
   );
 
@@ -134,7 +238,8 @@ abstract final class Achievements {
     id: 'the_long_road',
     name: 'The Long Road',
     blurb: 'Fifteen zones cleared to their bosses.',
-    category: AchievementCategory.journey,
+    category: AchievementCategory.campaign,
+    points: 25,
     progress: _zonesOf15,
   );
 
@@ -144,19 +249,21 @@ abstract final class Achievements {
     id: 'beyond_the_veil',
     name: 'Beyond the Veil',
     blurb: 'Rimeholt unlocked. The Totem stays with you.',
-    category: AchievementCategory.journey,
+    category: AchievementCategory.campaign,
+    points: 25,
     earnedWhen: _rimeholtOpen,
   );
 
-  // ---- Combat ------------------------------------------------------------
+  // ---- Duelling ----------------------------------------------------------
 
-  /// ⚠️ Combat counts [PlayerProfile.duelsWon] — the geared and campaign
+  /// ⚠️ Duelling counts [PlayerProfile.duelsWon] — the geared and campaign
   /// record. Academy ladder wins are a separate record and do not count.
   static const firstBlood = AchievementDef(
     id: 'first_blood',
     name: 'First Blood',
     blurb: 'One duel won.',
-    category: AchievementCategory.combat,
+    category: AchievementCategory.duelling,
+    points: 5,
     earnedWhen: _anyWin,
   );
 
@@ -164,7 +271,8 @@ abstract final class Achievements {
     id: 'tenfold',
     name: 'Tenfold',
     blurb: 'Ten duels won.',
-    category: AchievementCategory.combat,
+    category: AchievementCategory.duelling,
+    points: 10,
     progress: _winsOf10,
   );
 
@@ -172,7 +280,8 @@ abstract final class Achievements {
     id: 'centurion',
     name: 'Centurion',
     blurb: 'A hundred duels won.',
-    category: AchievementCategory.combat,
+    category: AchievementCategory.duelling,
+    points: 25,
     progress: _winsOf100,
   );
 
@@ -183,6 +292,7 @@ abstract final class Achievements {
     name: 'Journeyman',
     blurb: 'One craft taken to level 5.',
     category: AchievementCategory.craft,
+    points: 10,
     progress: _craftOf5,
   );
 
@@ -192,6 +302,7 @@ abstract final class Achievements {
     name: 'Artisan',
     blurb: 'One craft taken to level 10.',
     category: AchievementCategory.craft,
+    points: 25,
     progress: _craftOf10,
   );
 
@@ -202,6 +313,7 @@ abstract final class Achievements {
     name: 'On the Ladder',
     blurb: 'One rated duel played, on either ladder.',
     category: AchievementCategory.ladder,
+    points: 5,
     earnedWhen: _anyRatedGame,
   );
 
@@ -216,6 +328,7 @@ abstract final class Achievements {
     name: 'Regular',
     blurb: 'Ten rated duels played, on either ladder.',
     category: AchievementCategory.ladder,
+    points: 10,
     progress: _ratedOf10,
   );
 
@@ -255,6 +368,24 @@ abstract final class Achievements {
   /// future id is not counted, so the count can never pass [all]'s length.
   static int earnedCount(Set<String> earned) =>
       all.where((a) => earned.contains(a.id)).length;
+
+  /// ⭐ Every entry [p] has earned but not claimed, in catalogue order — what
+  /// Claim and Claim all may pay. ⚠️ An id the catalogue no longer knows is
+  /// never listed, so a retired entry can never be paid.
+  static List<AchievementDef> claimable(PlayerProfile p) => [
+    for (final a in all)
+      if (p.achievements.contains(a.id) &&
+          !p.claimedAchievements.contains(a.id))
+        a,
+  ];
+
+  /// The [AchievementDef.points] of every entry [p] has earned — claimed or
+  /// not: points are for earning, rewards for claiming (§7.1: this is the
+  /// number other players may one day see).
+  static int totalPoints(PlayerProfile p) => [
+    for (final a in all)
+      if (p.achievements.contains(a.id)) a.points,
+  ].fold(0, (a, b) => a + b);
 
   /// ⭐ Every entry [p] has met but does not hold yet, in catalogue order —
   /// the one question both the live grant and the load-time sweep ask.

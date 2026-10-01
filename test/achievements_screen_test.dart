@@ -8,7 +8,8 @@
 /// filters nothing, a filter row that grows when pressed, a count that
 /// counts nothing, and a row still wired to the placeholder.
 ///
-/// 📝 The catalogue itself and granting are pinned in `achievements_test`.
+/// 📝 The catalogue itself and granting are pinned in `achievements_test`;
+/// rewards and claiming in `achievement_claim_test`.
 library;
 
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import 'package:masters_of_magic_2/game/player_profile.dart';
 import 'package:masters_of_magic_2/game/profile_storage.dart';
 import 'package:masters_of_magic_2/screens/achievements_screen.dart';
 import 'package:masters_of_magic_2/screens/coming_soon_screen.dart';
+import 'package:masters_of_magic_2/screens/level_up_screen.dart';
 import 'package:masters_of_magic_2/screens/profile_screen.dart';
 import 'package:masters_of_magic_2/ui/app_theme.dart';
 
@@ -268,23 +270,26 @@ void main() {
           const AchievementsScreen(),
         );
         for (final c in AchievementCategory.values) {
+          final empty = Achievements.inCategory(c).isEmpty;
           expect(
             find.text(c.label.toUpperCase()),
-            findsOneWidget,
-            reason: 'kills an All view with no ${c.label} heading',
+            empty ? findsNothing : findsOneWidget,
+            reason: empty
+                ? 'kills a heading over a category with nothing in it yet'
+                : 'kills an All view with no ${c.label} heading',
           );
         }
 
-        await _tapChip(tester, 'Combat');
+        await _tapChip(tester, 'Dueling');
         expect(
           _namesShown(),
-          _names(AchievementCategory.combat),
+          _names(AchievementCategory.duelling),
           reason:
-              'kills a Combat chip that filters nothing, or filters the '
+              'kills a Duelling chip that filters nothing, or filters the '
               'wrong category',
         );
         expect(
-          find.text('COMBAT'),
+          find.text('DUELLING'),
           findsNothing,
           reason: 'kills a heading repeated under its own chip',
         );
@@ -347,7 +352,7 @@ void main() {
           reason: 'kills a heading left over an empty section',
         );
         expect(
-          find.text('JOURNEY'),
+          find.text('CAMPAIGN'),
           findsOneWidget,
           reason: 'kills a mutant that drops every heading',
         );
@@ -467,7 +472,284 @@ void main() {
     });
   });
 
+  group('⭐ Claim (ruling 2026-10-01)', () {
+    Finder claimIn(String id) => find.descendant(
+      of: find.byKey(AchievementRow.claimCellKey(id)),
+      matching: find.text(AchievementsScreen.claimLabel),
+    );
+
+    testWidgets('an earned, unclaimed row offers Claim; pressing it pays', (
+      tester,
+    ) async {
+      final profile = PlayerProfile.newPlayer()
+        ..achievements.addAll({'papers_in_order', 'first_blood'})
+        ..claimedAchievements.add('first_blood');
+      await _pump(tester, profile, const AchievementsScreen());
+
+      expect(
+        claimIn('papers_in_order'),
+        findsOneWidget,
+        reason: 'kills an earned, unclaimed row with no Claim',
+      );
+      expect(
+        claimIn('first_blood'),
+        findsNothing,
+        reason: 'kills a Claim left on a row already paid',
+      );
+      expect(
+        claimIn('tenfold'),
+        findsNothing,
+        reason: 'kills a Claim on a row not yet earned',
+      );
+
+      await tester.tap(claimIn('papers_in_order'));
+      await tester.pump();
+      expect(
+        profile.claimedAchievements,
+        contains('papers_in_order'),
+        reason: 'kills a Claim button wired to nothing',
+      );
+      expect(
+        claimIn('papers_in_order'),
+        findsNothing,
+        reason: 'kills a Claim that stays after paying',
+      );
+    });
+
+    testWidgets('⭐ press-stable: the claim cell is on every row, one width', (
+      tester,
+    ) async {
+      final profile = PlayerProfile.newPlayer()
+        ..achievements.add('papers_in_order');
+      await _pump(tester, profile, const AchievementsScreen());
+      final cell = find.byKey(AchievementRow.claimCellKey('papers_in_order'));
+      final before = tester.getRect(cell);
+      final nameAt = tester.getTopLeft(find.text(name));
+      final width = tester
+          .getSize(find.byKey(AchievementRow.claimCellKey('tenfold')))
+          .width;
+
+      await tester.tap(claimIn('papers_in_order'));
+      await tester.pump();
+
+      expect(
+        tester.getRect(cell),
+        before,
+        reason:
+            'kills a claim cell that collapses once paid — the button '
+            'pressed would take its row with it',
+      );
+      expect(
+        tester.getTopLeft(find.text(name)),
+        nameAt,
+        reason: 'kills a row that re-lays its text when Claim leaves',
+      );
+      expect(
+        width,
+        AchievementRow.claimCellWidth,
+        reason:
+            'kills a cell reserved only on claimable rows — the text column '
+            'would run wider on some rows than others',
+      );
+    });
+
+    testWidgets('⭐ Claim all and the total points, in the summary', (
+      tester,
+    ) async {
+      final profile = PlayerProfile.newPlayer()
+        ..achievements.addAll({'first_blood', 'tenfold', 'centurion'})
+        ..claimedAchievements.add('tenfold');
+      await _pump(tester, profile, const AchievementsScreen());
+
+      expect(
+        find.text('40 points'),
+        findsOneWidget,
+        reason: 'kills a summary with no total, or one over claimed only',
+      );
+      expect(
+        find.byKey(AchievementsScreen.claimAllKey),
+        findsOneWidget,
+        reason: 'kills a summary with no Claim all while rewards wait',
+      );
+      final firstRow = tester.getTopLeft(find.text(name));
+
+      await tester.tap(find.text(AchievementsScreen.claimAllLabel));
+      await tester.pump();
+
+      expect(profile.claimedAchievements, {
+        'tenfold',
+        'first_blood',
+        'centurion',
+      }, reason: 'kills a Claim all wired to nothing, or to one entry');
+      expect(
+        find.byKey(AchievementsScreen.claimAllKey),
+        findsNothing,
+        reason: 'kills a Claim all still offered with nothing to claim',
+      );
+      expect(
+        find.text(AchievementsScreen.claimLabel),
+        findsNothing,
+        reason: 'kills a row Claim that survives Claim all',
+      );
+      expect(
+        tester.getTopLeft(find.text(name)),
+        firstRow,
+        reason:
+            'kills a claim row that collapses when Claim all leaves — the '
+            'whole list would jump up',
+      );
+    });
+
+    testWidgets('no Claim all when nothing waits', (tester) async {
+      await _pump(
+        tester,
+        PlayerProfile.newPlayer(),
+        const AchievementsScreen(),
+      );
+      expect(
+        find.byKey(AchievementsScreen.claimAllKey),
+        findsNothing,
+        reason: 'kills a Claim all drawn over an empty pile',
+      );
+      expect(
+        find.text('0 points'),
+        findsOneWidget,
+        reason: 'kills a total hidden at zero',
+      );
+    });
+
+    testWidgets('⭐ every row prints its reward line', (tester) async {
+      await _pump(
+        tester,
+        PlayerProfile.newPlayer(),
+        const AchievementsScreen(),
+      );
+      int count(int points) =>
+          Achievements.all.where((a) => a.points == points).length;
+      expect(
+        find.text('+100 XP · +50 gold'),
+        findsNWidgets(count(5)),
+        reason: 'kills a 5-point row without its line, or with RP on it',
+      );
+      expect(
+        find.text('+250 XP · +150 gold'),
+        findsNWidgets(count(10)),
+        reason: 'kills a 10-point row without its line',
+      );
+      expect(
+        find.text('+750 XP · +500 gold · +1 RP'),
+        findsNWidgets(count(25)),
+        reason: 'kills a 25-point line that drops its RP',
+      );
+    });
+
+    test('the copy: reward lines group thousands; points read as points', () {
+      expect(
+        rewardLabel(Reward.forPoints(100)),
+        '+5,000 XP · +5,000 gold · +25 RP',
+        reason: 'kills a line printing 5000 where §6 writes 5,000',
+      );
+      expect(
+        rewardLabel(Reward.forPoints(10)),
+        '+250 XP · +150 gold',
+        reason: 'kills an RP clause printed as +0 RP',
+      );
+      expect(
+        pointsLabel(1240),
+        '1,240 points',
+        reason: 'kills a total without its thousands comma',
+      );
+    });
+
+    testWidgets('⭐ a hidden entry is ??? until earned — no blurb', (
+      tester,
+    ) async {
+      const secret = AchievementDef(
+        id: 'zz_secret',
+        name: 'The Quiet Door',
+        blurb: 'Found what nobody looks for.',
+        category: AchievementCategory.world,
+        points: 25,
+        hidden: true,
+      );
+      Future<void> row({required bool earned}) => tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AchievementRow(def: secret, earned: earned),
+          ),
+        ),
+      );
+
+      await row(earned: false);
+      expect(
+        find.text(AchievementRow.hiddenName),
+        findsOneWidget,
+        reason: 'kills a hidden entry that prints its name unearned',
+      );
+      expect(
+        find.text(secret.name),
+        findsNothing,
+        reason: 'kills the spoiler: the name shown before it is earned',
+      );
+      expect(
+        find.text(secret.blurb),
+        findsNothing,
+        reason: 'kills the spoiler: the blurb shown before it is earned',
+      );
+
+      await row(earned: true);
+      expect(
+        [
+          find.text(secret.name).evaluate().length,
+          find.text(secret.blurb).evaluate().length,
+          find.text(AchievementRow.hiddenName).evaluate().length,
+        ],
+        [1, 1, 0],
+        reason: 'kills a hidden entry that stays veiled once earned',
+      );
+    });
+
+    testWidgets('a claim that crosses a level shows the level-up', (
+      tester,
+    ) async {
+      final profile = PlayerProfile.newPlayer()..achievements.add('tenfold');
+      await _pump(tester, profile, const AchievementsScreen());
+      await tester.tap(claimIn('tenfold'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(
+        find.byType(LevelUpScreen),
+        findsOneWidget,
+        reason:
+            'kills a claim whose level-up waits, unseen, for the next duel '
+            'to surface it',
+      );
+    });
+  });
+
   group('the Profile row', () {
+    testWidgets('⭐ n to claim while rewards wait', (tester) async {
+      final profile = PlayerProfile.newPlayer()
+        ..achievements.addAll({'papers_in_order', 'first_blood', 'tenfold'})
+        ..claimedAchievements.add('tenfold');
+      await _pump(tester, profile, const ProfileScreen());
+      expect(
+        find.text('2 to claim'),
+        findsOneWidget,
+        reason:
+            'kills a row that still reads n / N while rewards wait, and one '
+            'that counts the claimed (3) or the earned',
+      );
+      expect(
+        achievementProfileTrailing(
+          profile
+            ..claimedAchievements.addAll({'papers_in_order', 'first_blood'}),
+        ),
+        '3 / $total',
+        reason: 'kills a row stuck on "0 to claim" once all is claimed',
+      );
+    });
+
     testWidgets('⭐ counts n / N off the profile', (tester) async {
       await _pump(tester, PlayerProfile.newPlayer(), const ProfileScreen());
       expect(
@@ -476,8 +758,10 @@ void main() {
         reason: 'kills a row with no count, or a count of something else',
       );
 
+      // Claimed, so the row is back to its count (see 'n to claim' below).
       final earned = PlayerProfile.newPlayer()
-        ..achievements.addAll({'papers_in_order', 'retired_or_future_id'});
+        ..achievements.addAll({'papers_in_order', 'retired_or_future_id'})
+        ..claimedAchievements.add('papers_in_order');
       await _pump(tester, earned, const ProfileScreen());
       expect(
         find.text('1 / $total'),

@@ -595,6 +595,54 @@ class GameState extends ChangeNotifier {
     return true;
   }
 
+  /// Takes the reward of earned achievement [id] (ruling, Christian
+  /// 2026-10-01: rewards are CLAIMED, not auto-granted). Returns whether it
+  /// paid.
+  ///
+  /// ⭐ **Refuses — false, nothing written — unless [id] is earned and not yet
+  /// claimed.** That refusal is the whole of the idempotence: a double tap,
+  /// or a stale screen, can never pay twice.
+  ///
+  /// ⭐ **One write** for the lot: the id joins
+  /// [PlayerProfile.claimedAchievements], and the [Reward.forPoints] XP, gold
+  /// ([PlayerProfile.earnGold], so the claim counts toward Wealth) and RP land
+  /// together. A level crossed raises [pendingLevelUp] exactly as a duel's
+  /// XP does.
+  Future<bool> claimAchievement(String id) async {
+    final def = Achievements.byId(id);
+    if (def == null) return false;
+    if (!profile.achievements.contains(id)) return false;
+    if (profile.claimedAchievements.contains(id)) return false;
+    await _payClaims([def]);
+    return true;
+  }
+
+  /// Claims every [Achievements.claimable] entry in **one** write and returns
+  /// the summed reward — all zero, and nothing written, when there is none.
+  Future<AchievementReward> claimAllAchievements() async {
+    final due = Achievements.claimable(profile);
+    if (due.isEmpty) return Reward.none;
+    return _payClaims(due);
+  }
+
+  /// Pays [defs] in one [_mutate]. ⚠️ The callers have already refused
+  /// anything unearned or claimed; this only adds up and writes.
+  Future<AchievementReward> _payClaims(List<AchievementDef> defs) async {
+    final paid = Reward.sum([for (final d in defs) d.reward]);
+    final before = profile.level;
+    await _mutate(() {
+      profile.claimedAchievements.addAll(defs.map((d) => d.id));
+      profile.xp += paid.xp;
+      profile.earnGold(paid.gold);
+      profile.resonancePrisms += paid.rp;
+    });
+    // 📝 Gold earned can satisfy a Wealth entry (stage 2) — a claim earns
+    // live like any other gain.
+    await _earnLive();
+    _flagLevelUp(before);
+    return paid;
+  }
+
   /// Arrive, if the clock says so. Cheap, idempotent, and safe to call often —
   /// this is what makes arriving while the app was closed unremarkable.
   ///
@@ -623,6 +671,9 @@ class GameState extends ChangeNotifier {
     profile.arrivedFromId = trip.fromId;
     profile.locationId = trip.toId;
     profile.trip = null;
+    // ⭐ The whole trip, once — it settles exactly once, because the trip is
+    // cleared on this same line's write. Rides the caller's save.
+    profile.travelSeconds += trip.totalSeconds;
     return true;
   }
 
@@ -642,6 +693,8 @@ class GameState extends ChangeNotifier {
       profile.locationId = trip.stopReachedAt(at);
       profile.discoveredLocationIds.addAll(trip.stopsSeenAt(at));
       profile.trip = null;
+      // The road actually walked counts; the rest of the trip does not.
+      profile.travelSeconds += trip.elapsedAt(at).inSeconds;
     });
   }
 
@@ -686,15 +739,22 @@ class GameState extends ChangeNotifier {
   /// AI loss pay out, which is the abuse the ruling closes. `launchDuel` is the
   /// only path that can see a remote opponent, and it is the only one that
   /// passes it.
+  ///
+  /// ⭐ [charges] is the duel's charge tally (element id → count, the local
+  /// player's only — `DuelController.chargesThisDuel`), banked onto
+  /// [PlayerProfile.charges] **in this same write** (ACHIEVEMENTS §2.2: flush
+  /// once at the end, never per charge). Empty for a caller that has none.
   Future<void> recordDuelResult({
     required bool won,
     int opponentLevel = 1,
     bool bossDefeated = false,
     String? locationId,
     bool pvp = false,
+    Map<String, int> charges = const {},
   }) async {
     final before = profile.level;
     await _mutate(() {
+      profile.addCharges(charges);
       // ⭐ XP scales with who you beat (10/level), so the fight worth taking
       // is the one that pays. Gold is deliberately still flat — scaling both
       // would make the economy climb as steeply as the power curve.
@@ -704,19 +764,26 @@ class GameState extends ChangeNotifier {
         pvp: pvp,
       );
       if (won) {
-        profile.gold += Progression.winGold;
+        profile.earnGold(Progression.winGold);
         profile.duelsWon++;
         if (bossDefeated) {
           final zone = locationId ?? profile.locationId;
           profile.zoneClears[zone] = profile.clearCountFor(zone) + 1;
         }
       } else {
-        profile.gold += Progression.lossGold;
+        profile.earnGold(Progression.lossGold);
         profile.duelsLost++;
       }
     });
     // Wins, clears and levels all move here.
     await _earnLive();
+    _flagLevelUp(before);
+  }
+
+  /// Raises [pendingLevelUp] when XP added since [before] crossed a level.
+  /// ⭐ The one level-up check every XP gain shares — a duel's
+  /// ([recordDuelResult]) and an achievement claim's ([claimAchievement]).
+  void _flagLevelUp(int before) {
     final after = profile.level;
     if (after > before) {
       pendingLevelUp = after;
@@ -1095,9 +1162,12 @@ class GameState extends ChangeNotifier {
   /// ⚠️ Nothing reaches the backpack here. The player chooses immediately after
   /// the fight ([claimVictoryLoot]) — the drops sit on the run only for the
   /// seconds in between, and survive a force-quit taken in those seconds.
+  ///
+  /// [charges] is the duel's charge tally — see [recordDuelResult].
   Future<List<String>> winEncounter({
     required int remainingHp,
     Random? rng,
+    Map<String, int> charges = const {},
   }) async {
     final r = run;
     if (r == null || r.isOver) return const [];
@@ -1122,6 +1192,9 @@ class GameState extends ChangeNotifier {
     // ⭐ The Bestiary's `slain` — on a WIN only, never in [loseEncounter].
     // Rides recordDuelResult's write below with the rest of the result.
     profile.noteSlain(enemy.def.id);
+    // ⭐ The Item library's `seen` — every def that DROPPED, whether or not
+    // the picker keeps it. Rides the same write.
+    profile.itemsSeen.addAll(loot.slots.map((s) => s.defId));
     r.recordVictory(
       loot: loot.slots,
       instances: loot.instances,
@@ -1134,6 +1207,7 @@ class GameState extends ChangeNotifier {
       opponentLevel: enemy.level,
       bossDefeated: wasBoss,
       locationId: r.zoneId,
+      charges: charges,
     );
     // ⚠️ **The boss fight is not special.** Its drops go through the very same
     // picker as encounter one's, so the last fight of a run cannot drift into
@@ -1161,7 +1235,12 @@ class GameState extends ChangeNotifier {
   /// Returns how many items were lost — ⚠️ stacks counted by their `count`
   /// since 2026-09-25 — so the screen can say it plainly. A penalty the player
   /// is not told about is indistinguishable from a bug.
-  Future<int> loseEncounter({Random? rng}) async {
+  ///
+  /// [charges] is the duel's charge tally — see [recordDuelResult].
+  Future<int> loseEncounter({
+    Random? rng,
+    Map<String, int> charges = const {},
+  }) async {
     final r = run;
     if (r == null || r.isOver) return 0;
     final enemy = r.current!;
@@ -1183,7 +1262,11 @@ class GameState extends ChangeNotifier {
     });
     // The defeat rides to disk on recordDuelResult's write, same as a win.
     // ⚠️ No `pvp` flag: a campaign death is single-player, so it pays 0 XP.
-    await recordDuelResult(won: false, opponentLevel: enemy.level);
+    await recordDuelResult(
+      won: false,
+      opponentLevel: enemy.level,
+      charges: charges,
+    );
     notifyListeners();
     return lost;
   }
@@ -1198,9 +1281,17 @@ class GameState extends ChangeNotifier {
   /// no XP, adds no gold, and must not tick `duelsLost`. Routing this anywhere
   /// near [loseEncounter] would hand the player the full death penalty for
   /// successfully getting away, which is the exact bug the ruling replaced.
-  Future<void> fleeEncounter({required int remainingHp}) async {
+  ///
+  /// ⭐ [charges] still bank: an escape is a duel the player fought, and its
+  /// charges were really thrown. They ride [leaveAdventure]'s write, the one
+  /// write an escape makes.
+  Future<void> fleeEncounter({
+    required int remainingHp,
+    Map<String, int> charges = const {},
+  }) async {
     final r = run;
     if (r == null || r.isOver) return;
+    profile.addCharges(charges);
     // Truthful to the last, even though the run is ending: the HP the player
     // escaped with is the HP the ending screen reads. Set before the call so
     // it rides [leaveAdventure]'s own write to disk rather than a second one.
@@ -2030,7 +2121,10 @@ class GameState extends ChangeNotifier {
         profile.itemInstances.remove(instId);
       }
 
-      profile.gold += quote.net;
+      // ⭐ Still exactly [quote.net] (net = sellGold − buyGold), split so the
+      // sale is EARNED gold and the purchase is not un-earned.
+      profile.gold -= quote.buyGold;
+      profile.earnGold(quote.sellGold);
       profile.storerooms[townId] = room;
       profile.backpack = pack;
       profile.shopStock[townId] = TownShopState(

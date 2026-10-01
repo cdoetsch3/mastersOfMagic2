@@ -1,13 +1,53 @@
 # Masters of Magic 2 — Achievements & Character Progress
 
-Status: 📝 **draft — designed here, nothing built.** Requested 2026-07-28,
-revised with Christian's rulings the same day.
+Status: 🔨 **stage 1 built (2026-10-01)** — the model, the four lifetime
+counters and Claim (see the rulings below and §11). 📝 Stage 2 is the
+catalogue content (≈160 entries) and the screen redesign. Requested
+2026-07-28, revised with Christian's rulings the same day.
 
 Two systems, documented together because one is useless without the other:
 
 1. **Character progress** (§2) — the record of what a character has done.
    Worth building on its own merits; achievements are only its first consumer.
 2. **Achievements** (§4 onward) — named milestones read *from* that record.
+
+---
+
+## ✅ Rulings 2026-10-01
+
+Christian's rulings for the stage-1 build. Each amends the section named.
+
+1. ✅ **Rewards are CLAIMED, not auto-granted** (amends §6, §7.3). Earning
+   marks the entry earned and toasts, as before; the player then presses
+   **Claim** on the Achievements screen (or **Claim all**) to receive the
+   reward. ✅ Built: `PlayerProfile.claimedAchievements` (the ids claimed),
+   `GameState.claimAchievement(id)` / `claimAllAchievements()` — each one
+   write. ⭐ The load-time sweep still *earns* silently and pays nothing, so a
+   returning player finds a pile to claim. ⚠️ Every save from before the
+   ruling reads as "claimed nothing", so everything already earned is owed
+   once.
+2. ✅ **Reward table = §6 as written**, keyed on points: 5 pt → 100 XP · 50
+   gold; 10 → 250 XP · 150 gold; 25 → 750 XP · 500 gold · 1 RP; 50 → 2,000
+   XP · 1,500 gold · 5 RP; 100+ → 5,000 XP · 5,000 gold · 25 RP (a 150-pt
+   entry pays the 100+ row). RP = `PlayerProfile.resonancePrisms`. 🚫 No
+   titles or cosmetics this pass — titles are deferred and §6.1 stands
+   untouched. ✅ Built: `Reward.forPoints` in `achievements.dart`; claimed
+   gold goes through `earnGold`, so it counts toward Wealth.
+3. ✅ **Mastery thresholds: 250 / 1,000 / 5,000 / 10,000 / 25,000 charges**
+   per element, tiers I–V (amends §3.1's provisional table; a duel is 30–40
+   charges). Consts, for Christian to tune:
+   `Achievements.masteryThresholds`.
+4. ✅ **The lifetime counters live on the CHARACTER document**, not in a
+   `progress/` subcollection — §2.3's amendment, extended. See **§2.4** for
+   each counter's bound.
+5. ✅ **Hidden entries exist**: `hidden: true` shows `???` and no blurb
+   until earned. 📝 The catalogue *content* (≈160 entries) is stage 2; stage
+   1 built the shape (`points`, `family` + `tier`, `hidden`) and migrated the
+   twelve shipped entries (ids unchanged — they are on disk since release 9).
+6. ✅ **Wealth is four entries** (amends §5.3): **Young Money** 10,000 gold
+   earned · 5 pt (new) · **Fat Stacks** 100,000 · 10 pt (was 1,000 · 5) ·
+   **Big Money** 1,000,000 · 25 pt · **Tres Commas** 1,000,000,000 · 100 pt
+   (its ❓ in §10 stands). 📝 Doc only — the entries are stage-2 content.
 
 ---
 
@@ -154,6 +194,39 @@ being a wall.
 ⚠️ **The Collector tier is still fully blocked** — "every possible drop" needs
 items, drop tables, and a permanent *seen* log that is separate from inventory
 (you can sell a thing and must not lose the credit). None of that exists.
+📝 (2026-10-01: the *seen* log now exists — `itemsSeen`, §2.4 — though it is
+per character, not per zone.)
+
+### 2.4 ✅ Amendment (2026-10-01) — the lifetime counters live on the CHARACTER
+
+✅ **Built**, ruling 4 above. Five fields on `PlayerProfile`, each always
+written (even empty or zero), each absent-reads-as-empty on an older save:
+
+| Field | Holds | Bound | Written by |
+|---|---|---|---|
+| `charges` | element id → lifetime charges, the local player's only | **12 keys**, one per element | the duel's result write (`recordDuelResult`; `fleeEncounter` for an escape) — ⭐ once per duel, never per charge |
+| `goldEarned` | lifetime gold **gained** (duel rewards, vendor sales, claims) | **one int** | `PlayerProfile.earnGold`, the only way gold is gained |
+| `itemsSeen` | every item def id that has ever dropped for this character | **≤265 ids** — the item catalogue | `winEncounter`, when the loot is rolled |
+| `travelSeconds` | lifetime seconds on the road | **one int** | `settleTravel` (the whole trip, on arrival); `cancelTravel` (the part walked) |
+| `claimedAchievements` | ids whose reward has been taken | **≤ the catalogue** (≈160) | `claimAchievement` / `claimAllAchievements` |
+
+The same three tests §2.3 applied, and the same answer:
+
+| §2.1's reason | Do these trigger it? |
+|---|---|
+| **Write volume** | ❌ Each rides a write that already happens — the duel result, the shop settle, the loot roll, the arrival, the claim. None adds a write of its own |
+| **Unbounded growth** | ❌ Every one is bounded (table above) — a few KiB at the very most, against a 1 MiB ceiling |
+| **Partial reads** | ❌ The Profile reads `itemsSeen` and the claimable count on every open; a subcollection would be a second read there |
+
+⚠️ **The precedent still to guard is §2.3's:** per-*enemy* kill tallies and
+per-*zone* drop logs (`enemiesDefeated`, `dropsSeen`) remain unbounded in
+shape and do not belong next to these. `itemsSeen` is safe only because it is
+one flat set over a finite catalogue.
+
+⭐ **Gold earned, not gold held** — §5.3's reason. A purchase is a plain
+`gold -=` and never lowers `goldEarned`; the shop settle splits the basket's
+net into the sale (earned) and the purchase (spent), so the purse still moves
+by exactly the quoted net.
 
 ---
 
@@ -193,7 +266,8 @@ achievement with a level. That is what both platform stores expect, it lets
 each tier carry its own reward, and it keeps "earned" a simple set.
 
 **Example — Pyro Mastery** (numbers 📝 provisional, to be tuned in a later
-session):
+session — ✅ **superseded 2026-10-01**: the thresholds are 250 / 1,000 /
+5,000 / 10,000 / 25,000, ruling 3 above; points per tier are still stage 2):
 
 | Tier | Charges | Points |
 |---|---|---|
@@ -267,16 +341,20 @@ It is the long tail. Two risks to accept openly:
 
 ### 5.3 Wealth ✅ (requested)
 
+✅ **Four entries (ruling 6, 2026-10-01).**
+
 | Achievement | Earned by | Points |
 |---|---|---|
-| **Fat Stacks** | Earn 1,000 gold | 5 |
+| **Young Money** | Earn 10,000 gold | 5 |
+| **Fat Stacks** | Earn 100,000 gold | 10 |
 | **Big Money** | Earn 1,000,000 gold | 25 |
 | **Tres Commas** | Earn 1,000,000,000 gold | 100 |
 
 ⚠️ **Lifetime gold *earned*, not gold *held*.** Held balance would punish
 spending — a player who invests in gear would watch progress go backwards, and
 the achievement would quietly discourage engaging with the economy. `totals`
-(§2.1) tracks the lifetime figure.
+(§2.1) tracks the lifetime figure. ✅ (2026-10-01: `PlayerProfile.goldEarned`, on the
+character — §2.4.)
 
 ❓ **Is a billion reachable?** That depends entirely on an economy that does
 not exist yet. If end-game income is ~10k/hour, Tres Commas is 100,000 hours
@@ -489,13 +567,17 @@ extra vocabulary, which is a point in favour of the names chosen.
 
 | # | Prerequisite | Blocks |
 |---|---|---|
-| 1 | ⛔ **Character progress subcollection** (§2) | everything |
-| 2 | ⛔ **Zone `cleared` state** (§2.3) | 23 campaign achievements |
-| 3 | ⛔ **Per-element charge counters** (§2.2) | 61 mastery achievements |
-| 4 | ⛔ **Lifetime gold earned** (§5.3) | wealth achievements |
+| 1 | ✅ **Character progress** (§2) — built on the character document, not a subcollection (§2.3, §2.4) | everything |
+| 2 | ✅ **Zone `cleared` state** (§2.3) — `PlayerProfile.zoneClears` | 23 campaign achievements |
+| 3 | ✅ **Per-element charge counters** (§2.2) — `PlayerProfile.charges` | 61 mastery achievements |
+| 4 | ✅ **Lifetime gold earned** (§5.3) — `PlayerProfile.goldEarned` | wealth achievements |
 | 5 | 📝 **Bestiary** (Phase 6) | purge + vanquisher achievements |
 | 6 | 📝 **Item catalogue + drop tables** (Phases 7–8) | collector achievements |
 | 7 | 📝 **`DuelSummary`** (§4) | conditional duel achievements only |
+
+📝 Built alongside 1–4 (2026-10-01): `PlayerProfile.itemsSeen` (the
+permanent *seen* log #6 needs) and `PlayerProfile.travelSeconds` (§5.5's The
+Long Road).
 
 ⭐ **1–4 are small and worth doing regardless of achievements.** "Which zones
 have I cleared", "what do I actually play", and "how much have I earned" are

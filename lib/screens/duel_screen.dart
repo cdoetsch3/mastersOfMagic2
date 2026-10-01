@@ -68,7 +68,15 @@ class DuelScreen extends StatefulWidget {
   /// the duel ends with '…' in the Ranking row, and fills in when the write
   /// lands. Blocking the card on a network round-trip would make every duel
   /// end in a pause.
-  final Future<DuelSettlement?> Function(DuelOutcome outcome)? onResult;
+  ///
+  /// ⭐ [charges] is the local player's charge tally for the duel
+  /// ([DuelController.chargesThisDuel]) — handed out once, at the end, so the
+  /// result write can bank it (ACHIEVEMENTS §2.2).
+  final Future<DuelSettlement?> Function(
+    DuelOutcome outcome,
+    Map<String, int> charges,
+  )?
+  onResult;
 
   /// ⭐ Health carried in from an adventure (GAME_DESIGN adventure loop). Null
   /// for a standalone duel, which starts at full.
@@ -92,7 +100,13 @@ class DuelScreen extends StatefulWidget {
   /// with its own consequences (the run ends, the haul survives, nothing is
   /// recorded); as a bool it could only arrive as `false`, i.e. as a defeat —
   /// which would wipe the very run the escape saved.
-  final Future<List<String>> Function(DuelOutcome outcome, int remainingHp)?
+  ///
+  /// [charges] is the duel's charge tally — see [onResult].
+  final Future<List<String>> Function(
+    DuelOutcome outcome,
+    int remainingHp,
+    Map<String, int> charges,
+  )?
   onSettle;
 
   /// The player's character level — scales their health and damage.
@@ -422,7 +436,7 @@ class _DuelScreenState extends State<DuelScreen>
   void _checkResult() {
     if (_resultReported || !c.gameOver) return;
     _resultReported = true;
-    final settling = widget.onResult?.call(c.outcome);
+    final settling = widget.onResult?.call(c.outcome, c.chargesThisDuel);
     if (settling != null) {
       _settling = true;
       settling.then((settlement) {
@@ -439,7 +453,7 @@ class _DuelScreenState extends State<DuelScreen>
       _loot = const [];
       return;
     }
-    settle(c.outcome, c.player.hp).then((loot) {
+    settle(c.outcome, c.player.hp, c.chargesThisDuel).then((loot) {
       if (mounted) setState(() => _loot = loot);
     });
   }
