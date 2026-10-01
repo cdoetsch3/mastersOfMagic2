@@ -855,6 +855,28 @@ class Ledger:
         rec["status"] = "approved"
         rec["updated"] = now
 
+    def approve_all(self, assets: list[Asset], *, now: str) -> list[str]:
+        """Approve every asset in [assets] that is generated AND placed.
+
+        ⭐ The bulk-review answer (Christian, 2026-10-01: "approve all of
+        them and note issues as I play"). ⚠️ Only `generated` + processed
+        records qualify: a pending asset has nothing to approve, a rejected
+        one has a note waiting to be acted on, and a raw that never made it
+        through pixelate is not on its contract path yet. Returns the ids
+        approved, in [assets] order.
+        """
+        done: list[str] = []
+        for asset in assets:
+            rec = self.assets.get(asset.asset_id)
+            if (
+                rec
+                and rec["status"] == "generated"
+                and rec.get("processed", False)
+            ):
+                self.approve(asset.asset_id, now=now)
+                done.append(asset.asset_id)
+        return done
+
     def reject(self, asset_id: str, *, feedback: str, now: str) -> None:
         """⚠️ Feedback is required, because it is the whole next prompt.
 
@@ -1729,6 +1751,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-open", action="store_true", help="do not open a browser")
     ap.add_argument("--status", action="store_true", help="table of every asset")
     ap.add_argument(
+        "--approve-all",
+        action="store_true",
+        help="approve every generated-and-placed asset (narrow with --zone); "
+        "the bulk alternative to clicking through --review",
+    )
+    ap.add_argument(
+        "--reject",
+        metavar="ASSET_ID",
+        help="reject one asset (approved or not) with --note, so the next "
+        "--zone run regenerates it as an edit carrying the note",
+    )
+    ap.add_argument("--note", help="the feedback a --reject carries (required)")
+    ap.add_argument(
         "--quality",
         choices=["low", "medium", "high"],
         default="medium",
@@ -1752,6 +1787,32 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.status:
         print_status(source, ledger, args.zone)
+        return 0
+
+    if args.approve_all:
+        done = ledger.approve_all(source.assets(zone=args.zone), now=now_iso())
+        ledger.save()
+        where = f" in {args.zone}" if args.zone else ""
+        print(f"approved {len(done)} asset(s){where}")
+        return 0
+
+    if args.reject:
+        # ⚠️ The note is the whole next prompt — the ledger refuses an empty
+        # one, and so does this flag, before anything is written.
+        if not (args.note or "").strip():
+            ap.error("--reject needs --note \"what to change\"")
+        asset = source.by_id(args.reject)
+        if asset is None:
+            ap.error(f"no asset called {args.reject!r} — see --status")
+        if ledger.status(asset) == "pending":
+            ap.error(f"{args.reject} has never been generated — run its zone")
+        ledger.reject(args.reject, feedback=args.note, now=now_iso())
+        ledger.save()
+        print(
+            f"rejected {args.reject}: {args.note.strip()}\n"
+            f"  regenerate with: python3 tool/artgen.py --zone {asset.zone} "
+            f"--only {args.reject}"
+        )
         return 0
 
     if args.review:

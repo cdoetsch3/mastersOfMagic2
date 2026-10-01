@@ -429,6 +429,32 @@ class LedgerTest(unittest.TestCase):
         self.ledger.approve("listening_fawn", now="T3")
         self.assertEqual(self.ledger.status(self.asset), "approved")
 
+    def test_approve_all_takes_only_what_is_generated_and_placed(self):
+        src = source()
+        placed = src.by_id("listening_fawn")
+        raw_only = src.by_id("bindweed_creeper")
+        noted = src.by_id("rootknuckle")
+        never = src.by_id("hollow_stag")
+        self.ledger.record_generated(placed, model="m", now="T0", processed=True)
+        self.ledger.record_generated(raw_only, model="m", now="T0", processed=False)
+        self.ledger.record_generated(noted, model="m", now="T0", processed=True)
+        self.ledger.reject("rootknuckle", feedback="face right", now="T1")
+        done = self.ledger.approve_all([placed, raw_only, noted, never], now="T2")
+        self.assertEqual(done, ["listening_fawn"], "kills approving the lot")
+        self.assertEqual(self.ledger.status(placed), "approved")
+        self.assertEqual(self.ledger.status(raw_only), "generated", "not placed yet")
+        self.assertEqual(self.ledger.status(noted), "rejected", "a note is waiting")
+        self.assertEqual(self.ledger.status(never), "pending")
+
+    def test_an_approved_asset_can_be_rejected_later_with_a_note(self):
+        # ⭐ The play-through loop: approve everything, then --reject what
+        # looks wrong in the game. The note rides into the next prompt.
+        self.ledger.record_generated(self.asset, model="m", now="T0", processed=True)
+        self.ledger.approve("listening_fawn", now="T1")
+        self.ledger.reject("listening_fawn", feedback="too dark at sprite size", now="T2")
+        self.assertEqual(self.ledger.status(self.asset), "rejected")
+        self.assertEqual(self.ledger.feedback("listening_fawn"), ["too dark at sprite size"])
+
     def test_a_rejection_without_feedback_is_refused(self):
         self.ledger.record_generated(self.asset, model="m", now="T0")
         with self.assertRaises(ValueError):
