@@ -260,7 +260,7 @@
       "kind": "route",
       "x": 206.0,
       "y": 810.0,
-      "band": "Lv 17-22",
+      "band": "Lv 23-28",
       "tier": "kinetic",
       "colors": [
         "#e8c547"
@@ -318,7 +318,7 @@
       "kind": "route",
       "x": 300.0,
       "y": 650.0,
-      "band": "Lv 23-28",
+      "band": "Lv 17-22",
       "tier": "kinetic",
       "colors": [
         "#e8c547",
