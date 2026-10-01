@@ -175,7 +175,7 @@ has), no cutout.
 python3 tool/test_artgen.py
 ```
 
-67 tests, stdlib only, no network anywhere: the docs parse to 55 / 52 / 5 with
+67 tests, stdlib only, no network anywhere: the docs parse to 286 / 265 / 26 with
 the ids matching the contract paths, prompts carry their preamble and no build
 instructions, the ledger round-trips and flags drift, the generator adapter is
 asserted against a fake transport (transparent background on creatures and

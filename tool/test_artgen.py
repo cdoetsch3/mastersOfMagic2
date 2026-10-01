@@ -38,16 +38,15 @@ ROOT = artgen.ROOT
 # Every zone in the game, as of the Celestial/Ethereal wave (2026-09-22), and
 # the numbers every other check hangs off.
 #
-# ⭐ **Creatures and icons are complete; backdrops are not.** All 26 zones have
-# eleven described creatures and a full icon list, but only fifteen have an
-# `### Arena backdrop` brief — the eleven Primal/Kinetic zones plus the four
-# Celestial/Ethereal lanes that wrote one (The Glass Archive, Hallowmarch, The
-# Sealed Garden, The Unwritten Library). ⚠️ That asymmetry is the point of
-# pinning three separate numbers rather than one: a missing backdrop brief is
-# invisible in the creature count.
+# ⭐ **Creatures, icons and backdrops are all complete.** All 26 zones have
+# eleven described creatures, a full icon list and an `### Arena backdrop`
+# brief. Backdrops lagged the other two for a week — fifteen briefs, then the
+# last eleven on 2026-09-30 — and ⚠️ that is still the point of pinning three
+# separate numbers rather than one: a missing backdrop brief is invisible in
+# the creature count.
 EXPECTED_CREATURES = 55 + 66 + 77 + 88  # Primal + Kinetic + Celestial + Ethereal
 EXPECTED_ICONS = 52 + 58 + 76 + 79  # same four bands, per ITEM_ART.md
-EXPECTED_BACKDROPS = 5 + 6 + 1 + 3
+EXPECTED_BACKDROPS = 5 + 6 + 7 + 8  # same four bands, Citadel in the last
 ICONS_PER_ZONE = {
     "thunderspire_peaks": 9,
     "frostfell_pass": 6,
@@ -77,23 +76,40 @@ ICONS_PER_ZONE = {
     "the_eclipsed_citadel": 7,
 }
 
-# The fifteen zones that actually carry an `### Arena backdrop` entry.
+# The zones that carry an `### Arena backdrop` entry — all 26, in band order.
+# ⚠️ Written out rather than `set(artgen.ZONES)`, so that a brief deleted from
+# BESTIARY_ART.md fails by name instead of shrinking both sides of the check.
 ZONES_WITH_BACKDROP = {
+    # Primal
     "whispering_woods",
     "glimmerbrook",
     "cinderpeak_foothills",
     "thornmire",
     "ashfall_vale",
+    # Kinetic
     "old_quarry",
     "stormcliff_coast",
     "windward_steppe",
     "frostfell_pass",
     "thunderspire_peaks",
     "the_molten_deep",
+    # Celestial
+    "the_kiln_desert",
+    "the_mirrormere",
+    "starfall_basin",
+    "tidewrack_shoals",
+    "the_sunless_reach",
+    "the_shattered_orrery",
     "the_glass_archive",
+    # Ethereal, then the finale
     "hallowmarch",
+    "the_buried_sky",
+    "the_umbral_wastes",
     "the_sealed_garden",
+    "the_collapsed_academy",
+    "the_reliquary_deep",
     "the_unwritten_library",
+    "the_eclipsed_citadel",
 }
 
 ONE_PIXEL_PNG = base64.b64decode(
@@ -177,12 +193,12 @@ class ParseTest(unittest.TestCase):
         )
 
     def test_the_zones_with_a_backdrop_brief_are_exactly_these(self):
-        # ⚠️ **This used to be "every zone has one", and it no longer is.**
-        # Eleven of the twenty-six zones have no `### Arena backdrop` entry:
-        # the Celestial/Ethereal wave's lanes wrote creature descriptions for
-        # all fifteen new zones and backdrop briefs for only four of them.
-        # Pinning the SET rather than the count keeps the gap named — widen
-        # this list when a brief lands, and the count moves with it.
+        # ⭐ **Every zone has one again.** For a week only fifteen of the 26
+        # did — the Celestial/Ethereal wave wrote creature descriptions for
+        # all fifteen new zones and backdrop briefs for four — and the last
+        # eleven landed on 2026-09-30. Pinning the SET rather than the count
+        # keeps any future gap named: a zone added to `artgen.ZONES` without
+        # a brief fails the equality check below.
         backdrops = [a for a in self.assets if a.kind == "backdrop"]
         self.assertEqual(len(backdrops), EXPECTED_BACKDROPS)
         self.assertEqual({a.zone for a in backdrops}, ZONES_WITH_BACKDROP)
@@ -196,6 +212,12 @@ class ParseTest(unittest.TestCase):
             ZONES_WITH_BACKDROP <= set(artgen.ZONES),
             "a backdrop brief under a heading artgen does not recognise as a "
             "zone is a prompt that will never be generated",
+        )
+        self.assertEqual(
+            set(artgen.ZONES) - ZONES_WITH_BACKDROP,
+            set(),
+            "every zone in the game ends with an `### Arena backdrop` brief — "
+            "a zone without one has no arena background to generate",
         )
 
     def test_the_anchors_still_match_in_both_directions(self):

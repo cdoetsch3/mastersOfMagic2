@@ -21,7 +21,7 @@ the whole reason `art/prompts/` was retired.
 `**Name** — *meta*` on its own line followed by a blockquote; an item and a
 backdrop also carry a `` `assets/...` `` filename line. Break that shape and
 this tool silently finds fewer assets — which is why `tool/test_artgen.py`
-pins the counts at 55 creatures / 52 icons / 5 backdrops in both directions,
+pins the counts at 286 creatures / 265 icons / 26 backdrops in both directions,
 exactly as the Dart coverage tests do.
 
 ⭐ **Nothing is generated twice by accident.** The ledger remembers status per

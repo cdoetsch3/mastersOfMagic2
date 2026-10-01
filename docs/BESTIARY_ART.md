@@ -1247,6 +1247,28 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > the suggestion of shoulders and a raised head but no face or limbs. The pale
 > ground beneath it is scorched to a ring. Upright, still, radiant.
 
+### Arena backdrop
+
+`assets/backgrounds/the_kiln_desert.png` — *16:9 · Solar palette*
+> Wide 16:9 landscape painting of a high salt pan seen side-on at standing
+> eye level, environment only — no creatures, no people, no text. A level
+> crust of white salt runs straight across the frame just past mid-height,
+> cracked into flat polygon plates with thin white frost riming every crack.
+> At the far left and far right edges, low wind-cut outcrops of bleached
+> sandstone no higher than a person's chest, cropped by the frame, salt
+> crusted along their bases and frosted on their shaded faces; one dull
+> bottle-green glint of fused glass sits at the foot of the left-hand rock.
+> The centre of the frame is **open pan running flat to a level horizon**,
+> with a faint low line of pale scarp along it and nothing rising out of it.
+> Above, a thin high-altitude sky, pale at the horizon and deepening to hard
+> slate-blue at the top edge, no sun disc in shot and no cloud. Across the
+> bottom fifth, one hard-edged band of shadow cast by something out of frame
+> lies over the near crust, its border dead straight and rimed white. Clear,
+> cold, dry light, with shadows cut too sharply for it. **Solar palette**,
+> matching the creatures above: salt white, bleached bone and sand, frost
+> white, hard slate-blue, one bottle-green note. Muted, low-contrast,
+> nothing soft and nothing damp — bright and cold at once.
+
 ---
 
 ## The Mirrormere · Lv 32–37 · Lunar
@@ -1341,6 +1363,26 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > throw a second, contradictory shadow from everything on the shore. Hanging
 > square-on, face fully lit, no crescent anywhere.
 
+### Arena backdrop
+
+`assets/backgrounds/the_mirrormere.png` — *16:9 · Lunar palette*
+> Wide 16:9 landscape painting of a lake shore at night seen side-on at
+> standing eye level, environment only — no creatures, no people, no text. A
+> level strip of flat grey shingle runs straight across the frame just past
+> mid-height, dark and wet along its edge. Behind it the lake lies perfectly
+> still to a low black far shore, its surface one unbroken mirror with no
+> ripple anywhere. At the far left and far right edges, pale bare reeds and
+> a few smooth grey boulders, cropped by the frame, each doubled exactly in
+> the water. The moon itself is **out of shot above the top edge**; only its
+> reflection shows, lying in the water in the right third, far wider than a
+> moon should be and softened to a dim cool silver blur. The centre of the
+> frame is **open dark water and empty night air** — no reflection, no mist,
+> no light in it. The near bank falls into deep shadow across the bottom
+> fifth. Cold flat moonlight from overhead, no warm light anywhere. **Lunar
+> palette**, matching the creatures above: silver, bone-white, lake-grey and
+> the dark of deep water. Near-monochrome, muted, low-contrast, and entirely
+> still.
+
 ---
 
 ## Starfall Basin · Lv 34–39 · Astral
@@ -1422,6 +1464,26 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > deep bowl, smooth and unmarked and matte blue-black, with a faint indigo
 > sheen along one curve. No crust, no damage, no scorching. Low, gathered,
 > and turned precisely toward the viewer.
+
+### Arena backdrop
+
+`assets/backgrounds/starfall_basin.png` — *16:9 · Astral palette*
+> Wide 16:9 landscape painting of a crater field at night seen side-on at
+> standing eye level, environment only — no creatures, no people, no text.
+> The flat floor of a broad shallow crater runs level across the frame just
+> past mid-height, pale grey dust scattered with fine blue-black grit. At
+> the far left and far right edges, cropped by the frame, the raised lip of
+> the crater and a few half-buried lumps of dark pitted sky-iron scabbed
+> with black fusion crust, none higher than a person's chest, each one's
+> direction of travel still legible in its shape. The centre of the frame is
+> **open crater floor running back to a low far rim**, with nothing standing
+> on it. Above, a perfectly clear night sky in deep blue-black and indigo,
+> holding small hard white star points that thin out toward the centre — no
+> moon, no streak, no comet, no glow. Across the bottom fifth, the near edge
+> of the floor falls away into deep shadow. Cold starlight only,
+> sharp-edged. **Astral palette**, matching the creatures above: blue-black,
+> indigo, fusion-crust black, pale crater grey, hard white points. Muted,
+> low-contrast, and nothing organic, rooted or weathered soft anywhere.
 
 ---
 
@@ -1516,6 +1578,25 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > Cold pale grey-green, lit as if from far overhead by something not in shot.
 > Featureless, low, and entirely in motion away.
 
+### Arena backdrop
+
+`assets/backgrounds/tidewrack_shoals.png` — *16:9 · Lunar + Aqua palette*
+> Wide 16:9 landscape painting of tidal flats at low water seen side-on at
+> standing eye level, environment only — no creatures, no people, no text. A
+> level sheet of wet slate-grey sand runs straight across the frame just past
+> mid-height, a skin of water a finger deep lying over it in faint parallel
+> ripple marks. At the far left, a low spine of black rock draped in weed; at
+> the far right, the grey timber ribs of an old wreck standing out of the
+> sand to chest height; both cropped by the frame and both scattered with
+> bleached white shell. The centre of the frame is **open wet flat running
+> back to a low grey line of distant sea**, with nothing standing on it. Flat
+> overcast sky in cold grey-green, no sun and no moon in shot. Across the
+> bottom fifth, a shallow runnel of dark water crosses the near sand in deep
+> shadow. Cold, even, diffuse daylight. **Lunar + Aqua palette**, matching
+> the creatures above: wet slate, shell-white, weed-black, cold pale
+> grey-green. Muted, low-contrast, nothing dry and nothing deep — everything
+> just uncovered and about to be covered again.
+
 ---
 
 ## The Sunless Reach · Lv 38–42 · Solar + Lunar
@@ -1606,6 +1687,26 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > anywhere on it — a silhouette rather than a body. Its outline is smooth and
 > unbroken, with no edges or points. Standing, shoulders forward, head low
 > and turned right.
+
+### Arena backdrop
+
+`assets/backgrounds/the_sunless_reach.png` — *16:9 · Solar + Lunar palette*
+> Wide 16:9 landscape painting of a valley floor at the foot of a high black
+> escarpment seen side-on at standing eye level, environment only — no
+> creatures, no people, no text. A level shelf of black scarp stone runs
+> straight across the frame just past mid-height, flat and dry. At the far
+> left and far right edges, broken blocks of the same black stone no higher
+> than a person's chest, cropped by the frame, picked out only by dim cold
+> moon-grey light along their upper faces. Behind the shelf the scarp wall
+> rises in total shadow almost to the top of the frame, and the centre of
+> the frame is **its flat unlit face**, quiet and featureless. Its crest runs
+> level along the top edge, and only the crest is lit: a thin strip of
+> bleached desert stone in hard sun, cut from the shadow below by **one
+> dead-straight line with no gradient across it** — no dusk, no glow, no
+> falloff. Across the bottom fifth, the near ground is lightless black.
+> **Solar + Lunar palette**, matching the creatures above: flat lightless
+> black, pale cold moon-grey, one thin band of bleached white. Muted,
+> low-contrast, and every edge between light and dark perfectly straight.
 
 ---
 
@@ -1701,6 +1802,27 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > fine white-gold lines, self-contained and resolved, with nothing orbiting it
 > and nothing unfinished at its edges. It casts a hard shadow the machine
 > around it does not. Upright, centred, entirely motionless.
+
+### Arena backdrop
+
+`assets/backgrounds/the_shattered_orrery.png` — *16:9 · Astral + Electro palette*
+> Wide 16:9 landscape painting of the floor of a vast machine chamber seen
+> side-on at standing eye level, environment only — no creatures, no people,
+> no text. A level floor of worn brass plates runs straight across the frame
+> just past mid-height, a long shallow groove worn into it by something that
+> rolled along it for centuries. At the far left and far right edges, cropped
+> by the frame, the lower arcs of two enormous tarnished brass rings curve up
+> and out of the top of the image, each as wide as a bridge, with exposed
+> gear trains and close copper windings at their hubs; one thin blue-white
+> arc jumps between the windings at the left, hard-edged, never a glow. The
+> centre of the frame is **open chamber floor and dark air**, running back
+> to a low far wall of riveted brass panels — nothing turns or rises in it.
+> High above, the roof is broken open on a faint, sparse field of stars.
+> Across the bottom fifth, the floor drops away into the deep shadow of a
+> gear pit. **Astral + Electro palette**, matching the creatures above:
+> yellow-brown brass with a blue tarnish bloom, copper, dark indigo night,
+> arc white. Muted, low-contrast, nothing organic, and the whole machine
+> holding still between ticks.
 
 ---
 
@@ -2040,6 +2162,27 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > figure does not quite occupy the same space as the rock holding it. Upright,
 > centred, entirely alight.
 
+### Arena backdrop
+
+`assets/backgrounds/the_buried_sky.png` — *16:9 · Geo + Astral palette*
+> Wide 16:9 landscape painting of the bottom of a deep cut shaft seen side-on
+> at standing eye level, environment only — no creatures, no people, no
+> text. A level floor of cut dark rock runs straight across the frame just
+> past mid-height, dusted with grit. Behind it the shaft wall is
+> **horizontally banded strata** — charcoal, rust-brown, pale grey,
+> near-black — each band a different thickness and grain, every seam flat
+> and level. At the far left and far right edges, cropped by the frame, the
+> wall steps forward in squared ledges no higher than a person's chest, and
+> their upper bands hold small scatters of cold blue-white pinpricks set into
+> the stone like something embedded. The centre of the frame is **the far
+> wall's quiet banding**, plain and dark, with no points of light in it and
+> nothing standing in front of it. No daylight from above, no beam, no wash
+> — only the pinpricks and a faint cold ambience. Across the bottom fifth,
+> the floor drops away into the deep shadow of a lower cut. **Geo + Astral
+> palette**, matching the creatures above: charcoal, rust-brown, pale grey,
+> near-black, cold blue-white points. Muted, low-contrast, no glass, no
+> warmth, nothing transparent — a record, not a ruin.
+
 ---
 
 ## The Umbral Wastes · Lv 47–51 · Umbra
@@ -2130,6 +2273,26 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > symmetrical and obviously chosen, with no surface texture and no light
 > falling on it at any point. A thin cold indigo line traces where its outline
 > meets the ice. Seated, still, facing the viewer.
+
+### Arena backdrop
+
+`assets/backgrounds/the_umbral_wastes.png` — *16:9 · Umbra palette*
+> Wide 16:9 landscape painting of a glacier shelf on a mountain's north face
+> seen side-on at standing eye level, environment only — no creatures, no
+> people, no text. A level shelf of blue-white glacier ice runs straight
+> across the frame just past mid-height, smooth and clean. At the far left
+> and far right edges, cropped by the frame, squared blocks of black ice no
+> higher than a person's chest, every face flat and every corner square,
+> faint blue-white refraction showing only along their edges. The centre of
+> the frame is **open ice running back to a low line of ice ridges**, with
+> nothing standing on it. No direct sun anywhere: the sky is a flat dark
+> slate deepening to near-black at the top edge, with one cold indigo band
+> lying low along the horizon. Across the bottom fifth, a band of matte black
+> shadow lies over the near ice with a perfectly straight, clean edge, cast
+> by nothing in shot. **Umbra palette**, matching the creatures above: matte
+> near-black, blue-white glacier ice, one cold indigo note, nothing warm
+> anywhere. Muted, low-contrast, nothing tattered and nothing decayed — the
+> dark here is neat.
 
 ---
 
@@ -2358,6 +2521,29 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > grow subtly larger down the stack. Ink black with a cold violet edge-light
 > along the top of every stroke. Level, frontal, filling the frame.
 
+### Arena backdrop
+
+`assets/backgrounds/the_collapsed_academy.png` — *16:9 · Arcane palette*
+> Wide 16:9 landscape painting of a lecture hall floor seen side-on at
+> standing eye level, environment only — no creatures, no people, no legible
+> text. A level floor of pale grey-violet planed boards runs straight across
+> the frame just past mid-height, every board square and newly finished. At
+> the far left, cropped by the frame, tiered reading benches step up and out
+> of the top of the image with no last tier; at the far right, a staircase of
+> planed timber and dressed pale stone climbs out of frame, its lowest tread
+> ending in clean-cut air, one cold violet note in the shade beneath it. A
+> low pool of cooled, bubbled grey-violet slag rests against the foot of the
+> left-hand benches. The centre of the frame is **open floor running back to
+> a low wall of dressed pale stone** with a long wiped chalkboard across it,
+> smeared faint white, nothing written. Above that wall there is no ceiling
+> and no sky — only flat pale grey-violet nothing, no cloud, no sun, no moon.
+> Across the bottom fifth, the floorboards stop at a dead-straight cut edge
+> with deep shadow below it. Even, sourceless light, no shadows with
+> direction. **Arcane palette**, matching the creatures above: grey-violet
+> planed timber, chalk white, dressed pale stone, dull slag grey-violet, one
+> cold violet note. Muted, low-contrast, nothing broken, mossy or weathered —
+> everything finished, and too much of it.
+
 ---
 
 ## The Reliquary Deep · Lv 52–56 · Sanctus + Umbra
@@ -2457,6 +2643,28 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > materials are the walls' own, so it is pale and gold, but every piece of it
 > is wrenched, bent or torn at the edges. Upright, head lowered, hands busy
 > at its own chest, facing right.
+
+### Arena backdrop
+
+`assets/backgrounds/the_reliquary_deep.png` — *16:9 · Sanctus + Umbra palette*
+> Wide 16:9 landscape painting looking straight across a broad bored stone
+> corridor at its far wall, seen side-on at standing eye level, environment
+> only — no creatures, no people, no text. A level floor of pale dressed
+> limestone flags runs straight across the frame just past mid-height. At
+> the far left and far right, cropped by the frame, shallow wall niches with
+> gold fittings and folded cream linen; the right-hand niche stands empty,
+> its gold prised away and its back stained with smoke. Small pierced-gold
+> oil lamps hang at shoulder height in both outer thirds, throwing low warm
+> pools of light on the stone. The centre of the frame is **a plain stretch
+> of dressed wall**, smooth, unadorned and dimly lit, with nothing hung on
+> it; the air there is very faintly warmer in tone than at either side,
+> never glowing. The vault is out of shot above, its smoke-black stain
+> reaching down along the top edge. Across the bottom fifth, the near floor
+> lies in deep shadow. **Sanctus + Umbra palette**, matching the creatures
+> above: pale dressed limestone, soft yellow gold, heavy cream linen,
+> ceiling-black smoke, one warm red-gold resin note. Lamplit interior — no
+> sky, no ice. Nothing ruined and nothing collapsed — a corridor in excellent
+> repair, being quietly taken apart.
 
 ---
 
@@ -2670,6 +2878,27 @@ Everything that is *not* a creature or a backdrop is still a `CustomPainter`.
 > band of shadow crosses his eyes at exactly the height a crown would sit.
 > Upright, still, waiting without any impatience at all.
 
+### Arena backdrop
+
+`assets/backgrounds/the_eclipsed_citadel.png` — *16:9 · all twelve palette*
+> Wide 16:9 landscape painting of the forecourt of a great black gate hall
+> seen side-on at standing eye level, environment only — no creatures, no
+> people, no text. A level floor of black dressed flagstones runs straight
+> across the frame just past mid-height, every joint tight. At the far left
+> and far right edges, cropped by the frame, massive black stone jambs banded
+> in black iron rise out of the top of the image, their outer edges picked
+> out by a thin line of cold white light, an unlit black iron sconce on
+> each. The centre of the frame is **a sheer matte black wall** filling the
+> back of the stage from the floor to the top edge, taking no highlight at
+> all — flat, closed and featureless. The only warm light comes from an
+> eclipse **out of shot above the top edge**: its corona lays one thin gold
+> edge down the inner face of each jamb and nowhere else. No sky, no
+> weather, no moon. Across the bottom fifth, the near flagstones fall into
+> deep shadow. **Citadel palette**, matching the creatures above: black
+> stone, black iron, cold white edge light, one warm gold note reserved for
+> the corona, and no element accent of its own. Muted, low-contrast, nothing
+> ruined and nothing decorative — architecture still doing its job.
+
 ---
 
 ## ✅ Written — all 286 creatures
@@ -2693,17 +2922,19 @@ ends up in two places that disagree.
 |---|---|---|---|---|
 | **Primal** 1–14 | 5 | 55 | ✅ | ✅ 5 |
 | Kinetic 15–29 | 6 | 66 | ✅ | ✅ 6 |
-| Celestial 30–47 | 7 | 77 | ✅ | 📝 1 of 7 (The Glass Archive) |
-| Ethereal 45–58 | 7 | 77 | ✅ | 📝 3 of 7 (Hallowmarch, The Sealed Garden, The Unwritten Library) |
-| The Eclipsed Citadel 58–60 | 1 | 11 | ✅ | ⬜ |
+| Celestial 30–47 | 7 | 77 | ✅ | ✅ 7 |
+| Ethereal 45–58 | 7 | 77 | ✅ | ✅ 7 |
+| The Eclipsed Citadel 58–60 | 1 | 11 | ✅ | ✅ 1 |
 
-⚠️ **Backdrops are the half that is still short.** Eleven of the fifteen new
-zones have no `### Arena backdrop` entry yet, so their arena background files
-have nothing to be generated from. `test/creature_art_test.dart` only requires
-a brief for the zones listed in its `_primalZones`, which is exactly the set
-whose asset directories are declared in pubspec — so the gap is real but
-silent, and it is tracked in IMPLEMENTATION_PLAN's zone matrices and pinned by
-name in `tool/test_artgen.py`'s `ZONES_WITH_BACKDROP`.
+✅ **Every zone now ends with its backdrop brief — all 26.** The Celestial and
+Ethereal lanes wrote four (The Glass Archive, Hallowmarch, The Sealed Garden,
+The Unwritten Library); the other eleven were written together on 2026-09-30,
+to the same stage brief as the Primal and Kinetic ones. `tool/test_artgen.py`
+pins the full set by name in `ZONES_WITH_BACKDROP`. ⚠️
+`test/creature_art_test.dart` still only requires a brief for the zones in its
+`_primalZones` — that list is the *art* front (pubspec directories), not the
+description front, so a brief deleted from a new zone would fail the artgen
+suite but not the Dart one.
 
 📝 **No PNG exists for any of the fifteen new zones**, and none is expected
 yet: `assets/creatures/<zone>/` is declared in pubspec only for the eleven

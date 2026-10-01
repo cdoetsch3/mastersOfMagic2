@@ -63,6 +63,23 @@ flutter:
     - assets/creatures/frostfell_pass/
     - assets/creatures/thunderspire_peaks/
     - assets/creatures/the_molten_deep/
+    # Celestial, Ethereal and the Citadel — the art front opened 2026-09-30
+    # for the bulk generation pass; empty (.gitkeep) until artgen lands PNGs.
+    - assets/creatures/the_kiln_desert/
+    - assets/creatures/the_mirrormere/
+    - assets/creatures/starfall_basin/
+    - assets/creatures/tidewrack_shoals/
+    - assets/creatures/the_sunless_reach/
+    - assets/creatures/the_shattered_orrery/
+    - assets/creatures/the_glass_archive/
+    - assets/creatures/hallowmarch/
+    - assets/creatures/the_buried_sky/
+    - assets/creatures/the_umbral_wastes/
+    - assets/creatures/the_sealed_garden/
+    - assets/creatures/the_collapsed_academy/
+    - assets/creatures/the_reliquary_deep/
+    - assets/creatures/the_unwritten_library/
+    - assets/creatures/the_eclipsed_citadel/
     - assets/backgrounds/
     # One per zone, matching `ItemCatalogue.byZone`'s keys. Empty until
     # `tool/pixelate.py --mode icon` is run; `ItemIcon` falls back silently
@@ -78,3 +95,18 @@ flutter:
     - assets/items/frostfell_pass/
     - assets/items/thunderspire_peaks/
     - assets/items/the_molten_deep/
+    - assets/items/the_kiln_desert/
+    - assets/items/the_mirrormere/
+    - assets/items/starfall_basin/
+    - assets/items/tidewrack_shoals/
+    - assets/items/the_sunless_reach/
+    - assets/items/the_shattered_orrery/
+    - assets/items/the_glass_archive/
+    - assets/items/hallowmarch/
+    - assets/items/the_buried_sky/
+    - assets/items/the_umbral_wastes/
+    - assets/items/the_sealed_garden/
+    - assets/items/the_collapsed_academy/
+    - assets/items/the_reliquary_deep/
+    - assets/items/the_unwritten_library/
+    - assets/items/the_eclipsed_citadel/

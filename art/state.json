@@ -1,6 +1,19 @@
 {
   "version": 1,
   "assets": {
+    "aqua_dust": {
+      "kind": "icon",
+      "zone": "glimmerbrook",
+      "target": "assets/items/glimmerbrook/aqua_dust.png",
+      "source": "art/source/items/glimmerbrook/aqua_dust.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:2b6914c13e6d8e05",
+      "model": "gpt-image-1",
+      "processed": false,
+      "updated": "2026-10-01T01:40:50+00:00"
+    },
     "bindweed_boots": {
       "kind": "icon",
       "zone": "whispering_woods",
@@ -131,6 +144,19 @@
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
     },
+    "fawnhide": {
+      "kind": "icon",
+      "zone": "glimmerbrook",
+      "target": "assets/items/glimmerbrook/fawnhide.png",
+      "source": "art/source/items/glimmerbrook/fawnhide.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:1edb5c5cb4b7b1f1",
+      "model": "gpt-image-1",
+      "processed": false,
+      "updated": "2026-10-01T01:40:50+00:00"
+    },
     "flora_crystal": {
       "kind": "icon",
       "zone": "whispering_woods",
@@ -208,6 +234,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-08-19T18:43:59+00:00"
+    },
+    "glimmerbrook": {
+      "kind": "backdrop",
+      "zone": "glimmerbrook",
+      "target": "assets/backgrounds/glimmerbrook.png",
+      "source": "art/source/backgrounds/glimmerbrook.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:8b52a52527bc3a3b",
+      "model": "gpt-image-1",
+      "processed": false,
+      "updated": "2026-10-01T01:40:50+00:00"
     },
     "heartwood": {
       "kind": "creature",
@@ -378,6 +417,19 @@
       "updated": "2026-08-19T00:00:00+00:00",
       "feedback": []
     },
+    "sapwort": {
+      "kind": "icon",
+      "zone": "glimmerbrook",
+      "target": "assets/items/glimmerbrook/sapwort.png",
+      "source": "art/source/items/glimmerbrook/sapwort.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:a53e2e287ffe2ea2",
+      "model": "gpt-image-1",
+      "processed": false,
+      "updated": "2026-10-01T01:40:50+00:00"
+    },
     "shiverfish_shoal": {
       "kind": "creature",
       "zone": "glimmerbrook",
@@ -520,6 +572,19 @@
       "model": "gpt-image-1",
       "processed": true,
       "updated": "2026-08-19T18:43:59+00:00"
+    },
+    "whispering_woods": {
+      "kind": "backdrop",
+      "zone": "whispering_woods",
+      "target": "assets/backgrounds/whispering_woods.png",
+      "source": "art/source/backgrounds/whispering_woods.png",
+      "status": "generated",
+      "attempts": 1,
+      "feedback": [],
+      "prompt_hash": "sha256:ebba11b665ffb12a",
+      "model": "gpt-image-1",
+      "processed": true,
+      "updated": "2026-10-01T01:40:25+00:00"
     }
   }
 }

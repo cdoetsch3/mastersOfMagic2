@@ -40,15 +40,13 @@ import 'package:mom_engine/mom_engine.dart';
 /// whose bestiary is deleted or renamed fails here instead of quietly
 /// shrinking every "for every zone" loop below.
 ///
-/// ⚠️ **Not "every zone with a described roster" any more.** As of 2026-09-22
-/// all 26 zones are described — the Celestial and Ethereal quarters are
-/// written in BESTIARY_ART.md and checked by the coverage test at the bottom
-/// of this file — but none of the fifteen new zones has a pubspec asset
-/// directory or a backdrop brief, because the art is generated a quarter at a
-/// time. 📝 So this list is the *art* front, not the *description* front, and
-/// the two moved apart on purpose. A zone joins it when its quarter's PNGs
-/// are commissioned: pubspec line, directory on disk, backdrop brief, all in
-/// the same pass.
+/// 📝 **All 26 since 2026-09-30.** From 2026-09-22 this list was the *art*
+/// front (eleven zones) while the *description* front covered all 26; the
+/// two moved apart on purpose, a zone joining here only when its PNGs were
+/// commissioned — pubspec line, directory on disk, backdrop brief, all in
+/// one pass. Christian's bulk generation pass commissioned every zone at
+/// once, so the fronts coincide again. ⚠️ The name is historical: "primal"
+/// here means "on the art front", which is now everything.
 const _primalZones = <String>[
   'whispering_woods',
   'glimmerbrook',
@@ -61,6 +59,21 @@ const _primalZones = <String>[
   'stormcliff_coast',
   'windward_steppe',
   'the_molten_deep',
+  'the_kiln_desert',
+  'the_mirrormere',
+  'starfall_basin',
+  'tidewrack_shoals',
+  'the_sunless_reach',
+  'the_shattered_orrery',
+  'the_glass_archive',
+  'hallowmarch',
+  'the_buried_sky',
+  'the_umbral_wastes',
+  'the_sealed_garden',
+  'the_collapsed_academy',
+  'the_reliquary_deep',
+  'the_unwritten_library',
+  'the_eclipsed_citadel',
 ];
 
 /// The one zone whose art has actually shipped.
@@ -573,28 +586,28 @@ void main() {
       );
     });
 
-    test('every zone with an open art pipeline ends with its backdrop brief', () {
-      // 📝 Backdrops are the sibling pipeline (`test/arena_backdrop_test.dart`
-      // checks the code path); this only checks the description exists, since
-      // both halves of the work are generated from this one file.
-      //
-      // ⚠️ **Only `_primalZones`, and that is the known gap.** Four of the
-      // fifteen Celestial/Ethereal zones arrived with a backdrop brief (The
-      // Glass Archive, Hallowmarch, The Sealed Garden, The Unwritten Library)
-      // and eleven did not. Widening this loop to `Bestiary.all` would fail
-      // today for a reason nobody is about to fix — the gap is tracked in
-      // IMPLEMENTATION_PLAN's zone matrices as `Backdrop 📝 desc` instead, and
-      // a zone joins this list when its quarter's art is commissioned.
-      for (final zone in _primalZones) {
-        expect(
-          doc,
-          contains('`assets/backgrounds/$zone.png`'),
-          reason:
-              'the $zone backdrop brief names its own output file — lose '
-              'it and the maintainer has no prompt to generate from',
-        );
-      }
-    });
+    test(
+      'every zone with an open art pipeline ends with its backdrop brief',
+      () {
+        // 📝 Backdrops are the sibling pipeline (`test/arena_backdrop_test.dart`
+        // checks the code path); this only checks the description exists, since
+        // both halves of the work are generated from this one file.
+        //
+        // 📝 All 26 since 2026-09-30: the bulk generation pass commissioned
+        // every zone, and the eleven Celestial/Ethereal briefs that were
+        // missing were written the same day. `_primalZones` IS every zone now,
+        // so this loop covers the whole bestiary.
+        for (final zone in _primalZones) {
+          expect(
+            doc,
+            contains('`assets/backgrounds/$zone.png`'),
+            reason:
+                'the $zone backdrop brief names its own output file — lose '
+                'it and the maintainer has no prompt to generate from',
+          );
+        }
+      },
+    );
   });
 }
 
