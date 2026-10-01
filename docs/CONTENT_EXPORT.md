@@ -33,7 +33,7 @@ document with a `schemaVersion`, four entity lists, and the derived index:
 | Key | Contents |
 |---|---|
 | `zones` | Every `GameLocation`: band, elements, gate, arrival, beats, epilogue, edges |
-| `creatures` | Every `EnemyDef`: rank, archetype, moves, full drop tables **with computed fractions** |
+| `creatures` | Every `EnemyDef`: rank, archetype, moves, full drop tables **with computed fractions**, and a `kill` block — consolation item, rank-gear chance and epic share (ENEMIES §2e.1, 2026-09-30) read off the roller |
 | `items` | Every `ItemDef`: kind, rarity, slot, modifiers, salvage, effects |
 | `recipes` | Every `RecipeDef`: skill, skill level, inputs, output, station requirement |
 | `index` | ⭐ `itemSources` + `itemUses` — see §4 |

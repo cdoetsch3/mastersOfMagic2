@@ -719,6 +719,68 @@ Kinetic Sigil's mechanism was deferred once already (KINETIC_CONTRACT §8.6),
 so the Celestial and Ethereal parts may land the same way — the roster says
 *which boss owes one*, not what it is called.
 
+##### ✅ RULINGS (Christian, 2026-09-30 playtest) — what one kill pays
+
+⭐ **Three of these are kill rules, not table rules.** They live in
+`rollKill` (`lib/game/enemies/loot.dart`), keyed on what the table rolled and
+on the creature's rank — never authored into the 26 bestiaries, so no zone can
+forget one and no table is re-balanced around them. The table always rolls
+first and exactly as authored, so every rate `content_export` publishes stays
+the roller's; the export carries the kill rules in a separate `kill` block.
+
+1. ✅ **Every monster drops SOMETHING** (note 4: *"Ionwake carried nothing"*).
+   When a table's own roll is empty, the kill pays **one unit of its
+   consolation item**: the heaviest-weighted `MaterialDef` in `main` (ties →
+   the first listed). ⚠️ A mote never qualifies through `main` — a
+   consolation of Dust would undo ruling 4. ⚠️ A `main` with no `MaterialDef`
+   falls back to the first `always` entry's def: as of this date only **The
+   Kiln Desert's Mirage** (role `mote` alone), which consoles with Solar Dust.
+   ⚠️ **`DropTable.empty` is the only way a kill pays nothing** — it has no
+   consolation to give. 📝 The `nothing` weights stay authored and keep their
+   meaning: the share of kills whose `main` draw came up empty.
+2. ✅ **Mini-bosses pay rare/epic gear more often** (note 5). The boss
+   guarantee became a rank rule, `rollRankGear`: a **boss always** pays one
+   rare-or-better piece of the zone's own gear, a **mini on a 30% roll**
+   (`miniGearChance`; first ruled 20%, amended to 30% the same day), a
+   **common never**. The epic share is identical for
+   both (`bossEpicChance`, 25%). ⭐ Both knobs are top-level consts in
+   `loot.dart`, and Christian tunes them. ⚠️ A mini draws its whole roll —
+   gate, epic share and pick — whether or not the gate hits, so a seeded
+   run's shape never depends on the outcome; a boss draws no gate at all
+   (the `< 1` guard the `always` bucket uses), so its roll is unchanged.
+3. ✅ **A rare never drops twice in one kill** (note 11: *"double dropped
+   Leanstone Charm from a boss"* — the Windward boss's own `main` pays
+   `leanstone_charm`, and the guarantee picked it again). Every def id the
+   table (or its consolation) already paid is **excluded from the rank-gear
+   pool**; if nothing is left, no extra piece is paid. ⚠️ Exclusion is
+   applied AFTER the rare-or-better cut, never before — so a zone whose only
+   rare+ piece already dropped pays nothing extra, not an uncommon.
+4. ✅ **Lean the tables toward craftables, away from motes** (*"lean a little
+   stronger into craftables and a little less into dust / shards /
+   crystals"*). Applied by one script to all 26 bestiaries, so the lean is
+   uniform:
+
+   | Table | Rule |
+   |---|---|
+   | Commons' `main` | `nothing` weight → half, floored; each mote (`MoteDef`) weight → ⅔, rounded; **every unit freed goes to the heaviest `MaterialDef`**, so every common `main` still sums to 100. Consumables and beltables untouched. ⚠️ A `main` with no `MaterialDef` is left alone (the Mirage, below) |
+   | Commons' `always` | Unchanged |
+   | Minis' `always` | Crystal `chance` 0.25 → **0.15** (hybrids: both); Dust 2–4 → **1–3**. The Ashfall/Thornmire shape (Shards at 0.5, Crystals at 0.15) → Crystals **0.10**, Dust (already 1–2) unchanged |
+   | Bosses' `always` | Dust 4–8 → **3–6**. Keys, essences, Crystals, Shards untouched |
+   | Any `min`/`max` on a material | Untouched |
+
+   ⚠️ **Two tables the lean does not touch:** Ashfall Vale's and Thornmire's
+   bosses carry Dust at 2–4, not 4–8, so the boss Dust rule does not reach
+   them; and ✅ **the Kiln Desert's Mirage is left alone on purpose**
+   (Christian, same day) — the lean exists to favour craftables, and a
+   `main` with none has nothing to lean into. It stays at its authored
+   45/15/40, and its consolation is Solar Dust (ruling 1's fallback).
+
+   📝 **What it bought, per common kill, averaged over the 26 zones**
+   (each zone's five commons weighted equally): craftable units **0.72 →
+   1.01** (1.05 with the consolation), mote units **1.62 → 1.53**, and the
+   table rolling nothing at all **7.7% → 3.9%** — before the consolation,
+   which takes it to zero.
+
 ---
 
 #### 2e.2 ✅ Off-element moves — §2h's guardrail, given a number

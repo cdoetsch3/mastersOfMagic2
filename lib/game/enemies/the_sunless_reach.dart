@@ -123,10 +123,10 @@ abstract final class SunlessReachBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('duskcap', weight: 50, min: 1, max: 2),
-        DropEntry('solar_shard', weight: 5),
-        DropEntry('solar_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('duskcap', weight: 73, min: 1, max: 2),
+        DropEntry('solar_shard', weight: 3),
+        DropEntry('solar_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -174,10 +174,10 @@ abstract final class SunlessReachBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('eclipse_opal', weight: 40),
-        DropEntry('solar_shard', weight: 8, min: 1, max: 2),
-        DropEntry('solar_dust', weight: 17, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('eclipse_opal', weight: 64),
+        DropEntry('solar_shard', weight: 5, min: 1, max: 2),
+        DropEntry('solar_dust', weight: 11, min: 2, max: 3),
         DropEntry('duskcap_tonic', weight: 5),
       ],
     ),
@@ -219,10 +219,10 @@ abstract final class SunlessReachBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('ebony_log', weight: 55, min: 1, max: 3),
-        DropEntry('lunar_shard', weight: 7),
-        DropEntry('lunar_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('ebony_log', weight: 74, min: 1, max: 3),
+        DropEntry('lunar_shard', weight: 5),
+        DropEntry('lunar_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('pilgrims_ration', chance: 0.02)],
     ),
@@ -263,10 +263,10 @@ abstract final class SunlessReachBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('ebony_log', weight: 55, min: 1, max: 3),
-        DropEntry('lunar_shard', weight: 7),
-        DropEntry('lunar_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('ebony_log', weight: 74, min: 1, max: 3),
+        DropEntry('lunar_shard', weight: 5),
+        DropEntry('lunar_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('pilgrims_ration', chance: 0.02)],
     ),
@@ -307,10 +307,10 @@ abstract final class SunlessReachBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('duskcap', weight: 50, min: 1, max: 2),
-        DropEntry('solar_shard', weight: 5),
-        DropEntry('solar_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('duskcap', weight: 73, min: 1, max: 2),
+        DropEntry('solar_shard', weight: 3),
+        DropEntry('solar_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -604,10 +604,10 @@ abstract final class SunlessReachBestiary {
     always: [
       DropEntry('solar_shard'),
       DropEntry('lunar_shard'),
-      DropEntry('solar_dust', min: 2, max: 4),
-      DropEntry('lunar_dust', min: 2, max: 4),
-      DropEntry('solar_crystal', chance: 0.25),
-      DropEntry('lunar_crystal', chance: 0.25),
+      DropEntry('solar_dust', min: 1, max: 3),
+      DropEntry('lunar_dust', min: 1, max: 3),
+      DropEntry('solar_crystal', chance: 0.15),
+      DropEntry('lunar_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('ebony_log', weight: 40, min: 2, max: 4),
@@ -628,8 +628,8 @@ abstract final class SunlessReachBestiary {
       DropEntry('lunar_crystal', min: 1, max: 2),
       DropEntry('solar_shard', min: 1, max: 2),
       DropEntry('lunar_shard', min: 1, max: 2),
-      DropEntry('solar_dust', min: 4, max: 8),
-      DropEntry('lunar_dust', min: 4, max: 8),
+      DropEntry('solar_dust', min: 3, max: 6),
+      DropEntry('lunar_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('ebony_log', weight: 35, min: 4, max: 8),

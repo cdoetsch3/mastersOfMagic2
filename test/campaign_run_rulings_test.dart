@@ -316,7 +316,13 @@ void main() {
       }
     });
 
-    test('a common or a mini never triggers it', () {
+    test('a common never earns gear; a mini only ever adds rare+ gear', () {
+      // 📝 Was "a common or a mini never triggers it" until 2026-09-30, when
+      // minis earned a `miniGearChance` share of the same roll (note 5) and an
+      // empty
+      // common roll began paying its consolation (note 4) — both pinned in
+      // loot_rulings_2026_09_30_test.dart. What survives here is the part
+      // that did not move: the table rolls first, exactly as before.
       final others = Bestiary.forZone(
         _frostfell,
       ).where((e) => e.rank != EnemyRank.boss);
@@ -329,13 +335,33 @@ void main() {
             zoneId: _frostfell,
             rng: Random(seed),
           );
-          expect(
-            kill.slots.map((s) => s.defId),
-            table.slots.map((s) => s.defId),
-            reason:
-                '${enemy.id} (${enemy.rank.name}) seed $seed: only the boss '
-                'rank earns the guarantee',
-          );
+          if (enemy.rank == EnemyRank.common && !table.isEmpty) {
+            expect(
+              kill.slots.map((s) => s.defId),
+              table.slots.map((s) => s.defId),
+              reason:
+                  '${enemy.id} seed $seed: a common that rolled something '
+                  'gets exactly its table — kills a common earning gear',
+            );
+          }
+          if (enemy.rank == EnemyRank.mini) {
+            expect(
+              kill.slots.take(table.slots.length).map((s) => s.defId),
+              table.slots.map((s) => s.defId),
+              reason:
+                  '${enemy.id} seed $seed: the table rolls first, untouched — '
+                  'kills a mini gear roll that eats the table\'s numbers',
+            );
+            for (final extra in kill.slots.skip(table.slots.length)) {
+              expect(
+                isRarePlusFrostGear(extra.defId),
+                isTrue,
+                reason:
+                    '${enemy.id} seed $seed paid ${extra.defId}: a mini\'s '
+                    'extra is the boss roll — kills a mini drawing other gear',
+              );
+            }
+          }
         }
       }
     });
@@ -345,7 +371,7 @@ void main() {
       var epics = 0;
       const kills = 4000;
       for (var i = 0; i < kills; i++) {
-        final id = rollBossGuarantee(_frostfell, rng)!;
+        final id = rollRankGear(EnemyRank.boss, _frostfell, rng)!;
         if (ItemCatalogue.byId(id).rarity == Rarity.epic) epics++;
       }
       expect(
@@ -361,7 +387,7 @@ void main() {
     test('every zone has a rare-or-better candidate of its own', () {
       final noEpic = <String>[];
       for (final zone in _zones) {
-        final candidates = bossGuaranteeCandidates(zone.id);
+        final candidates = rankGearCandidates(zone.id);
         expect(
           candidates,
           isNotEmpty,
@@ -399,7 +425,7 @@ void main() {
       // must yield to the tier the zone has.
       final rng = Random(5);
       for (var i = 0; i < 200; i++) {
-        final id = rollBossGuarantee('ashfall_vale', rng);
+        final id = rollRankGear(EnemyRank.boss, 'ashfall_vale', rng);
         expect(
           ItemCatalogue.tryById(id ?? '')?.rarity,
           Rarity.epic,

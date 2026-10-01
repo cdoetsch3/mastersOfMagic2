@@ -133,8 +133,8 @@ abstract final class UmbralWastesBestiary {
       // `umbralweave`, not in the zone's second material, and the explicit
       // table outranks §3.5.1's general `hide` rule.
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('umbralweave', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('umbralweave', weight: 65),
         DropEntry('goldenrood_draught', weight: 15),
       ],
     ),
@@ -189,10 +189,10 @@ abstract final class UmbralWastesBestiary {
       // ⭐ The `hide` role, resolved to the zone's SECOND gatherable material
       // (§3.5.1) — this zone skins nothing.
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('thoughtglass', weight: 50, min: 1, max: 2),
-        DropEntry('umbra_shard', weight: 8, min: 1, max: 2),
-        DropEntry('umbra_dust', weight: 12, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('thoughtglass', weight: 72, min: 1, max: 2),
+        DropEntry('umbra_shard', weight: 5, min: 1, max: 2),
+        DropEntry('umbra_dust', weight: 8, min: 2, max: 3),
       ],
     ),
   );
@@ -236,10 +236,10 @@ abstract final class UmbralWastesBestiary {
       // ⭐ The `material` role, and therefore the headline material —
       // umbralweave comes off the ice, and this is the ice.
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('umbralweave', weight: 55, min: 1, max: 3),
-        DropEntry('umbra_shard', weight: 7),
-        DropEntry('umbra_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('umbralweave', weight: 74, min: 1, max: 3),
+        DropEntry('umbra_shard', weight: 5),
+        DropEntry('umbra_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('climbers_ration', chance: 0.02)],
     ),
@@ -281,10 +281,10 @@ abstract final class UmbralWastesBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('umbralweave', weight: 55, min: 1, max: 3),
-        DropEntry('umbra_shard', weight: 7),
-        DropEntry('umbra_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('umbralweave', weight: 74, min: 1, max: 3),
+        DropEntry('umbra_shard', weight: 5),
+        DropEntry('umbra_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('climbers_ration', chance: 0.02)],
     ),
@@ -325,10 +325,10 @@ abstract final class UmbralWastesBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('thoughtglass', weight: 50, min: 1, max: 2),
-        DropEntry('umbra_shard', weight: 8, min: 1, max: 2),
-        DropEntry('umbra_dust', weight: 12, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('thoughtglass', weight: 72, min: 1, max: 2),
+        DropEntry('umbra_shard', weight: 5, min: 1, max: 2),
+        DropEntry('umbra_dust', weight: 8, min: 2, max: 3),
       ],
     ),
   );
@@ -621,8 +621,8 @@ abstract final class UmbralWastesBestiary {
   static const _miniDrops = DropTable(
     always: [
       DropEntry('umbra_shard'),
-      DropEntry('umbra_dust', min: 2, max: 4),
-      DropEntry('umbra_crystal', chance: 0.25),
+      DropEntry('umbra_dust', min: 1, max: 3),
+      DropEntry('umbra_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('umbralweave', weight: 40, min: 2, max: 4),
@@ -641,7 +641,7 @@ abstract final class UmbralWastesBestiary {
       DropEntry('the_dark_third'),
       DropEntry('umbra_crystal', min: 1, max: 2),
       DropEntry('umbra_shard', min: 1, max: 2),
-      DropEntry('umbra_dust', min: 4, max: 8),
+      DropEntry('umbra_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('umbralweave', weight: 45, min: 4, max: 8),

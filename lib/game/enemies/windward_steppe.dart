@@ -72,10 +72,10 @@ abstract final class WindwardSteppeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('tussock_flax', weight: 45),
-        DropEntry('aero_shard', weight: 7),
-        DropEntry('aero_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('tussock_flax', weight: 69),
+        DropEntry('aero_shard', weight: 5),
+        DropEntry('aero_dust', weight: 9, min: 1, max: 2),
       ],
     ),
     // Skirmisher (KINETIC_CONTRACT §2.3): dodge 8 — one of only two
@@ -118,10 +118,10 @@ abstract final class WindwardSteppeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('yew_log', weight: 40),
-        DropEntry('aero_shard', weight: 8, min: 1, max: 2),
-        DropEntry('aero_dust', weight: 17, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('yew_log', weight: 64),
+        DropEntry('aero_shard', weight: 5, min: 1, max: 2),
+        DropEntry('aero_dust', weight: 11, min: 2, max: 3),
         DropEntry('hardtack', weight: 5),
       ],
     ),
@@ -161,10 +161,10 @@ abstract final class WindwardSteppeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('tussock_flax', weight: 50, min: 1, max: 2),
-        DropEntry('aero_shard', weight: 5),
-        DropEntry('aero_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('tussock_flax', weight: 73, min: 1, max: 2),
+        DropEntry('aero_shard', weight: 3),
+        DropEntry('aero_dust', weight: 7, min: 1, max: 2),
       ],
     ),
     combatStats: EnemyCombatStats(critChance: 15, critDamage: -20),
@@ -198,8 +198,8 @@ abstract final class WindwardSteppeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('tussock_flax', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('tussock_flax', weight: 65),
         DropEntry('hardtack', weight: 15),
       ],
     ),
@@ -238,10 +238,10 @@ abstract final class WindwardSteppeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('yew_log', weight: 55, min: 1, max: 3),
-        DropEntry('aero_shard', weight: 7),
-        DropEntry('aero_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('yew_log', weight: 74, min: 1, max: 3),
+        DropEntry('aero_shard', weight: 5),
+        DropEntry('aero_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('hardtack', chance: 0.02)],
     ),
@@ -519,8 +519,8 @@ abstract final class WindwardSteppeBestiary {
   static const _miniDrops = DropTable(
     always: [
       DropEntry('aero_shard'),
-      DropEntry('aero_dust', min: 2, max: 4),
-      DropEntry('aero_crystal', chance: 0.25),
+      DropEntry('aero_dust', min: 1, max: 3),
+      DropEntry('aero_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('yew_log', weight: 40, min: 2, max: 4),
@@ -536,7 +536,7 @@ abstract final class WindwardSteppeBestiary {
     always: [
       DropEntry('aero_crystal', min: 1, max: 2),
       DropEntry('aero_shard', min: 1, max: 2),
-      DropEntry('aero_dust', min: 4, max: 8),
+      DropEntry('aero_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('yew_log', weight: 45, min: 4, max: 8),

@@ -92,8 +92,8 @@ abstract final class AshfallValeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('charcoal', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('charcoal', weight: 65),
         DropEntry('brookmint', weight: 15),
       ],
     ),
@@ -133,10 +133,10 @@ abstract final class AshfallValeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('birch_log', weight: 50, min: 1, max: 2),
-        DropEntry('flora_shard', weight: 7),
-        DropEntry('flora_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 15),
+        DropEntry('birch_log', weight: 71, min: 1, max: 2),
+        DropEntry('flora_shard', weight: 5),
+        DropEntry('flora_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -174,10 +174,10 @@ abstract final class AshfallValeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('charcoal', weight: 45),
-        DropEntry('pyro_shard', weight: 7),
-        DropEntry('pyro_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('charcoal', weight: 69),
+        DropEntry('pyro_shard', weight: 5),
+        DropEntry('pyro_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -214,10 +214,10 @@ abstract final class AshfallValeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('brookmint', weight: 40),
-        DropEntry('pyro_shard', weight: 7),
-        DropEntry('pyro_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('brookmint', weight: 64),
+        DropEntry('pyro_shard', weight: 5),
+        DropEntry('pyro_dust', weight: 9, min: 1, max: 2),
         // ⚠️ Deliberately thin. Tonics are meant to be CRAFTED (§9b.8) — the
         // brookmint is the real drop, and a generous potion faucet would make
         // Potions & Alchemy pointless before it opens.
@@ -259,8 +259,8 @@ abstract final class AshfallValeBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('birch_log', weight: 55, min: 1, max: 3),
+        DropEntry.nothing(weight: 12),
+        DropEntry('birch_log', weight: 68, min: 1, max: 3),
         DropEntry('charcoal', weight: 20),
       ],
     ),
@@ -535,8 +535,8 @@ abstract final class AshfallValeBestiary {
       DropEntry('flora_shard', chance: 0.5),
       DropEntry('pyro_dust', min: 1, max: 2),
       DropEntry('flora_dust', min: 1, max: 2),
-      DropEntry('pyro_crystal', chance: 0.15),
-      DropEntry('flora_crystal', chance: 0.15),
+      DropEntry('pyro_crystal', chance: 0.1),
+      DropEntry('flora_crystal', chance: 0.1),
     ],
     main: [
       DropEntry('birch_log', weight: 40, min: 2, max: 4),

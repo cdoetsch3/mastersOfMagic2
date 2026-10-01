@@ -107,10 +107,10 @@ abstract final class FrostfellPassBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('rimepelt', weight: 45),
-        DropEntry('aqua_shard', weight: 7),
-        DropEntry('aqua_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('rimepelt', weight: 69),
+        DropEntry('aqua_shard', weight: 5),
+        DropEntry('aqua_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -150,10 +150,10 @@ abstract final class FrostfellPassBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('rimepelt', weight: 40),
-        DropEntry('aqua_shard', weight: 8, min: 1, max: 2),
-        DropEntry('aqua_dust', weight: 17, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('rimepelt', weight: 64),
+        DropEntry('aqua_shard', weight: 5, min: 1, max: 2),
+        DropEntry('aqua_dust', weight: 11, min: 2, max: 3),
         DropEntry('hardtack', weight: 5),
       ],
     ),
@@ -194,10 +194,10 @@ abstract final class FrostfellPassBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('hoarlichen', weight: 50, min: 1, max: 2),
-        DropEntry('aero_shard', weight: 5),
-        DropEntry('aero_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('hoarlichen', weight: 73, min: 1, max: 2),
+        DropEntry('aero_shard', weight: 3),
+        DropEntry('aero_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -236,8 +236,8 @@ abstract final class FrostfellPassBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('hoarlichen', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('hoarlichen', weight: 65),
         DropEntry('everice', weight: 15),
       ],
     ),
@@ -269,10 +269,10 @@ abstract final class FrostfellPassBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('everice', weight: 55, min: 1, max: 3),
-        DropEntry('aero_shard', weight: 7),
-        DropEntry('aero_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('everice', weight: 74, min: 1, max: 3),
+        DropEntry('aero_shard', weight: 5),
+        DropEntry('aero_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('hardtack', chance: 0.02)],
     ),
@@ -536,10 +536,10 @@ abstract final class FrostfellPassBestiary {
     always: [
       DropEntry('aqua_shard'),
       DropEntry('aero_shard'),
-      DropEntry('aqua_dust', min: 2, max: 4),
-      DropEntry('aero_dust', min: 2, max: 4),
-      DropEntry('aqua_crystal', chance: 0.25),
-      DropEntry('aero_crystal', chance: 0.25),
+      DropEntry('aqua_dust', min: 1, max: 3),
+      DropEntry('aero_dust', min: 1, max: 3),
+      DropEntry('aqua_crystal', chance: 0.15),
+      DropEntry('aero_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('rimepelt', weight: 40, min: 2, max: 4),
@@ -560,8 +560,8 @@ abstract final class FrostfellPassBestiary {
       DropEntry('aero_crystal', min: 1, max: 2),
       DropEntry('aqua_shard', min: 1, max: 2),
       DropEntry('aero_shard', min: 1, max: 2),
-      DropEntry('aqua_dust', min: 4, max: 8),
-      DropEntry('aero_dust', min: 4, max: 8),
+      DropEntry('aqua_dust', min: 3, max: 6),
+      DropEntry('aero_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('rimepelt', weight: 35, min: 4, max: 8),

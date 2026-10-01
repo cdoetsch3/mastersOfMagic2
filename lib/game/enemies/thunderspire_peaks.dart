@@ -112,10 +112,10 @@ abstract final class ThunderspirePeaksBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('rowan_log', weight: 55, min: 1, max: 3),
-        DropEntry('electro_shard', weight: 7),
-        DropEntry('electro_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('rowan_log', weight: 74, min: 1, max: 3),
+        DropEntry('electro_shard', weight: 5),
+        DropEntry('electro_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('hardtack', chance: 0.02)],
     ),
@@ -157,10 +157,10 @@ abstract final class ThunderspirePeaksBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('hum_quartz', weight: 40),
-        DropEntry('electro_shard', weight: 8, min: 1, max: 2),
-        DropEntry('electro_dust', weight: 17, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('hum_quartz', weight: 64),
+        DropEntry('electro_shard', weight: 5, min: 1, max: 2),
+        DropEntry('electro_dust', weight: 11, min: 2, max: 3),
         DropEntry('hardtack', weight: 5),
       ],
     ),
@@ -202,10 +202,10 @@ abstract final class ThunderspirePeaksBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('iron_ore', weight: 50, min: 1, max: 2),
-        DropEntry('electro_shard', weight: 5),
-        DropEntry('electro_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('iron_ore', weight: 73, min: 1, max: 2),
+        DropEntry('electro_shard', weight: 3),
+        DropEntry('electro_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -244,10 +244,10 @@ abstract final class ThunderspirePeaksBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('rowan_log', weight: 45),
-        DropEntry('aero_shard', weight: 7),
-        DropEntry('aero_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('rowan_log', weight: 69),
+        DropEntry('aero_shard', weight: 5),
+        DropEntry('aero_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -294,8 +294,8 @@ abstract final class ThunderspirePeaksBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('iron_ore', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('iron_ore', weight: 65),
         DropEntry('hum_quartz', weight: 15),
       ],
     ),
@@ -583,10 +583,10 @@ abstract final class ThunderspirePeaksBestiary {
     always: [
       DropEntry('electro_shard'),
       DropEntry('aero_shard'),
-      DropEntry('electro_dust', min: 2, max: 4),
-      DropEntry('aero_dust', min: 2, max: 4),
-      DropEntry('electro_crystal', chance: 0.25),
-      DropEntry('aero_crystal', chance: 0.25),
+      DropEntry('electro_dust', min: 1, max: 3),
+      DropEntry('aero_dust', min: 1, max: 3),
+      DropEntry('electro_crystal', chance: 0.15),
+      DropEntry('aero_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('iron_ore', weight: 40, min: 2, max: 4),
@@ -609,8 +609,8 @@ abstract final class ThunderspirePeaksBestiary {
       DropEntry('aero_crystal', min: 1, max: 2),
       DropEntry('electro_shard', min: 1, max: 2),
       DropEntry('aero_shard', min: 1, max: 2),
-      DropEntry('electro_dust', min: 4, max: 8),
-      DropEntry('aero_dust', min: 4, max: 8),
+      DropEntry('electro_dust', min: 3, max: 6),
+      DropEntry('aero_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('iron_ore', weight: 35, min: 4, max: 8),

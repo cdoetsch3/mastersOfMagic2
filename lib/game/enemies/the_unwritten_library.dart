@@ -598,10 +598,10 @@ abstract final class UnwrittenLibraryBestiary {
   static const _hideCommon = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 30),
-      DropEntry('blankspine_vellum', weight: 40),
-      DropEntry('arcane_shard', weight: 8, min: 1, max: 2),
-      DropEntry('arcane_dust', weight: 17, min: 2, max: 3),
+      DropEntry.nothing(weight: 15),
+      DropEntry('blankspine_vellum', weight: 64),
+      DropEntry('arcane_shard', weight: 5, min: 1, max: 2),
+      DropEntry('arcane_dust', weight: 11, min: 2, max: 3),
       DropEntry('nightink_draught', weight: 5),
     ],
   );
@@ -610,10 +610,10 @@ abstract final class UnwrittenLibraryBestiary {
   static const _materialCommon = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 25),
-      DropEntry('nightink', weight: 55, min: 1, max: 3),
-      DropEntry('umbra_shard', weight: 7),
-      DropEntry('umbra_dust', weight: 13, min: 1, max: 2),
+      DropEntry.nothing(weight: 12),
+      DropEntry('nightink', weight: 74, min: 1, max: 3),
+      DropEntry('umbra_shard', weight: 5),
+      DropEntry('umbra_dust', weight: 9, min: 1, max: 2),
     ],
     bonus: [DropEntry('climbers_ration', chance: 0.02)],
   );
@@ -624,8 +624,8 @@ abstract final class UnwrittenLibraryBestiary {
   static const _colophonCommon = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 40),
-      DropEntry('colophon_stone', weight: 45),
+      DropEntry.nothing(weight: 20),
+      DropEntry('colophon_stone', weight: 65),
       DropEntry('censer_draught', weight: 15),
     ],
   );
@@ -636,10 +636,10 @@ abstract final class UnwrittenLibraryBestiary {
     always: [
       DropEntry('umbra_shard'),
       DropEntry('arcane_shard'),
-      DropEntry('umbra_dust', min: 2, max: 4),
-      DropEntry('arcane_dust', min: 2, max: 4),
-      DropEntry('umbra_crystal', chance: 0.25),
-      DropEntry('arcane_crystal', chance: 0.25),
+      DropEntry('umbra_dust', min: 1, max: 3),
+      DropEntry('arcane_dust', min: 1, max: 3),
+      DropEntry('umbra_crystal', chance: 0.15),
+      DropEntry('arcane_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('blankspine_vellum', weight: 35, min: 2, max: 4),
@@ -659,8 +659,8 @@ abstract final class UnwrittenLibraryBestiary {
       DropEntry('arcane_crystal', min: 1, max: 2),
       DropEntry('umbra_shard', min: 1, max: 2),
       DropEntry('arcane_shard', min: 1, max: 2),
-      DropEntry('umbra_dust', min: 4, max: 8),
-      DropEntry('arcane_dust', min: 4, max: 8),
+      DropEntry('umbra_dust', min: 3, max: 6),
+      DropEntry('arcane_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('blankspine_vellum', weight: 35, min: 4, max: 8),

@@ -289,8 +289,8 @@ abstract final class ReliquaryDeepBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('reliquary_gold', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('reliquary_gold', weight: 65),
         DropEntry('censer_draught', weight: 15),
       ],
     ),
@@ -571,10 +571,10 @@ abstract final class ReliquaryDeepBestiary {
   static const _materialACommon = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 25),
-      DropEntry('unleft_linen', weight: 55, min: 1, max: 3),
-      DropEntry('sanctus_shard', weight: 7),
-      DropEntry('sanctus_dust', weight: 13, min: 1, max: 2),
+      DropEntry.nothing(weight: 12),
+      DropEntry('unleft_linen', weight: 74, min: 1, max: 3),
+      DropEntry('sanctus_shard', weight: 5),
+      DropEntry('sanctus_dust', weight: 9, min: 1, max: 2),
     ],
     bonus: [DropEntry('climbers_ration', chance: 0.02)],
   );
@@ -587,10 +587,10 @@ abstract final class ReliquaryDeepBestiary {
   static const _materialBCommon = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 30),
-      DropEntry('censer_resin', weight: 50, min: 1, max: 2),
-      DropEntry('umbra_shard', weight: 8, min: 1, max: 2),
-      DropEntry('umbra_dust', weight: 12, min: 2, max: 3),
+      DropEntry.nothing(weight: 15),
+      DropEntry('censer_resin', weight: 72, min: 1, max: 2),
+      DropEntry('umbra_shard', weight: 5, min: 1, max: 2),
+      DropEntry('umbra_dust', weight: 8, min: 2, max: 3),
     ],
   );
 
@@ -601,10 +601,10 @@ abstract final class ReliquaryDeepBestiary {
     always: [
       DropEntry('sanctus_shard'),
       DropEntry('umbra_shard'),
-      DropEntry('sanctus_dust', min: 2, max: 4),
-      DropEntry('umbra_dust', min: 2, max: 4),
-      DropEntry('sanctus_crystal', chance: 0.25),
-      DropEntry('umbra_crystal', chance: 0.25),
+      DropEntry('sanctus_dust', min: 1, max: 3),
+      DropEntry('umbra_dust', min: 1, max: 3),
+      DropEntry('sanctus_crystal', chance: 0.15),
+      DropEntry('umbra_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('unleft_linen', weight: 35, min: 2, max: 4),
@@ -626,8 +626,8 @@ abstract final class ReliquaryDeepBestiary {
       DropEntry('umbra_crystal', min: 1, max: 2),
       DropEntry('sanctus_shard', min: 1, max: 2),
       DropEntry('umbra_shard', min: 1, max: 2),
-      DropEntry('sanctus_dust', min: 4, max: 8),
-      DropEntry('umbra_dust', min: 4, max: 8),
+      DropEntry('sanctus_dust', min: 3, max: 6),
+      DropEntry('umbra_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('unleft_linen', weight: 35, min: 4, max: 8),

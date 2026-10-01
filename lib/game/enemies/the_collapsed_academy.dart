@@ -124,10 +124,10 @@ abstract final class CollapsedAcademyBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('mana_slag', weight: 50, min: 1, max: 2),
-        DropEntry('arcane_shard', weight: 8, min: 1, max: 2),
-        DropEntry('arcane_dust', weight: 12, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('mana_slag', weight: 72, min: 1, max: 2),
+        DropEntry('arcane_shard', weight: 5, min: 1, max: 2),
+        DropEntry('arcane_dust', weight: 8, min: 2, max: 3),
       ],
     ),
   );
@@ -176,10 +176,10 @@ abstract final class CollapsedAcademyBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('aetherwood_log', weight: 55, min: 1, max: 3),
-        DropEntry('arcane_shard', weight: 7),
-        DropEntry('arcane_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('aetherwood_log', weight: 74, min: 1, max: 3),
+        DropEntry('arcane_shard', weight: 5),
+        DropEntry('arcane_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('climbers_ration', chance: 0.02)],
     ),
@@ -220,10 +220,10 @@ abstract final class CollapsedAcademyBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('aetherwood_log', weight: 55, min: 1, max: 3),
-        DropEntry('arcane_shard', weight: 7),
-        DropEntry('arcane_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('aetherwood_log', weight: 74, min: 1, max: 3),
+        DropEntry('arcane_shard', weight: 5),
+        DropEntry('arcane_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('climbers_ration', chance: 0.02)],
     ),
@@ -264,10 +264,10 @@ abstract final class CollapsedAcademyBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('mana_slag', weight: 50, min: 1, max: 2),
-        DropEntry('arcane_shard', weight: 8, min: 1, max: 2),
-        DropEntry('arcane_dust', weight: 12, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('mana_slag', weight: 72, min: 1, max: 2),
+        DropEntry('arcane_shard', weight: 5, min: 1, max: 2),
+        DropEntry('arcane_dust', weight: 8, min: 2, max: 3),
       ],
     ),
   );
@@ -315,8 +315,8 @@ abstract final class CollapsedAcademyBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('mana_slag', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('mana_slag', weight: 65),
         DropEntry('climbers_ration', weight: 15),
       ],
     ),
@@ -626,14 +626,15 @@ abstract final class CollapsedAcademyBestiary {
 
   // ---- shared tables --------------------------------------------------
 
-  /// §4.5's `_miniDrops`, transcribed. ⭐ Crystal at 0.25 is where the mote
+  /// §4.5's `_miniDrops`, transcribed, then leaned on 2026-09-30 (Crystal
+  /// 0.25 → 0.15, Dust 2–4 → 1–3). ⭐ Crystal is where the mote
   /// ladder is first FELT, so it must come off a fight the player chose
   /// (ITEMS §8).
   static const _miniDrops = DropTable(
     always: [
       DropEntry('arcane_shard'),
-      DropEntry('arcane_dust', min: 2, max: 4),
-      DropEntry('arcane_crystal', chance: 0.25),
+      DropEntry('arcane_dust', min: 1, max: 3),
+      DropEntry('arcane_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('aetherwood_log', weight: 40, min: 2, max: 4),
@@ -659,7 +660,7 @@ abstract final class CollapsedAcademyBestiary {
       DropEntry('the_written_third'),
       DropEntry('arcane_crystal', min: 1, max: 2),
       DropEntry('arcane_shard', min: 1, max: 2),
-      DropEntry('arcane_dust', min: 4, max: 8),
+      DropEntry('arcane_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('aetherwood_log', weight: 45, min: 4, max: 8),

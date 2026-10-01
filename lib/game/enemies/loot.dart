@@ -110,19 +110,32 @@ Loot rollDrops(DropTable table, [Random? rng]) {
   return _materialise(ids, rng);
 }
 
-/// Rolls one KILL: [table]'s own drops, plus whatever the enemy's [rank]
-/// guarantees on top.
+/// Rolls one KILL: [table]'s own drops, then the consolation item if they
+/// came to nothing, then whatever the enemy's [rank] earns on top.
 ///
-/// ✅ **RULING (Christian, 2026-09-25): a boss kill guarantees a
-/// rare-or-better piece of the zone's own gear** — see [rollBossGuarantee].
-/// ⭐ **One rule, 26 zones.** It is keyed on `rank == boss` here, never
-/// authored into a boss's table, so no zone can forget it and no table has to
-/// be re-balanced around it.
+/// ✅ **RULING (Christian, 2026-09-30, playtest note 4 — "Ionwake carried
+/// nothing"): every monster drops SOMETHING.** When [table]'s roll is empty
+/// the kill pays exactly one unit of [consolationOf] [table]. ⭐ **One rule,
+/// 26 zones** — never authored into a table, so the `nothing` weights stay
+/// what they are and keep meaning what they mean (the share of kills whose
+/// `main` draw came up empty). ⚠️ [DropTable.empty] is the ONLY way a kill
+/// pays nothing: it has no consolation to give.
+///
+/// ✅ **RULING (2026-09-25, widened 2026-09-30 for note 5): rank gear** — a
+/// boss always, and a mini on a [miniGearChance] roll, adds one
+/// rare-or-better piece of the zone's own gear; see [rollRankGear]. Keyed on
+/// [rank] here, never authored into a table, so no zone can forget it.
+///
+/// ✅ **RULING (2026-09-30, note 11 — "double dropped Leanstone Charm from a
+/// boss"): a rare never drops twice in one kill.** Every def id the table
+/// (or its consolation) already paid is excluded from the rank-gear pool.
 ///
 /// ⚠️ [table] is rolled FIRST and exactly as [rollDrops] rolls it, so a
-/// table's own rates — the ones `content_export` publishes — are untouched by
-/// the guarantee; it only ever adds. [zoneId] is the zone whose catalogue the
-/// guarantee draws from, i.e. the run's zone.
+/// table's own rates — the ones `content_export` publishes — are untouched;
+/// the consolation and the rank gear only ever add. 📝 The consolation is
+/// judged on the table's roll, before rank gear: moot by content, since every
+/// mini and boss `always` line pays guaranteed shards. [zoneId] is the zone
+/// whose catalogue rank gear draws from, i.e. the run's zone.
 ///
 /// Omitting [rng] is the production call, same as [rollDrops].
 Loot rollKill(
@@ -132,60 +145,167 @@ Loot rollKill(
   Random? rng,
 }) {
   rng ??= lootRng;
-  final base = rollDrops(table, rng);
-  if (rank != EnemyRank.boss) return base;
-  final guaranteed = rollBossGuarantee(zoneId, rng);
-  if (guaranteed == null) return base;
-  final extra = _materialise([guaranteed], rng);
+  var base = rollDrops(table, rng);
+  if (base.isEmpty) {
+    final consolation = consolationOf(table);
+    // ⭐ Every consolation is fungible by content (a craftable, or Mirage's
+    // Dust), so materialising it draws nothing from [rng]: the rank-gear roll
+    // below sees the same numbers whether or not the consolation paid.
+    if (consolation != null) base = _materialise([consolation], rng);
+  }
+  final gear = rollRankGear(
+    rank,
+    zoneId,
+    rng,
+    excluding: {for (final s in base.slots) s.defId},
+  );
+  if (gear == null) return base;
+  final extra = _materialise([gear], rng);
   return Loot(
     [...base.slots, ...extra.slots],
     {...base.instances, ...extra.instances},
   );
 }
 
-/// The chance a boss's guaranteed piece is drawn from the zone's EPIC gear
-/// rather than its rare gear (ruling 2026-09-25).
+/// The one unit a kill pays when [table]'s own roll came to nothing (ruling
+/// 2026-09-30), or null for a table with nothing to give.
+///
+/// ⭐ **The heaviest-weighted [MaterialDef] in [DropTable.main]** — the
+/// creature's signature craftable, the thing its table most wants to pay.
+/// ⚠️ A [MoteDef] never qualifies through `main`: the same day's ruling leans
+/// kills toward craftables, and a consolation of Dust would be the opposite.
+/// Ties go to the first entry, so the answer reads straight off the source.
+///
+/// ⚠️ **A `main` with no [MaterialDef] falls back to the first `always`
+/// entry's def** — as of 2026-09-30 only The Kiln Desert's Mirage (its role is
+/// `mote` alone, ENEMIES §2e), which therefore consoles with Solar Dust.
+/// [DropTable.empty] has neither and returns null: the only kill that pays
+/// nothing.
+String? consolationOf(DropTable table) {
+  DropEntry? best;
+  for (final e in table.main) {
+    final id = e.defId;
+    if (id == null || ItemCatalogue.tryById(id) is! MaterialDef) continue;
+    if (best == null || e.weight > best.weight) best = e;
+  }
+  if (best != null) return best.defId;
+  for (final e in table.always) {
+    if (e.defId != null) return e.defId;
+  }
+  return null;
+}
+
+/// The chance a rank-gear piece is drawn from the zone's EPIC gear rather
+/// than its rare gear (ruling 2026-09-25) — ⚠️ for a boss's guaranteed piece
+/// AND a mini's [miniGearChance] piece (ruling 2026-09-30: the epic share is
+/// identical), despite the name.
+///
+/// ⭐ **Christian tunes this.** It is the one place the number lives.
 const double bossEpicChance = 0.25;
 
-/// Every piece a boss of [zoneId] may guarantee: the zone catalogue's
-/// [EquipmentDef]s at [Rarity.rare] or above.
+/// The chance a MINI-BOSS kill pays one rare-or-better piece of the zone's
+/// gear on top of its table (ruling 2026-09-30, playtest note 5: minis should
+/// pay rare and epic gear more often; amended the same day from 0.20 to 0.30).
+///
+/// ⭐ **Christian tunes this, and this is the one place the number lives** —
+/// comments, docs and tests name [miniGearChance] rather than restating it.
+/// The piece is the very roll a boss's guarantee makes ([bossEpicChance] for
+/// the epic share), gated on this chance. A common never rolls it.
+const double miniGearChance = 0.30;
+
+/// Every piece rank gear in [zoneId] may pay: the zone catalogue's
+/// [EquipmentDef]s at [Rarity.rare] or above, minus [excluding].
 ///
 /// ⚠️ **Falls back to the zone's best rarity** when it has nothing rare or
-/// better, so the guarantee never silently pays nothing. 📝 As of 2026-09-25
-/// every one of the 26 catalogues has rare-or-better gear and the fallback is
-/// dead code by content — a test pins that, so it only ever wakes for a new
-/// zone.
-List<EquipmentDef> bossGuaranteeCandidates(String zoneId) {
+/// better, so the roll never silently pays nothing. 📝 As of 2026-09-25 every
+/// one of the 26 catalogues has rare-or-better gear and the fallback is dead
+/// code by content — a test pins that, so it only ever wakes for a new zone.
+///
+/// ⭐ [excluding] (ruling 2026-09-30, note 11) is applied AFTER the rarity
+/// cut, never before it: a kill whose table already paid the zone's only rare
+/// gets an epic or nothing, and exclusion never drags the pool down to
+/// uncommon gear.
+List<EquipmentDef> rankGearCandidates(
+  String zoneId, {
+  Set<String> excluding = const {},
+}) {
   final gear = [...?ItemCatalogue.byZone[zoneId]?.whereType<EquipmentDef>()];
   if (gear.isEmpty) return const [];
-  final rarePlus = [
+  var pool = [
     for (final d in gear)
       if (d.rarity.index >= Rarity.rare.index) d,
   ];
-  if (rarePlus.isNotEmpty) return rarePlus;
-  final best = gear.map((d) => d.rarity.index).reduce((a, b) => a > b ? a : b);
+  if (pool.isEmpty) {
+    final best = gear
+        .map((d) => d.rarity.index)
+        .reduce((a, b) => a > b ? a : b);
+    pool = [
+      for (final d in gear)
+        if (d.rarity.index == best) d,
+    ];
+  }
   return [
-    for (final d in gear)
-      if (d.rarity.index == best) d,
+    for (final d in pool)
+      if (!excluding.contains(d.id)) d,
   ];
 }
 
-/// The def id a boss of [zoneId] guarantees, or null when the zone has no
-/// equipment at all.
+/// The def id [rank] earns on top of its table in [zoneId], or null.
+///
+/// - **boss** — always one piece (ruling 2026-09-25).
+/// - **mini** — one piece on a [miniGearChance] roll (ruling 2026-09-30).
+/// - **common** — never, and draws nothing from [rng].
 ///
 /// ⭐ **Epic on a [bossEpicChance] roll when the zone has an epic, else
 /// rare.** The roll is ALWAYS drawn, whether or not the zone can answer it,
 /// so every zone consumes the same numbers from [rng] and a seeded run does
 /// not change shape with the catalogue.
 ///
+/// ⚠️ **A mini draws its WHOLE roll — gate, epic share and pick — whether or
+/// not the gate hits**, the same discipline: a seeded run's shape must not
+/// depend on the outcome, so only the pay-out is gated. (A piece that does
+/// pay then mints its quality and instance id in [rollKill]; those are the
+/// kill's last draws, after every decision.)
+///
 /// ⚠️ **A tier the zone lacks yields to the one it has** — a zone with only
-/// an epic (Ashfall Vale, as of 2026-09-25) guarantees that epic every time,
-/// rather than rolling "rare" into an empty list and paying nothing. Mythic
-/// and legendary gear, should any zone ever author some, is reachable only
+/// an epic (Ashfall Vale, as of 2026-09-25) pays that epic every time, rather
+/// than rolling "rare" into an empty list and paying nothing. Mythic and
+/// legendary gear, should any zone ever author some, is reachable only
 /// through that same fallback: the ruling names rare and epic, and a boss
 /// handing out mythics by default is a decision, not a side effect.
-String? rollBossGuarantee(String zoneId, Random rng) {
-  final candidates = bossGuaranteeCandidates(zoneId);
+///
+/// ⭐ [excluding] holds every def id the kill already paid (ruling
+/// 2026-09-30, note 11): a rare never drops twice in one kill. When nothing is
+/// left after exclusion, no piece is paid.
+String? rollRankGear(
+  EnemyRank rank,
+  String zoneId,
+  Random rng, {
+  Set<String> excluding = const {},
+}) {
+  final chance = rankGearChance(rank);
+  if (chance <= 0) return null;
+  // ⭐ The `< 1` guard, as in [rollDrops]'s `always` bucket: a certain piece
+  // (a boss's) draws no gate, so the boss roll consumes exactly the numbers
+  // it did before minis shared it.
+  final hit = chance >= 1 || rng.nextDouble() < chance;
+  final id = _rollRarePlus(zoneId, rng, excluding);
+  return hit ? id : null;
+}
+
+/// The chance a kill of [rank] pays a rank-gear piece: a boss 1, a mini
+/// [miniGearChance], a common 0. ⭐ [rollRankGear] rolls against this and
+/// `content_export` publishes it, so the wiki's number is the roller's.
+double rankGearChance(EnemyRank rank) => switch (rank) {
+  EnemyRank.boss => 1,
+  EnemyRank.mini => miniGearChance,
+  EnemyRank.common => 0,
+};
+
+/// One rare-or-better piece of [zoneId]'s gear — the roll [rollRankGear]
+/// makes for every rank that earns one.
+String? _rollRarePlus(String zoneId, Random rng, Set<String> excluding) {
+  final candidates = rankGearCandidates(zoneId, excluding: excluding);
   final epicRoll = rng.nextDouble() < bossEpicChance;
   if (candidates.isEmpty) return null;
   List<EquipmentDef> at(Rarity r) => [

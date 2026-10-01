@@ -1008,8 +1008,11 @@ void main() {
       );
       expect(
         table.mainChanceOf('umbralweave'),
-        closeTo(0.45, 1e-9),
-        reason: 'the Siphon row drifted off §4.3\'s 40/45/15',
+        closeTo(0.65, 1e-9),
+        reason:
+            'the Siphon row drifted off §4.3\'s 40/45/15 as leaned on '
+            '2026-09-30 (nothing halved to 20, its 20 moved onto '
+            'umbralweave: 20/65/15) — kills a lean that skipped this row',
       );
     });
 

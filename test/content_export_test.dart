@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masters_of_magic_2/game/content_export.dart';
 import 'package:masters_of_magic_2/game/enemies/bestiary.dart';
+import 'package:masters_of_magic_2/game/enemies/loot.dart';
 import 'package:masters_of_magic_2/game/items/item_catalogue.dart';
 import 'package:masters_of_magic_2/game/gathering/gather_node.dart';
 import 'package:masters_of_magic_2/game/items/recipe_book.dart';
@@ -85,6 +86,38 @@ void main() {
     for (final e in Bestiary.all) {
       expect(zoneIds, contains(e.zoneId), reason: e.id);
     }
+  });
+
+  test('each creature publishes its kill rules (rulings 2026-09-30)', () {
+    // ⭐ The consolation and rank gear live in the roller, not the tables; a
+    // wiki that read `drops` alone would show kills that pay nothing.
+    final creatures = (export['creatures']! as List).cast<Map>();
+    Map kill(String id) =>
+        creatures.firstWhere((c) => c['id'] == id)['kill'] as Map;
+    expect(
+      kill('ionwake')['consolationItemId'],
+      'iron_ore',
+      reason: 'kills an export that drops or restates the consolation',
+    );
+    expect(
+      kill('mirage')['consolationItemId'],
+      'solar_dust',
+      reason: 'the no-craftable fallback is published too',
+    );
+    final byRank = {
+      for (final c in creatures)
+        c['rank'] as String: (c['kill'] as Map)['rankGearChance'],
+    };
+    expect(byRank, {
+      'common': 0.0,
+      'mini': miniGearChance,
+      'boss': 1.0,
+    }, reason: 'kills a rank-gear chance published for the wrong rank');
+    expect(
+      kill('ionwake')['rankGearEpicShare'],
+      bossEpicChance,
+      reason: 'the epic share is the roller\'s knob, not a copy',
+    );
   });
 
   test('recipe ids are unique, and no recipe is a faucet', () {

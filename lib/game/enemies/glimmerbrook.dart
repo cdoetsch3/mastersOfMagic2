@@ -82,8 +82,8 @@ abstract final class GlimmerbrookBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('sapwort', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('sapwort', weight: 65),
         DropEntry('foragers_ration', weight: 15),
       ],
     ),
@@ -123,10 +123,10 @@ abstract final class GlimmerbrookBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('sapwort', weight: 50, min: 1, max: 2),
-        DropEntry('aqua_shard', weight: 5),
-        DropEntry('aqua_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('sapwort', weight: 73, min: 1, max: 2),
+        DropEntry('aqua_shard', weight: 3),
+        DropEntry('aqua_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -164,11 +164,11 @@ abstract final class GlimmerbrookBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('sapwort', weight: 40),
+        DropEntry.nothing(weight: 15),
+        DropEntry('sapwort', weight: 64),
         // ⭐ Still the zone's mote-richest common — it just pays in Dust now.
-        DropEntry('aqua_shard', weight: 8, min: 1, max: 2),
-        DropEntry('aqua_dust', weight: 17, min: 2, max: 3),
+        DropEntry('aqua_shard', weight: 5, min: 1, max: 2),
+        DropEntry('aqua_dust', weight: 11, min: 2, max: 3),
         DropEntry('sapwort_draught', weight: 5),
       ],
     ),
@@ -209,10 +209,10 @@ abstract final class GlimmerbrookBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('fawnhide', weight: 55, min: 1, max: 3),
-        DropEntry('aqua_shard', weight: 7),
-        DropEntry('aqua_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('fawnhide', weight: 74, min: 1, max: 3),
+        DropEntry('aqua_shard', weight: 5),
+        DropEntry('aqua_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -249,10 +249,10 @@ abstract final class GlimmerbrookBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('fawnhide', weight: 50, min: 2, max: 3),
-        DropEntry('aqua_shard', weight: 7),
-        DropEntry('aqua_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 15),
+        DropEntry('fawnhide', weight: 71, min: 2, max: 3),
+        DropEntry('aqua_shard', weight: 5),
+        DropEntry('aqua_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -512,8 +512,8 @@ abstract final class GlimmerbrookBestiary {
       // Shard income (see `whispering_woods.dart`'s _miniDrops). The Dust is
       // new — elevated ranks never dropped any.
       DropEntry('aqua_shard'),
-      DropEntry('aqua_dust', min: 2, max: 4),
-      DropEntry('aqua_crystal', chance: 0.25),
+      DropEntry('aqua_dust', min: 1, max: 3),
+      DropEntry('aqua_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('fawnhide', weight: 40, min: 2, max: 4),
@@ -530,7 +530,7 @@ abstract final class GlimmerbrookBestiary {
     always: [
       DropEntry('aqua_crystal', min: 1, max: 2),
       DropEntry('aqua_shard', min: 1, max: 2),
-      DropEntry('aqua_dust', min: 4, max: 8),
+      DropEntry('aqua_dust', min: 3, max: 6),
       // ⭐ The gate item. The second of Hearthwood's "three ordinary proofs".
       DropEntry('proof_of_the_brook'),
     ],

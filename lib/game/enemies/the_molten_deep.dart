@@ -97,10 +97,10 @@ abstract final class TheMoltenDeepBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('emberhide', weight: 40),
-        DropEntry('pyro_shard', weight: 8, min: 1, max: 2),
-        DropEntry('pyro_dust', weight: 17, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('emberhide', weight: 64),
+        DropEntry('pyro_shard', weight: 5, min: 1, max: 2),
+        DropEntry('pyro_dust', weight: 11, min: 2, max: 3),
         DropEntry('hardtack', weight: 5),
       ],
     ),
@@ -147,10 +147,10 @@ abstract final class TheMoltenDeepBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('firesalt', weight: 45),
-        DropEntry('pyro_shard', weight: 7),
-        DropEntry('pyro_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('firesalt', weight: 69),
+        DropEntry('pyro_shard', weight: 5),
+        DropEntry('pyro_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -192,10 +192,10 @@ abstract final class TheMoltenDeepBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('emberhide', weight: 55, min: 1, max: 3),
-        DropEntry('geo_shard', weight: 7),
-        DropEntry('geo_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('emberhide', weight: 74, min: 1, max: 3),
+        DropEntry('geo_shard', weight: 5),
+        DropEntry('geo_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('hardtack', chance: 0.02)],
     ),
@@ -234,8 +234,8 @@ abstract final class TheMoltenDeepBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('firesalt', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('firesalt', weight: 65),
         DropEntry('obsidian', weight: 15),
       ],
     ),
@@ -274,10 +274,10 @@ abstract final class TheMoltenDeepBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('obsidian', weight: 50, min: 1, max: 2),
-        DropEntry('geo_shard', weight: 5),
-        DropEntry('geo_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('obsidian', weight: 73, min: 1, max: 2),
+        DropEntry('geo_shard', weight: 3),
+        DropEntry('geo_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -548,10 +548,10 @@ abstract final class TheMoltenDeepBestiary {
     always: [
       DropEntry('pyro_shard'),
       DropEntry('geo_shard'),
-      DropEntry('pyro_dust', min: 2, max: 4),
-      DropEntry('geo_dust', min: 2, max: 4),
-      DropEntry('pyro_crystal', chance: 0.25),
-      DropEntry('geo_crystal', chance: 0.25),
+      DropEntry('pyro_dust', min: 1, max: 3),
+      DropEntry('geo_dust', min: 1, max: 3),
+      DropEntry('pyro_crystal', chance: 0.15),
+      DropEntry('geo_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('emberhide', weight: 35, min: 2, max: 4),
@@ -570,8 +570,8 @@ abstract final class TheMoltenDeepBestiary {
       DropEntry('geo_crystal', min: 1, max: 2),
       DropEntry('pyro_shard', min: 1, max: 2),
       DropEntry('geo_shard', min: 1, max: 2),
-      DropEntry('pyro_dust', min: 4, max: 8),
-      DropEntry('geo_dust', min: 4, max: 8),
+      DropEntry('pyro_dust', min: 3, max: 6),
+      DropEntry('geo_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('emberhide', weight: 35, min: 4, max: 8),

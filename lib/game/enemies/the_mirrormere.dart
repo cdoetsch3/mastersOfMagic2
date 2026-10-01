@@ -64,10 +64,10 @@ const _commonAlways = [DropEntry('lunar_dust', chance: 0.75, min: 1, max: 2)];
 /// the zone's wood. Weights sum to 100, so the percentages read straight off
 /// the numbers.
 const _materialAMain = [
-  DropEntry.nothing(weight: 25),
-  DropEntry('bloodwood_log', weight: 55, min: 1, max: 3),
-  DropEntry('lunar_shard', weight: 7),
-  DropEntry('lunar_dust', weight: 13, min: 1, max: 2),
+  DropEntry.nothing(weight: 12),
+  DropEntry('bloodwood_log', weight: 74, min: 1, max: 3),
+  DropEntry('lunar_shard', weight: 5),
+  DropEntry('lunar_dust', weight: 9, min: 1, max: 2),
 ];
 
 /// ⭐ §4.2's *material-B* row. ⚠️ **This is where the `hide` role lands.**
@@ -75,10 +75,10 @@ const _materialAMain = [
 /// the role resolves to the zone's **second gatherable material** —
 /// `mirrorflax` — at the weight a hide would have carried.
 const _materialBMain = [
-  DropEntry.nothing(weight: 30),
-  DropEntry('mirrorflax', weight: 50, min: 1, max: 2),
-  DropEntry('lunar_shard', weight: 8, min: 1, max: 2),
-  DropEntry('lunar_dust', weight: 12, min: 2, max: 3),
+  DropEntry.nothing(weight: 15),
+  DropEntry('mirrorflax', weight: 72, min: 1, max: 2),
+  DropEntry('lunar_shard', weight: 5, min: 1, max: 2),
+  DropEntry('lunar_dust', weight: 8, min: 2, max: 3),
 ];
 
 abstract final class MirrormereBestiary {
@@ -200,8 +200,8 @@ abstract final class MirrormereBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('mirrorflax', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('mirrorflax', weight: 65),
         DropEntry('glasswort_draught', weight: 15),
       ],
     ),
@@ -567,8 +567,8 @@ abstract final class MirrormereBestiary {
   static const _miniDrops = DropTable(
     always: [
       DropEntry('lunar_shard'),
-      DropEntry('lunar_dust', min: 2, max: 4),
-      DropEntry('lunar_crystal', chance: 0.25),
+      DropEntry('lunar_dust', min: 1, max: 3),
+      DropEntry('lunar_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('bloodwood_log', weight: 40, min: 2, max: 4),
@@ -588,7 +588,7 @@ abstract final class MirrormereBestiary {
       DropEntry('lunar_essence'),
       DropEntry('lunar_crystal', min: 1, max: 2),
       DropEntry('lunar_shard', min: 1, max: 2),
-      DropEntry('lunar_dust', min: 4, max: 8),
+      DropEntry('lunar_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('bloodwood_log', weight: 45, min: 4, max: 8),

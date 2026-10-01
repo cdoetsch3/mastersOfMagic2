@@ -19,6 +19,7 @@ library;
 import 'enemies/bestiary.dart';
 import 'enemies/drop_table.dart';
 import 'enemies/enemy_def.dart';
+import 'enemies/loot.dart';
 import 'items/item_catalogue.dart';
 import 'items/item_def.dart';
 import 'gathering/gather_node.dart';
@@ -107,6 +108,15 @@ abstract final class ContentExport {
         },
     ],
     'drops': _drops(e.drops),
+    // ⭐ The kill-level rules (ENEMIES §2e.1, rulings 2026-09-30) live in the
+    // roller, not in any table — so a wiki reading `drops` alone would print
+    // "35% nothing" for a kill that never pays nothing. Both are read off the
+    // roller's own function and knobs, never restated.
+    'kill': {
+      'consolationItemId': consolationOf(e.drops),
+      'rankGearChance': rankGearChance(e.rank),
+      'rankGearEpicShare': bossEpicChance,
+    },
   };
 
   /// ⭐ Every rate is exported as a **fraction**, computed by the same code the

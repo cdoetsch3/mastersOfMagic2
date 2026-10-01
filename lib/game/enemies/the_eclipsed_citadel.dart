@@ -725,8 +725,8 @@ abstract final class EclipsedCitadelBestiary {
   static const _echoPool = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 30),
-      DropEntry('eclipse_iron', weight: 35),
+      DropEntry.nothing(weight: 15),
+      DropEntry('eclipse_iron', weight: 50),
       DropEntry('corona_pearl', weight: 25),
       DropEntry('nightink_draught', weight: 10),
     ],
@@ -751,9 +751,9 @@ abstract final class EclipsedCitadelBestiary {
     always: [
       DropEntry('geo_shard'),
       DropEntry('electro_shard'),
-      DropEntry('geo_dust', min: 2, max: 4),
-      DropEntry('electro_dust', min: 2, max: 4),
-      DropEntry('geo_crystal', chance: 0.25),
+      DropEntry('geo_dust', min: 1, max: 3),
+      DropEntry('electro_dust', min: 1, max: 3),
+      DropEntry('geo_crystal', chance: 0.15),
     ],
     main: _miniMain,
   );
@@ -762,9 +762,9 @@ abstract final class EclipsedCitadelBestiary {
     always: [
       DropEntry('flora_shard'),
       DropEntry('aqua_shard'),
-      DropEntry('flora_dust', min: 2, max: 4),
-      DropEntry('aqua_dust', min: 2, max: 4),
-      DropEntry('flora_crystal', chance: 0.25),
+      DropEntry('flora_dust', min: 1, max: 3),
+      DropEntry('aqua_dust', min: 1, max: 3),
+      DropEntry('flora_crystal', chance: 0.15),
     ],
     main: _miniMain,
   );
@@ -773,9 +773,9 @@ abstract final class EclipsedCitadelBestiary {
     always: [
       DropEntry('solar_shard'),
       DropEntry('lunar_shard'),
-      DropEntry('solar_dust', min: 2, max: 4),
-      DropEntry('lunar_dust', min: 2, max: 4),
-      DropEntry('solar_crystal', chance: 0.25),
+      DropEntry('solar_dust', min: 1, max: 3),
+      DropEntry('lunar_dust', min: 1, max: 3),
+      DropEntry('solar_crystal', chance: 0.15),
     ],
     main: _miniMain,
   );
@@ -784,9 +784,9 @@ abstract final class EclipsedCitadelBestiary {
     always: [
       DropEntry('sanctus_shard'),
       DropEntry('umbra_shard'),
-      DropEntry('sanctus_dust', min: 2, max: 4),
-      DropEntry('umbra_dust', min: 2, max: 4),
-      DropEntry('sanctus_crystal', chance: 0.25),
+      DropEntry('sanctus_dust', min: 1, max: 3),
+      DropEntry('umbra_dust', min: 1, max: 3),
+      DropEntry('sanctus_crystal', chance: 0.15),
     ],
     main: _miniMain,
   );
@@ -819,9 +819,9 @@ abstract final class EclipsedCitadelBestiary {
       DropEntry('solar_shard', min: 1, max: 2),
       DropEntry('lunar_shard', min: 1, max: 2),
       DropEntry('umbra_shard', min: 1, max: 2),
-      DropEntry('solar_dust', min: 4, max: 8),
-      DropEntry('lunar_dust', min: 4, max: 8),
-      DropEntry('umbra_dust', min: 4, max: 8),
+      DropEntry('solar_dust', min: 3, max: 6),
+      DropEntry('lunar_dust', min: 3, max: 6),
+      DropEntry('umbra_dust', min: 3, max: 6),
     ],
     main: _bossMain,
   );
@@ -837,9 +837,9 @@ abstract final class EclipsedCitadelBestiary {
       DropEntry('arcane_shard', min: 1, max: 2),
       DropEntry('umbra_shard', min: 1, max: 2),
       DropEntry('lunar_shard', min: 1, max: 2),
-      DropEntry('arcane_dust', min: 4, max: 8),
-      DropEntry('umbra_dust', min: 4, max: 8),
-      DropEntry('lunar_dust', min: 4, max: 8),
+      DropEntry('arcane_dust', min: 3, max: 6),
+      DropEntry('umbra_dust', min: 3, max: 6),
+      DropEntry('lunar_dust', min: 3, max: 6),
     ],
     main: _bossMain,
   );

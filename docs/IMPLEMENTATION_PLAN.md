@@ -1209,6 +1209,29 @@ belt line, rating colour, cleared marks, the header pill.
 §8.5, Saltwort 75→95, Sanctus Aspect, stationRequired, wiki export stale
 (~40k lines), loot picker partial stacks (all-or-nothing today).
 
+## 🔨 Playtest batch 2026-09-30 (release 8, Opus lanes, merging)
+
+Thirteen notes + one mid-turn ruling ("lean the tables into craftables").
+Mockups: claude.ai/artifact/Fu5HF543vUw6Q8mnnphbve (map tiers, travel A,
+Achievements A + filters, Bestiary A + search).
+2. Potency line loses '(base 10%)'. 13. Nav tabs top-aligned (level with
+the Home hat). 3. **Provenance**: Gather/Drops lines on Map cards and the
+place sheet; 'Found in' on the item dialog. 4/5/11/14 **loot lane**: a
+roll that pays nothing pays the table's main craftable; minis roll 30% at
+rare+ zone gear (`miniGearChance`); a rare the table paid is never repeated
+by the rank roll; all 26 tables leaned (nothing halved, motes ×2/3, freed
+weight to the heaviest material; mini crystals 15%, boss dust 3–6). 10.
+Crit base 5% / +100% (`MageState.baseCritChance/baseCritDamage`). 1. Map:
+nine roads out (tier 1 rule + tier 2 hub trims; 38 stay). 9. Rowan tier 3 /
+Yew tier 4 (logs re-tiered, nothing moves). 6. Priorities snapped to the
+ladder: p4→5, p6→7 (51 moves). 12. **Travel chaining** (mockup A): tap any
+pin, per-character route that never passes an uncleared zone, a shut gate
+ends the trip at the gate. 7. **Achievements** (mockup A + filters):
+categories, progress, Hide earned, sweep on load. 8. **Bestiary** (mockup
+A + search): seen/slain per creature on the profile, field guide by zone,
+search by name or drop, entry page with moves and rates.
+⚠️ Christian verifies every screen above in the browser.
+
 ## Deferred / banked — do not build without an explicit ask
 
 - **📝 Creature sprites: the system works, the ART does not.** Built

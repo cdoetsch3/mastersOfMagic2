@@ -93,8 +93,8 @@ abstract final class ThornmireBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('bogflax_fibre', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('bogflax_fibre', weight: 65),
         DropEntry('fenroot', weight: 15),
       ],
     ),
@@ -133,10 +133,10 @@ abstract final class ThornmireBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('bogflax_fibre', weight: 50, min: 1, max: 2),
-        DropEntry('flora_shard', weight: 5),
-        DropEntry('flora_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('bogflax_fibre', weight: 73, min: 1, max: 2),
+        DropEntry('flora_shard', weight: 3),
+        DropEntry('flora_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -175,11 +175,11 @@ abstract final class ThornmireBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('fenroot', weight: 40),
+        DropEntry.nothing(weight: 15),
+        DropEntry('fenroot', weight: 64),
         // ⭐ Still the zone's mote-richest common — it just pays in Dust now.
-        DropEntry('aqua_shard', weight: 8, min: 1, max: 2),
-        DropEntry('aqua_dust', weight: 17, min: 2, max: 3),
+        DropEntry('aqua_shard', weight: 5, min: 1, max: 2),
+        DropEntry('aqua_dust', weight: 11, min: 2, max: 3),
         // ⏳ Amber banks for Jewelry, which opens at Rimeholt (45). ⚠️ Kept
         // deliberately thin — an uncommon that a common hands out freely
         // stops being worth banking.
@@ -220,10 +220,10 @@ abstract final class ThornmireBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('fenroot', weight: 45),
-        DropEntry('flora_shard', weight: 7),
-        DropEntry('flora_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('fenroot', weight: 69),
+        DropEntry('flora_shard', weight: 5),
+        DropEntry('flora_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -261,10 +261,10 @@ abstract final class ThornmireBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('bogflax_fibre', weight: 55, min: 1, max: 3),
-        DropEntry('aqua_shard', weight: 7),
-        DropEntry('aqua_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('bogflax_fibre', weight: 74, min: 1, max: 3),
+        DropEntry('aqua_shard', weight: 5),
+        DropEntry('aqua_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -531,8 +531,8 @@ abstract final class ThornmireBestiary {
       DropEntry('aqua_shard', chance: 0.5),
       DropEntry('flora_dust', min: 1, max: 2),
       DropEntry('aqua_dust', min: 1, max: 2),
-      DropEntry('flora_crystal', chance: 0.15),
-      DropEntry('aqua_crystal', chance: 0.15),
+      DropEntry('flora_crystal', chance: 0.1),
+      DropEntry('aqua_crystal', chance: 0.1),
     ],
     main: [
       DropEntry('bogflax_fibre', weight: 40, min: 2, max: 4),

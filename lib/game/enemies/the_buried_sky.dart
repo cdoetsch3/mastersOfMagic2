@@ -229,8 +229,8 @@ abstract final class BuriedSkyBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('nadir_garnet', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('nadir_garnet', weight: 65),
         DropEntry('goldenrood_draught', weight: 15),
       ],
     ),
@@ -574,10 +574,10 @@ abstract final class BuriedSkyBestiary {
   static const _materialDrops = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 25),
-      DropEntry('deepstratum_ore', weight: 55, min: 1, max: 3),
-      DropEntry('astral_shard', weight: 7),
-      DropEntry('astral_dust', weight: 13, min: 1, max: 2),
+      DropEntry.nothing(weight: 12),
+      DropEntry('deepstratum_ore', weight: 74, min: 1, max: 3),
+      DropEntry('astral_shard', weight: 5),
+      DropEntry('astral_dust', weight: 9, min: 1, max: 2),
     ],
     bonus: [DropEntry('climbers_ration', chance: 0.02)],
   );
@@ -597,10 +597,10 @@ abstract final class BuriedSkyBestiary {
   static const _hideDrops = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 30),
-      DropEntry('corebiter_hide', weight: 40),
-      DropEntry('geo_shard', weight: 8, min: 1, max: 2),
-      DropEntry('geo_dust', weight: 17, min: 2, max: 3),
+      DropEntry.nothing(weight: 15),
+      DropEntry('corebiter_hide', weight: 64),
+      DropEntry('geo_shard', weight: 5, min: 1, max: 2),
+      DropEntry('geo_dust', weight: 11, min: 2, max: 3),
       DropEntry('climbers_ration', weight: 5),
     ],
   );
@@ -611,10 +611,10 @@ abstract final class BuriedSkyBestiary {
     always: [
       DropEntry('geo_shard'),
       DropEntry('astral_shard'),
-      DropEntry('geo_dust', min: 2, max: 4),
-      DropEntry('astral_dust', min: 2, max: 4),
-      DropEntry('geo_crystal', chance: 0.25),
-      DropEntry('astral_crystal', chance: 0.25),
+      DropEntry('geo_dust', min: 1, max: 3),
+      DropEntry('astral_dust', min: 1, max: 3),
+      DropEntry('geo_crystal', chance: 0.15),
+      DropEntry('astral_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('corebiter_hide', weight: 35, min: 2, max: 4),
@@ -635,8 +635,8 @@ abstract final class BuriedSkyBestiary {
       DropEntry('astral_crystal', min: 1, max: 2),
       DropEntry('geo_shard', min: 1, max: 2),
       DropEntry('astral_shard', min: 1, max: 2),
-      DropEntry('geo_dust', min: 4, max: 8),
-      DropEntry('astral_dust', min: 4, max: 8),
+      DropEntry('geo_dust', min: 3, max: 6),
+      DropEntry('astral_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('corebiter_hide', weight: 35, min: 4, max: 8),

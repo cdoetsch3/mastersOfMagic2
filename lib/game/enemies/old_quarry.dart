@@ -79,10 +79,10 @@ abstract final class OldQuarryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('tin_ore', weight: 55, min: 1, max: 3),
-        DropEntry('geo_shard', weight: 7),
-        DropEntry('geo_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('tin_ore', weight: 74, min: 1, max: 3),
+        DropEntry('geo_shard', weight: 5),
+        DropEntry('geo_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('hardtack', chance: 0.02)],
     ),
@@ -113,8 +113,8 @@ abstract final class OldQuarryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('tin_ore', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('tin_ore', weight: 65),
         DropEntry('hardtack', weight: 15),
       ],
     ),
@@ -152,10 +152,10 @@ abstract final class OldQuarryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('quarry_jasper', weight: 45),
-        DropEntry('geo_shard', weight: 7),
-        DropEntry('geo_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('quarry_jasper', weight: 69),
+        DropEntry('geo_shard', weight: 5),
+        DropEntry('geo_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -195,10 +195,10 @@ abstract final class OldQuarryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('tin_ore', weight: 50, min: 1, max: 2),
-        DropEntry('geo_shard', weight: 5),
-        DropEntry('geo_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('tin_ore', weight: 73, min: 1, max: 2),
+        DropEntry('geo_shard', weight: 3),
+        DropEntry('geo_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -236,10 +236,10 @@ abstract final class OldQuarryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('quarry_jasper', weight: 40),
-        DropEntry('geo_shard', weight: 8, min: 1, max: 2),
-        DropEntry('geo_dust', weight: 17, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('quarry_jasper', weight: 64),
+        DropEntry('geo_shard', weight: 5, min: 1, max: 2),
+        DropEntry('geo_dust', weight: 11, min: 2, max: 3),
         DropEntry('hardtack', weight: 5),
       ],
     ),
@@ -521,8 +521,8 @@ abstract final class OldQuarryBestiary {
   static const _miniDrops = DropTable(
     always: [
       DropEntry('geo_shard'),
-      DropEntry('geo_dust', min: 2, max: 4),
-      DropEntry('geo_crystal', chance: 0.25),
+      DropEntry('geo_dust', min: 1, max: 3),
+      DropEntry('geo_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('tin_ore', weight: 40, min: 2, max: 4),
@@ -539,7 +539,7 @@ abstract final class OldQuarryBestiary {
     always: [
       DropEntry('geo_crystal', min: 1, max: 2),
       DropEntry('geo_shard', min: 1, max: 2),
-      DropEntry('geo_dust', min: 4, max: 8),
+      DropEntry('geo_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('tin_ore', weight: 45, min: 4, max: 8),

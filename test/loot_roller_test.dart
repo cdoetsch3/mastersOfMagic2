@@ -167,10 +167,20 @@ void main() {
     test('a common comes up empty at exactly its declared weight', () {
       // 🚫 Kills a `_drawOne` that skips null entries instead of counting their
       // weight — which would silently inflate every real slot on every common.
+      // 📝 20/65/15 since the 2026-09-30 lean (was 40/45/15): the empty slot
+      // halved and its weight moved onto the craftable.
       final drops = WhisperingWoodsBestiary.listeningFawn.drops;
       final counts = _mainHistogram(drops, 4242);
-      _expectRate(counts['(nothing)'] ?? 0, 0.40, 'the fawn paying nothing');
-      _expectRate(counts['bindweed_fibre'] ?? 0, 0.45, 'bindweed_fibre');
+      _expectRate(
+        counts['(nothing)'] ?? 0,
+        0.20,
+        'the fawn paying nothing (2026-09-30 lean: 40→20)',
+      );
+      _expectRate(
+        counts['bindweed_fibre'] ?? 0,
+        0.65,
+        'bindweed_fibre (2026-09-30 lean: 45→65)',
+      );
       _expectRate(counts['foragers_ration'] ?? 0, 0.15, 'foragers_ration');
     });
   });
@@ -222,16 +232,21 @@ void main() {
   });
 
   group('the always bucket honours its own chances', () {
-    test('a mini hands over a Crystal one kill in four, not every kill', () {
+    test('a mini hands over a Crystal 15% of kills, not every kill', () {
       // 🚫 Kills the bug this audit found: `rollDrops` expanded every `always`
       // entry unconditionally, so `chance: 0.25` meant 100%. A Crystal is 20
       // Shards (ITEMS §8), so a guaranteed one made the guaranteed 1–3 Shards
       // beside it statistical noise — and the wiki was publishing 25%.
+      // 📝 0.15 since the 2026-09-30 lean (was 0.25).
       final counts = _appearanceHistogram(
         WhisperingWoodsBestiary.elderroot.drops,
         5150,
       );
-      _expectRate(counts['flora_crystal'] ?? 0, 0.25, 'flora_crystal');
+      _expectRate(
+        counts['flora_crystal'] ?? 0,
+        0.15,
+        'flora_crystal (2026-09-30 lean: 0.25→0.15)',
+      );
       _expectRate(counts['flora_shard'] ?? 0, 1.0, 'flora_shard (chance 1)');
     });
 

@@ -841,8 +841,10 @@ void main() {
         );
         expect(
           crystal.chance,
-          0.25,
-          reason: '${m.id}\'s Crystal is not a quarter chance',
+          0.15,
+          reason:
+              '${m.id}\'s Crystal is not 15% — the 2026-09-30 lean took it '
+              'from 0.25 to 0.15; kills a zone the lean missed',
         );
       }
       for (final b in StarfallBasinBestiary.bosses) {

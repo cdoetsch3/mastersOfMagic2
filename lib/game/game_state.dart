@@ -961,7 +961,9 @@ class GameState extends ChangeNotifier {
     // ⭐ Defaulting inside rollKill (lootRng, one long-lived stream) — the
     // hygiene half of the 2026-08-17 drop audit; both shapes measured at 10%.
     // ⭐ rollKill, not rollDrops: the rank is what earns a boss its
-    // guaranteed rare-or-better piece of this zone's gear (ruling 2026-09-25).
+    // guaranteed rare-or-better piece of this zone's gear (ruling 2026-09-25)
+    // and a mini its miniGearChance roll; rollKill is also where an empty
+    // roll is paid its consolation craftable (both rulings 2026-09-30).
     final loot = rollKill(
       enemy.def.drops,
       rank: enemy.def.rank,

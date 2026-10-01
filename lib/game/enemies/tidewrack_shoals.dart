@@ -191,8 +191,8 @@ abstract final class TidewrackShoalsBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('nacre', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('nacre', weight: 65),
         DropEntry('glasswort_draught', weight: 15),
       ],
     ),
@@ -550,10 +550,10 @@ abstract final class TidewrackShoalsBestiary {
   static const _hideCommonDrops = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 30),
-      DropEntry('drownling_hide', weight: 40),
-      DropEntry('aqua_shard', weight: 8, min: 1, max: 2),
-      DropEntry('aqua_dust', weight: 17, min: 2, max: 3),
+      DropEntry.nothing(weight: 15),
+      DropEntry('drownling_hide', weight: 64),
+      DropEntry('aqua_shard', weight: 5, min: 1, max: 2),
+      DropEntry('aqua_dust', weight: 11, min: 2, max: 3),
       DropEntry('pilgrims_ration', weight: 5),
     ],
   );
@@ -566,10 +566,10 @@ abstract final class TidewrackShoalsBestiary {
   static const _materialCommonDrops = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 25),
-      DropEntry('wrackcotton', weight: 55, min: 1, max: 3),
-      DropEntry('lunar_shard', weight: 7),
-      DropEntry('lunar_dust', weight: 13, min: 1, max: 2),
+      DropEntry.nothing(weight: 12),
+      DropEntry('wrackcotton', weight: 74, min: 1, max: 3),
+      DropEntry('lunar_shard', weight: 5),
+      DropEntry('lunar_dust', weight: 9, min: 1, max: 2),
     ],
     bonus: [DropEntry('pilgrims_ration', chance: 0.02)],
   );
@@ -580,10 +580,10 @@ abstract final class TidewrackShoalsBestiary {
     always: [
       DropEntry('lunar_shard'),
       DropEntry('aqua_shard'),
-      DropEntry('lunar_dust', min: 2, max: 4),
-      DropEntry('aqua_dust', min: 2, max: 4),
-      DropEntry('lunar_crystal', chance: 0.25),
-      DropEntry('aqua_crystal', chance: 0.25),
+      DropEntry('lunar_dust', min: 1, max: 3),
+      DropEntry('aqua_dust', min: 1, max: 3),
+      DropEntry('lunar_crystal', chance: 0.15),
+      DropEntry('aqua_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('drownling_hide', weight: 35, min: 2, max: 4),
@@ -603,8 +603,8 @@ abstract final class TidewrackShoalsBestiary {
       DropEntry('aqua_crystal', min: 1, max: 2),
       DropEntry('lunar_shard', min: 1, max: 2),
       DropEntry('aqua_shard', min: 1, max: 2),
-      DropEntry('lunar_dust', min: 4, max: 8),
-      DropEntry('aqua_dust', min: 4, max: 8),
+      DropEntry('lunar_dust', min: 3, max: 6),
+      DropEntry('aqua_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('drownling_hide', weight: 35, min: 4, max: 8),

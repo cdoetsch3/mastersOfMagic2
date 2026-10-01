@@ -122,10 +122,10 @@ abstract final class StarfallBasinBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('fallstone', weight: 45),
-        DropEntry('astral_shard', weight: 8, min: 1, max: 2),
-        DropEntry('astral_dust', weight: 17, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('fallstone', weight: 69),
+        DropEntry('astral_shard', weight: 5, min: 1, max: 2),
+        DropEntry('astral_dust', weight: 11, min: 2, max: 3),
       ],
     ),
   );
@@ -167,8 +167,8 @@ abstract final class StarfallBasinBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('skyiron_ore', weight: 40, min: 1, max: 2),
+        DropEntry.nothing(weight: 15),
+        DropEntry('skyiron_ore', weight: 55, min: 1, max: 2),
         DropEntry('fallstone', weight: 20),
         DropEntry('glasswort_draught', weight: 10),
       ],
@@ -211,10 +211,10 @@ abstract final class StarfallBasinBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('fallstone', weight: 45),
-        DropEntry('astral_shard', weight: 8, min: 1, max: 2),
-        DropEntry('astral_dust', weight: 17, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('fallstone', weight: 69),
+        DropEntry('astral_shard', weight: 5, min: 1, max: 2),
+        DropEntry('astral_dust', weight: 11, min: 2, max: 3),
       ],
     ),
   );
@@ -255,10 +255,10 @@ abstract final class StarfallBasinBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('skyiron_ore', weight: 55, min: 1, max: 3),
-        DropEntry('astral_shard', weight: 7),
-        DropEntry('astral_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('skyiron_ore', weight: 74, min: 1, max: 3),
+        DropEntry('astral_shard', weight: 5),
+        DropEntry('astral_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('pilgrims_ration', chance: 0.02)],
     ),
@@ -300,10 +300,10 @@ abstract final class StarfallBasinBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('skyiron_ore', weight: 55, min: 1, max: 3),
-        DropEntry('astral_shard', weight: 7),
-        DropEntry('astral_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('skyiron_ore', weight: 74, min: 1, max: 3),
+        DropEntry('astral_shard', weight: 5),
+        DropEntry('astral_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('pilgrims_ration', chance: 0.02)],
     ),
@@ -584,7 +584,8 @@ abstract final class StarfallBasinBestiary {
 
   // ---- shared tables --------------------------------------------------
 
-  /// ⭐ One guaranteed Shard, a handful of Dust, and a **quarter chance** at
+  /// ⭐ One guaranteed Shard, a handful of Dust, and a **15% chance** (a
+  /// quarter until the 2026-09-30 lean) at
   /// the zone's first Crystal — the mote ladder's first real step, and it is
   /// a fight the player chose (ITEMS §8). ⚠️ `zodiac_pendant` is the rare
   /// chase and sits at weight 5 of 100: rare enough to be a chase, common
@@ -592,8 +593,8 @@ abstract final class StarfallBasinBestiary {
   static const _miniDrops = DropTable(
     always: [
       DropEntry('astral_shard'),
-      DropEntry('astral_dust', min: 2, max: 4),
-      DropEntry('astral_crystal', chance: 0.25),
+      DropEntry('astral_dust', min: 1, max: 3),
+      DropEntry('astral_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('skyiron_ore', weight: 40, min: 2, max: 4),
@@ -614,7 +615,7 @@ abstract final class StarfallBasinBestiary {
       DropEntry('astral_essence'),
       DropEntry('astral_crystal', min: 1, max: 2),
       DropEntry('astral_shard', min: 1, max: 2),
-      DropEntry('astral_dust', min: 4, max: 8),
+      DropEntry('astral_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('skyiron_ore', weight: 45, min: 4, max: 8),

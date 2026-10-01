@@ -631,10 +631,10 @@ abstract final class SealedGardenBestiary {
   static const _hideCommon = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 30),
-      DropEntry('thornpenitent_hide', weight: 40),
-      DropEntry('flora_shard', weight: 8, min: 1, max: 2),
-      DropEntry('flora_dust', weight: 17, min: 2, max: 3),
+      DropEntry.nothing(weight: 15),
+      DropEntry('thornpenitent_hide', weight: 64),
+      DropEntry('flora_shard', weight: 5, min: 1, max: 2),
+      DropEntry('flora_dust', weight: 11, min: 2, max: 3),
       DropEntry('climbers_ration', weight: 5),
     ],
   );
@@ -647,10 +647,10 @@ abstract final class SealedGardenBestiary {
   static const _materialCommon = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 25),
-      DropEntry('worldroot', weight: 55, min: 1, max: 3),
-      DropEntry('sanctus_shard', weight: 7),
-      DropEntry('sanctus_dust', weight: 13, min: 1, max: 2),
+      DropEntry.nothing(weight: 12),
+      DropEntry('worldroot', weight: 74, min: 1, max: 3),
+      DropEntry('sanctus_shard', weight: 5),
+      DropEntry('sanctus_dust', weight: 9, min: 1, max: 2),
     ],
     bonus: [DropEntry('climbers_ration', chance: 0.02)],
   );
@@ -662,8 +662,8 @@ abstract final class SealedGardenBestiary {
   static const _siphonCommon = DropTable(
     always: _commonAlways,
     main: [
-      DropEntry.nothing(weight: 40),
-      DropEntry('orchard_amber', weight: 45),
+      DropEntry.nothing(weight: 20),
+      DropEntry('orchard_amber', weight: 65),
       DropEntry('worldroot_tonic', weight: 15),
     ],
   );
@@ -674,10 +674,10 @@ abstract final class SealedGardenBestiary {
     always: [
       DropEntry('flora_shard'),
       DropEntry('sanctus_shard'),
-      DropEntry('flora_dust', min: 2, max: 4),
-      DropEntry('sanctus_dust', min: 2, max: 4),
-      DropEntry('flora_crystal', chance: 0.25),
-      DropEntry('sanctus_crystal', chance: 0.25),
+      DropEntry('flora_dust', min: 1, max: 3),
+      DropEntry('sanctus_dust', min: 1, max: 3),
+      DropEntry('flora_crystal', chance: 0.15),
+      DropEntry('sanctus_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('thornpenitent_hide', weight: 35, min: 2, max: 4),
@@ -701,8 +701,8 @@ abstract final class SealedGardenBestiary {
       DropEntry('sanctus_crystal', min: 1, max: 2),
       DropEntry('flora_shard', min: 1, max: 2),
       DropEntry('sanctus_shard', min: 1, max: 2),
-      DropEntry('flora_dust', min: 4, max: 8),
-      DropEntry('sanctus_dust', min: 4, max: 8),
+      DropEntry('flora_dust', min: 3, max: 6),
+      DropEntry('sanctus_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('thornpenitent_hide', weight: 35, min: 4, max: 8),

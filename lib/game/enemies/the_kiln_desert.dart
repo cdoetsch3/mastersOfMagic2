@@ -113,10 +113,10 @@ abstract final class KilnDesertBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('glasswort', weight: 45),
-        DropEntry('solar_shard', weight: 7),
-        DropEntry('solar_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('glasswort', weight: 69),
+        DropEntry('solar_shard', weight: 5),
+        DropEntry('solar_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -160,8 +160,8 @@ abstract final class KilnDesertBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('glasswort', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('glasswort', weight: 65),
         DropEntry('pilgrims_ration', weight: 15),
       ],
     ),
@@ -209,10 +209,10 @@ abstract final class KilnDesertBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('ironwood_log', weight: 55, min: 1, max: 3),
-        DropEntry('solar_shard', weight: 7),
-        DropEntry('solar_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('ironwood_log', weight: 74, min: 1, max: 3),
+        DropEntry('solar_shard', weight: 5),
+        DropEntry('solar_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('pilgrims_ration', chance: 0.02)],
     ),
@@ -222,6 +222,13 @@ abstract final class KilnDesertBestiary {
   /// the noon. ⚠️ The only common with no material role at all (ENEMIES
   /// §2e's roster: `mote` alone), so its table is the mote ladder and the
   /// empty slot, nothing else. A mirage does not leave anything behind.
+  ///
+  /// ⚠️ **The 2026-09-30 lean left this table alone, on purpose** (Christian,
+  /// same day): the lean exists to favour craftables, and a table with none
+  /// has nothing to lean into. It is the one common `main` still at its
+  /// authored 45/15/40. ⚠️ And "nothing behind" is no longer literal: an
+  /// empty roll is consoled with one Solar Dust (`consolationOf` — no
+  /// craftable in `main`, so the first `always` entry).
   static const mirage = EnemyDef(
     id: 'mirage',
     name: 'Mirage',
@@ -293,10 +300,10 @@ abstract final class KilnDesertBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('glasswort', weight: 45),
-        DropEntry('solar_shard', weight: 7),
-        DropEntry('solar_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('glasswort', weight: 69),
+        DropEntry('solar_shard', weight: 5),
+        DropEntry('solar_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -570,8 +577,8 @@ abstract final class KilnDesertBestiary {
   static const _miniDrops = DropTable(
     always: [
       DropEntry('solar_shard'),
-      DropEntry('solar_dust', min: 2, max: 4),
-      DropEntry('solar_crystal', chance: 0.25),
+      DropEntry('solar_dust', min: 1, max: 3),
+      DropEntry('solar_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('ironwood_log', weight: 40, min: 2, max: 4),
@@ -590,7 +597,7 @@ abstract final class KilnDesertBestiary {
       DropEntry('solar_essence'),
       DropEntry('solar_crystal', min: 1, max: 2),
       DropEntry('solar_shard', min: 1, max: 2),
-      DropEntry('solar_dust', min: 4, max: 8),
+      DropEntry('solar_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('ironwood_log', weight: 45, min: 4, max: 8),

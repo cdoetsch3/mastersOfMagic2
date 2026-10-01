@@ -71,10 +71,10 @@ abstract final class CinderpeakBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('tuskhide', weight: 55, min: 1, max: 3),
-        DropEntry('pyro_shard', weight: 7),
-        DropEntry('pyro_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('tuskhide', weight: 74, min: 1, max: 3),
+        DropEntry('pyro_shard', weight: 5),
+        DropEntry('pyro_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -110,10 +110,10 @@ abstract final class CinderpeakBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('copper_ore', weight: 45),
-        DropEntry('pyro_shard', weight: 5),
-        DropEntry('pyro_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 20),
+        DropEntry('copper_ore', weight: 70),
+        DropEntry('pyro_shard', weight: 3),
+        DropEntry('pyro_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -151,10 +151,10 @@ abstract final class CinderpeakBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('copper_ore', weight: 50, min: 1, max: 2),
-        DropEntry('pyro_shard', weight: 5),
-        DropEntry('pyro_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('copper_ore', weight: 73, min: 1, max: 2),
+        DropEntry('pyro_shard', weight: 3),
+        DropEntry('pyro_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -192,11 +192,11 @@ abstract final class CinderpeakBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('copper_ore', weight: 40),
+        DropEntry.nothing(weight: 15),
+        DropEntry('copper_ore', weight: 64),
         // ⭐ Still the zone's mote-richest common — it just pays in Dust now.
-        DropEntry('pyro_shard', weight: 8, min: 1, max: 2),
-        DropEntry('pyro_dust', weight: 17, min: 2, max: 3),
+        DropEntry('pyro_shard', weight: 5, min: 1, max: 2),
+        DropEntry('pyro_dust', weight: 11, min: 2, max: 3),
         DropEntry('tuskhide', weight: 5),
       ],
     ),
@@ -235,10 +235,10 @@ abstract final class CinderpeakBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('copper_ore', weight: 50, min: 2, max: 3),
-        DropEntry('pyro_shard', weight: 7),
-        DropEntry('pyro_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 15),
+        DropEntry('copper_ore', weight: 71, min: 2, max: 3),
+        DropEntry('pyro_shard', weight: 5),
+        DropEntry('pyro_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -500,8 +500,8 @@ abstract final class CinderpeakBestiary {
       // zone's Shard income (see `whispering_woods.dart`'s _miniDrops). The
       // Dust is new — elevated ranks never dropped any.
       DropEntry('pyro_shard'),
-      DropEntry('pyro_dust', min: 2, max: 4),
-      DropEntry('pyro_crystal', chance: 0.25),
+      DropEntry('pyro_dust', min: 1, max: 3),
+      DropEntry('pyro_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('tuskhide', weight: 40, min: 2, max: 4),
@@ -520,7 +520,7 @@ abstract final class CinderpeakBestiary {
     always: [
       DropEntry('pyro_crystal', min: 1, max: 2),
       DropEntry('pyro_shard', min: 1, max: 2),
-      DropEntry('pyro_dust', min: 4, max: 8),
+      DropEntry('pyro_dust', min: 3, max: 6),
       // ⭐ The gate item. The third of Hearthwood's "three ordinary proofs",
       // and the one that completes the set.
       DropEntry('proof_of_the_foothills'),

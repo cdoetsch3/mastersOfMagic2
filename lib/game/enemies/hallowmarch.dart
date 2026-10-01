@@ -77,10 +77,10 @@ const _commonAlways = [DropEntry('sanctus_dust', chance: 0.75, min: 1, max: 2)];
 const _materialA = DropTable(
   always: _commonAlways,
   main: [
-    DropEntry.nothing(weight: 25),
-    DropEntry('spiritwood_log', weight: 55, min: 1, max: 3),
-    DropEntry('sanctus_shard', weight: 7),
-    DropEntry('sanctus_dust', weight: 13, min: 1, max: 2),
+    DropEntry.nothing(weight: 12),
+    DropEntry('spiritwood_log', weight: 74, min: 1, max: 3),
+    DropEntry('sanctus_shard', weight: 5),
+    DropEntry('sanctus_dust', weight: 9, min: 1, max: 2),
   ],
   bonus: [DropEntry('climbers_ration', chance: 0.02)],
 );
@@ -90,10 +90,10 @@ const _materialA = DropTable(
 const _materialB = DropTable(
   always: _commonAlways,
   main: [
-    DropEntry.nothing(weight: 30),
-    DropEntry('goldenrood', weight: 50, min: 1, max: 2),
-    DropEntry('sanctus_shard', weight: 8, min: 1, max: 2),
-    DropEntry('sanctus_dust', weight: 12, min: 2, max: 3),
+    DropEntry.nothing(weight: 15),
+    DropEntry('goldenrood', weight: 72, min: 1, max: 2),
+    DropEntry('sanctus_shard', weight: 5, min: 1, max: 2),
+    DropEntry('sanctus_dust', weight: 8, min: 2, max: 3),
   ],
 );
 
@@ -105,8 +105,8 @@ const _materialB = DropTable(
 const _drudgeDrops = DropTable(
   always: _commonAlways,
   main: [
-    DropEntry.nothing(weight: 40),
-    DropEntry('goldenrood', weight: 45),
+    DropEntry.nothing(weight: 20),
+    DropEntry('goldenrood', weight: 65),
     DropEntry('climbers_ration', weight: 15),
   ],
 );
@@ -580,14 +580,15 @@ abstract final class HallowmarchBestiary {
   // ---- shared tables --------------------------------------------------
 
   /// ⭐ §4.1's mini table. Crystal — the mote ladder's first real step — is a
-  /// quarter chance here and guaranteed on a boss, so the ladder is felt as a
+  /// 15% chance here (a quarter until the 2026-09-30 lean) and guaranteed on
+  /// a boss, so the ladder is felt as a
   /// fight the player chose (ITEMS §8). ⚠️ `votive_pendant` at 5 is the
   /// zone's rare chase and the only rarity above `uncommon` a mini hands out.
   static const _miniDrops = DropTable(
     always: [
       DropEntry('sanctus_shard'),
-      DropEntry('sanctus_dust', min: 2, max: 4),
-      DropEntry('sanctus_crystal', chance: 0.25),
+      DropEntry('sanctus_dust', min: 1, max: 3),
+      DropEntry('sanctus_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('spiritwood_log', weight: 40, min: 2, max: 4),
@@ -610,7 +611,7 @@ abstract final class HallowmarchBestiary {
       DropEntry('the_kept_third'),
       DropEntry('sanctus_crystal', min: 1, max: 2),
       DropEntry('sanctus_shard', min: 1, max: 2),
-      DropEntry('sanctus_dust', min: 4, max: 8),
+      DropEntry('sanctus_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('spiritwood_log', weight: 45, min: 4, max: 8),

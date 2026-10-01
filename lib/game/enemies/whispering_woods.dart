@@ -63,8 +63,8 @@ abstract final class WhisperingWoodsBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 40),
-        DropEntry('bindweed_fibre', weight: 45),
+        DropEntry.nothing(weight: 20),
+        DropEntry('bindweed_fibre', weight: 65),
         DropEntry('foragers_ration', weight: 15),
       ],
     ),
@@ -100,10 +100,10 @@ abstract final class WhisperingWoodsBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('bindweed_fibre', weight: 50, min: 1, max: 2),
-        DropEntry('flora_shard', weight: 5),
-        DropEntry('flora_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('bindweed_fibre', weight: 73, min: 1, max: 2),
+        DropEntry('flora_shard', weight: 3),
+        DropEntry('flora_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -139,11 +139,11 @@ abstract final class WhisperingWoodsBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('bindweed_fibre', weight: 40),
+        DropEntry.nothing(weight: 15),
+        DropEntry('bindweed_fibre', weight: 64),
         // ⭐ Still the zone's mote-richest common — it just pays in Dust now.
-        DropEntry('flora_shard', weight: 8, min: 1, max: 2),
-        DropEntry('flora_dust', weight: 17, min: 2, max: 3),
+        DropEntry('flora_shard', weight: 5, min: 1, max: 2),
+        DropEntry('flora_dust', weight: 11, min: 2, max: 3),
         DropEntry('foragers_ration', weight: 5),
       ],
     ),
@@ -179,10 +179,10 @@ abstract final class WhisperingWoodsBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('bindweed_fibre', weight: 50, min: 2, max: 3),
-        DropEntry('flora_shard', weight: 7),
-        DropEntry('flora_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 15),
+        DropEntry('bindweed_fibre', weight: 71, min: 2, max: 3),
+        DropEntry('flora_shard', weight: 5),
+        DropEntry('flora_dust', weight: 9, min: 1, max: 2),
       ],
     ),
   );
@@ -218,10 +218,10 @@ abstract final class WhisperingWoodsBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('oak_log', weight: 55, min: 1, max: 3),
-        DropEntry('flora_shard', weight: 7),
-        DropEntry('flora_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('oak_log', weight: 74, min: 1, max: 3),
+        DropEntry('flora_shard', weight: 5),
+        DropEntry('flora_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('oak_circlet', chance: 0.02)],
     ),
@@ -461,8 +461,8 @@ abstract final class WhisperingWoodsBestiary {
   static const _miniDrops = DropTable(
     always: [
       DropEntry('flora_shard'),
-      DropEntry('flora_dust', min: 2, max: 4),
-      DropEntry('flora_crystal', chance: 0.25),
+      DropEntry('flora_dust', min: 1, max: 3),
+      DropEntry('flora_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('oak_log', weight: 40, min: 2, max: 4),
@@ -476,7 +476,7 @@ abstract final class WhisperingWoodsBestiary {
     always: [
       DropEntry('flora_crystal', min: 1, max: 2),
       DropEntry('flora_shard', min: 1, max: 2),
-      DropEntry('flora_dust', min: 4, max: 8),
+      DropEntry('flora_dust', min: 3, max: 6),
       // ⭐ The gate item. One of Hearthwood's "three ordinary proofs".
       DropEntry('proof_of_the_woods'),
     ],

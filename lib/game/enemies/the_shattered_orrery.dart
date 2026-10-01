@@ -123,10 +123,10 @@ abstract final class ShatteredOrreryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 30),
-        DropEntry('sidereal_glass', weight: 40),
-        DropEntry('astral_shard', weight: 8, min: 1, max: 2),
-        DropEntry('astral_dust', weight: 17, min: 2, max: 3),
+        DropEntry.nothing(weight: 15),
+        DropEntry('sidereal_glass', weight: 64),
+        DropEntry('astral_shard', weight: 5, min: 1, max: 2),
+        DropEntry('astral_dust', weight: 11, min: 2, max: 3),
         DropEntry('arcsalt_draught', weight: 5),
       ],
     ),
@@ -166,10 +166,10 @@ abstract final class ShatteredOrreryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('arcsalt', weight: 50, min: 1, max: 2),
-        DropEntry('astral_shard', weight: 5),
-        DropEntry('astral_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('arcsalt', weight: 73, min: 1, max: 2),
+        DropEntry('astral_shard', weight: 3),
+        DropEntry('astral_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -214,10 +214,10 @@ abstract final class ShatteredOrreryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('orrery_scrap', weight: 55, min: 1, max: 3),
-        DropEntry('electro_shard', weight: 7),
-        DropEntry('electro_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('orrery_scrap', weight: 74, min: 1, max: 3),
+        DropEntry('electro_shard', weight: 5),
+        DropEntry('electro_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('pilgrims_ration', chance: 0.02)],
     ),
@@ -257,10 +257,10 @@ abstract final class ShatteredOrreryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 35),
-        DropEntry('arcsalt', weight: 50, min: 1, max: 2),
-        DropEntry('astral_shard', weight: 5),
-        DropEntry('astral_dust', weight: 10, min: 1, max: 2),
+        DropEntry.nothing(weight: 17),
+        DropEntry('arcsalt', weight: 73, min: 1, max: 2),
+        DropEntry('astral_shard', weight: 3),
+        DropEntry('astral_dust', weight: 7, min: 1, max: 2),
       ],
     ),
   );
@@ -300,10 +300,10 @@ abstract final class ShatteredOrreryBestiary {
     drops: DropTable(
       always: _commonAlways,
       main: [
-        DropEntry.nothing(weight: 25),
-        DropEntry('orrery_scrap', weight: 55, min: 1, max: 3),
-        DropEntry('electro_shard', weight: 7),
-        DropEntry('electro_dust', weight: 13, min: 1, max: 2),
+        DropEntry.nothing(weight: 12),
+        DropEntry('orrery_scrap', weight: 74, min: 1, max: 3),
+        DropEntry('electro_shard', weight: 5),
+        DropEntry('electro_dust', weight: 9, min: 1, max: 2),
       ],
       bonus: [DropEntry('pilgrims_ration', chance: 0.02)],
     ),
@@ -582,10 +582,10 @@ abstract final class ShatteredOrreryBestiary {
     always: [
       DropEntry('astral_shard'),
       DropEntry('electro_shard'),
-      DropEntry('astral_dust', min: 2, max: 4),
-      DropEntry('electro_dust', min: 2, max: 4),
-      DropEntry('astral_crystal', chance: 0.25),
-      DropEntry('electro_crystal', chance: 0.25),
+      DropEntry('astral_dust', min: 1, max: 3),
+      DropEntry('electro_dust', min: 1, max: 3),
+      DropEntry('astral_crystal', chance: 0.15),
+      DropEntry('electro_crystal', chance: 0.15),
     ],
     main: [
       DropEntry('orrery_scrap', weight: 40, min: 2, max: 4),
@@ -605,8 +605,8 @@ abstract final class ShatteredOrreryBestiary {
       DropEntry('electro_crystal', min: 1, max: 2),
       DropEntry('astral_shard', min: 1, max: 2),
       DropEntry('electro_shard', min: 1, max: 2),
-      DropEntry('astral_dust', min: 4, max: 8),
-      DropEntry('electro_dust', min: 4, max: 8),
+      DropEntry('astral_dust', min: 3, max: 6),
+      DropEntry('electro_dust', min: 3, max: 6),
     ],
     main: [
       DropEntry('orrery_scrap', weight: 35, min: 4, max: 8),
