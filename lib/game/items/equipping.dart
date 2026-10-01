@@ -136,12 +136,13 @@ abstract final class Equipping {
   /// screen and not another. Only non-zero lines are emitted (the export
   /// makes the same choice, for the same reason).
   ///
-  /// [base] is the definition's own, un-rolled modifiers — the item dialog
-  /// passes it so a quality-scaled line can show where it started (see
-  /// [potencyLine]). ⚠️ Only consumable potency reads it today: it is the one
-  /// belt number quality moves (ruling 2026-09-25), and a Master belt that
-  /// printed only '+14%' would hide the roll that made it.
-  static List<String> describe(ItemModifiers m, {ItemModifiers? base}) => [
+  ///
+  /// 📝 Ruling 2026-09-30: the rolled number ONLY. Until then the dialog
+  /// passed the definition's modifiers alongside so a quality-scaled potency
+  /// line could read '(base 10%) +14%'; Christian asked for the parenthesis
+  /// to go — the Value line already teaches that quality moves a belt, and
+  /// the worked example under the stats shows the roll in use.
+  static List<String> describe(ItemModifiers m) => [
     if (m.maxHpBonus != 0) '+${m.maxHpBonus} max health',
     if (m.damagePerCast != 0) '+${m.damagePerCast} damage per cast',
     if (m.damagePerCharge != 0) '+${m.damagePerCharge} damage per charge spent',
@@ -158,24 +159,17 @@ abstract final class Equipping {
     if (m.regrowPercent != 0) 'Regrow ${m.regrowPercent}% health each turn',
     if (m.beltSlots != 0) '+${m.beltSlots} belt slots',
     if (m.consumablePotencyPercent != 0)
-      potencyLine(
-        m.consumablePotencyPercent,
-        base: base?.consumablePotencyPercent,
-      ),
+      potencyLine(m.consumablePotencyPercent),
   ];
 
-  /// The consumable-potency stat line (ruling 2026-09-25):
-  /// 'Consumable potency +14%', or — when the quality roll moved it off the
-  /// definition — 'Consumable potency (base 10%) +14%'.
+  /// The consumable-potency stat line: 'Consumable potency +14%'.
   ///
-  /// ⚠️ The base only rides along when it DIFFERS, the same rule the dialog's
-  /// Value line follows: a Standard belt reading '(base 10%) +10%' teaches
-  /// that quality moves potency by restating the same number.
-  static String potencyLine(int percent, {int? base}) {
+  /// ⚠️ The ROLLED number, with no '(base 10%)' beside it (ruling
+  /// 2026-09-30, reversing 2026-09-25's parenthesis). Quality's effect on a
+  /// belt is shown by the example line under the stats, not restated here.
+  static String potencyLine(int percent) {
     final signed = '${percent >= 0 ? '+' : ''}$percent%';
-    return base != null && base != percent
-        ? 'Consumable potency (base $base%) $signed'
-        : 'Consumable potency $signed';
+    return 'Consumable potency $signed';
   }
 
   /// The def id [potencyExample] quotes — the first Draught in the game.

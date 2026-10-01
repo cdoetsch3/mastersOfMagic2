@@ -54,9 +54,7 @@ Future<void> showItemDialog(
   // honest answer.
   final worn = Equipping.modifiersOf(def, instance);
   final lines = def is EquipmentDef
-      // ⭐ The definition rides along as `base` so a quality-scaled potency
-      // line can say where it started: '(base 10%) +14%' (ruling 2026-09-25).
-      ? Equipping.describe(worn, base: def.modifiers)
+      ? Equipping.describe(worn)
       : (def is Usable ? [(def as Usable).effect.describe] : const <String>[]);
   // ⭐ One worked example under a belt (ruling 2026-09-25) — null for
   // anything without potency, so a hat never grows the sentence.

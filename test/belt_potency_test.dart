@@ -323,16 +323,22 @@ void main() {
       expect(tester.takeException(), isNull, reason: 'lays out on a phone');
     }
 
-    testWidgets('⭐ a Master belt shows its potency, base and example', (
+    testWidgets('⭐ a Master belt shows its rolled potency and the example', (
       tester,
     ) async {
       await open(tester, 'fawnhide_belt', Quality.master);
       expect(
-        find.text('Consumable potency (base 10%) +14%'),
+        find.text('Consumable potency +14%'),
         findsOneWidget,
         reason:
-            'the rolled number with the definition beside it — a dialog '
-            'quoting only the base would disagree with the drink',
+            'the rolled number, bare (ruling 2026-09-30) — a dialog quoting '
+            'the base 10 would disagree with the drink, and one printing '
+            "'(base 10%) +14%' is the parenthesis Christian asked to drop",
+      );
+      expect(
+        find.textContaining('(base'),
+        findsNothing,
+        reason: 'no base parenthesis anywhere in the dialog',
       );
       expect(
         find.text('A Sapwort Draught heals 30 → 34 with this belt.'),
@@ -341,12 +347,12 @@ void main() {
       );
     });
 
-    testWidgets('a Standard belt shows no pointless base', (tester) async {
+    testWidgets('a Standard belt shows the same bare line', (tester) async {
       await open(tester, 'blankspine_belt', Quality.standard);
       expect(
         find.text('Consumable potency +30%'),
         findsOneWidget,
-        reason: "'(base 30%) +30%' would restate the same number",
+        reason: 'one format for every quality',
       );
       expect(
         find.text('A Sapwort Draught heals 30 → 39 with this belt.'),

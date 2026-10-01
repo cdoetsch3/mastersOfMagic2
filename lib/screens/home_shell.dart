@@ -185,7 +185,11 @@ class _BottomBar extends StatelessWidget {
       ),
       padding: const EdgeInsets.only(top: 6, bottom: 4),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        // ⭐ `start`, not `end` (ruling 2026-09-30): the raised Home button
+        // is the tallest cell, and bottom-aligning the four tabs beside it
+        // sank them to the very foot of the bar. Top-aligned, their icons
+        // sit level with the hat rather than under it.
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (var i = 0; i < _tabs.length; i++)
             Expanded(
