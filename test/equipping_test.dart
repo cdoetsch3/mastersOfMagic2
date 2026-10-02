@@ -110,9 +110,10 @@ void main() {
       expect(lines.single, isNot(contains('111')));
     });
 
-    // ✅ Re-ruled 2026-09-30 (base 5% / +100): §9b.8's "5% of 155%" is now
-    // 10% of 205% — the ring's +5 / +5 on the new base.
-    test('the Cinder Loop reads as 10% of 205% on the 2026-09-30 base', () {
+    // ✅ Re-ruled 2026-09-30 (base 5% / +100): §9b.8's "5% of 155%" became
+    // 10% of 205%. ✅ CORRECTED 2026-10-02: the damage base is +50 (150%), so
+    // the ring's +5 / +5 now reads 10% of 155%; the 5% chance stands.
+    test('the Cinder Loop reads as 10% of 155% on the 2026-10-02 base', () {
       final lines = Equipping.describeTotals(
         CinderpeakItems.cinderLoop.modifiers,
         level: 1,
@@ -126,10 +127,11 @@ void main() {
       );
       expect(
         lines,
-        contains('Crit damage 205% (+5)'),
+        contains('Crit damage 155% (+5)'),
         reason:
-            'a crit is 200% before gear — MageState.baseCritDamage is +100. '
-            'Kills the old typed 150 (155%)',
+            'a crit is 150% before gear (ruling 2026-10-02) — '
+            'MageState.baseCritDamage is +50. Kills the 2026-09-30 +100 base '
+            '(205%) and a base dropped from the total (5%)',
       );
     });
 
@@ -638,8 +640,15 @@ void main() {
         Equipping.baseCritDamagePercent,
         100 + MageState.baseCritDamage,
         reason:
-            'derived from the engine const — kills the old typed 150, '
-            'which would now disagree with the duel by half a hit',
+            'derived from the engine const — kills a typed copy, which '
+            'would disagree with the duel the moment the const is retuned',
+      );
+      expect(
+        Equipping.baseCritDamagePercent,
+        150,
+        reason:
+            '⚠️ the ruled figure (2026-10-02: a gearless crit deals 150%) — '
+            'kills a const left at the 2026-09-30 +100 (200)',
       );
     });
 

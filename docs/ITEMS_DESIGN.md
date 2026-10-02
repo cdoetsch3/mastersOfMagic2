@@ -1799,6 +1799,9 @@ none of the numbers.**
    **✅ RULED 2026-09-30: base 5% / +100%** — a crit now deals **200%** and every mage starts
    at **5%** crit chance; crit gear adds to both (`MageState.baseCritChance`
    / `baseCritDamage`). The Cinder Loop now reads 10% / 205%.
+   **✅ CORRECTED 2026-10-02: the damage base is +50 (150%); the 5% chance
+   stands** — a gearless crit deals 150% again (a 10-damage crit deals 15),
+   and the Cinder Loop reads 10% / 155%.
 5. ✅ **Q2's mechanics stay in Q2**: dodge, deflection, crit-as-a-lane, the
    Antidote, and offensive potions are all deliberately absent from Q1 so
    each quarter introduces something.
@@ -1834,7 +1837,9 @@ accuracy, crit, dodge and deflection — gear now feeds those rolls, and the
 engine gained the two flat-damage lanes (per cast, per charge spent, applied
 ONCE per cast, to the first hit). Crit lands exactly as ruled: engine base 50
 + item points, so the Cinder Loop reads 155%. *(✅ RULED 2026-09-30: base 5% / +100%: engine base
-now +100 and 5% chance, so the Cinder Loop reads 205% / 10%.)*
+now +100 and 5% chance, so the Cinder Loop reads 205% / 10%.)* *(✅ CORRECTED
+2026-10-02: the damage base is +50 (150%); the 5% chance stands — the Cinder
+Loop reads 155% / 10%.)*
 
 ### ✅ The engine side is in too (task #2, same day)
 

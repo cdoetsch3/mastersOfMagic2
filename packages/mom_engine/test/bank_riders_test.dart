@@ -348,10 +348,11 @@ void main() {
       expect(critOf(r), isTrue, reason: '29% is below the 30% line');
       expect(
         bruno.hp,
-        290 - 62,
+        290 - 47,
         reason:
-            'the min roll of 31 at the default +100% crit damage — ×2; the '
-            'old +50 base (×1.5) leaves 290 − 47',
+            'the min roll of 31 at the default +50% crit damage — ×1.5 '
+            '(ruling 2026-10-02: a gearless crit deals 150%); kills the '
+            '2026-09-30 +100 base (×2), which leaves 290 − 62',
       );
     });
 
@@ -392,22 +393,24 @@ void main() {
 
     test('⭐ a Heavyhand STANCE rides the guaranteed crit', () {
       // The same claim through the seam rather than the base field: Heavyhand
-      // contributes +30 crit damage, so the finisher hits for 31 x 2.3.
+      // contributes +30 crit damage, so the finisher hits for 31 x 1.8.
       bruno.hp = 290;
       final duel = engine(CountingRandom());
       cast(duel, Spellbook.heavyhand, MagicElement.geo);
       expect(
         alice.effectiveCritDamage,
         MageState.baseCritDamage + 30,
-        reason: '100 base + 30 stance',
+        reason: '50 base (ruling 2026-10-02) + 30 stance',
       );
       cast(duel, Spellbook.execute, MagicElement.geo);
       expect(
         bruno.hp,
-        290 - 71,
+        290 - 56,
         reason:
             'the stance reached the crit because the crit went through '
-            'the ordinary door',
+            'the ordinary door: 31 × 1.8 = 56 on the 150% base (ruling '
+            '2026-10-02); kills a stance that misses the crit (290 − 47) '
+            'and the 2026-09-30 +100 base (31 × 2.3, 290 − 71)',
       );
     });
 

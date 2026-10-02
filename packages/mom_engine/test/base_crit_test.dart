@@ -4,7 +4,11 @@ import 'package:mom_engine/mom_engine.dart';
 import 'package:test/test.dart';
 
 /// The base crit (ruling, Christian, playtest 2026-09-30, note 10): "Base crit
-/// chance should be 5%, base crit damage should be 100% (doubling)."
+/// chance should be 5%, base crit damage should be 100% (doubling)." —
+/// ✅ CORRECTED 2026-10-02 (a miscommunication): "I want the base crit damage
+/// to do 50% additional damage, which would be 150% as a base, not 200%. With
+/// no gear stats, I'd expect a 10 damage crit to do 15 damage." The 5% chance
+/// stands; the damage base is +50.
 ///
 /// ⭐ Every other engine test that asserts exact damage pins `critChance = 0`
 /// so a base crit cannot flake it. This file is the one that leaves the base
@@ -37,9 +41,10 @@ Spell _dmg(int amount) => Spell(
 );
 
 void main() {
-  /// One 20-damage hit from a DEFAULT mage (no crit gear, nothing pinned)
-  /// into a defender, on [rng]. Returns whether it crit and what is left.
-  (bool, int) hitOnce(Random rng) {
+  /// One [amount]-damage hit (20 unless told) from a DEFAULT mage (no crit
+  /// gear, nothing pinned) into a defender, on [rng]. Returns whether it crit
+  /// and what is left.
+  (bool, int) hitOnce(Random rng, {int amount = 20}) {
     final alice = MageState(name: 'Alice')..element = MagicElement.flora;
     final bruno = MageState(name: 'Bruno');
     final duel = DuelEngine(
@@ -50,14 +55,14 @@ void main() {
       baseMissPercent: 0,
     );
     final r = duel.resolveTurn(
-      CastAction(_dmg(20), MagicElement.flora),
+      CastAction(_dmg(amount), MagicElement.flora),
       const ForfeitAction(),
     );
     return (r.events.whereType<DamageEvent>().single.crit, bruno.hp);
   }
 
   group('a fresh mage', () {
-    test('⭐ starts at 5% crit chance and +100% crit damage', () {
+    test('⭐ starts at 5% crit chance and +50% crit damage', () {
       final m = MageState(name: 'Fresh');
       expect(
         m.critChance,
@@ -68,8 +73,10 @@ void main() {
       );
       expect(
         m.critDamage,
-        100,
-        reason: '⚠️ kills the pre-ruling +50 (a crit dealt 150%, not 200%)',
+        50,
+        reason:
+            '⚠️ kills the 2026-09-30 +100 (a crit dealt 200%) — ruling '
+            '2026-10-02: a gearless crit deals 150%',
       );
       expect(
         [MageState.baseCritChance, MageState.baseCritDamage],
@@ -80,14 +87,18 @@ void main() {
       );
       expect(
         [m.effectiveCritChance, m.effectiveCritDamage],
-        [5, 100],
-        reason: 'and the derived figures the duel reads start there too',
+        [5, 50],
+        reason:
+            'and the derived figures the duel reads start there too (the '
+            '150% base of ruling 2026-10-02) — kills a seam that drops or '
+            'doubles the base',
       );
     });
   });
 
   group('the base crit in a real duel', () {
-    test('⭐ seed 1: a gearless hit crits at the base and deals exactly 2×', () {
+    test('⭐ seed 1: a gearless hit crits at the base and deals exactly '
+        '1.5×', () {
       // ⭐ Found by search (2026-09-30): seed 1 is the first seed whose crit
       // roll lands under 5 for this hit. Seed 0, the control below, does not.
       final (crit, hp) = hitOnce(Random(1));
@@ -100,10 +111,28 @@ void main() {
       );
       expect(
         hp,
-        100 - 40,
+        100 - 30,
         reason:
-            '⚠️ kills the old +50 base: 20 × 1.5 = 30 leaves hp 70. The '
-            'ruling doubles it: 20 × 2 = 40',
+            '⚠️ kills the 2026-09-30 +100 base: 20 × 2 = 40 leaves hp 60. '
+            'Ruling 2026-10-02: a gearless crit deals 150%, 20 × 1.5 = 30',
+      );
+    });
+
+    test('⭐ the ruling\'s own example: a gearless 10-damage crit deals 15', () {
+      // Christian, 2026-10-02: "With no gear stats, I'd expect a 10 damage
+      // crit to do 15 damage." Seed 1 crits this hit too (same draw order).
+      final (crit, hp) = hitOnce(Random(1), amount: 10);
+      expect(
+        crit,
+        isTrue,
+        reason: '⚠️ kills a seed that stopped critting — the pin below is moot',
+      );
+      expect(
+        hp,
+        100 - 15,
+        reason:
+            '⚠️ the ruling verbatim (2026-10-02, 150%): kills the 2026-09-30 '
+            'doubling (20, hp 80) and a crit that adds nothing (10, hp 90)',
       );
     });
 

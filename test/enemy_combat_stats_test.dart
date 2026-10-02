@@ -102,7 +102,7 @@ void main() {
       expect(
         e.critDamage,
         MageState.baseCritDamage,
-        reason: 'unset critDamage must stay at the engine base (+100)',
+        reason: 'unset critDamage must stay at the engine base (+50, 150%)',
       );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 0);
@@ -120,7 +120,7 @@ void main() {
       expect(
         e.critDamage,
         MageState.baseCritDamage,
-        reason: 'unset critDamage must stay at the engine base (+100)',
+        reason: 'unset critDamage must stay at the engine base (+50, 150%)',
       );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 0);
@@ -140,7 +140,7 @@ void main() {
       expect(
         e.critDamage,
         MageState.baseCritDamage,
-        reason: 'unset critDamage must stay at the engine base (+100)',
+        reason: 'unset critDamage must stay at the engine base (+50, 150%)',
       );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 0);
@@ -177,7 +177,7 @@ void main() {
       expect(
         e.critDamage,
         MageState.baseCritDamage,
-        reason: 'unset critDamage must stay at the engine base (+100)',
+        reason: 'unset critDamage must stay at the engine base (+50, 150%)',
       );
       expect(e.deflectChance, 23, reason: 'the seam dropped deflectChance');
       expect(e.deflectAmount, 0);
@@ -195,7 +195,7 @@ void main() {
       expect(
         e.critDamage,
         MageState.baseCritDamage,
-        reason: 'unset critDamage must stay at the engine base (+100)',
+        reason: 'unset critDamage must stay at the engine base (+50, 150%)',
       );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 29, reason: 'the seam dropped deflectAmount');
@@ -262,7 +262,7 @@ void main() {
       expect(
         e.critDamage,
         MageState.baseCritDamage,
-        reason: 'the engine\'s own default (+100)',
+        reason: 'the engine\'s own default (+50, ruling 2026-10-02: 150%)',
       );
       expect(e.deflectChance, 0);
       expect(e.deflectAmount, 0);
@@ -388,7 +388,7 @@ void main() {
         ),
       );
       // ⚠️ Pinned: _ScriptedRandom's nextInt is always 0, so the player's
-      // 5% base crit (ruling 2026-09-30) would fire and double the hit.
+      // 5% base crit (ruling 2026-09-30) would fire and multiply the hit.
       final player = MageState(name: 'You', level: 1)..critChance = 0;
       final duel = DuelEngine(
         player,
@@ -420,8 +420,10 @@ void main() {
         );
         expect(
           enemy.critDamage,
-          120,
-          reason: '100 engine base + 20 archetype lean',
+          70,
+          reason:
+              '50 engine base (ruling 2026-10-02: a gearless crit deals '
+              '150%) + 20 archetype lean — kills the 2026-09-30 +100 (120)',
         );
         expect(
           enemy.powerScale,
@@ -445,10 +447,11 @@ void main() {
         );
         expect(
           before - player.hp,
-          44,
+          34,
           reason:
-              '20 × (100+120)/100 = 44 — the seam-carried crit lean landed on '
-              'the +100 base. Kills a dropped base (24) and the old +50 (34)',
+              '20 × (100+70)/100 = 34 — the seam-carried crit lean landed on '
+              'the +50 base (ruling 2026-10-02: 150%). Kills a dropped base '
+              '(24) and the 2026-09-30 +100 base (44)',
         );
       },
     );

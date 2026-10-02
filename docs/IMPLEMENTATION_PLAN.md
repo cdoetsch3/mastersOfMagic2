@@ -1223,7 +1223,8 @@ roll that pays nothing pays the table's main craftable; minis roll 30% at
 rare+ zone gear (`miniGearChance`); a rare the table paid is never repeated
 by the rank roll; all 26 tables leaned (nothing halved, motes ×2/3, freed
 weight to the heaviest material; mini crystals 15%, boss dust 3–6). 10.
-Crit base 5% / +100% (`MageState.baseCritChance/baseCritDamage`). 1. Map:
+Crit base 5% / +100% (`MageState.baseCritChance/baseCritDamage`) (damage
+base corrected to +50 on 2026-10-02). 1. Map:
 nine roads out (tier 1 rule + tier 2 hub trims; 38 stay). 9. Rowan tier 3 /
 Yew tier 4 (logs re-tiered, nothing moves). 6. Priorities: 51 off-ladder moves, all
 attacks — 28 one-charge countdown jabs to 5, 23 heavy attacks to 9 (an

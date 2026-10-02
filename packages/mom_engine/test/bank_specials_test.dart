@@ -367,7 +367,8 @@ void main() {
         80,
         reason:
             '⚠️ kills the missing blank: a 100%-crit attacker otherwise '
-            'lands 20 × 2 = 40 at the +100 base (hp 60)',
+            'lands 20 × 1.5 = 30 at the +50 base (ruling 2026-10-02: a '
+            'gearless crit deals 150%) (hp 70)',
       );
     });
 
@@ -420,10 +421,11 @@ void main() {
       );
       expect(
         alice.effectiveCritDamage,
-        140,
+        90,
         reason:
-            '100 base (MageState.baseCritDamage) + 40 — kills a grant that '
-            'never reaches the seam (100) and the old +50 base (90)',
+            '50 base (MageState.baseCritDamage, ruling 2026-10-02: a '
+            'gearless crit deals 150%) + 40 — kills a grant that never '
+            'reaches the seam (50) and the 2026-09-30 +100 base (140)',
       );
       expect(
         only<KeenStatus>(alice).turnsLeft,
@@ -490,7 +492,12 @@ void main() {
   // Death Wish — the desperation stance
   // ======================================================================
   group('Death Wish', () {
-    void attackAt(int aliceHp, {bool composed = false, required int expectHp}) {
+    void attackAt(
+      int aliceHp, {
+      bool composed = false,
+      required int expectHp,
+      String why = '',
+    }) {
       alice.statuses.add(DeathWishStatus(turns: 10));
       if (composed) bruno.statuses.add(ComposureStatus(turns: 25));
       alice.hp = aliceHp;
@@ -499,13 +506,20 @@ void main() {
       expect(
         bruno.hp,
         expectHp,
-        reason: 'alice at $aliceHp hp, composed: $composed',
+        reason: 'alice at $aliceHp hp, composed: $composed$why',
       );
     }
 
     test('⭐ it always crits below 25% of the holder\'s own max health', () {
-      // 20 × 2 at the +100 base crit damage (ruling 2026-09-30).
-      attackAt(24, expectHp: 60);
+      // 20 × 1.5 at the +50 base crit damage (ruling 2026-10-02).
+      attackAt(
+        24,
+        expectHp: 70,
+        why:
+            ' — 20 × 1.5 = 30 at the +50 base (ruling 2026-10-02: a gearless '
+            'crit deals 150%); kills no crit (hp 80) and the 2026-09-30 '
+            'doubling (hp 60)',
+      );
     });
 
     test('⭐ …and does nothing AT 25%, or above it', () {
@@ -558,11 +572,12 @@ void main() {
       castBy(duel, alice, dmg(20));
       expect(
         bruno.hp,
-        60,
+        70,
         reason:
             '⚠️ kills a guarantee that still rolls: that draws the 60 for '
             'the crit, leaving the deflect to read 0 < 50 and soften the '
-            '40-damage crit to 20 (hp 80)',
+            '30-damage crit (20 × 1.5, the 150% base of ruling 2026-10-02) '
+            'to 15 (hp 85)',
       );
     });
 

@@ -220,8 +220,9 @@ void main() {
     );
   });
 
-  /// ⭐ Ruling 2026-09-30 (base crit 5% / +100): the guide states the base,
-  /// and states it from the engine's consts rather than a typed copy.
+  /// ⭐ Ruling 2026-09-30 (base crit 5%), damage half corrected 2026-10-02
+  /// (+50, a gearless crit deals 150%): the guide states the base, and states
+  /// it from the engine's consts rather than a typed copy.
   testWidgets('the gameplay guide states the base crit from the engine', (
     tester,
   ) async {
@@ -229,19 +230,31 @@ void main() {
       GameplayGuideScreen.critRule,
       allOf(
         contains('${MageState.baseCritChance}% chance to crit'),
-        contains('doubles the damage'),
+        contains(
+          'deals half again the damage (${100 + MageState.baseCritDamage}%)',
+        ),
+        isNot(contains('doubles')),
         contains('crit gear adds to both'),
       ),
       reason:
           '⚠️ kills a sentence typed without the const (a stale "5%" would '
-          'survive a retune) and the old 150% wording',
+          'survive a retune) and the 2026-09-30 "doubles the damage" wording '
+          'the 2026-10-02 ruling (150%) corrected',
+    );
+    expect(
+      GameplayGuideScreen.critRule,
+      contains('(150%)'),
+      reason:
+          '⚠️ the ruled figure itself (2026-10-02: a gearless crit deals '
+          '150%) — kills a const left at the 2026-09-30 +100 (200%)',
     );
     expect(
       MageState.baseCritDamage,
-      100,
+      50,
       reason:
-          '"doubles" is only honest at +100 — the const conditional in '
-          'critRule falls back to a percentage otherwise',
+          '"half again" is only honest at +50 (ruling 2026-10-02, 150%) — '
+          'the const conditional in critRule falls back to a percentage '
+          'otherwise',
     );
 
     await tester.binding.setSurfaceSize(const Size(400, 800));

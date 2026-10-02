@@ -380,13 +380,15 @@ void main() {
         baseMissPercent: 0,
       );
       cast(duel, dmg(20));
-      // 100 base + 30 = 130% crit bonus → 20 × 2.3 = 46.
+      // 50 base (ruling 2026-10-02, a gearless crit deals 150%) + 30 = 80%
+      // crit bonus → 20 × 1.8 = 36.
       expect(
         bruno.hp,
-        54,
+        64,
         reason:
-            '⚠️ kills reading the stored critChance (0 → no crit, hp 80) '
-            'and the stored critDamage (100 → hp 60)',
+            '⚠️ kills reading the stored critChance (0 → no crit, hp 80), '
+            'the stored critDamage (50 → hp 70), and the 2026-09-30 +100 '
+            'base the 2026-10-02 ruling corrected to 150% (130 → hp 54)',
       );
     });
 

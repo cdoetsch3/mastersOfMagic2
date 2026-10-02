@@ -340,8 +340,8 @@ abstract final class Equipping {
   /// reads moves with it.
   static const int baseHitPercent = 100 - ElementTuning.baseMissPercent;
 
-  /// What a crit deals with no crit-damage gear: 200% of the hit (ruling
-  /// 2026-09-30, up from 150%).
+  /// What a crit deals with no crit-damage gear: 150% of the hit (ruling
+  /// 2026-10-02, correcting the 2026-09-30 ruling's 200%).
   ///
   /// ⭐ **Derived, never typed twice** — the 100% a normal hit deals plus
   /// [MageState.baseCritDamage], the engine's own const. Retune the engine

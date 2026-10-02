@@ -25,7 +25,7 @@ class EnemyCombatStats {
   final int critChance;
 
   /// Extra crit damage, in percent, ADDED to the engine's
-  /// `MageState.baseCritDamage` (+100, so a plain crit doubles the hit). A
+  /// `MageState.baseCritDamage` (+50, so a plain crit deals 150%). A
   /// negative value makes this creature's crits gentler than the base.
   final int critDamage;
 

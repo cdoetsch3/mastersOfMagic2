@@ -99,7 +99,9 @@ void main() {
       // finding for the ladder's owner; the blunder gradient was re-spread
       // the same day (spread A, `_blunderRate`) and 4 over 3 reads 53.4% on
       // the wide ruler. The re-measure stays: the narrow ruler is still
-      // ±1.2 against steps of 2–4 points.
+      // ±1.2 against steps of 2–4 points. ✅ CORRECTED 2026-10-02: the base
+      // crit damage is +50 (×1.5), not ×2; 4 over 3 reads 53.8% on the wide
+      // ruler and the lowest step is 8 over 7 at 51.8%.
       final wideSeeds = [for (var i = 0; i < 40; i++) 1000 + i * 13];
       final failures = <String>[];
       for (var low = 1; low < 10; low++) {
@@ -171,7 +173,10 @@ void main() {
       // 80,000 duels the step went 60.3% → 59.5%, and this 6-seed ruler
       // reads 59.4%. The step still clears every other floor here by miles;
       // 📝 whether rung 3 needs a retune to win back the point is the
-      // ladder owner's call, not this test's.
+      // ladder owner's call, not this test's. ✅ CORRECTED 2026-10-02: the
+      // base crit damage went back to +50 (×1.5) and the step recovered —
+      // 60.3% at 80,000 duels, 61.1% on this 6-seed ruler. The 59 floor is
+      // left where it is (the ruling did not ask for a ladder retune).
       for (final (low, high, floor) in const [
         (1, 2, 65.0), // a habit beats flailing
         (2, 3, 59.0), // using the charge system at all

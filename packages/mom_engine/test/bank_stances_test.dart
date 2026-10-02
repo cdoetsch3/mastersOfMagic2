@@ -292,8 +292,10 @@ void main() {
       expect(alice.effectiveCritChance, 15);
       expect(
         alice.effectiveCritDamage,
-        130,
-        reason: 'the +100 base (ruling 2026-09-30) + Heavyhand\'s 30',
+        80,
+        reason:
+            'the +50 base (ruling 2026-10-02: a gearless crit deals 150%) '
+            '+ Heavyhand\'s 30 — kills the 2026-09-30 +100 base (130)',
       );
     });
 
@@ -454,18 +456,24 @@ void main() {
       castBy(alice, dmg(20));
       expect(
         bruno.hp,
-        60,
+        70,
         reason:
             '⚠️ THE mutant: reading the stored critChance leaves 0, the '
-            'roll is skipped entirely, and 20 lands flat (hp 80). 20 × 2 '
-            '= 40 is the crit at the +100 base',
+            'roll is skipped entirely, and 20 lands flat (hp 80). 20 × 1.5 '
+            '= 30 is the crit at the +50 base (ruling 2026-10-02: 150%)',
       );
     });
 
-    test('⭐ Heavyhand moves crit damage, on top of the base 100', () {
+    test('⭐ Heavyhand moves crit damage, on top of the base 50', () {
       alice.critChance = 100; // gear: something must be critting first
       castBy(alice, Spellbook.heavyhand);
-      expect(alice.effectiveCritDamage, 130);
+      expect(
+        alice.effectiveCritDamage,
+        80,
+        reason:
+            'the +50 base (ruling 2026-10-02: 150%) + 30 — kills a stance '
+            'that never reaches the seam (50) and the 2026-09-30 +100 (130)',
+      );
       expect(
         alice.critDamage,
         MageState.baseCritDamage,
@@ -476,11 +484,12 @@ void main() {
       castBy(alice, dmg(20));
       expect(
         bruno.hp,
-        54,
+        64,
         reason:
-            '⚠️ THE mutant: reading the stored critDamage gives 20 × 2 '
-            '= 40 (hp 60); replacing the base instead of adding to it gives '
-            '20 × 1.3 = 26 (hp 74). It ADDS: 20 × 2.3 = 46',
+            '⚠️ THE mutant: reading the stored critDamage gives 20 × 1.5 '
+            '= 30 (hp 70); replacing the base instead of adding to it gives '
+            '20 × 1.3 = 26 (hp 74). It ADDS: 20 × 1.8 = 36 on the 150% base '
+            '(ruling 2026-10-02; the 2026-09-30 +100 gave 46, hp 54)',
       );
     });
 
@@ -601,8 +610,11 @@ void main() {
       );
       expect(
         alice.effectiveCritDamage,
-        150,
-        reason: 'Overkill\'s +50 on the +100 base, still running at turn 20',
+        100,
+        reason:
+            'Overkill\'s +50 on the +50 base (ruling 2026-10-02: 150%), '
+            'still running at turn 20 — kills an expired stance (50) and '
+            'the 2026-09-30 +100 base (150)',
       );
     });
 
@@ -616,10 +628,11 @@ void main() {
       castBy(alice, dmg(20));
       expect(
         bruno.hp,
-        60,
+        70,
         reason:
-            '⚠️ hp 54 is a contribution still being summed after the '
-            'status was removed — a cached sum, not a derived one',
+            '⚠️ hp 64 is a contribution still being summed after the '
+            'status was removed — a cached sum, not a derived one. 20 × 1.5 '
+            '= 30 is the bare crit on the 150% base (ruling 2026-10-02)',
       );
     });
   });

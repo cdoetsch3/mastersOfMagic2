@@ -12,17 +12,18 @@ class GameplayGuideScreen extends StatelessWidget {
   const GameplayGuideScreen({super.key});
 
   /// The base-crit sentence in "Hits, crits and deflection" (ruling,
-  /// Christian 2026-09-30: "every hit has a 5% chance to crit; a crit doubles
-  /// the damage; crit gear adds to both").
+  /// Christian 2026-09-30: "every hit has a 5% chance to crit … crit gear adds
+  /// to both"; the damage half corrected 2026-10-02: "50% additional damage,
+  /// which would be 150% as a base, not 200%").
   ///
   /// ⭐ **Computed from the engine's consts, never typed** —
   /// [MageState.baseCritChance] and [MageState.baseCritDamage] — so a retuned
-  /// base cannot leave the guide quoting the old one. ⚠️ "doubles" is only
-  /// true at +100; the const conditional falls back to the plain percentage
-  /// the moment that stops being so, rather than letting the word lie.
+  /// base cannot leave the guide quoting the old one. ⚠️ "half again" is only
+  /// true at +50; the const conditional falls back to the plain percentage
+  /// the moment that stops being so, rather than letting the words lie.
   static const critRule =
       'every hit has a ${MageState.baseCritChance}% chance to crit; a crit '
-      '${MageState.baseCritDamage == 100 ? 'doubles the damage' : 'deals ${100 + MageState.baseCritDamage}% damage'}; '
+      '${MageState.baseCritDamage == 50 ? 'deals half again the damage (${100 + MageState.baseCritDamage}%)' : 'deals ${100 + MageState.baseCritDamage}% damage'}; '
       'crit gear adds to both';
 
   @override

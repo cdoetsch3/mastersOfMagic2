@@ -105,8 +105,8 @@ have an axis other than shields.
 |---|---|---|
 | **Accuracy** | spell (+ gear) | **100%** for every shipped spell · **can exceed 100%** |
 | **Dodge** | mage (gear) | 0% · subtracts from accuracy |
-| **Crit Chance** | mage (gear) | **0%** *(✅ RULED 2026-09-30: base 5% / +100% — every mage crits 5% before gear)* |
-| **Crit Damage** | mage (gear) | +50% *(the bonus when a crit lands)* *(✅ RULED 2026-09-30: base 5% / +100% — a crit doubles the hit)* |
+| **Crit Chance** | mage (gear) | **0%** *(✅ RULED 2026-09-30: base 5% / +100% — every mage crits 5% before gear)* *(✅ CORRECTED 2026-10-02: the damage base is +50 (150%); the 5% chance stands)* |
+| **Crit Damage** | mage (gear) | +50% *(the bonus when a crit lands)* *(✅ RULED 2026-09-30: base 5% / +100% — a crit doubles the hit)* *(✅ CORRECTED 2026-10-02: the damage base is +50 (150%); the 5% chance stands)* |
 | **Deflection Chance** | mage (gear) | 0% |
 | **Deflection Amount** | mage (gear) | — *(% of damage reduced on proc; **capped at 50% for players**)* |
 
@@ -121,6 +121,12 @@ percentage nudge.
 > creature — now starts at 5% crit chance and +100% crit damage, and gear or
 > an enemy kit ADDS to both. The numbers live in one place,
 > `MageState.baseCritChance` / `MageState.baseCritDamage`.
+>
+> **✅ CORRECTED 2026-10-02: the damage base is +50 (150%); the 5% chance
+> stands.** (Christian, correcting a miscommunication in the ruling above: "I
+> want the base crit damage to do 50% additional damage, which would be 150% as
+> a base, not 200%. With no gear stats, I'd expect a 10 damage crit to do 15
+> damage.") `MageState.baseCritDamage` is 50; `baseCritChance` stays 5.
 
 #### One hit roll, not two ⭐
 

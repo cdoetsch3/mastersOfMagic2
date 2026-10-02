@@ -233,8 +233,8 @@ class DuelController extends ChangeNotifier {
   /// this parameter existed.
   ///
   /// ⭐ **Crit starts at the engine's base for EVERYONE** (ruling 2026-09-30):
-  /// [MageState.baseCritChance] (5%) and [MageState.baseCritDamage] (+100,
-  /// a crit doubles the hit), with gear and an enemy's kit ADDED on top. So a
+  /// [MageState.baseCritChance] (5%) and [MageState.baseCritDamage] (+50, a
+  /// crit deals 150% — corrected 2026-10-02), with gear and an enemy's kit ADDED on top. So a
   /// Champion whose kit says `critChance: 20` crits 25% of the time, and a
   /// Q1 creature with no kit at all still crits 5% — the base is a property
   /// of being a mage, not of carrying gear.
@@ -265,8 +265,8 @@ class DuelController extends ChangeNotifier {
               MageState.baseCritChance +
               gear.critChance +
               combatStats.critChance
-          // ⭐ critDamage ADDS to the engine's +100 base, so Cinder Loop's 5
-          // points read 205% — an archetype's lean adds the same way.
+          // ⭐ critDamage ADDS to the engine's +50 base, so Cinder Loop's 5
+          // points read 155% — an archetype's lean adds the same way.
           ..critDamage =
               MageState.baseCritDamage +
               gear.critDamage +

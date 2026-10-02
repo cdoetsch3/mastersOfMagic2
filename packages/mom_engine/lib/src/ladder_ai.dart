@@ -156,6 +156,11 @@ class EnemyView {
 // 9v5 68.6, 10v1 92.5. The top steps thin a little (8v7, 10v9) because
 // the top rungs were always close in competence and the blunder gap was
 // carrying them; 2 and 3 are untouched (3v2 59.5 either way).
+// 📝 Re-measured 2026-10-02 when the base crit DAMAGE was corrected back to
+// +50 (×1.5; the 5% chance stands), same 40-seed × 1000-duel ruler: 2v1
+// 81.5, 3v2 60.3, 4v3 53.8, 5v4 54.3, 6v5 58.3, 7v6 54.9, 8v7 51.8, 9v8
+// 54.3, 10v9 52.7, 9v5 68.9, 10v1 92.4. Every step still climbs, so spread
+// A stays as is — the gentler crit gave back a little luck, not a reorder.
 const Map<int, double> _blunderRate = {
   2: 0.44,
   3: 0.27,

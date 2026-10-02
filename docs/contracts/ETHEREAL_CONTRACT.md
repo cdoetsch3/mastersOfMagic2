@@ -211,6 +211,9 @@ on deflect: taken = damage × (1 − deflectAmount/100)
 
 > **✅ RULED 2026-09-30: base 5% / +100%** — the `150` above is now `200` (a crit doubles the
 > hit), and crit chance starts at 5% before gear.
+>
+> **✅ CORRECTED 2026-10-02: the damage base is +50 (150%); the 5% chance
+> stands** — the `150` above is right again; only the 5% chance changed.
 
 ⚠️ **CELESTIAL §2.1a's accuracy ceiling and §2.1b's summing deflection both
 bind hardest here**, because this is the quarter where a player can wear the
@@ -408,7 +411,7 @@ two; The Unbuilt Stair in the main hand, so no off-hand):
 | Dodge | 6 | **7.5%** of incoming attacks miss outright — effective health **1,437** |
 | Accuracy | +19 | hit chance 80 → **99%**, i.e. **+23.8% throughput** |
 | Flat damage | +54 on a 4-charge cast | Ruin 491 → 545, **+11.0%** |
-| Crit | 24% × (50+54) | expected damage **×1.250** *(✅ RULED 2026-09-30: base 5% / +100%: computed on the old base; not recomputed)* |
+| Crit | 24% × (50+54) | expected damage **×1.250** *(✅ RULED 2026-09-30: base 5% / +100%: computed on the old base; not recomputed)* *(✅ CORRECTED 2026-10-02: the damage base is +50 (150%); the 5% chance stands — the +50 in this row is right again; only the 5% base chance is unaccounted for)* |
 | **Outgoing total** | | **×1.717** |
 | **Effective health total** | | **×1.420** |
 | **Effective combat power** | | **×2.44** |

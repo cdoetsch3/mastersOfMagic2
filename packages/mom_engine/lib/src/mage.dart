@@ -204,19 +204,24 @@ class MageState {
   /// Extra damage every crit deals before gear, archetype or status, in
   /// percent: a crit deals `100 + critDamage` percent of the hit.
   ///
-  /// ⭐ **The one place the number lives** (ruling, Christian 2026-09-30:
-  /// "base crit damage should be 100% (doubling)" — up from +50, i.e. 150%).
-  /// Gear and kits ADD points to it; the app derives its "Crit damage 200%"
-  /// panel base from it rather than restating it.
-  static const int baseCritDamage = 100;
+  /// ⭐ **The one place the number lives** (ruling, Christian 2026-10-02,
+  /// correcting a miscommunication in the 2026-09-30 ruling: "I want the base
+  /// crit damage to do 50% additional damage, which would be 150% as a base,
+  /// not 200%" — a gearless 10-damage crit deals 15). Gear and kits ADD
+  /// points to it; the app derives its "Crit damage 150%" panel base from it
+  /// rather than restating it.
+  ///
+  /// 📝 The 2026-09-30 ruling briefly set this to +100 (a doubling crit); only
+  /// the damage half was corrected — [baseCritChance] stays 5.
+  static const int baseCritDamage = 50;
 
   /// Chance this mage's attacks land a crit (percent, 0–100). Starts at
   /// [baseCritChance]; the app OVERWRITES it with base + gear + kit.
   int critChance = baseCritChance;
 
   /// Extra damage a crit deals, in percent (starts at [baseCritDamage], so a
-  /// plain crit doubles the hit). Inert without [critChance], which is the
-  /// natural brake on the pair.
+  /// plain crit deals half again the hit — 150%). Inert without
+  /// [critChance], which is the natural brake on the pair.
   int critDamage = baseCritDamage;
 
   /// Chance this mage deflects an incoming hit (percent, 0–100).

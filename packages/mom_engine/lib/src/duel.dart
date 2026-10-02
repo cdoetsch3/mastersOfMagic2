@@ -1161,8 +1161,8 @@ class DuelEngine {
       // build rolls nothing — ⚠️ but every mage starts at
       // [MageState.baseCritChance] (5%, ruling 2026-09-30), so only a mage
       // explicitly pinned to 0 skips the draw. The bonus is a multiplier atop
-      // the damage mods: `100 + critDamage` percent, i.e. ×2 at the
-      // [MageState.baseCritDamage] of +100.
+      // the damage mods: `100 + critDamage` percent, i.e. ×1.5 at the
+      // [MageState.baseCritDamage] of +50 (ruling 2026-10-02).
       // Both figures are derived per hit (Keen and Heavyhand contribute here);
       // crit has no global clamp — Execute and Death Wish are *meant* to reach
       // a guaranteed crit, and Composure is the counter, not a cap.

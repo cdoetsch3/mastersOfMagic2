@@ -315,12 +315,16 @@ on deflect: taken = damage × (1 − deflectAmount/100)           (player cap 50
 > **✅ RULED 2026-09-30: base 5% / +100%** — engine base critDamage is now **100** (a crit
 > doubles the hit) and every mage starts at **5%** critChance; gear and enemy
 > kits ADD to both, so a kit's `critChance: 20` crits 25%.
+>
+> **✅ CORRECTED 2026-10-02: the damage base is +50 (150%); the 5% chance
+> stands** — the `critDamage = 50` line above is right again; a kit's
+> `critDamage: 30` rides it to 180%.
 
 ⚠️ **Three inert-stat traps, and every one of them is easy to ship:**
 
 | Trap | Why |
 |---|---|
-| `critDamage` with `critChance == 0` | The engine guards on `critChance > 0`. A Bruiser given +25 crit damage and no chance crits never. ✅ ITEMS §4.1a says so; this contract pairs them everywhere. *(✅ RULED 2026-09-30: base 5% / +100%: no built mage has 0 chance any more — the Bruiser crits at the 5% base, so its +25 is no longer wholly inert. The pairing rule still stands for readable kits.)* |
+| `critDamage` with `critChance == 0` | The engine guards on `critChance > 0`. A Bruiser given +25 crit damage and no chance crits never. ✅ ITEMS §4.1a says so; this contract pairs them everywhere. *(✅ RULED 2026-09-30: base 5% / +100%: no built mage has 0 chance any more — the Bruiser crits at the 5% base, so its +25 is no longer wholly inert. The pairing rule still stands for readable kits.)* *(✅ CORRECTED 2026-10-02: the damage base is +50 (150%); the 5% chance stands — this note is unchanged by it.)* |
 | `deflectChance` with `deflectAmount == 0` | `taken = damage × (1 − 0)`. A deflect that reduces nothing is a proc message. **The same pairing rule applies** |
 | `deflectAmount` with `deflectChance == 0` | Never procs |
 

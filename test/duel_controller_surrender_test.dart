@@ -110,12 +110,15 @@ void main() {
       );
       expect(geared.player.accuracyBonus, 5);
       expect(geared.player.damagePerCharge, 1);
-      // ⭐ The ruling (2026-09-30): crit = 200% base + points. Engine base is
-      // +100, so the Cinder Loop's 5 points must read 105, never 5.
+      // ⭐ The ruling (2026-10-02, correcting 2026-09-30): crit = 150% base +
+      // points. Engine base is +50, so the Cinder Loop's 5 points must read
+      // 55, never 5.
       expect(
         geared.player.critDamage,
-        105,
-        reason: '⚠️ kills dropping the base (5) and the old +50 base (55)',
+        55,
+        reason:
+            '⚠️ kills dropping the base (5) and the 2026-09-30 +100 base '
+            '(105) — ruling 2026-10-02: a gearless crit deals 150%',
       );
       expect(
         geared.player.critChance,
@@ -165,12 +168,14 @@ void main() {
         12,
         reason: 'the 5% base + their 7 — kills a base given only to us',
       );
-      // ⭐ The same +100 base applies to THEIR crits, or the two clients
+      // ⭐ The same +50 base applies to THEIR crits, or the two clients
       // roll different crit damage from the same seed.
       expect(
         duel.enemy.critDamage,
-        105,
-        reason: 'kills a base given only to us (5) and the old +50 (55)',
+        55,
+        reason:
+            'kills a base given only to us (5) and the 2026-09-30 +100 '
+            '(105) — ruling 2026-10-02: a gearless crit deals 150%',
       );
       expect(duel.enemy.deflectChance, 2);
       expect(duel.enemy.deflectAmount, 6);
@@ -311,9 +316,10 @@ void main() {
       );
     });
 
-    // ⭐ Ruling 2026-09-30: "base crit chance should be 5%, base crit damage
-    // should be 100%". `_buildMage` OVERWRITES both fields, so the base must
-    // be named in its sum — this pins base + gear + kit on both sides.
+    // ⭐ Ruling 2026-09-30: "base crit chance should be 5%"; the damage half
+    // corrected 2026-10-02 to +50 (a gearless crit deals 150%). `_buildMage`
+    // OVERWRITES both fields, so the base must be named in its sum — this
+    // pins base + gear + kit on both sides.
     test('⭐ crit is base + gear for us, base + kit for a campaign foe', () {
       final def = FrostfellPassBestiary.breathfrost;
       expect(
@@ -339,10 +345,11 @@ void main() {
       );
       expect(
         [duel.enemy.critChance, duel.enemy.critDamage],
-        [25, 130],
+        [25, 80],
         reason:
-            'a kit of 20 crits 25% on the 5% base, and its +30 rides the +100 '
-            '— kills dropping the base on the enemy side (20 / 30)',
+            'a kit of 20 crits 25% on the 5% base, and its +30 rides the +50 '
+            '(ruling 2026-10-02: 150%) — kills dropping the base on the enemy '
+            'side (20 / 30) and the 2026-09-30 +100 base (130)',
       );
     });
   });

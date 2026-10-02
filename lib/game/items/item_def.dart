@@ -156,8 +156,9 @@ class ItemModifiers {
   /// a chance every mage already has.
   final int critChance;
 
-  /// A crit deals `100 + MageState.baseCritDamage` = 200% damage (ruling
-  /// 2026-09-30, up from §9b.8's 150%); each point here adds 1 to it.
+  /// A crit deals `100 + MageState.baseCritDamage` = 150% damage (§9b.8's
+  /// figure — the 2026-09-30 ruling's 200% was corrected back on
+  /// 2026-10-02); each point here adds 1 to it.
   final int critDamage;
 
   final int deflectChance;
