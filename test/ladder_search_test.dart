@@ -37,6 +37,53 @@ void main() {
     });
   });
 
+  group('LadderSearch.pickBot measures the band on the LIVE rating', () {
+    // Wick seeds at 1107 geared; Pim at 1161. A player at 1107 with band
+    // 100 (the first 3 s) sees both by seed.
+    test(
+      '⭐ a bot that drifted OUT of the band on its live rating is skipped',
+      () {
+        // Wick's live standing is 1400 — 293 off the player. Pim stays near.
+        final picks = <String>{};
+        for (var seed = 0; seed < 40; seed++) {
+          picks.add(
+            LadderSearch.pickBot(
+              1107,
+              academy: false,
+              rng: Random(seed),
+              liveRatings: const {'wick': 1400},
+            ).id,
+          );
+        }
+        expect(
+          picks,
+          isNot(contains('wick')),
+          reason:
+              'kills the seed-only band (LadderRoster.withinBand): by seed Wick '
+              'is 0 off and would be drawn almost every time',
+        );
+      },
+    );
+
+    test('⭐ a bot that drifted INTO the band on its live rating qualifies', () {
+      // Nobody seeds within 100 of 2100; Aldorian (seed 1875) is live at
+      // 2150, 50 off — so the first band already holds a candidate.
+      final bot = LadderSearch.pickBot(
+        2100,
+        academy: false,
+        rng: Random(1),
+        liveRatings: const {'aldorian': 2150},
+      );
+      expect(
+        bot.id,
+        'aldorian',
+        reason:
+            'kills the seed-only band: by seed nothing is within 100 and the '
+            'band would double until the whole top of the roster qualified',
+      );
+    });
+  });
+
   group('LadderSearch.bandAt — the widening schedule (LADDER §3)', () {
     test('2999 ms is still phase 1 — band 100', () {
       expect(

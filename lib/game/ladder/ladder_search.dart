@@ -67,12 +67,23 @@ abstract final class LadderSearch {
     // band wide enough to cover the whole roster always exists — this loop
     // terminates by construction. The upper guard only protects against a
     // pathological caller (e.g. an empty roster) ever spinning forever.
+    // ⭐ The band is measured on the SAME rating the weights and the duel
+    // header use — [ratingOf], live when `bots/*` answered, else the seed.
+    // ⚠️ Not `LadderRoster.withinBand`, which reads seeds only: a bot that
+    // had drifted 200 points off its seed could qualify for a band its live
+    // rating was outside (and vice versa), so the player met bots the header
+    // then showed at a rating nowhere near theirs (Christian, 2026-10-02).
     while (candidates.isEmpty && band < 1 << 20) {
-      candidates = LadderRoster.withinBand(
-        rating,
-        band: band,
-        academy: academy,
-      ).where((b) => b.id != excludeBotId).toList();
+      candidates = LadderRoster.all
+          .where(
+            (b) =>
+                b.id != excludeBotId &&
+                (ratingOf(b, liveRatings: liveRatings, academy: academy) -
+                            rating)
+                        .abs() <=
+                    band,
+          )
+          .toList();
       if (candidates.isEmpty) band *= 2;
     }
     if (candidates.isEmpty) {

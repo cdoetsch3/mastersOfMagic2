@@ -1177,6 +1177,10 @@ abstract final class LadderRoster {
   static LadderBot byId(String id) => all.firstWhere((b) => b.id == id);
 
   /// Bots whose seed on the given ladder is within ±[band] of [rating].
+  /// ⚠️ Reads SEEDS only — a roster question, not a search one. The live
+  /// search (`LadderSearch.pickBot`) measures its band on `ratingOf`, the
+  /// live standing, since 2026-10-02; this stays for the roster tests and
+  /// for any caller that genuinely wants the seed geography.
   static List<LadderBot> withinBand(
     int rating, {
     required int band,
