@@ -230,9 +230,7 @@ void main() {
       GameplayGuideScreen.critRule,
       allOf(
         contains('${MageState.baseCritChance}% chance to crit'),
-        contains(
-          'deals half again the damage (${100 + MageState.baseCritDamage}%)',
-        ),
+        contains('deals ${MageState.baseCritDamage}% more damage'),
         isNot(contains('doubles')),
         contains('crit gear adds to both'),
       ),
@@ -243,10 +241,11 @@ void main() {
     );
     expect(
       GameplayGuideScreen.critRule,
-      contains('(150%)'),
+      contains('a crit deals 50% more damage'),
       reason:
-          '⚠️ the ruled figure itself (2026-10-02: a gearless crit deals '
-          '150%) — kills a const left at the 2026-09-30 +100 (200%)',
+          '⚠️ the ruled figure in the ruled words (Christian, 2026-10-02: '
+          '"a crit deals 50% more damage") — kills a const left at the '
+          '2026-09-30 +100, and the "half again (150%)" wording it replaced',
     );
     expect(
       MageState.baseCritDamage,

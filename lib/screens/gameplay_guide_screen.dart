@@ -23,7 +23,7 @@ class GameplayGuideScreen extends StatelessWidget {
   /// the moment that stops being so, rather than letting the words lie.
   static const critRule =
       'every hit has a ${MageState.baseCritChance}% chance to crit; a crit '
-      '${MageState.baseCritDamage == 50 ? 'deals half again the damage (${100 + MageState.baseCritDamage}%)' : 'deals ${100 + MageState.baseCritDamage}% damage'}; '
+      'deals ${MageState.baseCritDamage}% more damage; '
       'crit gear adds to both';
 
   @override
